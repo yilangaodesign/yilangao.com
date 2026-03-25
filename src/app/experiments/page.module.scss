@@ -1,0 +1,333 @@
+@use "@/styles" as *;
+
+// ── PAGE ────────────────────────────────────────────────────────────────────
+
+.page {
+  background: $portfolio-neutral-90;
+  color: #fff;
+  min-height: 100vh;
+}
+
+// ── NAV (mirrors home page, light text on dark) ─────────────────────────────
+
+.nav {
+  position: fixed;
+  top: $portfolio-spacing-06;
+  left: 0;
+  right: 0;
+  z-index: $portfolio-z-sticky;
+  width: calc(100% - $portfolio-spacing-06 * 2);
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  transition:
+    max-width $portfolio-duration-moderate $portfolio-easing-standard,
+    top $portfolio-duration-moderate $portfolio-easing-standard;
+
+  &.navScrolled {
+    max-width: 880px;
+
+    .navPill {
+      background-color: rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(20px) saturate(180%);
+      border-color: rgba(255, 255, 255, 0.1);
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
+    }
+  }
+}
+
+.navPill {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $portfolio-spacing-03 $portfolio-spacing-05;
+  border-radius: $portfolio-radius-full;
+  background-color: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(12px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition:
+    background-color $portfolio-duration-moderate $portfolio-easing-standard,
+    border-color $portfolio-duration-moderate $portfolio-easing-standard,
+    box-shadow $portfolio-duration-moderate $portfolio-easing-standard;
+}
+
+.logo {
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-base;
+  font-weight: $portfolio-weight-bold;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.navLinks {
+  display: none;
+  align-items: center;
+  gap: $portfolio-spacing-06;
+
+  @media #{$portfolio-mq-md} {
+    display: flex;
+  }
+}
+
+.navLink {
+  font-size: $portfolio-type-sm;
+  font-weight: $portfolio-weight-medium;
+  color: rgba(255, 255, 255, 0.6);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color $portfolio-duration-fast $portfolio-easing-standard;
+
+  &:hover {
+    color: #fff;
+  }
+}
+
+.navLinkActive {
+  color: #fff;
+}
+
+.navCta {
+  font-size: $portfolio-type-sm;
+  font-weight: $portfolio-weight-semibold;
+  color: #fff;
+  background-color: transparent;
+  padding: $portfolio-spacing-02 $portfolio-spacing-05;
+  border-radius: $portfolio-radius-full;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    background-color $portfolio-duration-fast $portfolio-easing-standard,
+    color $portfolio-duration-fast $portfolio-easing-standard;
+
+  &:hover {
+    background-color: #fff;
+    color: $portfolio-neutral-90;
+  }
+}
+
+// ── HERO ────────────────────────────────────────────────────────────────────
+
+.hero {
+  padding: 160px $portfolio-spacing-07 80px;
+  max-width: $portfolio-container-lg;
+  margin: 0 auto;
+}
+
+.heroInner {
+  max-width: 720px;
+}
+
+.label {
+  @include label;
+  color: $portfolio-accent-40;
+  display: block;
+  margin-bottom: $portfolio-spacing-05;
+}
+
+.heading {
+  font-family: $portfolio-font-serif;
+  font-size: clamp(2.25rem, 5vw, $portfolio-type-6xl);
+  font-weight: $portfolio-weight-regular;
+  line-height: $portfolio-leading-tight;
+  letter-spacing: $portfolio-tracking-tight;
+  color: #fff;
+  margin-bottom: $portfolio-spacing-06;
+}
+
+.headingItalic {
+  font-style: italic;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.sub {
+  font-family: $portfolio-font-sans;
+  font-size: clamp(1rem, 1.5vw, $portfolio-type-lg);
+  line-height: $portfolio-leading-relaxed;
+  color: rgba(255, 255, 255, 0.5);
+  max-width: 520px;
+}
+
+// ── LIST ────────────────────────────────────────────────────────────────────
+
+.list {
+  padding: 0 $portfolio-spacing-07 $portfolio-spacing-10;
+  max-width: $portfolio-container-lg;
+  margin: 0 auto;
+}
+
+.listInner {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+// ── ROW ─────────────────────────────────────────────────────────────────────
+
+.row {
+  display: grid;
+  grid-template-columns: 140px auto 1fr auto auto;
+  align-items: center;
+  gap: $portfolio-spacing-06;
+  padding: $portfolio-spacing-07 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  text-decoration: none;
+  color: #fff;
+  cursor: pointer;
+  transition: border-color $portfolio-duration-moderate $portfolio-easing-standard;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 80px auto 1fr auto;
+    gap: $portfolio-spacing-04;
+  }
+
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.25);
+  }
+}
+
+.rowActive {
+  .rowNum {
+    color: $portfolio-accent-40;
+  }
+
+  .rowTitle {
+    color: #fff;
+  }
+}
+
+// Thumbnail
+.rowThumb {
+  width: 140px;
+  height: 88px;
+  border-radius: $portfolio-radius-md;
+  overflow: hidden;
+  flex-shrink: 0;
+
+  @media (max-width: 768px) {
+    width: 80px;
+    height: 56px;
+  }
+}
+
+.thumbInner {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    135deg,
+    $portfolio-neutral-70 0%,
+    $portfolio-neutral-80 50%,
+    $portfolio-accent-80 100%
+  );
+  border-radius: $portfolio-radius-md;
+  will-change: transform;
+}
+
+// Number
+.rowNum {
+  font-family: $portfolio-font-mono;
+  font-size: $portfolio-type-sm;
+  color: rgba(255, 255, 255, 0.35);
+  letter-spacing: $portfolio-tracking-wide;
+  white-space: nowrap;
+  transition: color $portfolio-duration-moderate $portfolio-easing-standard;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
+}
+
+// Body (title + description + tags)
+.rowBody {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.rowTitle {
+  font-family: $portfolio-font-serif;
+  font-size: clamp(1.125rem, 2vw, $portfolio-type-2xl);
+  font-weight: $portfolio-weight-regular;
+  line-height: $portfolio-leading-snug;
+  color: rgba(255, 255, 255, 0.75);
+  transition: color $portfolio-duration-moderate $portfolio-easing-standard;
+}
+
+.rowDesc {
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-sm;
+  line-height: $portfolio-leading-relaxed;
+  color: rgba(255, 255, 255, 0.45);
+  max-width: 480px;
+  overflow: hidden;
+}
+
+.rowTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $portfolio-spacing-03;
+  margin-top: $portfolio-spacing-03;
+}
+
+.tag {
+  font-family: $portfolio-font-mono;
+  font-size: 11px;
+  letter-spacing: $portfolio-tracking-wide;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.4);
+  padding: 3px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: $portfolio-radius-full;
+  white-space: nowrap;
+}
+
+// Date
+.rowDate {
+  font-family: $portfolio-font-mono;
+  font-size: $portfolio-type-xs;
+  color: rgba(255, 255, 255, 0.3);
+  letter-spacing: $portfolio-tracking-wide;
+  text-transform: uppercase;
+  white-space: nowrap;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
+}
+
+// Arrow
+.rowArrow {
+  color: rgba(255, 255, 255, 0.5);
+  flex-shrink: 0;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
+}
+
+// ── FOOTER CTA ──────────────────────────────────────────────────────────────
+
+.footerCta {
+  padding: $portfolio-spacing-10 $portfolio-spacing-07;
+  max-width: $portfolio-container-lg;
+  margin: 0 auto;
+  text-align: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.footerCtaText {
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-lg;
+  color: rgba(255, 255, 255, 0.4);
+  margin-bottom: $portfolio-spacing-06;
+}
+
+.backLink {
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-sm;
+  font-weight: $portfolio-weight-medium;
+  color: $portfolio-accent-40;
+  text-decoration: none;
+  transition: color $portfolio-duration-fast $portfolio-easing-standard;
+
+  &:hover {
+    color: $portfolio-accent-30;
+  }
+}

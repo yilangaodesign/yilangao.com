@@ -1,0 +1,20 @@
+// =============================================================================
+// Portfolio Design System — Breakpoint Tokens
+// Based on Carbon breakpoints for consistent responsive behavior
+// =============================================================================
+
+$portfolio-bp-sm: 320px;
+$portfolio-bp-md: 672px;
+$portfolio-bp-lg: 1056px;
+$portfolio-bp-xl: 1312px;
+$portfolio-bp-2xl: 1584px;
+
+// Media query helpers (use with @media)
+$portfolio-mq-sm: '(min-width: #{$portfolio-bp-sm})';
+$portfolio-mq-md: '(min-width: #{$portfolio-bp-md})';
+$portfolio-mq-lg: '(min-width: #{$portfolio-bp-lg})';
+$portfolio-mq-xl: '(min-width: #{$portfolio-bp-xl})';
+$portfolio-mq-2xl: '(min-width: #{$portfolio-bp-2xl})';
+
+// Reduced motion
+$portfolio-mq-reduced-motion: '(prefers-reduced-motion: reduce)';

@@ -1,0 +1,155 @@
+// Import only the Carbon modules we need (not the full @carbon/styles which
+// bundles IBM Plex font files). We use Next.js font loading for Inter/Lora/JetBrains.
+@use "@carbon/styles/scss/reset";
+@use "@carbon/styles/scss/spacing";
+@use "@carbon/styles/scss/type";
+@use "@carbon/styles/scss/theme";
+@use "@carbon/styles/scss/breakpoint";
+
+// =============================================================================
+// PORTFOLIO DESIGN SYSTEM — GLOBAL TOKENS
+// Based on IBM Carbon with custom brand extensions
+// =============================================================================
+
+:root {
+  // Surface Colors
+  --portfolio-surface-primary: #FFFFFF;
+  --portfolio-surface-secondary: #F9F9F9;
+  --portfolio-surface-tertiary: #F4F4F4;
+  --portfolio-surface-inverse: #161616;
+  --portfolio-surface-overlay: rgba(0, 0, 0, 0.5);
+
+  // Text Colors
+  --portfolio-text-primary: #161616;
+  --portfolio-text-secondary: #525252;
+  --portfolio-text-placeholder: #A8A8A8;
+  --portfolio-text-disabled: #C6C6C6;
+  --portfolio-text-inverse: #FFFFFF;
+  --portfolio-text-link: #4A3ADB;
+
+  // Accent Brand Color
+  --portfolio-accent-10: #F0F0FF;
+  --portfolio-accent-20: #D9D9FF;
+  --portfolio-accent-30: #B3B3FF;
+  --portfolio-accent-40: #8C8CFF;
+  --portfolio-accent-50: #6B5CE7;
+  --portfolio-accent-60: #4A3ADB;
+  --portfolio-accent-70: #3628B0;
+  --portfolio-accent-80: #261C85;
+  --portfolio-accent-90: #18115A;
+  --portfolio-accent-100: #0C0930;
+
+  // Semantic / Support
+  --portfolio-support-error: #DA1E28;
+  --portfolio-support-error-bg: #FFF1F1;
+  --portfolio-support-warning: #F1C21B;
+  --portfolio-support-warning-bg: #FCF4D6;
+  --portfolio-support-success: #198038;
+  --portfolio-support-success-bg: #DEFBE6;
+  --portfolio-support-info: #0043CE;
+  --portfolio-support-info-bg: #E5F6FF;
+
+  // Border Colors
+  --portfolio-border-subtle: #E0E0E0;
+  --portfolio-border-strong: #8D8D8D;
+  --portfolio-border-interactive: #4A3ADB;
+  --portfolio-border-inverse: #161616;
+
+  // Typography (var(--font-*) are injected by next/font/google in layout.tsx)
+  --portfolio-font-sans: var(--font-inter, 'Inter'), 'Helvetica Neue', Arial, sans-serif;
+  --portfolio-font-serif: var(--font-lora, 'Lora'), 'Georgia', serif;
+  --portfolio-font-mono: var(--font-jetbrains, 'JetBrains Mono'), 'Menlo', 'Consolas', monospace;
+
+  // Spacing
+  --portfolio-spacing-01: 2px;
+  --portfolio-spacing-02: 4px;
+  --portfolio-spacing-03: 8px;
+  --portfolio-spacing-04: 12px;
+  --portfolio-spacing-05: 16px;
+  --portfolio-spacing-06: 24px;
+  --portfolio-spacing-07: 32px;
+  --portfolio-spacing-08: 40px;
+  --portfolio-spacing-09: 48px;
+  --portfolio-spacing-10: 64px;
+
+  // Shadows
+  --portfolio-shadow-none: none;
+  --portfolio-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --portfolio-shadow-md: 0 4px 8px rgba(0, 0, 0, 0.08);
+  --portfolio-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --portfolio-shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.16);
+
+  // Border Radius
+  --portfolio-radius-none: 0px;
+  --portfolio-radius-sm: 4px;
+  --portfolio-radius-md: 8px;
+  --portfolio-radius-lg: 12px;
+  --portfolio-radius-xl: 16px;
+  --portfolio-radius-full: 9999px;
+
+  // Motion
+  --portfolio-duration-fast: 110ms;
+  --portfolio-duration-moderate: 240ms;
+  --portfolio-duration-slow: 400ms;
+  --portfolio-easing-standard: cubic-bezier(0.2, 0, 0.38, 0.9);
+  --portfolio-easing-entrance: cubic-bezier(0, 0, 0.38, 0.9);
+  --portfolio-easing-exit: cubic-bezier(0.2, 0, 1, 0.9);
+}
+
+// =============================================================================
+// GLOBAL RESETS & BASE STYLES
+// =============================================================================
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: clip;
+}
+
+body {
+  font-family: var(--portfolio-font-sans);
+  color: var(--portfolio-text-primary);
+  background-color: var(--portfolio-surface-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+// Smooth scrolling (respects reduced motion)
+html {
+  scroll-behavior: smooth;
+
+  @media (prefers-reduced-motion: reduce) {
+    scroll-behavior: auto;
+  }
+}
+
+// Selection color
+::selection {
+  background-color: var(--portfolio-accent-20);
+  color: var(--portfolio-text-primary);
+}
+
+// Hide scrollbar entirely while keeping scroll functionality
+html {
+  scrollbar-width: none;
+}
+
+body::-webkit-scrollbar {
+  display: none;
+}

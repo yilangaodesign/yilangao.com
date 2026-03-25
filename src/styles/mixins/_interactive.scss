@@ -1,0 +1,74 @@
+@use '../tokens/colors' as *;
+@use '../tokens/elevation' as *;
+@use '../tokens/motion' as *;
+
+// =============================================================================
+// Portfolio Design System — Interactive State Mixins
+// =============================================================================
+
+@mixin focus-ring {
+  outline: 2px solid $portfolio-accent-60;
+  outline-offset: 2px;
+}
+
+@mixin hover-lift {
+  transition: transform $portfolio-duration-moderate $portfolio-easing-standard,
+              box-shadow $portfolio-duration-moderate $portfolio-easing-standard;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: $portfolio-shadow-lg;
+  }
+}
+
+@mixin hover-fade {
+  transition: opacity $portfolio-duration-fast $portfolio-easing-standard;
+
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+@mixin transition-base {
+  transition: all $portfolio-duration-moderate $portfolio-easing-standard;
+}
+
+@mixin transition-fast {
+  transition: all $portfolio-duration-fast $portfolio-easing-standard;
+}
+
+@mixin link-underline {
+  text-decoration: none;
+  background-image: linear-gradient(currentColor, currentColor);
+  background-position: 0% 100%;
+  background-repeat: no-repeat;
+  background-size: 0% 1px;
+  transition: background-size $portfolio-duration-moderate $portfolio-easing-standard;
+
+  &:hover,
+  &:focus-visible {
+    background-size: 100% 1px;
+  }
+}
+
+@mixin button-reset {
+  appearance: none;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+@mixin reduced-motion {
+  @media (prefers-reduced-motion: reduce) {
+    animation: none !important;
+    transition-duration: 0.01ms !important;
+  }
+}
