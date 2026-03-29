@@ -143,14 +143,15 @@ After modifying any source, run its sync mechanism and verify each consumer.
 
 **Correct alternative:** Before making any file changes:
 1. Check the current branch: `git branch --show-current`
-2. If on `main`, create a feature branch: `git checkout -b feat/<topic>`
-3. All work happens on the feature branch.
-4. Merge to `main` only when the work is complete and verified.
+2. If on `main`, switch to `dev`: `git checkout dev`
+3. All work happens on `dev`. Never create new branches.
+4. `main` only changes when the user explicitly requests a checkpoint merge.
 
-If you've already made changes on `main`, they can be moved without loss:
+If you've already made changes on `main`, move them without loss:
 ```bash
-git checkout -b feat/<topic>
-# Uncommitted changes travel with you
+git stash
+git checkout dev
+git stash pop
 ```
 
 **Incident:** ENG-006 (2026-03-29) — 15 components, Radix dependency, architecture docs, and playground changes made directly on `main` without a branch, creating rollback risk and blocking safe parallel work.

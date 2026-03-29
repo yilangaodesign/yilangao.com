@@ -14,15 +14,17 @@ This version has breaking changes — APIs, conventions, and file structure may 
 7. **ALWAYS** use flex layout with in-flow spacers for fixed sidebars — never rely on padding-left offsets
 
 **Engineering:**
-1. **NEVER** make file changes while on `main` — check `git branch --show-current` first; if on `main`, create a feature branch (`git checkout -b feat/<topic>`) before writing any code
-2. **NEVER** modify `src/styles/tokens/` without running `npm run sync-tokens` afterward
-3. **NEVER** start a dev server without first reading `docs/port-registry.md`
-4. **NEVER** kill a process on a port without checking what it is first
-5. **NEVER** use ports below 4000 — they are reserved for other projects
-6. **NEVER** assume a dev server from a previous session is still running — verify it
-7. **ALWAYS** verify changes on localhost after implementation
-8. **ALWAYS** trace data flow (source → build → server → browser) when debugging visibility issues
-9. **ALWAYS** run the Cross-App Parity Checklist (below) after creating or modifying anything in `src/`
+1. **NEVER** make file changes while on `main` — check `git branch --show-current` first; if on `main`, switch to `dev` (`git checkout dev`). All work happens on `dev`.
+2. **NEVER** create new git branches. The only branches are `dev` (working) and `main` (stable checkpoints). No feature branches, no session branches.
+3. **NEVER** switch branches during a session unless the user explicitly asks for a checkpoint merge to `main`.
+4. **NEVER** modify `src/styles/tokens/` without running `npm run sync-tokens` afterward
+5. **NEVER** start a dev server without first reading `docs/port-registry.md`
+6. **NEVER** kill a process on a port without checking what it is first
+7. **NEVER** use ports below 4000 — they are reserved for other projects
+8. **NEVER** assume a dev server from a previous session is still running — verify it
+9. **ALWAYS** verify changes on localhost after implementation
+10. **ALWAYS** trace data flow (source → build → server → browser) when debugging visibility issues
+11. **ALWAYS** run the Cross-App Parity Checklist (below) after creating or modifying anything in `src/`
 
 # Knowledge Routing
 

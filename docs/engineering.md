@@ -169,59 +169,81 @@ This documentation evolves from real incidents. When a new failure mode is disco
 
 ## 6. Git Branching & Session Safety
 
-**Severity: Critical** — Working directly on `main` creates rollback risk for single sessions and conflict risk for concurrent sessions.
+**Severity: Critical** — Working directly on `main` creates rollback risk. Branch-per-session creates forgotten-merge risk.
 
-### 6.1 The Rule: Never Write to `main`
+### 6.1 Two-Branch Model
 
-`main` is the deployed branch. It only changes via merges (PR or direct merge from a feature branch). **No agent or human should make direct commits to `main`.**
+This project uses exactly two permanent branches:
 
-Every piece of work — even a one-line fix — starts on a feature branch.
+| Branch | Purpose | Who writes | When it changes |
+|--------|---------|-----------|-----------------|
+| `dev` | All ongoing work. Always checked out. | Agent sessions + human | Every commit |
+| `main` | Stable checkpoints. Deployed state. | Human-triggered merge only | When user says "checkpoint" or "merge to main" |
 
-### 6.2 Agent Protocol — Branch Check Before Writing
+No other branches should exist. No feature branches, no session branches, no experiment branches.
+
+### 6.2 Why Not Branch-Per-Session
+
+Multiple agent sessions run concurrently in the same Cursor workspace. They share the same filesystem and git checkout. Creating separate branches provides zero isolation (only one branch can be checked out in a single directory) and creates branch accumulation because there is no reliable "end of session" trigger to merge back.
+
+### 6.3 Agent Protocol — Branch Check Before Writing
 
 Before making any file changes in a session, an agent MUST:
 
 1. Check the current branch: `git branch --show-current`
-2. If on `main`, create a feature branch before touching any files:
+2. If on `main`, switch to `dev`:
    ```bash
-   git checkout -b <branch-name>
+   git checkout dev
    ```
-3. Branch naming convention: `feat/<topic>`, `fix/<topic>`, `chore/<topic>`, `docs/<topic>`
+3. If `dev` does not exist (should never happen), create it from `main`:
+   ```bash
+   git checkout -b dev main
+   ```
 
-This is a **hard gate** — no files should be written until the agent is confirmed on a non-`main` branch.
+This is a **hard gate** — no files should be written until the agent is confirmed on `dev`.
 
-### 6.3 Concurrent Session Safety
+**NEVER create new branches.** Never run `git checkout -b`. The only branches are `dev` and `main`.
 
-When multiple agents or sessions may run in parallel:
+### 6.4 Concurrent Session Safety
 
-- Each session MUST operate on its own branch.
-- Branch names should include a distinguishing suffix if needed (e.g., `feat/button-component-a`, `feat/input-component-b`).
-- Sessions should never modify each other's branches.
-- Merging to `main` should happen one branch at a time, with conflict resolution between each merge.
+All agent sessions in the same Cursor workspace share the same `dev` branch and filesystem. Isolation comes from **task partitioning**, not branching:
 
-### 6.4 Workflow
+- Concurrent agents should work on **different files**. Two agents editing the same file simultaneously will cause overwrites regardless of branching strategy.
+- If two tasks require modifying the same file, serialize them — finish one before starting the other.
 
-```
-main (always deployable)
-  └── feat/foundational-ui-components (agent session 1)
-  └── fix/navigation-hover-bug (agent session 2)
-  └── feat/blog-page-redesign (human session)
-```
+### 6.5 Checkpoint Workflow (Merging to `main`)
 
-1. Start work → create branch from `main`
-2. Make changes → commit on the feature branch
-3. Work complete → merge to `main` (via PR or direct merge)
-4. After merge → delete the feature branch
-5. Next piece of work → new branch from updated `main`
-
-### 6.5 What If I Forgot and Already Made Changes on `main`?
-
-If uncommitted changes exist on `main`, they can be moved to a new branch without losing work:
+When the user says "checkpoint", "merge to main", or "deploy":
 
 ```bash
-git checkout -b feat/<topic>
-# All uncommitted changes come with you — nothing is lost
-git add -A && git commit -m "description"
+git checkout main
+git merge dev
+git push origin main
+git checkout dev
+git push origin dev
+```
+
+After this, `main` reflects the latest stable state. If Vercel is connected, it auto-deploys from `main`. The agent then continues working on `dev`.
+
+### 6.6 Rollback
+
+If `dev` gets into a bad state, it can be reset to the last checkpoint:
+
+```bash
+git checkout dev
+git reset --hard main
+```
+
+This discards all work on `dev` since the last merge to `main`. Use with caution.
+
+### 6.7 What If I'm on `main` with Uncommitted Changes?
+
+Move them to `dev` without losing work:
+
+```bash
+git stash
+git checkout dev
+git stash pop
 ```
 
 ---
