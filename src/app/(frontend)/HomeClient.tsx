@@ -3,9 +3,13 @@
 import Link from "next/link";
 import { FadeIn } from "@yilangaodesign/design-system";
 import { StaggerChildren, StaggerItem } from "@yilangaodesign/design-system";
+import AdminBar from "@/components/AdminBar";
+import EditButton from "@/components/EditButton";
+import { EditGlobalButton } from "@/components/EditButton";
 import styles from "./page.module.scss";
 
 type Project = {
+  id?: number;
   slug: string;
   title: string;
   category: string;
@@ -16,11 +20,14 @@ type Team = { name: string; url: string };
 type SocialLink = { label: string; href: string; external: boolean };
 type SiteIdentity = { name: string; role: string; location: string; email: string };
 
-function ProjectCard({ project }: { project: Project }) {
+function ProjectCard({ project, isAdmin }: { project: Project; isAdmin?: boolean }) {
   return (
     <Link href={`/work/${project.slug}`} className={`${styles.projectCard} ${project.featured ? styles.projectCardFeatured : ""}`}>
       <div className={styles.projectHero}>
         <div className={styles.projectImage} />
+        {isAdmin && project.id && (
+          <EditButton collection="projects" id={project.id} label={`Edit ${project.title}`} />
+        )}
       </div>
       <div className={styles.projectInfo}>
         <h3 className={styles.projectTitle}>{project.title}</h3>
@@ -35,20 +42,26 @@ export default function HomeClient({
   teams,
   links,
   siteConfig,
+  isAdmin,
 }: {
   projects: Project[];
   teams: Team[];
   links: SocialLink[];
   siteConfig: SiteIdentity;
+  isAdmin?: boolean;
 }) {
   return (
-    <main className={styles.page}>
+    <main className={styles.page} style={isAdmin ? { paddingTop: 44 } : undefined}>
+      {isAdmin && <AdminBar editUrl="/admin/globals/site-config" editLabel="Edit Site Config" />}
       <div className={styles.layout}>
         <aside className={styles.sidebar}>
           <div className={styles.sidebarInner}>
             <FadeIn>
               <header className={styles.identity}>
-                <h1 className={styles.name}>{siteConfig.name}</h1>
+                <h1 className={styles.name}>
+                  {siteConfig.name}
+                  {isAdmin && <EditGlobalButton global="site-config" label="Edit identity" />}
+                </h1>
                 <p className={styles.role}>{siteConfig.role}</p>
                 <p className={styles.location}>{siteConfig.location}</p>
               </header>
@@ -115,7 +128,7 @@ export default function HomeClient({
           <StaggerChildren className={styles.projectGrid}>
             {projects.map((project) => (
               <StaggerItem key={project.slug} className={project.featured ? styles.gridItemFeatured : styles.gridItem}>
-                <ProjectCard project={project} />
+                <ProjectCard project={project} isAdmin={isAdmin} />
               </StaggerItem>
             ))}
           </StaggerChildren>

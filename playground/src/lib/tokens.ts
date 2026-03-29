@@ -3,12 +3,31 @@ export type ColorStep = { step: string; value: string; token: string };
 export type ColorFamily = { name: string; prefix: string; steps: ColorStep[] };
 export type SemanticToken = { name: string; value: string; token: string; ref?: string };
 
+export type EmphasisToken = {
+  emphasis: string;
+  value: string;
+  token: string;
+  ref?: string;
+  legacy?: string;
+};
+
+export type RoleGroup = {
+  role: string;
+  tokens: EmphasisToken[];
+};
+
+export type PropertySection = {
+  property: string;
+  description: string;
+  roles: RoleGroup[];
+};
+
 const scale = (prefix: string, values: Record<string, string>): ColorStep[] =>
   Object.entries(values).map(([step, value]) => ({ step, value, token: `$portfolio-${prefix}-${step}` }));
 
 export const colors = {
   accent: scale("accent", {
-    "10": "#F0F0FF", "20": "#D9D9FF", "30": "#B3B3FF", "40": "#8C8CFF", "50": "#6B5CE7", "60": "#4A3ADB", "70": "#3628B0", "80": "#261C85", "90": "#18115A", "100": "#0C0930",
+    "10": "#F0F5FD", "20": "#D5E0FC", "30": "#B3C5FC", "40": "#8DA3FC", "50": "#7182FD", "60": "#3336FF", "70": "#0004E2", "80": "#0003A7", "90": "#000273", "100": "#05063E",
   }),
   neutral: scale("neutral", {
     "00": "#FFFFFF", "05": "#F9F9F9", "10": "#F4F4F4", "20": "#E0E0E0", "30": "#C6C6C6", "40": "#A8A8A8", "50": "#8D8D8D", "60": "#6F6F6F", "70": "#525252", "80": "#393939", "90": "#262626", "100": "#161616",
@@ -69,48 +88,252 @@ export const colors = {
   }),
     },
   ] as ColorFamily[],
-  semantic: {
-    surface: [
-    { name: "Primary", value: "#FFFFFF", token: "$portfolio-surface-primary", ref: "$portfolio-neutral-00" },
-    { name: "Secondary", value: "#F9F9F9", token: "$portfolio-surface-secondary", ref: "$portfolio-neutral-05" },
-    { name: "Tertiary", value: "#F4F4F4", token: "$portfolio-surface-tertiary", ref: "$portfolio-neutral-10" },
-    { name: "Inverse", value: "#161616", token: "$portfolio-surface-inverse", ref: "$portfolio-neutral-100" },
-    { name: "Overlay", value: "rgba(0, 0, 0, 0.5)", token: "$portfolio-surface-overlay" },
-    ] as SemanticToken[],
-    text: [
-    { name: "Primary", value: "#161616", token: "$portfolio-text-primary", ref: "$portfolio-neutral-100" },
-    { name: "Secondary", value: "#525252", token: "$portfolio-text-secondary", ref: "$portfolio-neutral-70" },
-    { name: "Helper", value: "#6F6F6F", token: "$portfolio-text-helper", ref: "$portfolio-neutral-60" },
-    { name: "Placeholder", value: "#A8A8A8", token: "$portfolio-text-placeholder", ref: "$portfolio-neutral-40" },
-    { name: "Disabled", value: "#C6C6C6", token: "$portfolio-text-disabled", ref: "$portfolio-neutral-30" },
-    { name: "Inverse", value: "#FFFFFF", token: "$portfolio-text-inverse", ref: "$portfolio-neutral-00" },
-    { name: "On Color", value: "#FFFFFF", token: "$portfolio-text-on-color", ref: "$portfolio-neutral-00" },
-    { name: "Link", value: "#4A3ADB", token: "$portfolio-text-link", ref: "$portfolio-accent-60" },
-    { name: "Error", value: "#DA1E28", token: "$portfolio-text-error", ref: "$portfolio-red-60" },
-    ] as SemanticToken[],
-    border: [
-    { name: "Subtle", value: "#E0E0E0", token: "$portfolio-border-subtle", ref: "$portfolio-neutral-20" },
-    { name: "Strong", value: "#8D8D8D", token: "$portfolio-border-strong", ref: "$portfolio-neutral-50" },
-    { name: "Interactive", value: "#4A3ADB", token: "$portfolio-border-interactive", ref: "$portfolio-accent-60" },
-    { name: "Inverse", value: "#161616", token: "$portfolio-border-inverse", ref: "$portfolio-neutral-100" },
-    { name: "Disabled", value: "#C6C6C6", token: "$portfolio-border-disabled", ref: "$portfolio-neutral-30" },
-    ] as SemanticToken[],
-    support: [
-    { name: "Error", value: "#DA1E28", token: "$portfolio-support-error", ref: "$portfolio-red-60" },
-    { name: "Success", value: "#198038", token: "$portfolio-support-success", ref: "$portfolio-green-60" },
-    { name: "Warning", value: "#F1C21B", token: "$portfolio-support-warning", ref: "$portfolio-yellow-30" },
-    { name: "Info", value: "#0043CE", token: "$portfolio-support-info", ref: "$portfolio-blue-70" },
-    { name: "Caution Minor", value: "#F1C21B", token: "$portfolio-support-caution-minor", ref: "$portfolio-yellow-30" },
-    { name: "Caution Major", value: "#FF832B", token: "$portfolio-support-caution-major", ref: "$portfolio-orange-40" },
-    ] as SemanticToken[],
-    focus: [
-    { name: "Focus", value: "#4A3ADB", token: "$portfolio-focus", ref: "$portfolio-accent-60" },
+  properties: [
+    {
+      property: "surface",
+      description: "Background fills. Any container that houses content should use a surface token.",
+      roles: [
+        {
+          role: "neutral",
+          tokens: [
+            { emphasis: "minimal", value: "#FFFFFF", token: "$portfolio-surface-neutral-minimal", ref: "$portfolio-neutral-00", legacy: "$portfolio-surface-primary" },
+            { emphasis: "subtle", value: "#F9F9F9", token: "$portfolio-surface-neutral-subtle", ref: "$portfolio-neutral-05", legacy: "$portfolio-surface-secondary" },
+            { emphasis: "regular", value: "#F4F4F4", token: "$portfolio-surface-neutral-regular", ref: "$portfolio-neutral-10", legacy: "$portfolio-surface-tertiary" },
+          ],
+        },
+        {
+          role: "inverse",
+          tokens: [
+            { emphasis: "bold", value: "#161616", token: "$portfolio-surface-inverse-bold", ref: "$portfolio-neutral-100", legacy: "$portfolio-surface-inverse" },
+          ],
+        },
+        {
+          role: "brand",
+          tokens: [
+            { emphasis: "bold", value: "#3336FF", token: "$portfolio-surface-brand-bold", ref: "$portfolio-accent-60" },
+            { emphasis: "subtle", value: "#F0F5FD", token: "$portfolio-surface-brand-subtle", ref: "$portfolio-accent-10" },
+          ],
+        },
+        {
+          role: "negative",
+          tokens: [
+            { emphasis: "bold", value: "#DA1E28", token: "$portfolio-surface-negative-bold", ref: "$portfolio-red-60" },
+            { emphasis: "subtle", value: "#FFF1F1", token: "$portfolio-surface-negative-subtle", ref: "$portfolio-red-10" },
+          ],
+        },
+        {
+          role: "positive",
+          tokens: [
+            { emphasis: "bold", value: "#198038", token: "$portfolio-surface-positive-bold", ref: "$portfolio-green-60" },
+            { emphasis: "subtle", value: "#DEFBE6", token: "$portfolio-surface-positive-subtle", ref: "$portfolio-green-10" },
+          ],
+        },
+        {
+          role: "warning",
+          tokens: [
+            { emphasis: "bold", value: "#F1C21B", token: "$portfolio-surface-warning-bold", ref: "$portfolio-yellow-30" },
+            { emphasis: "subtle", value: "#FCF4D6", token: "$portfolio-surface-warning-subtle", ref: "$portfolio-yellow-10" },
+          ],
+        },
+        {
+          role: "overlay",
+          tokens: [
+            { emphasis: "", value: "rgba(0, 0, 0, 0.5)", token: "$portfolio-surface-overlay" },
+          ],
+        },
+      ],
+    },
+    {
+      property: "text",
+      description: "Text elements. Ensures 4.5:1 AA compliance.",
+      roles: [
+        {
+          role: "neutral",
+          tokens: [
+            { emphasis: "bold", value: "#161616", token: "$portfolio-text-neutral-bold", ref: "$portfolio-neutral-100", legacy: "$portfolio-text-primary" },
+            { emphasis: "regular", value: "#525252", token: "$portfolio-text-neutral-regular", ref: "$portfolio-neutral-70", legacy: "$portfolio-text-secondary" },
+            { emphasis: "subtle", value: "#6F6F6F", token: "$portfolio-text-neutral-subtle", ref: "$portfolio-neutral-60", legacy: "$portfolio-text-helper" },
+            { emphasis: "minimal", value: "#A8A8A8", token: "$portfolio-text-neutral-minimal", ref: "$portfolio-neutral-40", legacy: "$portfolio-text-placeholder" },
+            { emphasis: "disabled", value: "#C6C6C6", token: "$portfolio-text-neutral-disabled", ref: "$portfolio-neutral-30", legacy: "$portfolio-text-disabled" },
+          ],
+        },
+        {
+          role: "brand",
+          tokens: [
+            { emphasis: "bold", value: "#3336FF", token: "$portfolio-text-brand-bold", ref: "$portfolio-accent-60", legacy: "$portfolio-text-link" },
+          ],
+        },
+        {
+          role: "inverse",
+          tokens: [
+            { emphasis: "bold", value: "#FFFFFF", token: "$portfolio-text-inverse-bold", ref: "$portfolio-neutral-00", legacy: "$portfolio-text-inverse" },
+          ],
+        },
+        {
+          role: "always-light",
+          tokens: [
+            { emphasis: "bold", value: "#FFFFFF", token: "$portfolio-text-always-light-bold", ref: "$portfolio-neutral-00", legacy: "$portfolio-text-on-color" },
+          ],
+        },
+        {
+          role: "negative",
+          tokens: [
+            { emphasis: "", value: "#DA1E28", token: "$portfolio-text-negative", ref: "$portfolio-red-60", legacy: "$portfolio-text-error" },
+          ],
+        },
+        {
+          role: "positive",
+          tokens: [
+            { emphasis: "", value: "#198038", token: "$portfolio-text-positive", ref: "$portfolio-green-60" },
+          ],
+        },
+        {
+          role: "warning",
+          tokens: [
+            { emphasis: "", value: "#F1C21B", token: "$portfolio-text-warning", ref: "$portfolio-yellow-30" },
+          ],
+        },
+      ],
+    },
+    {
+      property: "icon",
+      description: "Icon elements. Ensures 3:1 AA compliance (lower threshold than text).",
+      roles: [
+        {
+          role: "neutral",
+          tokens: [
+            { emphasis: "bold", value: "#161616", token: "$portfolio-icon-neutral-bold", ref: "$portfolio-neutral-100" },
+            { emphasis: "regular", value: "#525252", token: "$portfolio-icon-neutral-regular", ref: "$portfolio-neutral-70" },
+            { emphasis: "subtle", value: "#6F6F6F", token: "$portfolio-icon-neutral-subtle", ref: "$portfolio-neutral-60" },
+            { emphasis: "minimal", value: "#A8A8A8", token: "$portfolio-icon-neutral-minimal", ref: "$portfolio-neutral-40" },
+          ],
+        },
+        {
+          role: "brand",
+          tokens: [
+            { emphasis: "bold", value: "#3336FF", token: "$portfolio-icon-brand-bold", ref: "$portfolio-accent-60" },
+          ],
+        },
+        {
+          role: "inverse",
+          tokens: [
+            { emphasis: "bold", value: "#FFFFFF", token: "$portfolio-icon-inverse-bold", ref: "$portfolio-neutral-00" },
+          ],
+        },
+        {
+          role: "negative",
+          tokens: [
+            { emphasis: "", value: "#DA1E28", token: "$portfolio-icon-negative", ref: "$portfolio-red-60" },
+          ],
+        },
+        {
+          role: "positive",
+          tokens: [
+            { emphasis: "", value: "#198038", token: "$portfolio-icon-positive", ref: "$portfolio-green-60" },
+          ],
+        },
+        {
+          role: "warning",
+          tokens: [
+            { emphasis: "", value: "#F1C21B", token: "$portfolio-icon-warning", ref: "$portfolio-yellow-30" },
+          ],
+        },
+      ],
+    },
+    {
+      property: "border",
+      description: "Border and divider lines.",
+      roles: [
+        {
+          role: "neutral",
+          tokens: [
+            { emphasis: "bold", value: "#8D8D8D", token: "$portfolio-border-neutral-bold", ref: "$portfolio-neutral-50", legacy: "$portfolio-border-strong" },
+            { emphasis: "subtle", value: "#E0E0E0", token: "$portfolio-border-neutral-subtle", ref: "$portfolio-neutral-20", legacy: "$portfolio-border-subtle" },
+            { emphasis: "disabled", value: "#C6C6C6", token: "$portfolio-border-neutral-disabled", ref: "$portfolio-neutral-30", legacy: "$portfolio-border-disabled" },
+          ],
+        },
+        {
+          role: "brand",
+          tokens: [
+            { emphasis: "bold", value: "#3336FF", token: "$portfolio-border-brand-bold", ref: "$portfolio-accent-60", legacy: "$portfolio-border-interactive" },
+          ],
+        },
+        {
+          role: "inverse",
+          tokens: [
+            { emphasis: "bold", value: "#161616", token: "$portfolio-border-inverse-bold", ref: "$portfolio-neutral-100", legacy: "$portfolio-border-inverse" },
+          ],
+        },
+        {
+          role: "negative",
+          tokens: [
+            { emphasis: "", value: "#DA1E28", token: "$portfolio-border-negative", ref: "$portfolio-red-60" },
+          ],
+        },
+        {
+          role: "positive",
+          tokens: [
+            { emphasis: "", value: "#198038", token: "$portfolio-border-positive", ref: "$portfolio-green-60" },
+          ],
+        },
+        {
+          role: "warning",
+          tokens: [
+            { emphasis: "", value: "#F1C21B", token: "$portfolio-border-warning", ref: "$portfolio-yellow-30" },
+          ],
+        },
+      ],
+    },
+    {
+      property: "action",
+      description: "Actionable elements such as buttons, selected fills, and interactive controls.",
+      roles: [
+        {
+          role: "brand",
+          tokens: [
+            { emphasis: "bold", value: "#3336FF", token: "$portfolio-action-brand-bold", ref: "$portfolio-accent-60" },
+            { emphasis: "subtle", value: "#D5E0FC", token: "$portfolio-action-brand-subtle", ref: "$portfolio-accent-20" },
+          ],
+        },
+        {
+          role: "neutral",
+          tokens: [
+            { emphasis: "bold", value: "#161616", token: "$portfolio-action-neutral-bold", ref: "$portfolio-neutral-100" },
+            { emphasis: "regular", value: "#F4F4F4", token: "$portfolio-action-neutral-regular", ref: "$portfolio-neutral-10" },
+          ],
+        },
+        {
+          role: "inverse",
+          tokens: [
+            { emphasis: "bold", value: "#FFFFFF", token: "$portfolio-action-inverse-bold", ref: "$portfolio-neutral-00" },
+          ],
+        },
+        {
+          role: "negative",
+          tokens: [
+            { emphasis: "", value: "#DA1E28", token: "$portfolio-action-negative", ref: "$portfolio-red-60" },
+          ],
+        },
+        {
+          role: "positive",
+          tokens: [
+            { emphasis: "", value: "#198038", token: "$portfolio-action-positive", ref: "$portfolio-green-60" },
+          ],
+        },
+        {
+          role: "warning",
+          tokens: [
+            { emphasis: "", value: "#F1C21B", token: "$portfolio-action-warning", ref: "$portfolio-yellow-30" },
+          ],
+        },
+      ],
+    },
+  ] as PropertySection[],
+  interaction: [
+    { name: "Focus", value: "#3336FF", token: "$portfolio-focus", ref: "$portfolio-accent-60" },
     { name: "Focus Inset", value: "#FFFFFF", token: "$portfolio-focus-inset", ref: "$portfolio-neutral-00" },
-    ] as SemanticToken[],
-    highlight: [
-    { name: "Highlight", value: "#D9D9FF", token: "$portfolio-highlight", ref: "$portfolio-accent-20" },
-    ] as SemanticToken[],
-  },
+    { name: "Highlight", value: "#D5E0FC", token: "$portfolio-highlight", ref: "$portfolio-accent-20" },
+  ] as SemanticToken[],
 };
 // @sync-tokens:end
 

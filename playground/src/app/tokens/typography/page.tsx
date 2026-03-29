@@ -2,18 +2,28 @@
 
 import { Shell } from "@/components/shell";
 import { SectionHeading, SubSection, TokenRow } from "@/components/token-grid";
+import ScrollSpy from "@/components/scroll-spy";
 import { typography } from "@/lib/tokens";
+
+const scrollSpySections = [
+  { id: "type-scale", label: "Type Scale" },
+  { id: "font-stacks", label: "Font Stacks" },
+  { id: "font-weights", label: "Weights" },
+  { id: "line-heights", label: "Line Heights" },
+  { id: "letter-spacing", label: "Letter Spacing" },
+];
 
 export default function TypographyPage() {
   return (
     <Shell title="Typography">
+      <ScrollSpy sections={scrollSpySections} />
       <div className="max-w-5xl">
         <SectionHeading
           title="Typography"
           description="Type scale, font stacks, weights, line-heights, and letter-spacing tokens. The system uses Geist Sans as the primary face with a 10-step modular scale."
         />
 
-        <SubSection title="Type Scale">
+        <SubSection id="type-scale" title="Type Scale">
           <div className="border rounded-sm border-border overflow-x-auto">
             <div className="min-w-[480px]">
               {typography.scale.map((t) => (
@@ -41,7 +51,7 @@ export default function TypographyPage() {
           </div>
         </SubSection>
 
-        <SubSection title="Font Stacks">
+        <SubSection id="font-stacks" title="Font Stacks">
           <div className="space-y-4">
             {typography.fonts.map((f) => (
               <div key={f.name} className="p-5 rounded-sm border border-border">
@@ -68,7 +78,7 @@ export default function TypographyPage() {
           </div>
         </SubSection>
 
-        <SubSection title="Font Weights">
+        <SubSection id="font-weights" title="Font Weights">
           <div className="space-y-1">
             {typography.weights.map((w) => (
               <TokenRow
@@ -86,7 +96,7 @@ export default function TypographyPage() {
           </div>
         </SubSection>
 
-        <SubSection title="Line Heights">
+        <SubSection id="line-heights" title="Line Heights">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {typography.leading.map((l) => (
               <div key={l.name} className="p-5 rounded-sm border border-border">
@@ -103,7 +113,7 @@ export default function TypographyPage() {
           </div>
         </SubSection>
 
-        <SubSection title="Letter Spacing">
+        <SubSection id="letter-spacing" title="Letter Spacing">
           <div className="space-y-1">
             {typography.tracking.map((t) => (
               <TokenRow

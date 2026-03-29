@@ -4,7 +4,7 @@
 >
 > **Who reads this:** AI agents before making code changes — scan for relevant anti-patterns.
 > **Who writes this:** AI agents when an incident reveals a new anti-pattern.
-> **Last updated:** 2026-03-29
+> **Last updated:** 2026-03-29 (EAP-013 corrected: no script tags in React tree at all; EAP-014: hydration mismatch from window checks)
 
 ---
 
@@ -155,6 +155,100 @@ git stash pop
 ```
 
 **Incident:** ENG-006 (2026-03-29) — 15 components, Radix dependency, architecture docs, and playground changes made directly on `main` without a branch, creating rollback risk and blocking safe parallel work.
+
+---
+
+## EAP-010: Fixing Incidents Without Following Documentation Procedures
+
+**Trigger:** A user reports a bug or build failure mid-task. The agent fixes the immediate problem but does not follow the engineering-iteration skill (Step 5: Close the Loop) — no feedback log entry, no anti-pattern documentation, no engineering.md update.
+
+**Why it's wrong:** The fix itself is only half the value. The other half is the knowledge captured by documentation: what broke, why, and how to prevent it. When an agent context-switches from a current task to fix a bug and skips the documentation step, the incident becomes invisible. The next agent session has no record of it. If the same class of failure recurs, there's no history to detect the pattern.
+
+**Correct alternative:** When a user reports a bug mid-task, treat it as a full engineering incident:
+1. Pause the current task (mentally bookmark where you were).
+2. Route through the engineering-iteration skill — all 5 steps, including Step 5 (Close the Loop).
+3. Document the incident in `docs/engineering-feedback-log.md`.
+4. Check if it warrants a new anti-pattern in `docs/engineering-anti-patterns.md`.
+5. Resume the original task.
+
+Context-switching does not exempt the agent from documentation procedures.
+
+**Incident:** ENG-008, ENG-012 (2026-03-29) — Occurred 3 times in one session. Escalated to Hard Guardrail #1 in `AGENTS.md`: "NEVER respond to the user after fixing a bug or incident without FIRST completing all documentation steps."
+
+---
+
+## EAP-011: Node.js Built-in Imports in next.config.ts (Next.js 16)
+
+**Trigger:** Importing Node.js built-in modules (`path`, `url`, `fs`, etc.) in `next.config.ts` when using Next.js 16.
+
+**Why it's wrong:** Next.js 16 compiles `next.config.ts` into `next.config.compiled.js` via a bundler. When the bundler encounters Node.js built-in imports, it emits CommonJS-style `require()` and `exports` in the output. However, the compiled file is executed in an ESM scope, causing `ReferenceError: exports is not defined in ES module scope`. The server starts, reports "Ready", and then immediately crashes — making it look like a runtime error rather than a config error.
+
+**Correct alternative:**
+1. Do not import Node.js built-ins (`path`, `url`, `fs`) in `next.config.ts`.
+2. If you need `__dirname`, use `import.meta.dirname` (available in Node.js 21.2+) — but only if the config compilation supports it.
+3. For `sassOptions.includePaths`, modern sass resolves `@use` from `node_modules` automatically — the explicit `includePaths` pointing to `node_modules` is unnecessary.
+4. Keep `next.config.ts` minimal: type imports and framework wrappers (like `withPayload`) only.
+
+**Detection:** If `npm run dev` starts ("Ready") then immediately crashes with "exports is not defined", check `next.config.ts` for Node.js built-in imports.
+
+**Incident:** ENG-007 (2026-03-29) — `import path from "path"` and `import { fileURLToPath } from "url"` in next.config.ts caused immediate crash on Next.js 16.2.1.
+
+---
+
+## EAP-012: Installing Alternate Node Versions via Brew Without Checking Shared Library Impact
+
+**Trigger:** Running `brew install node@22` when `node` (v25) is already installed and linked. Brew upgrades shared dependencies (e.g., `simdjson`) to versions incompatible with the existing linked Node.
+
+**Why it's wrong:** Brew's dependency resolution for the new formula can upgrade shared C libraries (simdjson, icu4c, etc.) that the existing linked Node binary was compiled against. This breaks the primary `node` binary with `dyld: Library not loaded` errors, making `npm`, `npx`, and all Node-dependent commands crash.
+
+**Correct alternative:**
+1. Use `nvm` or `fnm` for managing multiple Node versions — they install self-contained binaries that don't share system libraries.
+2. If using brew, run `brew reinstall node` immediately after installing an alternate version to rebuild against the updated shared libraries.
+3. Always verify `node --version && npm --version` work after any brew node-related install.
+
+**Incident:** ENG-015 — `brew install node@22` broke Node 25 via simdjson library version mismatch.
+
+---
+
+## EAP-013: Script Tags in React 19 / Next.js 16 Component Trees
+
+**Trigger:** Rendering a `<script>` element in any React component tree — via raw `<script>`, `dangerouslySetInnerHTML`, or `next/script` (`<Script>`).
+
+**Why it's wrong:** React 19 warns about `<script>` tags during client-side hydration. **Every approach that puts a script element in the React tree triggers this warning:**
+1. `<script dangerouslySetInnerHTML>` — warned in both server and client components (ENG-017, ENG-018)
+2. `<Script>` from `next/script` — still renders a `<script>` element in the tree (ENG-018 follow-up)
+3. Third-party libraries like `next-themes` that inject `<script>` elements (ENG-017 original)
+
+This was misdiagnosed twice: first recommending `dangerouslySetInnerHTML` in server components, then recommending `next/script`. Both still trigger the warning.
+
+**Correct alternative:** Do not render any `<script>` element in the React tree. For theme initialization (preventing dark mode flash):
+1. Use a custom `ThemeProvider` that reads localStorage and applies the class via `useEffect`.
+2. Add `suppressHydrationWarning` to `<html>` so the theme class mutation doesn't cause hydration errors.
+3. Accept a one-frame flash on initial load — imperceptible in practice, and the only approach that avoids React 19 warnings.
+
+If a blocking script is truly required (analytics, third-party SDK), use `next/script` with `strategy="afterInteractive"` or `lazyOnload` — these inject scripts after hydration and avoid the warning. `beforeInteractive` still triggers it.
+
+**Incident:** ENG-017, ENG-018, ENG-019 — three attempts to fix the same warning, each time discovering a new approach also fails.
+
+---
+
+## EAP-014: Server/Client Branch Causing Hydration Mismatch
+
+**Trigger:** Using `typeof window !== "undefined"` or `window.location` to conditionally render different text or elements in a client component.
+
+**Why it's wrong:** During SSR, `window` is undefined, so the server renders one branch. During client hydration, `window` exists, so the client renders the other branch. React detects the mismatch and throws a recoverable error: "Hydration failed because the server rendered text didn't match the client." The page still works (React re-renders the client tree), but it's a performance hit and a console error.
+
+**Correct alternative:** Use `useState` with a server-safe default + `useEffect` to detect client-only values after mount:
+```tsx
+const [isLocal, setIsLocal] = useState(false);
+useEffect(() => {
+  setIsLocal(window.location.hostname === "localhost");
+}, []);
+```
+
+The initial render matches the server (false). After mount, `useEffect` updates to the correct client value. No hydration mismatch.
+
+**Incident:** ENG-019 — `DesignSystemFootnote` branched on `window.location.hostname`, causing "Local Dev" prefix to appear on client but not server.
 
 ---
 

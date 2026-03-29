@@ -4,6 +4,7 @@ import { FadeIn } from "@yilangaodesign/design-system";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import ScrollSpy from "@/components/ScrollSpy";
+import AdminBar from "@/components/AdminBar";
 import styles from "./page.module.scss";
 
 type ExperienceEntry = { role: string; company: string; period: string };
@@ -12,9 +13,11 @@ type EducationEntry = { degree: string; institution: string; period: string };
 export default function AboutClient({
   experience,
   education,
+  isAdmin,
 }: {
   experience: ExperienceEntry[];
   education: EducationEntry[];
+  isAdmin?: boolean;
 }) {
   const spySections = [
     { id: "intro", label: "Intro" },
@@ -23,7 +26,8 @@ export default function AboutClient({
   ];
 
   return (
-    <main className={styles.page}>
+    <main className={styles.page} style={isAdmin ? { paddingTop: 44 } : undefined}>
+      {isAdmin && <AdminBar editUrl="/admin/globals/site-config" editLabel="Edit Experience & Education" />}
       <Navigation />
       <ScrollSpy sections={spySections} />
       <div className={styles.container}>

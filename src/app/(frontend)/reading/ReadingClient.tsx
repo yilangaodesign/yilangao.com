@@ -3,13 +3,16 @@
 import { FadeIn } from "@yilangaodesign/design-system";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
+import AdminBar from "@/components/AdminBar";
+import EditButton from "@/components/EditButton";
 import styles from "./page.module.scss";
 
-type Book = { title: string; url: string };
+type Book = { id?: number; title: string; url: string };
 
-export default function ReadingClient({ books }: { books: Book[] }) {
+export default function ReadingClient({ books, isAdmin }: { books: Book[]; isAdmin?: boolean }) {
   return (
-    <main className={styles.page}>
+    <main className={styles.page} style={isAdmin ? { paddingTop: 44 } : undefined}>
+      {isAdmin && <AdminBar editUrl="/admin/collections/books" editLabel="Manage Books" />}
       <Navigation />
       <div className={styles.container}>
         <FadeIn>
@@ -26,8 +29,9 @@ export default function ReadingClient({ books }: { books: Book[] }) {
         <FadeIn delay={0.15}>
           <ul className={styles.bookList}>
             {books.map((book) => (
-              <li key={book.title}>
+              <li key={book.id ?? book.title}>
                 <a href={book.url} className={styles.bookLink}>{book.title}</a>
+                {isAdmin && book.id && <EditButton collection="books" id={book.id} label={`Edit ${book.title}`} />}
               </li>
             ))}
           </ul>

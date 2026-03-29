@@ -23,11 +23,12 @@
 
 | Service | Default Port | Current Port | Status | PID | Notes |
 |---|---|---|---|---|---|
-| Main site (`yilangao.com`) | 4000 | 4000 | running | 36219 | `npm run dev` |
-| Playground | 4001 | 4001 | running | 42675 | `npm run playground` |
+| Main site (`yilangao.com`) | 4000 | 4000 | running | 23214 | `npm run dev` |
+| Playground | 4001 | 4001 | running | 58319 | `npm run playground` |
 
 ## Change Log
 
 | Timestamp (UTC) | Service | Action | Port | Reason |
 |---|---|---|---|---|
 | 2026-03-29 01:30 | Main site | started | 4000 | Fresh start after cleanup |
+| 2026-03-29 16:48 | Main site | restarted | 4000 | Restarted with real Supabase DATABASE_URL (pooler) |

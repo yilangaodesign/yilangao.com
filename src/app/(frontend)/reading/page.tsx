@@ -1,4 +1,6 @@
 import { getPayloadClient } from "@/lib/payload";
+import { isAdminAuthenticated } from "@/lib/admin-auth";
+import { RefreshRouteOnSave } from "@/components/RefreshRouteOnSave";
 import ReadingClient from "./ReadingClient";
 
 const FALLBACK_BOOKS = [
@@ -15,7 +17,8 @@ const FALLBACK_BOOKS = [
 ];
 
 export default async function ReadingPage() {
-  let books = FALLBACK_BOOKS;
+  let books: { id?: number; title: string; url: string }[] = FALLBACK_BOOKS;
+  const isAdmin = await isAdminAuthenticated();
 
   try {
     const payload = await getPayloadClient();
@@ -27,6 +30,7 @@ export default async function ReadingPage() {
 
     if (res.docs.length > 0) {
       books = res.docs.map((b) => ({
+        id: b.id,
         title: b.title,
         url: b.url ?? "#",
       }));
@@ -35,5 +39,10 @@ export default async function ReadingPage() {
     // Payload not connected — use fallback data
   }
 
-  return <ReadingClient books={books} />;
+  return (
+    <>
+      <RefreshRouteOnSave />
+      <ReadingClient books={books} isAdmin={isAdmin} />
+    </>
+  );
 }

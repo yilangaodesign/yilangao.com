@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Shell } from "@/components/shell";
+import { elan } from "@/lib/elan";
 import { colors, typography, spacing, motion, elevation } from "@/lib/tokens";
 import {
   Palette,
@@ -12,7 +13,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 
-const sections = [
+const stylePages = [
   {
     title: "Colors",
     description: `${colors.accent.length + colors.neutral.length} color tokens across accent and neutral scales, plus semantic mappings for surfaces, text, borders, and support states.`,
@@ -88,37 +89,82 @@ export default function OverviewPage() {
   return (
     <Shell title="Overview">
       <div className="max-w-5xl">
-        <div className="mb-12">
-          <h2 className="text-3xl font-bold tracking-tight mb-3">Design System</h2>
-          <p className="text-muted-foreground text-lg leading-relaxed">
-            Tokens, components, and patterns for yilangao.com. Based on an 8px grid with
-            Carbon-inspired motion and spacing scales.
+        {/* Hero */}
+        <div className="mb-10">
+          <p className="text-[11px] font-mono uppercase tracking-[0.15em] text-muted-foreground/60 mb-2">
+            {elan.release.name}
+          </p>
+          <h2 className="text-3xl font-bold tracking-tight mb-3">
+            A personal design system by Yilan Gao
+          </h2>
+          <p className="text-muted-foreground text-[15px] leading-relaxed max-w-2xl">
+            Élan is the design language behind{" "}
+            <span className="text-foreground font-medium">yilangao.com</span> —
+            an opinionated collection of design tokens, components, and
+            interaction patterns that define how the site looks, moves, and
+            feels.
           </p>
         </div>
 
-        <div className="grid gap-5">
-          {sections.map((section) => {
-            const Icon = section.icon;
-            return (
-              <Link
-                key={section.href}
-                href={section.href}
-                className="group flex items-start gap-5 p-6 rounded-sm border border-border bg-card hover:bg-muted/50 transition-colors"
-              >
-                <div className="flex items-center justify-center w-10 h-10 rounded-sm bg-muted shrink-0">
-                  <Icon className="w-5 h-5 text-muted-foreground" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1.5">
-                    <h3 className="font-semibold">{section.title}</h3>
-                    <ArrowRight className="w-3.5 h-3.5 text-muted-foreground opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+        {/* About sections */}
+        <div className="grid gap-6 mb-12">
+          <div className="p-5 rounded-sm border border-border bg-card">
+            <h3 className="text-[13px] font-semibold uppercase tracking-[0.06em] text-muted-foreground mb-2">
+              Intended Use
+            </h3>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              This system powers a personal portfolio and project showcase.
+              Every token and component documented here is actively used in
+              production on yilangao.com. The playground serves as both
+              living documentation and a development environment for iterating
+              on the design language.
+            </p>
+          </div>
+          <div className="p-5 rounded-sm border border-border bg-card">
+            <h3 className="text-[13px] font-semibold uppercase tracking-[0.06em] text-muted-foreground mb-2">
+              How It&apos;s Built
+            </h3>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Élan draws from personal design sensibility and established
+              open-source design systems. The spacing and motion scales are
+              influenced by IBM Carbon; the color system follows a structured
+              property·role·emphasis naming convention inspired by Goldman
+              Sachs&apos;s One GS. Components are built from scratch or adapted
+              from open-source libraries with custom styling that conforms to
+              the token system. Based on an 8px grid.
+            </p>
+          </div>
+        </div>
+
+        {/* Style pages */}
+        <div className="mb-6">
+          <h3 className="text-[11px] font-mono uppercase tracking-[0.15em] text-muted-foreground/60 mb-4">
+            Styles
+          </h3>
+          <div className="grid gap-4">
+            {stylePages.map((section) => {
+              const Icon = section.icon;
+              return (
+                <Link
+                  key={section.href}
+                  href={section.href}
+                  className="group flex items-start gap-5 p-5 rounded-sm border border-border bg-card hover:bg-muted/50 transition-colors"
+                >
+                  <div className="flex items-center justify-center w-10 h-10 rounded-sm bg-muted shrink-0">
+                    <Icon className="w-5 h-5 text-muted-foreground" />
                   </div>
-                  <p className="text-sm text-muted-foreground mb-4">{section.description}</p>
-                  {section.preview && <div className="mt-1">{section.preview}</div>}
-                </div>
-              </Link>
-            );
-          })}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <h3 className="font-semibold">{section.title}</h3>
+                      <ArrowRight className="w-3.5 h-3.5 text-muted-foreground opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-4">{section.description}</p>
+                    {section.preview && <div className="mt-1">{section.preview}</div>}
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
         </div>
       </div>
     </Shell>

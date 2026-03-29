@@ -12,6 +12,7 @@ function ScrollSpyDemo() {
   const [isHovered, setIsHovered] = useState(false);
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const drag = useRef({ active: false, index: -1 });
+  const pointerStart = useRef<{ y: number; index: number } | null>(null);
 
   const sections = [
     { id: "demo-overview", label: "Overview" },
@@ -59,9 +60,10 @@ function ScrollSpyDemo() {
   const scrollTo = useCallback(
     (index: number, behavior: ScrollBehavior = "smooth") => {
       const container = containerRef.current;
-      const el = container?.querySelector(`#${sections[index]?.id}`);
-      if (el) {
-        el.scrollIntoView({ behavior, block: "start" });
+      const el = container?.querySelector(`#${sections[index]?.id}`) as HTMLElement | null;
+      if (container && el) {
+        const offset = el.getBoundingClientRect().top - container.getBoundingClientRect().top + container.scrollTop;
+        container.scrollTo({ top: offset, behavior });
         setActiveIndex(index);
       }
     },
@@ -70,11 +72,19 @@ function ScrollSpyDemo() {
 
   const indexFromPointer = useCallback(
     (clientY: number): number => {
-      if (!trackRef.current) return 0;
-      const { top, height } = trackRef.current.getBoundingClientRect();
-      const ratio = (clientY - top) / height;
-      const index = Math.round(ratio * (sections.length - 1));
-      return Math.max(0, Math.min(index, sections.length - 1));
+      const notches = trackRef.current?.querySelectorAll<HTMLElement>("[data-notch-index]");
+      if (!notches || notches.length === 0) return 0;
+      let closest = 0;
+      let minDist = Infinity;
+      notches.forEach((el, i) => {
+        const rect = el.getBoundingClientRect();
+        const dist = Math.abs(clientY - (rect.top + rect.height / 2));
+        if (dist < minDist) {
+          minDist = dist;
+          closest = i;
+        }
+      });
+      return closest;
     },
     [],
   );
@@ -84,18 +94,23 @@ function ScrollSpyDemo() {
       if (e.button !== 0) return;
       e.preventDefault();
       trackRef.current?.setPointerCapture(e.pointerId);
-
       const idx = indexFromPointer(e.clientY);
-      drag.current = { active: true, index: idx };
-      setDragIndex(idx);
-      scrollTo(idx, "instant");
+      pointerStart.current = { y: e.clientY, index: idx };
     },
-    [indexFromPointer, scrollTo],
+    [indexFromPointer],
   );
 
   const onPointerMove = useCallback(
     (e: React.PointerEvent) => {
-      if (!drag.current.active) return;
+      if (!pointerStart.current) return;
+
+      if (!drag.current.active) {
+        if (Math.abs(e.clientY - pointerStart.current.y) < 3) return;
+        drag.current = { active: true, index: pointerStart.current.index };
+        setDragIndex(pointerStart.current.index);
+        scrollTo(pointerStart.current.index, "instant");
+      }
+
       const idx = indexFromPointer(e.clientY);
       if (idx !== drag.current.index) {
         drag.current.index = idx;
@@ -106,10 +121,14 @@ function ScrollSpyDemo() {
     [indexFromPointer, scrollTo],
   );
 
-  const endDrag = useCallback(() => {
+  const endInteraction = useCallback(() => {
+    if (pointerStart.current && !drag.current.active) {
+      scrollTo(pointerStart.current.index, "smooth");
+    }
     drag.current = { active: false, index: -1 };
+    pointerStart.current = null;
     setDragIndex(null);
-  }, []);
+  }, [scrollTo]);
 
   const isDragging = dragIndex !== null;
 
@@ -139,13 +158,13 @@ function ScrollSpyDemo() {
 
       <div
         ref={trackRef}
-        className={`flex flex-col gap-2 items-end pt-4 shrink-0 p-3 -m-3 touch-none select-none ${isDragging ? "cursor-grabbing" : "cursor-pointer"}`}
+        className={`flex flex-col gap-4 items-end justify-center w-10 shrink-0 py-6 px-3 -mr-3 touch-none select-none ${isDragging ? "cursor-grabbing" : "cursor-pointer"}`}
         onPointerEnter={() => setIsHovered(true)}
         onPointerLeave={() => setIsHovered(false)}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
-        onPointerUp={endDrag}
-        onLostPointerCapture={endDrag}
+        onPointerUp={endInteraction}
+        onLostPointerCapture={endInteraction}
       >
         {sections.map((section, i) => {
           const isActive = i === activeIndex;
@@ -153,7 +172,7 @@ function ScrollSpyDemo() {
           const showLabel = isDragging ? isDragTarget : isHovered;
 
           return (
-            <div key={section.id} className="relative flex items-center justify-end">
+            <div key={section.id} data-notch-index={i} className="relative flex items-center justify-end py-1">
               {showLabel && (
                 <span className="absolute right-[calc(100%+8px)] top-1/2 -translate-y-1/2 text-[11px] font-mono text-muted-foreground whitespace-nowrap pointer-events-none animate-in fade-in slide-in-from-right-1 duration-100">
                   {section.label}

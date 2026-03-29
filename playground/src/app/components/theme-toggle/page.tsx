@@ -34,7 +34,7 @@ function ThemeToggleDemo() {
 
 const code = `"use client";
 
-import { useTheme } from "next-themes";
+import { useTheme } from "@/components/theme-provider";
 import { useEffect, useState } from "react";
 
 export default function ThemeToggle() {
@@ -70,7 +70,7 @@ export default function ThemeTogglePage() {
       <div className="max-w-5xl space-y-10">
         <SectionHeading
           title="ThemeToggle"
-          description="A button that toggles between light and dark themes using next-themes. Handles hydration with a mounted guard."
+          description="A button that toggles between light and dark themes using the custom ThemeProvider. Handles hydration with a mounted guard."
         />
 
         <ComponentPreview
@@ -87,7 +87,7 @@ export default function ThemeTogglePage() {
           </h3>
           <PropsTable
             props={[
-              { name: "(none)", type: "—", description: "Self-contained — reads/writes theme via the next-themes useTheme() hook." },
+              { name: "(none)", type: "—", description: "Self-contained — reads/writes theme via the ThemeProvider useTheme() hook." },
             ]}
           />
         </div>
@@ -99,7 +99,7 @@ export default function ThemeTogglePage() {
           <ul className="space-y-2 text-sm text-muted-foreground">
             <li className="flex gap-2">
               <span className="text-accent shrink-0">•</span>
-              <code className="text-xs bg-muted px-1.5 py-0.5 rounded-sm font-mono">next-themes</code> — ThemeProvider must wrap the app with <code className="text-xs bg-muted px-1.5 py-0.5 rounded-sm font-mono">attribute=&quot;data-theme&quot;</code>.
+              <code className="text-xs bg-muted px-1.5 py-0.5 rounded-sm font-mono">ThemeProvider</code> — must wrap the app. Applies <code className="text-xs bg-muted px-1.5 py-0.5 rounded-sm font-mono">class=&quot;dark&quot;</code> to <code className="text-xs bg-muted px-1.5 py-0.5 rounded-sm font-mono">&lt;html&gt;</code>.
             </li>
             <li className="flex gap-2">
               <span className="text-accent shrink-0">•</span>

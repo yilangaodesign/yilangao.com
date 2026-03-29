@@ -9,6 +9,9 @@
  * Non-color exports (typography, spacing, motion, elevation, breakpoints) are
  * preserved — the script only replaces content between codegen boundary markers.
  *
+ * Token architecture follows: $portfolio-{property}-{role}[-{emphasis}]
+ * See docs/design.md §9 for the full rationale.
+ *
  * Usage:
  *   node scripts/sync-tokens.mjs
  *   npm run sync-tokens
@@ -27,12 +30,11 @@ const BEGIN_MARKER = "// @sync-tokens:begin";
 const END_MARKER = "// @sync-tokens:end";
 
 // ---------------------------------------------------------------------------
-// 1. Parse SCSS
+// 1. Parse SCSS — Palette
 // ---------------------------------------------------------------------------
 
 const scss = readFileSync(SCSS_PATH, "utf-8");
 
-/** Parse `$portfolio-{family}-{step}: #HEX;` lines into a map. */
 function parsePaletteVars(src) {
   const vars = new Map();
   for (const line of src.split("\n")) {
@@ -48,31 +50,8 @@ function parsePaletteVars(src) {
   return vars;
 }
 
-/** Parse `$portfolio-{role}: $portfolio-{ref};` or literal values. */
-function parseSemanticVars(src) {
-  const semantics = [];
-  for (const line of src.split("\n")) {
-    const m = line.match(
-      /^\$portfolio-([\w-]+):\s*(\$portfolio-[\w-]+|#[0-9A-Fa-f]{3,8}|rgba\([^)]+\));/
-    );
-    if (m) {
-      const [, token, raw] = m;
-      // Skip palette vars (they have a numeric suffix like accent-10)
-      if (/\d+$/.test(token)) continue;
-      semantics.push({ token: `$portfolio-${token}`, raw });
-    }
-  }
-  return semantics;
-}
-
 const palette = parsePaletteVars(scss);
-const semantics = parseSemanticVars(scss);
 
-// ---------------------------------------------------------------------------
-// 2. Resolve semantic values
-// ---------------------------------------------------------------------------
-
-/** Build a flat lookup of all palette vars: "$portfolio-red-60" -> "#DA1E28" */
 function buildLookup(paletteMap) {
   const lookup = new Map();
   for (const [family, steps] of paletteMap) {
@@ -90,60 +69,142 @@ function resolveValue(raw) {
   return raw;
 }
 
-function resolveRef(raw) {
-  if (raw.startsWith("$")) return raw;
-  return "";
-}
-
 // ---------------------------------------------------------------------------
-// 3. Group semantics into categories
+// 2. Parse SCSS — Structured Semantic Tokens
 // ---------------------------------------------------------------------------
 
-const semanticGroups = {
-  surface: [],
-  text: [],
-  border: [],
-  support: [],
-  focus: [],
-  highlight: [],
+const KNOWN_PROPERTIES = ["surface", "text", "icon", "border", "action"];
+const MULTI_WORD_ROLES = ["always-light", "always-dark"];
+const LEGACY_BOUNDARY = "5. Legacy Aliases";
+
+const PROPERTY_DESCRIPTIONS = {
+  surface:
+    "Background fills. Any container that houses content should use a surface token.",
+  text: "Text elements. Ensures 4.5:1 AA compliance.",
+  icon: "Icon elements. Ensures 3:1 AA compliance (lower threshold than text).",
+  border: "Border and divider lines.",
+  action:
+    "Actionable elements such as buttons, selected fills, and interactive controls.",
 };
 
-for (const s of semantics) {
-  const name = s.token.replace("$portfolio-", "");
-  const resolved = resolveValue(s.raw);
-  const ref = resolveRef(s.raw);
+function parseStructuredSemantics(src) {
+  const lines = src.split("\n");
+  const structured = []; // property.role.emphasis tokens
+  const interaction = []; // focus, highlight
+  const legacyMap = new Map(); // new-token -> legacy-name
 
-  const displayName = name
-    .split("-")
-    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(" ");
+  let inLegacy = false;
 
-  const entry = {
-    name: displayName,
-    value: resolved,
-    token: s.token,
-    ...(ref ? { ref } : {}),
-  };
+  for (const line of lines) {
+    if (line.includes(LEGACY_BOUNDARY)) {
+      inLegacy = true;
+      continue;
+    }
 
-  if (name.startsWith("surface-")) semanticGroups.surface.push(entry);
-  else if (name.startsWith("text-")) semanticGroups.text.push(entry);
-  else if (name.startsWith("border-")) semanticGroups.border.push(entry);
-  else if (name.startsWith("support-")) semanticGroups.support.push(entry);
-  else if (name.startsWith("focus")) semanticGroups.focus.push(entry);
-  else if (name.startsWith("highlight")) semanticGroups.highlight.push(entry);
-}
+    const m = line.match(
+      /^\$portfolio-([\w-]+):\s*(\$portfolio-[\w-]+|#[0-9A-Fa-f]{3,8}|rgba\([^)]+\));/
+    );
+    if (!m) continue;
+    const [, fullName, raw] = m;
 
-// Clean up display names: "Surface Primary" -> "Primary", etc.
-for (const [group, entries] of Object.entries(semanticGroups)) {
-  for (const entry of entries) {
-    const prefix =
-      group === "focus" || group === "highlight"
-        ? ""
-        : group.charAt(0).toUpperCase() + group.slice(1) + " ";
-    if (prefix && entry.name.startsWith(prefix)) {
-      entry.name = entry.name.slice(prefix.length);
+    if (/^\w+-\d+$/.test(fullName)) continue;
+
+    if (inLegacy) {
+      if (raw.startsWith("$portfolio-")) {
+        const newTokenName = raw.replace(";", "");
+        if (!legacyMap.has(newTokenName)) {
+          legacyMap.set(newTokenName, `$portfolio-${fullName}`);
+        }
+      }
+      continue;
+    }
+
+    let property = null;
+    for (const p of KNOWN_PROPERTIES) {
+      if (fullName.startsWith(p + "-")) {
+        property = p;
+        break;
+      }
+    }
+
+    if (property) {
+      const rest = fullName.slice(property.length + 1);
+      let role, emphasis;
+
+      let matched = false;
+      for (const r of MULTI_WORD_ROLES) {
+        if (rest === r) {
+          role = r;
+          emphasis = null;
+          matched = true;
+          break;
+        }
+        if (rest.startsWith(r + "-")) {
+          role = r;
+          emphasis = rest.slice(r.length + 1);
+          matched = true;
+          break;
+        }
+      }
+
+      if (!matched) {
+        const parts = rest.split("-");
+        role = parts[0];
+        emphasis = parts.length > 1 ? parts.slice(1).join("-") : null;
+      }
+
+      structured.push({
+        property,
+        role,
+        emphasis,
+        token: `$portfolio-${fullName}`,
+        raw,
+        value: resolveValue(raw),
+        ref: raw.startsWith("$") ? raw : undefined,
+      });
+    } else if (
+      fullName.startsWith("focus") ||
+      fullName.startsWith("highlight")
+    ) {
+      interaction.push({
+        name: fullName
+          .split("-")
+          .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+          .join(" "),
+        token: `$portfolio-${fullName}`,
+        value: resolveValue(raw),
+        ref: raw.startsWith("$") ? raw : undefined,
+      });
     }
   }
+
+  return { structured, interaction, legacyMap };
+}
+
+const { structured, interaction, legacyMap } = parseStructuredSemantics(scss);
+
+// ---------------------------------------------------------------------------
+// 3. Build property → role → emphasis tree
+// ---------------------------------------------------------------------------
+
+const propertyTree = new Map();
+
+for (const token of structured) {
+  if (!propertyTree.has(token.property)) {
+    propertyTree.set(token.property, new Map());
+  }
+  const roleMap = propertyTree.get(token.property);
+  if (!roleMap.has(token.role)) {
+    roleMap.set(token.role, []);
+  }
+  const legacy = legacyMap.get(token.token);
+  roleMap.get(token.role).push({
+    emphasis: token.emphasis || "",
+    value: token.value,
+    token: token.token,
+    ref: token.ref,
+    legacy,
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -173,12 +234,11 @@ function formatScale(prefix, steps) {
   return `scale("${prefix}", {\n    ${pairs},\n  })`;
 }
 
-function formatSemanticArray(entries) {
-  const lines = entries.map((e) => {
-    const ref = e.ref ? `, ref: "${e.ref}"` : "";
-    return `    { name: "${e.name}", value: "${e.value}", token: "${e.token}"${ref} },`;
-  });
-  return lines.join("\n");
+function titleCase(str) {
+  return str
+    .split("-")
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
 }
 
 const accentSteps = palette.get("accent") || [];
@@ -188,6 +248,25 @@ let generated = `${BEGIN_MARKER}
 export type ColorStep = { step: string; value: string; token: string };
 export type ColorFamily = { name: string; prefix: string; steps: ColorStep[] };
 export type SemanticToken = { name: string; value: string; token: string; ref?: string };
+
+export type EmphasisToken = {
+  emphasis: string;
+  value: string;
+  token: string;
+  ref?: string;
+  legacy?: string;
+};
+
+export type RoleGroup = {
+  role: string;
+  tokens: EmphasisToken[];
+};
+
+export type PropertySection = {
+  property: string;
+  description: string;
+  roles: RoleGroup[];
+};
 
 const scale = (prefix: string, values: Record<string, string>): ColorStep[] =>
   Object.entries(values).map(([step, value]) => ({ step, value, token: \`$portfolio-\${prefix}-\${step}\` }));
@@ -206,26 +285,39 @@ for (const family of EXTENDED_FAMILIES) {
 }
 
 generated += `  ] as ColorFamily[],
-  semantic: {
-    surface: [
-${formatSemanticArray(semanticGroups.surface)}
-    ] as SemanticToken[],
-    text: [
-${formatSemanticArray(semanticGroups.text)}
-    ] as SemanticToken[],
-    border: [
-${formatSemanticArray(semanticGroups.border)}
-    ] as SemanticToken[],
-    support: [
-${formatSemanticArray(semanticGroups.support)}
-    ] as SemanticToken[],
-    focus: [
-${formatSemanticArray(semanticGroups.focus)}
-    ] as SemanticToken[],
-    highlight: [
-${formatSemanticArray(semanticGroups.highlight)}
-    ] as SemanticToken[],
-  },
+  properties: [
+`;
+
+for (const prop of KNOWN_PROPERTIES) {
+  const roleMap = propertyTree.get(prop);
+  if (!roleMap) continue;
+
+  const desc = PROPERTY_DESCRIPTIONS[prop] || "";
+  generated += `    {\n      property: "${prop}",\n      description: "${desc}",\n      roles: [\n`;
+
+  for (const [role, tokens] of roleMap) {
+    generated += `        {\n          role: "${role}",\n          tokens: [\n`;
+    for (const t of tokens) {
+      const ref = t.ref ? `, ref: "${t.ref}"` : "";
+      const legacy = t.legacy ? `, legacy: "${t.legacy}"` : "";
+      generated += `            { emphasis: "${t.emphasis}", value: "${t.value}", token: "${t.token}"${ref}${legacy} },\n`;
+    }
+    generated += `          ],\n        },\n`;
+  }
+
+  generated += `      ],\n    },\n`;
+}
+
+generated += `  ] as PropertySection[],
+  interaction: [
+`;
+
+for (const t of interaction) {
+  const ref = t.ref ? `, ref: "${t.ref}"` : "";
+  generated += `    { name: "${t.name}", value: "${t.value}", token: "${t.token}"${ref} },\n`;
+}
+
+generated += `  ] as SemanticToken[],
 };
 ${END_MARKER}`;
 
@@ -241,7 +333,8 @@ const endIdx = existing.indexOf(END_MARKER);
 let output;
 if (beginIdx !== -1 && endIdx !== -1) {
   const endOfMarker = endIdx + END_MARKER.length;
-  output = existing.slice(0, beginIdx) + generated + existing.slice(endOfMarker);
+  output =
+    existing.slice(0, beginIdx) + generated + existing.slice(endOfMarker);
 } else {
   console.warn(
     "Warning: Codegen markers not found in tokens.ts. Prepending generated code."
@@ -257,8 +350,12 @@ if (beginIdx !== -1 && endIdx !== -1) {
 writeFileSync(TOKENS_PATH, output, "utf-8");
 
 const familyCount = EXTENDED_FAMILIES.filter((f) => palette.has(f)).length;
-const semanticCount = semantics.length;
+const propCount = structured.length;
+const interactionCount = interaction.length;
 console.log(
-  `Synced: ${accentSteps.length} accent + ${neutralSteps.length} neutral + ${familyCount} extended families, ${semanticCount} semantic tokens`
+  `Synced: ${accentSteps.length} accent + ${neutralSteps.length} neutral + ${familyCount} extended families`
+);
+console.log(
+  `Structured: ${propCount} property tokens across ${KNOWN_PROPERTIES.length} properties, ${interactionCount} interaction tokens`
 );
 console.log(`Written to: ${TOKENS_PATH}`);

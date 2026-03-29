@@ -1,19 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { cn } from "@/lib/utils";
 import { Check, Copy } from "lucide-react";
 
 export function ColorSwatch({
   color,
   label,
   sublabel,
-  large,
 }: {
   color: string;
   label: string;
   sublabel?: string;
-  large?: boolean;
 }) {
   const [copied, setCopied] = useState(false);
 
@@ -26,10 +23,7 @@ export function ColorSwatch({
   return (
     <button onClick={copy} className="group text-left">
       <div
-        className={cn(
-          "rounded-sm border border-border/50 relative overflow-hidden transition-transform group-hover:scale-105",
-          large ? "h-20" : "h-14"
-        )}
+        className="h-14 rounded-sm border border-border/50 relative overflow-hidden transition-transform group-hover:scale-105"
         style={{ backgroundColor: color }}
       >
         <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20">
@@ -107,14 +101,16 @@ export function SectionHeading({
 }
 
 export function SubSection({
+  id,
   title,
   children,
 }: {
+  id?: string;
   title: string;
   children: React.ReactNode;
 }) {
   return (
-    <div className="mb-12">
+    <div id={id} className="mb-12 scroll-mt-16">
       <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-4">
         {title}
       </h3>

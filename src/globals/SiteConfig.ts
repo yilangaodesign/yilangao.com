@@ -4,7 +4,7 @@ export const SiteConfig: GlobalConfig = {
   slug: 'site-config',
   label: 'Site Config',
   admin: {
-    description: 'Global site configuration — bio, teams, links, experience, education.',
+    description: 'Global site configuration — bio, teams, links, clients, experience, education.',
   },
   access: {
     read: () => true,
@@ -93,6 +93,32 @@ export const SiteConfig: GlobalConfig = {
                   name: 'external',
                   type: 'checkbox',
                   defaultValue: true,
+                },
+              ],
+            },
+          ],
+        },
+        {
+          label: 'Clients',
+          fields: [
+            {
+              name: 'clients',
+              type: 'array',
+              admin: {
+                description: 'Client / company logos shown in the "Trusted by" marquee on the contact page',
+              },
+              fields: [
+                {
+                  name: 'name',
+                  type: 'text',
+                  required: true,
+                },
+                {
+                  name: 'url',
+                  type: 'text',
+                  admin: {
+                    description: 'Optional link to the client\'s website',
+                  },
                 },
               ],
             },

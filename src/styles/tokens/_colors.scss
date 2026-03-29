@@ -18,22 +18,24 @@
 
 
 // -----------------------------------------------------------------------------
-// 1. Brand Accent (Purple-Indigo) — NOT from Carbon
+// 1. Brand Accent (Lumen Blue-Violet) — NOT from Carbon
 // -----------------------------------------------------------------------------
-// This is the yilangao.com brand color. Carbon uses Blue 60 (#0f62fe) as its
-// primary interactive color; we deliberately diverge with a purple-indigo
-// family to maintain visual identity distinct from IBM products.
+// Ported from the Cadence Design System's "Lumen" scale (IBM Carbon project).
+// Lumen was designed as a perceptually uniform blue-violet ramp with no hue
+// discontinuity. Carbon uses Blue 60 (#0f62fe) as its primary interactive
+// color; we deliberately diverge to maintain visual identity distinct from
+// IBM products. The key brand color sits at step 60.
 
-$portfolio-accent-10: #F0F0FF;
-$portfolio-accent-20: #D9D9FF;
-$portfolio-accent-30: #B3B3FF;
-$portfolio-accent-40: #8C8CFF;
-$portfolio-accent-50: #6B5CE7;
-$portfolio-accent-60: #4A3ADB;
-$portfolio-accent-70: #3628B0;
-$portfolio-accent-80: #261C85;
-$portfolio-accent-90: #18115A;
-$portfolio-accent-100: #0C0930;
+$portfolio-accent-10: #F0F5FD;
+$portfolio-accent-20: #D5E0FC;
+$portfolio-accent-30: #B3C5FC;
+$portfolio-accent-40: #8DA3FC;
+$portfolio-accent-50: #7182FD;
+$portfolio-accent-60: #3336FF;
+$portfolio-accent-70: #0004E2;
+$portfolio-accent-80: #0003A7;
+$portfolio-accent-90: #000273;
+$portfolio-accent-100: #05063E;
 
 
 // -----------------------------------------------------------------------------
@@ -175,48 +177,115 @@ $portfolio-magenta-100: #2A0A18;
 
 
 // =============================================================================
-// 4. Semantic Tokens — Role-Based Aliases
+// 4. Semantic Tokens — Property · Role · Emphasis
 // =============================================================================
-// These map palette colors to UI roles. The UI consumes ONLY semantic tokens,
-// never raw palette values. This indirection allows us to swap underlying
-// colors without touching component code.
+// Token naming formula:  $portfolio-{property}-{role}-{emphasis}
+//
+//   Property  — What element type: surface | text | icon | border | action
+//   Role      — Semantic intent:   neutral | brand | inverse | always-light |
+//                                  negative | positive | warning | overlay
+//   Emphasis  — Prominence level:  bold | regular | subtle | minimal | disabled
+//               (not all tokens carry an emphasis modifier)
+//
+// Inspired by Goldman Sachs One GS design system's structured color taxonomy.
+// Components consume ONLY these semantic tokens, never raw palette values.
+// See docs/design.md §9 for the full architecture rationale.
 
-// — Surfaces
-$portfolio-surface-primary: $portfolio-neutral-00;
-$portfolio-surface-secondary: $portfolio-neutral-05;
-$portfolio-surface-tertiary: $portfolio-neutral-10;
-$portfolio-surface-inverse: $portfolio-neutral-100;
+// — Surface ·······························································
+$portfolio-surface-neutral-minimal: $portfolio-neutral-00;
+$portfolio-surface-neutral-subtle: $portfolio-neutral-05;
+$portfolio-surface-neutral-regular: $portfolio-neutral-10;
+$portfolio-surface-inverse-bold: $portfolio-neutral-100;
+$portfolio-surface-brand-bold: $portfolio-accent-60;
+$portfolio-surface-brand-subtle: $portfolio-accent-10;
+$portfolio-surface-negative-bold: $portfolio-red-60;
+$portfolio-surface-negative-subtle: $portfolio-red-10;
+$portfolio-surface-positive-bold: $portfolio-green-60;
+$portfolio-surface-positive-subtle: $portfolio-green-10;
+$portfolio-surface-warning-bold: $portfolio-yellow-30;
+$portfolio-surface-warning-subtle: $portfolio-yellow-10;
 $portfolio-surface-overlay: rgba(0, 0, 0, 0.5);
 
-// — Text
-$portfolio-text-primary: $portfolio-neutral-100;
-$portfolio-text-secondary: $portfolio-neutral-70;
-$portfolio-text-helper: $portfolio-neutral-60;
-$portfolio-text-placeholder: $portfolio-neutral-40;
-$portfolio-text-disabled: $portfolio-neutral-30;
-$portfolio-text-inverse: $portfolio-neutral-00;
-$portfolio-text-on-color: $portfolio-neutral-00;
-$portfolio-text-link: $portfolio-accent-60;
-$portfolio-text-error: $portfolio-red-60;
+// — Text ··································································
+$portfolio-text-neutral-bold: $portfolio-neutral-100;
+$portfolio-text-neutral-regular: $portfolio-neutral-70;
+$portfolio-text-neutral-subtle: $portfolio-neutral-60;
+$portfolio-text-neutral-minimal: $portfolio-neutral-40;
+$portfolio-text-neutral-disabled: $portfolio-neutral-30;
+$portfolio-text-brand-bold: $portfolio-accent-60;
+$portfolio-text-inverse-bold: $portfolio-neutral-00;
+$portfolio-text-always-light-bold: $portfolio-neutral-00;
+$portfolio-text-negative: $portfolio-red-60;
+$portfolio-text-positive: $portfolio-green-60;
+$portfolio-text-warning: $portfolio-yellow-30;
 
-// — Borders
-$portfolio-border-subtle: $portfolio-neutral-20;
-$portfolio-border-strong: $portfolio-neutral-50;
-$portfolio-border-interactive: $portfolio-accent-60;
-$portfolio-border-inverse: $portfolio-neutral-100;
-$portfolio-border-disabled: $portfolio-neutral-30;
+// — Icon ··································································
+$portfolio-icon-neutral-bold: $portfolio-neutral-100;
+$portfolio-icon-neutral-regular: $portfolio-neutral-70;
+$portfolio-icon-neutral-subtle: $portfolio-neutral-60;
+$portfolio-icon-neutral-minimal: $portfolio-neutral-40;
+$portfolio-icon-brand-bold: $portfolio-accent-60;
+$portfolio-icon-inverse-bold: $portfolio-neutral-00;
+$portfolio-icon-negative: $portfolio-red-60;
+$portfolio-icon-positive: $portfolio-green-60;
+$portfolio-icon-warning: $portfolio-yellow-30;
 
-// — Support (status indicators)
+// — Border ································································
+$portfolio-border-neutral-bold: $portfolio-neutral-50;
+$portfolio-border-neutral-subtle: $portfolio-neutral-20;
+$portfolio-border-neutral-disabled: $portfolio-neutral-30;
+$portfolio-border-brand-bold: $portfolio-accent-60;
+$portfolio-border-inverse-bold: $portfolio-neutral-100;
+$portfolio-border-negative: $portfolio-red-60;
+$portfolio-border-positive: $portfolio-green-60;
+$portfolio-border-warning: $portfolio-yellow-30;
+
+// — Action ································································
+$portfolio-action-brand-bold: $portfolio-accent-60;
+$portfolio-action-brand-subtle: $portfolio-accent-20;
+$portfolio-action-neutral-bold: $portfolio-neutral-100;
+$portfolio-action-neutral-regular: $portfolio-neutral-10;
+$portfolio-action-inverse-bold: $portfolio-neutral-00;
+$portfolio-action-negative: $portfolio-red-60;
+$portfolio-action-positive: $portfolio-green-60;
+$portfolio-action-warning: $portfolio-yellow-30;
+
+// — Focus & Highlight (interaction states — no property dimension)
+$portfolio-focus: $portfolio-accent-60;
+$portfolio-focus-inset: $portfolio-neutral-00;
+$portfolio-highlight: $portfolio-accent-20;
+
+
+// =============================================================================
+// 5. Legacy Aliases — Backward Compatibility
+// =============================================================================
+// These preserve backward compatibility with existing component code.
+// New code should use the property·role·emphasis names in §4 above.
+
+$portfolio-surface-primary: $portfolio-surface-neutral-minimal;
+$portfolio-surface-secondary: $portfolio-surface-neutral-subtle;
+$portfolio-surface-tertiary: $portfolio-surface-neutral-regular;
+$portfolio-surface-inverse: $portfolio-surface-inverse-bold;
+
+$portfolio-text-primary: $portfolio-text-neutral-bold;
+$portfolio-text-secondary: $portfolio-text-neutral-regular;
+$portfolio-text-helper: $portfolio-text-neutral-subtle;
+$portfolio-text-placeholder: $portfolio-text-neutral-minimal;
+$portfolio-text-disabled: $portfolio-text-neutral-disabled;
+$portfolio-text-inverse: $portfolio-text-inverse-bold;
+$portfolio-text-on-color: $portfolio-text-always-light-bold;
+$portfolio-text-link: $portfolio-text-brand-bold;
+$portfolio-text-error: $portfolio-text-negative;
+
+$portfolio-border-subtle: $portfolio-border-neutral-subtle;
+$portfolio-border-strong: $portfolio-border-neutral-bold;
+$portfolio-border-interactive: $portfolio-border-brand-bold;
+$portfolio-border-inverse: $portfolio-border-inverse-bold;
+$portfolio-border-disabled: $portfolio-border-neutral-disabled;
+
 $portfolio-support-error: $portfolio-red-60;
 $portfolio-support-success: $portfolio-green-60;
 $portfolio-support-warning: $portfolio-yellow-30;
 $portfolio-support-info: $portfolio-blue-70;
 $portfolio-support-caution-minor: $portfolio-yellow-30;
 $portfolio-support-caution-major: $portfolio-orange-40;
-
-// — Focus
-$portfolio-focus: $portfolio-accent-60;
-$portfolio-focus-inset: $portfolio-neutral-00;
-
-// — Highlight
-$portfolio-highlight: $portfolio-accent-20;

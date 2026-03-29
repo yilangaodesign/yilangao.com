@@ -9,10 +9,12 @@ import {
   GeistPixelLine,
 } from "geist/font/pixel";
 import "../globals.scss";
+import elan from "../../../elan.json";
 
 export const metadata: Metadata = {
   title: "Yilan Gao — UX Designer",
   description: "Portfolio of Yilan Gao, UX Designer crafting thoughtful digital experiences.",
+  generator: `${elan.name} ${elan.release.version}`,
 };
 
 const fontVariables = [

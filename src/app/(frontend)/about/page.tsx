@@ -1,4 +1,6 @@
 import { getPayloadClient } from "@/lib/payload";
+import { isAdminAuthenticated } from "@/lib/admin-auth";
+import { RefreshRouteOnSave } from "@/components/RefreshRouteOnSave";
 import AboutClient from "./AboutClient";
 
 const FALLBACK_EXPERIENCE = [
@@ -15,6 +17,7 @@ const FALLBACK_EDUCATION = [
 export default async function AboutPage() {
   let experience = FALLBACK_EXPERIENCE;
   let education = FALLBACK_EDUCATION;
+  const isAdmin = await isAdminAuthenticated();
 
   try {
     const payload = await getPayloadClient();
@@ -39,5 +42,10 @@ export default async function AboutPage() {
     // Payload not connected — use fallback data
   }
 
-  return <AboutClient experience={experience} education={education} />;
+  return (
+    <>
+      <RefreshRouteOnSave />
+      <AboutClient experience={experience} education={education} isAdmin={isAdmin} />
+    </>
+  );
 }

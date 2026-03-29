@@ -1,5 +1,7 @@
 import { notFound } from "next/navigation";
 import { getPayloadClient } from "@/lib/payload";
+import { isAdminAuthenticated } from "@/lib/admin-auth";
+import { RefreshRouteOnSave } from "@/components/RefreshRouteOnSave";
 import ProjectClient from "./ProjectClient";
 
 const FALLBACK_PROJECT = {
@@ -29,7 +31,8 @@ type Props = {
 export default async function ProjectPage({ params }: Props) {
   const { slug } = await params;
 
-  let project = FALLBACK_PROJECT;
+  let project: typeof FALLBACK_PROJECT & { id?: number } = FALLBACK_PROJECT;
+  const isAdmin = await isAdminAuthenticated();
 
   try {
     const payload = await getPayloadClient();
@@ -42,6 +45,7 @@ export default async function ProjectPage({ params }: Props) {
     if (res.docs.length > 0) {
       const doc = res.docs[0];
       project = {
+        id: doc.id,
         title: doc.title,
         category: doc.category,
         description: typeof doc.description === "string" ? doc.description : "Project description.",
@@ -67,5 +71,10 @@ export default async function ProjectPage({ params }: Props) {
     // Payload not connected — use fallback data
   }
 
-  return <ProjectClient project={project} />;
+  return (
+    <>
+      <RefreshRouteOnSave />
+      <ProjectClient project={project} isAdmin={isAdmin} />
+    </>
+  );
 }

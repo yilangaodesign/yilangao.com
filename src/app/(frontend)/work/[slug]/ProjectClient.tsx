@@ -5,6 +5,7 @@ import { FadeIn } from "@yilangaodesign/design-system";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import ScrollSpy from "@/components/ScrollSpy";
+import AdminBar from "@/components/AdminBar";
 import type { ScrollSpySection } from "@/components/ScrollSpy";
 import styles from "./page.module.scss";
 
@@ -16,6 +17,7 @@ type ProjectSection = {
 };
 
 type ProjectData = {
+  id?: number;
   title: string;
   category: string;
   description: string;
@@ -34,7 +36,7 @@ function slugify(text: string): string {
     .replace(/(^-|-$)/g, "");
 }
 
-export default function ProjectClient({ project }: { project: ProjectData }) {
+export default function ProjectClient({ project, isAdmin }: { project: ProjectData; isAdmin?: boolean }) {
   const p = project;
 
   const spySections: ScrollSpySection[] = useMemo(
@@ -46,8 +48,11 @@ export default function ProjectClient({ project }: { project: ProjectData }) {
     [p.sections],
   );
 
+  const editUrl = p.id ? `/admin/collections/projects/${p.id}` : '/admin/collections/projects'
+
   return (
-    <article className={styles.page}>
+    <article className={styles.page} style={isAdmin ? { paddingTop: 44 } : undefined}>
+      {isAdmin && <AdminBar editUrl={editUrl} editLabel={`Edit "${p.title}"`} />}
       <Navigation />
       <ScrollSpy sections={spySections} />
 

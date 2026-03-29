@@ -1,4 +1,6 @@
 import { getPayloadClient } from "@/lib/payload";
+import { isAdminAuthenticated } from "@/lib/admin-auth";
+import { RefreshRouteOnSave } from "@/components/RefreshRouteOnSave";
 import HomeClient from "./HomeClient";
 
 const FALLBACK_TEAMS = [
@@ -32,10 +34,11 @@ const FALLBACK_PROJECTS = [
 ];
 
 export default async function Home() {
-  let projects = FALLBACK_PROJECTS;
+  let projects: { id?: number; slug: string; title: string; category: string; featured: boolean }[] = FALLBACK_PROJECTS;
   let teams = FALLBACK_TEAMS;
   let links = FALLBACK_LINKS;
   let siteConfig = { name: "Yilan Gao", role: "UX Designer", location: "City, ST", email: "hello@example.com" };
+  const isAdmin = await isAdminAuthenticated();
 
   try {
     const payload = await getPayloadClient();
@@ -48,6 +51,7 @@ export default async function Home() {
 
     if (projectsRes.docs.length > 0) {
       projects = projectsRes.docs.map((p) => ({
+        id: p.id,
         slug: p.slug,
         title: p.title,
         category: p.category,
@@ -80,15 +84,19 @@ export default async function Home() {
       }
     }
   } catch {
-    // Payload not connected yet — use fallback data
+    // Payload not connected — use fallback data
   }
 
   return (
-    <HomeClient
-      projects={projects}
-      teams={teams}
-      links={links}
-      siteConfig={siteConfig}
-    />
+    <>
+      <RefreshRouteOnSave />
+      <HomeClient
+        projects={projects}
+        teams={teams}
+        links={links}
+        siteConfig={siteConfig}
+        isAdmin={isAdmin}
+      />
+    </>
   );
 }

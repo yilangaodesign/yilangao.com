@@ -16,8 +16,8 @@ Don't just fix the surface symptom. Ask:
 ### Step 2: Check Existing Knowledge
 
 Before writing code:
-1. Search `docs/engineering.md` for the relevant section.
-2. Search `docs/engineering-anti-patterns.md` for matching anti-patterns.
+1. Read the **full** `docs/engineering.md` — not just the Section Index. Incident processing requires complete context, even if pre-flight only loaded one section.
+2. Read `docs/engineering-anti-patterns.md` for matching anti-patterns.
 3. If a documented solution exists, **apply it directly** — don't re-derive.
 
 ### Step 3: Reproduce and Diagnose

@@ -4,7 +4,483 @@
 >
 > **Who reads this:** AI agents at session start (scan recent entries for context), and during feedback processing (check for recurring patterns).
 > **Who writes this:** AI agents after each feedback cycle via the `design-iteration` skill.
-> **Last updated:** 2026-03-29
+> **Last updated:** 2026-03-29 (FB-035: square icon tabs in collapsed sidebar)
+
+---
+
+## Session: 2026-03-29 — Square Icon Tabs in Collapsed Sidebar
+
+**Chat:** Current session
+**Scope:** `playground/src/components/sidebar.tsx`
+
+#### FB-035: "Each collapsed nav tab is not a square — keep the height, make it wider"
+
+**UX Intent:** Collapsed nav icons should live inside a perfect square hit zone, not a rectangle. The user wants visual symmetry — each tab should be as wide as it is tall.
+
+**Root Cause:** The sidebar was 40px wide. After 1px border-r and 6px padding each side (`px-1.5`), items had 27px of width but 28px of height (`h-7`) — 1px off from square.
+
+**Resolution:** Widened the collapsed sidebar from 40px to 41px. Inner width = 40px, minus 12px padding = 28px item width = `h-7`. Each tab is now a 28×28 square. Also updated the search flyout (`left-[41px]`) and category sliver positioning (`left-[41px]`).
+
+**Bonus:** With 28px item width and `pl-[7px]`, the 14px-wide icon center lands at exactly 14px = 28/2. The previously "near-centered" icon (0.5px offset) is now **exactly centered** (0px offset).
+
+**Pattern extracted → `design.md` §4.2 updated with square-tab geometry.**
+
+---
+
+## Session: 2026-03-29 — Search-to-Nav Spacing & Category Naming
+
+**Chat:** Current session
+**Scope:** `playground/src/components/sidebar.tsx`
+
+#### FB-034: "Spacing between search and nav is too much; divider not centered; 'Foundational' collides with 'Foundations'"
+
+**UX Intent:** Three related sidebar polish issues: (1) excessive gap between search and the first nav section, especially visible in collapsed view; (2) the divider line positioned closer to the items below than the search above (2:1 ratio instead of 1:1); (3) naming collision between the "Foundations" section header and the "Foundational" component category.
+
+**Root Cause:**
+1. Three additive padding sources between search and nav: `pb-1` on search container (4px) + `pt-1` on scrollable nav (4px) + `mt-1` on section divider (4px) = 12px above the `h-6` divider wrapper. The divider line sat at 24px from search (12px padding + 12px half of h-6) vs 12px from first item — a 2:1 ratio.
+2. The "Foundational" category name shares the "found-" root with the "Foundations" section header. Users read both labels in the same visual column and perceive them as related/redundant.
+
+**Resolution:**
+1. Removed `pb-1` from both search containers (collapsed and expanded)
+2. Removed `pt-1` from the scrollable nav area
+3. Removed `mt-1` from section dividers — the `h-6` wrapper IS the entire gap, per §1.4
+4. Divider line now sits at 12px from search bottom and 12px from first item — perfectly centered
+5. Renamed "Foundational" category to "Base" (id changed from `foundational` to `base`)
+
+**Pattern extracted → `design.md` §11: naming collision avoidance principle**
+
+---
+
+## Session: 2026-03-29 — Collapsed Icon Centering
+
+**Chat:** Current session
+**Scope:** `playground/src/components/sidebar.tsx`
+
+#### FB-033: "Navigation bar items are not centrally aligned — skewed towards the right"
+
+**UX Intent:** In a narrow 40px collapsed sidebar, even a 1.5px offset from center is perceptible. Multiple icons stacked vertically amplify the asymmetry. The user expects icons to appear centered in the collapsed column.
+
+**Root Cause:** `pl-2` (8px left padding) places the icon center at 21px from the sidebar left edge. The sidebar's inner width is 39px (40px minus 1px `border-r`), so the true center is 19.5px. The icon was 1.5px right of center. The 1px border-right was not accounted for in the original centering math.
+
+**Resolution:** Changed all collapsed-mode left padding from `pl-2` (8px) to `pl-[7px]` (7px) across all five instances: search button, header expand button, category buttons (direct links and flyout triggers), and Archive link. The icon center is now at 20px — 0.5px from true center — imperceptible. The transition shift between collapsed (13px) and expanded (14px) is only 1px over 200ms.
+
+**Pattern extracted → `design.md` §4.2: updated with `pl-[7px]` rule and border-width accounting**
+
+---
+
+## Session: 2026-03-29 — Navigation IA: Foundations Section + Overview Identity
+
+**Chat:** Current session
+**Scope:** `playground/src/components/sidebar.tsx`, `playground/src/app/page.tsx`
+
+#### FB-032: "Put Overview and Styles together under a section — add branding to Overview page"
+
+**UX Intent:** The sidebar navigation lacked a conceptual tier for the system's identity layer. Overview (what is this system?) and Styles (what are its visual atoms?) are both "foundation-level" artifacts — they describe what the system IS, not what it BUILDS. Grouping them under a shared "Foundations" section header establishes a clear hierarchy: Foundations → Components → Archive. The Overview page itself was generic ("Design System / Tokens, components, and patterns") and needed to become the system's front door — introducing Élan by name, explaining its purpose, methodology, and intended use.
+
+**Root Cause:** Overview was a standalone link outside the category system, and the Styles category had its own section header ("Styles"). There was no conceptual grouping that said "these two things belong together." The Overview page content was auto-generated summary text with no authorial voice.
+
+**Resolution:**
+1. Added `href` optional field to `NavCategory` type for direct-link items (no flyout)
+2. Moved Overview into `componentCategories` as a direct-link entry: `{ id: "overview", href: "/", section: "Foundations" }`
+3. Changed Styles section from `"Styles"` to `"Foundations"`
+4. Updated `CategoriesSection` rendering to handle `href` categories as `<Link>` (not flyout trigger)
+5. Updated `getCategoryForPath` to check `cat.href` in addition to `cat.links`
+6. Updated search index to include direct-link categories
+7. Removed standalone Overview link from scrollable nav
+8. Rewrote Overview page: Élan version header, "A personal design system by Yilan Gao" hero, two info cards (Intended Use, How It's Built), then style page navigation cards with a "Styles" sub-header
+
+**Pattern extracted → `design.md` §11: direct-link categories extend the NavCategory model for items that navigate directly without a flyout**
+
+---
+
+## Session: 2026-03-29 — Sidebar Collapse Anchoring & Hover Sliver
+
+**Chat:** Current session
+**Scope:** `playground/src/components/sidebar.tsx`
+
+### Design Reflection — What the User Was Actually Designing
+
+This session surfaced two interaction-level issues that share a common principle: **navigation should feel spatially anchored and effortlessly responsive to the user's intent.**
+
+1. **Left-anchored collapse** — When collapsing the sidebar, icons shifted from left-aligned to center-aligned positions. The user perceives this as the nav "moving to the middle and then to the right." The correct mental model is a sidebar anchored to the left edge: it extends rightward when expanding and retracts from the right when collapsing. The icons should be at a fixed horizontal position in both states.
+
+2. **Hover-to-reveal sliver** — The category sliver (secondary menu) required a click to open. The user finds this "very inconvenient" — a pattern that requires deliberate targeting and clicking for what should be a fluid exploration action. Hover-to-reveal treats the sidebar as a progressive disclosure surface: the user's cursor position expresses intent, and the interface responds without requiring a commitment (click).
+
+**The meta-principle:** A navigation system should minimize the effort required to explore. Clicking to open a sub-menu, then clicking to close it, creates a transactional feel. Hovering to reveal and leaving to dismiss creates a conversational feel — the user and the interface are in a continuous dialogue about what's being explored. The sidebar becomes a lens the user moves around, not a series of doors they must open and close.
+
+### Feedback → Intent → Resolution
+
+---
+
+#### FB-030: "When collapsing, everything moves to the middle — should be left-aligned"
+
+**UX Intent:** The navigation sidebar should be anchored to the left edge. During the collapse transition, icons should stay at the same horizontal position. The sidebar width shrinks from the right; the left edge is invariant. Centering icons in collapsed mode creates horizontal shift during the transition that users perceive as unstable layout.
+
+**Root Cause:** In collapsed mode, all nav links used `justify-center w-7 mx-auto` — centering icons in a 28px square within the 28px container. In expanded mode, links used `px-2` — left-aligning icons at 14px from sidebar edge. The icon position shifted from ~14px (expanded) to ~13px (collapsed, centered) during the transition.
+
+**Resolution:**
+1. Replaced `justify-center w-7 mx-auto` with `pl-2` on all collapsed nav links (Overview, categories, Archive)
+2. Changed collapsed header from `justify-center` to `px-1.5` (left-aligned)
+3. Changed collapsed search button from centered (`justify-center w-7 h-7 mx-auto`) to left-aligned (`pl-2 h-7`)
+4. Icons now sit at 14px from sidebar left edge in both states — zero horizontal shift during transition
+
+**Pattern extracted → `design.md` §4: updated §4.2 with left-anchoring principle**
+
+---
+
+#### FB-031: "Side panel should slide out on hover, not require clicking"
+
+**UX Intent:** Navigation exploration should be fluid and effortless. Requiring a click to open the category sliver creates unnecessary interaction friction for what is essentially a "peek at what's inside" action. Hover-to-reveal treats the user's cursor position as a statement of interest; leaving the area is a statement of disinterest. No commitment (click) required.
+
+**Root Cause:** The CategorySliver component was wired to `onClick` handlers on category buttons. Opening required a click; closing required clicking the backdrop or the close button. Both interactions demand targeting precision and deliberate action.
+
+**Resolution:**
+1. Added `onMouseEnter` to category buttons that opens the sliver on hover (desktop only; mobile retains tap)
+2. Replaced the backdrop overlay + close button with a timer-based hover zone: `onMouseLeave` on sidebar/sliver starts a 200ms close timer; `onMouseEnter` on either cancels it
+3. Added slide animation to CategorySliver: `translate-x-0` (visible) ↔ `-translate-x-full` (hidden) with `transition-transform duration-200 ease-out` — sliver slides out from behind the sidebar and slides back
+4. Non-category elements (header, Overview, search, Archive) close the sliver on hover — prevents stale sliver when user moves to non-category areas
+5. Added `displayedCategory` state to keep sliver content during exit animation
+6. Sliver resets on sidebar collapse/expand (state coherence per §12.3)
+
+**Pattern extracted → `design.md` §4: updated §4.1 with hover-to-reveal interaction model**
+
+---
+
+### Session Meta-Analysis
+
+**Recurring theme:** Both issues relate to spatial stability and interaction fluidity — the same family of concerns from FB-013 (collapse spacing) and FB-020/021/022/023 (search flyout session). The sidebar is the most-interacted-with element in the playground, and users are acutely sensitive to any friction or instability in it.
+
+**Key learning — Hover zones need timer handoff:** When two adjacent elements (sidebar and sliver) share a hover zone, the mouse must be able to cross the boundary between them without triggering a close. A 200ms timer on `mouseLeave` with a `cancelClose` on `mouseEnter` handles this seamlessly. The timer also serves as a grace period for quick mouse passes.
+
+**Key learning — Non-category elements must reset sliver:** The `mouseEnter`/`mouseLeave` pattern on the aside element alone is insufficient because moving between elements inside the aside (from a category to the Overview link) doesn't trigger `mouseLeave` on the aside. Explicit close handlers on non-category elements are needed.
+
+---
+
+## Session: 2026-03-29 — Footer Height Alignment
+
+**Chat:** Current session
+**Scope:** `playground/src/components/shell.tsx`, `playground/src/components/sidebar.tsx`
+
+#### FB-029: "The footer height and the navigation tab archive section height are not aligned"
+
+**UX Intent:** Horizontal bands that span the full page width (sidebar + content) must share the same height. The top row already does this (sidebar header `h-12`, page header `h-12`). The bottom row was inconsistent — the sidebar archive section was ~44px (implicit from `py-2` + `h-7` link) while the page footer was ~40px (implicit from `py-3` + text). A 4px mismatch at the bottom edge creates a visible seam that undermines the otherwise aligned grid. The principle: if adjacent panels share a horizontal boundary, the boundary must be at the same Y coordinate.
+
+**Root Cause:** Both bottom sections used implicit height derived from padding + content instead of an explicit shared value. The top row avoided this problem because both headers used explicit `h-12`.
+
+**Resolution:**
+1. Gave both the sidebar archive section and the page footer an explicit `h-11` (44px) with `flex items-center` for vertical centering.
+2. Removed `py-2` / `py-3` padding that was creating the implicit (mismatched) heights.
+
+**Pattern extracted -> `design.md` §2: Layout Integrity — horizontal bands across adjacent panels must use explicit shared heights, not implicit padding-derived heights.**
+
+---
+
+## Session: 2026-03-29 — Version Display Consolidation
+
+**Chat:** Current session
+**Scope:** `playground/src/components/sidebar.tsx`, `playground/src/components/shell.tsx`
+
+#### FB-028: "I don't think you should add the version controlling navigation bar"
+
+**UX Intent:** Version metadata belongs at the page level, not in persistent navigation. The sidebar had "Élan 1.0.0" while the page footer had "Local Dev · Design System last updated 2026-03-29" — two competing sources of the same information. Conflicting metadata erodes trust and creates visual noise in the nav, which should be reserved for navigation only.
+
+**Root Cause:** The Élan versioning implementation placed version info in the sidebar (persistent, always-visible) while a pre-existing footnote in the Shell component already showed version-adjacent metadata. The two were never consolidated.
+
+**Resolution:**
+1. Removed the version label from the sidebar bottom section.
+2. Updated the Shell footer to use `elan.json` data instead of a hardcoded date constant, consolidating version + last-updated into a single page-level footnote.
+3. The footnote now reads: "Élan 1.0.0 · Last updated 2026-03-29" (with dev version and release-ahead indicator when running locally).
+
+**Pattern extracted -> `design.md` §14: Playground Consistency Principles — version metadata belongs in page-level footnotes, not navigation chrome.**
+
+---
+
+## Session: 2026-03-29 — Color Page UI Audit & Playground Footnote
+
+**Chat:** [Color page UI audit — swatch sizes, legacy removal, footnote](current-session)
+**Scope:** `playground/src/app/tokens/colors/page.tsx`, `playground/src/components/token-grid.tsx`, `playground/src/components/shell.tsx`
+**Duration:** 1 feedback exchange (3 issues raised)
+
+### Design Reflection — What the User Was Actually Designing
+
+This session surfaced three issues that share a common root principle: **the playground is a product, and its audience is designers and developers who need to consume token information efficiently.** Every UI element must justify its presence through user value, not system completeness.
+
+1. **Inconsistent swatch sizes** — Three different heights (80px, 56px, 40px) across the same page for the same conceptual element (a color swatch). This isn't a feature; it's visual inconsistency that makes the page look unpolished. The user correctly identified this as the first thing that feels wrong.
+
+2. **Legacy "was:" labels** — Showing previous token names (`was: surface-primary`) is system-centric thinking. It answers "what was this called before?" — a question only the maintainer cares about. The audience (designers, developers) needs to know what a token is called *now*. Historical names are noise that dilutes the signal.
+
+3. **Version/last-updated footnote** — Rather than removing version info entirely, the user reframed it as a useful piece of metadata: "when was this design system last released?" This is audience-centric — it tells consumers how fresh the documentation is. The localhost vs. production distinction acknowledges that the same UI serves two contexts with different trust models.
+
+**The meta-principle:** Every piece of information in a design system playground must pass a user-centric filter: "Does the audience need to see this?" If the answer is "only the maintainer needs this," it doesn't belong in the UI. Put it in docs, git history, or changelogs — not in the product surface.
+
+### Feedback → Intent → Resolution
+
+---
+
+#### FB-025: "Why are all the colors using different sizes?"
+
+**UX Intent:** Visual consistency is foundational to a design system's credibility. If the playground — the system's own documentation — can't maintain consistent sizing for its most basic element (a color swatch), it undermines trust in the system's rigor. Every swatch on the page represents the same conceptual object (a color sample) and should have the same visual weight.
+
+**Root Cause:** Three independent sizing decisions drifted apart:
+1. `ColorSwatch` component had a `large` prop (`h-20` vs `h-14`) used for accent/neutral scales
+2. `EmphasisSwatch` used `h-14` for semantic tokens
+3. Interaction section used a completely different card layout with `w-10 h-10` inline swatches
+
+**Resolution:** Removed the `large` prop from `ColorSwatch`, standardizing all swatches to `h-14`. Refactored the interaction section to use the same `ColorSwatch` component instead of a custom card layout. All color swatches on the page now share one visual pattern at one size.
+
+**Pattern extracted → `design.md` §14: Playground Consistency Principles (new)**
+
+---
+
+#### FB-026: "I don't need what it was before; that is just noise"
+
+**UX Intent:** Design system documentation should be user-centric, not maintainer-centric. Legacy token names answer a question only the system author cares about ("what was this called before the refactor?"). The audience — designers and developers consuming the tokens — only needs the current, canonical name and value. Historical information belongs in changelogs and git history, not in the product surface.
+
+**Root Cause:** The `EmphasisSwatch` component had a `showLegacy` prop that displayed `was: {old-token-name}` beneath each swatch. This was useful during the migration from flat naming to property·role·emphasis naming, but was never removed after the migration completed.
+
+**Resolution:** Removed `showLegacy` prop from `EmphasisSwatch` and `RoleRow`. Removed all `showLegacy` prop passes in `PropertySection`. The legacy mapping still exists in `tokens.ts` data for programmatic use but is no longer rendered in the UI.
+
+---
+
+#### FB-027: "There could be a version in footnotes — when was this last released?"
+
+**UX Intent:** Consumers of a design system need to know how current the documentation is. A "last updated" footnote is a trust signal — it tells the audience "this was reviewed recently" or "this might be stale." The localhost vs. production distinction is important: on localhost, the developer needs to know they're looking at a local build (not the published version); on production, the audience just needs the release date.
+
+**Root Cause:** No version or timestamp metadata was displayed anywhere in the playground UI.
+
+**Resolution:** Added `DesignSystemFootnote` component to `Shell`. On localhost, it displays "Local Dev · Design System last updated YYYY-MM-DD". On production, it displays "Design System last updated YYYY-MM-DD". The date is a constant (`DS_LAST_UPDATED`) that should be updated when the design system is released. The footer uses `text-[11px]` mono at 60% opacity — clearly subordinate to page content.
+
+---
+
+### Session Meta-Analysis
+
+**Key learning — User-centric vs. system-centric information:** The "was:" labels and inconsistent sizing both stem from the same root issue: the playground was partially built from the maintainer's perspective (showing migration artifacts, using different sizes for different data sources) rather than the consumer's perspective (showing the current system, consistently). This is a recurring risk in design system documentation — the people building it have different information needs than the people using it.
+
+**Key learning — Visual consistency as a swatch primitive:** A color swatch is the most basic visual element in a color token page. If it doesn't have consistent sizing, nothing else on the page will feel intentional. The `large` prop was a convenience that created visual fragmentation.
+
+---
+
+## Session: 2026-03-29 — ScrollSpy for Long Playground Pages
+
+**Chat:** [ScrollSpy for pages with significant overflow](current-session)
+**Scope:** `playground/src/app/tokens/{colors,motion,typography}/page.tsx`, `playground/src/components/scroll-spy.tsx`, `playground/src/components/token-grid.tsx`
+**Duration:** 1 feedback exchange (proactive design request, not a complaint fix)
+
+### Design Reflection — What the User Was Actually Designing
+
+This request appeared to be about adding a UI component to pages. It was not. The user was establishing a **content navigation policy** — a design-system-level rule about when secondary navigation aids are warranted and when they create unnecessary complexity.
+
+The critical phrase was: *"Only if the scroll is significant, and you need to find how significant it is to justify a ScrollSpy, because adding ScrollSpy unnecessarily can create lots of work, so let's not do that."* This is a cost-benefit framework: the user is saying that every UI element has a maintenance cost, a cognitive cost, and an implementation cost, and those costs must be justified by proportional user benefit. A ScrollSpy on a 1.5-viewport-height page is visual noise — it adds interaction surface that doesn't pay for itself. A ScrollSpy on a 5-viewport-height page with 8 named sections is essential wayfinding.
+
+**The design principle being articulated:** Navigation aids follow a threshold model, not a blanket policy. The threshold has two dimensions — **content depth** (how many viewport heights) and **section count** (how many distinct, named regions). Both must be high enough to justify the aid. A page can be long but monotonic (a single grid of 200 color swatches) — that doesn't need a ScrollSpy because there's nothing to navigate *between*. A page can have many sections but be short — that doesn't need a ScrollSpy because the user can already see most sections. The sweet spot is pages that are both deep AND structured.
+
+**The audit discipline:** The user explicitly asked me to *evaluate* which pages qualify rather than giving me a list. This is a design maturity signal — the user expects the agent to apply judgment, not just follow instructions. The evaluation required reading every page, estimating rendered height (not just line count — a 150-line page with data-driven grids can render 5 viewport heights), and assessing section structure. This is design auditing, not implementation.
+
+**What was decided:**
+- **Colors** (8 sections, 4-5+ viewport heights): accent, neutral, extended palette with many color families, and 5 semantic categories. The extended palette alone renders hundreds of swatches.
+- **Motion** (6 sections, 5+ viewport heights): easing curves with SVG visualizations, duration demos, choreography preset cards, 11 interactive mixin demos in a 3-column grid, globals, z-index.
+- **Typography** (5 sections, 3+ viewport heights): type scale with rendered samples, font stack cards with sample text, weights, line heights with paragraph demos, letter spacing.
+
+**What was excluded and why:** All 15 component pages were excluded despite some having 4 preview sections. A `ComponentPreview` in default (preview) mode renders at ~280px height. Four of these plus a props table total ~1500-1800px — roughly 1.7-2 viewport heights. That's moderate scrolling, not "a lot." The user explicitly drew the line at "a lot," which maps to 3+ viewport heights with 5+ named sections.
+
+### Feedback → Intent → Resolution
+
+---
+
+#### FB-024: "For all pages with significant vertical overflow, add ScrollSpy — only if it's a lot of scrolling"
+
+**UX Intent:** Establish a content navigation policy: secondary navigation aids (ScrollSpy) should only be added when the cost-benefit analysis is positive. The costs are: implementation effort, maintenance burden, additional interaction surface for the user to learn, and visual noise on shorter pages. The benefit is: wayfinding in deeply structured, long pages where the user loses their place. The user wants the agent to develop judgment about where this threshold falls, not apply a blanket rule.
+
+**Root Cause:** Not a bug — a proactive design enhancement. The three token pages (colors, motion, typography) had accumulated enough content sections and rendered depth to cross the threshold where users would meaningfully benefit from a right-rail navigation aid.
+
+**Resolution:**
+1. Created `playground/src/components/scroll-spy.tsx` — Tailwind-based equivalent of the main site's `src/components/ScrollSpy.tsx`, preserving all interaction behaviors: IntersectionObserver tracking, pointer capture drag, dead zone click/drag discrimination (from AP-012 lesson), closest-element mapping (from AP-011 lesson)
+2. Added `id` prop to `SubSection` component in `token-grid.tsx` with `scroll-mt-16` to offset for the sticky header
+3. Added ScrollSpy with section ids to colors (8 notches), motion (6 notches), typography (5 notches)
+4. ScrollSpy labels use abbreviated versions of section titles for tooltip brevity: "Choreography" instead of "Choreography Presets (TS)"
+
+**Pattern extracted → `design.md` §13: Content Navigation Policy (new section)**
+
+---
+
+### Session Meta-Analysis
+
+**Key learning — ScrollSpy threshold model:** ScrollSpy is warranted when a page meets BOTH conditions: (a) 3+ viewport heights of rendered content, and (b) 5+ distinct named sections that a user might want to jump between. Pages that are long but monotonic, or structured but short, do not benefit.
+
+**Key learning — Label brevity:** ScrollSpy tooltip labels must be shorter than section headings. The heading "Interactive Mixins (SCSS)" becomes the label "Mixins". The user is already on the page and knows the context — the label only needs to differentiate sections from each other, not introduce them.
+
+**Key learning — `scroll-mt` for sticky headers:** Any `scrollIntoView({ block: "start" })` or anchor navigation requires `scroll-mt-{N}` on the target element to prevent the section heading from scrolling under the sticky header bar.
+
+**Process failure in this session:** The agent did not activate the design-iteration skill before beginning work, did not read `docs/design.md` or `docs/design-anti-patterns.md` pre-flight, and initially completed the task without writing this reflection. This was caught by the user. See meta-analysis below.
+
+---
+
+## Session: 2026-03-29 — Sidebar Information Architecture & Search Redesign
+
+**Chat:** [Sidebar IA taxonomy and search redesign](e4c4b12f-63d8-4e02-acd3-706ddef7b37d)
+**Scope:** `playground/src/components/sidebar.tsx` — Navigation taxonomy, search interaction, flyout architecture
+**Duration:** 9 feedback exchanges
+
+### Design Reflection — What the User Was Actually Designing
+
+This session appeared to be about renaming a tab and reorganizing a list. It was not. Across nine exchanges, the user was articulating a coherent design systems philosophy through specific, concrete decisions. Every prompt carried a deeper intent:
+
+**1. "Rename UI Primitives to Foundational" → Taxonomy is architecture, not labeling.**
+The user rejected "UI Primitives" not because the name was wrong, but because the *concept* was wrong. "Primitives" is implementation jargon — it describes what a component *is* (a building block). "Foundational" describes what the component *does for the designer* (it forms the base you build on). This is the difference between taxonomy-as-inventory and taxonomy-as-wayfinding. The user was pushing the design system from a developer's mental model (component types) to a designer's mental model (design tasks). Every subsequent categorization decision — Toast moving to Feedback, Select moving to Forms — followed this same principle: categorize by the job the designer is trying to accomplish, not by the component's technical ancestry.
+
+**2. "I significantly disagree with how some of them are here" → Design system credibility requires opinion.**
+A design system that dumps 15 components into "UI Primitives" is a system that hasn't been curated. It's a directory listing, not a design opinion. The user's frustration wasn't just about findability — it was about the system's authority. If the component library can't decide where a Toast belongs, why would a consumer trust its spacing tokens? The reorganization into 9 task-oriented categories (Foundational, Forms & Controls, Feedback & Overlay, Navigation & Menus, Data Display, Layout & Shell, Content & Media, Entrance & Reveal, Interaction) was an act of editorial curation that makes the system feel *authored*, not auto-generated.
+
+**3. "There should still be dividers" → Hierarchy needs explicit visual scaffolding.**
+When the initial reorganization flattened everything into a single list of categories, the user immediately asked for the TOKENS/COMPONENTS section dividers back. This isn't nostalgia for the old layout — it's recognition that two distinct *types* of artifacts (tokens vs. components) need a visual signal that they belong to different conceptual tiers. The dividers act as a typographic device: they declare "what follows is a different kind of thing." Without them, the user has to infer the boundary from context, which adds cognitive overhead in exactly the place where navigation should be effortless.
+
+**4. "Within the sliver there could be a section header" → Progressive disclosure must preserve context.**
+Category flyouts (slivers) that present a flat list of 8+ links lose the user. Adding optional `group` sub-headers inside the flyout gives structure without adding depth. This is the Goldilocks principle applied to progressive disclosure: one level (flat list) is too shallow for large categories, three levels (nested accordions) is too deep for a sidebar, but two levels (category → grouped links) is exactly right.
+
+**5. "Instead of the form expanding, it kind of just has a floating menu" → Interaction responses belong near the trigger.**
+The user rejected both a centered modal and an in-place expansion for search. The centered modal violated Fitts's Law — the mouse travels from the sidebar edge to the viewport center, a long movement for a frequent action. The in-place expansion was better but consumed sidebar real estate and disrupted spatial memory (other nav items shift). The floating adjacent panel was the synthesis: it appears immediately next to the trigger (minimal mouse travel), doesn't displace existing navigation (spatial stability), and disappears when not needed (no persistent cost). This is the same principle as right-click context menus and tooltip popovers — the response should appear where the user's attention already is.
+
+**6. "When I click to expand, that search modal doesn't disappear" → State must be coherent across mode transitions.**
+The flyout persisting into expanded mode as a visual duplicate revealed a systems-level concern: the sidebar has two display modes (collapsed/expanded), and every piece of transient state (open menus, search queries, active flyouts) must either transfer gracefully between modes or reset. The user wasn't just reporting a rendering bug — they were asserting that modal state and layout state must be coupled. When the layout changes, the modals must re-evaluate whether they still make sense in the new context.
+
+**7. "It's a different size" / "not aligned horizontally" → Visual identity must survive spatial transformation.**
+When the same affordance (search input) appears in two spatial contexts (inline in expanded sidebar, flyout adjacent to collapsed sidebar), it must look like the same control. Different font sizes, different heights, different border treatments — these signal "two different things" rather than "one thing in two places." The user was enforcing identity consistency: the search input is a single design artifact; its spatial position changes, but its visual form does not.
+
+**Meta-pattern across the whole session:** The user is designing at the systems level. Every individual piece of feedback was a specific instance of a general principle: *a design system must be internally coherent, editorially opinionated, and spatially stable*. The taxonomy work was about coherence (every component has exactly one logical home). The search redesign was about spatial stability (interactions don't displace content, mode transitions don't create visual duplicates). The insistence on matching sizes and alignment was about editorial opinion (the system has a specific visual voice that doesn't change based on context).
+
+This session's deepest lesson: **the navigation IS the design system's first impression.** If the sidebar — the literal table of contents — is disorganized, inconsistent between states, or spatially unstable, it undermines every component documented inside it. The user was fixing the frame, not the painting.
+
+### Feedback → Intent → Resolution
+
+---
+
+#### FB-019: "Change UI Primitives to Foundational; rearrange components — Toast to feedback, forms and controls, data grid, menu"
+
+**UX Intent:** Component taxonomy should reflect design tasks (what the user is trying to accomplish), not implementation types (what the component technically is). A catch-all "UI Primitives" category with 15 items signals a system that hasn't been curated. Each category should answer the question "what kind of design problem am I solving?" — Foundational (base building blocks), Forms & Controls (data input), Feedback & Overlay (system responses), etc.
+
+**Root Cause:** The original taxonomy was auto-organized by technical similarity (all "basic" components in one bucket) rather than by usage context. No editorial pass had been done to challenge placements.
+
+**Resolution:**
+1. Renamed "UI Primitives" to "Foundational" and reduced it to true base elements (Button, Card, Badge, Divider, Avatar, Tag)
+2. Created 9 task-oriented categories: Foundational, Forms & Controls, Feedback & Overlay, Navigation & Menus, Data Display, Layout & Shell, Content & Media, Entrance & Reveal, Interaction
+3. Redistributed all components based on the design job they serve (Toast → Feedback, Select/Input → Forms, DataGrid → Data Display, etc.)
+4. Converted flat token links into a collapsible "Tokens" category, consistent with component categories
+
+**Pattern extracted → `design.md` §11: Information Architecture**
+
+---
+
+#### FB-020: "Instead of the form expanding, have an extension as a floating menu or modal"
+
+**UX Intent:** Search interaction responses should appear adjacent to the trigger (Fitts's Law) without displacing existing navigation (spatial stability). A centered modal requires long mouse travel; an inline expansion shifts nav items. A floating panel next to the sidebar synthesizes proximity with stability.
+
+**Root Cause:** The original search expanded inline, consuming sidebar space and pushing navigation items down — violating spatial memory.
+
+**Resolution:**
+1. Replaced inline search expansion with `SidebarSearch` component
+2. Collapsed mode: floating flyout panel rendered via `createPortal` to `document.body`, positioned adjacent to sidebar at `left-[40px]`
+3. Expanded mode: inline dropdown below a trigger button, within the sidebar column
+4. Global `Cmd+K` shortcut wired to both modes
+
+**Pattern extracted → `design.md` §4.4: Search Interaction, §11.3: Interaction Proximity**
+
+---
+
+#### FB-021: "The floating modal is not center-aligned with the search tab; not the same size"
+
+**UX Intent:** When the same affordance (search input) appears in two spatial contexts, it must be visually identical. Different sizes signal "two different controls" rather than "one control in two positions." Visual identity must survive spatial transformation.
+
+**Root Cause:** The collapsed flyout input used `h-9`, `text-[13px]` while the expanded inline input used `h-7`, `text-[12px]`. The flyout was at `left-[44px]` (4px gap from sidebar edge) instead of flush.
+
+**Resolution:**
+1. Unified input styling: both modes use `h-7`, `text-[12px]`, `pl-6 pr-2`, `bg-sidebar-muted/50 rounded-sm border border-accent/50`
+2. Flyout positioned at `left-[40px]` (flush with sidebar right edge), `w-[200px]` (matches expanded sidebar width)
+3. Search icon size unified to `w-3 h-3` in both contexts
+
+**Pattern extracted → `design.md` §12.2: Visual Identity Across Spatial Contexts**
+
+---
+
+#### FB-022: "When I expand the sidebar, the search modal doesn't disappear — becomes duplicate"
+
+**UX Intent:** Transient UI state (open flyouts, search queries) must be coherent with layout state. When the sidebar mode changes, all mode-dependent transient state must either transfer or reset. A flyout that persists into expanded mode creates a visual duplicate — the user sees two search bars, which is disorienting and signals broken state management.
+
+**Root Cause:** The `SidebarSearch` component's `open` state was not coupled to the `collapsed` prop. Expanding the sidebar changed the rendered UI but didn't reset the flyout.
+
+**Resolution:** Added a `useEffect` in `SidebarSearch` that watches the `collapsed` prop and resets `open` to `false` and `query` to `""` on any change. Mode transitions now always start from a clean state.
+
+**Pattern extracted → `design.md` §12.3: State Coherence Across Mode Transitions**
+
+---
+
+#### FB-023: "It's trapped in the navigation bar; I can't see anything; same as screenshot"
+
+**UX Intent:** A flyout that is visually trapped inside its parent container defeats the purpose of a flyout. The user couldn't see the search results, couldn't interact with the sidebar, and couldn't dismiss the overlay — a complete interaction dead-end.
+
+**Root Cause:** The sidebar `<aside>` element had Tailwind transition classes that applied CSS `transform` (e.g., `translate-x-0`). In CSS, any `transform` property — even an identity transform — creates a new stacking context and a containing block. `position: fixed` elements inside a transformed ancestor are positioned relative to that ancestor, not the viewport. Combined with `overflow-hidden` on the sidebar, the flyout was clipped to the sidebar's bounds.
+
+**Resolution:** Rendered the collapsed flyout via `createPortal(…, document.body)`. This escapes the sidebar's DOM hierarchy entirely, making the flyout truly viewport-fixed. A separate `flyoutRef` was added for click-away detection spanning both the trigger button and the portal content.
+
+**Pattern extracted → `design.md` §12.1: Portal Escape for Stacking Contexts**
+
+**Anti-pattern extracted → `design-anti-patterns.md` AP-013: Fixed Positioning Inside Transformed Containers, AP-014: Centered Modals for Contextual Actions**
+
+---
+
+### Session Meta-Analysis
+
+**Recurring theme:** 5 of 9 messages were about the search flyout — its positioning, sizing, state management, and stacking context behavior. The search control is a microcosm of the session's larger concern: **a design system's navigation must be spatially stable, visually consistent, and state-coherent.** Each search bug was a different manifestation of the same principle violation.
+
+**Escalation pattern:** The user's feedback escalated when a fix addressed the symptom but not the principle. Fixing the flyout's visual appearance without fixing the stacking context left the interaction broken (FB-023 after FB-021). This confirms §7.1: diagnose architecturally before patching visually.
+
+**Design maturity signal:** The user consistently operated at the systems level — never asking "make this pixel bigger" but always asking "why doesn't this behave like it should?" The gap between what was built and what was expected reveals where the system's internal logic breaks down. Every fix in this session was a logic fix, not a cosmetic fix.
+
+---
+
+## Session: 2026-03-29 — ScrollSpy Interaction Design
+
+**Chat:** [ScrollSpy playground interaction fixes](current-session)
+**Scope:** `playground/src/app/components/scroll-spy/page.tsx` — ScrollSpy demo component
+**Duration:** 4 feedback exchanges
+
+### Feedback → Intent → Resolution
+
+---
+
+#### FB-017: "ScrollSpy spacing should be slightly wider; drag sensitivity too low; active tick width change squeezes content"
+
+**UX Intent:** Three related interaction design issues that compound into a broken feel:
+1. **Spacing (Fitts's Law):** Interactive tick elements spaced at 8px create tiny pointer targets. The user must move with surgical precision to hit a specific notch — the opposite of how a scrub control should feel. Generous spacing increases target zones and makes the control feel responsive.
+2. **Gesture discrimination:** A control that supports both click-to-navigate and drag-to-scrub must distinguish between the two intents. When every pointer-down immediately enters drag mode, taps are impossible — the user can only drag, never click. The dead zone pattern (defer drag until movement exceeds a threshold) is the standard solution.
+3. **Layout stability:** When the active tick widens (16px → 28px), the track column's intrinsic width changes, pushing the adjacent content panel. This is the same class of bug as AP-009 (toggle state spacing inconsistency) applied to width instead of height: state transitions must not alter layout geometry.
+
+**Root Cause:**
+1. Track `gap-2` (8px) was too tight for comfortable pointer interaction
+2. `onPointerDown` immediately entered drag mode with `e.preventDefault()`, suppressing `click` events and making tap-to-navigate impossible
+3. Track column had no fixed width — relied on intrinsic sizing from child ticks, which varies with active state
+4. `indexFromPointer` used linear interpolation across the full track height (including padding), causing pointer zones to misalign with actual tick positions
+
+**Resolution:**
+1. Increased tick spacing to `gap-4` (16px) with `py-1` per notch for larger hit areas
+2. Added pointer dead zone pattern: `onPointerDown` records start position, `onPointerMove` only enters drag mode after 3px of movement, `endInteraction` detects click (no drag activated) and smooth-scrolls to target
+3. Added `w-10` fixed width to track column so tick width changes don't affect layout
+4. Replaced linear interpolation with closest-element detection: `indexFromPointer` queries all `[data-notch-index]` elements and returns the one whose center is nearest to the cursor
+
+**Pattern extracted → `design.md` §10: Interactive Control Design (new section)**
+
+**Anti-pattern extracted → `design-anti-patterns.md` AP-011: Linear Interpolation for Pointer-to-Element Mapping**
+
+---
+
+#### FB-018: "The drag sensitivity and distance are still too long; click is not working"
+
+**UX Intent:** The first fix improved spacing and added click/drag discrimination, but the pointer-to-index mapping was still broken. Clicking a specific tick mapped to the wrong section because the linear interpolation didn't account for padding and centering. This is a precision issue: the user clicks exactly on a tick and expects to go to that section — any mismatch feels random and broken.
+
+**Root Cause:** `indexFromPointer` still used `(clientY - trackTop) / trackHeight * (count - 1)`. With `py-6 justify-center`, ticks were centered in the track, so the top ~25% of the track mapped to index 0, and clicking tick 0 (which was at ~30% from top) returned index 1.
+
+**Resolution:** Replaced the linear formula with a closest-element query. Each notch div has a `data-notch-index` attribute. `indexFromPointer` iterates all notches, computes distance from cursor to each center, and returns the closest. This is always correct regardless of padding, gaps, or centering.
+
+**Pattern extracted → `design.md` §10.3: Pointer-to-Index Mapping**
 
 ---
 
@@ -269,6 +745,42 @@ These differences compounded, causing tabs to visibly jump 15–20px when toggli
 **Escalation pattern:** User frustration escalated from constructive ("add padding") to profanity ("what the fuck") when the same category of problem persisted across multiple exchanges. This signals that the AI was treating symptoms (adding more padding classes) instead of diagnosing the root cause (unlayered reset overriding everything).
 
 **Key learning:** When Tailwind classes appear correct but produce no visual effect, check the CSS cascade layers first. The problem is almost never "not enough padding" — it's "something is overriding the padding."
+
+---
+
+#### FB-020: "Reshape color token structure referencing One GS design system"
+
+**UX Intent:** The flat semantic token naming (`text-primary`, `surface-inverse`, `border-subtle`) was ad-hoc — each category used different naming conventions with no predictable pattern. A staff UX designer should be able to look at any token name and immediately know what element it applies to, what its semantic role is, and how prominent it is.
+
+**Root Cause:** The original naming was inherited from Carbon's flat token model, which works for Carbon because it has a massive docs site explaining each token. For a smaller design system, the naming itself needs to be self-documenting.
+
+**Resolution:** Adopted a structured three-part naming formula inspired by Goldman Sachs One GS: `$portfolio-{property}-{role}-{emphasis}`. Added `icon` and `action` as new properties. Introduced emphasis ladder (bold/regular/subtle/minimal) to replace ad-hoc names (primary/secondary/helper/placeholder). All old names preserved as legacy aliases. Updated sync-tokens.mjs, playground display, and design.md §9.
+
+**Pattern extracted → `design.md` §9.5: Token Architecture: Property · Role · Emphasis**
+
+---
+
+#### FB-021: "Map accent/brand color to match Lumen from IBM Carbon project"
+
+**UX Intent:** The brand accent scale should be a single, intentionally designed ramp shared across projects. The Cadence project's "Lumen" scale was designed with perceptual uniformity (no hue jump at step 50) and serves as the canonical brand blue-violet.
+
+**Root Cause:** The original accent was an ad-hoc ramp with a visible hue discontinuity between steps 40 and 50 (desaturated blue-gray → warm indigo). The Lumen scale was designed later with corrected interpolation.
+
+**Resolution:** Replaced all 10 accent steps with the Lumen scale values (key: #3336FF at step 60). Updated playground theme variables (#6B5CE7 → #7182FD, #8C8CFF → #8DA3FC, #f0f0ff → #F0F5FD). Ran sync-tokens. Resolves the §9.10 open issue "Accent scale perceptual jump at step 50."
+
+**Pattern extracted → `design.md` §9.3: Brand Accent: Lumen Blue-Violet**
+
+---
+
+#### FB-022: "Check accessibility — accent color for text is too light"
+
+**UX Intent:** Meaningful text in the playground (prop types, token values, active navigation labels) must be readable by all users. Using a decorative/light accent step for text fails users with low vision.
+
+**Root Cause:** `--color-accent` was set to accent-50 (#7182FD) which achieves only 3.33:1 contrast on white — below the 4.5:1 WCAG AA requirement for normal text. This was an aesthetic choice that prioritized a softer accent tone over accessibility.
+
+**Resolution:** Changed light-mode `--color-accent` and `--color-ring` from accent-50 (#7182FD) to accent-60 (#3336FF), which achieves 6.75:1 on white. Dark mode accent-40 (#8DA3FC) at 7.56:1 on #161616 was already compliant — no change needed. Added §9.8 "Accent Color Accessibility Policy" to design.md codifying the rule: any accent step used as foreground text must achieve 4.5:1 against its background.
+
+**Pattern extracted → `design.md` §9.8: Accent Color Accessibility Policy**
 
 ---
 

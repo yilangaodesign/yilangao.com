@@ -29,7 +29,6 @@ import {
   TextCursorInput,
   Bell,
   ChevronRight,
-  X,
   GripVertical,
   RectangleHorizontal,
   Square,
@@ -45,6 +44,10 @@ import {
   PanelTopOpen,
   LayoutList,
   BellRing,
+  Shapes,
+  Compass,
+  Table2,
+  Paintbrush,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -56,12 +59,13 @@ import {
   useRef,
   useMemo,
 } from "react";
+import { createPortal } from "react-dom";
 import Fuse from "fuse.js";
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
 const W_EXPANDED = "w-[200px]";
-const W_COLLAPSED = "w-[40px]";
+const W_COLLAPSED = "w-[41px]";
 
 // ── Context ──────────────────────────────────────────────────────────────────
 
@@ -99,6 +103,7 @@ type NavLink = {
   href: string;
   label: string;
   icon: React.ComponentType<{ className?: string }>;
+  group?: string;
 };
 
 type NavCategory = {
@@ -106,52 +111,127 @@ type NavCategory = {
   label: string;
   icon: React.ComponentType<{ className?: string }>;
   links: NavLink[];
+  section?: string;
+  href?: string;
 };
-
-const tokenLinks: NavLink[] = [
-  { href: "/tokens/colors", label: "Colors", icon: Palette },
-  { href: "/tokens/typography", label: "Typography", icon: Type },
-  { href: "/tokens/spacing", label: "Spacing", icon: Ruler },
-  { href: "/tokens/motion", label: "Motion", icon: Zap },
-  { href: "/tokens/elevation", label: "Elevation", icon: Layers },
-];
 
 const componentCategories: NavCategory[] = [
   {
-    id: "primitives",
-    label: "UI Primitives",
-    icon: RectangleHorizontal,
+    id: "overview",
+    label: "Overview",
+    icon: Home,
+    section: "Foundations",
+    href: "/",
+    links: [],
+  },
+  {
+    id: "tokens",
+    label: "Styles",
+    icon: Paintbrush,
+    section: "Foundations",
+    links: [
+      { href: "/tokens/colors", label: "Colors", icon: Palette },
+      { href: "/tokens/typography", label: "Typography", icon: Type },
+      { href: "/tokens/spacing", label: "Spacing", icon: Ruler },
+      { href: "/tokens/motion", label: "Motion", icon: Zap },
+      { href: "/tokens/elevation", label: "Elevation", icon: Layers },
+    ],
+  },
+  {
+    id: "base",
+    label: "Base",
+    icon: Shapes,
+    section: "Components",
     links: [
       { href: "/components/button", label: "Button", icon: Square },
-      { href: "/components/card", label: "Card", icon: RectangleHorizontal },
       { href: "/components/badge", label: "Badge", icon: Tag },
-      { href: "/components/divider", label: "Divider", icon: SeparatorHorizontal },
       { href: "/components/avatar", label: "Avatar", icon: CircleUser },
+      { href: "/components/card", label: "Card", icon: RectangleHorizontal },
+      {
+        href: "/components/divider",
+        label: "Divider",
+        icon: SeparatorHorizontal,
+      },
+    ],
+  },
+  {
+    id: "forms",
+    label: "Forms & Controls",
+    icon: TextCursorInput,
+    section: "Components",
+    links: [
       { href: "/components/input", label: "Input", icon: FormInput },
       { href: "/components/textarea", label: "Textarea", icon: AlignLeft },
       { href: "/components/select", label: "Select", icon: ListFilter },
       { href: "/components/checkbox", label: "Checkbox", icon: CheckSquare },
       { href: "/components/toggle", label: "Toggle", icon: ToggleRight },
-      { href: "/components/tooltip", label: "Tooltip", icon: MessageSquare },
-      { href: "/components/dialog", label: "Dialog", icon: PanelTopOpen },
-      { href: "/components/dropdown-menu", label: "DropdownMenu", icon: ListFilter },
-      { href: "/components/tabs", label: "Tabs", icon: LayoutList },
-      { href: "/components/toast", label: "Toast", icon: BellRing },
+      {
+        href: "/components/theme-toggle",
+        label: "ThemeToggle",
+        icon: ToggleLeft,
+      },
     ],
+  },
+  {
+    id: "feedback",
+    label: "Feedback & Overlay",
+    icon: Bell,
+    section: "Components",
+    links: [
+      { href: "/components/toast", label: "Toast", icon: BellRing },
+      { href: "/components/dialog", label: "Dialog", icon: PanelTopOpen },
+      { href: "/components/tooltip", label: "Tooltip", icon: MessageSquare },
+    ],
+  },
+  {
+    id: "nav-menus",
+    label: "Navigation & Menus",
+    icon: Compass,
+    section: "Components",
+    links: [
+      {
+        href: "/components/dropdown-menu",
+        label: "DropdownMenu",
+        icon: ListFilter,
+      },
+      { href: "/components/tabs", label: "Tabs", icon: LayoutList },
+    ],
+  },
+  {
+    id: "data-display",
+    label: "Data Display",
+    icon: Table2,
+    section: "Components",
+    links: [],
   },
   {
     id: "layout",
     label: "Layout & Shell",
     icon: PanelTop,
+    section: "Components",
     links: [
-      { href: "/components/navigation", label: "Navigation", icon: Navigation },
+      {
+        href: "/components/navigation",
+        label: "Navigation",
+        icon: Navigation,
+      },
       { href: "/components/footer", label: "Footer", icon: PanelBottom },
+    ],
+  },
+  {
+    id: "content",
+    label: "Content & Media",
+    icon: Newspaper,
+    section: "Components",
+    links: [
+      { href: "/components/marquee", label: "Marquee", icon: Repeat },
     ],
   },
   {
     id: "entrance",
     label: "Entrance & Reveal",
     icon: Sparkles,
+    section: "Components",
     links: [
       {
         href: "/components/fade-in",
@@ -169,6 +249,7 @@ const componentCategories: NavCategory[] = [
     id: "interaction",
     label: "Interaction",
     icon: MousePointer2,
+    section: "Components",
     links: [
       {
         href: "/components/expand-collapse",
@@ -187,32 +268,6 @@ const componentCategories: NavCategory[] = [
       },
     ],
   },
-  {
-    id: "content",
-    label: "Content & Media",
-    icon: Newspaper,
-    links: [
-      { href: "/components/marquee", label: "Marquee", icon: Repeat },
-    ],
-  },
-  {
-    id: "form",
-    label: "Form & Input",
-    icon: TextCursorInput,
-    links: [
-      {
-        href: "/components/theme-toggle",
-        label: "ThemeToggle",
-        icon: ToggleLeft,
-      },
-    ],
-  },
-  {
-    id: "feedback",
-    label: "Feedback",
-    icon: Bell,
-    links: [],
-  },
 ];
 
 // ── Search Index ─────────────────────────────────────────────────────────────
@@ -220,11 +275,19 @@ const componentCategories: NavCategory[] = [
 type SearchItem = NavLink & { section: string };
 
 const allSearchableItems: SearchItem[] = [
-  { href: "/", label: "Overview", icon: Home, section: "Pages" },
-  ...tokenLinks.map((l) => ({ ...l, section: "Tokens" })),
-  ...componentCategories.flatMap((cat) =>
-    cat.links.map((l) => ({ ...l, section: cat.label }))
-  ),
+  ...componentCategories.flatMap((cat) => {
+    const items: SearchItem[] = [];
+    if (cat.href) {
+      items.push({
+        href: cat.href,
+        label: cat.label,
+        icon: cat.icon,
+        section: cat.section || "Pages",
+      });
+    }
+    items.push(...cat.links.map((l) => ({ ...l, section: cat.label })));
+    return items;
+  }),
   { href: "/archive", label: "Archive", icon: Archive, section: "Pages" },
 ];
 
@@ -238,74 +301,83 @@ const fuseInstance = new Fuse(allSearchableItems, {
 
 function getCategoryForPath(pathname: string): string | null {
   for (const cat of componentCategories) {
+    if (cat.href === pathname) return cat.id;
     if (cat.links.some((l) => l.href === pathname)) return cat.id;
   }
   return null;
 }
 
-// ── Search Component ─────────────────────────────────────────────────────────
+// ── Sidebar Search (collapsed: flyout, expanded: inline dropdown) ────────────
 
 function SidebarSearch({
   collapsed,
   onNavigate,
-  onExpandSidebar,
-  focusRequested,
-  onFocusHandled,
+  onMouseEnter,
 }: {
   collapsed: boolean;
   onNavigate?: () => void;
-  onExpandSidebar?: () => void;
-  focusRequested: boolean;
-  onFocusHandled: () => void;
+  onMouseEnter?: () => void;
 }) {
+  const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
-  const [focused, setFocused] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const flyoutRef = useRef<HTMLDivElement>(null);
 
   const results = useMemo(() => {
     if (!query.trim()) return [];
     return fuseInstance.search(query).slice(0, 8);
   }, [query]);
 
-  const showDropdown =
-    focused && query.trim().length > 0 && results.length > 0;
-
   useEffect(() => {
     setSelectedIndex(0);
   }, [results]);
 
   useEffect(() => {
-    if (focusRequested && !collapsed && inputRef.current) {
-      inputRef.current.focus();
-      onFocusHandled();
-    }
-  }, [focusRequested, collapsed, onFocusHandled]);
+    setOpen(false);
+    setQuery("");
+  }, [collapsed]);
 
   useEffect(() => {
+    if (open) {
+      requestAnimationFrame(() => inputRef.current?.focus());
+    }
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
     function handleClick(e: MouseEvent) {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(e.target as Node)
-      ) {
-        setFocused(false);
-      }
+      const target = e.target as Node;
+      if (containerRef.current?.contains(target)) return;
+      if (flyoutRef.current?.contains(target)) return;
+      setOpen(false);
+      setQuery("");
     }
     document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
+  }, [open]);
+
+  useEffect(() => {
+    function handleKey(e: KeyboardEvent) {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        setOpen(true);
+      }
+    }
+    document.addEventListener("keydown", handleKey);
+    return () => document.removeEventListener("keydown", handleKey);
   }, []);
 
   function handleKeyDown(e: React.KeyboardEvent) {
     if (e.key === "Escape") {
-      e.stopPropagation();
-      setFocused(false);
+      e.preventDefault();
+      setOpen(false);
       setQuery("");
-      inputRef.current?.blur();
       return;
     }
-    if (!showDropdown) return;
+    if (results.length === 0) return;
     if (e.key === "ArrowDown") {
       e.preventDefault();
       setSelectedIndex((i) => Math.min(i + 1, results.length - 1));
@@ -321,130 +393,196 @@ function SidebarSearch({
   function navigateTo(href: string) {
     router.push(href);
     setQuery("");
-    setFocused(false);
+    setOpen(false);
     onNavigate?.();
   }
 
+  const showResults = query.trim().length > 0;
+
+  const resultsDropdown = showResults && (
+    <div className="max-h-[50vh] overflow-y-auto p-1">
+      {results.length === 0 ? (
+        <div className="px-3 py-4 text-center text-[12px] text-sidebar-muted-foreground/50">
+          No results for &ldquo;{query}&rdquo;
+        </div>
+      ) : (
+        results.map((r, idx) => {
+          const Icon = r.item.icon;
+          return (
+            <button
+              key={r.item.href}
+              className={cn(
+                "flex items-center gap-2 w-full px-2 h-7 rounded-sm text-[12px] transition-colors text-left",
+                idx === selectedIndex
+                  ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                  : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+              )}
+              onMouseEnter={() => setSelectedIndex(idx)}
+              onClick={() => navigateTo(r.item.href)}
+            >
+              <Icon className="w-3 h-3 shrink-0 text-sidebar-muted-foreground" />
+              <span className="truncate flex-1">{r.item.label}</span>
+              <span className="text-[10px] text-sidebar-muted-foreground/50 shrink-0">
+                {r.item.section}
+              </span>
+            </button>
+          );
+        })
+      )}
+    </div>
+  );
+
   if (collapsed) {
     return (
-      <div className="px-1.5 pb-1">
+      <div ref={containerRef} onMouseEnter={onMouseEnter} className="shrink-0 pt-2 px-1.5">
         <button
-          onClick={onExpandSidebar}
-          className="flex items-center justify-center w-7 h-7 mx-auto rounded-sm text-sidebar-muted-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-foreground transition-colors"
+          onClick={() => setOpen(!open)}
+          className="flex items-center pl-[7px] h-7 rounded-sm text-sidebar-muted-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-foreground transition-colors"
           title="Search (⌘K)"
         >
           <Search className="w-3.5 h-3.5" />
         </button>
+        {open &&
+          createPortal(
+            <div
+              ref={flyoutRef}
+              className="fixed top-[56px] left-[41px] z-50 w-[200px] bg-sidebar border border-sidebar-border rounded-sm shadow-2xl overflow-hidden"
+            >
+              <div className="relative p-1.5">
+                <Search className="absolute left-[14px] top-1/2 -translate-y-1/2 w-3 h-3 text-sidebar-muted-foreground pointer-events-none" />
+                <input
+                  ref={inputRef}
+                  type="text"
+                  placeholder="Search…"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  className="w-full h-7 pl-6 pr-2 text-[12px] bg-sidebar-muted/50 rounded-sm border border-accent/50 text-sidebar-foreground placeholder:text-sidebar-muted-foreground/50 focus:outline-none transition-colors"
+                />
+              </div>
+              {resultsDropdown}
+            </div>,
+            document.body
+          )}
       </div>
     );
   }
 
   return (
-    <div ref={containerRef} className="relative px-1.5 pb-1">
-      <div className="relative">
-        <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-sidebar-muted-foreground pointer-events-none" />
-        <input
-          ref={inputRef}
-          type="text"
-          placeholder="Search… ⌘K"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          onFocus={() => setFocused(true)}
-          onKeyDown={handleKeyDown}
-          className="w-full h-7 pl-6 pr-2 text-[12px] bg-sidebar-muted/50 rounded-sm border border-sidebar-border/50 text-sidebar-foreground placeholder:text-sidebar-muted-foreground/50 focus:outline-none focus:border-accent/50 transition-colors"
-        />
-      </div>
-
-      {showDropdown && (
-        <div className="absolute left-1.5 right-1.5 top-[calc(100%-2px)] z-50 bg-sidebar border border-sidebar-border rounded-sm shadow-lg overflow-hidden">
-          {results.map((r, idx) => {
-            const Icon = r.item.icon;
-            return (
-              <button
-                key={r.item.href}
-                className={cn(
-                  "flex items-center gap-2 w-full px-2 h-7 text-[12px] transition-colors text-left",
-                  idx === selectedIndex
-                    ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                    : "text-sidebar-foreground hover:bg-sidebar-accent/50"
-                )}
-                onMouseEnter={() => setSelectedIndex(idx)}
-                onClick={() => navigateTo(r.item.href)}
-              >
-                <Icon className="w-3 h-3 shrink-0 text-sidebar-muted-foreground" />
-                <span className="truncate flex-1">{r.item.label}</span>
-                <span className="text-[10px] text-sidebar-muted-foreground/50 shrink-0">
-                  {r.item.section}
-                </span>
-              </button>
-            );
-          })}
-        </div>
+    <div ref={containerRef} onMouseEnter={onMouseEnter} className="shrink-0 pt-2 relative px-1.5">
+      {!open ? (
+        <button
+          onClick={() => setOpen(true)}
+          title="Search (⌘K)"
+          className="flex items-center gap-2 w-full h-7 px-2 rounded-sm text-[12px] bg-sidebar-muted/50 border border-sidebar-border/50 text-sidebar-muted-foreground/50 hover:border-accent/50 hover:text-sidebar-muted-foreground transition-colors"
+        >
+          <Search className="w-3 h-3 shrink-0" />
+          <span className="flex-1 text-left">Search…</span>
+          <kbd className="text-[10px] font-medium">⌘K</kbd>
+        </button>
+      ) : (
+        <>
+          <div className="relative">
+            <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-sidebar-muted-foreground pointer-events-none" />
+            <input
+              ref={inputRef}
+              type="text"
+              placeholder="Search…"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={handleKeyDown}
+              className="w-full h-7 pl-6 pr-2 text-[12px] bg-sidebar-muted/50 rounded-sm border border-accent/50 text-sidebar-foreground placeholder:text-sidebar-muted-foreground/50 focus:outline-none transition-colors"
+            />
+          </div>
+          {showResults && (
+            <div className="absolute left-1.5 right-1.5 top-[calc(100%-2px)] z-50 bg-sidebar border border-sidebar-border rounded-sm shadow-lg overflow-hidden">
+              {results.length === 0 ? (
+                <div className="px-3 py-4 text-center text-[12px] text-sidebar-muted-foreground/50">
+                  No results for &ldquo;{query}&rdquo;
+                </div>
+              ) : (
+                results.map((r, idx) => {
+                  const Icon = r.item.icon;
+                  return (
+                    <button
+                      key={r.item.href}
+                      className={cn(
+                        "flex items-center gap-2 w-full px-2 h-7 text-[12px] transition-colors text-left",
+                        idx === selectedIndex
+                          ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                          : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+                      )}
+                      onMouseEnter={() => setSelectedIndex(idx)}
+                      onClick={() => navigateTo(r.item.href)}
+                    >
+                      <Icon className="w-3 h-3 shrink-0 text-sidebar-muted-foreground" />
+                      <span className="truncate flex-1">{r.item.label}</span>
+                      <span className="text-[10px] text-sidebar-muted-foreground/50 shrink-0">
+                        {r.item.section}
+                      </span>
+                    </button>
+                  );
+                })
+              )}
+            </div>
+          )}
+        </>
       )}
     </div>
   );
 }
 
-// ── Tokens Section (flat — stable, small count) ──────────────────────────────
+// ── Link rendering with optional group sub-headers ───────────────────────────
 
-function TokensSection({
-  pathname,
-  collapsed,
-  onNavigate,
-}: {
-  pathname: string;
-  collapsed: boolean;
-  onNavigate?: () => void;
-}) {
-  return (
-    <div>
-      <div className="h-6 flex items-center">
-        {collapsed ? (
-          <div className="w-full border-t border-sidebar-border" />
-        ) : (
-          <span className="px-2 text-[9px] font-medium tracking-[0.12em] uppercase text-sidebar-muted-foreground/50">
-            Tokens
-          </span>
+function renderLinksWithGroups(
+  links: NavLink[],
+  pathname: string,
+  onNavigate?: () => void
+) {
+  let lastGroup: string | undefined;
+
+  return links.map((link) => {
+    const LinkIcon = link.icon;
+    const isLinkActive = pathname === link.href;
+    const showGroupHeader = link.group && link.group !== lastGroup;
+    if (link.group) lastGroup = link.group;
+
+    return (
+      <div key={link.href}>
+        {showGroupHeader && (
+          <div className="px-2 pt-2 pb-0.5">
+            <span className="text-[9px] font-medium tracking-[0.1em] uppercase text-sidebar-muted-foreground/40">
+              {link.group}
+            </span>
+          </div>
         )}
+        <Link
+          href={link.href}
+          onClick={onNavigate}
+          className={cn(
+            "flex items-center gap-2 h-7 px-2 rounded-sm text-[13px] transition-colors",
+            isLinkActive
+              ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
+              : "text-sidebar-muted-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
+          )}
+        >
+          <LinkIcon className="w-3.5 h-3.5 shrink-0" />
+          {link.label}
+        </Link>
       </div>
-      <nav className="space-y-px">
-        {tokenLinks.map((link) => {
-          const Icon = link.icon;
-          const isActive = pathname === link.href;
-          return (
-            <Link
-              key={link.href}
-              href={link.href}
-              onClick={onNavigate}
-              title={collapsed ? link.label : undefined}
-              className={cn(
-                "flex items-center h-7 rounded-sm transition-colors",
-                collapsed
-                  ? "justify-center w-7 mx-auto"
-                  : "gap-2 px-2 text-[13px]",
-                isActive
-                  ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
-                  : "text-sidebar-muted-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
-              )}
-            >
-              <Icon className="w-3.5 h-3.5 shrink-0" />
-              {!collapsed && link.label}
-            </Link>
-          );
-        })}
-      </nav>
-    </div>
-  );
+    );
+  });
 }
 
-// ── Components Section (categorized with sliver/inline expansion) ────────────
+// ── Categories Section (unified tokens + components with section dividers) ───
 
-function ComponentsSection({
+function CategoriesSection({
   pathname,
   collapsed,
   isMobile,
   openCategory,
   onCategoryClick,
+  onCategoryHover,
   onNavigate,
 }: {
   pathname: string;
@@ -452,6 +590,7 @@ function ComponentsSection({
   isMobile: boolean;
   openCategory: string | null;
   onCategoryClick: (categoryId: string) => void;
+  onCategoryHover: (categoryId: string) => void;
   onNavigate?: () => void;
 }) {
   const activeCategory = getCategoryForPath(pathname);
@@ -461,21 +600,14 @@ function ComponentsSection({
     if (isMobile) {
       setMobileExpanded((prev) => (prev === catId ? null : catId));
     } else {
-      onCategoryClick(catId);
+      onCategoryHover(catId);
     }
   }
 
+  let lastSection: string | undefined;
+
   return (
     <div>
-      <div className="h-6 flex items-center">
-        {collapsed ? (
-          <div className="w-full border-t border-sidebar-border" />
-        ) : (
-          <span className="px-2 text-[9px] font-medium tracking-[0.12em] uppercase text-sidebar-muted-foreground/50">
-            Components
-          </span>
-        )}
-      </div>
       <nav className="space-y-px">
         {componentCategories.map((cat) => {
           const Icon = cat.icon;
@@ -483,67 +615,90 @@ function ComponentsSection({
           const isOpen =
             isMobile ? mobileExpanded === cat.id : openCategory === cat.id;
           const isEmpty = cat.links.length === 0;
+          const isDirectLink = !!cat.href;
+          const isDirectActive = isDirectLink && pathname === cat.href;
+
+          const showSectionDivider =
+            cat.section && cat.section !== lastSection;
+          if (cat.section) lastSection = cat.section;
 
           return (
             <div key={cat.id}>
-              <button
-                onClick={() => !isEmpty && handleCategoryClick(cat.id)}
-                title={collapsed ? cat.label : undefined}
-                disabled={isEmpty}
-                className={cn(
-                  "flex items-center h-7 rounded-sm transition-colors w-full",
-                  collapsed
-                    ? "justify-center w-7 mx-auto"
-                    : "gap-2 px-2 text-[13px]",
-                  isEmpty && "opacity-30 cursor-not-allowed",
-                  isOpen
-                    ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
-                    : isCatActive && !isEmpty
-                      ? "text-accent font-medium"
+              {showSectionDivider && (
+                <div className="h-6 flex items-center">
+                  {collapsed ? (
+                    <div className="w-full border-t border-sidebar-border" />
+                  ) : (
+                    <span className="px-2 text-[9px] font-medium tracking-[0.12em] uppercase text-sidebar-muted-foreground/50">
+                      {cat.section}
+                    </span>
+                  )}
+                </div>
+              )}
+              {isDirectLink ? (
+                <Link
+                  href={cat.href!}
+                  onClick={onNavigate}
+                  onMouseEnter={() => !isMobile && onCategoryHover("")}
+                  title={collapsed ? cat.label : undefined}
+                  className={cn(
+                    "flex items-center h-7 rounded-sm transition-colors w-full",
+                    collapsed ? "pl-[7px]" : "gap-2 px-2 text-[13px]",
+                    isDirectActive
+                      ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
                       : "text-sidebar-muted-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
-                )}
-              >
-                <Icon className="w-3.5 h-3.5 shrink-0" />
-                {!collapsed && (
-                  <>
+                  )}
+                >
+                  <Icon className="w-3.5 h-3.5 shrink-0" />
+                  {!collapsed && (
                     <span className="flex-1 text-left truncate">
                       {cat.label}
                     </span>
-                    {!isEmpty && (
-                      <ChevronRight
-                        className={cn(
-                          "w-3 h-3 shrink-0 transition-transform duration-150",
-                          isMobile && isOpen && "rotate-90"
-                        )}
-                      />
-                    )}
-                  </>
-                )}
-              </button>
+                  )}
+                </Link>
+              ) : (
+                <button
+                  onClick={() => !isEmpty && handleCategoryClick(cat.id)}
+                  onMouseEnter={() =>
+                    !isMobile && !isEmpty && onCategoryHover(cat.id)
+                  }
+                  title={collapsed ? cat.label : undefined}
+                  disabled={isEmpty}
+                  className={cn(
+                    "flex items-center h-7 rounded-sm transition-colors w-full",
+                    collapsed
+                      ? "pl-[7px]"
+                      : "gap-2 px-2 text-[13px]",
+                    isEmpty && "opacity-30 cursor-not-allowed",
+                    isOpen
+                      ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
+                      : isCatActive && !isEmpty
+                        ? "text-accent font-medium"
+                        : "text-sidebar-muted-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
+                  )}
+                >
+                  <Icon className="w-3.5 h-3.5 shrink-0" />
+                  {!collapsed && (
+                    <>
+                      <span className="flex-1 text-left truncate">
+                        {cat.label}
+                      </span>
+                      {!isEmpty && (
+                        <ChevronRight
+                          className={cn(
+                            "w-3 h-3 shrink-0 transition-transform duration-150",
+                            isMobile && isOpen && "rotate-90"
+                          )}
+                        />
+                      )}
+                    </>
+                  )}
+                </button>
+              )}
 
-              {/* Mobile: inline expansion */}
-              {isMobile && isOpen && (
+              {isMobile && isOpen && !isDirectLink && (
                 <div className="pl-4 space-y-px">
-                  {cat.links.map((link) => {
-                    const LinkIcon = link.icon;
-                    const isLinkActive = pathname === link.href;
-                    return (
-                      <Link
-                        key={link.href}
-                        href={link.href}
-                        onClick={onNavigate}
-                        className={cn(
-                          "flex items-center gap-2 h-7 px-2 rounded-sm text-[13px] transition-colors",
-                          isLinkActive
-                            ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
-                            : "text-sidebar-muted-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
-                        )}
-                      >
-                        <LinkIcon className="w-3.5 h-3.5 shrink-0" />
-                        {link.label}
-                      </Link>
-                    );
-                  })}
+                  {renderLinksWithGroups(cat.links, pathname, onNavigate)}
                 </div>
               )}
             </div>
@@ -560,59 +715,41 @@ function CategorySliver({
   category,
   pathname,
   sidebarCollapsed,
-  onClose,
+  visible,
+  onMouseEnter,
+  onMouseLeave,
+  onNavigate,
 }: {
   category: NavCategory;
   pathname: string;
   sidebarCollapsed: boolean;
-  onClose: () => void;
+  visible: boolean;
+  onMouseEnter: () => void;
+  onMouseLeave: () => void;
+  onNavigate?: () => void;
 }) {
   return (
-    <>
-      {/* Click-away backdrop — z-28, below sidebar (z-30) and sliver (z-29) */}
-      <div className="fixed inset-0 z-[28]" onClick={onClose} />
-
-      {/* Panel */}
-      <div
-        className={cn(
-          "fixed top-0 h-screen w-[200px] z-[29] bg-sidebar border-r border-sidebar-border shadow-lg",
-          sidebarCollapsed ? "left-[40px]" : "left-[200px]"
-        )}
-      >
-        <div className="flex items-center justify-between h-12 px-3 border-b border-sidebar-border">
-          <span className="text-[12px] font-medium text-sidebar-foreground">
-            {category.label}
-          </span>
-          <button
-            onClick={onClose}
-            className="flex items-center justify-center w-6 h-6 rounded-sm hover:bg-sidebar-accent/50 text-sidebar-muted-foreground hover:text-sidebar-foreground transition-colors"
-          >
-            <X className="w-3 h-3" />
-          </button>
-        </div>
-        <nav className="p-1.5 space-y-px">
-          {category.links.map((link) => {
-            const Icon = link.icon;
-            const isActive = pathname === link.href;
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={cn(
-                  "flex items-center gap-2 h-7 px-2 rounded-sm text-[13px] transition-colors",
-                  isActive
-                    ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
-                    : "text-sidebar-muted-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
-                )}
-              >
-                <Icon className="w-3.5 h-3.5 shrink-0" />
-                {link.label}
-              </Link>
-            );
-          })}
-        </nav>
+    <div
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+      className={cn(
+        "fixed top-0 h-screen w-[200px] z-[29] bg-sidebar border-r border-sidebar-border shadow-lg",
+        "transition-transform duration-200 ease-out",
+        visible
+          ? "translate-x-0"
+          : "-translate-x-full pointer-events-none",
+        sidebarCollapsed ? "left-[41px]" : "left-[200px]"
+      )}
+    >
+      <div className="flex items-center h-12 px-3 border-b border-sidebar-border">
+        <span className="text-[12px] font-medium text-sidebar-foreground">
+          {category.label}
+        </span>
       </div>
-    </>
+      <nav className="p-1.5 space-y-px">
+        {renderLinksWithGroups(category.links, pathname, onNavigate)}
+      </nav>
+    </div>
   );
 }
 
@@ -637,34 +774,57 @@ export function Sidebar() {
   const pathname = usePathname();
   const { mobileOpen, setMobileOpen, collapsed, setCollapsed } = useSidebar();
   const [openCategory, setOpenCategory] = useState<string | null>(null);
-  const [searchFocusRequested, setSearchFocusRequested] = useState(false);
+  const [displayedCategory, setDisplayedCategory] = useState<string | null>(
+    null
+  );
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const closeMobile = useCallback(() => setMobileOpen(false), [setMobileOpen]);
 
   const isCollapsedDesktop = collapsed && !mobileOpen;
   const isMobile = mobileOpen;
 
-  // Close sliver + mobile on route change
+  const scheduleClose = useCallback(() => {
+    closeTimerRef.current = setTimeout(() => {
+      setOpenCategory(null);
+    }, 200);
+  }, []);
+
+  const cancelClose = useCallback(() => {
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+  }, []);
+
+  useEffect(() => {
+    if (openCategory) setDisplayedCategory(openCategory);
+  }, [openCategory]);
+
   useEffect(() => {
     closeMobile();
     setOpenCategory(null);
   }, [pathname, closeMobile]);
 
-  // Global ⌘K to focus search
+  useEffect(() => {
+    setOpenCategory(null);
+  }, [collapsed]);
+
+  useEffect(() => {
+    return () => {
+      if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+    };
+  }, []);
+
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {
-      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
-        e.preventDefault();
-        if (isCollapsedDesktop) setCollapsed(false);
-        setSearchFocusRequested(true);
-      }
       if (e.key === "Escape" && openCategory) {
         setOpenCategory(null);
       }
     }
     document.addEventListener("keydown", handleKey);
     return () => document.removeEventListener("keydown", handleKey);
-  }, [isCollapsedDesktop, setCollapsed, openCategory]);
+  }, [openCategory]);
 
   const widthClass = isCollapsedDesktop ? W_COLLAPSED : W_EXPANDED;
 
@@ -672,13 +832,21 @@ export function Sidebar() {
     setOpenCategory((prev) => (prev === catId ? null : catId));
   }
 
-  const activeCategoryData = openCategory
-    ? componentCategories.find((c) => c.id === openCategory) ?? null
+  function handleCategoryHover(catId: string) {
+    if (!catId) {
+      setOpenCategory(null);
+      return;
+    }
+    cancelClose();
+    setOpenCategory(catId);
+  }
+
+  const sliverCategoryData = displayedCategory
+    ? componentCategories.find((c) => c.id === displayedCategory) ?? null
     : null;
 
   return (
     <>
-      {/* Mobile overlay */}
       {mobileOpen && (
         <div
           className="fixed inset-0 z-20 bg-black/40 lg:hidden"
@@ -686,7 +854,6 @@ export function Sidebar() {
         />
       )}
 
-      {/* Desktop: in-flow spacer that reserves sidebar width */}
       <div
         className={cn(
           "hidden lg:block shrink-0 transition-[width] duration-200 ease-in-out",
@@ -694,9 +861,10 @@ export function Sidebar() {
         )}
       />
 
-      {/* The sidebar panel */}
       <aside
         data-sidebar
+        onMouseEnter={cancelClose}
+        onMouseLeave={scheduleClose}
         className={cn(
           "fixed top-0 left-0 z-30 flex flex-col h-screen border-r bg-sidebar text-sidebar-foreground border-sidebar-border transition-[width] duration-200 ease-in-out overflow-hidden",
           "lg:translate-x-0",
@@ -706,9 +874,10 @@ export function Sidebar() {
       >
         {/* Header */}
         <div
+          onMouseEnter={() => setOpenCategory(null)}
           className={cn(
             "flex items-center h-12 border-b border-sidebar-border shrink-0",
-            isCollapsedDesktop ? "justify-center" : "justify-between px-4"
+            isCollapsedDesktop ? "px-1.5" : "justify-between px-4"
           )}
         >
           {!isCollapsedDesktop && (
@@ -728,7 +897,7 @@ export function Sidebar() {
           {isCollapsedDesktop && (
             <button
               onClick={() => setCollapsed(false)}
-              className="flex items-center justify-center w-7 h-7 rounded-sm hover:bg-sidebar-accent/50 text-sidebar-muted-foreground hover:text-sidebar-foreground transition-colors"
+              className="flex items-center pl-[7px] h-7 rounded-sm hover:bg-sidebar-accent/50 text-sidebar-muted-foreground hover:text-sidebar-foreground transition-colors"
               aria-label="Expand sidebar"
             >
               <PanelLeftOpen className="w-3.5 h-3.5" />
@@ -752,66 +921,37 @@ export function Sidebar() {
           )}
         </div>
 
-        {/* Search — pinned below header, above scrollable area */}
-        <div className="shrink-0 pt-2">
-          <SidebarSearch
-            collapsed={isCollapsedDesktop}
-            onNavigate={closeMobile}
-            onExpandSidebar={() => setCollapsed(false)}
-            focusRequested={searchFocusRequested}
-            onFocusHandled={() => setSearchFocusRequested(false)}
-          />
-        </div>
+        {/* Search */}
+        <SidebarSearch
+          collapsed={isCollapsedDesktop}
+          onNavigate={closeMobile}
+          onMouseEnter={() => setOpenCategory(null)}
+        />
 
         {/* Scrollable nav */}
-        <div className="flex-1 overflow-y-auto overflow-x-hidden pt-1 pb-4 px-1.5">
-          {/* Overview */}
-          <Link
-            href="/"
-            onClick={closeMobile}
-            title={isCollapsedDesktop ? "Overview" : undefined}
-            className={cn(
-              "flex items-center h-7 rounded-sm transition-colors",
-              isCollapsedDesktop
-                ? "justify-center w-7 mx-auto"
-                : "gap-2 px-2 text-[13px]",
-              pathname === "/"
-                ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
-                : "text-sidebar-muted-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
-            )}
-          >
-            <Home className="w-3.5 h-3.5 shrink-0" />
-            {!isCollapsedDesktop && "Overview"}
-          </Link>
-
-          {/* Tokens — flat list, small stable count */}
-          <TokensSection
-            pathname={pathname}
-            collapsed={isCollapsedDesktop}
-            onNavigate={closeMobile}
-          />
-
-          {/* Components — categorized */}
-          <ComponentsSection
+        <div className="flex-1 overflow-y-auto overflow-x-hidden pb-4 px-1.5">
+          <CategoriesSection
             pathname={pathname}
             collapsed={isCollapsedDesktop}
             isMobile={isMobile}
             openCategory={openCategory}
             onCategoryClick={handleCategoryClick}
+            onCategoryHover={handleCategoryHover}
             onNavigate={closeMobile}
           />
         </div>
 
-        {/* Bottom — Archive pinned */}
-        <div className="shrink-0 border-t border-sidebar-border px-1.5 py-2">
+        {/* Bottom — Archive pinned (h-11 matches page footer) */}
+        <div className="shrink-0 h-11 flex items-center border-t border-sidebar-border px-1.5">
           <Link
             href="/archive"
             onClick={closeMobile}
+            onMouseEnter={() => setOpenCategory(null)}
             title={isCollapsedDesktop ? "Archive" : undefined}
             className={cn(
               "flex items-center h-7 rounded-sm transition-colors",
               isCollapsedDesktop
-                ? "justify-center w-7 mx-auto"
+                ? "pl-[7px]"
                 : "gap-2 px-2 text-[13px]",
               pathname === "/archive"
                 ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
@@ -824,15 +964,18 @@ export function Sidebar() {
         </div>
       </aside>
 
-      {/* Category Sliver — desktop only, rendered outside sidebar for independent positioning */}
-      {!isMobile && activeCategoryData && (
+      {!isMobile && sliverCategoryData && (
         <CategorySliver
-          category={activeCategoryData}
+          category={sliverCategoryData}
           pathname={pathname}
           sidebarCollapsed={isCollapsedDesktop}
-          onClose={() => setOpenCategory(null)}
+          visible={openCategory !== null}
+          onMouseEnter={cancelClose}
+          onMouseLeave={scheduleClose}
+          onNavigate={() => setOpenCategory(null)}
         />
       )}
+
     </>
   );
 }

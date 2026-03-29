@@ -44,9 +44,113 @@ const BOOKS = [
   "Book Title Twenty-Five: The Art of Building",
 ]
 
+const TESTIMONIALS = [
+  {
+    text: "Working with Yilan was a transformative experience. The attention to detail and user-centered thinking elevated our product beyond expectations.",
+    name: "Sarah Chen",
+    role: "VP of Product, Acme Corp",
+    order: 1,
+  },
+  {
+    text: "Yilan brings a rare combination of technical understanding and design sensibility. Every interaction was thoughtful and intentional.",
+    name: "Marcus Rivera",
+    role: "Engineering Lead, Globex",
+    order: 2,
+  },
+  {
+    text: "The design system Yilan built for us became the foundation of everything we shipped. It was elegant, scalable, and a joy to work with.",
+    name: "Jamie Okafor",
+    role: "CTO, Initech",
+    order: 3,
+  },
+  {
+    text: "Yilan has an extraordinary ability to synthesize complex user research into clear, actionable design direction. Our conversion rate improved 40% after the redesign.",
+    name: "Priya Sharma",
+    role: "Head of Growth, Umbrella",
+    order: 4,
+  },
+  {
+    text: "What sets Yilan apart is the systems thinking. Every component, every interaction, every micro-animation serves the bigger picture.",
+    name: "Alex Kim",
+    role: "Design Director, Stark Ind",
+    order: 5,
+  },
+]
+
+const EXPERIMENTS = [
+  {
+    slug: "ascii-shader",
+    num: "01",
+    title: "ASCII Shader Engine",
+    description: "Real-time WebGL shader that converts any video feed into dynamic ASCII art. Built with custom GLSL fragment shaders and a character-density mapping algorithm.",
+    tags: [{ tag: "WebGL" }, { tag: "GLSL" }, { tag: "Creative Coding" }],
+    date: "Mar 2026",
+    order: 1,
+  },
+  {
+    slug: "generative-grid",
+    num: "02",
+    title: "Generative Grid System",
+    description: "A procedurally generated layout engine that creates unique editorial compositions on every page load, inspired by Swiss design and computational art.",
+    tags: [{ tag: "Generative Art" }, { tag: "Canvas API" }, { tag: "Typography" }],
+    date: "Feb 2026",
+    order: 2,
+  },
+  {
+    slug: "spatial-audio",
+    num: "03",
+    title: "Spatial Audio Visualizer",
+    description: "3D audio-reactive environment built with Three.js and the Web Audio API. Sound frequency data drives particle behavior, color fields, and camera movement in real time.",
+    tags: [{ tag: "Three.js" }, { tag: "Web Audio" }, { tag: "3D" }],
+    date: "Jan 2026",
+    order: 3,
+  },
+  {
+    slug: "scroll-physics",
+    num: "04",
+    title: "Scroll Physics Playground",
+    description: "An exploration of inertia, spring dynamics, and momentum-based scroll interactions. Each section demonstrates a different physics model driving UI transitions.",
+    tags: [{ tag: "Framer Motion" }, { tag: "Physics" }, { tag: "Interaction" }],
+    date: "Dec 2025",
+    order: 4,
+  },
+  {
+    slug: "type-morph",
+    num: "05",
+    title: "Typographic Morphing",
+    description: "Variable font axes animated through scroll and cursor position. Letterforms continuously morph between weight, width, and optical size in response to user input.",
+    tags: [{ tag: "Variable Fonts" }, { tag: "CSS" }, { tag: "Animation" }],
+    date: "Nov 2025",
+    order: 5,
+  },
+  {
+    slug: "data-sculpture",
+    num: "06",
+    title: "Data Sculpture",
+    description: "Transforms live API data streams into abstract 3D forms. Each data point influences geometry, material, and light — turning numbers into a living sculpture.",
+    tags: [{ tag: "Three.js" }, { tag: "Data Viz" }, { tag: "API" }],
+    date: "Oct 2025",
+    order: 6,
+  },
+]
+
+const CLIENTS = [
+  { name: "Acme Corp", url: "https://example.com" },
+  { name: "Globex", url: "https://example.com" },
+  { name: "Initech", url: "https://example.com" },
+  { name: "Umbrella", url: "https://example.com" },
+  { name: "Stark Ind", url: "https://example.com" },
+  { name: "Wayne Corp", url: "https://example.com" },
+  { name: "Cyberdyne", url: "https://example.com" },
+  { name: "Soylent", url: "https://example.com" },
+  { name: "Tyrell", url: "https://example.com" },
+  { name: "Weyland", url: "https://example.com" },
+]
+
 async function seed() {
   const payload = await getPayload({ config })
 
+  // --- Projects ---
   console.log('Seeding projects...')
   for (const project of PROJECTS) {
     const existing = await payload.find({
@@ -83,6 +187,7 @@ async function seed() {
     }
   }
 
+  // --- Books ---
   console.log('Seeding books...')
   for (let i = 0; i < BOOKS.length; i++) {
     const title = BOOKS[i]
@@ -103,6 +208,47 @@ async function seed() {
     }
   }
 
+  // --- Testimonials ---
+  console.log('Seeding testimonials...')
+  for (const testimonial of TESTIMONIALS) {
+    const existing = await payload.find({
+      collection: 'testimonials',
+      where: { name: { equals: testimonial.name } },
+      limit: 1,
+    })
+
+    if (existing.docs.length === 0) {
+      await payload.create({
+        collection: 'testimonials',
+        data: testimonial,
+      })
+      console.log(`  Created: ${testimonial.name}`)
+    } else {
+      console.log(`  Skipped (exists): ${testimonial.name}`)
+    }
+  }
+
+  // --- Experiments ---
+  console.log('Seeding experiments...')
+  for (const experiment of EXPERIMENTS) {
+    const existing = await payload.find({
+      collection: 'experiments',
+      where: { slug: { equals: experiment.slug } },
+      limit: 1,
+    })
+
+    if (existing.docs.length === 0) {
+      await payload.create({
+        collection: 'experiments',
+        data: experiment,
+      })
+      console.log(`  Created: ${experiment.title}`)
+    } else {
+      console.log(`  Skipped (exists): ${experiment.title}`)
+    }
+  }
+
+  // --- Site Config (global) ---
   console.log('Seeding site config...')
   await payload.updateGlobal({
     slug: 'site-config',
@@ -124,6 +270,7 @@ async function seed() {
         { label: 'Instagram', href: '#', external: true },
         { label: 'Twitter', href: '#', external: true },
       ],
+      clients: CLIENTS,
       experience: [
         { role: 'Product Designer', company: 'Company Name', period: '2024 – Present' },
         { role: 'UX Designer', company: 'Company Name', period: '2022 – 2024' },
@@ -137,7 +284,13 @@ async function seed() {
   })
   console.log('  Site config updated.')
 
-  console.log('Seed complete!')
+  console.log('\nSeed complete! All collections populated.')
+  console.log('  - Projects: ' + PROJECTS.length)
+  console.log('  - Books: ' + BOOKS.length)
+  console.log('  - Testimonials: ' + TESTIMONIALS.length)
+  console.log('  - Experiments: ' + EXPERIMENTS.length)
+  console.log('  - Clients: ' + CLIENTS.length)
+  console.log('  - Site Config: updated')
   process.exit(0)
 }
 

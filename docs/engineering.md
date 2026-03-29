@@ -2,9 +2,28 @@
 
 > **What this file is:** The synthesized, authoritative engineering knowledge base for yilangao.com. Every principle here was extracted from real incidents, debugging sessions, and process failures. This is a living document — it grows after every engineering incident.
 >
-> **Who reads this:** Every AI agent before making any code change.
+> **Who reads this:** AI agents routed here by `AGENTS.md` Pre-Flight. Read the Section Index first, then only the section matching your task.
 > **Who writes this:** AI agents after processing engineering feedback via the `engineering-iteration` skill.
 > **Last updated:** 2026-03-29
+
+---
+
+## Section Index — Read This First
+
+| § | Topic | Read when |
+|---|-------|-----------|
+| §0 | Engineering Posture | Always for infra/build work (~8 lines — read this every time) |
+| §1 | Localhost Verification | Starting servers, verifying changes |
+| §2 | Port Management | Starting/stopping servers, port conflicts |
+| §3 | Single Source of Truth (Token Sync) | Modifying tokens, sync scripts, data flow |
+| §4 | Debugging Methodology | Diagnosing any "it doesn't work" issue |
+| §5 | Process Principles | Meta — how to approach engineering changes |
+| §6 | Git Branching & Session Safety | Branch questions, commits, checkpoints |
+| §7 | Cross-App Infrastructure Parity | Adding dependencies, fonts, or infra to either app |
+| §8 | Knowledge Enforcement | Recurring incidents, promoting docs to rules layer |
+| §9 | Multi-App Architecture & URL Namespace | Adding routes, new apps, or CMS endpoints |
+| §10 | Design System Versioning (Élan) | Version bumps, releases, checkpoint workflow |
+| Appendix | Incident Frequency Map | Checking for recurring incident patterns |
 
 ---
 
@@ -21,9 +40,10 @@
 
 ## How to Use This File
 
-1. **Before writing any code**, scan the relevant section below.
-2. **If the user reports a bug or engineering issue**, check whether an existing principle already covers it — apply the documented fix, don't re-derive.
+1. **Read the Section Index above** — match your task to a section, read only that section.
+2. **If the user reports a bug**, activate the `engineering-iteration` skill — it will handle full doc reading.
 3. **After resolving an issue**, update this file: strengthen existing principles or add new ones.
+4. **Do NOT read the entire file** unless the skill protocol requires it.
 
 ---
 
@@ -216,14 +236,25 @@ All agent sessions in the same Cursor workspace share the same `dev` branch and 
 When the user says "checkpoint", "merge to main", or "deploy":
 
 ```bash
+# 1. Stamp the release version
+npm run version:release
+git add elan.json
+git commit -m "release: Élan $(node -p \"require('./elan.json').release.version\")"
+
+# 2. Merge to main and push
 git checkout main
 git merge dev
 git push origin main
+
+# 3. Return to dev and bump to next patch
 git checkout dev
+npm run version:patch
+git add elan.json
+git commit -m "chore: begin Élan $(node -p \"require('./elan.json').version\")"
 git push origin dev
 ```
 
-After this, `main` reflects the latest stable state. If Vercel is connected, it auto-deploys from `main`. The agent then continues working on `dev`.
+After this, `main` reflects the latest stable state with a stamped Élan release. If Vercel is connected, it auto-deploys from `main`. The agent then continues working on `dev` with the version already bumped to the next patch.
 
 ### 6.6 Rollback
 
@@ -312,6 +343,129 @@ Recurring incidents should be escalated up this hierarchy until they stop recurr
 
 ---
 
+## 9. Multi-App Architecture & URL Namespace Separation
+
+**Source:** User feedback, 2026-03-29 — "Why is the admin part using the same localhost? You might not want to use the same kind of URL for both the CMS and the design system."
+
+### 9.1 The Current Architecture
+
+This project runs three distinct concerns across two Next.js processes:
+
+| Concern | Audience | Port | Route space | Process |
+|---------|----------|------|-------------|---------|
+| Public portfolio | Visitors | 4000 | `/`, `/reading`, etc. | Main site |
+| CMS admin panel | Site owner (editor) | 4000 | `/admin/*` | Main site (shared) |
+| Design system playground | Developers/designers | 4001 | `/tokens/*`, `/components/*` | Playground (separate) |
+
+The CMS admin and public site share a process and URL namespace. This is a **Payload CMS 3 design constraint** — Payload embeds into your Next.js app and serves admin UI at a configurable route prefix (default `/admin`).
+
+### 9.2 Known Trade-offs
+
+**Shared process (portfolio + CMS on port 4000):**
+- In production, `/admin` login page is publicly accessible (though auth-gated)
+- Admin panel CSS/JS bundles are included in the production build even for public visitors
+- A CMS crash or heavy admin operation can affect public page performance
+- Route namespace collision risk if the portfolio ever needs `/admin` for portfolio content
+
+**Separate process (playground on port 4001):**
+- Clean separation — design system tooling never interferes with the live site
+- Can be developed, started, and stopped independently
+- Different deployment story (playground is dev-only, not deployed to production)
+
+### 9.3 Architectural Decision Record
+
+**Decision:** Accept Payload's embedded architecture for now. The trade-offs are manageable at current scale.
+
+**When to revisit:**
+- If the admin panel causes measurable performance impact on public pages
+- If a third audience/concern needs to share port 4000 (the namespace is already at capacity with two)
+- If the project moves to a multi-service deployment (e.g., separate CMS API server)
+
+**Mitigation for production:**
+- Add Next.js middleware to restrict `/admin` access by IP or auth header
+- Consider `output: 'standalone'` builds that tree-shake unused admin routes from the public bundle (Payload's roadmap may address this)
+
+### 9.4 The Principle — One Port, One Audience
+
+Each port should ideally serve **one audience with one mental model**. When a port serves two audiences (visitors + editors), the risk of namespace collision, performance crosstalk, and deployment coupling increases. The playground gets this right (port 4001, developers only). The main site violates it out of framework necessity (Payload embeds into Next.js).
+
+When adding new routes or concerns in the future:
+1. **Ask first:** Who is the audience? Is it the same audience as an existing port?
+2. **If different audience:** Prefer a new port (4002+) over cramming into an existing namespace.
+3. **If same audience but different concern:** Use clear route prefixes and document the namespace allocation.
+
+### 9.5 Route Namespace Allocation (Living Reference)
+
+| Port | Prefix | Owner | Purpose |
+|------|--------|-------|---------|
+| 4000 | `/` | Portfolio | Public pages |
+| 4000 | `/admin` | Payload CMS | Content management (framework-mandated) |
+| 4000 | `/api` | Payload CMS | CMS REST/GraphQL API |
+| 4001 | `/tokens` | Playground | Design token previews |
+| 4001 | `/components` | Playground | Component previews |
+
+Update this table when adding new route prefixes or services.
+
+---
+
+## 10. Design System Versioning (Élan)
+
+**Source:** Session 2026-03-29 — "Let's start doing version control for the design system."
+
+### 10.1 Overview
+
+The design system is named **Élan** and uses semantic versioning (major.minor.patch). The single source of truth is `elan.json` at the repo root.
+
+The two-branch model maps directly onto the version lifecycle:
+- `dev` branch carries the **development version** — the next version being built
+- `main` branch carries the **released version** — what's deployed on Vercel
+
+### 10.2 Manifest Structure (`elan.json`)
+
+| Field | Purpose |
+|---|---|
+| `name` | Always "Élan" |
+| `version` | Development version (always >= `release.version`) |
+| `release.version` | Currently deployed version |
+| `release.name` | Display name, e.g. "Élan 1.0.0" |
+| `release.releasedAt` | ISO 8601 timestamp of last deploy |
+
+### 10.3 Semver Policy
+
+| Level | When to use | Examples |
+|---|---|---|
+| **Patch** (1.0.x) | Token value changes, bug fixes, minor component tweaks | Adjust a color hex, fix a mixin edge case |
+| **Minor** (1.x.0) | New tokens, new components, new playground pages, non-breaking additions | Add a new semantic color role, create a new component |
+| **Major** (x.0.0) | Breaking token renames/removals, component API changes, architectural shifts | Rename `$portfolio-*` prefix, restructure token files |
+
+### 10.4 Commands
+
+| Command | Effect |
+|---|---|
+| `npm run version:patch` | Bump dev version patch number |
+| `npm run version:minor` | Bump dev version minor number |
+| `npm run version:major` | Bump dev version major number |
+| `npm run version:release` | Promote `version` → `release.version`, stamp `releasedAt` |
+
+### 10.5 Release Workflow
+
+Integrated into the checkpoint workflow (§6.5). Before merging to `main`:
+1. Run `npm run version:release` to stamp the release
+2. Commit the updated `elan.json`
+3. Merge to `main` and push
+4. Return to `dev`, bump to next patch, commit
+
+### 10.6 Runtime Exposure
+
+- **Main site:** `<meta name="generator" content="Élan x.x.x">` in the HTML head (release version, from `elan.json`)
+- **Playground:** Page-level footnote in the Shell component showing version and last-updated date on every page
+
+### 10.7 Changelog
+
+`CHANGELOG.md` at repo root follows [Keep a Changelog](https://keepachangelog.com/) format. Update it when bumping versions — document what was Added, Changed, Removed, or Fixed.
+
+---
+
 ## Appendix: Incident Frequency Map
 
 | Pattern | Times Raised | Priority |
@@ -321,9 +475,15 @@ Recurring incidents should be escalated up this hierarchy until they stop recurr
 | Rules-layer enforcement gap | 1 | Critical |
 | Port management | 0 | Critical |
 | Localhost verification | 1 | Critical |
-| Build / bundler issues | 0 | High |
+| Build / bundler issues (React 19 compat) | 4 | **Critical — 3 failed fixes (ENG-017→018→019). Rule: no `<script>` in React tree. See EAP-013.** |
+| Verification gap (reporting done without browser check) | 3 | **Critical — promoted to Hard Guardrail #10 (ENG-020). curl ≠ verification.** |
 | Process automation gaps | 1 | High |
+| Documentation procedure skips | 3 | **Critical — promoted to Hard Guardrail #1 (ENG-012)** |
+| Zombie server processes | 1 | High |
+| External service placeholder configs | 1 | High |
+| Node.js version / CLI tool compat | 1 | High — Node 25 breaks Payload CLI (ENG-015); use Node 22 LTS if CLI needed |
 | Git branching / session safety | 1 | Critical |
+| URL namespace / multi-app architecture | 1 | High — documented as ADR, revisit if a third concern lands on port 4000 |
 
 ---
 

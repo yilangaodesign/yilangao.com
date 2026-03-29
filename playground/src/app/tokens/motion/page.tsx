@@ -3,7 +3,17 @@
 import { useState } from "react";
 import { Shell } from "@/components/shell";
 import { SectionHeading, SubSection, TokenRow } from "@/components/token-grid";
+import ScrollSpy from "@/components/scroll-spy";
 import { motion as motionTokens } from "@/lib/tokens";
+
+const scrollSpySections = [
+  { id: "easing-curves", label: "Easing Curves" },
+  { id: "durations", label: "Durations" },
+  { id: "choreography-presets", label: "Choreography" },
+  { id: "interactive-mixins", label: "Mixins" },
+  { id: "global-behaviors", label: "Globals" },
+  { id: "z-index-scale", label: "Z-Index" },
+];
 
 const EASING = {
   standard: "cubic-bezier(0.2, 0, 0.38, 0.9)",
@@ -611,6 +621,7 @@ function MixinDemoCard({
 export default function MotionPage() {
   return (
     <Shell title="Motion">
+      <ScrollSpy sections={scrollSpySections} />
       <div className="max-w-5xl">
         <SectionHeading
           title="Motion & Interaction"
@@ -618,7 +629,7 @@ export default function MotionPage() {
         />
 
         {/* Easing Curves */}
-        <SubSection title="Easing Curves">
+        <SubSection id="easing-curves" title="Easing Curves">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {motionTokens.easings.map((e) => (
               <EasingDemo
@@ -633,7 +644,7 @@ export default function MotionPage() {
         </SubSection>
 
         {/* Durations */}
-        <SubSection title="Durations">
+        <SubSection id="durations" title="Durations">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {motionTokens.durations.map((d) => (
               <DurationDemo
@@ -648,7 +659,7 @@ export default function MotionPage() {
         </SubSection>
 
         {/* Choreography Presets */}
-        <SubSection title="Choreography Presets (TS)">
+        <SubSection id="choreography-presets" title="Choreography Presets (TS)">
           <p className="text-sm text-muted-foreground mb-4">
             Named transition presets from <code className="text-xs bg-muted px-1.5 py-0.5 rounded-sm font-mono">src/lib/motion.ts</code>. These combine token durations + easings into ready-to-spread Framer Motion objects. Click <strong>Play</strong> to see each preset in action.
           </p>
@@ -667,7 +678,7 @@ export default function MotionPage() {
         </SubSection>
 
         {/* Interactive SCSS Mixins */}
-        <SubSection title="Interactive Mixins (SCSS)">
+        <SubSection id="interactive-mixins" title="Interactive Mixins (SCSS)">
           <p className="text-sm text-muted-foreground mb-4">
             Live demonstrations of SCSS mixins from <code className="text-xs bg-muted px-1.5 py-0.5 rounded-sm font-mono">_interactive.scss</code>. Each demo replicates the exact CSS the mixin produces, using the same token-backed durations and easings. Hover, click, or focus to see the effect.
           </p>
@@ -687,7 +698,7 @@ export default function MotionPage() {
         </SubSection>
 
         {/* Global Behaviors */}
-        <SubSection title="Global Behaviors">
+        <SubSection id="global-behaviors" title="Global Behaviors">
           <div className="space-y-1">
             {motionTokens.globals.map((g) => (
               <TokenRow
@@ -701,7 +712,7 @@ export default function MotionPage() {
         </SubSection>
 
         {/* Z-Index Scale */}
-        <SubSection title="Z-Index Scale">
+        <SubSection id="z-index-scale" title="Z-Index Scale">
           <div className="space-y-1">
             {motionTokens.zIndex.map((z) => (
               <TokenRow

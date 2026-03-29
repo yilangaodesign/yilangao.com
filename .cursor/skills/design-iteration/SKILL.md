@@ -14,8 +14,8 @@ Don't just fix the surface-level complaint. Ask:
 ### Step 2: Check Existing Knowledge
 
 Before writing code:
-1. Search `docs/design.md` for the relevant section.
-2. Search `docs/design-anti-patterns.md` for matching anti-patterns.
+1. Read the **full** `docs/design.md` — not just the Section Index. Feedback processing requires complete context, even if pre-flight only loaded one section.
+2. Read `docs/design-anti-patterns.md` for matching anti-patterns.
 3. If a documented solution exists, **apply it directly** — don't re-derive.
 
 ### Step 3: Diagnose Root Cause
