@@ -17,6 +17,10 @@
 /.next/
 /out/
 
+# playground (subdirectory Next.js app)
+/playground/.next/
+/playground/node_modules/
+
 # production
 /build
 
@@ -39,3 +43,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# payload
+/src/app/(payload)/admin/importMap.js
+/src/payload-types.ts
+/media

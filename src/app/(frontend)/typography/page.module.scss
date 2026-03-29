@@ -1,0 +1,404 @@
+@use '@yilangaodesign/design-system/scss' as *;
+
+.page {
+  min-height: 100vh;
+  background: $portfolio-surface-primary;
+  color: $portfolio-text-primary;
+}
+
+// ── Nav ──────────────────────────────────────────────────────────────────────
+
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: $portfolio-z-sticky;
+  background-color: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+  padding: $portfolio-spacing-04 $portfolio-spacing-07;
+  border-bottom: 1px solid $portfolio-border-subtle;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.navName {
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-sm;
+  font-weight: $portfolio-weight-medium;
+  color: $portfolio-text-primary;
+  text-decoration: none;
+  transition: color $portfolio-duration-fast $portfolio-easing-standard;
+
+  &:hover { color: $portfolio-text-secondary; }
+}
+
+.navLabel {
+  font-family: $portfolio-font-mono;
+  font-size: $portfolio-type-xs;
+  color: $portfolio-text-secondary;
+  letter-spacing: $portfolio-tracking-wide;
+}
+
+// ── Container ────────────────────────────────────────────────────────────────
+
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: $portfolio-layout-04 $portfolio-spacing-05;
+
+  @media #{$portfolio-mq-md} {
+    padding: $portfolio-layout-05 $portfolio-spacing-07;
+  }
+}
+
+// ── Page Header ──────────────────────────────────────────────────────────────
+
+.pageHeader {
+  margin-bottom: $portfolio-layout-04;
+}
+
+.pageTitle {
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-3xl;
+  font-weight: $portfolio-weight-semibold;
+  line-height: $portfolio-leading-tight;
+  letter-spacing: $portfolio-tracking-tight;
+  margin-bottom: $portfolio-spacing-04;
+
+  @media #{$portfolio-mq-md} {
+    font-size: $portfolio-type-4xl;
+  }
+}
+
+.pageDesc {
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-base;
+  line-height: $portfolio-leading-relaxed;
+  color: $portfolio-text-secondary;
+  max-width: 600px;
+}
+
+// ── Section ──────────────────────────────────────────────────────────────────
+
+.section {
+  margin-bottom: $portfolio-layout-05;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: baseline;
+  gap: $portfolio-spacing-04;
+  margin-bottom: $portfolio-spacing-06;
+  padding-bottom: $portfolio-spacing-04;
+  border-bottom: 1px solid $portfolio-border-subtle;
+}
+
+.sectionTitle {
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-xl;
+  font-weight: $portfolio-weight-semibold;
+  line-height: $portfolio-leading-snug;
+}
+
+.sectionCount {
+  font-family: $portfolio-font-mono;
+  font-size: $portfolio-type-xs;
+  color: $portfolio-text-secondary;
+}
+
+// ── Font Card ────────────────────────────────────────────────────────────────
+
+.fontCard {
+  border: 1px solid $portfolio-border-subtle;
+  border-radius: $portfolio-radius-sm;
+  margin-bottom: $portfolio-spacing-05;
+  overflow: hidden;
+}
+
+.fontCardHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: $portfolio-spacing-05;
+  padding: $portfolio-spacing-05;
+  background: $portfolio-surface-secondary;
+  border-bottom: 1px solid $portfolio-border-subtle;
+
+  @media #{$portfolio-mq-md} {
+    padding: $portfolio-spacing-05 $portfolio-spacing-06;
+  }
+}
+
+.fontMeta {
+  flex: 1;
+  min-width: 0;
+}
+
+.fontName {
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-base;
+  font-weight: $portfolio-weight-semibold;
+  margin-bottom: $portfolio-spacing-02;
+}
+
+.fontCategory {
+  font-family: $portfolio-font-mono;
+  font-size: 11px;
+  color: $portfolio-text-secondary;
+  letter-spacing: $portfolio-tracking-wide;
+  text-transform: uppercase;
+  margin-bottom: $portfolio-spacing-03;
+}
+
+.fontToken {
+  font-family: $portfolio-font-mono;
+  font-size: $portfolio-type-xs;
+  color: $portfolio-accent-60;
+  background: rgba($portfolio-accent-60, 0.08);
+  padding: 2px 6px;
+  border-radius: $portfolio-radius-sm;
+  display: inline-block;
+  margin-bottom: $portfolio-spacing-02;
+}
+
+.fontFallbacks {
+  font-family: $portfolio-font-mono;
+  font-size: 11px;
+  color: $portfolio-text-placeholder;
+  line-height: $portfolio-leading-relaxed;
+  word-break: break-all;
+}
+
+.fontCardBody {
+  padding: $portfolio-spacing-06;
+
+  @media #{$portfolio-mq-md} {
+    padding: $portfolio-spacing-07;
+  }
+}
+
+// ── Specimen ─────────────────────────────────────────────────────────────────
+
+.specimen {
+  margin-bottom: $portfolio-spacing-06;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.specimenLabel {
+  font-family: $portfolio-font-mono;
+  font-size: 11px;
+  color: $portfolio-text-secondary;
+  letter-spacing: $portfolio-tracking-wide;
+  text-transform: uppercase;
+  margin-bottom: $portfolio-spacing-03;
+}
+
+.specimenText {
+  line-height: $portfolio-leading-snug;
+  color: $portfolio-text-primary;
+}
+
+// ── Weight Grid ──────────────────────────────────────────────────────────────
+
+.weightGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: $portfolio-spacing-05;
+}
+
+.weightItem {
+  padding: $portfolio-spacing-04;
+  border: 1px solid $portfolio-border-subtle;
+  border-radius: $portfolio-radius-sm;
+}
+
+.weightValue {
+  font-family: $portfolio-font-mono;
+  font-size: 11px;
+  color: $portfolio-text-secondary;
+  margin-bottom: $portfolio-spacing-03;
+}
+
+.weightSample {
+  font-size: $portfolio-type-xl;
+  line-height: $portfolio-leading-snug;
+  color: $portfolio-text-primary;
+}
+
+// ── Alphabet ─────────────────────────────────────────────────────────────────
+
+.alphabet {
+  font-size: $portfolio-type-sm;
+  line-height: $portfolio-leading-loose;
+  color: $portfolio-text-secondary;
+  letter-spacing: $portfolio-tracking-wide;
+  word-break: break-all;
+}
+
+// ── Type Scale ───────────────────────────────────────────────────────────────
+
+.scaleTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.scaleRow {
+  border-bottom: 1px solid $portfolio-border-subtle;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.scaleCell {
+  padding: $portfolio-spacing-04 0;
+  vertical-align: baseline;
+}
+
+.scaleMeta {
+  width: 120px;
+  font-family: $portfolio-font-mono;
+  font-size: 11px;
+  color: $portfolio-text-secondary;
+  padding-right: $portfolio-spacing-05;
+
+  @media #{$portfolio-mq-md} {
+    width: 160px;
+  }
+}
+
+.scaleToken {
+  display: block;
+  color: $portfolio-accent-60;
+  margin-bottom: 2px;
+}
+
+.scaleValue {
+  display: block;
+  color: $portfolio-text-placeholder;
+}
+
+.scaleSample {
+  line-height: $portfolio-leading-snug;
+  color: $portfolio-text-primary;
+}
+
+// ── Mixing Playground ────────────────────────────────────────────────────────
+
+.playground {
+  border: 1px solid $portfolio-border-subtle;
+  border-radius: $portfolio-radius-sm;
+  overflow: hidden;
+}
+
+.playgroundControls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $portfolio-spacing-03;
+  padding: $portfolio-spacing-05;
+  background: $portfolio-surface-secondary;
+  border-bottom: 1px solid $portfolio-border-subtle;
+}
+
+.controlGroup {
+  display: flex;
+  flex-direction: column;
+  gap: $portfolio-spacing-02;
+}
+
+.controlLabel {
+  font-family: $portfolio-font-mono;
+  font-size: 11px;
+  color: $portfolio-text-secondary;
+  letter-spacing: $portfolio-tracking-wide;
+  text-transform: uppercase;
+}
+
+.controlSelect {
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-sm;
+  color: $portfolio-text-primary;
+  background: $portfolio-surface-primary;
+  border: 1px solid $portfolio-border-subtle;
+  border-radius: $portfolio-radius-sm;
+  padding: $portfolio-spacing-02 $portfolio-spacing-04;
+  cursor: pointer;
+  transition: border-color $portfolio-duration-fast $portfolio-easing-standard;
+
+  &:hover {
+    border-color: $portfolio-border-strong;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: $portfolio-border-interactive;
+  }
+}
+
+.playgroundPreview {
+  padding: $portfolio-spacing-07;
+
+  @media #{$portfolio-mq-md} {
+    padding: $portfolio-layout-04;
+  }
+}
+
+.previewHeading {
+  line-height: $portfolio-leading-tight;
+  letter-spacing: $portfolio-tracking-tight;
+  color: $portfolio-text-primary;
+  margin-bottom: $portfolio-spacing-05;
+}
+
+.previewBody {
+  line-height: $portfolio-leading-relaxed;
+  color: $portfolio-text-secondary;
+  margin-bottom: $portfolio-spacing-05;
+}
+
+.previewMono {
+  line-height: $portfolio-leading-normal;
+  color: $portfolio-text-secondary;
+  background: $portfolio-surface-secondary;
+  padding: $portfolio-spacing-04 $portfolio-spacing-05;
+  border-radius: $portfolio-radius-sm;
+  border: 1px solid $portfolio-border-subtle;
+}
+
+.previewLabel {
+  line-height: $portfolio-leading-normal;
+  letter-spacing: $portfolio-tracking-wider;
+  text-transform: uppercase;
+  color: $portfolio-text-placeholder;
+  margin-bottom: $portfolio-spacing-04;
+}
+
+// ── Footer ───────────────────────────────────────────────────────────────────
+
+.footer {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: $portfolio-spacing-09 $portfolio-spacing-05;
+  border-top: 1px solid $portfolio-border-subtle;
+
+  @media #{$portfolio-mq-md} {
+    padding: $portfolio-spacing-09 $portfolio-spacing-07;
+  }
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: $portfolio-spacing-03;
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-sm;
+  font-weight: $portfolio-weight-medium;
+  color: $portfolio-text-secondary;
+  text-decoration: none;
+  transition: color $portfolio-duration-fast $portfolio-easing-standard;
+
+  &:hover { color: $portfolio-text-primary; }
+}

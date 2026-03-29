@@ -1,13 +1,222 @@
-:root {
-  --color-bg: #ffffff;
-  --color-text: #171717;
-  --color-text-muted: #737373;
-  --color-border: #e5e5e5;
-}
+// =============================================================================
+// Color Palette — yilangao.com Design System
+// =============================================================================
+//
+// A comprehensive, accessible color palette influenced by the IBM Carbon
+// Design System. The palette is a TOOLKIT, not a mandate — having a color
+// defined here does not mean it must be used. The UI should remain
+// predominantly neutral with selective, intentional color.
+//
+// See docs/design.md §9 for the full color philosophy and usage rationale.
+//
+// Sources:
+//   - IBM Design Language: https://www.ibm.com/design/language/color
+//   - Carbon Design System: https://carbondesignsystem.com/elements/color/tokens
+//   - @carbon/colors v11: https://github.com/carbon-design-system/carbon
+//
+// =============================================================================
 
-[data-theme="dark"] {
-  --color-bg: #0a0a0a;
-  --color-text: #fafafa;
-  --color-text-muted: #a3a3a3;
-  --color-border: #262626;
-}
+
+// -----------------------------------------------------------------------------
+// 1. Brand Accent (Purple-Indigo) — NOT from Carbon
+// -----------------------------------------------------------------------------
+// This is the yilangao.com brand color. Carbon uses Blue 60 (#0f62fe) as its
+// primary interactive color; we deliberately diverge with a purple-indigo
+// family to maintain visual identity distinct from IBM products.
+
+$portfolio-accent-10: #F0F0FF;
+$portfolio-accent-20: #D9D9FF;
+$portfolio-accent-30: #B3B3FF;
+$portfolio-accent-40: #8C8CFF;
+$portfolio-accent-50: #6B5CE7;
+$portfolio-accent-60: #4A3ADB;
+$portfolio-accent-70: #3628B0;
+$portfolio-accent-80: #261C85;
+$portfolio-accent-90: #18115A;
+$portfolio-accent-100: #0C0930;
+
+
+// -----------------------------------------------------------------------------
+// 2. Neutral Gray — Matches Carbon Gray exactly
+// -----------------------------------------------------------------------------
+// The neutral-05 step (#F9F9F9) is a yilangao.com addition; Carbon jumps
+// directly from White to Gray 10. We use it as surface-secondary for a subtle
+// background tier.
+
+$portfolio-neutral-00: #FFFFFF;
+$portfolio-neutral-05: #F9F9F9;
+$portfolio-neutral-10: #F4F4F4;
+$portfolio-neutral-20: #E0E0E0;
+$portfolio-neutral-30: #C6C6C6;
+$portfolio-neutral-40: #A8A8A8;
+$portfolio-neutral-50: #8D8D8D;
+$portfolio-neutral-60: #6F6F6F;
+$portfolio-neutral-70: #525252;
+$portfolio-neutral-80: #393939;
+$portfolio-neutral-90: #262626;
+$portfolio-neutral-100: #161616;
+
+
+// -----------------------------------------------------------------------------
+// 3. Extended Palette — Sourced from IBM Carbon (@carbon/colors v11)
+// -----------------------------------------------------------------------------
+// These color families are available for future use: status indicators, data
+// visualization, tags, badges, syntax highlighting, illustrations, etc.
+// They are NOT currently used in the UI. When adopting a color, document the
+// rationale in docs/design.md §9.
+
+// — Blue (Carbon's primary action color; we use it for info states, not brand)
+$portfolio-blue-10: #EDF5FF;
+$portfolio-blue-20: #D0E2FF;
+$portfolio-blue-30: #A6C8FF;
+$portfolio-blue-40: #78A9FF;
+$portfolio-blue-50: #4589FF;
+$portfolio-blue-60: #0F62FE;
+$portfolio-blue-70: #0043CE;
+$portfolio-blue-80: #002D9C;
+$portfolio-blue-90: #001D6C;
+$portfolio-blue-100: #001141;
+
+// — Red
+$portfolio-red-10: #FFF1F1;
+$portfolio-red-20: #FFD7D9;
+$portfolio-red-30: #FFB3B8;
+$portfolio-red-40: #FF8389;
+$portfolio-red-50: #FA4D56;
+$portfolio-red-60: #DA1E28;
+$portfolio-red-70: #A2191F;
+$portfolio-red-80: #750E13;
+$portfolio-red-90: #520408;
+$portfolio-red-100: #2D0709;
+
+// — Green
+$portfolio-green-10: #DEFBE6;
+$portfolio-green-20: #A7F0BA;
+$portfolio-green-30: #6FDC8C;
+$portfolio-green-40: #42BE65;
+$portfolio-green-50: #24A148;
+$portfolio-green-60: #198038;
+$portfolio-green-70: #0E6027;
+$portfolio-green-80: #044317;
+$portfolio-green-90: #022D0D;
+$portfolio-green-100: #071908;
+
+// — Yellow
+$portfolio-yellow-10: #FCF4D6;
+$portfolio-yellow-20: #FDDC69;
+$portfolio-yellow-30: #F1C21B;
+$portfolio-yellow-40: #D2A106;
+$portfolio-yellow-50: #B28600;
+$portfolio-yellow-60: #8E6A00;
+$portfolio-yellow-70: #684E00;
+$portfolio-yellow-80: #483700;
+$portfolio-yellow-90: #302400;
+$portfolio-yellow-100: #1C1500;
+
+// — Orange
+$portfolio-orange-10: #FFF2E8;
+$portfolio-orange-20: #FFD9BE;
+$portfolio-orange-30: #FFB784;
+$portfolio-orange-40: #FF832B;
+$portfolio-orange-50: #EB6200;
+$portfolio-orange-60: #BA4E00;
+$portfolio-orange-70: #8A3800;
+$portfolio-orange-80: #5E2900;
+$portfolio-orange-90: #3E1A00;
+$portfolio-orange-100: #231000;
+
+// — Teal
+$portfolio-teal-10: #D9FBFB;
+$portfolio-teal-20: #9EF0F0;
+$portfolio-teal-30: #3DDBD9;
+$portfolio-teal-40: #08BDBA;
+$portfolio-teal-50: #009D9A;
+$portfolio-teal-60: #007D79;
+$portfolio-teal-70: #005D5D;
+$portfolio-teal-80: #004144;
+$portfolio-teal-90: #022B30;
+$portfolio-teal-100: #081A1C;
+
+// — Cyan
+$portfolio-cyan-10: #E5F6FF;
+$portfolio-cyan-20: #BAE6FF;
+$portfolio-cyan-30: #82CFFF;
+$portfolio-cyan-40: #33B1FF;
+$portfolio-cyan-50: #1192E8;
+$portfolio-cyan-60: #0072C3;
+$portfolio-cyan-70: #00539A;
+$portfolio-cyan-80: #003A6D;
+$portfolio-cyan-90: #012749;
+$portfolio-cyan-100: #061727;
+
+// — Purple (Carbon's purple — distinct from our accent purple-indigo)
+$portfolio-purple-10: #F6F2FF;
+$portfolio-purple-20: #E8DAFF;
+$portfolio-purple-30: #D4BBFF;
+$portfolio-purple-40: #BE95FF;
+$portfolio-purple-50: #A56EFF;
+$portfolio-purple-60: #8A3FFC;
+$portfolio-purple-70: #6929C4;
+$portfolio-purple-80: #491D8B;
+$portfolio-purple-90: #31135E;
+$portfolio-purple-100: #1C0F30;
+
+// — Magenta
+$portfolio-magenta-10: #FFF0F7;
+$portfolio-magenta-20: #FFD6E8;
+$portfolio-magenta-30: #FFAFD2;
+$portfolio-magenta-40: #FF7EB6;
+$portfolio-magenta-50: #EE5396;
+$portfolio-magenta-60: #D02670;
+$portfolio-magenta-70: #9F1853;
+$portfolio-magenta-80: #740937;
+$portfolio-magenta-90: #510224;
+$portfolio-magenta-100: #2A0A18;
+
+
+// =============================================================================
+// 4. Semantic Tokens — Role-Based Aliases
+// =============================================================================
+// These map palette colors to UI roles. The UI consumes ONLY semantic tokens,
+// never raw palette values. This indirection allows us to swap underlying
+// colors without touching component code.
+
+// — Surfaces
+$portfolio-surface-primary: $portfolio-neutral-00;
+$portfolio-surface-secondary: $portfolio-neutral-05;
+$portfolio-surface-tertiary: $portfolio-neutral-10;
+$portfolio-surface-inverse: $portfolio-neutral-100;
+$portfolio-surface-overlay: rgba(0, 0, 0, 0.5);
+
+// — Text
+$portfolio-text-primary: $portfolio-neutral-100;
+$portfolio-text-secondary: $portfolio-neutral-70;
+$portfolio-text-helper: $portfolio-neutral-60;
+$portfolio-text-placeholder: $portfolio-neutral-40;
+$portfolio-text-disabled: $portfolio-neutral-30;
+$portfolio-text-inverse: $portfolio-neutral-00;
+$portfolio-text-on-color: $portfolio-neutral-00;
+$portfolio-text-link: $portfolio-accent-60;
+$portfolio-text-error: $portfolio-red-60;
+
+// — Borders
+$portfolio-border-subtle: $portfolio-neutral-20;
+$portfolio-border-strong: $portfolio-neutral-50;
+$portfolio-border-interactive: $portfolio-accent-60;
+$portfolio-border-inverse: $portfolio-neutral-100;
+$portfolio-border-disabled: $portfolio-neutral-30;
+
+// — Support (status indicators)
+$portfolio-support-error: $portfolio-red-60;
+$portfolio-support-success: $portfolio-green-60;
+$portfolio-support-warning: $portfolio-yellow-30;
+$portfolio-support-info: $portfolio-blue-70;
+$portfolio-support-caution-minor: $portfolio-yellow-30;
+$portfolio-support-caution-major: $portfolio-orange-40;
+
+// — Focus
+$portfolio-focus: $portfolio-accent-60;
+$portfolio-focus-inset: $portfolio-neutral-00;
+
+// — Highlight
+$portfolio-highlight: $portfolio-accent-20;

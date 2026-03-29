@@ -1,0 +1,63 @@
+@use '../tokens/spacing' as *;
+@use '../tokens/breakpoints' as *;
+
+@mixin container {
+  width: 100%;
+  max-width: $portfolio-container-lg;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: $portfolio-spacing-05;
+  padding-right: $portfolio-spacing-05;
+
+  @media #{$portfolio-mq-md} {
+    padding-left: $portfolio-spacing-07;
+    padding-right: $portfolio-spacing-07;
+  }
+
+  @media #{$portfolio-mq-xl} {
+    padding-left: $portfolio-spacing-09;
+    padding-right: $portfolio-spacing-09;
+  }
+}
+
+@mixin container-narrow {
+  width: 100%;
+  max-width: $portfolio-container-md;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: $portfolio-spacing-05;
+  padding-right: $portfolio-spacing-05;
+
+  @media #{$portfolio-mq-md} {
+    padding-left: $portfolio-spacing-07;
+    padding-right: $portfolio-spacing-07;
+  }
+}
+
+@mixin section-padding {
+  padding-top: $portfolio-layout-05;
+  padding-bottom: $portfolio-layout-05;
+
+  @media #{$portfolio-mq-md} {
+    padding-top: $portfolio-layout-06;
+    padding-bottom: $portfolio-layout-06;
+  }
+}
+
+@mixin stack($gap: $portfolio-spacing-05) {
+  display: flex;
+  flex-direction: column;
+  gap: $gap;
+}
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}

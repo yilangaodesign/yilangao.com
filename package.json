@@ -3,20 +3,28 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --port 4000",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "sync-tokens": "node scripts/sync-tokens.mjs",
+    "seed": "PAYLOAD_CONFIG_PATH=src/payload.config.ts npx tsx src/scripts/seed.ts",
+    "playground": "npm run dev --prefix playground"
   },
   "dependencies": {
+    "@payloadcms/db-postgres": "^3.80.0",
+    "@payloadcms/next": "^3.80.0",
+    "@payloadcms/richtext-lexical": "^3.80.0",
+    "@yilangaodesign/design-system": "^1.0.0",
     "framer-motion": "^12.38.0",
-    "gray-matter": "^4.0.3",
+    "geist": "^1.7.0",
     "next": "16.2.1",
-    "next-mdx-remote": "^6.0.0",
     "next-themes": "^0.4.6",
+    "payload": "^3.80.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
-    "sass": "^1.98.0"
+    "sass": "^1.98.0",
+    "sharp": "^0.33.5"
   },
   "devDependencies": {
     "@types/node": "^20",

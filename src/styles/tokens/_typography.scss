@@ -1,4 +1,51 @@
-:root {
-  --font-sans: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
-}
+// ── Font Stacks ─────────────────────────────────────────────────────────────
+// Each token maps to a specific primary font with system fallbacks.
+//
+//   Token                          → Primary Font          | Category
+//   ──────────────────────────────   ─────────────────────   ──────────
+//   $portfolio-font-sans           → Geist Sans            | Sans-serif (geometric, Swiss-inspired)
+//   $portfolio-font-serif          → Georgia               | Serif (classic, web-safe)
+//   $portfolio-font-mono           → Geist Mono            | Monospace (code, data)
+//   $portfolio-font-pixel-square   → Geist Pixel Square    | Display / pixel art (square dots)
+//   $portfolio-font-pixel-grid     → Geist Pixel Grid      | Display / pixel art (grid pattern)
+//   $portfolio-font-pixel-circle   → Geist Pixel Circle    | Display / pixel art (circular dots)
+//   $portfolio-font-pixel-triangle → Geist Pixel Triangle  | Display / pixel art (triangles)
+//   $portfolio-font-pixel-line     → Geist Pixel Line      | Display / pixel art (scan lines)
+
+$portfolio-font-sans: var(--font-geist-sans), 'Inter', system-ui, -apple-system, sans-serif;
+$portfolio-font-serif: 'Georgia', 'Times New Roman', serif;
+$portfolio-font-mono: var(--font-geist-mono), 'JetBrains Mono', ui-monospace, monospace;
+$portfolio-font-pixel-square: var(--font-geist-pixel-square), monospace;
+$portfolio-font-pixel-grid: var(--font-geist-pixel-grid), monospace;
+$portfolio-font-pixel-circle: var(--font-geist-pixel-circle), monospace;
+$portfolio-font-pixel-triangle: var(--font-geist-pixel-triangle), monospace;
+$portfolio-font-pixel-line: var(--font-geist-pixel-line), monospace;
+
+$portfolio-weight-light: 300;
+$portfolio-weight-regular: 400;
+$portfolio-weight-medium: 500;
+$portfolio-weight-semibold: 600;
+$portfolio-weight-bold: 700;
+
+$portfolio-type-xs: 0.75rem;
+$portfolio-type-sm: 0.875rem;
+$portfolio-type-base: 1rem;
+$portfolio-type-lg: 1.125rem;
+$portfolio-type-xl: 1.25rem;
+$portfolio-type-2xl: 1.5rem;
+$portfolio-type-3xl: 1.875rem;
+$portfolio-type-4xl: 2.25rem;
+$portfolio-type-5xl: 3rem;
+$portfolio-type-6xl: 3.75rem;
+
+$portfolio-leading-tight: 1.1;
+$portfolio-leading-snug: 1.25;
+$portfolio-leading-normal: 1.5;
+$portfolio-leading-relaxed: 1.625;
+$portfolio-leading-loose: 2;
+
+$portfolio-tracking-tight: -0.02em;
+$portfolio-tracking-normal: 0em;
+$portfolio-tracking-wide: 0.02em;
+$portfolio-tracking-wider: 0.05em;
+$portfolio-tracking-widest: 0.1em;

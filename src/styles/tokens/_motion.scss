@@ -1,0 +1,39 @@
+// ── Durations ────────────────────────────────────────────────────────────────
+// Mirrors src/lib/motion.ts → DURATION.*
+// Fast: micro-interactions (hover, focus, color shifts)
+// Moderate: standard transitions (border, background, layout shifts)
+// Slow: deliberate transforms (scale, translate, expand/collapse)
+// Slower: choreographic entrances (scroll-reveal, page-load)
+
+$portfolio-duration-fast: 110ms;
+$portfolio-duration-moderate: 240ms;
+$portfolio-duration-slow: 400ms;
+$portfolio-duration-slower: 600ms;
+
+// ── Easing curves ────────────────────────────────────────────────────────────
+// Mirrors src/lib/motion.ts → EASING.*
+// Sourced from IBM Carbon motion (productive set).
+// Standard: general-purpose, symmetrical deceleration
+// Entrance: starts at rest, decelerates into view
+// Exit: accelerates out of view
+// Expressive: dramatic overshoot for personality moments
+
+$portfolio-easing-standard: cubic-bezier(0.2, 0, 0.38, 0.9);
+$portfolio-easing-entrance: cubic-bezier(0, 0, 0.38, 0.9);
+$portfolio-easing-exit: cubic-bezier(0.2, 0, 1, 0.9);
+$portfolio-easing-expressive: cubic-bezier(0.4, 0.14, 0.3, 1);
+
+// ── Z-index scale ────────────────────────────────────────────────────────────
+
+$portfolio-z-base: 0;
+$portfolio-z-dropdown: 100;
+$portfolio-z-sticky: 200;
+$portfolio-z-overlay: 300;
+$portfolio-z-modal: 400;
+$portfolio-z-toast: 600;
+
+// ── Global scroll behavior ───────────────────────────────────────────────────
+// scroll-behavior: smooth is set globally on <html> in globals.scss.
+// This provides native smooth-scrolling for anchor navigation.
+// Override per-element with scroll-behavior: auto where instant jumps are needed.
+// The reduced-motion mixin in _interactive.scss resets this to auto.

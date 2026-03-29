@@ -1,0 +1,362 @@
+@use '@yilangaodesign/design-system/scss' as *;
+
+// ── PAGE ─────────────────────────────────────────────────────────────────────
+
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+// ── TWO-COLUMN LAYOUT ────────────────────────────────────────────────────────
+
+.layout {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  max-width: $portfolio-container-lg;
+  margin: 0 auto;
+  width: 100%;
+  padding: $portfolio-spacing-09 $portfolio-spacing-05;
+
+  @media #{$portfolio-mq-lg} {
+    flex-direction: row;
+    gap: $portfolio-spacing-10;
+    padding: $portfolio-layout-06 $portfolio-spacing-09;
+  }
+}
+
+// ── SIDEBAR (LEFT) ───────────────────────────────────────────────────────────
+
+.sidebar {
+  @media #{$portfolio-mq-lg} {
+    width: 340px;
+    flex-shrink: 0;
+    position: sticky;
+    top: $portfolio-layout-06;
+    align-self: flex-start;
+    max-height: calc(100vh - #{$portfolio-layout-06} - #{$portfolio-layout-04});
+    overflow-y: auto;
+  }
+}
+
+.sidebarInner {
+  display: flex;
+  flex-direction: column;
+  gap: $portfolio-spacing-09;
+  padding-bottom: $portfolio-spacing-09;
+
+  @media #{$portfolio-mq-lg} {
+    padding-bottom: 0;
+  }
+}
+
+// ── IDENTITY ─────────────────────────────────────────────────────────────────
+
+.identity {
+  display: flex;
+  flex-direction: column;
+  gap: $portfolio-spacing-02;
+}
+
+.name {
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-2xl;
+  font-weight: $portfolio-weight-medium;
+  line-height: $portfolio-leading-snug;
+  color: $portfolio-text-primary;
+  letter-spacing: $portfolio-tracking-tight;
+}
+
+.role {
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-sm;
+  font-weight: $portfolio-weight-regular;
+  color: $portfolio-text-secondary;
+}
+
+.location {
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-sm;
+  font-weight: $portfolio-weight-regular;
+  color: $portfolio-text-placeholder;
+}
+
+// ── SECTION LABEL ────────────────────────────────────────────────────────────
+
+.sectionLabel {
+  display: block;
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-xs;
+  font-weight: $portfolio-weight-semibold;
+  letter-spacing: $portfolio-tracking-wider;
+  text-transform: uppercase;
+  color: $portfolio-text-placeholder;
+  margin-bottom: $portfolio-spacing-05;
+}
+
+// ── ABOUT ────────────────────────────────────────────────────────────────────
+
+.aboutText {
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-sm;
+  font-weight: $portfolio-weight-regular;
+  line-height: $portfolio-leading-relaxed;
+  color: $portfolio-text-secondary;
+}
+
+.inlineLink {
+  color: $portfolio-text-primary;
+  text-decoration: underline;
+  text-decoration-color: $portfolio-border-subtle;
+  text-underline-offset: 3px;
+  transition: text-decoration-color $portfolio-duration-fast $portfolio-easing-standard;
+
+  &:hover {
+    text-decoration-color: $portfolio-text-primary;
+  }
+}
+
+// ── TEAMS ────────────────────────────────────────────────────────────────────
+
+.teamsList {
+  display: flex;
+  flex-direction: column;
+  gap: $portfolio-spacing-03;
+}
+
+.teamItem {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: $portfolio-spacing-04;
+}
+
+.teamLink {
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-sm;
+  font-weight: $portfolio-weight-medium;
+  color: $portfolio-text-primary;
+  text-decoration: none;
+  transition: color $portfolio-duration-fast $portfolio-easing-standard;
+
+  &:hover {
+    color: $portfolio-text-link;
+  }
+}
+
+.teamNum {
+  font-family: $portfolio-font-mono;
+  font-size: $portfolio-type-xs;
+  color: $portfolio-text-placeholder;
+  min-width: 1.5ch;
+  text-align: right;
+}
+
+// ── LINKS ────────────────────────────────────────────────────────────────────
+
+.linksList {
+  display: flex;
+  flex-direction: column;
+  gap: $portfolio-spacing-03;
+}
+
+.externalLink {
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-sm;
+  font-weight: $portfolio-weight-regular;
+  color: $portfolio-text-secondary;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: $portfolio-spacing-02;
+  transition: color $portfolio-duration-fast $portfolio-easing-standard;
+
+  &:hover {
+    color: $portfolio-text-primary;
+  }
+}
+
+.arrow {
+  font-size: $portfolio-type-xs;
+  opacity: 0.5;
+}
+
+// ── MAIN (RIGHT COLUMN) ─────────────────────────────────────────────────────
+
+.main {
+  flex: 1;
+  min-width: 0;
+}
+
+// ── PROJECT GRID ─────────────────────────────────────────────────────────────
+
+.projectGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $portfolio-spacing-05;
+
+  @media #{$portfolio-mq-md} {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media #{$portfolio-mq-lg} {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.gridItem {
+  grid-column: span 1;
+}
+
+.gridItemFeatured {
+  @media #{$portfolio-mq-md} {
+    grid-column: span 2;
+  }
+}
+
+// ── PROJECT CARD ─────────────────────────────────────────────────────────────
+
+.projectCard {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  border-radius: $portfolio-radius-sm;
+  overflow: hidden;
+  transition: transform $portfolio-duration-moderate $portfolio-easing-standard;
+
+  &:hover {
+    .projectImage {
+      transform: scale(1.02);
+    }
+    .projectTitle {
+      color: $portfolio-text-link;
+    }
+  }
+}
+
+.projectCardFeatured {
+  composes: projectCard;
+
+  .projectHero {
+    aspect-ratio: 2 / 1;
+  }
+}
+
+.projectHero {
+  position: relative;
+  overflow: hidden;
+  border-radius: $portfolio-radius-sm;
+  aspect-ratio: 4 / 3;
+  background-color: $portfolio-surface-tertiary;
+}
+
+.projectImage {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    145deg,
+    $portfolio-neutral-10 0%,
+    $portfolio-neutral-20 40%,
+    $portfolio-neutral-10 100%
+  );
+  transition: transform $portfolio-duration-slow $portfolio-easing-standard;
+}
+
+.projectInfo {
+  padding: $portfolio-spacing-04 $portfolio-spacing-02;
+}
+
+.projectTitle {
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-sm;
+  font-weight: $portfolio-weight-medium;
+  color: $portfolio-text-primary;
+  margin-bottom: $portfolio-spacing-01;
+  transition: color $portfolio-duration-fast $portfolio-easing-standard;
+}
+
+.projectCategory {
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-xs;
+  font-weight: $portfolio-weight-regular;
+  color: $portfolio-text-placeholder;
+}
+
+// ── FOOTER ───────────────────────────────────────────────────────────────────
+
+.footer {
+  border-top: 1px solid $portfolio-border-subtle;
+  margin-top: $portfolio-layout-06;
+}
+
+.footerInner {
+  max-width: $portfolio-container-lg;
+  margin: 0 auto;
+  padding: $portfolio-spacing-09 $portfolio-spacing-05;
+  display: flex;
+  flex-direction: column;
+  gap: $portfolio-spacing-06;
+
+  @media #{$portfolio-mq-md} {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: $portfolio-spacing-07;
+    padding: $portfolio-spacing-09;
+  }
+}
+
+.footerVersion {
+  font-family: $portfolio-font-mono;
+  font-size: $portfolio-type-xs;
+  color: $portfolio-text-placeholder;
+}
+
+.footerUpdated {
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-xs;
+  color: $portfolio-text-placeholder;
+}
+
+.footerLinks {
+  display: flex;
+  gap: $portfolio-spacing-05;
+}
+
+.footerLink {
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-xs;
+  color: $portfolio-text-secondary;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: $portfolio-spacing-01;
+  transition: color $portfolio-duration-fast $portfolio-easing-standard;
+
+  &:hover { color: $portfolio-text-primary; }
+}
+
+.footerCta {
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-sm;
+  font-weight: $portfolio-weight-medium;
+  color: $portfolio-text-primary;
+
+  @media #{$portfolio-mq-md} {
+    margin-left: auto;
+  }
+}
+
+.footerEmail {
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-sm;
+  color: $portfolio-text-secondary;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: $portfolio-spacing-02;
+  transition: color $portfolio-duration-fast $portfolio-easing-standard;
+
+  &:hover { color: $portfolio-text-primary; }
+}

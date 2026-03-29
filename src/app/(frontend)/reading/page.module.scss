@@ -1,0 +1,53 @@
+@use '@yilangaodesign/design-system/scss' as *;
+
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.container {
+  flex: 1;
+  max-width: 720px;
+  margin: 0 auto;
+  width: 100%;
+  padding: $portfolio-layout-05 $portfolio-spacing-05;
+
+  @media #{$portfolio-mq-md} {
+    padding: $portfolio-layout-06 $portfolio-spacing-07;
+  }
+}
+
+.header {
+  margin-bottom: $portfolio-layout-04;
+}
+
+.intro {
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-base;
+  font-weight: $portfolio-weight-regular;
+  line-height: $portfolio-leading-relaxed;
+  color: $portfolio-text-secondary;
+}
+
+.bookList {
+  display: flex;
+  flex-direction: column;
+  gap: $portfolio-spacing-04;
+}
+
+.bookLink {
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-sm;
+  font-weight: $portfolio-weight-regular;
+  line-height: $portfolio-leading-normal;
+  color: $portfolio-text-link;
+  text-decoration: none;
+  @include transition-fast;
+  display: block;
+  padding: $portfolio-spacing-02 0;
+
+  &:hover {
+    opacity: 0.7;
+  }
+}

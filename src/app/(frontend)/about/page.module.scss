@@ -1,0 +1,100 @@
+@use '@yilangaodesign/design-system/scss' as *;
+
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.container {
+  flex: 1;
+  max-width: 720px;
+  margin: 0 auto;
+  width: 100%;
+  padding: $portfolio-layout-05 $portfolio-spacing-05;
+
+  @media #{$portfolio-mq-md} {
+    padding: $portfolio-layout-06 $portfolio-spacing-07;
+  }
+}
+
+.header {
+  margin-bottom: $portfolio-layout-04;
+}
+
+.title {
+  @include heading-2;
+  margin-bottom: $portfolio-spacing-04;
+}
+
+.subtitle {
+  @include body-lg;
+}
+
+.section {
+  margin-bottom: $portfolio-layout-04;
+}
+
+.sectionLabel {
+  @include label;
+  color: $portfolio-text-placeholder;
+  margin-bottom: $portfolio-spacing-05;
+}
+
+.bodyText {
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-base;
+  font-weight: $portfolio-weight-regular;
+  line-height: $portfolio-leading-relaxed;
+  color: $portfolio-text-secondary;
+}
+
+.inlineLink {
+  color: $portfolio-text-primary;
+  text-decoration: underline;
+  text-decoration-color: $portfolio-border-subtle;
+  text-underline-offset: 3px;
+  @include transition-fast;
+
+  &:hover {
+    text-decoration-color: $portfolio-text-primary;
+  }
+}
+
+.experienceList {
+  display: flex;
+  flex-direction: column;
+  gap: $portfolio-spacing-06;
+}
+
+.experienceItem {
+  display: flex;
+  flex-direction: column;
+  gap: $portfolio-spacing-02;
+}
+
+.experienceRole {
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-sm;
+  font-weight: $portfolio-weight-medium;
+  color: $portfolio-text-primary;
+}
+
+.experienceCompany {
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-sm;
+  font-weight: $portfolio-weight-regular;
+  color: $portfolio-text-secondary;
+}
+
+.experienceDate {
+  font-family: $portfolio-font-mono;
+  font-size: $portfolio-type-xs;
+  color: $portfolio-text-placeholder;
+}
+
+.divider {
+  border: none;
+  border-top: 1px solid $portfolio-border-subtle;
+  margin: $portfolio-layout-04 0;
+}
