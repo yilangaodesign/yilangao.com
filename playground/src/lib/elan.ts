@@ -4,7 +4,7 @@
  */
 export const elan = {
   name: "Élan",
-  version: "1.0.0",
+  version: "1.0.1",
   release: {
     version: "1.0.0",
     name: "Élan 1.0.0",
