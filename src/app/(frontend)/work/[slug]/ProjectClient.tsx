@@ -1,8 +1,11 @@
 "use client";
 
+import { useMemo } from "react";
 import { FadeIn } from "@yilangaodesign/design-system";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
+import ScrollSpy from "@/components/ScrollSpy";
+import type { ScrollSpySection } from "@/components/ScrollSpy";
 import styles from "./page.module.scss";
 
 type ProjectSection = {
@@ -24,12 +27,29 @@ type ProjectData = {
   sections: ProjectSection[];
 };
 
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
+
 export default function ProjectClient({ project }: { project: ProjectData }) {
   const p = project;
+
+  const spySections: ScrollSpySection[] = useMemo(
+    () =>
+      p.sections.map((s) => ({
+        id: slugify(s.heading),
+        label: s.heading,
+      })),
+    [p.sections],
+  );
 
   return (
     <article className={styles.page}>
       <Navigation />
+      <ScrollSpy sections={spySections} />
 
       <FadeIn>
         <div className={styles.heroImage} />
@@ -85,7 +105,7 @@ export default function ProjectClient({ project }: { project: ProjectData }) {
         <hr className={styles.divider} />
 
         {p.sections.map((section, i) => (
-          <section key={i} className={styles.contentSection}>
+          <section key={i} id={slugify(section.heading)} className={styles.contentSection}>
             <FadeIn>
               <h2 className={styles.sectionHeading}>{section.heading}</h2>
               <p className={styles.sectionBody}>{section.body}</p>

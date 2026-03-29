@@ -3,6 +3,7 @@
 import { FadeIn } from "@yilangaodesign/design-system";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
+import ScrollSpy from "@/components/ScrollSpy";
 import styles from "./page.module.scss";
 
 type ExperienceEntry = { role: string; company: string; period: string };
@@ -15,9 +16,16 @@ export default function AboutClient({
   experience: ExperienceEntry[];
   education: EducationEntry[];
 }) {
+  const spySections = [
+    { id: "intro", label: "Intro" },
+    { id: "experience", label: "Experience" },
+    { id: "education", label: "Education" },
+  ];
+
   return (
     <main className={styles.page}>
       <Navigation />
+      <ScrollSpy sections={spySections} />
       <div className={styles.container}>
         <FadeIn>
           <header className={styles.header}>
@@ -29,7 +37,7 @@ export default function AboutClient({
         </FadeIn>
 
         <FadeIn delay={0.1}>
-          <section className={styles.section}>
+          <section id="intro" className={styles.section}>
             <p className={styles.bodyText}>
               Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod
               tempor incididunt ut labore et dolore magna aliqua. At the moment,
@@ -46,7 +54,7 @@ export default function AboutClient({
         <hr className={styles.divider} />
 
         <FadeIn delay={0.15}>
-          <section className={styles.section}>
+          <section id="experience" className={styles.section}>
             <h2 className={styles.sectionLabel}>Experience</h2>
             <div className={styles.experienceList}>
               {experience.map((item) => (
@@ -63,7 +71,7 @@ export default function AboutClient({
         <hr className={styles.divider} />
 
         <FadeIn delay={0.2}>
-          <section className={styles.section}>
+          <section id="education" className={styles.section}>
             <h2 className={styles.sectionLabel}>Education</h2>
             <div className={styles.experienceList}>
               {education.map((item) => (
