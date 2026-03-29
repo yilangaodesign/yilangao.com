@@ -1,0 +1,130 @@
+@use '@yilangaodesign/design-system/scss' as *;
+
+.button {
+  @include button-reset;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $portfolio-spacing-03;
+  font-family: $portfolio-font-sans;
+  font-weight: $portfolio-weight-medium;
+  line-height: $portfolio-leading-tight;
+  border-radius: $portfolio-radius-sm;
+  white-space: nowrap;
+  user-select: none;
+  @include transition-fast;
+
+  &:disabled,
+  &[aria-disabled='true'] {
+    cursor: not-allowed;
+    opacity: 0.5;
+    pointer-events: none;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Variants
+// ---------------------------------------------------------------------------
+
+.primary {
+  background-color: $portfolio-accent-60;
+  color: $portfolio-text-on-color;
+
+  &:hover {
+    background-color: $portfolio-accent-70;
+  }
+
+  &:active {
+    background-color: $portfolio-accent-80;
+  }
+}
+
+.secondary {
+  background-color: transparent;
+  color: $portfolio-text-primary;
+  border: 1px solid $portfolio-border-strong;
+
+  &:hover {
+    background-color: $portfolio-surface-tertiary;
+  }
+
+  &:active {
+    background-color: $portfolio-neutral-20;
+  }
+}
+
+.ghost {
+  background-color: transparent;
+  color: $portfolio-text-primary;
+
+  &:hover {
+    background-color: $portfolio-surface-tertiary;
+  }
+
+  &:active {
+    background-color: $portfolio-neutral-20;
+  }
+}
+
+.danger {
+  background-color: $portfolio-support-error;
+  color: $portfolio-text-on-color;
+
+  &:hover {
+    background-color: $portfolio-red-70;
+  }
+
+  &:active {
+    background-color: $portfolio-red-80;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Sizes
+// ---------------------------------------------------------------------------
+
+.sm {
+  height: 32px;
+  padding: 0 $portfolio-spacing-04;
+  font-size: $portfolio-type-xs;
+}
+
+.md {
+  height: 40px;
+  padding: 0 $portfolio-spacing-05;
+  font-size: $portfolio-type-sm;
+}
+
+.lg {
+  height: 48px;
+  padding: 0 $portfolio-spacing-06;
+  font-size: $portfolio-type-base;
+}
+
+// ---------------------------------------------------------------------------
+// Icon-only modifier (square aspect ratio)
+// ---------------------------------------------------------------------------
+
+.iconOnly {
+  padding: 0;
+
+  &.sm {
+    width: 32px;
+  }
+
+  &.md {
+    width: 40px;
+  }
+
+  &.lg {
+    width: 48px;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Full-width modifier
+// ---------------------------------------------------------------------------
+
+.fullWidth {
+  width: 100%;
+}

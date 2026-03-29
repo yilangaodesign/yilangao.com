@@ -1,0 +1,67 @@
+---
+description: Engineering feedback loop — ensures every code change follows accumulated engineering principles
+globs:
+  - "**/*"
+alwaysApply: true
+---
+
+# Engineering — Always-On Rules
+
+You are building yilangao.com. Every code change must be informed by the project's accumulated engineering knowledge.
+
+## Pre-Flight (Every Session)
+
+Before writing any code, read these files:
+- `docs/engineering.md` — accumulated engineering principles and protocols
+- `docs/engineering-anti-patterns.md` — patterns that must never be used
+
+## When User Reports a Bug or Engineering Issue
+
+1. **Read the `engineering-iteration` skill** at `.cursor/skills/engineering-iteration/SKILL.md`
+2. Follow the full incident processing protocol defined there
+3. Always update the docs after resolving the issue
+
+## Critical Guardrails
+
+1. **NEVER** make file changes while on `main` — run `git branch --show-current` first; if on `main`, create a feature branch (`git checkout -b feat/<topic>`) before writing any code
+2. **NEVER** modify `src/styles/tokens/` without running `npm run sync-tokens` afterward
+3. **NEVER** start a dev server without first reading `docs/port-registry.md`
+4. **NEVER** kill a process on a port without checking what it is first
+5. **NEVER** use ports below 4000 — they are reserved for other projects
+6. **NEVER** assume a dev server from a previous session is still running — verify it
+7. **ALWAYS** verify changes on localhost after implementation
+8. **ALWAYS** trace data flow (source → build → server → browser) when debugging visibility issues
+9. **ALWAYS** run the Cross-App Parity Checklist (below) after creating or modifying anything in `src/`
+
+## Cross-App Parity Checklist (Mandatory)
+
+This project has TWO Next.js apps: main site (`src/`) and playground (`playground/`). They must stay in sync. **Run this checklist after every creation or modification — not as a "nice to have" but as a blocking gate before considering the task complete.**
+
+| What you did | What you MUST also do |
+|---|---|
+| Created a new component in `src/components/` | Create `playground/src/app/components/<slug>/page.tsx` preview page AND add sidebar entry in `playground/src/components/sidebar.tsx` |
+| Added a font or dependency to root `package.json` | Add it to `playground/package.json` too, wire in `playground/src/app/layout.tsx` |
+| Changed font loading in `src/app/(frontend)/layout.tsx` | Mirror in `playground/src/app/layout.tsx` |
+| Added CSS variables or tokens | Update `playground/src/app/globals.css` if needed |
+| Modified `src/styles/tokens/` | Run `npm run sync-tokens` to update `playground/src/lib/tokens.ts` |
+
+**Why this exists:** Cross-app parity failure has been the #1 recurring incident category (ENG-002, ENG-003, ENG-004). The playground is the design system documentation UI — if something exists in the main site but not the playground, it's invisible to the design system.
+
+## Task Routing — Design vs. Engineering
+
+| Signal | Track | Action |
+|--------|-------|--------|
+| Visual appearance, spacing, color choice | Design | Activate `design-iteration` skill |
+| Data out of sync, build broken, port conflict | Engineering | Activate `engineering-iteration` skill |
+| Token value wrong (looks wrong) | Design | Check `docs/design.md` |
+| Token not appearing in UI (not rendered) | Engineering | Check `docs/engineering.md` §3 |
+| "It looks wrong" | Design | `docs/design-feedback-log.md` |
+| "It doesn't work / show up" | Engineering | `docs/engineering-feedback-log.md` |
+
+## Token Sync Protocol
+
+When modifying any file in `src/styles/tokens/`:
+1. Make the change in the SCSS source of truth
+2. Run `npm run sync-tokens` to regenerate playground data
+3. Verify the playground renders the change: `curl -sI http://localhost:4001/tokens/colors`
+4. If adding new semantic tokens that need CSS custom properties, update `playground/src/app/globals.css`

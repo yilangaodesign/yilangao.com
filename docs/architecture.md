@@ -56,7 +56,8 @@ The project is split across **three artifacts** that serve different audiences:
 | SCSS barrel | `@yilangaodesign/design-system/scss` | All tokens + mixins via `_index.scss` |
 | SCSS sub-modules | `@yilangaodesign/design-system/scss/tokens/colors` | Individual token files |
 | CSS custom properties | `@yilangaodesign/design-system/css/tokens` | Compiled CSS variables |
-| React components | `@yilangaodesign/design-system` | `FadeIn`, `StaggerChildren`, `StaggerItem` |
+| React components (motion) | `@yilangaodesign/design-system` | `FadeIn`, `StaggerChildren`, `StaggerItem` |
+| React components (UI) | `src/components/ui/` (local, promotion pending) | Button, Card, Badge, Divider, Avatar, Input, Textarea, Select, Checkbox, Toggle, Tooltip, Dialog, DropdownMenu, Tabs, Toast |
 | Design docs | `@yilangaodesign/design-system/docs/*` | `design.md`, `design-anti-patterns.md` |
 
 ### Publishing Flow
@@ -94,6 +95,36 @@ The `NPM_TOKEN` needs `read:packages` scope (or `write:packages` for publishing)
 - **React:** `import { FadeIn } from '@yilangaodesign/design-system'`
 - **Local overrides:** `src/styles/` contains site-specific tokens and mixins
   that haven't been promoted to the shared package
+
+### UI Component Layer (`src/components/ui/`)
+
+Foundational UI primitives live in `src/components/ui/`, organized by component:
+
+```
+src/components/ui/
+  Button/       Card/        Badge/       Divider/     Avatar/
+  Input/        Textarea/    Select/      Checkbox/    Toggle/
+  Tooltip/      Dialog/      DropdownMenu/ Tabs/       Toast/
+  index.ts      (barrel re-export)
+```
+
+Each component follows the same pattern:
+- `Component.tsx` — React component with typed props and `forwardRef`
+- `Component.module.scss` — SCSS module consuming `@yilangaodesign/design-system/scss` tokens
+- `index.ts` — re-export for clean imports
+
+**Styling:** All components use SCSS modules with design system tokens. No inline styles, no Tailwind.
+
+**Complex interactivity:** Components requiring keyboard navigation, focus trapping, or ARIA management (Select, Checkbox, Toggle, Tooltip, Dialog, DropdownMenu, Tabs, Toast) use Radix UI primitives for behavior, with custom SCSS for all visual styling.
+
+**Import pattern:**
+```tsx
+import { Button, Card, Badge } from "@/components/ui";
+```
+
+**Promotion path:** Once a component is stable and used in production, it gets promoted to the `@yilangaodesign/design-system` package (see §6 below).
+
+**Tier 4 — Headless data layer (future):** For complex data-heavy components, use headless logic libraries: `@tanstack/react-table` for data tables, `react-hook-form` + `zod` for form validation, `react-day-picker` for date picking, `@tanstack/react-virtual` for virtualized lists. These handle logic without imposing design.
 
 ### Local vs Package Tokens
 
@@ -218,7 +249,22 @@ registry to a CMS or API rather than a filesystem JSON file.
 
 ---
 
-## 6. Repo Map
+## 6. Component Promotion Path
+
+Once a local UI component is stable and used in production:
+
+1. Copy the component to the design-system repo under `components/`
+2. Add to `components/index.ts` exports
+3. Include the SCSS module in the package build (update `tsup.config.ts` if needed)
+4. Publish a new version via Changesets
+5. Update this repo to import from the package instead of local `src/components/ui/`
+6. Update the component's entry in `archive/registry.json` with the new `sourcePath`
+
+**Decision criteria for promotion:** A component is ready for promotion when it has been used in at least 2 different pages/contexts on the main site, its API has been stable for 2+ weeks, and it has no outstanding design feedback.
+
+---
+
+## 7. Repo Map
 
 ```
 yilangao.com/
@@ -228,6 +274,7 @@ yilangao.com/
 │   │   ├── about/ work/ blog/ contact/ reading/ experiments/
 │   │   └── api/                  # Payload CMS API routes
 │   ├── components/               # Site components
+│   │   └── ui/                   # Foundational UI primitives (Button, Card, etc.)
 │   ├── styles/                   # Site-specific SCSS (overrides + local tokens)
 │   │   ├── tokens/               # Local token files
 │   │   └── mixins/               # Local mixins

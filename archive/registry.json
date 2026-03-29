@@ -1,0 +1,1013 @@
+{
+  "items": [
+    {
+      "id": "exp02-navigation",
+      "name": "Global Navigation Bar",
+      "type": "Component",
+      "experiment": "experiment-02",
+      "status": "archived",
+      "description": "Traditional top nav with Work/Blog/About/Contact links and theme toggle. Uses inline styles with CSS variables for theming.",
+      "sourcePath": "src/components/Navigation.tsx",
+      "createdAt": "2026-03-15T00:00:00Z",
+      "createdBy": "cursor",
+      "origin": {
+        "type": "custom"
+      },
+      "tags": [
+        "navigation",
+        "layout",
+        "chrome"
+      ],
+      "hasPreview": true,
+      "archivePath": "archive/experiment-02/components/Navigation.tsx",
+      "archivedAt": "2026-03-28T00:00:00Z",
+      "archivedBy": "cursor",
+      "reason": "Replaced by joseph.cv sidebar pattern in experiment-02."
+    },
+    {
+      "id": "exp02-theme-toggle",
+      "name": "Theme Toggle",
+      "type": "Component",
+      "experiment": "experiment-02",
+      "status": "archived",
+      "description": "Light/dark mode toggle button using next-themes. Renders null until mounted to avoid hydration mismatch.",
+      "sourcePath": "src/components/ThemeToggle.tsx",
+      "createdAt": "2026-03-15T00:00:00Z",
+      "createdBy": "cursor",
+      "origin": {
+        "type": "library",
+        "library": "next-themes",
+        "url": "https://github.com/pacocoursey/next-themes"
+      },
+      "tags": [
+        "theming",
+        "interactive",
+        "toggle"
+      ],
+      "hasPreview": true,
+      "archivePath": "archive/experiment-02/components/ThemeToggle.tsx",
+      "archivedAt": "2026-03-28T00:00:00Z",
+      "archivedBy": "cursor",
+      "reason": "Shelved since the wireframe uses a fixed light theme."
+    },
+    {
+      "id": "exp02-footer",
+      "name": "Footer",
+      "type": "Component",
+      "experiment": "experiment-02",
+      "status": "archived",
+      "description": "Global footer with copyright text. Uses inline styles and CSS variables.",
+      "sourcePath": "src/components/Footer.tsx",
+      "createdAt": "2026-03-15T00:00:00Z",
+      "createdBy": "cursor",
+      "origin": {
+        "type": "custom"
+      },
+      "tags": [
+        "layout",
+        "chrome"
+      ],
+      "hasPreview": true,
+      "archivePath": "archive/experiment-02/components/Footer.tsx",
+      "archivedAt": "2026-03-28T00:00:00Z",
+      "archivedBy": "cursor",
+      "reason": "Replaced by per-page footers matching joseph.cv pattern."
+    },
+    {
+      "id": "exp02-theme-provider",
+      "name": "ThemeProvider Wrapper",
+      "type": "Component",
+      "experiment": "experiment-02",
+      "status": "archived",
+      "description": "next-themes provider wrapping the app with attribute=\"data-theme\", defaultTheme=\"system\", enableSystem.",
+      "sourcePath": "src/components/ThemeProvider.tsx",
+      "createdAt": "2026-03-15T00:00:00Z",
+      "createdBy": "cursor",
+      "origin": {
+        "type": "library",
+        "library": "next-themes",
+        "url": "https://github.com/pacocoursey/next-themes"
+      },
+      "tags": [
+        "theming",
+        "provider"
+      ],
+      "hasPreview": false,
+      "archivePath": "archive/experiment-02/components/ThemeProvider.tsx",
+      "archivedAt": "2026-03-28T00:00:00Z",
+      "archivedBy": "cursor",
+      "reason": "Removed from layout when switching to minimal chrome."
+    },
+    {
+      "id": "exp02-css-variable-tokens",
+      "name": "CSS Variable Tokens",
+      "type": "Token",
+      "experiment": "experiment-02",
+      "status": "archived",
+      "description": "Initial CSS custom property system (--color-bg, --color-text, --color-border, etc.) for theming.",
+      "sourcePath": "src/styles/tokens/_variables.scss",
+      "createdAt": "2026-03-14T00:00:00Z",
+      "createdBy": "cursor",
+      "origin": {
+        "type": "custom"
+      },
+      "tags": [
+        "tokens",
+        "css-variables",
+        "theming"
+      ],
+      "hasPreview": false,
+      "archivePath": "archive/experiment-02/styles/_variables.scss",
+      "archivedAt": "2026-03-28T00:00:00Z",
+      "archivedBy": "cursor",
+      "reason": "Replaced by SCSS portfolio token system ($portfolio-*)."
+    },
+    {
+      "id": "exp01-splash-hero",
+      "name": "Splash Hero",
+      "type": "Component",
+      "experiment": "experiment-01",
+      "status": "archived",
+      "description": "Full-screen hero that shrinks on scroll via Framer Motion spring physics.",
+      "sourcePath": "src/components/SplashHero.tsx",
+      "createdAt": "2026-03-01T00:00:00Z",
+      "createdBy": "cursor",
+      "origin": {
+        "type": "hybrid",
+        "library": "Framer Motion",
+        "url": "https://www.framer.com/motion/"
+      },
+      "tags": [
+        "hero",
+        "animation",
+        "scroll"
+      ],
+      "hasPreview": false,
+      "archivePath": "archive/experiment-01/components/SplashHero.tsx",
+      "archivedAt": "2026-03-12T00:00:00Z",
+      "archivedBy": "user",
+      "reason": "Replaced by a static two-column layout."
+    },
+    {
+      "id": "exp01-word-reveal",
+      "name": "Word Reveal",
+      "type": "Component",
+      "experiment": "experiment-01",
+      "status": "archived",
+      "description": "Scroll-driven gray-to-black word reveal animation using Framer Motion.",
+      "sourcePath": "src/components/WordReveal.tsx",
+      "createdAt": "2026-03-02T00:00:00Z",
+      "createdBy": "cursor",
+      "origin": {
+        "type": "hybrid",
+        "library": "Framer Motion",
+        "url": "https://www.framer.com/motion/"
+      },
+      "tags": [
+        "animation",
+        "scroll",
+        "typography"
+      ],
+      "hasPreview": false,
+      "archivePath": "archive/experiment-01/components/WordReveal.tsx",
+      "archivedAt": "2026-03-12T00:00:00Z",
+      "archivedBy": "user",
+      "reason": "Decided the interaction was too heavy for a portfolio."
+    },
+    {
+      "id": "exp01-auto-scroll-carousel",
+      "name": "Auto-Scroll Carousel",
+      "type": "Component",
+      "experiment": "experiment-01",
+      "status": "archived",
+      "description": "Infinite horizontal testimonial track with pause-on-hover.",
+      "sourcePath": "src/components/AutoScrollCarousel.tsx",
+      "createdAt": "2026-03-03T00:00:00Z",
+      "createdBy": "cursor",
+      "origin": {
+        "type": "custom"
+      },
+      "tags": [
+        "carousel",
+        "animation",
+        "interactive"
+      ],
+      "hasPreview": false,
+      "archivePath": "archive/experiment-01/components/AutoScrollCarousel.tsx",
+      "archivedAt": "2026-03-12T00:00:00Z",
+      "archivedBy": "cursor",
+      "reason": "Shelved in favor of a simpler static grid."
+    },
+    {
+      "id": "exp01-animated-counter",
+      "name": "Animated Counter",
+      "type": "Component",
+      "experiment": "experiment-01",
+      "status": "archived",
+      "description": "Number counter with cubic easing triggered on scroll into view.",
+      "sourcePath": "src/components/AnimatedCounter.tsx",
+      "createdAt": "2026-03-03T00:00:00Z",
+      "createdBy": "cursor",
+      "origin": {
+        "type": "custom"
+      },
+      "tags": [
+        "animation",
+        "scroll",
+        "numbers"
+      ],
+      "hasPreview": false,
+      "archivePath": "archive/experiment-01/components/AnimatedCounter.tsx",
+      "archivedAt": "2026-03-12T00:00:00Z",
+      "archivedBy": "cursor",
+      "reason": "Removed stats section entirely."
+    },
+    {
+      "id": "exp01-content-sheet",
+      "name": "Content Sheet",
+      "type": "Page",
+      "experiment": "experiment-01",
+      "status": "archived",
+      "description": "Paper-overlay page layout that slides up over the splash hero.",
+      "sourcePath": "src/app/content-sheet/page.tsx",
+      "createdAt": "2026-03-04T00:00:00Z",
+      "createdBy": "user",
+      "origin": {
+        "type": "custom"
+      },
+      "tags": [
+        "page",
+        "layout",
+        "animation"
+      ],
+      "hasPreview": false,
+      "archivePath": "archive/experiment-01/pages/content-sheet.tsx",
+      "archivedAt": "2026-03-12T00:00:00Z",
+      "archivedBy": "user",
+      "reason": "Replaced by the joseph.cv-style split layout."
+    },
+    {
+      "id": "exp01-services-grid",
+      "name": "Services Grid",
+      "type": "Page",
+      "experiment": "experiment-01",
+      "status": "archived",
+      "description": "Six-column services breakdown with numbered categories.",
+      "sourcePath": "src/app/services/page.tsx",
+      "createdAt": "2026-03-04T00:00:00Z",
+      "createdBy": "user",
+      "origin": {
+        "type": "custom"
+      },
+      "tags": [
+        "page",
+        "layout",
+        "grid"
+      ],
+      "hasPreview": false,
+      "archivePath": "archive/experiment-01/pages/services-grid.tsx",
+      "archivedAt": "2026-03-12T00:00:00Z",
+      "archivedBy": "user",
+      "reason": "Didn't fit the project-focused direction."
+    },
+    {
+      "id": "exp01-dark-card-contact",
+      "name": "Dark Card Contact",
+      "type": "Component",
+      "experiment": "experiment-01",
+      "status": "archived",
+      "description": "Dark background contact form card with gradient.",
+      "sourcePath": "src/components/DarkCardContact.tsx",
+      "createdAt": "2026-03-05T00:00:00Z",
+      "createdBy": "cursor",
+      "origin": {
+        "type": "custom"
+      },
+      "tags": [
+        "contact",
+        "form",
+        "dark-theme"
+      ],
+      "hasPreview": false,
+      "archivePath": "archive/experiment-01/components/DarkCardContact.tsx",
+      "archivedAt": "2026-03-12T00:00:00Z",
+      "archivedBy": "cursor",
+      "reason": "Moved to a simpler contact stub."
+    },
+    {
+      "id": "exp01-lora-serif-scale",
+      "name": "Lora Serif Scale",
+      "type": "Token",
+      "experiment": "experiment-01",
+      "status": "archived",
+      "description": "Lora font pairing as editorial serif typeface.",
+      "sourcePath": "src/styles/tokens/_serif.scss",
+      "createdAt": "2026-03-01T00:00:00Z",
+      "createdBy": "user",
+      "origin": {
+        "type": "library",
+        "library": "Google Fonts — Lora",
+        "url": "https://fonts.google.com/specimen/Lora"
+      },
+      "tags": [
+        "tokens",
+        "typography",
+        "serif"
+      ],
+      "hasPreview": false,
+      "archivePath": "archive/experiment-01/styles/_serif.scss",
+      "archivedAt": "2026-03-12T00:00:00Z",
+      "archivedBy": "user",
+      "reason": "Dropped in favor of sans-only Geist type system."
+    },
+    {
+      "id": "shared-accent-warm",
+      "name": "Accent Color — Warm",
+      "type": "Token",
+      "experiment": "shared",
+      "status": "archived",
+      "description": "Warm orange/amber accent palette exploration.",
+      "sourcePath": "src/styles/tokens/_accent-warm.scss",
+      "createdAt": "2026-03-08T00:00:00Z",
+      "createdBy": "user",
+      "origin": {
+        "type": "custom"
+      },
+      "tags": [
+        "tokens",
+        "color",
+        "accent"
+      ],
+      "hasPreview": false,
+      "archivePath": "archive/shared/tokens/_accent-warm.scss",
+      "archivedAt": "2026-03-20T00:00:00Z",
+      "archivedBy": "user",
+      "reason": "Decided on indigo for a more professional tone."
+    },
+    {
+      "id": "shared-8px-strict",
+      "name": "8px Spacing Strict",
+      "type": "Token",
+      "experiment": "shared",
+      "status": "archived",
+      "description": "Strict 8px-only grid without 2px/4px fine adjustments.",
+      "sourcePath": "src/styles/tokens/_spacing-strict.scss",
+      "createdAt": "2026-03-06T00:00:00Z",
+      "createdBy": "cursor",
+      "origin": {
+        "type": "custom"
+      },
+      "tags": [
+        "tokens",
+        "spacing",
+        "grid"
+      ],
+      "hasPreview": false,
+      "archivePath": "archive/shared/tokens/_spacing-strict.scss",
+      "archivedAt": "2026-03-20T00:00:00Z",
+      "archivedBy": "cursor",
+      "reason": "Too rigid for small UI details."
+    },
+    {
+      "id": "shared-marquee-trust-bar",
+      "name": "Marquee Trust Bar",
+      "type": "Component",
+      "experiment": "shared",
+      "status": "archived",
+      "description": "Infinite-scroll logo carousel for client logos.",
+      "sourcePath": "src/components/MarqueeTrustBar.tsx",
+      "createdAt": "2026-03-10T00:00:00Z",
+      "createdBy": "user",
+      "origin": {
+        "type": "custom"
+      },
+      "tags": [
+        "carousel",
+        "animation",
+        "logos"
+      ],
+      "hasPreview": false,
+      "archivePath": "archive/shared/components/MarqueeTrustBar.tsx",
+      "archivedAt": "2026-03-20T00:00:00Z",
+      "archivedBy": "user",
+      "reason": "Didn't fit the minimal portfolio direction."
+    },
+    {
+      "id": "shared-fade-in",
+      "name": "FadeIn",
+      "type": "Component",
+      "experiment": "shared",
+      "status": "active",
+      "description": "Scroll-triggered fade-and-slide-up entrance animation. Uses shared motion constants (DURATION.slower, EASING.entrance) and respects prefers-reduced-motion.",
+      "sourcePath": "src/components/FadeIn.tsx",
+      "createdAt": "2026-03-16T00:00:00Z",
+      "createdBy": "cursor",
+      "origin": {
+        "type": "hybrid",
+        "library": "Framer Motion",
+        "url": "https://www.framer.com/motion/"
+      },
+      "tags": [
+        "animation",
+        "scroll",
+        "entrance",
+        "utility"
+      ],
+      "hasPreview": true
+    },
+    {
+      "id": "shared-stagger-children",
+      "name": "StaggerChildren",
+      "type": "Component",
+      "experiment": "shared",
+      "status": "active",
+      "description": "Staggered entrance animation container. Children animate in sequence with configurable delay. Uses shared motion constants and respects prefers-reduced-motion. Includes StaggerItem child wrapper.",
+      "sourcePath": "src/components/StaggerChildren.tsx",
+      "createdAt": "2026-03-16T00:00:00Z",
+      "createdBy": "cursor",
+      "origin": {
+        "type": "hybrid",
+        "library": "Framer Motion",
+        "url": "https://www.framer.com/motion/"
+      },
+      "tags": [
+        "animation",
+        "scroll",
+        "stagger",
+        "utility"
+      ],
+      "hasPreview": true
+    },
+    {
+      "id": "shared-token-colors",
+      "name": "Color Tokens",
+      "type": "Token",
+      "experiment": "shared",
+      "status": "active",
+      "description": "Perceptually balanced palette with 10-step accent (indigo) and 12-step neutral scales, plus semantic tokens for surfaces, text, borders, and support colors.",
+      "sourcePath": "src/styles/tokens/_colors.scss",
+      "createdAt": "2026-03-14T00:00:00Z",
+      "createdBy": "cursor",
+      "origin": {
+        "type": "hybrid",
+        "library": "IBM Carbon Design System",
+        "url": "https://carbondesignsystem.com/guidelines/color/overview/"
+      },
+      "tags": [
+        "tokens",
+        "color",
+        "palette",
+        "semantic"
+      ],
+      "hasPreview": false
+    },
+    {
+      "id": "shared-token-typography",
+      "name": "Typography Tokens",
+      "type": "Token",
+      "experiment": "shared",
+      "status": "active",
+      "description": "Type scale (xs–6xl), font families (sans, serif, mono), font weights, line-height, and letter-spacing tokens.",
+      "sourcePath": "src/styles/tokens/_typography.scss",
+      "createdAt": "2026-03-14T00:00:00Z",
+      "createdBy": "cursor",
+      "origin": {
+        "type": "hybrid",
+        "library": "IBM Carbon Design System",
+        "url": "https://carbondesignsystem.com/guidelines/typography/overview/"
+      },
+      "tags": [
+        "tokens",
+        "typography",
+        "fonts",
+        "scale"
+      ],
+      "hasPreview": false
+    },
+    {
+      "id": "shared-token-spacing",
+      "name": "Spacing Tokens",
+      "type": "Token",
+      "experiment": "shared",
+      "status": "active",
+      "description": "13-step spacing scale (2px–128px), 7-step layout scale, and container width tokens following IBM Carbon spacing conventions.",
+      "sourcePath": "src/styles/tokens/_spacing.scss",
+      "createdAt": "2026-03-14T00:00:00Z",
+      "createdBy": "cursor",
+      "origin": {
+        "type": "hybrid",
+        "library": "IBM Carbon Design System",
+        "url": "https://carbondesignsystem.com/guidelines/spacing/overview/"
+      },
+      "tags": [
+        "tokens",
+        "spacing",
+        "layout",
+        "grid"
+      ],
+      "hasPreview": false
+    },
+    {
+      "id": "shared-token-motion",
+      "name": "Motion Tokens (SCSS)",
+      "type": "Token",
+      "experiment": "shared",
+      "status": "active",
+      "description": "SCSS duration tokens (fast/moderate/slow/slower), easing curves (standard/entrance/exit/expressive), z-index scale, and scroll-behavior documentation. Mirrored in TS via src/lib/motion.ts.",
+      "sourcePath": "src/styles/tokens/_motion.scss",
+      "createdAt": "2026-03-16T00:00:00Z",
+      "createdBy": "cursor",
+      "origin": {
+        "type": "hybrid",
+        "library": "IBM Carbon Design System",
+        "url": "https://carbondesignsystem.com/guidelines/motion/overview/"
+      },
+      "tags": [
+        "tokens",
+        "motion",
+        "animation",
+        "easing"
+      ],
+      "hasPreview": true
+    },
+    {
+      "id": "shared-token-elevation",
+      "name": "Elevation Tokens",
+      "type": "Token",
+      "experiment": "shared",
+      "status": "active",
+      "description": "Box-shadow scale (none through overlay) and border-radius scale for consistent depth and corner treatment.",
+      "sourcePath": "src/styles/tokens/_elevation.scss",
+      "createdAt": "2026-03-16T00:00:00Z",
+      "createdBy": "cursor",
+      "origin": {
+        "type": "custom"
+      },
+      "tags": [
+        "tokens",
+        "elevation",
+        "shadow",
+        "radius"
+      ],
+      "hasPreview": false
+    },
+    {
+      "id": "shared-token-breakpoints",
+      "name": "Breakpoint Tokens",
+      "type": "Token",
+      "experiment": "shared",
+      "status": "active",
+      "description": "Responsive breakpoints (sm/md/lg/xl/2xl) and media query helpers following Carbon grid conventions.",
+      "sourcePath": "src/styles/tokens/_breakpoints.scss",
+      "createdAt": "2026-03-16T00:00:00Z",
+      "createdBy": "cursor",
+      "origin": {
+        "type": "hybrid",
+        "library": "IBM Carbon Design System",
+        "url": "https://carbondesignsystem.com/guidelines/2x-grid/overview/"
+      },
+      "tags": [
+        "tokens",
+        "breakpoints",
+        "responsive",
+        "grid"
+      ],
+      "hasPreview": false
+    },
+    {
+      "id": "shared-mixin-interactive",
+      "name": "Interactive Mixins",
+      "type": "Style",
+      "experiment": "shared",
+      "status": "active",
+      "description": "SCSS mixins for interaction patterns: focus-ring, transition helpers, hover-lift, hover-micro-lift, hover-scale, compound-card-hover, link-underline, link-color, form-field-focus, button-reset, and reduced-motion.",
+      "sourcePath": "src/styles/mixins/_interactive.scss",
+      "createdAt": "2026-03-16T00:00:00Z",
+      "createdBy": "cursor",
+      "origin": {
+        "type": "custom"
+      },
+      "tags": [
+        "mixins",
+        "hover",
+        "focus",
+        "interactive",
+        "motion",
+        "reduced-motion"
+      ],
+      "hasPreview": true
+    },
+    {
+      "id": "shared-mixin-layout",
+      "name": "Layout Mixins",
+      "type": "Style",
+      "experiment": "shared",
+      "status": "active",
+      "description": "SCSS mixins for common layout patterns: containers, flex helpers, responsive grids.",
+      "sourcePath": "src/styles/mixins/_layout.scss",
+      "createdAt": "2026-03-16T00:00:00Z",
+      "createdBy": "cursor",
+      "origin": {
+        "type": "custom"
+      },
+      "tags": [
+        "mixins",
+        "layout",
+        "flex",
+        "grid"
+      ],
+      "hasPreview": false
+    },
+    {
+      "id": "shared-mixin-typography",
+      "name": "Typography Mixins",
+      "type": "Style",
+      "experiment": "shared",
+      "status": "active",
+      "description": "SCSS mixins for typographic presets: headings, body text, captions, and code blocks.",
+      "sourcePath": "src/styles/mixins/_typography.scss",
+      "createdAt": "2026-03-16T00:00:00Z",
+      "createdBy": "cursor",
+      "origin": {
+        "type": "custom"
+      },
+      "tags": [
+        "mixins",
+        "typography",
+        "text"
+      ],
+      "hasPreview": false
+    },
+    {
+      "id": "shared-motion-constants",
+      "name": "Motion Constants (TS)",
+      "type": "Token",
+      "experiment": "shared",
+      "status": "active",
+      "description": "Shared TypeScript motion constants that mirror SCSS tokens for Framer Motion. Includes durations, easings, choreography presets, stagger interval, and reduced-motion helpers.",
+      "sourcePath": "src/lib/motion.ts",
+      "createdAt": "2026-03-29T00:00:00Z",
+      "createdBy": "cursor",
+      "origin": {
+        "type": "hybrid",
+        "library": "Framer Motion",
+        "url": "https://www.framer.com/motion/"
+      },
+      "tags": [
+        "tokens",
+        "motion",
+        "animation",
+        "easing",
+        "typescript"
+      ],
+      "hasPreview": true
+    },
+    {
+      "id": "shared-mount-entrance",
+      "name": "MountEntrance",
+      "type": "Component",
+      "experiment": "shared",
+      "status": "active",
+      "description": "Page-load entrance animation (non-scroll-triggered). Fades and slides up immediately on mount. For hero sections and above-the-fold content.",
+      "sourcePath": "src/components/MountEntrance.tsx",
+      "createdAt": "2026-03-29T00:00:00Z",
+      "createdBy": "cursor",
+      "origin": {
+        "type": "hybrid",
+        "library": "Framer Motion",
+        "url": "https://www.framer.com/motion/"
+      },
+      "tags": [
+        "animation",
+        "entrance",
+        "mount",
+        "utility"
+      ],
+      "hasPreview": true
+    },
+    {
+      "id": "shared-expand-collapse",
+      "name": "ExpandCollapse",
+      "type": "Component",
+      "experiment": "shared",
+      "status": "active",
+      "description": "Animated expand/collapse disclosure using AnimatePresence and height: auto. For accordions, inline detail panels, and any toggle-driven content reveal.",
+      "sourcePath": "src/components/ExpandCollapse.tsx",
+      "createdAt": "2026-03-29T00:00:00Z",
+      "createdBy": "cursor",
+      "origin": {
+        "type": "hybrid",
+        "library": "Framer Motion",
+        "url": "https://www.framer.com/motion/"
+      },
+      "tags": [
+        "animation",
+        "disclosure",
+        "expand",
+        "interactive"
+      ],
+      "hasPreview": true
+    },
+    {
+      "id": "shared-arrow-reveal",
+      "name": "ArrowReveal",
+      "type": "Component",
+      "experiment": "shared",
+      "status": "active",
+      "description": "Hover-driven arrow/icon reveal. Shifts children along x-axis and fades from resting to active opacity. Used on list rows or card links as a go-to affordance.",
+      "sourcePath": "src/components/ArrowReveal.tsx",
+      "createdAt": "2026-03-29T00:00:00Z",
+      "createdBy": "cursor",
+      "origin": {
+        "type": "hybrid",
+        "library": "Framer Motion",
+        "url": "https://www.framer.com/motion/"
+      },
+      "tags": [
+        "animation",
+        "hover",
+        "indicator",
+        "interactive"
+      ],
+      "hasPreview": true
+    },
+    {
+      "id": "shared-marquee",
+      "name": "Marquee",
+      "type": "Component",
+      "experiment": "shared",
+      "status": "active",
+      "description": "Infinite horizontal marquee with pause-on-hover and edge-fade masks. Pure CSS animation, no Framer Motion dependency. Children tripled internally for seamless loop.",
+      "sourcePath": "src/components/Marquee.tsx",
+      "createdAt": "2026-03-29T00:00:00Z",
+      "createdBy": "cursor",
+      "origin": {
+        "type": "custom"
+      },
+      "tags": [
+        "animation",
+        "marquee",
+        "carousel",
+        "infinite-scroll"
+      ],
+      "hasPreview": true
+    },
+    {
+      "id": "shared-motion-playground",
+      "name": "Motion & Interaction Playground",
+      "type": "Page",
+      "experiment": "shared",
+      "status": "active",
+      "description": "Design system playground page with live previews of all 13 motion and interaction patterns: tokens, entrance animations, hover interactions, layout animations, and global behaviors.",
+      "sourcePath": "src/app/design-system/motion/page.tsx",
+      "createdAt": "2026-03-29T00:00:00Z",
+      "createdBy": "cursor",
+      "origin": {
+        "type": "custom"
+      },
+      "tags": [
+        "playground",
+        "motion",
+        "design-system",
+        "documentation"
+      ],
+      "hasPreview": true
+    },
+    {
+      "id": "shared-scroll-spy",
+      "name": "ScrollSpy",
+      "type": "Component",
+      "experiment": "shared",
+      "status": "active",
+      "description": "Fixed vertical rail of section indicators on the right edge. Tracks active section via IntersectionObserver, supports click-to-scroll and drag-to-snap. Shows tooltip labels on hover.",
+      "sourcePath": "src/components/ScrollSpy.tsx",
+      "createdAt": "2026-03-29T04:30:00Z",
+      "createdBy": "cursor",
+      "origin": {
+        "type": "custom"
+      },
+      "tags": ["navigation", "scroll", "interaction", "accessibility"],
+      "hasPreview": false
+    },
+    {
+      "id": "shared-ui-button",
+      "name": "Button",
+      "type": "Component",
+      "experiment": "shared",
+      "status": "active",
+      "description": "Foundational button with primary, secondary, ghost, and danger variants. Sizes: sm, md, lg. Supports icon-only mode, left/right icon slots, and full-width layout.",
+      "sourcePath": "src/components/ui/Button/Button.tsx",
+      "createdAt": "2026-03-29T06:00:00Z",
+      "createdBy": "cursor",
+      "origin": {
+        "type": "custom"
+      },
+      "tags": ["ui", "interactive", "form", "primitive"],
+      "hasPreview": false
+    },
+    {
+      "id": "shared-ui-card",
+      "name": "Card",
+      "type": "Component",
+      "experiment": "shared",
+      "status": "active",
+      "description": "Surface container with optional CardHeader, CardBody, and CardFooter sub-components. Supports elevated and interactive variants.",
+      "sourcePath": "src/components/ui/Card/Card.tsx",
+      "createdAt": "2026-03-29T06:00:00Z",
+      "createdBy": "cursor",
+      "origin": {
+        "type": "custom"
+      },
+      "tags": ["ui", "layout", "surface", "primitive"],
+      "hasPreview": false
+    },
+    {
+      "id": "shared-ui-badge",
+      "name": "Badge",
+      "type": "Component",
+      "experiment": "shared",
+      "status": "active",
+      "description": "Inline status/tag indicator with default, success, warning, error, and info variants. Maps to support semantic tokens.",
+      "sourcePath": "src/components/ui/Badge/Badge.tsx",
+      "createdAt": "2026-03-29T06:00:00Z",
+      "createdBy": "cursor",
+      "origin": {
+        "type": "custom"
+      },
+      "tags": ["ui", "status", "tag", "primitive"],
+      "hasPreview": false
+    },
+    {
+      "id": "shared-ui-divider",
+      "name": "Divider",
+      "type": "Component",
+      "experiment": "shared",
+      "status": "active",
+      "description": "Horizontal or vertical separator line. Uses border-subtle semantic token.",
+      "sourcePath": "src/components/ui/Divider/Divider.tsx",
+      "createdAt": "2026-03-29T06:00:00Z",
+      "createdBy": "cursor",
+      "origin": {
+        "type": "custom"
+      },
+      "tags": ["ui", "layout", "separator", "primitive"],
+      "hasPreview": false
+    },
+    {
+      "id": "shared-ui-avatar",
+      "name": "Avatar",
+      "type": "Component",
+      "experiment": "shared",
+      "status": "active",
+      "description": "Circular image with fallback initials derived from name prop. Sizes: sm, md, lg. Uses rounded-full per design.md section 8.",
+      "sourcePath": "src/components/ui/Avatar/Avatar.tsx",
+      "createdAt": "2026-03-29T06:00:00Z",
+      "createdBy": "cursor",
+      "origin": {
+        "type": "custom"
+      },
+      "tags": ["ui", "identity", "image", "primitive"],
+      "hasPreview": false
+    },
+    {
+      "id": "shared-ui-input",
+      "name": "Input",
+      "type": "Component",
+      "experiment": "shared",
+      "status": "active",
+      "description": "Text input with label, helper text, and error state. Uses semantic tokens for focus, error, and disabled states.",
+      "sourcePath": "src/components/ui/Input/Input.tsx",
+      "createdAt": "2026-03-29T06:00:00Z",
+      "createdBy": "cursor",
+      "origin": { "type": "custom" },
+      "tags": ["ui", "form", "input", "primitive"],
+      "hasPreview": true
+    },
+    {
+      "id": "shared-ui-textarea",
+      "name": "Textarea",
+      "type": "Component",
+      "experiment": "shared",
+      "status": "active",
+      "description": "Multi-line text input with label, helper text, and error state. Shares styling conventions with Input.",
+      "sourcePath": "src/components/ui/Textarea/Textarea.tsx",
+      "createdAt": "2026-03-29T06:00:00Z",
+      "createdBy": "cursor",
+      "origin": { "type": "custom" },
+      "tags": ["ui", "form", "textarea", "primitive"],
+      "hasPreview": false
+    },
+    {
+      "id": "shared-ui-select",
+      "name": "Select",
+      "type": "Component",
+      "experiment": "shared",
+      "status": "active",
+      "description": "Accessible dropdown select built on @radix-ui/react-select. Keyboard navigation, focus management, and ARIA handled by Radix; all styling is custom SCSS.",
+      "sourcePath": "src/components/ui/Select/Select.tsx",
+      "createdAt": "2026-03-29T06:00:00Z",
+      "createdBy": "cursor",
+      "origin": { "type": "hybrid", "library": "Radix UI", "url": "https://www.radix-ui.com/primitives/docs/components/select" },
+      "tags": ["ui", "form", "select", "radix", "primitive"],
+      "hasPreview": false
+    },
+    {
+      "id": "shared-ui-checkbox",
+      "name": "Checkbox",
+      "type": "Component",
+      "experiment": "shared",
+      "status": "active",
+      "description": "Checkbox with label, supports checked, unchecked, and indeterminate states. Built on @radix-ui/react-checkbox.",
+      "sourcePath": "src/components/ui/Checkbox/Checkbox.tsx",
+      "createdAt": "2026-03-29T06:00:00Z",
+      "createdBy": "cursor",
+      "origin": { "type": "hybrid", "library": "Radix UI", "url": "https://www.radix-ui.com/primitives/docs/components/checkbox" },
+      "tags": ["ui", "form", "checkbox", "radix", "primitive"],
+      "hasPreview": false
+    },
+    {
+      "id": "shared-ui-toggle",
+      "name": "Toggle",
+      "type": "Component",
+      "experiment": "shared",
+      "status": "active",
+      "description": "On/off switch with label. Built on @radix-ui/react-switch.",
+      "sourcePath": "src/components/ui/Toggle/Toggle.tsx",
+      "createdAt": "2026-03-29T06:00:00Z",
+      "createdBy": "cursor",
+      "origin": { "type": "hybrid", "library": "Radix UI", "url": "https://www.radix-ui.com/primitives/docs/components/switch" },
+      "tags": ["ui", "form", "toggle", "switch", "radix", "primitive"],
+      "hasPreview": false
+    },
+    {
+      "id": "shared-ui-tooltip",
+      "name": "Tooltip",
+      "type": "Component",
+      "experiment": "shared",
+      "status": "active",
+      "description": "Accessible hover/focus tooltip with configurable side, align, and delay. Built on @radix-ui/react-tooltip.",
+      "sourcePath": "src/components/ui/Tooltip/Tooltip.tsx",
+      "createdAt": "2026-03-29T06:00:00Z",
+      "createdBy": "cursor",
+      "origin": { "type": "hybrid", "library": "Radix UI", "url": "https://www.radix-ui.com/primitives/docs/components/tooltip" },
+      "tags": ["ui", "overlay", "tooltip", "radix", "primitive"],
+      "hasPreview": false
+    },
+    {
+      "id": "shared-ui-dialog",
+      "name": "Dialog",
+      "type": "Component",
+      "experiment": "shared",
+      "status": "active",
+      "description": "Modal dialog with focus trap, backdrop overlay, close on escape, and animated enter/exit. Built on @radix-ui/react-dialog.",
+      "sourcePath": "src/components/ui/Dialog/Dialog.tsx",
+      "createdAt": "2026-03-29T06:00:00Z",
+      "createdBy": "cursor",
+      "origin": { "type": "hybrid", "library": "Radix UI", "url": "https://www.radix-ui.com/primitives/docs/components/dialog" },
+      "tags": ["ui", "overlay", "modal", "dialog", "radix", "primitive"],
+      "hasPreview": false
+    },
+    {
+      "id": "shared-ui-dropdown-menu",
+      "name": "DropdownMenu",
+      "type": "Component",
+      "experiment": "shared",
+      "status": "active",
+      "description": "Context/action dropdown menu with keyboard navigation, destructive item variant, separator, label, and shortcut display. Built on @radix-ui/react-dropdown-menu.",
+      "sourcePath": "src/components/ui/DropdownMenu/DropdownMenu.tsx",
+      "createdAt": "2026-03-29T06:00:00Z",
+      "createdBy": "cursor",
+      "origin": { "type": "hybrid", "library": "Radix UI", "url": "https://www.radix-ui.com/primitives/docs/components/dropdown-menu" },
+      "tags": ["ui", "overlay", "menu", "dropdown", "radix", "primitive"],
+      "hasPreview": false
+    },
+    {
+      "id": "shared-ui-tabs",
+      "name": "Tabs",
+      "type": "Component",
+      "experiment": "shared",
+      "status": "active",
+      "description": "Tabbed content panels with underline indicator on active tab. Built on @radix-ui/react-tabs.",
+      "sourcePath": "src/components/ui/Tabs/Tabs.tsx",
+      "createdAt": "2026-03-29T06:00:00Z",
+      "createdBy": "cursor",
+      "origin": { "type": "hybrid", "library": "Radix UI", "url": "https://www.radix-ui.com/primitives/docs/components/tabs" },
+      "tags": ["ui", "disclosure", "tabs", "radix", "primitive"],
+      "hasPreview": false
+    },
+    {
+      "id": "shared-ui-toast",
+      "name": "Toast",
+      "type": "Component",
+      "experiment": "shared",
+      "status": "active",
+      "description": "Notification toast with title, description, action, and close. Supports swipe-to-dismiss. Built on @radix-ui/react-toast.",
+      "sourcePath": "src/components/ui/Toast/Toast.tsx",
+      "createdAt": "2026-03-29T06:00:00Z",
+      "createdBy": "cursor",
+      "origin": { "type": "hybrid", "library": "Radix UI", "url": "https://www.radix-ui.com/primitives/docs/components/toast" },
+      "tags": ["ui", "overlay", "notification", "toast", "radix", "primitive"],
+      "hasPreview": false
+    }
+  ]
+}

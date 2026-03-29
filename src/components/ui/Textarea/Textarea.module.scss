@@ -1,0 +1,75 @@
+@use '@yilangaodesign/design-system/scss' as *;
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: $portfolio-spacing-02;
+}
+
+.label {
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-sm;
+  font-weight: $portfolio-weight-medium;
+  line-height: $portfolio-leading-normal;
+  color: $portfolio-text-primary;
+}
+
+.textarea {
+  width: 100%;
+  min-height: 96px;
+  padding: $portfolio-spacing-03 $portfolio-spacing-04;
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-sm;
+  line-height: $portfolio-leading-normal;
+  color: $portfolio-text-primary;
+  background-color: $portfolio-surface-primary;
+  border: 1px solid $portfolio-border-subtle;
+  border-radius: $portfolio-radius-sm;
+  resize: vertical;
+  @include transition-fast;
+
+  &::placeholder {
+    color: $portfolio-text-placeholder;
+  }
+
+  &:hover:not(:disabled) {
+    border-color: $portfolio-border-strong;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: $portfolio-focus;
+    box-shadow: 0 0 0 1px $portfolio-focus;
+  }
+
+  &:disabled {
+    background-color: $portfolio-surface-tertiary;
+    border-color: $portfolio-border-disabled;
+    color: $portfolio-text-disabled;
+    cursor: not-allowed;
+    resize: none;
+  }
+}
+
+.error .textarea {
+  border-color: $portfolio-support-error;
+
+  &:focus {
+    border-color: $portfolio-support-error;
+    box-shadow: 0 0 0 1px $portfolio-support-error;
+  }
+}
+
+.helperText {
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-xs;
+  line-height: $portfolio-leading-normal;
+  color: $portfolio-text-helper;
+}
+
+.errorText {
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-xs;
+  line-height: $portfolio-leading-normal;
+  color: $portfolio-text-error;
+}

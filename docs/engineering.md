@@ -167,9 +167,68 @@ This documentation evolves from real incidents. When a new failure mode is disco
 
 ---
 
-## 6. Cross-App Infrastructure Parity
+## 6. Git Branching & Session Safety
 
-**Severity: High** — The playground font gap (ENG-002) was caused by adding infrastructure to the main app without propagating it.
+**Severity: Critical** — Working directly on `main` creates rollback risk for single sessions and conflict risk for concurrent sessions.
+
+### 6.1 The Rule: Never Write to `main`
+
+`main` is the deployed branch. It only changes via merges (PR or direct merge from a feature branch). **No agent or human should make direct commits to `main`.**
+
+Every piece of work — even a one-line fix — starts on a feature branch.
+
+### 6.2 Agent Protocol — Branch Check Before Writing
+
+Before making any file changes in a session, an agent MUST:
+
+1. Check the current branch: `git branch --show-current`
+2. If on `main`, create a feature branch before touching any files:
+   ```bash
+   git checkout -b <branch-name>
+   ```
+3. Branch naming convention: `feat/<topic>`, `fix/<topic>`, `chore/<topic>`, `docs/<topic>`
+
+This is a **hard gate** — no files should be written until the agent is confirmed on a non-`main` branch.
+
+### 6.3 Concurrent Session Safety
+
+When multiple agents or sessions may run in parallel:
+
+- Each session MUST operate on its own branch.
+- Branch names should include a distinguishing suffix if needed (e.g., `feat/button-component-a`, `feat/input-component-b`).
+- Sessions should never modify each other's branches.
+- Merging to `main` should happen one branch at a time, with conflict resolution between each merge.
+
+### 6.4 Workflow
+
+```
+main (always deployable)
+  └── feat/foundational-ui-components (agent session 1)
+  └── fix/navigation-hover-bug (agent session 2)
+  └── feat/blog-page-redesign (human session)
+```
+
+1. Start work → create branch from `main`
+2. Make changes → commit on the feature branch
+3. Work complete → merge to `main` (via PR or direct merge)
+4. After merge → delete the feature branch
+5. Next piece of work → new branch from updated `main`
+
+### 6.5 What If I Forgot and Already Made Changes on `main`?
+
+If uncommitted changes exist on `main`, they can be moved to a new branch without losing work:
+
+```bash
+git checkout -b feat/<topic>
+# All uncommitted changes come with you — nothing is lost
+git add -A && git commit -m "description"
+```
+
+---
+
+## 7. Cross-App Infrastructure Parity
+
+**Severity: Critical** — The playground font gap (ENG-002) was caused by adding infrastructure to the main app without propagating it.
 
 ### 6.1 The Problem
 
@@ -188,6 +247,7 @@ When adding any of the following to the main app, explicitly check whether the p
 | CSS variable injection | `<html className={vars}>` | `<html className={vars}>` |
 | CSS theme font-family | `src/app/globals.scss` | `playground/src/app/globals.css` |
 | New token category | `src/styles/tokens/` | `playground/src/lib/tokens.ts` |
+| **New reusable component** | `src/components/Foo.tsx` | `playground/src/app/components/foo/page.tsx` + sidebar entry in `sidebar.tsx` |
 
 ### 6.3 Checklist (After Any Shared Infrastructure Change)
 
@@ -196,6 +256,37 @@ When adding any of the following to the main app, explicitly check whether the p
 3. Did you add CSS variables that tokens reference? -> Check both global CSS files.
 4. Does the playground's preview page hardcode values instead of reading from tokens? -> Fix it to use token values.
 5. **After any font change:** Run `grep -r "fontFamily" playground/src/ --include="*.tsx"` to find inline overrides. There should be zero hardcoded font families in component pages (ENG-003).
+6. **After creating any new component in `src/components/`:** Create a playground preview page at `playground/src/app/components/<slug>/page.tsx` and add a sidebar entry in `playground/src/components/sidebar.tsx`. Also add an entry to `archive/registry.json` (ENG-004).
+
+---
+
+## 8. Knowledge Enforcement (Rules Layer vs. Docs Layer)
+
+**Severity: Critical** — The cross-app parity category recurred 3 times (ENG-002, ENG-003, ENG-004) despite being documented after the first incident.
+
+### 7.1 The Problem
+
+Engineering principles documented in `docs/engineering.md` are read by agents at session start, but long documents get diluted. The agent retains the general idea but forgets specific checklist items when deep in implementation. This is especially true for cross-cutting concerns (like "also update the playground") that aren't directly related to the task at hand.
+
+### 7.2 The Rule
+
+When the same category of incident occurs **3 or more times**, the fix is not to add more documentation. The fix is to **promote the check from docs to the rules layer**:
+
+1. Add it to `AGENTS.md` Hard Guardrails (NEVER/ALWAYS list).
+2. If it's part of a workflow (e.g., artifact creation), add it as a mandatory step in `AGENTS.md`.
+3. Make it an **inline checklist** — not a pointer to a doc file.
+
+### 7.3 Why This Matters
+
+The always-on layer (`AGENTS.md`) is processed by the agent with higher priority and shorter context than doc files. Items in Hard Guardrails are treated as hard gates. Items in docs are treated as reference material. The enforcement hierarchy is:
+
+| Level | Where | Agent behavior |
+|-------|-------|----------------|
+| **Hard gate** | `AGENTS.md` Hard Guardrails and mandatory protocols | Agent checks these before considering task complete |
+| **Soft reference** | `docs/engineering.md`, `docs/design.md` | Agent reads per routing table, may not recall specific items during implementation |
+| **Background knowledge** | Feedback logs, anti-patterns catalog | Agent consults when debugging, not proactively |
+
+Recurring incidents should be escalated up this hierarchy until they stop recurring.
 
 ---
 
@@ -204,11 +295,13 @@ When adding any of the following to the main app, explicitly check whether the p
 | Pattern | Times Raised | Priority |
 |---------|-------------|----------|
 | Data sync / token drift | 1 | Critical |
-| Cross-app infrastructure parity | 2 | Critical |
+| Cross-app infrastructure parity | 3 | Critical |
+| Rules-layer enforcement gap | 1 | Critical |
 | Port management | 0 | Critical |
 | Localhost verification | 1 | Critical |
 | Build / bundler issues | 0 | High |
 | Process automation gaps | 1 | High |
+| Git branching / session safety | 1 | Critical |
 
 ---
 

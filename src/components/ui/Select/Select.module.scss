@@ -1,0 +1,170 @@
+@use '@yilangaodesign/design-system/scss' as *;
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: $portfolio-spacing-02;
+}
+
+.label {
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-sm;
+  font-weight: $portfolio-weight-medium;
+  line-height: $portfolio-leading-normal;
+  color: $portfolio-text-primary;
+}
+
+.trigger {
+  @include button-reset;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 40px;
+  padding: 0 $portfolio-spacing-04;
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-sm;
+  line-height: $portfolio-leading-normal;
+  color: $portfolio-text-primary;
+  background-color: $portfolio-surface-primary;
+  border: 1px solid $portfolio-border-subtle;
+  border-radius: $portfolio-radius-sm;
+  @include transition-fast;
+
+  &:hover {
+    border-color: $portfolio-border-strong;
+  }
+
+  &[data-state='open'] {
+    border-color: $portfolio-focus;
+    box-shadow: 0 0 0 1px $portfolio-focus;
+  }
+
+  &[data-disabled] {
+    background-color: $portfolio-surface-tertiary;
+    border-color: $portfolio-border-disabled;
+    color: $portfolio-text-disabled;
+    cursor: not-allowed;
+  }
+}
+
+.placeholder {
+  color: $portfolio-text-placeholder;
+}
+
+.icon {
+  color: $portfolio-text-helper;
+  flex-shrink: 0;
+}
+
+// ---------------------------------------------------------------------------
+// Content (dropdown)
+// ---------------------------------------------------------------------------
+
+.content {
+  overflow: hidden;
+  background-color: $portfolio-surface-primary;
+  border: 1px solid $portfolio-border-subtle;
+  border-radius: $portfolio-radius-sm;
+  box-shadow: $portfolio-shadow-lg;
+  z-index: $portfolio-z-dropdown;
+  min-width: var(--radix-select-trigger-width);
+
+  &[data-state='open'] {
+    animation: slideDown $portfolio-duration-fast $portfolio-easing-entrance;
+  }
+}
+
+.viewport {
+  padding: $portfolio-spacing-02;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: $portfolio-spacing-03;
+  padding: $portfolio-spacing-03 $portfolio-spacing-04;
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-sm;
+  line-height: $portfolio-leading-normal;
+  color: $portfolio-text-primary;
+  border-radius: 2px;
+  cursor: pointer;
+  user-select: none;
+  outline: none;
+
+  &[data-highlighted] {
+    background-color: $portfolio-surface-tertiary;
+  }
+
+  &[data-disabled] {
+    color: $portfolio-text-disabled;
+    pointer-events: none;
+  }
+}
+
+.itemIndicator {
+  width: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: $portfolio-accent-60;
+}
+
+.separator {
+  height: 1px;
+  background-color: $portfolio-border-subtle;
+  margin: $portfolio-spacing-02 0;
+}
+
+.groupLabel {
+  padding: $portfolio-spacing-03 $portfolio-spacing-04;
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-xs;
+  font-weight: $portfolio-weight-medium;
+  color: $portfolio-text-helper;
+  text-transform: uppercase;
+  letter-spacing: $portfolio-tracking-wider;
+}
+
+// ---------------------------------------------------------------------------
+// Helper / error text
+// ---------------------------------------------------------------------------
+
+.helperText {
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-xs;
+  line-height: $portfolio-leading-normal;
+  color: $portfolio-text-helper;
+}
+
+.errorText {
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-xs;
+  line-height: $portfolio-leading-normal;
+  color: $portfolio-text-error;
+}
+
+.error .trigger {
+  border-color: $portfolio-support-error;
+
+  &[data-state='open'] {
+    border-color: $portfolio-support-error;
+    box-shadow: 0 0 0 1px $portfolio-support-error;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Animation
+// ---------------------------------------------------------------------------
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -1,0 +1,51 @@
+@use '@yilangaodesign/design-system/scss' as *;
+
+.list {
+  display: flex;
+  border-bottom: 1px solid $portfolio-border-subtle;
+  gap: 0;
+}
+
+.trigger {
+  @include button-reset;
+  position: relative;
+  padding: $portfolio-spacing-03 $portfolio-spacing-05;
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-sm;
+  font-weight: $portfolio-weight-medium;
+  line-height: $portfolio-leading-normal;
+  color: $portfolio-text-secondary;
+  @include transition-fast;
+
+  &:hover {
+    color: $portfolio-text-primary;
+  }
+
+  &[data-state='active'] {
+    color: $portfolio-text-primary;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background-color: $portfolio-accent-60;
+    }
+  }
+
+  &[data-disabled] {
+    color: $portfolio-text-disabled;
+    cursor: not-allowed;
+  }
+}
+
+.content {
+  padding-top: $portfolio-spacing-06;
+  outline: none;
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}

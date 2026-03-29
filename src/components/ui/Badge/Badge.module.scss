@@ -1,0 +1,58 @@
+@use '@yilangaodesign/design-system/scss' as *;
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: $portfolio-spacing-02;
+  font-family: $portfolio-font-sans;
+  font-weight: $portfolio-weight-medium;
+  line-height: $portfolio-leading-tight;
+  border-radius: $portfolio-radius-full;
+  white-space: nowrap;
+  user-select: none;
+}
+
+// ---------------------------------------------------------------------------
+// Sizes
+// ---------------------------------------------------------------------------
+
+.sm {
+  height: 20px;
+  padding: 0 $portfolio-spacing-03;
+  font-size: 0.6875rem; // 11px
+}
+
+.md {
+  height: 24px;
+  padding: 0 $portfolio-spacing-03;
+  font-size: $portfolio-type-xs;
+}
+
+// ---------------------------------------------------------------------------
+// Variants
+// ---------------------------------------------------------------------------
+
+.default {
+  background-color: $portfolio-surface-tertiary;
+  color: $portfolio-text-secondary;
+}
+
+.success {
+  background-color: $portfolio-green-10;
+  color: $portfolio-green-70;
+}
+
+.warning {
+  background-color: $portfolio-yellow-10;
+  color: $portfolio-yellow-70;
+}
+
+.error {
+  background-color: $portfolio-red-10;
+  color: $portfolio-red-70;
+}
+
+.info {
+  background-color: $portfolio-blue-10;
+  color: $portfolio-blue-70;
+}

@@ -1,0 +1,20 @@
+@use '@yilangaodesign/design-system/scss' as *;
+
+.divider {
+  border: none;
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.horizontal {
+  width: 100%;
+  height: 1px;
+  background-color: $portfolio-border-subtle;
+}
+
+.vertical {
+  width: 1px;
+  height: 100%;
+  min-height: 1em;
+  background-color: $portfolio-border-subtle;
+}

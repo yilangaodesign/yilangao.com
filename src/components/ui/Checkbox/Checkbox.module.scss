@@ -1,0 +1,58 @@
+@use '@yilangaodesign/design-system/scss' as *;
+
+.wrapper {
+  display: flex;
+  align-items: flex-start;
+  gap: $portfolio-spacing-03;
+}
+
+.checkbox {
+  @include button-reset;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  border: 1px solid $portfolio-border-strong;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: $portfolio-surface-primary;
+  @include transition-fast;
+
+  &:hover:not([data-disabled]) {
+    border-color: $portfolio-accent-60;
+  }
+
+  &[data-state='checked'],
+  &[data-state='indeterminate'] {
+    background-color: $portfolio-accent-60;
+    border-color: $portfolio-accent-60;
+    color: $portfolio-text-on-color;
+  }
+
+  &[data-disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.label {
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-sm;
+  line-height: $portfolio-leading-normal;
+  color: $portfolio-text-primary;
+  cursor: pointer;
+  user-select: none;
+
+  &[data-disabled] {
+    color: $portfolio-text-disabled;
+    cursor: not-allowed;
+  }
+}

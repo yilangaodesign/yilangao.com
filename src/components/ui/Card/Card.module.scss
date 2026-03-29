@@ -1,0 +1,39 @@
+@use '@yilangaodesign/design-system/scss' as *;
+
+.card {
+  background-color: $portfolio-surface-primary;
+  border: 1px solid $portfolio-border-subtle;
+  border-radius: $portfolio-radius-sm;
+  overflow: hidden;
+}
+
+.interactive {
+  @include transition-fast;
+
+  &:hover {
+    box-shadow: $portfolio-shadow-md;
+    border-color: $portfolio-border-strong;
+  }
+}
+
+.elevated {
+  box-shadow: $portfolio-shadow-sm;
+}
+
+// ---------------------------------------------------------------------------
+// Sub-components
+// ---------------------------------------------------------------------------
+
+.header {
+  padding: $portfolio-spacing-05 $portfolio-spacing-06;
+  border-bottom: 1px solid $portfolio-border-subtle;
+}
+
+.body {
+  padding: $portfolio-spacing-06;
+}
+
+.footer {
+  padding: $portfolio-spacing-05 $portfolio-spacing-06;
+  border-top: 1px solid $portfolio-border-subtle;
+}

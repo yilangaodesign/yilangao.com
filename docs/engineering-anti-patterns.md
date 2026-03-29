@@ -98,6 +98,65 @@ After modifying any source, run its sync mechanism and verify each consumer.
 
 ---
 
+## EAP-008: Documenting Recurring Fixes in Docs Instead of Promoting to Rules
+
+**Trigger:** A category of incident occurs 3+ times. Each time, the fix is documented in `docs/engineering.md` or `docs/engineering-anti-patterns.md`, but the check is never promoted to the rules layer (`AGENTS.md` Hard Guardrails or mandatory protocols).
+
+**Why it's wrong:** Doc files are reference material — the agent reads them at session start but doesn't re-check them mid-task. The rules layer is the enforcement mechanism — items in Critical Guardrails are treated as hard gates the agent checks before considering work complete. Leaving a recurring fix in the docs layer means the agent "knows" the principle but doesn't enforce it. The knowledge exists but isn't actionable at the right moment.
+
+**Correct alternative:** When the same category of incident occurs 3+ times:
+1. Stop adding to docs.
+2. Add a NEVER/ALWAYS rule to `AGENTS.md` Hard Guardrails.
+3. If the check is part of a workflow (e.g., creating artifacts), add it as a mandatory step in `AGENTS.md`.
+4. Make it an inline checklist in the rules — not a pointer to "go read this section of this doc."
+
+**Incident:** ENG-005 (2026-03-29) — Cross-app parity failures recurred 3 times despite being documented after incident #1.
+
+---
+
+## EAP-007: Adding Components to Main Site Without Playground Preview
+
+**Trigger:** Creating a new reusable component in `src/components/` and integrating it into pages, but not creating a corresponding preview page in the playground (`playground/src/app/components/<slug>/page.tsx`) and not adding it to the sidebar navigation.
+
+**Why it's wrong:** The playground is the design system documentation UI — it's where components are discovered, previewed, and understood. A component that exists in the main site but not the playground is invisible to anyone browsing the design system. It won't appear in search, won't have a code example, won't have a props table, and won't be verifiable in isolation. This is the component-level equivalent of EAP-005 (infrastructure parity).
+
+**Correct alternative:** When creating any new component in `src/components/`:
+1. Create a preview page at `playground/src/app/components/<kebab-name>/page.tsx` using the established pattern: `Shell` → `SectionHeading` → `ComponentPreview` (with interactive demo + code) → `PropsTable` → behavior notes → file path footnote.
+2. Add the component to the appropriate category in `playground/src/components/sidebar.tsx` `componentCategories` array (this also makes it searchable via Fuse.js).
+3. Add an entry to `archive/registry.json`.
+
+**Detection:** After creating any component, verify: `ls playground/src/app/components/<name>/page.tsx` — if it doesn't exist, the component is not in the playground.
+
+**Incident:** ENG-004 (2026-03-29) — ScrollSpy created in main site but missing from playground.
+
+---
+
+## EAP-009: Working Directly on `main`
+
+**Trigger:** Starting a coding session and making changes without first creating a feature branch, leaving all work as uncommitted modifications on `main`.
+
+**Why it's wrong:** Three compounding risks:
+
+1. **No rollback boundary.** If the session produces a regression, there's no clean way to revert without manually undoing changes. `main` is in a state that's neither the old version nor a coherent new version.
+2. **Concurrent session conflicts.** If a second agent or the user starts a parallel session, both are modifying `main` simultaneously. Git has no mechanism to warn them — the first to commit wins, the second discovers conflicts.
+3. **Broken deployment invariant.** `main` should always be deployable. Uncommitted WIP on `main` means you cannot confidently deploy at any moment.
+
+**Correct alternative:** Before making any file changes:
+1. Check the current branch: `git branch --show-current`
+2. If on `main`, create a feature branch: `git checkout -b feat/<topic>`
+3. All work happens on the feature branch.
+4. Merge to `main` only when the work is complete and verified.
+
+If you've already made changes on `main`, they can be moved without loss:
+```bash
+git checkout -b feat/<topic>
+# Uncommitted changes travel with you
+```
+
+**Incident:** ENG-006 (2026-03-29) — 15 components, Radix dependency, architecture docs, and playground changes made directly on `main` without a branch, creating rollback risk and blocking safe parallel work.
+
+---
+
 ## Entry Template
 
 ```markdown

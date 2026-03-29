@@ -30,6 +30,21 @@ import {
   Bell,
   ChevronRight,
   X,
+  GripVertical,
+  RectangleHorizontal,
+  Square,
+  Tag,
+  SeparatorHorizontal,
+  CircleUser,
+  FormInput,
+  AlignLeft,
+  ListFilter,
+  CheckSquare,
+  ToggleRight,
+  MessageSquare,
+  PanelTopOpen,
+  LayoutList,
+  BellRing,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -103,6 +118,28 @@ const tokenLinks: NavLink[] = [
 
 const componentCategories: NavCategory[] = [
   {
+    id: "primitives",
+    label: "UI Primitives",
+    icon: RectangleHorizontal,
+    links: [
+      { href: "/components/button", label: "Button", icon: Square },
+      { href: "/components/card", label: "Card", icon: RectangleHorizontal },
+      { href: "/components/badge", label: "Badge", icon: Tag },
+      { href: "/components/divider", label: "Divider", icon: SeparatorHorizontal },
+      { href: "/components/avatar", label: "Avatar", icon: CircleUser },
+      { href: "/components/input", label: "Input", icon: FormInput },
+      { href: "/components/textarea", label: "Textarea", icon: AlignLeft },
+      { href: "/components/select", label: "Select", icon: ListFilter },
+      { href: "/components/checkbox", label: "Checkbox", icon: CheckSquare },
+      { href: "/components/toggle", label: "Toggle", icon: ToggleRight },
+      { href: "/components/tooltip", label: "Tooltip", icon: MessageSquare },
+      { href: "/components/dialog", label: "Dialog", icon: PanelTopOpen },
+      { href: "/components/dropdown-menu", label: "DropdownMenu", icon: ListFilter },
+      { href: "/components/tabs", label: "Tabs", icon: LayoutList },
+      { href: "/components/toast", label: "Toast", icon: BellRing },
+    ],
+  },
+  {
     id: "layout",
     label: "Layout & Shell",
     icon: PanelTop,
@@ -142,6 +179,11 @@ const componentCategories: NavCategory[] = [
         href: "/components/arrow-reveal",
         label: "ArrowReveal",
         icon: ArrowRight,
+      },
+      {
+        href: "/components/scroll-spy",
+        label: "ScrollSpy",
+        icon: GripVertical,
       },
     ],
   },

@@ -1,0 +1,130 @@
+@use '@yilangaodesign/design-system/scss' as *;
+
+.viewport {
+  position: fixed;
+  bottom: $portfolio-spacing-07;
+  right: $portfolio-spacing-07;
+  z-index: $portfolio-z-toast;
+  display: flex;
+  flex-direction: column;
+  gap: $portfolio-spacing-03;
+  width: 360px;
+  max-width: calc(100vw - #{$portfolio-spacing-07} * 2);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  outline: none;
+}
+
+.root {
+  display: flex;
+  align-items: flex-start;
+  gap: $portfolio-spacing-04;
+  padding: $portfolio-spacing-05;
+  background-color: $portfolio-surface-primary;
+  border: 1px solid $portfolio-border-subtle;
+  border-radius: $portfolio-radius-sm;
+  box-shadow: $portfolio-shadow-lg;
+
+  &[data-state='open'] {
+    animation: slideIn $portfolio-duration-moderate $portfolio-easing-entrance;
+  }
+  &[data-state='closed'] {
+    animation: slideOut $portfolio-duration-fast $portfolio-easing-exit;
+  }
+
+  &[data-swipe='move'] {
+    transform: translateX(var(--radix-toast-swipe-move-x));
+  }
+  &[data-swipe='cancel'] {
+    transform: translateX(0);
+    transition: transform $portfolio-duration-fast $portfolio-easing-standard;
+  }
+  &[data-swipe='end'] {
+    animation: swipeOut $portfolio-duration-fast $portfolio-easing-exit;
+  }
+}
+
+.body {
+  flex: 1;
+  min-width: 0;
+}
+
+.title {
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-sm;
+  font-weight: $portfolio-weight-medium;
+  line-height: $portfolio-leading-normal;
+  color: $portfolio-text-primary;
+}
+
+.description {
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-xs;
+  line-height: $portfolio-leading-normal;
+  color: $portfolio-text-secondary;
+  margin-top: $portfolio-spacing-01;
+}
+
+.close {
+  @include button-reset;
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: $portfolio-radius-sm;
+  color: $portfolio-text-helper;
+  @include transition-fast;
+
+  &:hover {
+    background-color: $portfolio-surface-tertiary;
+    color: $portfolio-text-primary;
+  }
+}
+
+.action {
+  @include button-reset;
+  margin-top: $portfolio-spacing-03;
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-xs;
+  font-weight: $portfolio-weight-medium;
+  color: $portfolio-accent-60;
+  @include transition-fast;
+
+  &:hover {
+    color: $portfolio-accent-70;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Animations
+// ---------------------------------------------------------------------------
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideOut {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}
+
+@keyframes swipeOut {
+  from { transform: translateX(var(--radix-toast-swipe-end-x)); }
+  to { transform: translateX(100%); }
+}

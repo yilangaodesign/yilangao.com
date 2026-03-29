@@ -1,73 +1,87 @@
-<!-- BEGIN:nextjs-agent-rules -->
 # This is NOT the Next.js you know
 
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
-<!-- END:nextjs-agent-rules -->
 
-<!-- BEGIN:architecture -->
-# Architecture
+# Hard Guardrails
 
-**Full architecture doc:** [`docs/architecture.md`](docs/architecture.md)
+**Design:**
+1. **NEVER** use inline `style={{}}` — always use Tailwind classes or CSS custom properties
+2. **NEVER** place CSS resets outside `@layer base` — unlayered resets override all Tailwind utilities
+3. **NEVER** use `@theme inline` for themeable values — use `@theme` so dark mode works
+4. **NEVER** treat repeated user complaints incrementally — 3+ in the same category means the root cause is architectural
+5. **NEVER** skip dark mode verification when touching colors or backgrounds
+6. **ALWAYS** start with comfortable base padding (≥32px for content areas) and scale up at larger breakpoints
+7. **ALWAYS** use flex layout with in-flow spacers for fixed sidebars — never rely on padding-left offsets
 
-Read this doc before making structural changes. It covers:
-- How the design system package, main site, and playground UI relate
-- Publishing flow (GitHub Packages → Renovate → consumer PRs)
-- Deployment strategy (main site + playground as separate Vercel projects)
-- Known architectural tensions (dual token sources, missing package dep, playground coupling)
-<!-- END:architecture -->
+**Engineering:**
+1. **NEVER** make file changes while on `main` — check `git branch --show-current` first; if on `main`, create a feature branch (`git checkout -b feat/<topic>`) before writing any code
+2. **NEVER** modify `src/styles/tokens/` without running `npm run sync-tokens` afterward
+3. **NEVER** start a dev server without first reading `docs/port-registry.md`
+4. **NEVER** kill a process on a port without checking what it is first
+5. **NEVER** use ports below 4000 — they are reserved for other projects
+6. **NEVER** assume a dev server from a previous session is still running — verify it
+7. **ALWAYS** verify changes on localhost after implementation
+8. **ALWAYS** trace data flow (source → build → server → browser) when debugging visibility issues
+9. **ALWAYS** run the Cross-App Parity Checklist (below) after creating or modifying anything in `src/`
 
-<!-- BEGIN:shared-design-system -->
-# Centralized Design System (npm package)
+# Knowledge Routing
 
-The design system is published as **`@yilangaodesign/design-system`** on GitHub
-Packages. Source repo: https://github.com/yilangaodesign/design-system
+Read **only** the docs relevant to your current task — not everything.
 
-This project consumes the package — it does NOT own the tokens or mixins locally.
-To modify the design system, make changes in the design-system repo, publish a
-new version, then update the dependency here.
+| Task type | Read before working |
+|---|---|
+| UI / design work | `docs/design.md` + `docs/design-anti-patterns.md` |
+| Engineering / infra | `docs/engineering.md` + `docs/engineering-anti-patterns.md` |
+| Starting or stopping a server | `docs/port-registry.md` |
+| Structural / architectural changes | `docs/architecture.md` |
+| User gives design feedback | Activate `design-iteration` skill |
+| User reports a bug or incident | Activate `engineering-iteration` skill |
+| Ambiguous: "it looks wrong" | Design track — check `docs/design-feedback-log.md` |
+| Ambiguous: "it doesn't work" | Engineering track — check `docs/engineering-feedback-log.md` |
 
-- **SCSS barrel**: `@use '@yilangaodesign/design-system/scss' as *`
-- **SCSS sub-modules**: `@use '@yilangaodesign/design-system/scss/tokens/colors' as *`
-- **CSS custom properties**: `@import '@yilangaodesign/design-system/css/tokens'`
-- **React components**: `import { FadeIn } from '@yilangaodesign/design-system'`
-- **Design docs**: shipped with the package under `docs/`
+# Design System Package
 
-**Local `src/styles/` still exists** for site-specific overrides and mixins not
-yet promoted to the shared package. When adding new tokens/mixins, decide
-whether they belong in the package (shared across projects) or locally.
+Published as **`@yilangaodesign/design-system`** on GitHub Packages.
+Source repo: https://github.com/yilangaodesign/design-system
 
-**Renovate** is configured (`renovate.json`) to auto-create PRs when a new
-version of the design system is published. Review the changelog and merge.
-<!-- END:shared-design-system -->
+| Import type | Path |
+|---|---|
+| SCSS barrel | `@use '@yilangaodesign/design-system/scss' as *` |
+| SCSS sub-module | `@use '@yilangaodesign/design-system/scss/tokens/colors' as *` |
+| CSS custom properties | `@import '@yilangaodesign/design-system/css/tokens'` |
+| React components | `import { FadeIn } from '@yilangaodesign/design-system'` |
 
-<!-- BEGIN:archive-rules -->
-# Archive — Cold Storage
+Local `src/styles/` exists for site-specific overrides not yet promoted to the package.
+`docs/design.md` is the canonical working copy — update it in-session, then periodically publish to the package.
+Renovate (`renovate.json`) auto-creates PRs when a new package version is published.
 
-`/archive/` contains explored-but-shelved code (components, tokens, styles,
-pages) from past experiments.
+# Cross-App Parity Checklist
 
-**Agent rules:**
-1. Do NOT reference or import anything from `/archive/` unless the user
-   explicitly asks you to look at past explorations.
-2. Do NOT include `/archive/` contents in search results during normal work.
-3. When the user decides to shelve code, move it to the appropriate
-   `archive/experiment-XX/` or `archive/shared/` subdirectory and add a brief
-   comment at the top of the file noting its origin and why it was shelved.
+This project has TWO Next.js apps: main site (`src/`) and playground (`playground/`). **This is a blocking gate — run after every creation or modification.**
 
-See `archive/README.md` for the full convention.
-<!-- END:archive-rules -->
+| What you did | What you MUST also do |
+|---|---|
+| Created a new component in `src/components/` | Create `playground/src/app/components/<slug>/page.tsx` preview AND add sidebar entry in `playground/src/components/sidebar.tsx` |
+| Added a font or dependency to root `package.json` | Add to `playground/package.json` too, wire in `playground/src/app/layout.tsx` |
+| Changed font loading in `src/app/(frontend)/layout.tsx` | Mirror in `playground/src/app/layout.tsx` |
+| Added CSS variables or tokens | Update `playground/src/app/globals.css` if needed |
+| Modified `src/styles/tokens/` | Run `npm run sync-tokens` to update `playground/src/lib/tokens.ts` |
 
-<!-- BEGIN:component-registry -->
+# Token Sync Protocol
+
+When modifying any file in `src/styles/tokens/`:
+1. Make the change in the SCSS source of truth
+2. Run `npm run sync-tokens` to regenerate playground data
+3. Verify: `curl -sI http://localhost:4001/tokens/colors`
+4. If adding new semantic tokens, update `playground/src/app/globals.css`
+
 # Component Registry
 
-`archive/registry.json` is the **single source of truth** for all design system
-artifacts — both active and archived. Every component, token, style, and page
-must have an entry in this file.
+`archive/registry.json` is the **single source of truth** for all design system artifacts.
 
-## When creating a new artifact
+**When creating a new artifact — all three steps are mandatory:**
 
-Add an entry to `archive/registry.json` with these required fields:
-
+**Step 1: Registry entry** — Add to `archive/registry.json`:
 ```json
 {
   "id": "<experiment>-<kebab-name>",
@@ -79,90 +93,26 @@ Add an entry to `archive/registry.json` with these required fields:
   "sourcePath": "src/path/to/file",
   "createdAt": "<ISO 8601 timestamp>",
   "createdBy": "user | cursor",
-  "origin": {
-    "type": "custom | library | hybrid",
-    "library": "Library Name (if applicable)",
-    "url": "https://library-url (if applicable)"
-  },
+  "origin": { "type": "custom | library | hybrid", "library": "...", "url": "..." },
   "tags": ["relevant", "tags"],
   "hasPreview": false
 }
 ```
 
-## When archiving an artifact
+**Step 2: Playground preview** (Components only) —
+Create page at `playground/src/app/components/<kebab-name>/page.tsx` and add sidebar entry in `playground/src/components/sidebar.tsx`. A component without a preview is incomplete.
 
-Set `status` to `"archived"` and populate the archive-specific fields:
-`archivePath`, `archivedAt`, `archivedBy`, `reason`. Move the file from `src/`
-to the appropriate `archive/` subdirectory.
+**Step 3: Cross-app parity check** — Run the checklist above.
 
-## When restoring an artifact
+**Archiving:** Set `status` to `"archived"`, populate `archivePath`/`archivedAt`/`archivedBy`/`reason`, move file to `archive/`.
+**Restoring:** Set `status` to `"active"`, remove archive fields, move back to `sourcePath`.
+**Origin types:** `custom` (from scratch) · `library` (wrapper/direct usage) · `hybrid` (custom + library)
 
-Set `status` back to `"active"` and remove the archive-specific fields. Move
-the file from `archive/` back to its `sourcePath`.
+# Archive — Cold Storage
 
-## Origin types
+`/archive/` contains explored-but-shelved code from past experiments.
+1. Do NOT reference or import from `/archive/` unless the user explicitly asks.
+2. Do NOT include `/archive/` contents in search results during normal work.
+3. When shelving: move to `archive/experiment-XX/` or `archive/shared/`, add a comment noting origin and reason.
 
-- **custom**: Built from scratch, no external library dependency
-- **library**: Thin wrapper or direct usage of an open-source library
-- **hybrid**: Custom code built on top of a library (e.g., custom animation
-  component using Framer Motion)
-<!-- END:component-registry -->
-
-<!-- BEGIN:port-registry -->
-# Port Registry
-
-**Live ledger:** [`docs/port-registry.md`](docs/port-registry.md)
-
-All dev servers in this project MUST use ports in the **4000–5000** range.
-Ports below 4000 (e.g. 3000, 3001) are reserved for other projects and must
-NEVER be used.
-
-**Agent protocol — follow every time, no exceptions:**
-
-1. **Before starting any server:** Read `docs/port-registry.md` to check
-   the service's default port and current state.
-2. **After starting a server:** Update the ledger — set `Current Port`,
-   `Status` to `running`, record the `PID`, and append a Change Log entry.
-3. **After stopping a server:** Update the ledger — set `Current Port` to
-   `—`, `Status` to `stopped`, clear the `PID`, and append a Change Log entry.
-4. **If the default port is occupied:** Pick the next free port in 4000–5000,
-   start the service there, set `Status` to `temporary`, and record the
-   reason in both the `Notes` column and the Change Log.
-5. **When the conflict resolves:** Move back to the default port, update
-   status to `running`, and log the change.
-6. **NEVER** start a server on a port outside 4000–5000.
-7. **NEVER** kill processes on ports outside 4000–5000 unless explicitly asked.
-<!-- END:port-registry -->
-
-<!-- BEGIN:design-system-rules -->
-# Design System Feedback Loop
-
-Before any UI work, read the design docs shipped with `@yilangaodesign/design-system`:
-- `node_modules/@yilangaodesign/design-system/docs/design.md`
-- `node_modules/@yilangaodesign/design-system/docs/design-anti-patterns.md`
-
-When processing user design feedback, activate the skill at
-`.cursor/skills/design-iteration/SKILL.md`. After resolving feedback, update
-the design docs in the **design-system repo** (not this repo) so all consumers
-benefit. See `.cursor/rules/design-system.mdc` for full protocol.
-<!-- END:design-system-rules -->
-
-<!-- BEGIN:engineering-feedback-loop -->
-# Engineering Feedback Loop
-
-Before any code work, read `docs/engineering.md` and
-`docs/engineering-anti-patterns.md`. When the user reports a bug,
-broken feature, data sync issue, or process failure, activate the skill at
-`.cursor/skills/engineering-iteration/SKILL.md`. After resolving the
-issue, always update the engineering docs. See
-`.cursor/rules/engineering.mdc` for full protocol.
-
-**Dual-track routing:** Design issues ("it looks wrong") go to the design
-track. Engineering issues ("it doesn't work / show up") go to the
-engineering track. See the routing table in `.cursor/rules/engineering.mdc`.
-
-**Token sync:** Tokens now live in the `@yilangaodesign/design-system` package.
-To modify tokens, update the design-system repo and publish a new version.
-After updating the dependency here, run `npm run sync-tokens` if the
-playground needs regenerated token bindings.
-<!-- END:engineering-feedback-loop -->
+See `archive/README.md` for the full convention.

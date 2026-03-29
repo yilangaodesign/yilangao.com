@@ -1,0 +1,54 @@
+@use '@yilangaodesign/design-system/scss' as *;
+
+.content {
+  z-index: $portfolio-z-toast;
+  padding: $portfolio-spacing-02 $portfolio-spacing-03;
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-xs;
+  line-height: $portfolio-leading-normal;
+  color: $portfolio-text-inverse;
+  background-color: $portfolio-surface-inverse;
+  border-radius: $portfolio-radius-sm;
+  box-shadow: $portfolio-shadow-md;
+  user-select: none;
+
+  animation-duration: $portfolio-duration-fast;
+  animation-timing-function: $portfolio-easing-entrance;
+
+  &[data-state='delayed-open'][data-side='top'] {
+    animation-name: slideUp;
+  }
+  &[data-state='delayed-open'][data-side='bottom'] {
+    animation-name: slideDown;
+  }
+  &[data-state='delayed-open'][data-side='left'] {
+    animation-name: slideLeft;
+  }
+  &[data-state='delayed-open'][data-side='right'] {
+    animation-name: slideRight;
+  }
+}
+
+.arrow {
+  fill: $portfolio-surface-inverse;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideLeft {
+  from { opacity: 0; transform: translateX(4px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideRight {
+  from { opacity: 0; transform: translateX(-4px); }
+  to { opacity: 1; transform: translateX(0); }
+}
