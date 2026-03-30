@@ -1,13 +1,13 @@
-@use "@yilangaodesign/design-system/scss" as *;
+@use "../../../styles" as *;
 
-$card-margin: 16px;
+$card-margin: $portfolio-spacer-2x;
 
 // ── PAGE — fills viewport exactly, no scroll ────────────────────────────────
 
 .page {
   height: 100vh;
   overflow: hidden;
-  background-color: #f3f3f3;
+  background-color: $portfolio-neutral-10;
   display: flex;
   flex-direction: column;
 }
@@ -16,8 +16,8 @@ $card-margin: 16px;
 
 .nav {
   flex-shrink: 0;
-  background-color: #fff;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  background-color: $portfolio-neutral-00;
+  border-bottom: 1px solid $portfolio-border-subtle;
   z-index: $portfolio-z-sticky;
 }
 
@@ -25,15 +25,13 @@ $card-margin: 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 28px;
-  max-width: 1200px;
+  padding: $portfolio-spacer-1-5x $portfolio-spacer-3x;
+  max-width: $elan-container-default;
   margin: 0 auto;
 }
 
 .logo {
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-lg;
-  font-weight: $portfolio-weight-bold;
+  @include subtitle-2-bold;
   color: $portfolio-text-primary;
   text-decoration: none;
 }
@@ -41,25 +39,25 @@ $card-margin: 16px;
 .navLinks {
   display: none;
   align-items: center;
-  gap: 24px;
-  @media #{$portfolio-mq-md} { display: flex; }
+  gap: $portfolio-spacer-3x;
+  @media #{$elan-mq-sm} { display: flex; }
 }
 
 .navLink {
-  font-size: 14px;
+  @include body-sm;
   font-weight: $portfolio-weight-medium;
   color: $portfolio-text-secondary;
   text-decoration: none;
-  transition: color $portfolio-duration-fast $portfolio-easing-standard;
+  @include transition-fast;
   &:hover { color: $portfolio-text-primary; }
 }
 
 .navCta {
-  font-size: 14px;
+  @include body-sm;
   font-weight: $portfolio-weight-semibold;
   color: $portfolio-text-primary;
   background-color: transparent;
-  padding: 6px 18px;
+  padding: $portfolio-spacer-utility-0-75x $portfolio-spacer-utility-2-25x;
   border-radius: $portfolio-radius-full;
   border: 1px solid $portfolio-text-primary;
   text-decoration: none;
@@ -92,7 +90,7 @@ $card-margin: 16px;
   z-index: 0;
   opacity: 0.06;
   background-image: radial-gradient(circle, rgba(255, 255, 255, 0.5) 1px, transparent 1px);
-  background-size: 24px 24px;
+  background-size: $portfolio-spacer-3x $portfolio-spacer-3x;
 }
 
 // ── COLUMNS ─────────────────────────────────────────────────────────────────
@@ -105,7 +103,7 @@ $card-margin: 16px;
   flex: 1;
   min-height: 0;
 
-  @media #{$portfolio-mq-md} {
+  @media #{$elan-mq-sm} {
     flex-direction: row;
   }
 }
@@ -116,36 +114,32 @@ $card-margin: 16px;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  color: #fff;
-  padding: 32px 28px;
+  color: $portfolio-text-always-light-bold;
+  padding: $portfolio-spacer-4x $portfolio-spacer-3x;
 
-  @media #{$portfolio-mq-md} {
+  @media #{$elan-mq-sm} {
     width: 50%;
     flex-shrink: 0;
-    padding: 36px 36px;
+    padding: $portfolio-spacer-4x;
   }
 
-  @media #{$portfolio-mq-lg} {
-    padding: 40px 48px;
+  @media #{$elan-mq-md} {
+    padding: $portfolio-spacer-5x $portfolio-spacer-6x;
   }
 }
 
 .heading {
-  font-family: $portfolio-font-serif;
-  font-size: clamp(1.75rem, 3vw, 2.75rem);
-  font-weight: $portfolio-weight-regular;
-  line-height: 1.15;
-  letter-spacing: -0.02em;
-  margin-bottom: 14px;
+  @include heading-2-fluid;
+  color: $portfolio-text-always-light-bold;
+  margin-bottom: $portfolio-spacer-2x;
 }
 
 .subtext {
-  font-family: $portfolio-font-sans;
-  font-size: 14px;
+  @include body-sm;
   color: rgba(255, 255, 255, 0.5);
-  line-height: 1.65;
+  line-height: $portfolio-leading-relaxed;
   max-width: 360px;
-  margin-bottom: 28px;
+  margin-bottom: $portfolio-spacer-3x;
 }
 
 // Testimonial slider
@@ -154,16 +148,26 @@ $card-margin: 16px;
   background-color: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.07);
   border-radius: $portfolio-radius-sm;
-  padding: 20px;
+  padding: $portfolio-spacer-2-5x;
   max-width: 360px;
 }
 
 .quoteIcon {
   font-family: $portfolio-font-serif;
-  font-size: 40px;
+  font-size: $portfolio-type-4xl;
   line-height: 1;
   color: rgba(255, 255, 255, 0.1);
-  margin-bottom: 2px;
+  margin-bottom: $portfolio-spacer-0-25x;
+  user-select: none;
+}
+
+.quoteIconEditable {
+  cursor: pointer;
+  @include transition-fast;
+
+  &:hover {
+    color: rgba(255, 255, 255, 0.25);
+  }
 }
 
 .sliderQuote {
@@ -171,36 +175,47 @@ $card-margin: 16px;
 }
 
 .sliderText {
-  font-family: $portfolio-font-sans;
-  font-size: 13px;
-  line-height: 1.65;
+  @include body-sm;
+  line-height: $portfolio-leading-relaxed;
   color: rgba(255, 255, 255, 0.65);
-  margin-bottom: 12px;
+  margin-bottom: $portfolio-spacer-1-5x;
 }
 
 .sliderAttrib {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: $portfolio-spacer-0-25x;
 }
 
 .sliderName {
-  font-family: $portfolio-font-sans;
-  font-size: 13px;
+  @include body-sm-medium;
   font-weight: $portfolio-weight-semibold;
-  color: #fff;
+  color: $portfolio-text-always-light-bold;
 }
 
 .sliderRole {
-  font-family: $portfolio-font-sans;
-  font-size: 11px;
+  @include caption;
   color: rgba(255, 255, 255, 0.35);
 }
 
 .sliderControls {
   display: flex;
-  gap: 8px;
-  margin-top: 12px;
+  align-items: center;
+  gap: $portfolio-spacer-1x;
+  margin-top: $portfolio-spacer-1-5x;
+}
+
+.addTestimonialBtn {
+  margin-top: $portfolio-spacer-1-5x;
+  min-height: 48px;
+  border-color: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.4);
+
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.3);
+    color: $portfolio-text-always-light-bold;
+    background: rgba(255, 255, 255, 0.05);
+  }
 }
 
 .sliderBtn {
@@ -219,7 +234,7 @@ $card-margin: 16px;
 
   &:hover {
     border-color: rgba(255, 255, 255, 0.3);
-    color: #fff;
+    color: $portfolio-text-always-light-bold;
   }
 }
 
@@ -230,24 +245,20 @@ $card-margin: 16px;
   z-index: 1;
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 16px 28px;
+  gap: $portfolio-spacer-2x;
+  padding: $portfolio-spacer-2x $portfolio-spacer-3x;
   flex-shrink: 0;
 
-  @media #{$portfolio-mq-md} {
-    padding: 16px 36px;
+  @media #{$elan-mq-sm} {
+    padding: $portfolio-spacer-2x $portfolio-spacer-4x;
   }
 }
 
 .trustLabel {
-  font-family: $portfolio-font-sans;
-  font-size: 11px;
-  font-weight: $portfolio-weight-medium;
+  @include label;
   color: rgba(255, 255, 255, 0.3);
   white-space: nowrap;
   flex-shrink: 0;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
 }
 
 @keyframes contactMarquee {
@@ -279,13 +290,12 @@ $card-margin: 16px;
   align-items: center;
   justify-content: center;
   min-width: 80px;
-  height: 24px;
-  padding: 0 10px;
-  margin-right: 24px;
+  height: $portfolio-spacer-3x;
+  padding: 0 $portfolio-spacer-utility-1-25x;
+  margin-right: $portfolio-spacer-3x;
   background-color: rgba(255, 255, 255, 0.06);
-  border-radius: 4px;
-  font-family: $portfolio-font-sans;
-  font-size: 11px;
+  border-radius: $portfolio-radius-sm;
+  font-size: $portfolio-type-xs;
   font-weight: $portfolio-weight-medium;
   color: rgba(255, 255, 255, 0.3);
   white-space: nowrap;
@@ -297,51 +307,48 @@ $card-margin: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 12px;
+  padding: $portfolio-spacer-1-5x;
 
-  @media #{$portfolio-mq-md} {
+  @media #{$elan-mq-sm} {
     width: 50%;
     flex-shrink: 0;
-    padding: 16px;
+    padding: $portfolio-spacer-2x;
   }
 }
 
 .formCard {
   width: 100%;
   max-width: 420px;
-  background-color: #fff;
+  background-color: $portfolio-neutral-00;
   border-radius: $portfolio-radius-sm;
-  padding: 32px 28px;
-  box-shadow:
-    0 12px 48px rgba(0, 0, 0, 0.2),
-    0 2px 8px rgba(0, 0, 0, 0.08);
+  padding: $portfolio-spacer-4x $portfolio-spacer-3x;
+  box-shadow: $portfolio-shadow-xl;
 
-  @media #{$portfolio-mq-md} {
-    padding: 36px 32px;
+  @media #{$elan-mq-sm} {
+    padding: $portfolio-spacer-4x;
   }
 }
 
 .form {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: $portfolio-spacer-utility-1-75x;
 }
 
 .formRow {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  gap: $portfolio-spacer-1-5x;
 }
 
 .field {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: $portfolio-spacer-utility-0-75x;
 }
 
 .label {
-  font-family: $portfolio-font-sans;
-  font-size: 12px;
+  font-size: $portfolio-type-xs;
   font-weight: $portfolio-weight-medium;
   color: $portfolio-text-secondary;
 }
@@ -349,24 +356,23 @@ $card-margin: 16px;
 .input,
 .textarea,
 .select {
-  font-family: $portfolio-font-sans;
-  font-size: 13px;
+  @include body-compact;
   color: $portfolio-text-primary;
-  background-color: #f8f8f8;
-  border: 1px solid #e8e8e8;
+  background-color: $portfolio-neutral-05;
+  border: 1px solid $portfolio-neutral-20;
   border-radius: $portfolio-radius-sm;
-  padding: 9px 12px;
+  padding: $portfolio-spacer-utility-1-25x $portfolio-spacer-1-5x;
   outline: none;
   transition:
     border-color $portfolio-duration-fast $portfolio-easing-standard,
     box-shadow $portfolio-duration-fast $portfolio-easing-standard;
 
-  &::placeholder { color: #b0b0b0; }
+  &::placeholder { color: $portfolio-text-placeholder; }
 
   &:focus {
     border-color: $portfolio-accent-60;
     box-shadow: 0 0 0 3px rgba($portfolio-accent-60, 0.08);
-    background-color: #fff;
+    background-color: $portfolio-neutral-00;
   }
 }
 
@@ -374,8 +380,8 @@ $card-margin: 16px;
   appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg width='12' height='12' viewBox='0 0 12 12' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M3 4.5L6 7.5L9 4.5' stroke='%236f6f6f' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right 12px center;
-  padding-right: 32px;
+  background-position: right $portfolio-spacer-1-5x center;
+  padding-right: $portfolio-spacer-4x;
   cursor: pointer;
 }
 
@@ -385,17 +391,15 @@ $card-margin: 16px;
 }
 
 .submit {
-  font-family: $portfolio-font-sans;
-  font-size: 14px;
-  font-weight: $portfolio-weight-medium;
-  color: #fff;
+  @include body-sm-medium;
+  color: $portfolio-text-always-light-bold;
   background-color: $portfolio-surface-inverse;
   border: none;
   border-radius: $portfolio-radius-sm;
-  padding: 11px 24px;
+  padding: $portfolio-spacer-utility-1-25x $portfolio-spacer-3x;
   cursor: pointer;
   width: 100%;
-  margin-top: 2px;
+  margin-top: $portfolio-spacer-0-25x;
   transition:
     opacity $portfolio-duration-fast $portfolio-easing-standard,
     transform $portfolio-duration-fast $portfolio-easing-standard;
@@ -412,20 +416,20 @@ $card-margin: 16px;
 }
 
 .formError {
-  font-size: 12px;
-  color: $portfolio-support-error;
+  @include helper-text;
+  color: $portfolio-text-negative;
 }
 
 .privacy {
-  font-size: 11px;
-  color: #a0a0a0;
+  @include legal;
+  color: $portfolio-text-placeholder;
   text-align: center;
-  margin-top: 2px;
+  margin-top: $portfolio-spacer-0-25x;
 }
 
 .privacyLink {
   text-decoration: underline;
   cursor: pointer;
-  transition: color $portfolio-duration-fast $portfolio-easing-standard;
+  @include transition-fast;
   &:hover { color: $portfolio-text-secondary; }
 }

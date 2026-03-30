@@ -7,4 +7,4 @@ export {
   ToastAction,
   ToastClose,
 } from "./Toast";
-export type { ToastProps } from "./Toast";
+export type { ToastProps, ToastVariant } from "./Toast";

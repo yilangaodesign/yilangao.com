@@ -206,6 +206,16 @@ $portfolio-surface-warning-bold: $portfolio-yellow-30;
 $portfolio-surface-warning-subtle: $portfolio-yellow-10;
 $portfolio-surface-overlay: rgba(0, 0, 0, 0.5);
 
+// — Overlay interaction states (semi-transparent for dark/light surface contexts)
+$portfolio-overlay-white-08: rgba(255, 255, 255, 0.08);
+$portfolio-overlay-white-12: rgba(255, 255, 255, 0.12);
+$portfolio-overlay-white-16: rgba(255, 255, 255, 0.16);
+$portfolio-overlay-black-04: rgba(0, 0, 0, 0.04);
+$portfolio-overlay-black-06: rgba(0, 0, 0, 0.06);
+$portfolio-overlay-black-08: rgba(0, 0, 0, 0.08);
+$portfolio-overlay-black-10: rgba(0, 0, 0, 0.10);
+$portfolio-overlay-black-14: rgba(0, 0, 0, 0.14);
+
 // — Text ··································································
 $portfolio-text-neutral-bold: $portfolio-neutral-100;
 $portfolio-text-neutral-regular: $portfolio-neutral-70;

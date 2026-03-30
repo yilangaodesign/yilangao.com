@@ -1,6 +1,11 @@
 // Tier 1 — Core Primitives
 export { Button } from "./Button";
-export type { ButtonProps, ButtonVariant, ButtonSize } from "./Button";
+export type {
+  ButtonProps,
+  ButtonAppearance,
+  ButtonEmphasis,
+  ButtonSize,
+} from "./Button";
 
 export { Card, CardHeader, CardBody, CardFooter } from "./Card";
 export type { CardProps, CardSectionProps } from "./Card";
@@ -25,7 +30,7 @@ export { Select, SelectItem, SelectGroup, SelectLabel, SelectSeparator } from ".
 export type { SelectProps, SelectItemProps } from "./Select";
 
 export { Checkbox } from "./Checkbox";
-export type { CheckboxProps } from "./Checkbox";
+export type { CheckboxCheckedState, CheckboxProps } from "./Checkbox";
 
 export { Toggle } from "./Toggle";
 export type { ToggleProps } from "./Toggle";
@@ -70,4 +75,26 @@ export {
   ToastAction,
   ToastClose,
 } from "./Toast";
-export type { ToastProps } from "./Toast";
+export type { ToastProps, ToastVariant } from "./Toast";
+
+// Tier 4 — Extended Primitives
+export { ColorPicker } from "./ColorPicker";
+export type { ColorPickerProps } from "./ColorPicker";
+
+export { Slider } from "./Slider";
+export type { SliderProps } from "./Slider";
+
+export { ScrubInput } from "./ScrubInput";
+export type { ScrubInputProps } from "./ScrubInput";
+
+export { Dropzone } from "./Dropzone";
+export type { DropzoneProps } from "./Dropzone";
+
+export { ProgressBar } from "./ProgressBar";
+export type { ProgressBarProps } from "./ProgressBar";
+
+export { SegmentedControl } from "./SegmentedControl";
+export type { SegmentedControlProps, SegmentedControlItem } from "./SegmentedControl";
+
+export { CodeBlock } from "./CodeBlock";
+export type { CodeBlockProps } from "./CodeBlock";

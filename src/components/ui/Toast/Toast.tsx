@@ -18,19 +18,23 @@ export function ToastViewport() {
 // Toast root
 // ---------------------------------------------------------------------------
 
+export type ToastVariant = "default" | "success" | "error" | "warning" | "info";
+
 export interface ToastProps {
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
   duration?: number;
   children: ReactNode;
   className?: string;
+  /** Visual tone: accent border + semantic text. Default keeps neutral styling. */
+  variant?: ToastVariant;
 }
 
 export const Toast = forwardRef<HTMLLIElement, ToastProps>(
-  ({ className, ...props }, ref) => (
+  ({ className, variant = "default", ...props }, ref) => (
     <ToastPrimitive.Root
       ref={ref}
-      className={[styles.root, className].filter(Boolean).join(" ")}
+      className={[styles.root, variant !== "default" && styles[variant], className].filter(Boolean).join(" ")}
       {...props}
     />
   ),

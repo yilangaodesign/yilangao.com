@@ -8,7 +8,7 @@ import {
 } from "@/components/token-grid";
 import ScrollSpy from "@/components/scroll-spy";
 import { colors } from "@/lib/tokens";
-import type { EmphasisToken, RoleGroup } from "@/lib/tokens";
+import type { RoleGroup } from "@/lib/tokens";
 
 
 const scrollSpySections = [
@@ -29,32 +29,20 @@ function titleCase(str: string) {
     .join(" ");
 }
 
-function EmphasisSwatch({ token }: { token: EmphasisToken }) {
-  return (
-    <div className="min-w-0">
-      <div
-        className="h-14 rounded-sm border border-border/50"
-        style={{ backgroundColor: token.value }}
-      />
-      <p className="mt-1.5 text-xs font-medium truncate">
-        {token.emphasis ? titleCase(token.emphasis) : "Default"}
-      </p>
-      <p className="text-[11px] text-muted-foreground font-mono truncate">
-        {token.value}
-      </p>
-    </div>
-  );
-}
-
 function RoleRow({ role }: { role: RoleGroup }) {
   return (
     <div className="flex gap-4 items-start">
       <div className="w-24 shrink-0 pt-1">
         <p className="text-xs font-medium">{titleCase(role.role)}</p>
       </div>
-      <div className="flex-1 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-2">
+      <div className="flex flex-wrap gap-1.5">
         {role.tokens.map((t) => (
-          <EmphasisSwatch key={t.token} token={t} />
+          <ColorSwatch
+            key={t.token}
+            color={t.value}
+            label={t.emphasis ? titleCase(t.emphasis) : "Default"}
+            sublabel={t.value}
+          />
         ))}
       </div>
     </div>
@@ -74,7 +62,7 @@ function PropertySection({
   const otherRoles = roles.filter((r) => r.role !== "neutral");
 
   return (
-    <div id={property} className="mb-16 scroll-mt-16">
+    <div id={property} className="mb-16 scroll-mt-24">
       <h3 className="text-lg font-semibold tracking-tight mb-1">
         {titleCase(property)}
       </h3>
@@ -101,7 +89,7 @@ export default function ColorsPage() {
         />
 
         {/* Architecture explanation */}
-        <div id="token-architecture" className="mb-16 scroll-mt-16">
+        <div id="token-architecture" className="mb-16 scroll-mt-24">
           <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-4">
             Token Architecture
           </h3>
@@ -192,7 +180,7 @@ export default function ColorsPage() {
         ))}
 
         {/* Interaction */}
-        <div id="interaction" className="mb-16 scroll-mt-16">
+        <div id="interaction" className="mb-16 scroll-mt-24">
           <h3 className="text-lg font-semibold tracking-tight mb-1">
             Focus & Highlight
           </h3>
@@ -200,7 +188,7 @@ export default function ColorsPage() {
             Interaction state tokens. These are global — they don&apos;t follow
             the property dimension.
           </p>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
+          <div className="flex flex-wrap gap-1.5">
             {colors.interaction.map((t) => (
               <ColorSwatch
                 key={t.name}
@@ -213,7 +201,7 @@ export default function ColorsPage() {
         </div>
 
         {/* Palette Reference */}
-        <div id="palette-reference" className="scroll-mt-16">
+        <div id="palette-reference" className="scroll-mt-24">
           <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-2">
             Palette Reference
           </h3>
@@ -223,7 +211,7 @@ export default function ColorsPage() {
           </p>
 
           <SubSection title="Accent Scale (Brand)">
-            <div className="grid grid-cols-5 sm:grid-cols-10 gap-2 sm:gap-3">
+            <div className="flex flex-wrap gap-1.5">
               {colors.accent.map((c) => (
                 <ColorSwatch
                   key={c.step}
@@ -236,7 +224,7 @@ export default function ColorsPage() {
           </SubSection>
 
           <SubSection title="Neutral Scale">
-            <div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-12 gap-2 sm:gap-3">
+            <div className="flex flex-wrap gap-1.5">
               {colors.neutral.map((c) => (
                 <ColorSwatch
                   key={c.step}
@@ -259,7 +247,7 @@ export default function ColorsPage() {
             {colors.extended.map((family) => (
               <div key={family.prefix} className="mb-6">
                 <p className="text-xs font-medium mb-2">{family.name}</p>
-                <div className="grid grid-cols-5 sm:grid-cols-10 gap-1.5 sm:gap-2">
+                <div className="flex flex-wrap gap-1.5">
                   {family.steps.map((c) => (
                     <ColorSwatch
                       key={c.step}

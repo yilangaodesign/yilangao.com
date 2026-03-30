@@ -1,9 +1,9 @@
-@use '@yilangaodesign/design-system/scss' as *;
+@use '../../../styles' as *;
 
 .wrapper {
   display: flex;
   align-items: flex-start;
-  gap: $portfolio-spacing-03;
+  gap: $portfolio-spacer-1x;
 }
 
 .checkbox {
@@ -41,6 +41,21 @@
   display: flex;
   align-items: center;
   justify-content: center;
+
+  .iconChecked,
+  .iconIndeterminate {
+    display: none;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &[data-state='checked'] .iconChecked {
+    display: flex;
+  }
+
+  &[data-state='indeterminate'] .iconIndeterminate {
+    display: flex;
+  }
 }
 
 .label {

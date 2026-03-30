@@ -1,0 +1,67 @@
+@use '../../../styles' as *;
+
+.wrapper {
+  border: 1px solid $portfolio-border-subtle;
+  border-radius: $portfolio-radius-sm;
+  overflow: hidden;
+  background-color: $portfolio-neutral-05;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $portfolio-spacer-0-5x $portfolio-spacer-1-5x;
+  border-bottom: 1px solid $portfolio-border-subtle;
+  background-color: $portfolio-neutral-10;
+  min-height: 36px;
+}
+
+.filename {
+  font-family: $portfolio-font-mono;
+  font-size: $portfolio-type-xs;
+  line-height: $portfolio-leading-normal;
+  color: $portfolio-text-secondary;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: $portfolio-spacer-0-5x;
+  margin-left: auto;
+}
+
+.actionBtn {
+  @include button-reset;
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-xs;
+  font-weight: $portfolio-weight-medium;
+  line-height: $portfolio-leading-normal;
+  color: $portfolio-text-secondary;
+  padding: $portfolio-spacer-0-25x $portfolio-spacer-0-5x;
+  border-radius: $portfolio-radius-sm;
+  @include transition-fast;
+
+  &:hover {
+    color: $portfolio-text-primary;
+    background-color: $portfolio-neutral-20;
+  }
+}
+
+.codeWrap {
+  overflow: auto;
+}
+
+.pre {
+  margin: 0;
+  padding: $portfolio-spacer-1-5x;
+}
+
+.code {
+  font-family: $portfolio-font-mono;
+  font-size: $portfolio-type-sm;
+  line-height: $portfolio-leading-relaxed;
+  color: $portfolio-text-primary;
+  white-space: pre;
+  tab-size: 2;
+}

@@ -1,15 +1,15 @@
-@use "@yilangaodesign/design-system/scss" as *;
+@use "../styles" as *;
 
 .rail {
   position: fixed;
-  right: $portfolio-spacing-05;
+  right: $portfolio-spacer-2x;
   top: 50%;
   transform: translateY(-50%);
   z-index: 40;
   display: none;
   pointer-events: none;
 
-  @media #{$portfolio-mq-lg} {
+  @media #{$elan-mq-md} {
     display: flex;
   }
 }
@@ -17,14 +17,14 @@
 .track {
   display: flex;
   flex-direction: column;
-  gap: $portfolio-spacing-03;
+  gap: $portfolio-spacer-1x;
   align-items: flex-end;
   touch-action: none;
   user-select: none;
   cursor: pointer;
   pointer-events: auto;
-  padding: $portfolio-spacing-04;
-  margin: -$portfolio-spacing-04;
+  padding: $portfolio-spacer-1-5x;
+  margin: -$portfolio-spacer-1-5x;
 
   &[data-dragging] {
     cursor: grabbing;
@@ -36,24 +36,38 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
+  width: 28px;
+  height: $portfolio-spacer-2x;
 }
 
 .label {
   position: absolute;
-  right: calc(100% + #{$portfolio-spacing-03});
-  top: 50%;
-  transform: translateY(-50%);
+  right: calc(100% + #{$portfolio-spacer-1x});
+  top: 0;
+  height: $portfolio-spacer-2x;
+  display: flex;
+  align-items: center;
   font-family: $portfolio-font-mono;
   font-size: $portfolio-type-xs;
-  color: $portfolio-text-secondary;
+  line-height: 1;
+  color: $portfolio-text-placeholder;
+  font-weight: 400;
   white-space: nowrap;
   pointer-events: none;
+  transition: color $portfolio-duration-moderate $portfolio-easing-standard;
+
+  .notch[data-active] & {
+    color: $portfolio-text-primary;
+    font-weight: 500;
+  }
 }
 
 .tick {
   @include button-reset;
   width: 16px;
   height: 2px;
+  line-height: 0;
+  min-height: 0;
   background: $portfolio-border-subtle;
   border-radius: 1px;
   transition:

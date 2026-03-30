@@ -1,0 +1,42 @@
+// =============================================================================
+// Portfolio Design System — Typography Tokens
+// Inter (primary sans), Lora (editorial serif), JetBrains Mono (code/data)
+// =============================================================================
+
+$portfolio-font-sans: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+$portfolio-font-serif: 'Lora', 'Georgia', serif;
+$portfolio-font-mono: 'JetBrains Mono', 'Menlo', 'Consolas', monospace;
+
+// Font weights
+$portfolio-weight-light: 300;
+$portfolio-weight-regular: 400;
+$portfolio-weight-medium: 500;
+$portfolio-weight-semibold: 600;
+$portfolio-weight-bold: 700;
+
+// Type scale — sizes
+$portfolio-type-xs: 0.75rem;    // 12px
+$portfolio-type-sm: 0.875rem;   // 14px
+$portfolio-type-base: 1rem;     // 16px
+$portfolio-type-lg: 1.125rem;   // 18px
+$portfolio-type-xl: 1.25rem;    // 20px
+$portfolio-type-2xl: 1.5rem;    // 24px
+$portfolio-type-3xl: 1.875rem;  // 30px
+$portfolio-type-4xl: 2.25rem;   // 36px
+$portfolio-type-5xl: 3rem;      // 48px
+$portfolio-type-6xl: 3.75rem;   // 60px
+$portfolio-type-7xl: 4.5rem;    // 72px
+
+// Line heights
+$portfolio-leading-tight: 1.1;
+$portfolio-leading-snug: 1.25;
+$portfolio-leading-normal: 1.5;
+$portfolio-leading-relaxed: 1.625;
+$portfolio-leading-loose: 2;
+
+// Letter spacing
+$portfolio-tracking-tight: -0.02em;
+$portfolio-tracking-normal: 0em;
+$portfolio-tracking-wide: 0.02em;
+$portfolio-tracking-wider: 0.05em;
+$portfolio-tracking-widest: 0.1em;

@@ -1,13 +1,65 @@
-$portfolio-bp-sm: 320px;
-$portfolio-bp-md: 672px;
-$portfolio-bp-lg: 1056px;
-$portfolio-bp-xl: 1312px;
-$portfolio-bp-2xl: 1584px;
+// =============================================================================
+// BREAKPOINT TOKENS — 6-Tier Enterprise Scale
+// =============================================================================
+//
+// Unified breakpoint system for enterprise B2B SaaS.
+// Values selected from comparative audit of IBM Carbon, OneGS, and Tailwind v4.
+//
+// Column logic: doubles at major layout shifts (4→8→16).
+// Above md, column count holds at 16; wider viewports get wider columns.
+//
+// Source: FB-064, design.md §6
+// =============================================================================
 
-$portfolio-mq-sm: '(min-width: #{$portfolio-bp-sm})';
-$portfolio-mq-md: '(min-width: #{$portfolio-bp-md})';
-$portfolio-mq-lg: '(min-width: #{$portfolio-bp-lg})';
+// ---------------------------------------------------------------------------
+// Canonical tokens (Élan design system)
+// ---------------------------------------------------------------------------
+
+$elan-bp-xs: 375px;    // Modern smallest phone (iPhone SE) — from OneGS
+$elan-bp-sm: 672px;    // Large phone landscape / small tablet — from Carbon
+$elan-bp-md: 1056px;   // Standard laptop — from Carbon
+$elan-bp-lg: 1440px;   // Common laptop / external display — from OneGS
+$elan-bp-xl: 1920px;   // Full HD desktop monitor — from OneGS
+$elan-bp-2xl: 2560px;  // QHD / ultrawide — enterprise extension
+
+$elan-mq-xs: '(min-width: #{$elan-bp-xs})';
+$elan-mq-sm: '(min-width: #{$elan-bp-sm})';
+$elan-mq-md: '(min-width: #{$elan-bp-md})';
+$elan-mq-lg: '(min-width: #{$elan-bp-lg})';
+$elan-mq-xl: '(min-width: #{$elan-bp-xl})';
+$elan-mq-2xl: '(min-width: #{$elan-bp-2xl})';
+
+$elan-mq-reduced-motion: '(prefers-reduced-motion: reduce)';
+
+// ---------------------------------------------------------------------------
+// Breakpoint map (for programmatic iteration)
+// ---------------------------------------------------------------------------
+
+$elan-breakpoints: (
+  xs: $elan-bp-xs,
+  sm: $elan-bp-sm,
+  md: $elan-bp-md,
+  lg: $elan-bp-lg,
+  xl: $elan-bp-xl,
+  2xl: $elan-bp-2xl,
+);
+
+// ---------------------------------------------------------------------------
+// Legacy aliases (deprecated — migrate to $elan-bp-* / $elan-mq-*)
+// ---------------------------------------------------------------------------
+// Original Carbon-derived values preserved for backward compatibility.
+// These will be removed in a future major version.
+
+$portfolio-bp-sm: $elan-bp-xs;
+$portfolio-bp-md: $elan-bp-sm;
+$portfolio-bp-lg: $elan-bp-md;
+$portfolio-bp-xl: 1312px;  // Dropped from canonical scale; kept for migration
+$portfolio-bp-2xl: 1584px; // Dropped from canonical scale; kept for migration
+
+$portfolio-mq-sm: $elan-mq-xs;
+$portfolio-mq-md: $elan-mq-sm;
+$portfolio-mq-lg: $elan-mq-md;
 $portfolio-mq-xl: '(min-width: #{$portfolio-bp-xl})';
 $portfolio-mq-2xl: '(min-width: #{$portfolio-bp-2xl})';
 
-$portfolio-mq-reduced-motion: '(prefers-reduced-motion: reduce)';
+$portfolio-mq-reduced-motion: $elan-mq-reduced-motion;

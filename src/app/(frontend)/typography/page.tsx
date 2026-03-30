@@ -527,7 +527,7 @@ export default function TypographyPage() {
             style={{
               fontSize: "0.875rem",
               lineHeight: 1.6,
-              color: "#525252",
+              color: "var(--portfolio-text-secondary, #525252)",
               marginBottom: "16px",
             }}
           >

@@ -1,8 +1,8 @@
-@use '@yilangaodesign/design-system/scss' as *;
+@use '../../../styles' as *;
 
 .content {
   z-index: $portfolio-z-toast;
-  padding: $portfolio-spacing-02 $portfolio-spacing-03;
+  padding: $portfolio-spacer-0-5x $portfolio-spacer-1x;
   font-family: $portfolio-font-sans;
   font-size: $portfolio-type-xs;
   line-height: $portfolio-leading-normal;

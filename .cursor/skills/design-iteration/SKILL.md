@@ -11,6 +11,11 @@ Don't just fix the surface-level complaint. Ask:
 - **Why does this matter to a UX designer?** (trust, professionalism, usability, consistency)
 - **Is this the same category as a previous complaint?** (check feedback log)
 
+**Cross-category check (mandatory):** Before proceeding, ask: **does this feedback also have an engineering or content dimension?** A visual/UX complaint about forms, labels, or interactions often implies:
+- An **engineering** issue (missing data field, broken save flow, wrong schema)
+- A **content** issue (poor labels, bad microcopy, unclear instructions)
+- If other dimensions exist, note them now. You will document them in Step 5.
+
 ### Step 2: Check Existing Knowledge
 
 Before writing code:
@@ -57,6 +62,11 @@ After resolving the feedback:
    - A workaround that bypassed the token system
 
 4. **Update the frequency map** in `design.md` Appendix if a category gets another hit.
+
+5. **Cross-category documentation (if Step 1 identified other dimensions):**
+   - If engineering dimension exists → also append to `docs/engineering-feedback-log.md` and check `docs/engineering-anti-patterns.md`
+   - If content dimension exists → also append to `docs/content-feedback-log.md` and check `docs/content-anti-patterns.md`
+   - Each cross-category entry should include a "Cross-category note" referencing the design entry (e.g., "Also documented as FB-NNN")
 
 ## Escalation Triggers
 

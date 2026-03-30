@@ -1,5 +1,5 @@
-@use "@yilangaodesign/design-system/scss" as *;
-@use "../../../styles/mixins/interactive" as local;
+@use "../../../../styles" as *;
+@use "../../../../styles/mixins/interactive" as local;
 
 // ── PAGE ─────────────────────────────────────────────────────────────────────
 
@@ -17,7 +17,7 @@
   z-index: $portfolio-z-sticky;
   background-color: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(12px);
-  padding: $portfolio-spacing-04 $portfolio-spacing-07;
+  padding: $portfolio-spacer-1-5x $portfolio-spacer-4x;
   border-bottom: 1px solid $portfolio-border-subtle;
   display: flex;
   align-items: center;
@@ -43,24 +43,24 @@
 // ── CONTAINER ────────────────────────────────────────────────────────────────
 
 .container {
-  max-width: 960px;
+  max-width: $elan-container-default;
   margin: 0 auto;
-  padding: $portfolio-layout-04 $portfolio-spacing-05;
+  padding: $portfolio-spacer-layout-x-spacious $portfolio-spacer-2x;
 
-  @media #{$portfolio-mq-md} {
-    padding: $portfolio-layout-05 $portfolio-spacing-07;
+  @media #{$elan-mq-sm} {
+    padding: $portfolio-spacer-layout-xx-spacious $portfolio-spacer-4x;
   }
 }
 
 // ── INTRO ────────────────────────────────────────────────────────────────────
 
 .intro {
-  margin-bottom: $portfolio-layout-04;
+  margin-bottom: $portfolio-spacer-layout-x-spacious;
 }
 
 .pageTitle {
   @include heading-2;
-  margin-bottom: $portfolio-spacing-04;
+  margin-bottom: $portfolio-spacer-1-5x;
 }
 
 .pageDesc {
@@ -68,19 +68,19 @@
   font-size: $portfolio-type-base;
   line-height: $portfolio-leading-relaxed;
   color: $portfolio-text-secondary;
-  max-width: 600px;
+  max-width: $elan-container-narrow;
 }
 
 // ── SECTION ──────────────────────────────────────────────────────────────────
 
 .section {
-  margin-bottom: $portfolio-layout-05;
+  margin-bottom: $portfolio-spacer-layout-xx-spacious;
 }
 
 .sectionTitle {
   @include heading-3;
-  margin-bottom: $portfolio-spacing-03;
-  padding-bottom: $portfolio-spacing-03;
+  margin-bottom: $portfolio-spacer-1x;
+  padding-bottom: $portfolio-spacer-1x;
   border-bottom: 1px solid $portfolio-border-subtle;
 }
 
@@ -89,20 +89,20 @@
   font-size: $portfolio-type-sm;
   line-height: $portfolio-leading-relaxed;
   color: $portfolio-text-secondary;
-  margin-bottom: $portfolio-spacing-07;
-  max-width: 600px;
+  margin-bottom: $portfolio-spacer-4x;
+  max-width: $elan-container-narrow;
 }
 
 // ── DEMO CARD ────────────────────────────────────────────────────────────────
 
 .demo {
-  margin-bottom: $portfolio-spacing-09;
+  margin-bottom: $portfolio-spacer-6x;
 }
 
 .demoLabel {
   @include label;
   color: $portfolio-text-placeholder;
-  margin-bottom: $portfolio-spacing-03;
+  margin-bottom: $portfolio-spacer-1x;
 }
 
 .demoTitle {
@@ -110,22 +110,22 @@
   font-size: $portfolio-type-base;
   font-weight: $portfolio-weight-semibold;
   color: $portfolio-text-primary;
-  margin-bottom: $portfolio-spacing-02;
+  margin-bottom: $portfolio-spacer-0-5x;
 }
 
 .demoMeta {
   font-family: $portfolio-font-mono;
-  font-size: 11px;
+  font-size: $portfolio-type-xs;
   color: $portfolio-text-placeholder;
   letter-spacing: $portfolio-tracking-wide;
-  margin-bottom: $portfolio-spacing-05;
+  margin-bottom: $portfolio-spacer-2x;
 }
 
 .demoArea {
   background-color: $portfolio-surface-secondary;
   border: 1px solid $portfolio-border-subtle;
   border-radius: $portfolio-radius-sm;
-  padding: $portfolio-spacing-07;
+  padding: $portfolio-spacer-4x;
   min-height: 120px;
   display: flex;
   align-items: center;
@@ -145,7 +145,7 @@
   composes: demoArea;
   min-height: 200px;
   flex-direction: column;
-  gap: $portfolio-spacing-05;
+  gap: $portfolio-spacer-2x;
   align-items: stretch;
 }
 
@@ -162,7 +162,7 @@
   font-family: $portfolio-font-sans;
   font-size: $portfolio-type-xs;
   color: $portfolio-text-placeholder;
-  margin-top: $portfolio-spacing-03;
+  margin-top: $portfolio-spacer-1x;
 }
 
 // ── TOKEN TABLE ──────────────────────────────────────────────────────────────
@@ -177,13 +177,13 @@
 .tokenTable th {
   text-align: left;
   font-weight: $portfolio-weight-semibold;
-  padding: $portfolio-spacing-03 $portfolio-spacing-04;
+  padding: $portfolio-spacer-1x $portfolio-spacer-1-5x;
   border-bottom: 1px solid $portfolio-border-subtle;
   color: $portfolio-text-primary;
 }
 
 .tokenTable td {
-  padding: $portfolio-spacing-03 $portfolio-spacing-04;
+  padding: $portfolio-spacer-1x $portfolio-spacer-1-5x;
   border-bottom: 1px solid $portfolio-border-subtle;
   color: $portfolio-text-secondary;
   vertical-align: middle;
@@ -200,11 +200,11 @@
 .easingGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: $portfolio-spacing-05;
+  gap: $portfolio-spacer-2x;
 }
 
 .easingCard {
-  padding: $portfolio-spacing-05;
+  padding: $portfolio-spacer-2x;
   border: 1px solid $portfolio-border-subtle;
   border-radius: $portfolio-radius-sm;
   text-align: center;
@@ -212,16 +212,16 @@
 
 .easingName {
   font-family: $portfolio-font-mono;
-  font-size: 11px;
+  font-size: $portfolio-type-xs;
   color: $portfolio-accent-60;
-  margin-bottom: $portfolio-spacing-02;
+  margin-bottom: $portfolio-spacer-0-5x;
 }
 
 .easingValue {
   font-family: $portfolio-font-mono;
   font-size: 10px;
   color: $portfolio-text-placeholder;
-  margin-bottom: $portfolio-spacing-04;
+  margin-bottom: $portfolio-spacer-1-5x;
   word-break: break-all;
 }
 
@@ -251,7 +251,7 @@
   letter-spacing: $portfolio-tracking-wide;
   text-transform: uppercase;
   color: $portfolio-accent-60;
-  padding: $portfolio-spacing-02 $portfolio-spacing-04;
+  padding: $portfolio-spacer-0-5x $portfolio-spacer-1-5x;
   border: 1px solid $portfolio-accent-60;
   border-radius: $portfolio-radius-sm;
   @include transition-fast;
@@ -280,7 +280,7 @@
 }
 
 .sampleCardBody {
-  padding: $portfolio-spacing-03 $portfolio-spacing-04;
+  padding: $portfolio-spacer-1x $portfolio-spacer-1-5x;
 }
 
 .sampleCardTitle {
@@ -310,7 +310,7 @@
 }
 
 .compoundTitle {
-  padding: $portfolio-spacing-03 $portfolio-spacing-04;
+  padding: $portfolio-spacer-1x $portfolio-spacer-1-5x;
   font-size: $portfolio-type-sm;
   font-weight: $portfolio-weight-medium;
   transition: color $portfolio-duration-fast $portfolio-easing-standard;
@@ -324,7 +324,7 @@
   background-color: $portfolio-surface-inverse;
   border: none;
   border-radius: $portfolio-radius-sm;
-  padding: $portfolio-spacing-03 $portfolio-spacing-06;
+  padding: $portfolio-spacer-1x $portfolio-spacer-3x;
   cursor: pointer;
   @include local.hover-micro-lift;
 }
@@ -336,7 +336,7 @@
   background-color: $portfolio-surface-secondary;
   border: 1px solid $portfolio-border-subtle;
   border-radius: $portfolio-radius-sm;
-  padding: $portfolio-spacing-03 $portfolio-spacing-04;
+  padding: $portfolio-spacer-1x $portfolio-spacer-1-5x;
   outline: none;
   width: 240px;
   @include local.form-field-focus;
@@ -359,13 +359,13 @@
 
 .sampleLinksRow {
   display: flex;
-  gap: $portfolio-spacing-06;
+  gap: $portfolio-spacer-3x;
   align-items: center;
 }
 
 .hoverRow {
   display: flex;
-  gap: $portfolio-spacing-07;
+  gap: $portfolio-spacer-4x;
   align-items: center;
   flex-wrap: wrap;
 }
@@ -375,7 +375,7 @@
 .staggerGrid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: $portfolio-spacing-03;
+  gap: $portfolio-spacer-1x;
   width: 100%;
 }
 
@@ -388,7 +388,7 @@
 // ── EXPAND DEMO ──────────────────────────────────────────────────────────────
 
 .expandContent {
-  padding: $portfolio-spacing-05;
+  padding: $portfolio-spacer-2x;
   font-family: $portfolio-font-sans;
   font-size: $portfolio-type-sm;
   line-height: $portfolio-leading-relaxed;
@@ -405,8 +405,8 @@
   justify-content: center;
   min-width: 100px;
   height: 32px;
-  padding: 0 $portfolio-spacing-04;
-  margin-right: $portfolio-spacing-06;
+  padding: 0 $portfolio-spacer-1-5x;
+  margin-right: $portfolio-spacer-3x;
   background-color: $portfolio-surface-tertiary;
   border-radius: $portfolio-radius-sm;
   font-family: $portfolio-font-mono;
@@ -427,7 +427,7 @@
   position: sticky;
   top: 0;
   z-index: 1;
-  padding: $portfolio-spacing-03 $portfolio-spacing-05;
+  padding: $portfolio-spacer-1x $portfolio-spacer-2x;
   background-color: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid $portfolio-border-subtle;
@@ -444,18 +444,18 @@
 }
 
 .scrollNavScrolled {
-  padding: $portfolio-spacing-02 $portfolio-spacing-05;
+  padding: $portfolio-spacer-0-5x $portfolio-spacer-2x;
   background-color: rgba(255, 255, 255, 0.98);
   box-shadow: $portfolio-shadow-sm;
 }
 
 .scrollNavContent {
-  padding: $portfolio-spacing-05;
+  padding: $portfolio-spacer-2x;
 }
 
 .scrollNavBlock {
   height: 100px;
-  margin-bottom: $portfolio-spacing-05;
+  margin-bottom: $portfolio-spacer-2x;
   background-color: $portfolio-surface-secondary;
   border-radius: $portfolio-radius-sm;
 }
@@ -465,8 +465,8 @@
 .arrowRow {
   display: flex;
   align-items: center;
-  gap: $portfolio-spacing-05;
-  padding: $portfolio-spacing-04;
+  gap: $portfolio-spacer-2x;
+  padding: $portfolio-spacer-1-5x;
   border: 1px solid $portfolio-border-subtle;
   border-radius: $portfolio-radius-sm;
   cursor: pointer;
@@ -499,12 +499,12 @@
 .backLink {
   display: inline-flex;
   align-items: center;
-  gap: $portfolio-spacing-02;
+  gap: $portfolio-spacer-0-5x;
   font-family: $portfolio-font-sans;
   font-size: $portfolio-type-sm;
   color: $portfolio-text-secondary;
   text-decoration: none;
   @include local.link-color;
-  margin-top: $portfolio-layout-04;
-  padding-bottom: $portfolio-layout-04;
+  margin-top: $portfolio-spacer-layout-x-spacious;
+  padding-bottom: $portfolio-spacer-layout-x-spacious;
 }

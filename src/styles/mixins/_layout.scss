@@ -3,48 +3,48 @@
 
 @mixin container {
   width: 100%;
-  max-width: $portfolio-container-lg;
+  max-width: $elan-container-wide;
   margin-left: auto;
   margin-right: auto;
-  padding-left: $portfolio-spacing-05;
-  padding-right: $portfolio-spacing-05;
+  padding-left: $portfolio-spacer-layout-compact;
+  padding-right: $portfolio-spacer-layout-compact;
 
-  @media #{$portfolio-mq-md} {
-    padding-left: $portfolio-spacing-07;
-    padding-right: $portfolio-spacing-07;
+  @media #{$elan-mq-sm} {
+    padding-left: $portfolio-spacer-layout-spacious;
+    padding-right: $portfolio-spacer-layout-spacious;
   }
 
-  @media #{$portfolio-mq-xl} {
-    padding-left: $portfolio-spacing-09;
-    padding-right: $portfolio-spacing-09;
+  @media #{$elan-mq-lg} {
+    padding-left: $portfolio-spacer-layout-x-spacious;
+    padding-right: $portfolio-spacer-layout-x-spacious;
   }
 }
 
 @mixin container-narrow {
   width: 100%;
-  max-width: $portfolio-container-md;
+  max-width: $elan-container-narrow;
   margin-left: auto;
   margin-right: auto;
-  padding-left: $portfolio-spacing-05;
-  padding-right: $portfolio-spacing-05;
+  padding-left: $portfolio-spacer-layout-compact;
+  padding-right: $portfolio-spacer-layout-compact;
 
-  @media #{$portfolio-mq-md} {
-    padding-left: $portfolio-spacing-07;
-    padding-right: $portfolio-spacing-07;
+  @media #{$elan-mq-sm} {
+    padding-left: $portfolio-spacer-layout-spacious;
+    padding-right: $portfolio-spacer-layout-spacious;
   }
 }
 
 @mixin section-padding {
-  padding-top: $portfolio-layout-05;
-  padding-bottom: $portfolio-layout-05;
+  padding-top: $portfolio-spacer-layout-xx-spacious;
+  padding-bottom: $portfolio-spacer-layout-xx-spacious;
 
-  @media #{$portfolio-mq-md} {
-    padding-top: $portfolio-layout-06;
-    padding-bottom: $portfolio-layout-06;
+  @media #{$elan-mq-sm} {
+    padding-top: $portfolio-spacer-layout-xxxx-spacious;
+    padding-bottom: $portfolio-spacer-layout-xxxx-spacious;
   }
 }
 
-@mixin stack($gap: $portfolio-spacing-05) {
+@mixin stack($gap: $portfolio-spacer-layout-compact) {
   display: flex;
   flex-direction: column;
   gap: $gap;

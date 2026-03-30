@@ -5,6 +5,7 @@ export const Projects: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'category', 'featured', 'order'],
+    group: 'Work',
   },
   access: {
     read: () => true,
@@ -125,11 +126,11 @@ export const Projects: CollectionConfig = {
               ],
             },
             {
-              name: 'duration',
-              type: 'text',
-              admin: {
-                description: 'e.g. "2024 – Present"',
-              },
+            name: 'duration',
+            type: 'text',
+            admin: {
+              description: 'Project length, e.g. "~3 months", "6 weeks", "2024 – Present". Avoid ship dates here — put those in the description.',
+            },
             },
             {
               name: 'tools',

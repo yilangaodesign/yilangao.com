@@ -2,8 +2,8 @@ import { getPayload } from 'payload'
 import config from '@payload-config'
 
 const PROJECTS = [
-  { slug: "project-one", title: "Project Title One", category: "Digital toolmaking", featured: true, order: 1 },
-  { slug: "project-two", title: "Project Title Two", category: "Consumer Product", featured: true, order: 2 },
+  { slug: "lacework", title: "Lacework", category: "Enterprise SaaS \u00b7 Data Visualization", featured: true, order: 1 },
+  { slug: "meteor", title: "Meteor", category: "Financial Operations \u00b7 Founding Design", featured: true, order: 3 },
   { slug: "project-three", title: "Project Title Three", category: "Productivity", featured: true, order: 3 },
   { slug: "project-four", title: "Project Title Four", category: "AI code editor", featured: false, order: 4 },
   { slug: "project-five", title: "Project Title Five", category: "Assistive AI Agents", featured: false, order: 5 },
@@ -49,30 +49,40 @@ const TESTIMONIALS = [
     text: "Working with Yilan was a transformative experience. The attention to detail and user-centered thinking elevated our product beyond expectations.",
     name: "Sarah Chen",
     role: "VP of Product, Acme Corp",
+    linkedinUrl: "#",
+    showOnHome: true,
     order: 1,
   },
   {
     text: "Yilan brings a rare combination of technical understanding and design sensibility. Every interaction was thoughtful and intentional.",
     name: "Marcus Rivera",
     role: "Engineering Lead, Globex",
+    linkedinUrl: "#",
+    showOnHome: false,
     order: 2,
   },
   {
     text: "The design system Yilan built for us became the foundation of everything we shipped. It was elegant, scalable, and a joy to work with.",
     name: "Jamie Okafor",
     role: "CTO, Initech",
+    linkedinUrl: "#",
+    showOnHome: true,
     order: 3,
   },
   {
     text: "Yilan has an extraordinary ability to synthesize complex user research into clear, actionable design direction. Our conversion rate improved 40% after the redesign.",
     name: "Priya Sharma",
     role: "Head of Growth, Umbrella",
+    linkedinUrl: "#",
+    showOnHome: false,
     order: 4,
   },
   {
     text: "What sets Yilan apart is the systems thinking. Every component, every interaction, every micro-animation serves the bigger picture.",
     name: "Alex Kim",
     role: "Design Director, Stark Ind",
+    linkedinUrl: "#",
+    showOnHome: true,
     order: 5,
   },
 ]
@@ -165,7 +175,7 @@ async function seed() {
         data: {
           ...project,
           role: 'Product Designer',
-          duration: '2024 – Present',
+          duration: '~6 months',
           collaborators: [{ name: 'Name Surname' }, { name: 'Design Team' }],
           tools: [{ name: 'Figma' }, { name: 'React' }],
           externalLinks: [{ label: 'Website', href: '#' }],
@@ -265,7 +275,8 @@ async function seed() {
         { name: 'Company Name', url: '#' },
       ],
       socialLinks: [
-        { label: 'Reading', href: '/reading', external: false },
+        { label: 'About', href: '/about', external: false },
+        { label: 'Experiments', href: '/experiments', external: false },
         { label: 'Linkedin', href: '#', external: true },
         { label: 'Instagram', href: '#', external: true },
         { label: 'Twitter', href: '#', external: true },

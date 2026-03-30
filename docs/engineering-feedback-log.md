@@ -4,7 +4,852 @@
 >
 > **Who reads this:** AI agents at session start (scan recent entries for context), and during incident response (check for recurring patterns).
 > **Who writes this:** AI agents after each incident resolution via the `engineering-iteration` skill.
-> **Last updated:** 2026-03-29 (ENG-024: nested `<a>` hydration error from EditButton inside Link)
+> **Last updated:** 2026-03-30 (ENG-072: DAG canvas wheel handler hijacks page scroll)
+
+---
+
+## Session: 2026-03-30 — DAG Canvas Scroll Hijack
+
+#### ENG-072: "The canvas in the harness architecture should not be scrolling when the parent scrolls"
+
+**Issue:** The Architecture DAG (pannable canvas in `EscalationTimeline.tsx`) had an `onWheel` handler that captured all wheel events. Regular scroll (no modifier keys) panned the canvas instead of scrolling the page. When a user scrolled through the case study and their mouse happened to be over the DAG viewport, the page stopped scrolling and the canvas panned instead. This is a scroll hijack — a fundamental UX violation for embedded canvases.
+
+**Root Cause:** The `handleWheel` callback had two branches: Ctrl/Meta+wheel for zoom (correct), and bare wheel for pan (incorrect). The bare-wheel pan branch consumed the event without `preventDefault()`, so it technically didn't block the browser's native scroll, but it still updated canvas pan state in response to scroll, creating a confusing dual-scroll effect where both the page and the canvas moved simultaneously. The `touch-action: none` CSS also blocked native scroll passthrough on touch devices.
+
+**Resolution:**
+1. Removed the `onWheel` handler entirely. Pan is now drag-only (pointer down + move). Zoom is buttons and keyboard only (+/- keys, zoom buttons in corner).
+2. Changed `touch-action: none` to `touch-action: pan-y` on `.dagViewport` so vertical scroll passes through on touch devices.
+3. Scroll events now pass through to the page regardless of cursor position.
+
+**Cross-category note:** Also documented as FB-067 (design) — part of the same session on Token Architecture and canvas interaction.
+
+---
+
+## Session: 2026-03-30 — Checkbox indeterminate icon
+
+#### ENG-071: "Production Checkbox indeterminate should show dash; align with Radix state"
+
+**Issue:** The shared `Checkbox` had a `MinusIcon` branch and root SCSS for `data-state='indeterminate'`, but the indicator chose check vs dash using the React `checked` prop. For uncontrolled usage (`checked` undefined) with `defaultChecked="indeterminate"`, Radix sets internal state and `data-state` on the trigger/indicator while the prop stays undefined — the UI incorrectly rendered the checkmark.
+
+**Root Cause:** Icon selection was driven by props instead of the same source Radix uses for visibility (`CheckboxIndicator` receives `data-state` from context via `getState(context.checked)`).
+
+**Resolution:** Render both glyphs inside `CheckboxPrimitive.Indicator` and show/hide with `.indicator[data-state='checked']` / `.indicator[data-state='indeterminate']` in SCSS. Re-export Radix `CheckedState` as `CheckboxCheckedState`; type `defaultChecked` and callbacks with it. Export `CheckboxCheckedState` from `src/components/ui/index.ts` and `Checkbox/index.ts`.
+
+---
+
+## Session: 2026-03-30 — Breakpoint System Unification
+
+#### ENG-070: "Audit breakpoints — cross-app inconsistency between SCSS tokens and Tailwind defaults"
+
+**Issue:** The three apps in this monorepo use three different breakpoint systems. Main site SCSS uses Carbon values (320/672/1056/1312/1584). Playground and ASCII Tool use Tailwind v4 defaults (640/768/1024/1280/1536) because `globals.css` never overrides `--breakpoint-*`. Additionally, hardcoded values appear in AdminBar (640px), experiments page (768px), and typography comments (768/1200). Every Tailwind responsive utility (`sm:`, `md:`, `lg:`) in the Playground resolves to different pixel values than the same-named SCSS tokens in the main site.
+
+**Root Cause:** When the Playground and ASCII Tool were created, their `globals.css` files were set up with `@theme` blocks for colors, fonts, spacing, and radii — but breakpoints were never included. Tailwind v4 ships with built-in `--breakpoint-*` defaults, so omitting them from `@theme` silently activates the framework defaults instead of the design system tokens. No cross-app parity check existed for breakpoints at the time.
+
+**Resolution:** PLANNED — awaiting user confirmation. The plan includes:
+1. Define a unified 6-tier breakpoint scale (375/672/1056/1440/1920/2560) in SCSS tokens
+2. Override `--breakpoint-*` in Playground and ASCII Tool `globals.css` to match
+3. Replace all hardcoded media query values with token references
+4. Resolve the container naming collision (`container-sm` = 672 vs `bp-sm` = 320)
+5. Add a breakpoints page to the Playground
+6. Update Cross-App Parity Checklist in AGENTS.md to include breakpoint sync
+
+**Cross-category note:** Also documented as FB-064 (design) — full comparative analysis of Carbon, OneGS, and Tailwind breakpoint philosophies.
+
+---
+
+## Session: 2026-03-30 — Version Infrastructure
+
+#### ENG-069: "Footer last updated date is stale; version doesn't auto-detect change scope"
+
+**Issue:** Two related problems: (1) The playground footer's "Last updated" date only reflected the static `release.releasedAt` from `elan.json`, which doesn't update during local development — even though active edits are happening, the date stays frozen at the last deploy date. (2) Version bumps (patch/minor/major) are entirely manual — there's no mechanism to analyze the scope of changes and recommend or apply the appropriate bump level.
+
+**Root Cause:** The version system was designed with a manual-first workflow: `version-bump.mjs` bumps the number, `version-release.mjs` stamps the release. But `releasedAt` only updates on release, and there's no "last modified" concept for the dev cycle. The semver level decision was left entirely to human judgment with no tooling support.
+
+**Resolution:**
+1. Created `/api/dev-info` route in the playground — returns live timestamps (git log + uncommitted file check) and change analysis during development (403 in production).
+2. Created `useDevInfo()` hook that polls the API every 60s, providing live data to both the footer and sidebar header.
+3. Updated the footer to show the live `lastModifiedDate` in dev mode (falls back to static `releasedAt` in production), plus a change analysis badge showing file count and suggested bump level.
+4. Updated the sidebar header to show the live version via the same hook.
+5. Created `scripts/version-analyze.mjs` — standalone script that diffs against the last release commit, categorizes changes (new/deleted/modified components and tokens), and recommends patch/minor/major. Supports `--apply` for auto-bump and `--quiet` for JSON output.
+6. Added `npm run version:analyze` and `npm run version:auto` scripts.
+
+**Principle extracted -> `engineering.md` §10.5–10.8: Automated version analysis, live dev info API, and runtime exposure. Version level should be data-driven, not guesswork. The playground footer is the canary — if the analysis shows stale versioning, it's immediately visible.**
+
+---
+
+## Session: 2026-03-30 — HeroUploadZone Hydration Fix
+
+#### ENG-068: "This modal's height has the same exact issue — adjust viewport"
+
+**Issue:** ProjectEditModal rendered with collapsed height — all content squeezed into a tiny area. The modal had `max-height: 90vh` but no `min-height` or `min-width`, violating the established modal sizing pattern.
+
+**Root Cause:** Repeat of AP-027 (Flex Containers Without Minimum Dimension Constraints). The existing `EditableArray` panel uses `min-height: min(420px, 65vh)` and `min-width: 320px`, but this pattern was not carried over when creating the new `ProjectEditModal`. This is the third occurrence of this anti-pattern (FB-043, FB-045, now ENG-068) — documenting patterns is insufficient without enforcement during new component creation.
+
+**Resolution:** Added `min-height: min(520px, 70vh)`, `min-width: 320px`, and aligned `max-height` to `88vh` (matching the array panel). Increased body padding from `16px 18px` to `18px 20px` and gap from `16px` to `20px` for breathing room.
+
+**Cross-category note:** Also documented as FB-062 (design). Third violation of AP-027.
+
+**Principle extracted -> Every new modal/panel component MUST copy dimension constraints from the established modal template (`min-height`, `min-width`, `max-height`). AP-027 has been violated 3 times — consider extracting a shared SCSS mixin for modal containers.**
+
+---
+
+#### ENG-067: "Hydration failed — HeroUploadZone server/client mismatch"
+
+**Issue:** React hydration error on the home page: "Hydration failed because the server rendered HTML didn't match the client." The diff showed `HeroUploadZone`'s inner `<div>` present on the client but absent from the server-rendered DOM.
+
+**Root Cause:** `HeroUploadZone` was already removed from the source code in ENG-066 (replaced by `ProjectEditModal`), but Turbopack's incremental build cache in `.next/dev/static/chunks/` still contained the old compiled chunk with the component. The browser loaded this stale chunk, which rendered `HeroUploadZone` client-side while the server (using current source) no longer produced its HTML. This server/client divergence caused the hydration mismatch. The original `HeroUploadZone` also had an architectural issue documented in ENG-066: interactive content (`<input type="file">`, `onClick`/`onDrop` handlers) nested inside a `<Link>` (`<a>`) — invalid HTML that compounds hydration problems.
+
+**Resolution:** Cleared the `.next` build cache (`rm -rf .next`) and restarted the dev server. The fresh compilation no longer includes `HeroUploadZone` in any chunk, resolving the mismatch. Documented as EAP-035 (stale Turbopack cache after component removal).
+
+**Principle extracted -> `engineering.md`: After removing a component from source, always clear `.next` and restart. Turbopack's incremental cache does not reliably invalidate removed files. If a hydration error references a component that doesn't exist in `src/`, the issue is stale cache — not source code.**
+
+---
+
+#### ENG-066: "Hover upload blocks navigation; edit button should open modal"
+
+**Issue:** The HeroUploadZone hover overlay on project tiles (1) didn't respond to clicks (file input never triggered), (2) blocked the underlying `<Link>` so users couldn't navigate to the detail page, and (3) the Edit button navigated to the Payload dashboard in a new tab instead of allowing inline editing.
+
+**Root Cause:** The HeroUploadZone was rendered as a full-overlay `<div>` inside a `<Link>`, with `e.stopPropagation()` on click. But the hidden `<input type="file">` inside a portal-less overlay had inconsistent browser focus behavior — `fileRef.current?.click()` silently failed in some contexts. The overlay also captured all pointer events on hover, preventing the `<Link>` from responding to clicks. The Edit button was a separate `EditButton` component that always opened the admin dashboard in a new tab via `window.open`.
+
+**Resolution:** Removed HeroUploadZone entirely. Replaced the EditButton in ProjectCard with a custom inline edit button that opens a new `ProjectEditModal` — a portal-based modal with: (1) cover image preview + upload new + browse existing media grid, (2) title and category text fields, (3) "Open in Dashboard" link + "Save & Close" button. The modal uses a single PATCH request to update all changed fields. Media browser lazy-fetches from `GET /api/media` on first toggle. `heroImageId` was added to the server->client data flow so the modal knows the current image's Payload ID.
+
+**Cross-category note:** Also documented as FB-061 (design) — modal UX pattern for inline project editing.
+
+**Principle extracted -> When admin editing tools are overlaid on navigable elements (links, cards), they must NOT capture pointer events on the navigable surface. Admin actions should be contained in discrete, non-overlapping UI elements (buttons in a corner badge) that open portaled modals, never full-surface overlays.**
+
+---
+
+#### ENG-065: "The footer yilangao@gmail.com doesn't really allow people to click on that"
+
+**Issue:** The footer email address rendered as an `<a>` tag but had no `href` attribute, making it non-clickable. Visitors could not click to open their email client.
+
+**Root Cause:** `EditableText` rendered the element with `as="a"` but did not support forwarding arbitrary HTML attributes like `href`. The component's interface only accepted its own known props, silently dropping anything else.
+
+**Resolution:** (1) Added index signature `[htmlAttr: string]: unknown` to `EditableTextProps` interface. (2) Destructured `...htmlAttrs` rest props in the component. (3) Spread `htmlAttrs` into `createElement` calls in both admin and non-admin render paths. (4) Added `href={`mailto:${siteConfig.email}`}` to the footer email `EditableText` in `HomeClient.tsx`.
+
+**Principle extracted -> When wrapping native HTML elements via polymorphic `as` prop, always forward unknown attributes to the underlying element. A component that accepts `as="a"` but silently drops `href` is a broken abstraction.**
+
+---
+
+## Session: 2026-03-30 — Spacing Token Tier Separation Audit
+
+#### ENG-064: Spacing token audit — primitive/utility tier separation and layout mixin consistency
+
+**Issue:** Audit revealed 5 structural inconsistencies in the spacing token system that reduced agent parseability: (1) oddball fractional multipliers in Tier 1, (2) layout mixins using Tier 1 instead of Tier 2 tokens, (3) incomplete utility documentation, (4) utility tokens back-referencing nonexistent primitives, (5) dead `sass:map` import.
+
+**Root Cause:** Initial migration (ENG-060) correctly established the three-tier architecture but populated Tier 1 with values that only Tier 3 consumers needed. This was carried over from creating matching primitives for every utility value, violating the One GS reference where utility tokens own their component-specific values independently.
+
+**Resolution:**
+- Removed 4 oddball primitive tokens (`spacer-0-75x`, `spacer-0-875x`, `spacer-1-25x`, `spacer-1-625x`) from `_spacing.scss` Tier 1 and the `$portfolio-spacer-scale` map. Primitive scale now has 25 clean tokens (was 29).
+- Utility tokens own px values directly (e.g., `$portfolio-spacer-utility-0-75x: 6px;` instead of referencing `$portfolio-spacer-0-75x`).
+- Layout mixins (`container`, `container-narrow`, `stack`) migrated from Tier 1 primitives to Tier 2 semantic tokens (`spacer-layout-compact`, `spacer-layout-spacious`, `spacer-layout-x-spacious`).
+- `design.md` Tier 1 table cleaned (removed 0.75x), Tier 3 table expanded to all 10 tokens.
+- `tokens.ts` primitive scale updated to match (removed 4 oddball entries).
+- Removed unused `@use 'sass:map'`.
+
+**Verified:** SCSS barrel compiles clean, Button.module.scss compiles clean, playground TypeScript compiles clean. No references to removed primitives anywhere in codebase.
+
+**Principle extracted → `engineering.md` Appendix frequency map: token-tier-separation — 1 occurrence.**
+
+**Cross-category note:** Also documented as FB-060 (design).
+
+---
+
+## Session: 2026-03-30 — Media Upload Integration (Inline Edit + Masonry Tiles)
+
+#### ENG-062: "Masonry tiles have no image upload — cover images are hardcoded"
+
+**Issue:** Homepage project tile cover images were driven by a hardcoded `COVER_IMAGES` map in `page.tsx` (only one slug mapped). The CMS `heroImage` field on Projects was unused for the homepage. Admin users had no way to upload or change cover images from the homepage.
+
+**Root Cause:** The homepage data fetch did not include `heroImage` (no `depth: 1`), and the mapping used `COVER_IMAGES[p.slug] ?? null` instead of the CMS field.
+
+**Resolution:** (1) Removed the hardcoded `COVER_IMAGES` map. (2) Added `depth: 1` to the projects query to populate the `heroImage` relation. (3) Mapped `coverImage` from `(p.heroImage as { url?: string })?.url ?? null`. (4) Created `HeroUploadZone` component: admin-only hover overlay on project tiles that accepts click-to-browse or drag-and-drop image uploads, calls `uploadMedia` + `updateCollectionField('projects', id, 'heroImage', media.id)`, then `router.refresh()`.
+
+**Cross-category note:** Also documented as FB-059 (design — upload affordance on tiles).
+
+**Principle extracted -> `engineering.md` §11: Homepage cover images now flow from CMS `heroImage` field via depth-1 query. No hardcoded image maps.**
+
+---
+
+#### ENG-063: "Inline edit link modals only accept typed URLs — no file upload"
+
+**Issue:** When editing social links or project external links via the `EditableArray` modal, the URL field was a plain `<input type="url">`. Users couldn't upload a file (like a resume PDF) and have the URL auto-populated — they had to upload separately in the Payload admin, copy the URL, then paste it.
+
+**Root Cause:** `FieldDefinition` only supported `'text' | 'email' | 'checkbox' | 'url'` types. No media upload integration existed in the array edit panel.
+
+**Resolution:** (1) Added `'media-url'` to the `FieldDefinition` type union. (2) Created `MediaUrlField` component in `EditableArray.tsx`: renders a URL input alongside an upload button; clicking the button opens a file picker, uploads via `uploadMedia`, and fills the URL field with the returned public URL. (3) Updated `LINK_FIELDS.href` and `EXT_LINK_FIELDS.href` to use `'media-url'` type.
+
+**Cross-category note:** Also documented as CFB-018 (content — link fields should support file uploads).
+
+**Principle extracted -> `engineering.md` §11: Array fields that accept URLs should use `media-url` type when the URL target could be an uploaded file (resumes, deliverables, assets).**
+
+---
+
+## Session: 2026-03-30 — Supabase Storage S3 Rejects Filenames with Special Characters
+
+#### ENG-060: "Cannot upload [Gao_Yilan] Resume_2026.pdf — Something went wrong"
+
+**Issue:** Uploading a PDF via the Payload admin Media collection fails with "Something went wrong." The file never reaches Supabase Storage.
+
+**Root Cause:** Supabase Storage's S3-compatible API rejects object keys containing square brackets (`[]`). The filename `[Gao_Yilan] Resume_2026.pdf` is used verbatim as the S3 key by the `@payloadcms/storage-s3` plugin (via `@payloadcms/plugin-cloud-storage`'s `getIncomingFiles`, which reads `data.filename`). The S3 `PutObject` call returns `InvalidKey` (HTTP 400). Spaces are also problematic — they get URL-encoded to `%5B`/`%5D`/`%20` in the key, which some S3 implementations reject.
+
+**Resolution:** Added a `beforeChange` hook to the Media collection (`src/collections/Media.ts`) that sanitizes filenames before they reach the S3 upload handler. The sanitizer replaces brackets, spaces, and other non-safe characters with hyphens, collapses consecutive hyphens, and preserves the file extension. Applied to both the main filename and all auto-generated size variant filenames.
+
+**Principle extracted -> `engineering.md` §12.3: Filenames uploaded to Supabase Storage must be sanitized to remove S3-incompatible characters (brackets, spaces, special chars). The sanitization hook is a `beforeChange` on the Media collection — it runs before the cloud storage plugin's `afterChange` hook that performs the actual S3 upload.**
+
+---
+
+#### ENG-061: "Upload screen has no validation — same UX feedback pattern"
+
+**Issue:** The Media upload form uses technical field names without explanations ("Alt", "Caption"), provides no validation feedback when filenames contain invalid characters, and shows only a generic "Something went wrong" toast on S3 rejection. The user flagged this as a recurring pattern of poor CMS admin form UX.
+
+**Root Cause:** Payload collections default to bare field configs — no `admin.description`, no `admin.placeholder`, no custom labels. The collection itself lacked an `admin.description` to orient the user. Combined with ENG-060's S3 key rejection, the user hit two failures simultaneously: (1) incomprehensible error, (2) no guidance on what the fields mean.
+
+**Resolution:** Added human-readable labels, descriptions with plain-language explanations, placeholder examples, and a collection-level description explaining the upload process. This complements ENG-060's filename sanitization by making the system transparent.
+
+**Cross-category note:** Also documented as FB-058 (design — form UX) and CFB-017 (content — field microcopy).
+
+**Principle extracted -> `engineering.md` §12.3 addendum: Every Payload field on an upload collection must include `label`, `admin.description`, and `admin.placeholder`. The collection itself must include `admin.description` explaining the upload process and any automatic transformations (like filename sanitization). This is the CMS admin form UX standard — no bare fields.**
+
+---
+
+## Session: 2026-03-30 — Turbopack Cache Corruption Causes Phantom Route Conflicts
+
+#### ENG-056: "/work/elan-design-system HTTP ERROR 404"
+
+**Issue:** All `/work/*` routes returned 404. Server logs showed "Conflicting routes" and "You cannot have two parallel pages that resolve to the same path" errors for every `(frontend)` page route (`about`, `blog`, `contact`, `experiments`, `reading`, `work`). The errors claimed routes existed at bare paths (`/about`, `/work`) outside the `(frontend)` route group, but no such files existed on disk. Other routes (`/`, `/about`, `/contact`) intermittently worked while `/work/*` consistently 404'd.
+
+**Root Cause:** Corrupted Turbopack filesystem cache in `.next/`. The `.next/` directory contained stale route manifests from a previous dev session (the server had been running for ~8 hours). The Turbopack cache had already self-detected an internal error earlier ("Turbopack's filesystem cache has been deleted because we previously detected an internal error in Turbopack"), but the corruption persisted across the dev session. The phantom route conflicts were artifacts of the corrupted cache — the actual file structure had no duplicate routes.
+
+**Resolution:** Killed the dev server (PID 58495), deleted the entire `.next/` directory (`rm -rf .next`), and restarted with `npm run dev`. Fresh compilation resolved all route conflicts — zero "Duplicate page" or "Conflicting routes" errors in the new server log, and `/work/elan-design-system` returned 200 OK with correct content.
+
+**Principle extracted → frequency map update: Turbopack cache corruption 1 → 2. Same class as ENG-047. Rule reinforced: when route errors or runtime behavior contradicts the file structure on disk, clear `.next/` and restart before investigating code.**
+
+**Cross-category note:** None — purely an infrastructure/cache issue.
+
+---
+
+## Session: 2026-03-30 — TestimonialCard Hydration Mismatch
+
+#### ENG-055: "Hydration failed — AvatarUpload server/client mismatch"
+
+**Issue:** Hydration failed on the home page. Server rendered `<span className="avatarInitials">` (non-admin path) but the client rendered `<div className="avatarUploadWrap">` (admin AvatarUpload component). The `canEdit` flag — derived from `isAdmin && id != null` — evaluated differently during SSR vs client hydration, causing the avatar section of `TestimonialCard` to produce structurally different DOM trees.
+
+**Root Cause:** The `TestimonialCard` component conditionally renders completely different DOM structures based on `canEdit`: a `<span>` for non-admin vs a `<div>` wrapper (AvatarUpload) for admin. When `isAdmin` evaluates differently between the server HTML render and the client hydration pass (possible due to Next.js 16/Turbopack HTML caching, streaming, or cookie availability timing), the DOM structures diverge at the first element. This is a variant of EAP-014 (server/client branch causing hydration mismatch) — the branching variable is `isAdmin` rather than `typeof window`, but the structural outcome is identical.
+
+**Resolution:** Applied the EAP-014 deferred-mount pattern to `TestimonialCard`. Added `const [mounted, setMounted] = useState(false)` with a `useEffect(() => { setMounted(true) }, [])`, then gated admin features with `const canEdit = mounted && isAdmin && id != null`. This ensures:
+- Server SSR: `mounted=false` → `canEdit=false` → renders non-admin DOM (plain `<span>`)
+- Client hydration (initial): `mounted=false` → `canEdit=false` → matches server HTML exactly
+- Client after mount: `mounted=true` → `canEdit=true` → re-renders with admin features (AvatarUpload, EditableText, etc.)
+
+The brief flash of non-admin content is imperceptible since admin features appear within one frame after mount.
+
+**Principle extracted → `engineering.md` §11: Any client component that conditionally renders structurally different DOM based on `isAdmin` must defer the admin branch using the mounted-state pattern (EAP-014) to prevent hydration mismatches.**
+
+**Cross-category note:** None — this is purely an engineering/React hydration issue.
+
+---
+
+## Session: 2026-03-30 — Élan Case Study CMS Data Sync
+
+#### ENG-054: "I don't see the DAG at all here — what's going on? Check the bugs."
+
+**Issue:** The Agent Harness Architecture (DAG) and Systemic Pattern Map visuals were completely invisible on the Élan case study page. The user expected to see the interactive DAG from a previous conversation but it wasn't rendering at all.
+
+**Root Cause:** The `update-elan` API route (`src/app/(frontend)/api/update-elan/route.ts`) was updated with new section headings ("Agent Harness Architecture", "Systemic Pattern Map") in a previous session, but the route was never re-executed against the CMS database. The CMS still contained old headings from the original creation: "Self-Healing Process" and "Feedback-Driven Component Library." The interactive visual rendering in `ProjectClient.tsx` uses exact string matching: `interactiveVisuals?.[section.heading]`. When the CMS heading "Self-Healing Process" doesn't match the INTERACTIVE_VISUALS key "Agent Harness Architecture", the visual silently returns `undefined` and nothing renders — no error, no fallback.
+
+**Resolution:**
+1. Updated the `update-elan` route with the correct restructured section headings and content
+2. Updated `INTERACTIVE_VISUALS` in `page.tsx` to match the new section headings
+3. Re-ran the route to sync CMS data
+4. Verified visuals render on localhost
+
+**Principle extracted → `engineering.md`: When the `update-elan` route or any CMS seed data is modified, the route MUST be re-executed to sync the database. The INTERACTIVE_VISUALS mapping uses exact heading string matching — a heading mismatch silently drops the visual with no error.**
+
+**Cross-category note:** Also documented as CFB-014 (content — the broader case study restructuring that motivated the heading changes).
+
+---
+
+## Session: 2026-03-30 — Collection CRUD for Inline Edit
+
+#### ENG-052: DAG rebuild — CSS module purity constraint and reduced-motion scoping
+
+**Issue:** After rebuilding the ArchitectureDag as a pannable canvas and adding `prefers-reduced-motion` to the SCSS module, Turbopack rejected the CSS: `Selector "*" is not pure. Pure selectors must contain at least one local class or id.` The `*` wildcard in `@media (prefers-reduced-motion: reduce) { * { transition-duration: 0s !important; } }` violated CSS Modules' purity requirement.
+
+**Root Cause:** CSS Modules enforce that every selector contains at least one locally-scoped class or ID. A bare `*` selector is globally-scoped, which CSS Modules cannot hash. This applies even inside `@media` blocks.
+
+**Resolution:** Scoped the reduced-motion rule under `.visualContainer` using `:where(*)` — the parent class provides the local scope, and `:where()` keeps specificity at 0 so it doesn't override component-level styles unexpectedly:
+```scss
+.visualContainer {
+  @media (prefers-reduced-motion: reduce) {
+    &, & :where(*) { transition-duration: 0s !important; animation-duration: 0s !important; }
+  }
+}
+```
+
+**Cross-category note:** Also documented as FB-055 (design) — DAG rebuild and §17 accessibility policy establishment.
+
+**Principle extracted -> `engineering.md` §3: In CSS Modules, every selector must contain at least one local class/ID. Use `:where()` to wrap global selectors within a locally-scoped parent.**
+
+---
+
+#### ENG-051: "I don't have the ability to remove, delete, or add extra case studies or testimonials in the inline edit view"
+
+**Issue:** The inline edit system supported editing fields on existing documents and managing array fields on globals (teams, social links, clients via `EditableArray`), but there was no way to create or delete entire collection documents (projects, testimonials) from the frontend inline edit view. Admin users had to navigate to the Payload CMS admin panel for any add/remove operations.
+
+**Root Cause:** Architectural gap — the inline edit system was designed for field-level mutations only (`EditableText` for text, `EditableArray` for arrays on globals). Collection-level CRUD operations (POST/DELETE to Payload REST API) were never wired into the frontend admin flow.
+
+**Resolution:**
+1. Added `createCollectionItem` and `deleteCollectionItem` functions to `src/components/inline-edit/api.ts` — these call Payload's REST API (POST for create, DELETE for delete) with `credentials: 'include'` for admin session auth.
+2. Created `CollectionActions.tsx` with two components:
+   - `DeleteItemButton`: trash icon that appears on hover (matching `EditButton` pattern), triggers a confirmation dialog before deleting.
+   - `AddItemCard`: dashed-border card with "+" icon that creates a new document with sensible defaults, optionally opens the admin panel for the new item.
+3. Integrated into `HomeClient.tsx`: each project card now shows both Edit and Delete buttons; "Add project" and "Add testimonial" cards appear at the end of the masonry grid.
+4. Integrated into `TestimonialCard.tsx`: delete button alongside existing edit button.
+5. Integrated into `ContactClient.tsx`: delete button on the current testimonial slider item, add testimonial button below the slider.
+6. Both actions trigger `router.refresh()` after completion to re-fetch server data.
+
+**Principle extracted → `engineering.md` §11: The inline edit system now supports three tiers of mutation: field-level (EditableText), array-level (EditableArray), and collection-level (DeleteItemButton, AddItemCard).**
+
+---
+
+## Session: 2026-03-30 — Testimonial Inline Edit Still Broken (Data Flow)
+
+#### ENG-050: "I still cannot edit in the inline visual edit mode for the user testimonial card"
+
+**Issue:** Despite adding `EditableText` wrappers, `id`, and `isAdmin` props to TestimonialCard (ENG-049), the user still cannot edit testimonials inline on the homepage. The cards render as plain non-editable text.
+
+**Root Cause:** The server component queries `where: { showOnHome: { equals: true } }`, but the `showOnHome` field was newly added to the schema. Existing testimonials in the database either: (a) don't have the field at all (server not restarted since schema change), or (b) have it defaulting to `false`/`undefined`. Either way, the query returns 0 documents. The code falls back to `FALLBACK_TESTIMONIALS` which have no `id` property. In the component, `canEdit = isAdmin && id != null` evaluates to `false`, so plain `<p>`/`<span>` elements render instead of `EditableText`. The inline edit code was correct but never reached because the data pipeline short-circuited it.
+
+This is an instance of EAP-016 (conditional rendering hiding inline-editable empty state) combined with a new pattern: **filtering on a newly-added field that has no data yet silently breaks the entire feature**.
+
+**Resolution:** Removed the `showOnHome` filter from the homepage testimonials query. All testimonials now appear on the homepage with their CMS document IDs, enabling inline editing. The `showOnHome` field remains in the schema for future use as an admin-side curation tool, but the homepage no longer gates on it.
+
+**Principle extracted → EAP-030: Filtering on newly-added fields breaks features that depend on the filtered data.**
+
+---
+
+## Session: 2026-03-30 — Inline Edit Guardrail for New Components
+
+#### ENG-049: "Every time you add a new component, you are not making it editable in inline edit"
+
+**Issue:** TestimonialCard was created rendering CMS data (text, name, role) as plain `<p>` and `<span>` elements without `EditableText` wrappers, `id` prop, or `EditButton`. Admin users could see testimonial text on the homepage but couldn't edit it inline. This is the same class of failure that could recur with any new component.
+
+**Root Cause:** No guardrail or anti-pattern existed that explicitly required inline edit support for new CMS-backed components. The CMS-Frontend Parity Checklist covered schema/fetch/UI synchronization but didn't include inline editing as a fourth mandatory layer. The agent treated inline edit as a feature rather than an architectural requirement.
+
+**Resolution:**
+1. **Fixed the component:** Updated `TestimonialCard.tsx` to accept `id` and `isAdmin` props. When admin, text/name/role are wrapped in `EditableText` with proper `fieldId`/`target`/`fieldPath`, and an `EditButton` links to the full admin form.
+2. **Fixed the data flow:** Updated `page.tsx` to pass `id` from Payload docs. Updated `HomeClient.tsx` to pass `isAdmin` to testimonial cards.
+3. **New anti-pattern:** Added EAP-029 ("New Components Rendering CMS Data Without Inline Edit Wiring") with a 6-point checklist.
+4. **New hard guardrail:** Added Engineering Hard Guardrail #16 in `AGENTS.md`: "NEVER create a component that renders CMS data without inline edit support."
+5. **Updated CMS-Frontend Parity Checklist:** Changed from "three layers" to "four layers" (schema, data fetch, UI, inline edit). Added a new row for "Created a new component rendering CMS data."
+
+**Principle extracted → `engineering.md` / `AGENTS.md`: Inline edit is not optional — it's the fourth layer of the CMS-frontend contract.**
+
+---
+
+## Session: 2026-03-30 — TestimonialCard Component & CMS Integration
+
+#### ENG-048: "Build a testimonial card to mix in with the waterfall gallery"
+
+**Issue:** User requested a new TestimonialCard component that integrates into the homepage masonry grid alongside project cards. Required CMS schema changes, data flow wiring, and a new component.
+
+**Root Cause:** N/A — new feature, not a bug.
+
+**Resolution:**
+1. **Schema:** Added `avatar` (upload→media), `linkedinUrl` (text), `showOnHome` (checkbox) fields to `src/collections/Testimonials.ts`. The `showOnHome` flag controls which testimonials appear on the homepage (sidebar position in admin).
+2. **Component:** Created `src/components/TestimonialCard.tsx` + `TestimonialCard.module.scss` — standalone card with Geist Pixel Square quotation mark, quote text, avatar (image or initials fallback), name/role attribution, and optional LinkedIn icon button.
+3. **Data flow:** Updated `src/app/(frontend)/page.tsx` to fetch testimonials with `showOnHome: true` filter. Updated `HomeClient.tsx` to accept testimonials and interleave them into the masonry grid using an `interleaveGrid()` function that places testimonials every 3–4 project cards.
+4. **Seeds:** Updated both `api/seed/route.ts` and `scripts/seed.ts` with new fields.
+5. **Playground:** Created `playground/src/app/components/testimonial-card/page.tsx` preview, added sidebar entry under "Content & Media".
+6. **Registry:** Added `shared-testimonial-card` entry to `archive/registry.json`.
+
+**CMS-Frontend Parity Check:**
+- Schema: `Testimonials.ts` has `text`, `name`, `role`, `avatar`, `linkedinUrl`, `showOnHome`, `order` ✓
+- Data fetch: `page.tsx` maps `text`, `name`, `role`, `avatarUrl` (from avatar.url), `linkedinUrl` ✓
+- UI: `TestimonialCardProps` type + rendering in `HomeClient.tsx` ✓
+- **Note:** Dev server restart required for Payload to recognize new fields.
+
+**Cross-category note:** Also documented as FB-054 (design) for visual design decisions.
+
+**Principle extracted → `engineering.md`: CMS-Frontend Parity Checklist applies to collection field additions.**
+
+---
+
+## Session: 2026-03-30 — Turbopack Cache Corruption
+
+#### ENG-047: "isAdminAuthenticated is not a function — Runtime TypeError in ProjectPage"
+
+**Issue:** Navigating to `/work/lacework` throws a runtime TypeError: `(0, ...isAdminAuthenticated) is not a function`. The error originates in the Turbopack-compiled RSC chunk for `page.tsx`, even though `admin-auth.ts` correctly exports `isAdminAuthenticated` as a named async function and all import sites use the correct named import.
+
+**Root Cause:** Turbopack cache corruption in `.next/`. The compiled module at `[app-rsc]` had a stale reference that didn't match the current export shape of `admin-auth.ts`. The source code was correct — the build artifact was not. This likely resulted from rapid schema restarts and file modifications in the prior session without cache invalidation.
+
+**Resolution:** Killed existing dev server processes on port 4000, deleted `.next/` entirely (`rm -rf .next`), and restarted the dev server. The page compiled cleanly and returned HTTP 200 with correct HTML output including `isAdmin: true` passed to `ProjectClient`.
+
+**Principle extracted → `engineering.md` §4: When a runtime error contradicts correct source code, clear `.next/` before investigating code-level causes.**
+
+---
+
+## Session: 2026-03-29 — Payload Admin IA Improvements
+
+#### ENG-046: "When I click, it just opens my website on localhost, but there is no admin added to view"
+
+**Issue:** Clicking page tiles on the admin dashboard opens the live site, but no admin bar, no inline editing, no edit buttons appear. The site renders as if the user is a public visitor.
+
+**Root Cause:** `isAdminAuthenticated()` in `src/lib/admin-auth.ts` checked for the `payload-token` browser cookie. But Payload's `autoLogin` feature (with `prefillOnly: false`) authenticates at the server level without setting a browser cookie. The cookie is only set when a user manually logs in via `/admin/login`. In dev mode with auto-login, the cookie never exists in the browser — so every frontend page sees `isAdmin = false`.
+
+**Resolution:** Rewrote `isAdminAuthenticated()` to:
+1. First check the `payload-token` cookie (works for production manual login)
+2. Fall back to checking dev mode (`NODE_ENV !== 'production'`) + auto-login configured (`PAYLOAD_ADMIN_EMAIL` env var set) — returns `true` if both are true
+
+**Anti-pattern extracted → EAP-026: Checking for browser cookies that server-side auth mechanisms never set.**
+
+**Documentation violation note:** This was the 3rd consecutive incident in this session resolved without documenting. See meta-analysis below ENG-044.
+
+---
+
+#### ENG-045: Hydration mismatch — server rendered `<a>`, client rendered `<div>`
+
+**Issue:** After HMR-updating DashboardPages from `<a>` card wrappers to `<div>` card wrappers, the admin panel threw a hydration error: server HTML had `<a>` elements, client JS expected `<div>` elements.
+
+**Root Cause:** HMR updated the client-side bundle but the server-side cached render still used the old component code. Payload admin components are SSR'd and then hydrated — when HMR only updates one side, the mismatch triggers React's hydration error.
+
+**Resolution:** Clean restart with `rm -rf .next` to purge all server and client caches.
+
+**Principle → After changing the DOM structure of a Payload admin component, always clean restart (`rm -rf .next && npm run dev`). HMR alone is insufficient for SSR'd admin components.**
+
+---
+
+#### ENG-044: "It doesn't open the visual inline edit when I click on that tile"
+
+**Issue:** Clicking a page tile on the admin DashboardPages component did not navigate to the live site. Click appeared to do nothing.
+
+**Root Cause:** The component had a `<a>` element (the card) wrapping another `<a>` element (the pencil icon). Nested `<a>` tags are invalid HTML. Browsers handle this by "flattening" the nesting — the inner `<a>` effectively breaks the outer `<a>`, making the click target ambiguous. The result: clicks didn't navigate.
+
+**Resolution:** Changed the card wrapper from `<a>` to `<div role="button">` with `onClick={() => window.open(...)}`. The pencil `<a>` remains as the only anchor element, no longer nested.
+
+**Anti-pattern extracted → EAP-025: Nested `<a>` elements break navigation silently.**
+
+---
+
+#### ENG-043: "How do I open this view? I don't see it. Where is it?"
+
+**Issue:** After adding NavPages to the admin sidebar (ENG-042), user still couldn't find the visual editing entry points. The sidebar was collapsed by default, hiding the Pages section entirely. User explicitly said: "I actually prefer the live preview and inline edit front and center."
+
+**Root Cause:** Sidebar-only navigation is not discoverable when the sidebar starts collapsed. The dashboard — the first thing users see — showed only collection cards (System, Work, Reading, etc.) with no visual editing entry points. The Pages section existed but was behind a hamburger menu. Three failed attempts to make visual editing discoverable (ENG-042's sidebar nav, ViewSiteLink rename) all put the entry point in the wrong place.
+
+**Resolution:**
+1. Created `src/components/admin/DashboardPages.tsx` — a `beforeDashboard` component that renders a prominent "Pages" grid at the top of the dashboard, above the collection cards.
+2. Each page card's primary action (clicking the card) opens the live site in a new tab for inline editing.
+3. Secondary action (pencil icon in card footer) goes to the admin field editor.
+4. Had to manually add DashboardPages to `importMap.js` because `payload generate:importmap` fails with ESM top-level await errors.
+
+**Escalation note:** This is the 2nd iteration of the same "can't find visual editing" feedback (ENG-042 was the 1st). The pattern: sidebar-only navigation is insufficient for primary workflows. The dashboard is the only reliable entry point because it's visible by default.
+
+**Cross-category note:** Strong design dimension — IA, discoverability, primary action hierarchy. See design feedback log.
+
+**Principle extracted → The dashboard is the front door. Primary workflows must be on the dashboard, not in the sidebar.**
+
+---
+
+#### ENG-042: "How do I open the edit view for the page where I can visually do the CMS?"
+
+**Issue:** The Payload admin UI had no clear navigation to the visual editing experience. The sidebar showed a flat, ungrouped list of collections with no mapping to pages. The only site link was labeled "Visual Editor" (misleading — it just opened the homepage, not an editor). User forgot the editing flow entirely, proving the IA was undiscoverable.
+
+**Root Cause:** Architectural gap — the admin UI was built incrementally (one `ViewSiteLink` component at a time) without designing the full navigation information architecture. Three specific problems:
+1. No "Pages" concept in the sidebar — the mapping of "Home page content → Site Config global", "Work page → Projects collection" was implicit
+2. "Visual Editor" label was misleading — it sounded like an in-admin editor but just opened the homepage in a new tab
+3. Collections listed flat without grouping — no indication of which collection powers which page
+
+**Resolution:**
+1. Created `src/components/admin/NavPages.tsx` — sidebar component (registered in `beforeNavLinks`) showing a "Pages" section. Primary click goes to the admin edit form for each page's data source (where Payload's built-in Live Preview works). Secondary external-link icon opens the live page for inline editing.
+2. Added `admin.group` to all 6 collections and the SiteConfig global: Work, Reading, Experiments, Contact, Settings, System.
+3. Renamed "Visual Editor" → "Open Live Site" in `ViewSiteLink.tsx` to match what it actually does.
+4. Updated `SiteConfig.ts` description to reference the new "Pages" nav section.
+5. Restarted dev server to regenerate the Payload import map with the new component.
+
+**Cross-category note:** Also a design dimension (sidebar IA, labeling, discoverability). Documented as design entry in the same session.
+
+**Principle extracted → `engineering.md` §7: Admin IA — always organize collections by page, not by data type. The sidebar should be self-documenting. Every link label must describe what actually happens when you click it.**
+
+---
+
+## Session: 2026-03-29 — Case Study Detail Page Fixes
+
+**Chat:** Current session
+**Scope:** `src/app/(frontend)/work/[slug]/ProjectClient.tsx`, `src/app/(frontend)/work/[slug]/page.module.scss`, `src/app/(frontend)/api/update-lacework/route.ts`, `src/collections/Projects.ts`
+
+#### ENG-041: "Collaborators are all stacked into one line"
+
+**Issue:** Multiple collaborator stakeholders (Product Management, Engineering, Customer Success) rendered on a single line instead of separate lines in the case study sidebar.
+
+**Root Cause:** The `EditableArray` component wraps all rendered items in a `createElement(Tag, { className }, items.map(renderItem))` call — defaulting to a plain `<div>`. The rendered items are `<span>` elements (inline by default). While the grandparent `.metaGroup` uses `flex-direction: column`, the `EditableArray` wrapper `<div>` absorbs the spans into a single flex child. Without explicit column layout on the wrapper, spans flow inline.
+
+**Resolution:** Created `.collaboratorList` CSS class (`display: flex; flex-direction: column; gap: spacing-02`) and passed it via `className` prop to `EditableArray`. Wrapped the non-admin fallback path in a `<div className={styles.collaboratorList}>` for parity. The fix is structural — any `EditableArray` rendering stacked items needs an explicit layout class on its wrapper.
+
+**Cross-category note:** Also documented as FB-051 (design) and CF-010 (content).
+
+**Principle extracted → `engineering.md`: When using `EditableArray` to render stacked/column items, always pass a `className` with explicit column layout. The default `<div>` wrapper has no layout — inline children will flow horizontally.**
+
+---
+
+## Session: 2026-03-29 — ScrollSpy Design System Migration
+
+**Chat:** Current session
+**Scope:** `next.config.ts`, `@yilangaodesign/design-system/package.json`
+
+#### ENG-040: ScrollSpy design system migration — infrastructure changes
+
+**User observed:** ScrollSpy alignment was broken; user directed that the fix be applied upstream in the design system, not at the portfolio level.
+
+**Root cause:** ScrollSpy was a portfolio-local component, not exported from `@yilangaodesign/design-system`. Portfolio had no `transpilePackages` configured, so source-level imports (TSX + SCSS modules) from node_modules wouldn't compile.
+
+**Resolution:**
+1. Added `transpilePackages: ["@yilangaodesign/design-system"]` to `next.config.ts` — enables Next.js to compile TSX and SCSS module imports from the design system package.
+2. Updated `@yilangaodesign/design-system/package.json`: added `components` to `files` array, added `"./components/ScrollSpy": "./components/ScrollSpy.tsx"` to `exports` map.
+3. Updated portfolio imports in `ProjectClient.tsx` and `AboutClient.tsx` from `@/components/ScrollSpy` to `@yilangaodesign/design-system/components/ScrollSpy`.
+4. Restarted dev server to pick up next.config change.
+
+**Cross-category note:** Also documented as FB-050 (design) — alignment fix and upstream principle.
+
+---
+
+## Session: 2026-03-29 — Admin Edit View Bugs Batch
+
+**Chat:** Current session
+**Scope:** `src/components/inline-edit/`, `src/globals/SiteConfig.ts`, `src/app/(frontend)/HomeClient.tsx`, `src/payload.config.ts`
+
+#### ENG-039: "Payload admin tabs not synced with visual edit sections"
+
+**Issue:** CMS admin had 6 tabs (Identity, Teams, Links, Labels & Footer, Clients, Experience) that didn't map clearly to the visual edit sections on the frontend. Two tabs were labeled "Experience" after the rename. The "Labels & Footer" tab grouped unrelated fields (aboutLabel, teamsLabel, linksLabel, footerCta) together instead of colocating them with their respective data.
+
+**Root Cause:** The SiteConfig tab structure was organized by field *type* (all labels together, all arrays together) rather than by *page section*. When the frontend evolved (tabs removed, sections renamed), the CMS admin didn't evolve with it.
+
+**Resolution:** Reorganized tabs to mirror frontend page sections: Identity (home sidebar header + footer), Experience (home sidebar experience list + heading), Links (home sidebar links + heading), Clients (contact page), Work History (about page). Eliminated the "Labels & Footer" tab entirely by moving each label into its respective section tab. Added `description` to each tab explaining where its data appears on the live site. Renamed the original "Experience" tab (work history for About page) to "Work History" to avoid collision.
+
+**Principle extracted -> `engineering.md` §11 (CMS-Frontend Data Parity): Tab structure should mirror page sections, not field types.**
+
+**Cross-category note:** Also documented as FB-049 (design) — the missing navigation path from CMS admin to visual editor.
+
+#### ENG-038: "save() catches errors internally, EditableArray never knows save failed"
+
+**Issue:** When saving via `EditableArray.commitPanel()`, the panel always closed after `await ctx.save()`, even if the save had failed. The user thought their edits were saved when they weren't.
+
+**Root Cause:** `InlineEditProvider.save()` caught errors internally (setting `saveError` state) but never re-threw. `commitPanel` awaited `save()` which always resolved successfully, so `setPanelOpen(false)` always fired.
+
+**Resolution:** Made `save()` re-throw the error after setting `saveError`, so callers like `commitPanel` can detect failures and keep the panel open. Updated all direct callers (InlineEditBar button, keyboard shortcut) to catch the re-thrown error gracefully since they already rely on `saveError` state for UI.
+
+**Principle extracted -> `engineering-anti-patterns.md`: Error-swallowing saves create silent data loss.**
+
+#### ENG-037: "editing the email in the footer, when I hit save, it doesn't really save"
+
+**Issue:** Editing the email field in the footer via inline edit and saving appeared to silently fail — the value would revert after save.
+
+**Root Cause:** Two contributing factors: (1) The CMS `email` field used Payload's `type: 'email'` which applies strict email validation. `contentEditable`'s `textContent` can capture trailing whitespace or invisible characters from browser editing, causing the value to fail email validation. (2) Save errors were caught but not always visible if the user had already moved focus.
+
+**Resolution:** (1) Changed the `email` field in `SiteConfig.ts` from `type: 'email'` to `type: 'text'` with a custom `validate` function that accepts empty strings and valid email patterns (less strict than Payload's built-in). (2) Added `.trim()` to the value captured from `contentEditable` in `EditableText.tsx` to strip whitespace before saving. (3) Fixed error propagation (ENG-038) so save failures are more visible.
+
+**Principle extracted -> `engineering-anti-patterns.md`: Payload `type: 'email'` with contentEditable is fragile; use `type: 'text'` + custom validation for inline-edited email fields.**
+
+**Cross-category note:** Also documented as FB-047 (design) — footer editing UX was broken.
+
+---
+
+## Session: 2026-03-29 — Drag-and-Reorder Re-Grab Bug
+
+**Chat:** Current session
+**Scope:** `src/components/inline-edit/EditableArray.tsx`
+
+#### ENG-036: "bug on the re-grabbing and drag and reorder interaction where, once I have put something somewhere"
+
+**Issue:** After successfully dragging an item to a new position in the `EditableArray` panel, any item that was moved to a different position could no longer be grabbed and dragged again. The drag handle appeared visually correct but was non-functional.
+
+**Root Cause:** `localItems.map()` used `key={index}` for each drag-and-drop row. With index keys, React reuses the same physical DOM nodes after a reorder — it updates props/content in place rather than creating new elements. The browser retains drag-related state on the physical DOM node that participated in the previous drag operation. When the same DOM node (now rendering different item content) is picked up for a second drag, the browser's stale drag state prevents the `dragstart` event from properly initiating a new drag. This is the classic "index-as-key" pitfall applied specifically to draggable elements.
+
+**Resolution:** Introduced a parallel `itemKeys` state (`string[]`) that holds a stable, unique string key per item. Keys are initialized when the panel opens (`openPanel`), reordered in sync with `reorderItem`, filtered in sync with `deleteItem`, and extended in sync with `addItem`. The row render now uses `key={itemKeys[index] ?? index}` — each item's key travels with it through reorders, forcing React to create new DOM nodes at each position rather than reusing them. Browser drag state is therefore always on a fresh element.
+
+**Category:** CMS UX / inline editing — tenth occurrence.
+
+---
+
+## Session: 2026-03-29 — Required Field Blocking Save + Client Validation
+
+**Chat:** Current session
+**Scope:** `src/globals/SiteConfig.ts`, `src/app/(frontend)/HomeClient.tsx`, `src/components/inline-edit/EditableArray.tsx`, `src/components/inline-edit/inline-edit.module.scss`
+
+#### ENG-035: "why is URL required?... it's blocking users from completing the user flow"
+
+**Issue (schema):** `socialLinks[].href` was `required: true` in both Payload schema and frontend field definition. This meant users couldn't save a link with just a label (e.g. "Resume" as a placeholder) without also providing a URL. The required constraint blocked the save flow entirely, frustrating users who wanted to save partial progress.
+
+**Issue (validation UX):** The panel had zero client-side validation — no visual indication of which fields are required, no prevention of save attempts with empty required fields, no inline error messages. Users discovered validation failures only after the server rejected the request, with no guidance on what to fix.
+
+**Resolution:**
+
+1. **Schema relaxation:** Removed `required: true` from `socialLinks[].href` in `SiteConfig.ts`. Updated `LINK_FIELDS` in `HomeClient.tsx` to match. Only `label` remains required (a link needs a name; URL can be added later).
+
+2. **Client-side validation in EditableArray:**
+   - Added `validationErrors` computed from `localItems` against `requiredFields` — a `Set<string>` of `"index:fieldName"` keys.
+   - Added `showValidation` state — errors only appear after the user's first save attempt (not on panel open, to avoid premature nagging).
+   - `commitPanel` checks validation before sending to API. If invalid, sets `showValidation` and returns early.
+   - "Save & Close" button is disabled when validation is showing and errors exist.
+   - Validation state resets when panel closes.
+
+3. **CMS-Frontend Parity:** Both Payload schema and frontend `LINK_FIELDS` updated atomically per the parity checklist.
+
+4. **Server restart (missed, then corrected):** After modifying `SiteConfig.ts`, the dev server was NOT restarted. User hit the same "URL is required" server-side error again because Payload was still running the old schema. This is a repeat of the ENG-030 pattern and a direct violation of **Hard Guardrail #15** ("ALWAYS restart the Payload dev server after modifying any global or collection schema"). The server was restarted after the user reported the continued failure. PID updated to 55573 in port-registry.md.
+
+**Operational lesson:** Guardrail #15 exists precisely because this failure mode has recurred three times now (ENG-030, ENG-035). The schema change and the server restart must be treated as a single atomic operation — the change is not complete until the server has restarted and the schema is live. No amount of code changes matter if the running server doesn't know about them.
+
+**Cross-category note:** Also documented as FB-044 (design — required indicators, inline errors) and CF-008 (content — validation messaging).
+
+**Category:** CMS UX / inline editing — ninth occurrence.
+
+---
+
+## Session: 2026-03-29 — Panel Body Collapsed After Flex Refactor
+
+**Chat:** Current session
+**Scope:** `src/components/inline-edit/inline-edit.module.scss`
+
+#### ENG-034: "why is this in such a bad height... content flexbox is in such a bad shape"
+
+**Issue:** After the flex column refactor (ENG-032) to fix sticky header/footer, the Edit Teams panel collapsed to just header + footer with the body area at near-zero height. Items existed but were invisible.
+
+**Root Cause:** The body had `flex: 1 1 0` (flex-basis 0) which is correct for growing into available space — but the panel itself had no `height` or `min-height`, only `max-height: 80vh`. Without a minimum, the flex container collapsed to its content size: header (~44px) + body(0 basis, no content pushing it) + footer (~44px). The body never grew because the panel never gave it space to grow into.
+
+**Resolution:** Added `min-height: min(400px, 60vh)` and `min-width: 320px` to `.arrayPanel`. The body's `flex: 1 1 0` now fills the guaranteed minimum space. This also establishes a responsive floor — on small viewports, `60vh` prevents the panel from becoming too tall for the screen; on large viewports, `400px` ensures usability.
+
+**Category:** CMS UX / inline editing — eighth occurrence. Self-inflicted regression from ENG-032.
+
+**Cross-category note:** Also a design principle — all modal/panel containers need minimum dimension constraints. Documented as FB-043 (design).
+
+---
+
+## Session: 2026-03-29 — Save Error Parsing and Human-Readable Messages
+
+**Chat:** Current session
+**Scope:** `src/components/inline-edit/api.ts`, `src/components/inline-edit/InlineEditBar.tsx`, `src/components/inline-edit/inline-edit.module.scss`
+
+#### ENG-033: "Failed to update global:site-config: 400 — {raw JSON}"
+
+**Issue:** When Payload CMS rejects a save due to validation (e.g. a required `href` field is empty), the error thrown by `saveFields` included the full raw JSON response body, producing an unreadable error message like `Failed to update global:site-config: 400 — {"errors":[{"name":"ValidationError",...}]}`.
+
+**Root Cause:** `api.ts` treated the response body as an opaque string and concatenated it into the error message without parsing.
+
+**Resolution:**
+1. Added `parsePayloadError()` in `api.ts` that extracts Payload's structured validation errors, translates field labels (e.g. "Links > Social Links 1 > Href" → "Social Link 1 → URL"), and humanizes messages (e.g. "This field is required" → "is required").
+2. Added fallback handling for auth errors (401/403), server errors (500+), and non-JSON responses.
+3. Final message format: `"Could not save — Social Link 1 → URL is required."` instead of raw JSON.
+
+**Cross-category note:** Also documented as FB-042 (design — error banner visibility) and CF-007 (content — technical jargon in error copy).
+
+**Category:** CMS UX / inline editing — seventh occurrence.
+
+---
+
+## Session: 2026-03-29 — Panel Layout and Drag Reorder
+
+**Chat:** Current session
+**Scope:** `src/components/inline-edit/EditableArray.tsx`, `src/components/inline-edit/inline-edit.module.scss`
+
+#### ENG-032: "the CTA for Save and Close is not always visible... why multiple clicks"
+
+**Issue:** Two UX problems with the EditableArray panel: (1) Save & Close button scrolled off-screen with long lists, (2) up/down arrow buttons for reordering were high-friction compared to drag-and-drop.
+
+**Root Cause:** Panel used `overflow-y: auto` on the entire container (header + body + footer scroll as one unit). Reordering used `moveItem(from, ±1)` which only swaps adjacent items.
+
+**Resolution:**
+1. Restructured panel to flex column: header (flex-shrink: 0) → body (flex: 1, overflow-y: auto) → footer (flex-shrink: 0). Only body scrolls.
+2. Replaced up/down buttons with drag handles using native HTML5 drag-and-drop. New `reorderItem(from, to)` uses splice for arbitrary position moves.
+3. Added collapsed view during drag: `.panelDragging` class hides fields/actions, shows single-line summary per item.
+4. Removed inline `style={{}}` on "No items" text (guardrail violation), replaced with `.noItemsText` class.
+
+**Cross-category note:** Also documented as FB-041a/b (design) — the primary dimension is UX design (persistent action layer, direct manipulation).
+
+**Category:** CMS UX / inline editing — sixth occurrence.
+
+---
+
+## Session: 2026-03-29 — CMS-Frontend Parity Drift (Systemic)
+
+**Chat:** Current session
+**Scope:** `AGENTS.md`, `src/globals/SiteConfig.ts`, `src/app/(frontend)/contact/page.tsx`, `src/app/(frontend)/contact/ContactClient.tsx`
+
+#### ENG-031: "I don't think the actual configuration dashboard is reflecting the additions"
+
+**Issue:** The user reported that fields added to the frontend inline editing UI (like the `period` field on Teams) were not reflected in the Payload admin dashboard. The user identified this as a dangerous architectural discrepancy: changes to one side don't automatically propagate to the other, creating silent data drift.
+
+**Root Cause (architectural — 5th incident in the same category):**
+The CMS data stack has three layers that must stay in sync: (1) Payload schema (`SiteConfig.ts`), (2) data fetch layer (`page.tsx`), (3) frontend UI types + inline edit fields (`*Client.tsx`). There was no guardrail, checklist, or automation enforcing that changes to one layer propagated to the others. Additionally, schema changes require a server restart that was never mandated.
+
+Full audit revealed one concrete discrepancy: `clients[].url` existed in the CMS schema but was never wired through the contact page data fetch, TypeScript type, or inline edit fields. The field was invisible to the frontend.
+
+**Resolution (systemic — per escalation triggers, not incremental):**
+1. **Fixed the concrete drift:** Added `url` to `ClientEntry` type, `CLIENT_FIELDS`, `contact/page.tsx` fallbacks and data mapping. Client names in the marquee now link to their URLs when provided.
+2. **Created CMS-Frontend Parity Checklist** in `AGENTS.md` — a blocking gate (like the Cross-App Parity Checklist) that maps "what you did" to "what you must also do" across all three layers.
+3. **Added two new Hard Guardrails** to `AGENTS.md`:
+   - #14: ALWAYS run the CMS-Frontend Parity Checklist after any field change.
+   - #15: ALWAYS restart the Payload dev server after schema changes.
+4. **Added EAP-019** anti-pattern documenting single-layer field changes.
+
+**Principle extracted → `AGENTS.md` CMS-Frontend Parity Checklist:** CMS schema, data fetch, and frontend UI are three layers of a single data contract. A field change to any one layer that doesn't propagate to all three is a bug.
+
+**Category:** CMS UX / inline editing — fifth occurrence (ENG-027→031). Escalation trigger activated: systemic fix applied.
+
+---
+
+## Session: 2026-03-29 — EditableArray Save Flow Bugs
+
+**Chat:** Current session
+**Scope:** `src/components/inline-edit/EditableArray.tsx`, `src/components/inline-edit/InlineEditProvider.tsx`, `src/components/inline-edit/inline-edit.module.scss`
+
+#### ENG-030: "My entry for present is never documented or saved"
+
+**Issue:** The user edited Teams in the array panel (added Goldman Sachs URL, set period to "Present"), clicked "Done", but:
+1. The data was never persisted to the CMS — the `period` field showed as `null` in the API.
+2. The sidebar display didn't update to show "Present" in place of the index number.
+
+**Root Cause (compound — three interacting bugs):**
+1. **"Done" didn't save:** The `commitPanel` function only staged changes in a local dirty map via `ctx.setFieldValue()`. The user had to ALSO click "Save" on the InlineEditBar at the bottom — a separate step that was neither discoverable nor expected. The user naturally treated "Done" as "done, save it."
+2. **`save()` read stale state:** Even if the bottom-bar Save button was clicked immediately after Done, the `save` callback closed over `dirtyFields` from its `useCallback` dependency. Since `setFieldValue` queues a state update (not synchronous), calling `save()` in the same event loop read the OLD empty `dirtyFields`. The save would silently succeed with zero changes.
+3. **Schema not in database:** The `period` field was added to `SiteConfig.ts` but the Payload dev server hadn't been restarted. Payload pushes schema changes on startup only, so the `period` column didn't exist in Postgres. Even a correct save would have stripped the field silently.
+
+**Resolution:**
+1. **"Save & Close":** Renamed the button and made `commitPanel` call `flushSync(() => ctx.setFieldValue(...))` followed by `await ctx.save()`. The panel now saves directly to the CMS — one click, no hidden second step.
+2. **`save()` reads from ref:** Changed `save()` to read `dirtyRef.current` (a synchronously-updated ref) instead of the `dirtyFields` closure. `setFieldValue` now also updates `dirtyRef.current` inside the state setter callback, ensuring `save()` always sees the latest dirty fields regardless of React's batching.
+3. **Removed `registryRef.current.clear()`:** After saving, the old code wiped the field registry. This meant that editing the same array a second time in the same session would silently fail (field not registered → `setFieldValue` returns early). The registry is no longer cleared; stale entries are harmlessly overwritten when components re-register after `router.refresh()`.
+4. **Restarted dev server:** Schema sync pushed the `period` column to Postgres.
+
+**Principle extracted:**
+- Panel-level "Done" or "Submit" buttons MUST save to the backend — never leave data in a local staging area that requires a second UI action to persist. Users expect the most prominent action button to complete the operation.
+- React `save()` callbacks that need the latest state must read from a ref, not from closure-captured state, because `setFieldValue` → `save()` in the same event loop will see stale data due to React batching.
+- CMS schema changes require a server restart to take effect in the database. If the agent adds fields to a Payload collection/global, it must also restart the dev server.
+
+**Category:** CMS UX / inline editing — fourth occurrence (see ENG-027, ENG-028, ENG-029).
+
+---
+
+## Session: 2026-03-29 — EditableArray UX and Teams Schema
+
+**Chat:** Current session
+**Scope:** `src/components/inline-edit/EditableArray.tsx`, `src/components/inline-edit/inline-edit.module.scss`, `src/globals/SiteConfig.ts`, `src/app/(frontend)/HomeClient.tsx`, `src/app/(frontend)/page.tsx`
+
+#### ENG-029: "It's really unclear about what the second field is"
+
+**Issue:** The EditableArray panel for Teams was confusing in three ways:
+1. Input fields had no visible labels — only placeholder text that vanishes when a value is present. With "#" in the URL field, users couldn't tell what the field was for.
+2. The user typed period info ("Present", "2023-2024") into the URL field because no period field existed and nothing indicated the field was for URLs.
+3. Changes in the panel weren't visually reflected on the sidebar because the sidebar rendered sequential numbers (i+1), not any data from the URL field.
+
+**Root Cause:** The EditableArray panel relied solely on `placeholder` for field identification. When fields had values, there was zero visual indication of what each input was for. The Teams schema also lacked a `period` field, so users had no place to put temporal context.
+
+**Resolution:**
+1. Added visible `<label>` elements above each input in the EditableArray panel — styled as small uppercase labels that persist regardless of input state.
+2. Added `period` field to the Teams CMS schema (`SiteConfig.ts`) for time context like "2023-2024" or "Present".
+3. Updated Teams field definitions to use clearer labels: "Company", "Period", "Website" instead of "Name", "URL".
+4. Updated sidebar rendering: shows period (e.g. "Present") instead of sequential index when available; company names link to URLs when a valid URL is provided.
+
+**Principle extracted:** Form fields in editing UIs must always have persistent visible labels — placeholders alone are insufficient because they disappear when a value is present.
+
+**Category:** CMS UX / inline editing — third occurrence (see ENG-027, ENG-028).
+
+---
+
+## Session: 2026-03-29 — Inline Edit Coverage Gaps
+
+**Chat:** Current session
+**Scope:** `src/globals/SiteConfig.ts`, `src/app/(frontend)/page.tsx`, `src/app/(frontend)/HomeClient.tsx`
+
+#### ENG-028: "I still cannot edit the section header and also the About section"
+
+**Issue:** Three categories of content on the home page were not editable via inline editing:
+1. Bio paragraph — conditional rendering meant when CMS bio was empty (default), the hardcoded Lorem Ipsum fallback rendered without EditableText. Chicken-and-egg: can't populate bio via inline edit because it only shows the editable version when bio is already populated.
+2. Section headers ("ABOUT", "TEAMS", "LINKS") — hardcoded strings with no corresponding CMS fields. Nothing to save to.
+3. Footer CTA and email — not wrapped in EditableText.
+
+**Root Cause:** 
+1. Bio: defensive conditional `{siteConfig.bio ? <EditableText> : <p>hardcoded</p>}` excluded the empty-state path from editing.
+2. Section labels: no CMS fields existed — they were static strings in JSX, not data.
+3. Footer: simply not wired up during initial integration.
+
+**Resolution:**
+1. Removed bio conditional — always renders EditableText, using placeholder text as fallback content when bio is empty.
+2. Added four new text fields to `SiteConfig` global (new "Labels & Footer" tab): `aboutLabel`, `teamsLabel`, `linksLabel`, `footerCta` — all with sensible defaults. Wired through `page.tsx` → `HomeClient` as EditableText.
+3. Wrapped footer CTA and email as EditableText.
+
+**Principle extracted -> `engineering-anti-patterns.md`:** Inline-editable fields must never have conditional rendering that hides the editable component when the CMS value is empty — the empty state is exactly when the user needs to populate it.
+
+**Category:** CMS UX / inline editing — second occurrence (see ENG-027).
+
+---
+
+## Session: 2026-03-29 — Inline CMS Editing System
+
+**Chat:** Current session
+**Scope:** `src/components/inline-edit/` (new), all `*Client.tsx` pages, `page.tsx` data layers
+
+#### ENG-027: Inline CMS editing — Figma-like hover/edit/save on frontend
+
+**Issue:** Content editing required navigating to the Payload admin panel — no way to edit text directly on the live site.
+
+**Resolution:** Built a full inline editing system with these components:
+- `InlineEditProvider` — React context managing dirty field state, batched saves, keyboard shortcuts (Cmd+S), and beforeunload warnings.
+- `EditableText` — Wraps any text element; shows blue bounding box on hover, activates `contentEditable` on double-click, tracks changes in dirty map.
+- `EditableArray` — Floating panel for array CRUD (add/remove/reorder) on teams, links, experience, education, collaborators, tools, etc.
+- `InlineEditBar` — Fixed bottom toolbar showing unsaved change count with Save/Discard buttons.
+- `api.ts` — Batches dirty fields by API target, calls Payload REST API (PATCH for collections, POST for globals). Wraps richText fields with `makeLexicalParagraph()`.
+
+Integrated across all 6 page types: Home, About, Contact, Experiments, Reading, Work detail. Also wired `site-config.bio` (richText) to the Home page frontend — it was previously defined in the CMS schema but rendered as hardcoded Lorem Ipsum.
+
+**Data shape changes:** ProjectClient collaborators/tools changed from `string[]` to `{name: string}[]` to match CMS format for direct PATCH. ContactClient clients changed from `string[]` to `{name: string}[]`.
+
+**Architecture decision:** Used Payload's built-in REST API with `payload-token` cookie auth (same-origin, auto-sent). No custom API routes needed. Admin-only code is conditionally rendered (not behind dynamic import yet — future optimization).
+
+**Category:** Feature / CMS UX — first occurrence.
+
+---
+
+## Session: 2026-03-29 — Payload Admin Login UX
+
+**Chat:** Current session
+**Scope:** `src/payload.config.ts`, `src/collections/Users.ts`, `src/components/admin/EnableAutocomplete.tsx`, `src/app/(payload)/custom.scss`, `.env`
+
+#### ENG-026: Payload admin login friction — no autocomplete, short sessions, no auto-login
+
+**Issue:** Every dev session required manually typing credentials into the Payload admin login page. Browser autocomplete was not offering saved credentials, and sessions expired after 2 hours (Payload default).
+
+**Root Cause:** Three compounding factors: (1) Payload's login form does not set `autocomplete` attributes that browsers need to offer saved credentials; (2) default `tokenExpiration` of 7200 seconds (2 hours) means frequent re-login; (3) no `autoLogin` config was set for local development.
+
+**Fix:**
+1. Extended `tokenExpiration` to 30 days (2,592,000 seconds) in the Users collection `auth` config — sessions persist across restarts.
+2. Added `admin.autoLogin` gated behind `isDev && PAYLOAD_ADMIN_EMAIL` env var — when both are set, dev bypasses the login page entirely.
+3. Created `src/components/admin/EnableAutocomplete.tsx` (`beforeLogin` component) that uses `useEffect` + `MutationObserver` to set `autocomplete="username email"` / `autocomplete="current-password"` on the login form inputs — enables browser credential manager even when autoLogin is off.
+4. Added autofill-safe CSS in `custom.scss` to prevent Chrome's blue autofill background from clashing with Payload's dark theme.
+
+**Lesson:** Payload v3's `autoLogin` (with `prefillOnly: false`) is the correct way to skip login in dev. The `beforeLogin` admin component slot is rendered on the login page and can run client-side effects. Token expiration is set on the collection `auth` object, not in the admin config.
+
+---
+
+## Session: 2026-03-29 — Lacework Case Study CMS Implementation
+
+**Chat:** Current session
+**Scope:** `src/lib/lexical.ts`, `src/app/(frontend)/work/[slug]/page.tsx`, `src/app/(frontend)/work/[slug]/ProjectClient.tsx`, `src/app/(frontend)/api/update-lacework/route.ts`
+
+#### ENG-025: Lexical richText silently dropped by string type check
+
+**Issue:** The `page.tsx` project page mapped Payload CMS data using `typeof doc.description === "string" ? doc.description : "Project description."`. Since Payload's `richText` field stores Lexical JSON (an object, not a string), all CMS-authored body text was silently replaced with placeholder strings. This meant any content entered through the admin UI would never display.
+
+**Root Cause:** The frontend was written to accept plain strings but the Payload schema defines `description` and section `body` as `richText` (Lexical JSON). The type guard `typeof === "string"` always failed for real CMS content.
+
+**Resolution:**
+1. Created `src/lib/lexical.ts` with two utilities:
+   - `makeLexicalParagraph(text)` — creates valid Lexical JSON from a plain string (for seeding)
+   - `extractLexicalText(value)` — recursively extracts plain text from Lexical JSON objects
+2. Updated `page.tsx` to use `extractLexicalText()` instead of the `typeof === "string"` check
+3. Created `src/app/(frontend)/api/update-lacework/route.ts` — one-time API endpoint using Payload local API to find-and-update the project record with proper Lexical JSON content
+4. Added labeled image placeholder system: `IMAGE_PLACEHOLDERS` constant maps section headings to descriptive labels, `ProjectClient` renders dashed-border skeleton boxes with labels and index numbers
+
+**Principle:** When a CMS field uses structured data (Lexical JSON, Slate, ProseMirror), the frontend must have a proper deserializer — not a `typeof string` check. Silent fallbacks mask the problem until content editors wonder why their text never appears.
 
 ---
 
@@ -596,9 +1441,335 @@ Additionally, a third file (`playground/src/app/globals.css`) contains yet anoth
 
 ---
 
+#### ENG-019: "Module not found: Can't resolve 'src/components/admin/EnableAutocomplete'"
+
+**Issue:** Build error — Turbopack cannot resolve the bare path `src/components/admin/EnableAutocomplete` in the Payload-generated `importMap.js`. The admin panel and any SSR page that touches the import map fail to compile.
+
+**Root Cause:** `payload.config.ts` specified the `beforeLogin` component as `'src/components/admin/EnableAutocomplete'` — a bare string path. Payload copies this string directly into the generated `importMap.js` as an import specifier. Turbopack (unlike Webpack in some configurations) does not resolve bare `src/...` paths — it needs either a path alias (`@/...`) or a relative path (`./...`).
+
+**Resolution:** Changed the path in `payload.config.ts` from `'src/components/admin/EnableAutocomplete'` to `'@/components/admin/EnableAutocomplete'`. The `@/` alias is configured in `tsconfig.json` to map to `./src/*`. The import map was regenerated by the dev server automatically.
+
+**Principle extracted -> `engineering-anti-patterns.md`: Payload admin component paths must use `@/` alias, not bare `src/` paths.**
+
+**Category:** Build / Payload CMS — first occurrence.
+
+---
+
+#### ENG-020: "Hydration failed because the server rendered text didn't match the client"
+
+**Issue:** Recoverable hydration mismatch error on the homepage when logged in as admin. The `EditableText` component rendered different HTML attributes on server vs client — the server produced plain elements (no `data-editable`, no inline-edit class) while the client produced admin-enhanced elements. Additionally, `new Date().toLocaleDateString()` in the footer generated time-dependent output that could differ between server and client.
+
+**Root Cause:** Two separate issues:
+1. The `EditableText` and `EditableArray` components checked `ctx?.isAdmin` to decide between a plain branch (non-admin) and an enhanced branch (admin with `data-editable`, `contentEditable`, inline-edit CSS class). During SSR, the `InlineEditContext` resolved to `null` (likely a Turbopack module identity issue between the provider and consumer during SSR bundling), causing the non-admin branch. During client hydration, the context resolved correctly, causing the admin branch. Different branches = different HTML = hydration mismatch.
+2. `new Date().toLocaleDateString(...)` was called directly in JSX, producing output that depends on the execution time and locale. If SSR and client hydration disagree on the formatted date, it's a hydration mismatch.
+
+**Resolution:**
+1. Added `const [hydrated, setHydrated] = useState(false)` + `useEffect(() => setHydrated(true), [])` to `EditableText.tsx`. Derived `const isAdmin = hydrated && !!ctx?.isAdmin`. This ensures both server and client initially render the non-admin branch (matching), then admin features activate post-mount. Applied the same pattern to `EditableArray.tsx` (which already had a `mounted` state for portal rendering — reused it for the admin guard).
+2. Moved `new Date().toLocaleDateString()` in `HomeClient.tsx` to a `useEffect` with `useState("")`, so the footer renders an empty-safe value during SSR and fills in the date after mount.
+
+**Principle extracted -> `engineering-anti-patterns.md` EAP-014 (existing): Already documents the `useState + useEffect` pattern for hydration-safe rendering. This incident is a new instance of the same pattern applied to inline-edit admin branching.**
+
+**Category:** Hydration / SSR — 4th occurrence (ENG-017, ENG-018, ENG-019 were related; EAP-014 already exists).
+
+---
+
+#### ENG-021: "Admin bar blocks navigation buttons, bad practice to overlay content"
+
+**Issue:** The admin bar (`AdminBar`) used `position: fixed; top: 0` which removed it from document flow. Every client page compensated with `style={{ paddingTop: 44 }}` (inline) or `&[data-admin] { padding-top: 44px }` (SCSS). This is fragile: the hardcoded 44px must match the bar's height exactly, the inline style violates AP-003, and if the bar height ever changes, all 6+ pages break silently. The bar also blocked navigation buttons and other interactive elements in the header area.
+
+**Root Cause:** `position: fixed` removes the element from document flow. The pattern of "fixed element + manual padding offset" is the exact anti-pattern documented in AP-004 for sidebars, applied here to a top bar. The same class of problem: fragile coupling between the overlay and every page that must compensate for it.
+
+**Resolution:** Changed both `AdminBar` and `InlineEditBar` from `position: fixed` to `position: sticky`. Sticky positioning keeps elements in the document flow (naturally pushing content) while still sticking to viewport edges during scroll. Removed all compensating hacks:
+- `style={{ paddingTop: 44 }}` from HomeClient, AboutClient, ContactClient, ReadingClient, ExperimentsClient
+- `data-admin` attribute and `&[data-admin] { padding-top: 44px }` from ProjectClient / page.module.scss
+- Removed `left: 0; right: 0` from `.bar` and `.editBar` (sticky elements auto-fill their parent width)
+
+**Cross-category note:** Also documented as FB-050 (design) — the overlay pattern is a UX anti-pattern (blocking interactive elements with non-interactive overlays).
+
+**Category:** CSS Layout / Admin UI — first occurrence of this specific pattern, but related to AP-004 (fixed elements with padding offsets).
+
+---
+
+#### ENG-042: "Design system code updates not reflective of playground in real time"
+
+**Issue:** The user discovered that changes to the main site's `ScrollSpy` component were not being reflected in the playground's version, and vice versa. A full audit revealed multi-directional drift across three codebases: (1) main site `src/components/ScrollSpy.tsx`, (2) playground reusable `playground/src/components/scroll-spy.tsx`, (3) playground demo `playground/src/app/components/scroll-spy/page.tsx`. The playground had correct behavioral patterns (closest-element detection, click/drag dead zone) that were never ported to the main site. The main site had correct visual updates (label color/weight pairing, track gap) that were partially ported to the playground component but not the demo. The playground component also had an AP-031 violation (CSS transform centering on FM-animated label) that the main site had already fixed.
+
+**Root Cause:** Cross-App Parity Checklist was not enforced atomically. Changes were made to one codebase and the corresponding update to the other was either partial or skipped entirely. The three codebases evolved independently: the playground was improved during the initial ScrollSpy implementation session (correct behavior patterns), and the main site was improved during this session (visual polish), but neither was synced back to the other. The playground demo was treated as "close enough" and never updated when the reusable component changed.
+
+**Resolution:**
+- **Main site ← Playground behavior:** Ported closest-element `indexFromPointer`, 3px dead zone pattern, `pointerStart` ref, `endInteraction` handler, and `data-notch-index` attributes.
+- **Playground demo ← Main site visuals:** Added active/inactive label color and weight differentiation (`text-foreground font-medium` vs `text-muted-foreground/60`).
+- **Playground component ← Main site fix:** Fixed AP-031 label centering by replacing `top-1/2 -translate-y-1/2` with `top-0 h-4 flex items-center` (non-transform centering). Added `data-active` to notch container for state propagation.
+
+**Category:** Cross-App Parity — this is the ScrollSpy-specific instance of a systemic process gap: the Cross-App Parity Checklist covers creation and modification but doesn't enforce bidirectional sync when two versions of the same component exist.
+
+---
+
+#### ENG-016: ASCII Art Tool — Standalone App Scaffold
+
+**Issue:** Proactive build — user requested rebuilding the Portrait Halftone ASCII video tool as a standalone Next.js app within the monorepo, following the playground pattern.
+
+**Root Cause:** N/A — new feature build.
+
+**Resolution:** Scaffolded `ascii-tool/` as a third Next.js app in the monorepo: own package.json with ffmpeg.wasm, idb-keyval, geist, next-themes, lucide-react; shared Tailwind v4 tokens via `globals.css` @theme block; COOP/COEP headers in next.config.ts for SharedArrayBuffer (ffmpeg.wasm requirement); port 4002 registered. Engine ported as pure logic modules. Persistence migrated from Express server to localStorage + IndexedDB. MP4 export migrated to @ffmpeg/ffmpeg WASM. Build compiles with zero TypeScript errors.
+
+**Cross-category note:** Also documented as FB-051 (design) — 7 new DS components and 9 missing playground pages built as prerequisite.
+
+**Principle extracted -> `engineering.md` §3.1: Multi-app monorepo pattern — each app owns its dependencies and config but shares design tokens via manually synced globals.css.**
+
+---
+
+#### ENG-017: Undocumented App — Architecture Gap
+
+**Issue:** User feedback — "whenever there is a new app being spun up or added to the repo, this should be documented in the architecture." The ASCII Art Studio was scaffolded without a corresponding entry in `AGENTS.md`'s architecture section, without its own version control manifest, and without a formal onboarding process.
+
+**Root Cause:** No "New App Onboarding Checklist" existed. The agent treated app creation as a code task (scaffold files, install deps) rather than an architecture task (register in docs, establish versioning, update meta-prompt). Port registration was done, but versioning and architecture docs were afterthoughts.
+
+**Resolution:** (1) Added **App Registry** section to `AGENTS.md` — single source of truth for all apps in the monorepo. (2) Created `ascii-studio.json` version manifest with same structure as `elan.json`. (3) Updated `scripts/version-bump.mjs` and `scripts/version-release.mjs` to be data-driven multi-app scripts (APPS config map, backward-compatible). (4) Added `ascii-tool:version:patch/minor/major/release` npm scripts. (5) Created `ascii-tool/src/lib/version.ts` as synced version file. (6) Added **New App Onboarding Checklist** to `AGENTS.md` — 13-step mandatory process. (7) Updated Cross-App Parity Checklist to include ascii-tool. (8) Updated `docs/engineering.md` §9 architecture and route tables. (9) Updated Hard Guardrail 13 to reference multi-app version releases.
+
+**Principle extracted -> `engineering.md` §9: An app that exists in the filesystem but not in the architecture docs is a maintenance hazard. Documentation IS part of the creation workflow, not a post-step.**
+
+---
+
+#### ENG-018: Masonry layout — CSS column-count replaced with JS column distribution
+
+**Issue:** User feedback — masonry tiles were all the same height (forced aspect-ratio), cover images were cropped, and testimonial/project ordering didn't match expectations. CSS `column-count` fills top-to-bottom per column, making "row N, column M" positioning unintuitive for content curation.
+
+**Root Cause:** CSS `column-count` distributes items sequentially into columns (item 1-N/3 in col 1, N/3-2N/3 in col 2, etc.), not left-to-right by row. This means placing an item at "index 2" puts it in column 1 (not column 3), and there's no way to control row/column placement without knowing total item count and heights upfront. Fixed `aspect-ratio` on `.projectHero` combined with `object-fit: cover` on images forced uniform tile heights and cropped thumbnails.
+
+**Resolution:** (1) Replaced CSS `column-count` masonry in `page.module.scss` with a CSS Grid shell (`grid-template-columns: repeat(3, 1fr)`) + JS round-robin distribution in `HomeClient.tsx`. Items distributed via `items.forEach((item, i) => cols[i % columnCount].push(item))`. Each column rendered as a flex column. (2) Responsive column count via `useState(3)` + `useEffect` (768px → 2 cols, <768px → 1 col). Default of 3 matches server render for desktop; mobile gets brief reflow. (3) Removed `aspect-ratio` from `.projectHero`, changed `.projectCoverImg` to `width: 100%; height: auto`. (4) Updated CMS testimonial and project ordering via Payload REST API.
+
+**Cross-category note:** Also documented as FB-052 (design) — visual hierarchy and thumbnail proportions.
+
+**Principle extracted -> `engineering.md` §3: For masonry layouts requiring predictable item positioning, prefer JS-distributed columns over CSS column-count. CSS columns are height-balanced by the browser and don't support row-based addressing.**
+
+---
+
+#### ENG-019: Drag-and-drop tile reordering for homepage masonry grid
+
+**Issue:** User request — need to drag tiles to reorder them in the inline edit view, with changes persisting to the backend.
+
+**Root Cause:** No mechanism existed for curating tile order visually. The `interleaveGrid` function algorithmically placed testimonials among projects, and individual `order` fields on each collection couldn't encode a unified interleaved sequence.
+
+**Resolution:** (1) Added `gridOrder` JSON field to `SiteConfig` global — stores `[{type, id}]` array representing the flat tile sequence. (2) When `gridOrder` exists, `HomeClient` uses it to order items instead of `interleaveGrid`, with new/untracked items appended. (3) Implemented reorder mode (admin only) using `@dnd-kit/core` + `@dnd-kit/sortable`: flat CSS grid with `rectSortingStrategy`, 6-dot drag handles, `DragOverlay` for visual feedback. (4) Save/cancel bar persists the new order to SiteConfig via `POST /api/globals/site-config`. (5) Original `interleaveGrid` preserved as the default fallback when no `gridOrder` is saved.
+
+**Cross-category note:** Also documented as FB-053 (design) — visual curation affordance for homepage grid.
+
+**Principle extracted -> `engineering.md` §3: When multiple collections need a unified ordering that can't be expressed by individual per-collection `order` fields, store the merged sequence as a single JSON field on a global config rather than trying to reverse-engineer separate order spaces.**
+
+---
+
+#### ENG-020: "I cannot drag things still" — DnD listeners on child swallowed by Link
+
+**Issue:** User reported drag-and-drop tiles could not be dragged after the reorder feature (ENG-019) shipped. Clicking the "Reorder tiles" button entered reorder mode, but attempting to drag any tile did nothing.
+
+**Root Cause:** The `@dnd-kit` `useSortable` listeners (`onPointerDown`, etc.) were attached to a 28×28px drag handle `<button>` positioned absolutely inside the tile. But the tile's main content was a Next.js `<Link>` (rendered as `<a>`) that covered the entire card. The `<a>` tag intercepted all pointer events before they reached the handle — clicking anywhere on the tile started link navigation, not a drag. Even when the user managed to click the tiny handle, the `PointerSensor` 5px activation distance meant any slight movement triggered the link navigation before the drag activated.
+
+**Resolution:** (1) Moved `{...attributes}` and `{...listeners}` from the handle `<button>` to the outer wrapper `<div>` — making the entire tile the drag target. (2) Added `pointer-events: none` on `.sortableTileContent` (the div wrapping the card content) to prevent the inner `<Link>` from capturing events. (3) Added `touch-action: none` on the tile for proper pointer capture. (4) Added `user-select: none` to prevent text selection during drag. (5) Changed the handle from a `<button>` to a visual-only `<div>` indicator.
+
+**Cross-category note:** Also documented as FB-054 (design) — affordance failure from a drag handle that was too small and competed with a link overlay.
+
+**Principle extracted -> `engineering.md` §3: When implementing DnD inside components that contain `<Link>` or `<a>` tags, attach drag listeners to the outermost wrapper and apply `pointer-events: none` to the inner clickable content. Never put DnD listeners on a child element inside a Link — the Link's pointer event handling will always win. See also EAP-028.**
+
+---
+
+#### ENG-021: "Drag mode is working, but it doesn't save the actual dragged order"
+
+**Issue:** User dragged tiles into a new order and clicked "Save order." The save appeared to succeed (button showed "Saving…" then the mode exited), but the grid immediately reverted to the pre-drag order. On page reload, the old order was still shown.
+
+**Root Cause:** After the POST to `/api/globals/site-config` succeeded, the save handler called `setReorderMode(false)` — which switched `displayItems` from `orderedItems` (the drag result) back to `gridItems`. But `gridItems` is derived from the `savedGridOrder` **prop**, which comes from the server component (`page.tsx`). The server component had not re-run, so its `savedGridOrder` was stale. No `router.refresh()` was called, so the server never re-fetched the updated `gridOrder` from the CMS. Additionally, the `useEffect` that syncs `orderedItems` with `gridItems` (`if (!reorderMode) setOrderedItems(gridItems)`) immediately overwrote the drag result with the old server data.
+
+**Resolution:** (1) Imported `useRouter` from `next/navigation` and called `router.refresh()` after a successful save — this triggers the server component tree to re-run, re-fetching `gridOrder` from the CMS and sending updated props to the client. (2) Added a `hasPendingSave` flag to bridge the gap between save and server refresh: while the flag is true, `displayItems` continues to show `orderedItems` (the drag result), not the stale `gridItems`. (3) When the refreshed `gridItems` arrives (the `useEffect` fires because the `gridItems` dependency changed), the flag clears and the component transitions to the server-confirmed order. This prevents the "snap back to old order" flash.
+
+**Principle extracted -> `engineering.md` §3: In Next.js App Router, client state changes don't automatically refresh server component props. After any client-side mutation that affects data fetched by a parent server component, call `router.refresh()` to re-run the server tree. When the mutation result must be visible immediately (no flash of stale data), hold optimistic state in the client until the server refresh arrives — use a flag like `hasPendingSave` to bridge the gap.**
+
+---
+
 ## Entry Template
 
 ```markdown
+#### ENG-053: "How do I store assets? Where are thumbnails and resumes stored?"
+
+**Issue:** User discovered that all uploaded media (thumbnails, hero images, avatars) were stored on local disk (`./media/` directory) despite the database being cloud-hosted on Supabase Postgres. This meant files would be lost on redeploy. Additionally, the Media collection only accepted `image/*` MIME types, preventing document uploads (PDFs, resumes).
+
+**Root Cause:** The Payload CMS config had no storage adapter plugin — it defaulted to local `staticDir: 'media'` disk storage. The database (structured metadata) was on Supabase, but actual binary files had no cloud persistence. The `mimeTypes` restriction was set to images-only.
+
+**Resolution:** (1) Installed `@payloadcms/storage-s3` adapter. (2) Configured `s3Storage` plugin in `payload.config.ts` pointing to Supabase Storage's S3-compatible endpoint with `forcePathStyle: true`. (3) Added env vars (`S3_ENDPOINT`, `S3_BUCKET`, `S3_REGION`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`) to `.env`. (4) Expanded `mimeTypes` to include `application/pdf` alongside `image/*`. User still needs to create a `media` bucket in Supabase Dashboard and provide S3 access keys.
+
+**Principle extracted -> `engineering.md` §12: Media & File Storage (Supabase Storage) — new section documenting the storage architecture, S3 adapter configuration, env vars, bucket setup, MIME types, public URL pattern, and verification commands. Also created EAP-032 (architectural changes without engineering.md update) after the user flagged this documentation was initially skipped — 7th occurrence of the documentation-skip pattern.**
+
+---
+
+#### ENG-054: "Cannot add links to LinkedIn icon button on testimonial cards"
+
+**Issue:** User could not edit the LinkedIn URL on testimonial cards via inline editing. The LinkedIn icon was always visible but its URL could only be changed through the Payload admin panel, not the inline editing UI.
+
+**Root Cause:** The `linkedinUrl` field had no inline edit UI. The `TestimonialCard` component rendered the LinkedIn icon as a static link/span, but unlike `text`, `name`, and `role` fields, `linkedinUrl` had no `EditableText` wrapper or any other inline editing mechanism. This is an attribute (URL) rather than visible text, so `EditableText` (which uses `contentEditable`) couldn't be directly applied.
+
+**Resolution:** Added a click-to-edit popover on the LinkedIn icon when admin. Clicking the icon opens a URL input popover with save/cancel. Saves directly via `updateCollectionField('testimonials', id, 'linkedinUrl', value)` — a new API helper added to `inline-edit/api.ts`. The LinkedIn icon also turns accent-colored when a URL is set, providing visual feedback.
+
+**Principle extracted -> inline edit system should cover ALL CMS fields, not just visible text. Attributes like URLs need dedicated editor patterns (popovers, modals) since they aren't displayed as text content.**
+
+---
+
+#### ENG-055: "Cannot upload images for testimonial card avatars inline"
+
+**Issue:** User wanted to upload avatar photos for testimonial cards directly from the inline edit view. The avatar field existed in the CMS schema (`type: 'upload', relationTo: 'media'`) and uploads route to Supabase S3, but there was no inline upload UI.
+
+**Root Cause:** The inline edit system only supported text (`EditableText`) and array (`EditableArray`) editing. File uploads require a different flow: file picker → multipart upload to `/api/media` → relationship update on the parent document. No inline upload component existed.
+
+**Resolution:** (1) Added `uploadMedia(file, alt)` helper to `inline-edit/api.ts` — POSTs `FormData` to `/api/media` and returns `{ id, url }`. (2) Added `updateCollectionField(collection, id, field, value)` helper for direct single-field PATCH updates. (3) Created `AvatarUpload` sub-component inside `TestimonialCard.tsx` — renders hover overlay on avatar, opens native file picker, shows instant preview via blob URL, uploads to Payload media (→ Supabase S3), then updates the testimonial's `avatar` relationship field and refreshes. (4) Added corresponding SCSS styles for the upload overlay and loading spinner.
+
+**Principle extracted -> The inline edit system needs a file upload primitive (`uploadMedia`) alongside its text primitives. The upload → relationship update → refresh pattern applies to any CMS upload field and should be reusable.**
+
+---
+
+#### ENG-056: "Audit all current portfolio and playground parity"
+
+**Issue:** User requested a full audit of whether all main-site components are reflected in the playground design system UI.
+
+**Root Cause:** N/A — proactive audit request.
+
+**Resolution:** Audit completed. All 32 shared UI/layout components have matching playground preview pages and sidebar entries. TestimonialCard is in the playground with a Tailwind-based demo. Gaps found are by-design exclusions (admin chrome, inline edit subsystem, elan-visuals). Registry (`archive/registry.json`) has duplicate IDs and stale `hasPreview` flags — cleanup recommended. No missing components found.
+
+**Principle extracted -> Periodic parity audits catch registry drift before it becomes systemic. The registry's `hasPreview` field should be kept in sync after each playground page creation.**
+
+---
+
+#### ENG-057: "I need the ability to make only certain words bold"
+
+**Issue:** User reported three issues: (1) ⌘B bolds the entire text element, not selected words — no partial bold support. (2) TextFormatBar doesn't reflect selection-level formatting state. (3) Quotation mark on testimonial cards is not editable (can't click it to start editing the quote).
+
+**Root Cause:** (1) `EditableText` ⌘B handler changed `el.style.fontWeight` on the whole element instead of using `document.execCommand('bold')` on the text selection. (2) `TextFormatBar` read element-level `getComputedStyle()` but not selection-level formatting via `queryCommandState`. (3) The quotation mark `<span>` was a separate element from the `EditableText` with no click handler to bridge them.
+
+**Resolution:** (1) Rewrote ⌘B/⌘I in `EditableText.tsx` to detect text selections (`hasTextSelection` helper) and use `document.execCommand('bold'/'italic')` for word-level formatting. Falls back to element-level toggle when no selection. `handleInput` now captures `innerHTML` for `isRichText` fields. (2) Added `selectionBold`/`selectionItalic` properties to `TextFormatBar` state using `document.queryCommandState`. Added `selectionchange` listener to track formatting as the caret moves through formatted text. Bold/italic toolbar buttons also use `execCommand` when a selection exists. (3) Added click handler to quotation mark spans that dispatches a synthetic `dblclick` on the adjacent `[data-editable]` element. Added `.quoteMarkEditable` / `.quoteIconEditable` styles for hover affordance. (4) Changed testimonial `text` field from `textarea` to `richText` in CMS schema so formatting persists. Added `htmlToLexicalDocument()` in `api.ts` to convert HTML with `<b>`/`<i>` tags to Lexical JSON with format bitmasks. Added `lexicalToHtml()` in `lexical.ts` for rendering formatted Lexical content. Added `htmlContent` prop to `EditableText` for round-trip formatted rendering. Updated both home and contact page data fetches to pass `textHtml`.
+
+**Principle extracted -> Inline text formatting requires three synchronized layers: (1) DOM-level `execCommand` for visual formatting within `contentEditable`, (2) selection-state tracking via `queryCommandState` for toolbar state, (3) HTML-to-Lexical and Lexical-to-HTML converters for persistence round-trip. Element-level style toggles are only appropriate for whole-field changes (like changing the element's font size), not for inline formatting.**
+
+---
+
+#### ENG-058: "Raw Lexical JSON displayed in testimonial card after bolding"
+
+**Issue:** After the user bolded words ("product sense", "judgment") in a testimonial quote via inline edit, the card displayed the raw Lexical JSON string `{"root":{"type":"root","format":"","indent":0,...}` instead of the formatted text.
+
+**Root Cause:** Two compounding failures: (1) The schema was changed from `textarea` to `richText` but the dev server was not restarted before the user tested, so Payload still treated `text` as a textarea field. When the inline edit system saved a Lexical JSON object, Payload serialized it to a string. (2) Both `lexicalToHtml()` and `extractLexicalText()` had an early return `if (typeof value === 'string') return value` that passed JSON strings straight through without attempting to parse them.
+
+**Resolution:** (1) Added `ensureParsed()` guard to both `lexicalToHtml()` and `extractLexicalText()` in `src/lib/lexical.ts` — detects strings that look like JSON (`{...}` or `[...]`), attempts `JSON.parse()`, and falls through to normal string handling on failure. This makes both functions robust against stringified Lexical data regardless of how it was stored. (2) Restarted the dev server to sync the richText schema, which changes the DB column from text to JSONB so future saves store proper objects.
+
+**Principle extracted -> Any function that processes CMS data with a `typeof value === 'string'` early return MUST also check for serialized JSON. Schema type changes create a window where old-schema storage can serialize objects to strings, and defensive parsing is the only way to handle both migration states. Additionally: schema changes that require server restarts should be paired with an IMMEDIATE restart — not deferred to the user — because the window between schema change and restart is a data corruption risk.**
+
+---
+
+#### ENG-059: "Conflicting routes at /api/contact build error"
+
+**Issue:** Next.js 16.2.1 build failed with: `Conflicting routes at /api/contact: route at /api/contact/route and route at /(frontend)/api/contact/route`. The app could not start.
+
+**Root Cause:** Stale untracked duplicate files existed directly in `src/app/` that mirrored the canonical routes inside the `src/app/(frontend)/` route group. Since Next.js route groups like `(frontend)` are transparent in the URL, both `src/app/api/contact/route.ts` and `src/app/(frontend)/api/contact/route.ts` resolved to the same `/api/contact` path. The duplicates were likely leftovers from the original project structure before the `(frontend)` route group was introduced. Affected directories: `api/`, `about/`, `blog/`, `contact/`, `experiments/`, `reading/`, `work/`, plus `page.tsx`, `page.module.scss`, and `layout.tsx` at the `src/app/` root.
+
+**Resolution:** Deleted all stale untracked files and directories from `src/app/` that conflicted with their `src/app/(frontend)/` counterparts. The canonical versions in `(frontend)/` were retained as they contained the real CMS-integrated code. Total of 9 files/directories removed.
+
+**Principle extracted -> When restructuring the app directory (e.g., introducing a route group like `(frontend)`), all old route files must be removed — not just moved. Untracked duplicates outside the route group silently conflict because Next.js route groups are URL-transparent. A `git status` check for `??` entries in `src/app/` can catch this class of issue early.**
+
+---
+
+#### ENG-060: Spacing token system migration to One GS multiplier-based naming
+
+**Issue:** Spacing tokens used opaque numeric indices (`$portfolio-spacing-01` through `$portfolio-spacing-13`) that required a lookup table for value resolution. The scale had gaps (no 20px, 56px, 72px steps), forcing magic numbers in components like the sidebar (6px padding). Layout tokens (`layout-01..07`) carried no semantic density information. The naming convention was optimized for human designers using Figma panels, not for AI agents reading source code.
+
+**Root Cause:** The original token system was modeled on IBM Carbon's indexed spacing convention. While the pixel values were correct, the naming abstraction leaked no information about value or intent, making it the worst-case scenario for agent-driven development.
+
+**Resolution:** Full three-tier migration to One GS multiplier-based architecture:
+- Tier 1 — Primitives: `$portfolio-spacer-Nx` (25 steps, base unit 8px, from `0-125x` to `20x`). SCSS variables encode decimals as hyphens (`0-5x` for `0.5x`).
+- Tier 2 — Layout semantics: `$portfolio-spacer-layout-*` map with descriptive density names (`x-compact` through `xxxx-spacious`), Functional density as default.
+- Tier 3 — Utility: `$portfolio-spacer-utility-Nx` for component-internal spacing.
+- Legacy aliases (`$portfolio-spacing-NN`, `$portfolio-layout-NN`) preserved as deprecated forwards.
+- Button component expanded from 3 to 5 sizes with explicit vertical padding tokens.
+
+**Cross-category note:** Also documented as FB-055 (design) — agent readability rationale and naming convention decision.
+
+**Principle extracted -> Design token naming must be optimized for AI agent comprehension. For spacing: (1) Primitive tokens use multiplier-based names so agents can derive values via arithmetic (`spacer-3x` = 3 x 8 = 24px). (2) Layout tokens use semantic density names so agents can reason about intent (`spacer-layout-standard` vs `spacer-layout-spacious`). (3) Indexed names (`spacing-06`) are never acceptable — they encode neither value nor intent.**
+
+---
+
+#### ENG-061: "Doing all this on the button and making sure"
+
+**Issue:** Button component used hardcoded pixel values (e.g., `px-[14px]`, `h-[44px]`) instead of referencing the established three-tier spacing token system. Several values (30px, 44px, 52px heights; 3px, 5px, 11px, 14px padding) didn't land on any token in the grid.
+
+**Root Cause:** Previous iteration optimized for visual feedback (shrinking padding/heights) without constraining values to the token grid. The spacing token system (`_spacing.scss`) was already established but not exposed as CSS custom properties in the playground, and the button was built with raw pixel values.
+
+**Resolution:**
+1. Added two new Tier 3 utility tokens to `_spacing.scss`: `utility-1.75x` (14px) and `utility-2.25x` (18px) for button icon sizes.
+2. Exposed all primitive (Tier 1) and utility (Tier 3) spacer tokens as CSS custom properties in `playground/src/app/globals.css` `@theme` block.
+3. Snapped all off-grid values to nearest token (heights: 30→32, 44→48, 52→56; padding values realigned accordingly).
+4. Replaced every hardcoded pixel spacing class with `var()` token references (e.g., `h-[var(--spacer-6x)]`, `px-[var(--spacer-utility-2x)]`).
+5. Ran `npm run sync-tokens` after modifying `_spacing.scss`.
+
+**Cross-category note:** Also documented as FB-056 (design) — visual token alignment and grid conformance.
+
+**Principle extracted -> When building components, ALL spacing values (height, padding, gap, icon padding) must reference established token custom properties via `var()`. If a desired value doesn't exist in the token grid, either snap to the nearest token or add a new Tier 3 utility token — never use a raw pixel value that sits between tokens.**
+
+---
+
+#### ENG-042: "DS compliance audit — token and mixin adoption across portfolio"
+
+**Issue:** Design system tokens and mixins existed but weren't adopted across the portfolio site. Brand color drift (`#6c63ff` vs `$portfolio-accent-60`), raw px values for spacing/breakpoints/typography, missing container tokens for 720px width pattern.
+
+**Root Cause:** The DS was built incrementally after many pages existed. No enforcement mechanism ensured new tokens/mixins were retroactively applied. Pages were "good enough" with raw values that happened to match token values numerically.
+
+**Resolution:**
+- Added `$elan-container-content: 720px` to spacing tokens.
+- Added `$portfolio-radius-xs: 2px` to elevation tokens.
+- Ran `npm run sync-tokens` to propagate changes to playground.
+- Cross-category: also documented as FB-065 (design).
+
+**Principle extracted -> When adding new tokens or mixins, audit existing consumers that use equivalent raw values and migrate them in the same commit. A token that exists but isn't adopted provides zero value.**
+
+---
+
+#### ENG-073: "Playground experiments not propagated to production across sessions"
+
+**Issue:** Three design experiments (Button two-axis model, three-tier spacing tokens, semantic typography mixins) were conducted in the playground across multiple sessions but never propagated to production. Production code continued using the old `variant=` Button API, legacy `$portfolio-spacing-NN` token names, and raw `font-size:` declarations while the playground already demonstrated the new patterns. User discovered the drift during a comprehensive audit.
+
+**Root Cause:** The Cross-App Parity Checklist in AGENTS.md was one-directional (production → playground). No rule existed for propagating playground experiments back to production. The engineering-iteration skill and pre-flight routing didn't flag playground→production drift as a category. Each experiment session ended with "playground updated" but no verification that production matched.
+
+**Resolution:**
+1. Phase 0: Switched 26 component SCSS files from `@yilangaodesign/design-system/scss` to local `../styles` barrel import (stale published package didn't have new tokens).
+2. Phase 1: Rebuilt production Button with two-axis model (appearance × emphasis), 4 sizes (xs/sm/lg/xl), `type="button"` default, bounding-box icon spacing. Rebuilt playground DemoButton to match.
+3. Phase 2: Migrated 31 SCSS files from legacy `$portfolio-spacing-NN` / `$portfolio-layout-NN` to new `$portfolio-spacer-*` / `$portfolio-spacer-layout-*` names.
+4. Phase 3: Resolved 11px → 12px decision (20 instances), migrated safe typography declarations to semantic mixins.
+5. Phase 4: Fixed Slider filled track, Toast variants, Checkbox indeterminate state.
+6. Phase 5: Fixed playground shell self-consistency (magic px, hardcoded hex), misleading content, shadow/radius violations.
+7. Phase 6: Added bidirectional rows to Cross-App Parity Checklist in AGENTS.md, added EAP-030, updated design.md §14.4 and §15.4.
+
+**Cross-category note:** Also impacts design documentation (FB-067 in design-feedback-log).
+
+**Principle extracted -> `engineering.md`: The Cross-App Parity Checklist is bidirectional. When playground experiments advance a component/token, production MUST be updated in the same session. See EAP-030.**
+
+---
+
+#### ENG-074: "Do not hard code anything. Use the primitives in the system"
+
+**Issue:** User found that the playground DemoButton component used hardcoded pixel values (`h-[48px]`, `px-[16px]`) and non-system colors (Tailwind's `bg-emerald-600`, `bg-red-600`, `hover:opacity-90`) instead of referencing the design system's CSS custom properties. The production Button.module.scss also had raw `rgba()` values instead of overlay tokens for inverse/always-dark/always-light hover states.
+
+**Root Cause:** When the DemoButton was rebuilt during ENG-073's Phase 1b, it was reconstructed from the _plan's numeric values_ rather than from the original token-integrated implementation (which used `var(--spacer-6x)` instead of `h-[48px]`). The original implementation was lost during a `git checkout --` operation. Additionally, the SCSS color system lacked overlay interaction tokens, so production used raw `rgba()` values.
+
+**Resolution:**
+1. Added 30+ palette CSS custom properties to `playground/src/app/globals.css` `:root` block (neutral, accent, red, green scales mirroring `_colors.scss`).
+2. Added overlay interaction tokens (`--overlay-white-08`, `--overlay-black-04`, etc.) to both `globals.css` and `_colors.scss`.
+3. Added motion tokens (`--duration-fast: 110ms`, `--easing-standard`) and line-height overrides (`--leading-tight: 1.1`) to `globals.css`.
+4. Added theme-adaptive button state CSS vars (`--btn-neutral-*`, `--btn-highlight-*`) with dark mode overrides in `.dark` block.
+5. Converted all DemoButton sizing from raw pixels to `var()` spacer token references.
+6. Converted all DemoButton colors from Tailwind defaults/hex to palette CSS var references.
+7. Replaced all `rgba()` in production `Button.module.scss` with `$portfolio-overlay-*` SCSS tokens.
+8. Fixed line-height discrepancy (Tailwind `leading-tight` = 1.25 → overridden to 1.1 to match `$portfolio-leading-tight`).
+9. Added `cursor-pointer` to DemoButton base (matching production `cursor: pointer`).
+
+**Cross-category note:** Also a design issue — the DemoButton's visual output now exactly matches production at the token level.
+
+**Principle extracted -> `engineering.md`: Demo components in the playground MUST reference CSS custom property tokens via `var()`, never hardcoded pixel or hex values. When SCSS tokens exist without CSS var counterparts, add them to `globals.css` before building the demo. See EAP-055.**
+
+---
+
 #### ENG-NNN: "[First 10 words of user message]"
 
 **Issue:** [What the user observed]

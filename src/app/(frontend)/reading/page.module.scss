@@ -1,4 +1,4 @@
-@use '@yilangaodesign/design-system/scss' as *;
+@use '../../../styles' as *;
 
 .page {
   min-height: 100vh;
@@ -8,24 +8,22 @@
 
 .container {
   flex: 1;
-  max-width: 720px;
+  max-width: $elan-container-content;
   margin: 0 auto;
   width: 100%;
-  padding: $portfolio-layout-05 $portfolio-spacing-05;
+  padding: $portfolio-spacer-layout-xx-spacious $portfolio-spacer-2x;
 
-  @media #{$portfolio-mq-md} {
-    padding: $portfolio-layout-06 $portfolio-spacing-07;
+  @media #{$elan-mq-sm} {
+    padding: $portfolio-spacer-layout-xxxx-spacious $portfolio-spacer-4x;
   }
 }
 
 .header {
-  margin-bottom: $portfolio-layout-04;
+  margin-bottom: $portfolio-spacer-layout-x-spacious;
 }
 
 .intro {
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-base;
-  font-weight: $portfolio-weight-regular;
+  @include body-base;
   line-height: $portfolio-leading-relaxed;
   color: $portfolio-text-secondary;
 }
@@ -33,19 +31,16 @@
 .bookList {
   display: flex;
   flex-direction: column;
-  gap: $portfolio-spacing-04;
+  gap: $portfolio-spacer-1-5x;
 }
 
 .bookLink {
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-sm;
-  font-weight: $portfolio-weight-regular;
-  line-height: $portfolio-leading-normal;
+  @include body-sm;
   color: $portfolio-text-link;
   text-decoration: none;
   @include transition-fast;
   display: block;
-  padding: $portfolio-spacing-02 0;
+  padding: $portfolio-spacer-0-5x 0;
 
   &:hover {
     opacity: 0.7;

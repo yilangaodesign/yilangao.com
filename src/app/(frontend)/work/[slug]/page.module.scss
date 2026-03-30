@@ -1,138 +1,171 @@
-@use '@yilangaodesign/design-system/scss' as *;
+@use '../../../../styles' as *;
+
+// ── PAGE ─────────────────────────────────────────────────────────────────────
 
 .page {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+
 }
 
-.heroImage {
-  width: 100%;
-  aspect-ratio: 21 / 9;
-  background: linear-gradient(
-    145deg,
-    $portfolio-neutral-10 0%,
-    $portfolio-neutral-20 40%,
-    $portfolio-neutral-10 100%
-  );
-}
+// ── TWO-COLUMN LAYOUT ────────────────────────────────────────────────────────
 
-.container {
+.layout {
+  display: flex;
+  flex-direction: column;
   flex: 1;
-  max-width: 960px;
+  max-width: $elan-container-wide;
   margin: 0 auto;
   width: 100%;
-  padding: $portfolio-layout-04 $portfolio-spacing-05;
+  padding: $portfolio-spacer-2x $portfolio-spacer-1-5x;
 
-  @media #{$portfolio-mq-md} {
-    padding: $portfolio-layout-05 $portfolio-spacing-07;
+  @media #{$elan-mq-sm} {
+    padding: $portfolio-spacer-3x $portfolio-spacer-2x;
+  }
+
+  @media #{$elan-mq-md} {
+    flex-direction: row;
+    gap: $portfolio-spacer-4x;
+    padding: $portfolio-spacer-3x $portfolio-spacer-4x;
+    padding-right: $portfolio-spacer-8x;
   }
 }
 
-.header {
-  margin-bottom: $portfolio-layout-04;
+// ── SIDEBAR (LEFT) ───────────────────────────────────────────────────────────
+
+.sidebar {
+  @media #{$elan-mq-md} {
+    width: 300px;
+    flex-shrink: 0;
+    position: sticky;
+    top: $portfolio-spacer-3x;
+    align-self: flex-start;
+  }
 }
 
-.headerLeft {
+.sidebarInner {
   display: flex;
   flex-direction: column;
-  gap: $portfolio-spacing-03;
+  gap: $portfolio-spacer-2x;
+  padding-bottom: $portfolio-spacer-2x;
+
+  @media #{$elan-mq-md} {
+    gap: $portfolio-spacer-4x;
+    padding-bottom: 0;
+  }
+}
+
+// ── BACK LINK ────────────────────────────────────────────────────────────────
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: $portfolio-spacer-0-5x;
+  @include body-sm-medium;
+  color: $portfolio-text-secondary;
+  text-decoration: none;
+  @include transition-fast;
+
+  &:hover {
+    color: $portfolio-text-primary;
+  }
+}
+
+// ── PROJECT IDENTITY ─────────────────────────────────────────────────────────
+
+.projectIdentity {
+  display: flex;
+  flex-direction: column;
+  gap: $portfolio-spacer-0-5x;
 }
 
 .title {
   font-family: $portfolio-font-sans;
-  font-size: clamp($portfolio-type-3xl, 4vw, $portfolio-type-5xl);
-  font-weight: $portfolio-weight-semibold;
-  line-height: $portfolio-leading-tight;
+  font-size: $portfolio-type-2xl;
+  font-weight: $portfolio-weight-medium;
+  line-height: $portfolio-leading-snug;
   letter-spacing: $portfolio-tracking-tight;
   color: $portfolio-text-primary;
 }
 
 .category {
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-base;
-  font-weight: $portfolio-weight-regular;
+  @include body-sm;
   color: $portfolio-text-secondary;
 }
 
-.intro {
+// ── HERO METRIC ──────────────────────────────────────────────────────────────
+
+.heroMetric {
   display: flex;
   flex-direction: column;
-  gap: $portfolio-layout-04;
-  margin-bottom: $portfolio-layout-04;
-
-  @media #{$portfolio-mq-md} {
-    flex-direction: row;
-    gap: $portfolio-layout-05;
-  }
+  gap: $portfolio-spacer-0-5x;
 }
 
-.description {
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-base;
-  font-weight: $portfolio-weight-regular;
-  line-height: $portfolio-leading-relaxed;
+.heroMetricValue {
+  @include stat-sm;
+  color: $portfolio-text-primary;
+}
+
+.heroMetricLabel {
+  @include body-sm;
   color: $portfolio-text-secondary;
-  flex: 1;
 }
+
+// ── META ─────────────────────────────────────────────────────────────────────
 
 .meta {
   display: flex;
   flex-direction: column;
-  gap: $portfolio-spacing-06;
-  flex-shrink: 0;
-
-  @media #{$portfolio-mq-md} {
-    width: 220px;
-  }
+  gap: $portfolio-spacer-3x;
 }
 
 .metaGroup {
   display: flex;
   flex-direction: column;
-  gap: $portfolio-spacing-02;
+  gap: $portfolio-spacer-0-5x;
+}
+
+.collaboratorList {
+  display: flex;
+  flex-direction: column;
+  gap: $portfolio-spacer-0-5x;
 }
 
 .metaLabel {
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-xs;
-  font-weight: $portfolio-weight-medium;
+  @include label;
+  font-weight: $portfolio-weight-semibold;
   color: $portfolio-text-placeholder;
 }
 
 .metaValue {
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-sm;
-  font-weight: $portfolio-weight-regular;
+  @include body-sm;
   color: $portfolio-text-primary;
 }
 
 .toolTags {
   display: flex;
   flex-wrap: wrap;
-  gap: $portfolio-spacing-03;
+  gap: $portfolio-spacer-1x;
 }
 
 .toolTag {
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-xs;
+  @include caption;
   font-weight: $portfolio-weight-medium;
   color: $portfolio-text-secondary;
   background-color: $portfolio-surface-tertiary;
-  padding: $portfolio-spacing-02 $portfolio-spacing-04;
+  padding: $portfolio-spacer-0-5x $portfolio-spacer-1-5x;
   border-radius: $portfolio-radius-sm;
 }
 
 .metaLinks {
   display: flex;
   flex-direction: column;
-  gap: $portfolio-spacing-03;
+  gap: $portfolio-spacer-1x;
 }
 
 .metaLink {
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-sm;
-  font-weight: $portfolio-weight-regular;
+  @include body-sm;
   color: $portfolio-text-link;
   text-decoration: none;
   @include transition-fast;
@@ -142,36 +175,113 @@
   }
 }
 
+.externalIcon {
+  display: inline;
+  vertical-align: super;
+  margin-left: 1px;
+}
+
+.inlineLink {
+  color: $portfolio-text-link;
+  text-decoration: none;
+  white-space: nowrap;
+  @include transition-fast;
+
+  &:hover {
+    opacity: 0.7;
+  }
+}
+
+// ── CONTENT (RIGHT COLUMN) ──────────────────────────────────────────────────
+
+.content {
+  flex: 1;
+  min-width: 0;
+  max-width: $elan-container-content;
+
+  @media #{$elan-mq-lg} {
+    margin-left: $portfolio-spacer-3x;
+  }
+}
+
+// ── HERO IMAGE ──────────────────────────────────────────────────────────────
+
+.heroImage {
+  margin-bottom: $portfolio-spacer-layout-x-spacious;
+}
+
+.heroImg {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: $portfolio-radius-sm;
+}
+
+.heroImagePlaceholder {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: linear-gradient(
+    145deg,
+    $portfolio-neutral-10 0%,
+    $portfolio-neutral-20 40%,
+    $portfolio-neutral-10 100%
+  );
+  border-radius: $portfolio-radius-sm;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.heroImageLabel {
+  @include body-sm-medium;
+  color: $portfolio-text-placeholder;
+}
+
+.description {
+  margin-bottom: $portfolio-spacer-layout-x-spacious;
+}
+
+.descriptionText {
+  @include body-lg;
+  font-weight: $portfolio-weight-medium;
+  color: $portfolio-text-primary;
+}
+
 .divider {
   border: none;
   border-top: 1px solid $portfolio-border-subtle;
-  margin: $portfolio-layout-04 0;
+  margin: $portfolio-spacer-layout-x-spacious 0;
 }
 
 .contentSection {
-  // spacing handled by dividers
+  scroll-margin-top: $portfolio-spacer-layout-x-spacious;
 }
 
 .sectionHeading {
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-xl;
-  font-weight: $portfolio-weight-semibold;
-  line-height: $portfolio-leading-snug;
+  @include subtitle-1;
   color: $portfolio-text-primary;
-  margin-bottom: $portfolio-spacing-05;
+  margin-bottom: $portfolio-spacer-2x;
 }
 
 .sectionBody {
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-sm;
-  font-weight: $portfolio-weight-regular;
+  @include body-sm;
   line-height: $portfolio-leading-relaxed;
   color: $portfolio-text-secondary;
-  margin-bottom: $portfolio-spacing-07;
+  margin-bottom: $portfolio-spacer-4x;
 }
 
+// ── INTERACTIVE VISUAL BLOCKS ─────────────────────────────────────────────────
+
+.interactiveVisualBlock {
+  margin-bottom: $portfolio-spacer-2x;
+  display: flex;
+  flex-direction: column;
+}
+
+// ── IMAGE BLOCKS ─────────────────────────────────────────────────────────────
+
 .imageBlock {
-  margin-bottom: $portfolio-spacing-05;
+  margin-bottom: $portfolio-spacer-2x;
 }
 
 .imagePlaceholder {
@@ -201,17 +311,17 @@
 .imageGrid2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: $portfolio-spacing-05;
-  margin-bottom: $portfolio-spacing-05;
+  gap: $portfolio-spacer-2x;
+  margin-bottom: $portfolio-spacer-2x;
 }
 
 .imageGrid3 {
   display: grid;
   grid-template-columns: 1fr;
-  gap: $portfolio-spacing-05;
-  margin-bottom: $portfolio-spacing-05;
+  gap: $portfolio-spacer-2x;
+  margin-bottom: $portfolio-spacer-2x;
 
-  @media #{$portfolio-mq-md} {
+  @media #{$elan-mq-sm} {
     grid-template-columns: 1fr 1fr;
 
     .imagePlaceholderWide {
@@ -220,11 +330,111 @@
   }
 }
 
+.placeholderGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $portfolio-spacer-2x;
+  margin-bottom: $portfolio-spacer-2x;
+
+  @media #{$elan-mq-sm} {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.labeledPlaceholder {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  border-radius: $portfolio-radius-sm;
+  border: 2px dashed $portfolio-border-subtle;
+  background: $portfolio-surface-secondary;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: $portfolio-spacer-1x;
+  padding: $portfolio-spacer-2x;
+}
+
+.labeledPlaceholderWide {
+  @extend .labeledPlaceholder;
+  aspect-ratio: 21 / 9;
+
+  @media #{$elan-mq-sm} {
+    grid-column: span 2;
+  }
+}
+
+.placeholderLabel {
+  @include body-sm-medium;
+  color: $portfolio-text-secondary;
+  text-align: center;
+  line-height: $portfolio-leading-relaxed;
+}
+
+.placeholderIndex {
+  @include caption;
+  color: $portfolio-text-placeholder;
+}
+
 .imageCaption {
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-xs;
-  font-weight: $portfolio-weight-regular;
+  @include caption;
   color: $portfolio-text-placeholder;
   line-height: $portfolio-leading-relaxed;
-  margin-top: $portfolio-spacing-03;
+  margin-top: $portfolio-spacer-1x;
+}
+
+// ── PREV / NEXT NAVIGATION ──────────────────────────────────────────────────
+
+.projectNav {
+  border-top: 1px solid $portfolio-border-subtle;
+  margin-top: $portfolio-spacer-layout-xx-spacious;
+  padding-top: $portfolio-spacer-3x;
+}
+
+.projectNavInner {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: $portfolio-spacer-2x;
+}
+
+.projectNavLink {
+  display: flex;
+  align-items: flex-start;
+  gap: $portfolio-spacer-1x;
+  text-decoration: none;
+  color: $portfolio-text-secondary;
+  @include transition-fast;
+  max-width: 50%;
+
+  svg {
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  &:hover {
+    color: $portfolio-text-primary;
+  }
+}
+
+.projectNavLinkNext {
+  margin-left: auto;
+  text-align: right;
+}
+
+.projectNavText {
+  display: flex;
+  flex-direction: column;
+  gap: $portfolio-spacer-0-25x;
+}
+
+.projectNavLabel {
+  @include label;
+  font-weight: $portfolio-weight-semibold;
+  color: $portfolio-text-placeholder;
+}
+
+.projectNavTitle {
+  @include body-sm-medium;
+  color: inherit;
 }

@@ -1,9 +1,9 @@
-@use '@yilangaodesign/design-system/scss' as *;
+@use '../../../styles' as *;
 
 .badge {
   display: inline-flex;
   align-items: center;
-  gap: $portfolio-spacing-02;
+  gap: $portfolio-spacer-0-5x;
   font-family: $portfolio-font-sans;
   font-weight: $portfolio-weight-medium;
   line-height: $portfolio-leading-tight;
@@ -18,13 +18,13 @@
 
 .sm {
   height: 20px;
-  padding: 0 $portfolio-spacing-03;
+  padding: 0 $portfolio-spacer-1x;
   font-size: 0.6875rem; // 11px
 }
 
 .md {
   height: 24px;
-  padding: 0 $portfolio-spacing-03;
+  padding: 0 $portfolio-spacer-1x;
   font-size: $portfolio-type-xs;
 }
 

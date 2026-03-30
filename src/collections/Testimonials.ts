@@ -4,8 +4,9 @@ export const Testimonials: CollectionConfig = {
   slug: 'testimonials',
   admin: {
     useAsTitle: 'name',
-    defaultColumns: ['name', 'role', 'order'],
-    description: 'Client/colleague testimonials shown on the contact page.',
+    defaultColumns: ['name', 'role', 'showOnHome', 'order'],
+    description: 'Client/colleague testimonials shown on the contact page and homepage grid.',
+    group: 'Contact',
   },
   access: {
     read: () => true,
@@ -13,10 +14,10 @@ export const Testimonials: CollectionConfig = {
   fields: [
     {
       name: 'text',
-      type: 'textarea',
+      type: 'richText',
       required: true,
       admin: {
-        description: 'The testimonial quote',
+        description: 'The testimonial quote (supports bold/italic formatting)',
       },
     },
     {
@@ -33,6 +34,30 @@ export const Testimonials: CollectionConfig = {
       required: true,
       admin: {
         description: 'e.g. "VP of Product, Company"',
+      },
+    },
+    {
+      name: 'avatar',
+      type: 'upload',
+      relationTo: 'media',
+      admin: {
+        description: 'Profile photo (optional — initials shown when empty)',
+      },
+    },
+    {
+      name: 'linkedinUrl',
+      type: 'text',
+      admin: {
+        description: 'LinkedIn profile URL',
+      },
+    },
+    {
+      name: 'showOnHome',
+      type: 'checkbox',
+      defaultValue: false,
+      admin: {
+        description: 'Show this testimonial in the homepage waterfall grid',
+        position: 'sidebar',
       },
     },
     {

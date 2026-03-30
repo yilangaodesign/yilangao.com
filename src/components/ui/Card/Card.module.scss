@@ -1,4 +1,4 @@
-@use '@yilangaodesign/design-system/scss' as *;
+@use '../../../styles' as *;
 
 .card {
   background-color: $portfolio-surface-primary;
@@ -25,15 +25,15 @@
 // ---------------------------------------------------------------------------
 
 .header {
-  padding: $portfolio-spacing-05 $portfolio-spacing-06;
+  padding: $portfolio-spacer-2x $portfolio-spacer-3x;
   border-bottom: 1px solid $portfolio-border-subtle;
 }
 
 .body {
-  padding: $portfolio-spacing-06;
+  padding: $portfolio-spacer-3x;
 }
 
 .footer {
-  padding: $portfolio-spacing-05 $portfolio-spacing-06;
+  padding: $portfolio-spacer-2x $portfolio-spacer-3x;
   border-top: 1px solid $portfolio-border-subtle;
 }

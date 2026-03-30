@@ -1,14 +1,18 @@
 "use client";
 
 import { forwardRef, useId } from "react";
+import type { CheckedState as RadixCheckedState } from "@radix-ui/react-checkbox";
 import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
 import styles from "./Checkbox.module.scss";
 
+/** Radix checkbox value: `true`, `false`, or `"indeterminate"` (partial / mixed). */
+export type CheckboxCheckedState = RadixCheckedState;
+
 export interface CheckboxProps {
   label?: string;
-  checked?: boolean | "indeterminate";
-  defaultChecked?: boolean;
-  onCheckedChange?: (checked: boolean | "indeterminate") => void;
+  checked?: CheckboxCheckedState;
+  defaultChecked?: CheckboxCheckedState;
+  onCheckedChange?: (checked: CheckboxCheckedState) => void;
   disabled?: boolean;
   name?: string;
   value?: string;
@@ -38,7 +42,13 @@ export const Checkbox = forwardRef<HTMLButtonElement, CheckboxProps>(
           value={value}
         >
           <CheckboxPrimitive.Indicator className={styles.indicator}>
-            {checked === "indeterminate" ? <MinusIcon /> : <CheckIcon />}
+            {/* Icons follow Indicator `data-state` (Radix context), not the `checked` prop — required when uncontrolled + defaultChecked indeterminate */}
+            <span className={styles.iconChecked} aria-hidden="true">
+              <CheckIcon />
+            </span>
+            <span className={styles.iconIndeterminate} aria-hidden="true">
+              <MinusIcon />
+            </span>
           </CheckboxPrimitive.Indicator>
         </CheckboxPrimitive.Root>
         {label && (

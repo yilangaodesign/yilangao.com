@@ -1,9 +1,9 @@
-@use '@yilangaodesign/design-system/scss' as *;
+@use '../../../styles' as *;
 
 .wrapper {
   display: flex;
   align-items: center;
-  gap: $portfolio-spacing-03;
+  gap: $portfolio-spacer-1x;
 }
 
 .switch {

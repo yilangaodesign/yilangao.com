@@ -4,7 +4,7 @@
 >
 > **Who reads this:** AI agents routed here by `AGENTS.md` Pre-Flight. Read the Section Index first, then only the section matching your task.
 > **Who writes this:** AI agents after processing user feedback via the `design-iteration` skill.
-> **Last updated:** 2026-03-29 (§11.5 naming collision avoidance + spacing fix)
+> **Last updated:** 2026-03-30 (FB-068: TokenGrid interactive builder — color-first dropdown, cascading filters, tab consolidation)
 
 ---
 
@@ -16,9 +16,9 @@
 | §1 | Spacing & Breathing Room | Touching spacing, padding, gaps, hit zones |
 | §2 | Layout Integrity | Changing layout, positioning, flex structure |
 | §3 | CSS Framework (Tailwind v4) | Touching CSS config, layers, theme directives |
-| §4 | Navigation Design | Modifying sidebar, nav, collapsible panels, category flyouts |
+| §4 | Navigation Design | Modifying sidebar, nav, collapsible panels, category flyouts, submenu aim |
 | §5 | Theming | Touching colors, dark mode, CSS variables |
-| §6 | Responsive Design | Touching breakpoints, fluid layout, viewports |
+| §6 | Responsive Design & Breakpoints | Touching breakpoints, fluid layout, viewports, density modes, container queries, grid influencers |
 | §8 | Corner Radius | Adding or modifying border-radius |
 | §9 | Color Philosophy & Token Architecture | Adopting palette colors, token naming (property·role·emphasis), semantic tokens |
 | §10 | Interactive Controls | Building scrub/drag/click controls, hit zones, gesture handling |
@@ -26,6 +26,12 @@
 | §12 | Overlay & Flyout Positioning | Flyouts, portals, stacking contexts, state coherence across modes |
 | §13 | Content Navigation Policy | Adding ScrollSpy or secondary nav aids to long pages |
 | §14 | Playground Consistency Principles | Token page visual consistency, user-centric information filtering |
+| §15 | Portfolio Grid Layout | Homepage project grid, masonry layout, card density, scannability |
+| §16 | Homepage Information Architecture | Sidebar navigation, page structure, nav consistency |
+| §18 | Typography System | Font role assignments, semantic mixins, pairing rules, enterprise compact guidelines |
+| §19 | Admin UI Palette Policy | Admin vs public palette split, intentional exceptions |
+| §20 | Button Adoption Policy | When to use DS Button vs raw `<button>`, missing variants |
+| §21 | Undocumented Patterns | DS gap analysis — patterns on site without DS coverage |
 | §7 | Process Principles | Meta — how to diagnose and fix design issues |
 | Appendix | Frequency Map | Checking for recurring feedback patterns |
 
@@ -65,23 +71,59 @@
 - Responsive padding should increase modestly, not double. The jump from 16→20px is sufficient.
 - **Supersedes earlier "32px minimum" guidance** — that was appropriate for consumer spacing but too loose for B2B tool interfaces.
 
-### 1.2 IBM Carbon Spacing Scale (Reference)
+### 1.2 Three-Tier Spacing Token Architecture (One GS Reference)
 
-Use these as the canonical spacing tokens. When in doubt, round up.
+Spacing tokens use a three-tier architecture optimized for AI agent comprehension. An agent must be able to derive the pixel value from a primitive token name via arithmetic, and infer layout intent from a layout token name without consulting a lookup table.
+
+**Base unit: 8px.** All primitive tokens are multiples of 8. SCSS encodes decimals as hyphens (`spacer-0-5x` for 0.5x).
+
+**Tier 1 — Primitive Spacers (`spacer-Nx`):** Value = N x 8px. Self-documenting: `spacer-3x` = 24px.
 
 | Token | Value | Use |
 |-------|-------|-----|
-| `spacing-03` | 8px | Icon padding, compact element gaps |
-| `spacing-04` | 12px | List item vertical padding |
-| `spacing-05` | 16px | Nav link horizontal padding, card internal padding minimum |
-| `spacing-06` | 24px | Section gaps, card padding standard |
-| `spacing-07` | 32px | Content area padding, major section spacing |
-| `spacing-08` | 40px | Large viewport content padding |
-| `spacing-09` | 48px | Page-level vertical rhythm |
-| `layout-01` | 16px | Minimum layout margin |
-| `layout-02` | 24px | Standard layout margin |
-| `layout-03` | 32px | Comfortable layout margin |
-| `layout-04` | 48px | Generous layout margin |
+| `spacer-0.125x` | 1px | Hairline borders, sub-pixel adjustments |
+| `spacer-0.25x` | 2px | Fine divider spacing |
+| `spacer-0.5x` | 4px | Micro gaps, divider spacing |
+| `spacer-1x` | 8px | Icon padding, compact element gaps |
+| `spacer-1.5x` | 12px | List item vertical padding |
+| `spacer-2x` | 16px | Nav link padding, card internal padding minimum |
+| `spacer-2.5x` | 20px | Mid-range component padding |
+| `spacer-3x` | 24px | Section gaps, card padding standard |
+| `spacer-4x` | 32px | Content area padding, major section spacing |
+| `spacer-5x` | 40px | Large viewport content padding |
+| `spacer-6x`–`spacer-20x` | 48–160px | Section/page-level rhythm (integer steps) |
+
+Clean progression: sub-1x uses halving (0.5, 0.25, 0.125), 1x–2.5x use half-steps, 3x+ use integer steps. Oddball fractions (0.75x, 0.875x, 1.25x, 1.625x) belong ONLY in Tier 3 (utility). See `_spacing.scss` for the complete 25-token scale.
+
+**Tier 2 — Layout Spacers (`spacer-layout-*`):** Semantic density names for section/page spacing. Default density: Functional (B2B tool UI).
+
+| Token | Functional Value | Use |
+|-------|-----------------|-----|
+| `spacer-layout-x-compact` | 8px | Tightest layout gap (data tables) |
+| `spacer-layout-compact` | 16px | Minimum layout margin |
+| `spacer-layout-standard` | 24px | Standard layout margin |
+| `spacer-layout-spacious` | 32px | Comfortable layout margin |
+| `spacer-layout-x-spacious` | 48px | Generous layout margin |
+| `spacer-layout-xx-spacious` | 64px | Section vertical rhythm (default) |
+| `spacer-layout-xxx-spacious` | 80px | Hero/feature section spacing |
+| `spacer-layout-xxxx-spacious` | 96px | Major section dividers |
+
+**Tier 3 — Utility Spacers (`spacer-utility-Nx`):** Component-internal spacing for buttons, inputs, checkboxes. Same multiplier math, separate namespace to signal "this is component-internal, not layout." Oddball fractions (0.75x, 0.875x, 1.25x, 1.625x) live ONLY here — they serve component sizing but don't belong in the clean primitive grid. Utility tokens own their pixel values directly (no primitive counterpart exists for oddball fractions).
+
+| Token | Value | Use |
+|-------|-------|-----|
+| `spacer-utility-0.5x` | 4px | xs button padding |
+| `spacer-utility-0.75x` | 6px | Compact component internal spacing |
+| `spacer-utility-0.875x` | 7px | sm button vertical padding |
+| `spacer-utility-1x` | 8px | sm button horizontal padding, md gap |
+| `spacer-utility-1.25x` | 10px | md button vertical padding |
+| `spacer-utility-1.5x` | 12px | md button horizontal padding, lg gap |
+| `spacer-utility-1.625x` | 13px | lg button vertical padding |
+| `spacer-utility-2x` | 16px | lg button horizontal padding, xl gap |
+| `spacer-utility-2.5x` | 20px | Component padding, card internal spacing |
+| `spacer-utility-3x` | 24px | xl button horizontal padding |
+
+**Migration from legacy names:** All old `spacing-NN` and `layout-NN` tokens are preserved as deprecated aliases. See `_spacing.scss` for the full mapping. When in doubt, round up to the next multiplier step.
 
 ### 1.3 Never Zero
 
@@ -183,6 +225,8 @@ Every persistent sidebar must support two states:
 
 The toggle control lives **inside the sidebar header** (top-right), not in the main content header.
 
+**Critical — Unified padding:** The sidebar header must use the same container padding (`px-1.5`) as the nav area, search, and archive sections. Internal elements use their own padding to achieve the 14px edge distance: logo link gets `px-2`, collapse button gets `mr-2`. This ensures all elements across the sidebar are horizontally aligned at 14px from the sidebar edges. The collapse button's right-edge distance (14px) must match the collapsed expand button's right-edge distance (14px) for visual stability during the expand/collapse transition.
+
 ### 4.2 Collapsed State — Square Icon Tabs, Exactly Centered
 
 **Geometry:** Sidebar = 41px, border-r = 1px → inner = 40px. Container `px-1.5` = 6px each side → item width = 28px. Item height = `h-7` = 28px. **Each tab is a perfect 28×28 square.**
@@ -243,6 +287,29 @@ Rule 4 is critical: without it, moving from a category to the Overview link (sti
 
 **Mobile:** Touch devices retain tap-to-expand (accordion) behavior. Hover-to-reveal is desktop-only.
 
+### 4.7 Safe Triangle (Submenu Aim)
+
+**Source:** Session 2026-03-29, "area for mouse maneuvering is too narrow and causes bad experience"
+
+When a category sliver is open and the user moves their cursor diagonally toward it, the cursor crosses adjacent category buttons. Without protection, each crossing triggers a category switch — the "whack-a-mole" problem. This is the exact issue Amazon solved with their mega-dropdown menus.
+
+**Solution:** The `useSafeTriangle` hook (`playground/src/hooks/use-safe-triangle.ts`) implements Amazon's slope-based path prediction:
+
+1. Track the last 4 mouse positions via a document-level `mousemove` listener.
+2. When a new category button is hovered while a sliver is already open, compute slopes from the current and previous cursor positions to the far corners of the sliver.
+3. If the slopes are diverging (the "cone" from cursor to sliver is widening — meaning the cursor is getting closer to the sliver), the cursor is heading toward the submenu. **Defer** the category switch by 100ms.
+4. After the deferral, re-check. If the cursor is still heading toward the sliver, re-defer. If not, execute the switch.
+5. If the cursor is NOT heading toward the sliver (moving vertically through items), switch immediately — no perceptible delay.
+
+**Integration:** The `interceptHover` function wraps the `setOpenCategory` call. It only engages when `openCategory !== null` (a sliver is already visible) and `catId !== openCategory` (attempting to switch). First-time opens and re-hovers of the same category bypass the check entirely.
+
+**Parameters:**
+- `delay`: 100ms default (re-check interval)
+- `tolerance`: 75px (vertical forgiveness beyond the sliver's actual bounds)
+- `direction`: `"right"` for right-opening slivers, `"left"` for left-opening
+
+**Reusability:** The hook is generic — any component with parent-menu + submenu hover dynamics can use it. It accepts a `submenuRef` for bounding rect calculation and returns `{ interceptHover, cancelPending }`.
+
 ---
 
 ## 5. Theming
@@ -272,15 +339,124 @@ Every surface (card, sidebar, code block, preview area) must have both light and
 
 ## 6. Responsive Design
 
-### 6.1 Content Containers
+**Source:** Session 2026-03-30, comparative analysis of IBM Carbon, Goldman Sachs OneGS, and Tailwind v4 breakpoint systems. Audited for enterprise B2B SaaS requirements: small phones through ultrawide monitors, with variable information density at any viewport.
 
-- Use `max-w-5xl` (not `max-w-4xl`) for content wrappers — allows content to breathe on wide screens.
+### 6.1 Breakpoint Scale (6-Tier)
+
+**Status: PLANNED — awaiting confirmation before implementation.**
+
+The design system uses a **6-tier mobile-first breakpoint scale**. Values were selected by auditing IBM Carbon (5 tiers, enterprise-proven), OneGS (5 tiers, device-oriented), and Tailwind v4 defaults (5 tiers, general web). The unified scale cherry-picks the best from each while addressing gaps none of them cover (ultrawide enterprise monitors).
+
+| Tier | SCSS Token | CSS Custom Property | Value | Columns | Origin | Rationale |
+|------|-----------|-------------------|-------|---------|--------|-----------|
+| `xs` | `$elan-bp-xs` | `--breakpoint-xs` | 375px | 4 | OneGS | Modern smallest phone (iPhone SE). Replaces Carbon's obsolete 320px. |
+| `sm` | `$elan-bp-sm` | `--breakpoint-sm` | 672px | 8 | Carbon | Large phone landscape / small tablet. Column count doubles (4→8). |
+| `md` | `$elan-bp-md` | `--breakpoint-md` | 1056px | 16 | Carbon | Standard laptop. Column count doubles again (8→16). Primary desktop target. |
+| `lg` | `$elan-bp-lg` | `--breakpoint-lg` | 1440px | 16 | OneGS | Common laptop resolution (MacBook Pro 15"). Same column count, wider columns. |
+| `xl` | `$elan-bp-xl` | `--breakpoint-xl` | 1920px | 16+ | OneGS | Full HD monitor. Most common enterprise desktop viewport. |
+| `2xl` | `$elan-bp-2xl` | `--breakpoint-2xl` | 2560px | 16+ | New | QHD / ultrawide. Increasingly common in enterprise with external monitors. |
+
+**Column logic:** Columns double at major layout shifts (4→8→16) following Carbon's 2x Grid principle. Above `md` (1056px), column count stays at 16 — wider viewports get wider columns, not more columns (unless a grid influencer reduces available space). Above `xl`, layouts may optionally add columns in increments of 2.
+
+**Migration from current tokens:** The `$portfolio-bp-*` prefix will be renamed to `$elan-bp-*` to match the design system name. Old token names will be aliased during transition.
+
+| Current token | Current value | New token | New value | Change |
+|---------------|---------------|-----------|-----------|--------|
+| `$portfolio-bp-sm` | 320px | `$elan-bp-xs` | 375px | Renamed + value updated |
+| `$portfolio-bp-md` | 672px | `$elan-bp-sm` | 672px | Renamed only |
+| `$portfolio-bp-lg` | 1056px | `$elan-bp-md` | 1056px | Renamed only |
+| `$portfolio-bp-xl` | 1312px | — | — | **Dropped** (too close to both 1056 and 1440) |
+| `$portfolio-bp-2xl` | 1584px | — | — | **Replaced** by `$elan-bp-xl` at 1920px |
+| — | — | `$elan-bp-lg` | 1440px | **New tier** |
+| — | — | `$elan-bp-xl` | 1920px | **New tier** |
+| — | — | `$elan-bp-2xl` | 2560px | **New tier** |
+
+### 6.2 Design Decisions and Trade-offs
+
+**Why 6 tiers instead of 5:** Enterprise B2B users work on 1440px laptops, 1920px external monitors, and 2560px ultrawides. These are three genuinely different workspace contexts — a dashboard that works at 1440px wastes half the screen at 2560px, and a layout optimized for 2560px is unusably cramped at 1440px. Five tiers (like Carbon or OneGS) force at least one of these into "above max" territory with no explicit design target.
+
+**Why 1312px was dropped:** It sits only 256px above 1056px and 128px below 1440px. In practice, layouts that change at 1056 don't need to change again at 1312 — the next meaningful shift is at 1440 where laptop screens give way to external monitors. Carbon uses 1312 because its max-width container is 1584px and 1312 provides a pre-max tier, but with our max at 1920, that logic no longer applies.
+
+**Why 1584px was dropped:** Carbon's "max" at 1584px (99rem) was designed when 1080p was the dominant enterprise display. Today, 1920px Full HD is the baseline for enterprise monitors, not the ceiling. Keeping 1584px as a tier would create a breakpoint that triggers on almost no real device boundary.
+
+**Why 375px instead of 320px:** The smallest phone in active circulation (iPhone SE) has a 375px viewport. 320px hasn't been a real device width since iPhone 5 (discontinued 2016). Using 320px wastes the mobile tier on a nonexistent device. OneGS correctly starts at 375px.
+
+### 6.3 Density Modes (Gutter System)
+
+**Adopted from Carbon.** Information density is orthogonal to viewport size — a 1920px monitor might show a spacious editorial page or a cramped data table. Breakpoints control *layout*; density modes control *spacing within that layout*.
+
+| Mode | Gutter | Use Case |
+|------|--------|----------|
+| **Comfortable** (default) | 32px | Editorial content, reading-heavy pages, settings panels |
+| **Compact** | 16px | Data tables, dashboards, form-heavy admin screens, side panels |
+| **Condensed** | 1px (with `$border-subtle`) | Dense dashboards, resource catalogs, tile overviews |
+
+Density modes are applied via a class on a container (e.g., `.density-compact`), not via breakpoints. A single page can mix modes: a side panel in compact mode next to a content area in comfortable mode.
+
+**This is the solution for "big screen, dense content."** At `xl` (1920px), a dashboard can use condensed gutter mode to pack information tightly, while the same viewport shows a case study in comfortable mode. The breakpoint stays the same; the density changes.
+
+### 6.4 Grid Influencers
+
+**Adopted from Carbon.** A grid influencer is a UI element (left nav, slide-in panel) that reduces the available grid width when present. The grid reflows into the remaining space — column count stays the same but columns narrow, or the effective breakpoint downgrades.
+
+This is critical for enterprise B2B SaaS because:
+- Products almost always have a persistent left navigation (sidebar)
+- Slide-in panels for detail views, configurations, and wizards are ubiquitous
+- The content grid must respond to the *available* width, not the *viewport* width
+
+**Implementation approach:** Use CSS container queries on the content area rather than viewport media queries for components inside grid-influenced regions. This way, a component in a 800px-wide content area behaves the same whether the viewport is 1440px (with a 640px sidebar) or 800px (full width on a small screen).
+
+### 6.5 Container Widths
+
+Container tokens define the max-width of content areas. They are intentionally **not** aligned 1:1 with breakpoint names to avoid the naming collision in the current system.
+
+| Token | Value | Use |
+|-------|-------|-----|
+| `$elan-container-narrow` | 672px | Long-form reading, blog posts, narrow forms |
+| `$elan-container-default` | 1056px | Standard content pages, case studies |
+| `$elan-container-wide` | 1440px | Dashboards with moderate density |
+| `$elan-container-full` | 100% | High-density interfaces, data tables, full-bleed layouts |
+
+**Key change:** Containers now use semantic names (`narrow`, `default`, `wide`, `full`) instead of size labels (`sm`, `md`, `lg`, `xl`). This eliminates the current collision where `container-sm` (672px) maps to `bp-md` (672px).
+
+### 6.6 Cross-App Unification
+
+All three apps must use the same breakpoint values. See AP-038 for why mixed systems are an anti-pattern.
+
+**Implementation plan:**
+
+1. **SCSS source of truth** (`src/styles/tokens/_breakpoints.scss`): Define the 6-tier `$elan-bp-*` tokens + media query helpers
+2. **Playground `globals.css`**: Add `--breakpoint-xs: 375px` through `--breakpoint-2xl: 2560px` to the `@theme` block
+3. **ASCII Tool `globals.css`**: Same `--breakpoint-*` overrides
+4. **Replace hardcoded values**: Kill `640px` in AdminBar, `768px` in experiments, `768/1200` in typography comments — all become token references
+5. **Playground tokens page**: Create `/tokens/breakpoints` preview page and add sidebar entry
+6. **Sync script**: `npm run sync-tokens` must include breakpoint data in `playground/src/lib/tokens.ts`
+
+### 6.7 Content Containers (Existing Guidance, Retained)
+
 - Add `overflow-x-auto` to any table or grid that might exceed viewport width.
 - Mobile: Content must be usable without the sidebar visible (sidebar slides in as overlay).
 
-### 6.2 Fluid, Not Fixed
+### 6.8 Fluid, Not Fixed (Existing Guidance, Retained)
 
 Avoid hardcoded pixel widths for content areas. Use `flex-1 min-w-0` to let content fill available space naturally.
+
+### 6.9 Container Queries for Component-Level Responsiveness
+
+For components that live inside grid-influenced regions (next to sidebars, inside panels), prefer CSS `@container` queries over `@media` queries. This ensures the component responds to its actual available space, not the viewport.
+
+```scss
+.card-grid-wrapper {
+  container-type: inline-size;
+}
+
+@container (min-width: 672px) {
+  .card-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@container (min-width: 1056px) {
+  .card-grid { grid-template-columns: repeat(3, 1fr); }
+}
+```
 
 ---
 
@@ -560,6 +736,42 @@ When an interactive element changes visual state (active tick widens, hovered bu
 - **Fixed-width containers:** Give the track/rail a fixed width (`w-10`) that accommodates the widest tick state. Use `items-end` to align ticks within the fixed space.
 - **This is the width-axis equivalent of AP-009** (vertical spacing inconsistency between toggle states). The same principle applies: if a state change causes adjacent content to shift, that's a layout bug.
 
+### 10.5 Transform Conflicts with Animation Libraries
+
+**Source:** Session 2026-03-30, "IT IS STILL NOT FIXED!!!! This text is still aligned to the center."
+
+**Never use CSS `transform` for positioning on elements animated by Framer Motion** (or any library that manages transforms via inline styles). Framer Motion compiles `x`, `y`, `scale`, `rotate` props into an inline `transform` string that **overrides** the CSS class's `transform`. If the CSS uses `transform: translateY(-50%)` for vertical centering and FM animates `x`, the `translateY` is silently dropped.
+
+**Symptom:** An absolutely positioned label uses `top: 50%; transform: translateY(-50%)`. On hover, FM animates it with `x: 4 → 0`. The label appears ~6px below the target because `translateY(-50%)` is overridden.
+
+**Rule:** For elements animated by FM, use **non-transform centering**:
+```scss
+.label {
+  position: absolute;
+  top: 0;
+  height: $parent-height;    // same as the containing element
+  display: flex;
+  align-items: center;       // flex centering — no transform needed
+}
+```
+
+This achieves the same vertical centering without `transform`, so FM's animation of `x` doesn't interfere.
+
+**Incident:** FB-053 — 4th centering/alignment complaint. Labels were 6px below their ticks because FM's `x` animation silently replaced the CSS `translateY(-50%)`.
+
+### 10.6 Paired Visual Channels Must Share State
+
+**Source:** Session 2026-03-30, "there is inconsistency between the notes for the notch and the notch's visual"
+
+When an interactive control communicates state through multiple visual channels (e.g., a tick bar and a text label), **all channels must reflect the same state.** If the bar is bold/dark for active and light/muted for inactive, the paired label must follow the same color and weight progression.
+
+**Violated principle:** The ScrollSpy tick had three distinct visual states (active: `$portfolio-text-primary`; hovered-inactive: `$portfolio-text-placeholder`; default-inactive: `$portfolio-border-subtle`) but the label used a single static color (`$portfolio-text-secondary`) for all states. The label color sat between the active and inactive tick colors, matching neither.
+
+**Rule:** For any control with paired visual elements (bar + label, icon + text, indicator + tooltip):
+- Active state: both elements use the primary/bold color; text weight increases (e.g., 400 → 500)
+- Inactive state: both elements use the muted/subtle color; text weight stays at base
+- The pairing must be enforced through shared state propagation (e.g., `data-active` on the container, CSS descendant selectors)
+
 ---
 
 ## 11. Information Architecture
@@ -692,9 +904,20 @@ Pages that are long but monotonic (a single repeating grid) do not benefit — t
 
 Labels in ScrollSpy tooltips should be shorter than section headings. The section heading "Interactive Mixins (SCSS)" becomes the ScrollSpy label "Mixins". The user is already on the page and knows the context — the label only needs to differentiate sections from each other, not introduce them. Aim for 1-2 words per label.
 
-### 13.3 Scroll Offset for Sticky Headers
+### 13.3 Scroll Offset — Context-Preserving Navigation
 
-Any section targeted by `scrollIntoView({ block: "start" })` or anchor navigation must have `scroll-mt-{N}` (e.g., `scroll-mt-16`) to prevent the heading from scrolling under a sticky header bar. This applies to the `SubSection` component and any element with an `id` used for scroll targeting.
+**Source:** Session 2026-03-30, "I don't want it to be up against the upper border of the browser screen"
+
+Any section targeted by `scrollIntoView({ block: "start" })` or anchor navigation must have `scroll-margin-top` that provides **contextual breathing room**, not just header clearance. When a user jumps to a section, they need to see a sliver of the preceding content to maintain spatial context — "where did I come from?" Without it, the section heading slams against the viewport top edge, losing all sense of position within the page.
+
+**Values:**
+
+| Context | Property | Value | Rationale |
+|---------|----------|-------|-----------|
+| Main site (no sticky header) | `scroll-margin-top` | `$portfolio-layout-04` (48px) | Pure breathing room — shows the divider from the previous section |
+| Playground (sticky header) | `scroll-mt-24` | 96px (6rem) | 64px header clearance + 32px breathing room |
+
+**UX principle:** Scroll-to navigation is a spatial metaphor. The user expects to "arrive" slightly above the destination, as if they walked up to it and stopped a step before. Landing exactly on it (flush top) feels like teleportation — disorienting because the preceding context is invisible. The offset creates a landing zone that preserves the user's mental map of the page.
 
 ### 13.4 Current ScrollSpy Pages (Playground)
 
@@ -716,7 +939,9 @@ Any section targeted by `scrollIntoView({ block: "start" })` or anchor navigatio
 
 When the same conceptual element (e.g., "a color swatch") appears multiple times on a page, every instance must share the same dimensions, border treatment, and interaction pattern. Different data sources (semantic tokens, palette scales, interaction tokens) are not a justification for different visual presentations. The audience sees "color swatches" — not "EmphasisSwatch vs. ColorSwatch vs. inline card."
 
-Concrete rule: A swatch is `h-14` with `rounded-sm border border-border/50`. No `large` variant. No inline card alternative. One element, one treatment.
+Concrete rule: A swatch is `w-12 h-12` (48px, fixed intrinsic size) with `rounded-sm border border-border/50`. Swatch size must never be grid-derived — use `flex flex-wrap gap-1.5` containers so item count and container width cannot inflate dimensions. All swatches use the same `ColorSwatch` component with hover overlay + click-to-copy. No "display-only" variants. No `large` variant. No inline card alternative. One element, one treatment, one interaction.
+
+**Focus ring clearance (FB-066):** The swatch button must include `p-0.5` (2px padding) around the swatch content, with total outer width `w-[52px]`. This reserves space for `focus-visible:ring-2` so the ring is never clipped by adjacent elements or container edges. An interactive element without room for its focus indicator is incomplete — see AP-039.
 
 ### 14.2 User-Centric Information Filtering
 
@@ -729,7 +954,112 @@ Historical information belongs in changelogs, git history, and `docs/` — not i
 
 ### 14.3 Metadata as Footnotes
 
-System-level metadata (version, last updated, build environment) belongs in a page footer — never inline with token content. It should be visually subordinate: `text-[11px]`, `font-mono`, reduced opacity. On localhost, prefix with "Local Dev" to distinguish from published builds.
+System-level metadata (version, last updated, build environment) belongs in a page footer — never inline with token content. It should be visually subordinate: `text-xs`, `font-mono`, reduced opacity. On localhost, prefix with "Local Dev" to distinguish from published builds.
+
+### 14.4 Production Sync Obligation
+
+The playground is both a documentation surface AND an experimentation surface. When a design experiment in the playground advances a component or token beyond what production implements, the production codebase MUST be updated in the same session. Conversely, when production adds or modifies a component, the playground demo MUST be updated in the same session.
+
+**Rule:** A playground experiment that isn't propagated to production (or vice versa) within the same session is a parity violation (see EAP-030). The Cross-App Parity Checklist in `AGENTS.md` is bidirectional — it applies in both directions.
+
+---
+
+## 15. Portfolio Grid Layout
+
+**Source:** Session 2026-03-29, "case studies space is taking up a lot of space, not great for quick scanning"
+
+### 15.1 Scannability Over Showcase
+
+The homepage project grid optimizes for **breadth scanning**, not individual project showcase. A portfolio visitor's first action is assessing the range of work — companies, industries, project types — before committing to read any single case study. The grid must let the eye jump between tiles without sequential scrolling.
+
+**Rule:** The homepage grid uses CSS columns masonry (`column-count`), not CSS Grid with row-based flow. Masonry packs cards efficiently by filling vertical gaps, maximizing the number of tiles visible in a single viewport.
+
+### 15.2 Column Count
+
+| Breakpoint | Columns | Rationale |
+|------------|---------|-----------|
+| Mobile (< md) | 1 | Single-column for readable card widths on narrow screens |
+| Medium (md) | 2 | Enough density for scanning without cramming |
+| Large (lg+) | 3 | Maximum density — more columns dilute individual card readability |
+
+The user explicitly stated "two to three columns at maximum." Three columns is the upper bound.
+
+### 15.3 Height Variation for Visual Interest
+
+In a masonry layout, uniform card heights create a rigid grid that negates the waterfall effect. Height variation comes from aspect ratio differentiation:
+
+| Card type | Image aspect ratio | Purpose |
+|-----------|-------------------|---------|
+| Featured | 4:3 | Slightly taller, draws more attention |
+| Regular | 3:2 | Compact, efficient scanning |
+
+Both types occupy the same column width. The height difference creates the waterfall stagger.
+
+### 15.4 Layout Spacing — Enterprise Density
+
+The homepage uses B2B-tight spacing throughout. Every value was audited against the §0 density mandate: if whitespace doesn't serve a clear separation purpose, remove it.
+
+| Element | Token | Value | Rationale |
+|---------|-------|-------|-----------|
+| Layout top/bottom padding | `spacer-3x` | 24px | Enough to clear browser chrome, no more |
+| Layout side padding (desktop) | `spacer-4x` | 32px | Standard layout margin |
+| Sidebar-to-content gap | `spacer-4x` | 32px | Clear channel between sidebar and grid |
+| Sidebar sections gap | `spacer-4x` | 32px | Separates identity/about/teams/links |
+| Column gap | `spacer-1.5x` | 12px | Tight gutter — cards are the focus, not the space between them |
+| Card margin-bottom | `spacer-1.5x` | 12px | Matches column gap for uniform density |
+| Section label margin | `spacer-1.5x` | 12px | Subordinate label, minimal separation from content |
+
+**Rule:** The first visible content must appear within the top 80px of the viewport. No dead zone at the top.
+
+### 15.5 Card Density
+
+Card info (title + category) uses compact padding: `$portfolio-spacer-1x` (8px) vertical, `$portfolio-spacer-0-25x` (2px) horizontal. The image is the primary visual; the text label is a quick identifier, not a content area.
+
+---
+
+## 16. Homepage Information Architecture
+
+**Source:** Session 2026-03-29, hiring manager audit — "mobile experience squeezes, unnecessary tabs, follow Joseph's denser layout"
+
+### 16.1 The Homepage Is Navigation
+
+The homepage sidebar serves as the primary navigation surface. It does NOT need a separate `<Navigation />` bar — the identity block + Links section fulfill that role. Interior pages (case studies, about, experiments) use the shared `<Navigation />` component for consistency.
+
+**Rule:** Every publicly reachable page must be accessible from the homepage sidebar Links section. If a page isn't worth linking from the sidebar, it shouldn't be a public route.
+
+### 16.2 Navigation Link Set
+
+The portfolio has exactly **two** navigation links: **About** and **Experiments**. These appear:
+- In the homepage sidebar Links section (alongside social links)
+- In the `<Navigation />` component on interior pages
+
+Removed pages from navigation: Reading (low hiring-signal value), Contact (email CTA in footer is lower friction than a form page), Blog (empty page signals abandonment).
+
+**Rule:** Navigation links must pass the hiring manager signal test: "Does visiting this page increase P(Alive)?" A reading list does not. An experiments page demonstrating technical craft does.
+
+### 16.3 Teams + Links Layout — Context-Dependent Stacking
+
+Teams and Links use a responsive 2-column grid (`.teamsAndLinks`). On **tight screens** (mobile/tablet) they sit side-by-side to conserve vertical space and get to work faster. On **wide screens** (desktop sidebar) they stack vertically — the sidebar has plenty of height and the vertical rhythm reads better.
+
+| Breakpoint | Layout | Rationale |
+|------------|--------|-----------|
+| Default (< lg) | Side-by-side (`1fr 1fr`) | Save vertical space, work visible sooner |
+| Large (lg+) | Stacked (`1fr`) | Sidebar has room; vertical flow matches other sidebar sections |
+
+**Rule:** When the sidebar is the primary content column (mobile), pack information horizontally. When it's a secondary column alongside work (desktop), let it breathe vertically.
+
+### 16.4 Mobile Density
+
+On mobile, the sidebar stacks above the project grid. Every pixel of sidebar height is a pixel of project grid hidden below the fold. Mobile-specific spacing reductions:
+
+| Element | Desktop | Mobile | Rationale |
+|---------|---------|--------|-----------|
+| Sidebar section gap | `spacing-07` (32px) | `spacing-05` (16px) | Work visible sooner |
+| Layout padding | `spacing-06/07` | `spacing-05/04` | Tighter frame |
+| Identity gap | `spacing-02` (6px) | `spacing-01` (2px) | Name+role+location are a single unit |
+| Section label margin | `spacing-04` (12px) | `spacing-03` (8px) | Labels are subordinate |
+
+**Rule:** Mobile sidebar content must be compact enough that the first project card is visible within ~1.5 screen heights of scrolling. If it takes more, tighten.
 
 ---
 
@@ -753,25 +1083,140 @@ Before writing UI code, read this file. If the user's feedback maps to an existi
 
 | Pattern | Times Raised | Priority |
 |---------|-------------|----------|
-| Spacing / Padding / Breathing Room | 10 | Critical |
-| State transition consistency (toggle jump / layout shift / mode coherence) | 5 | Critical |
-| Layout integrity (no overlapping, cross-panel alignment) | 4 | Critical |
-| Interactive control design (hit zones, gestures, mapping) | 3 | High |
+| Spacing / Padding / Breathing Room | 12 | Critical |
+| State transition consistency (toggle jump / layout shift / mode coherence) | 6 | Critical |
+| Layout integrity (no overlapping, cross-panel alignment) | 5 | Critical |
+| Interactive control design (hit zones, gestures, mapping, color-first builders) | 4 | High |
 | Dark mode / Theming | 3 | High |
 | Overlay / flyout positioning (stacking contexts, portals) | 3 | High |
 | Visual hierarchy in navigation | 2 | High |
-| Information architecture / taxonomy / naming | 4 | High |
-| Visual identity across spatial contexts (size/alignment consistency) | 3 | High |
-| Centering / Symmetry | 3 | High |
+| Information architecture / taxonomy / naming / tab consolidation | 5 | Critical |
+| Visual identity across spatial contexts (size/alignment consistency) | 4 | High |
+| Centering / Symmetry | 4 | Critical |
 | Token-first, no inline styles | 2 | High |
-| CSS framework architecture | 2 | High |
+| CSS framework architecture (global resets breaking inline elements) | 3 | High |
 | Collapsibility / Compact modes | 2 | Medium |
 | Interaction proximity (response near trigger) | 1 | High |
 | Interaction friction (click vs. hover for exploration) | 1 | High |
 | Corner radius too large | 1 | High |
 | Color philosophy / palette governance | 1 | High |
-| Content navigation policy (ScrollSpy threshold) | 1 | Medium |
+| Content navigation policy (ScrollSpy threshold, scroll offset) | 2 | High |
+| Portfolio grid density / scannability | 1 | High |
+| Homepage IA / nav consistency / mobile density | 1 | High |
 | User-centric information filtering (audience vs. maintainer data) | 1 | High |
+| Playground swatch interaction/shape/size consistency | 3 | High |
+| CMS inline edit panel UX (actions, drag, errors, dimensions, validation) | 6 | Critical |
+| CMS admin form UX (field labels, descriptions, validation feedback) | 1 | High |
+| Upload affordances (contextual upload where content is displayed) | 1 | High |
+| Admin controls displacing component content (overlay separation) | 1 | High |
+| Interactive visual scoping (content must match section topic) | 1 | High |
+| False affordances (static elements styled as interactive) | 1 | High |
+| Responsive breakpoints / cross-app parity | 1 | High |
+| DS compliance (token adoption, mixin usage, brand color) | 1 | High |
+| Undocumented patterns (gradient bg, masonry, dark surface alpha) | 1 | Medium |
+
+---
+
+## 19. Admin UI Palette Policy
+
+**Source:** DS compliance audit, 2026-03-30.
+
+### 19.1 Intentional Split: Admin vs Public Palette
+
+The admin/CMS editing UI (`src/components/ProjectEditModal.module.scss`, `src/components/inline-edit/inline-edit.module.scss`, `src/components/admin/*.module.scss`) intentionally uses a **Tailwind-influenced gray palette** (`#111827`, `#e5e7eb`, `#6b7280`, `#f3f4f6`, `#dc2626`) that differs from the public site's Carbon-based neutrals (`#161616`-`#f4f4f4`).
+
+**Rationale:** The admin UI overlays the public site and must be visually distinct so the user always knows they're in "edit mode." Using the same neutral palette as the site would make admin panels blend into the content, creating ambiguity about what's editable and what's the final output.
+
+**Rules:**
+1. The admin palette is a documented exception — it does NOT need to migrate to DS neutral tokens.
+2. Brand accent colors (accent-60, accent-70) MUST use DS tokens even in admin components (fixed in Phase 1).
+3. Admin error states should use `$portfolio-text-negative` / `$portfolio-support-error` from the DS, not raw `#dc2626`, for consistent error handling across the system.
+4. Admin border-radius MAY use larger values (6-10px) to visually distinguish admin controls from the B2B-sharp public components.
+
+---
+
+## 20. Button Component Adoption Policy
+
+**Source:** DS compliance audit, 2026-03-30.
+
+### 19.1 When to Use the DS Button
+
+**Rule:** Any new button that performs a standard action (submit, confirm, cancel, navigate) MUST use `Button` from `src/components/ui/Button/`. Available variants: `primary`, `secondary`, `ghost`, `danger`. Available sizes: `xs`, `sm`, `md`, `lg`, `xl`.
+
+### 19.2 When Raw `<button>` + `@include button-reset` Is Acceptable
+
+Raw buttons are acceptable ONLY when all three conditions are met:
+1. The button has a highly custom visual identity that doesn't map to any DS Button variant (e.g., circular icon-only overlay, slider thumb, scrub control tick)
+2. The button's styling is context-dependent (changes based on parent hover, animation state, or position)
+3. Adding a new Button variant would be single-use and not reusable
+
+**Current documented exceptions:**
+- **ScrollSpy ticks** — interactive control geometry, not a standard button
+- **Card admin overlays** (edit, reorder) — appear-on-hover overlays with scale transitions
+- **Testimonial slider arrows** — dark-surface navigation arrows
+- **Drag handles** — DnD affordance, not a standard button
+
+### 19.3 Missing Button Variant: Inverse
+
+The contact page submit button uses `$portfolio-surface-inverse` background (black on light mode) — a pattern not covered by the current DS Button variants. Consider adding a `variant="inverse"` to the Button component.
+
+---
+
+## 21. Undocumented Patterns (DS Gap Analysis)
+
+**Source:** DS compliance audit, 2026-03-30.
+
+These patterns exist in the production portfolio site but have no corresponding DS component, mixin, or documented pattern. They are listed here to track the gap between what the site uses and what the design system formally covers.
+
+### 21.1 Patterns Requiring DS Components
+
+| Pattern | Location | Current Implementation | Recommended DS Action |
+|---------|----------|----------------------|----------------------|
+| **Category Pill Nav** | Experiments page | Scrollable horizontal pill-shaped filter tabs, dark surface | Create `PillNav` or `FilterBar` DS component |
+| **Stat/Metric Callout** | Work/[slug] hero | Raw styles; DS has `stat-*` mixins but they weren't wired | Now wired via `@include stat-sm` (Phase 3). Promote to a `StatCard` component if reused. |
+| **Page-Level Scroll Nav** | Experiments (sticky filtered nav) | Custom sticky nav with scroll-shrink animation | Distinct from ScrollSpy; evaluate as `PageNav` component |
+
+### 21.2 Patterns Documented as Exceptions
+
+| Pattern | Location | Rationale for Exception |
+|---------|----------|------------------------|
+| **Gradient Hero Background** | Contact page | `linear-gradient(165deg, #1a1a2e, #16213e, #0f3460)` — bespoke dark-surface pattern for the contact page's editorial feel. The dark navy gradient creates visual separation from the form card. Tokenizing as a semantic surface would over-generalize a single-use pattern. |
+| **Masonry Grid** | Homepage | CSS Grid with round-robin column distribution. The layout is page-specific (homepage only), driven by project card data. A reusable `MasonryGrid` component adds abstraction without reuse benefit. Document as a layout pattern in this section instead. |
+| **Fixed Sidebar Layout** | Homepage, Work/[slug] | 300px fixed sidebar + fluid content area. The sidebar width is page-specific (matches the identity block's content needs). The playground has its own sidebar with different dimensions. A shared `SidebarLayout` component would need too many props to accommodate both contexts. |
+| **Card Admin Overlay** | Homepage cards | Edit/reorder buttons that appear on hover over project cards. Admin-only UI that overlays CMS content. Follows the admin palette exception (§19). |
+
+### 21.3 Masonry Grid Layout Pattern
+
+**Used on:** Homepage (`src/app/(frontend)/page.module.scss`)
+
+The homepage uses a round-robin column distribution (not CSS `column-count`) with `display: grid` and responsive column counts:
+
+| Breakpoint | Columns | Token |
+|------------|---------|-------|
+| Mobile (default) | 1 | — |
+| `$elan-mq-sm` (672px) | 2 | `repeat(2, 1fr)` |
+| `$elan-mq-md` (1056px) | 3 | `repeat(3, 1fr)` |
+
+Gap: `$portfolio-spacer-1-5x` (12px) — tight B2B density per §15.4.
+
+Cards within columns use `flex-direction: column; gap: $portfolio-spacer-1-5x` for vertical spacing. Height variation comes from image aspect ratio (4:3 featured vs 3:2 regular).
+
+### 21.4 Dark Surface Alpha Pattern
+
+**Used on:** Contact page, Experiments page
+
+When text and UI elements appear on dark surfaces (gradients, dark backgrounds), the pattern uses `rgba(255, 255, 255, opacity)` for progressive disclosure:
+
+| Opacity | Use |
+|---------|-----|
+| 0.04–0.06 | Subtle surface tints, dot patterns, faint backgrounds |
+| 0.07–0.12 | Borders, dividers, button outlines |
+| 0.25–0.40 | Secondary text, muted labels, inactive controls |
+| 0.50–0.65 | Body text, descriptions |
+| 0.75 | Emphasized secondary text |
+| 1.0 (`$portfolio-text-always-light-bold`) | Primary text, headings, active states |
+
+This alpha system is not tokenized because it's context-dependent — the same opacity on different gradient backgrounds produces different contrast ratios. When dark surfaces are formalized, these should become semantic dark-mode tokens.
 
 ---
 
@@ -788,3 +1233,249 @@ Before writing UI code, read this file. If the user's feedback maps to an existi
 **Rule:** [The principle to follow going forward]
 **Implementation:** [Specific code pattern or token to use]
 ```
+
+## 17. Interactive Component Accessibility
+
+All interactive components must be usable with keyboard alone, compatible with screen readers, and safe for motion-sensitive users. These standards apply to every component in the design system and every interactive visual in the portfolio.
+
+### 17.1 Keyboard Navigation
+
+**Rule:** Every interactive control (button, tab, toggle, drag handle) must be reachable via keyboard. Tab bars use `role="tablist"` / `role="tab"` with arrow key navigation between tabs. Custom drag interactions (canvas pan, scrub controls) must have keyboard equivalents (arrow keys).
+
+**Implementation:**
+- Tab bars: Left/Right arrow keys move between tabs, Home/End jump to first/last
+- `tabIndex={0}` on the active tab, `tabIndex={-1}` on inactive tabs — Tab key enters the tab bar, arrows move within
+- Canvas/drag: Arrow keys for panning (40px per press), +/- for zoom
+- Focus must never become trapped — Escape should release custom key handlers where applicable
+
+### 17.2 ARIA Attributes
+
+**Rule:** Interactive patterns must declare their role and state to assistive technology.
+
+**Implementation:**
+- Tab bars: container gets `role="tablist"`, each tab gets `role="tab"`, `aria-selected="true|false"`, `aria-controls="panelId"`. Tab panels get `role="tabpanel"`, `aria-labelledby="tabId"`.
+- Interactive diagrams: `role="figure"` with `aria-label` describing the content for screen readers
+- Toggle buttons: `aria-pressed="true|false"`
+- Live regions: Use `role="status"` with `aria-live="polite"` for content that updates in response to user interaction (e.g., node descriptions, mode indicators)
+
+### 17.3 Focus Indicators
+
+**Rule:** Every focusable element must have a visible focus ring. Never remove `outline` without replacing it.
+
+**Implementation:**
+- Default: `outline: 2px solid $portfolio-accent-60; outline-offset: 2px`
+- Applied via `&:focus-visible` (not `:focus`) to avoid showing rings on mouse click
+- High contrast: ring must pass 3:1 contrast against adjacent colors (accent-60 on white = 6.75:1 ✓)
+
+### 17.4 Motion Sensitivity
+
+**Rule:** Components with animation must respect `prefers-reduced-motion: reduce`. Disable transitions, entrance animations, and auto-playing motion.
+
+**Implementation:**
+```scss
+@media (prefers-reduced-motion: reduce) {
+  * { transition-duration: 0s !important; animation-duration: 0s !important; }
+}
+```
+Applied at the component SCSS module level. FadeIn entrance animations, tab transitions, and canvas zoom all collapse to instant state changes.
+
+### 17.5 Pointer-Only Interaction Equivalents
+
+**Rule:** Any interaction that requires a pointer (drag-to-pan, hover tooltips, scrub controls) must have a keyboard or touch alternative. Pointer-only interactions are enhancements, not requirements.
+
+**Implementation:**
+- Drag-to-pan canvas → arrow key panning + zoom buttons
+- Hover tooltips → click-to-reveal on touch; focus-triggered on keyboard
+- Scrub/slider controls → arrow key increment + click-to-jump
+
+---
+
+## 18. Typography System
+
+**Severity: Foundational** — Typography tokens and semantic mixins define the hierarchy, density, and readability of every screen. This section codifies font role assignments, the mixin catalogue, pairing rules, and enterprise compact guidelines. Informed by an audit of Goldman Sachs OneGS and IBM Carbon design systems.
+
+**Source files:**
+- Tokens: `src/styles/tokens/_typography.scss`
+- Mixins: `src/styles/mixins/_typography.scss`
+- Playground mirror: `playground/src/lib/tokens.ts`
+
+### 18.1 Font Role Assignments
+
+Every font family has exactly one permitted role. Using a font outside its role is a bug.
+
+| Font | Token | Role | Permitted contexts |
+|------|-------|------|--------------------|
+| **Geist Sans** | `$portfolio-font-sans` | Primary UI | Headings, subtitles, body, labels, captions, stats, legal, helper text — all interface text |
+| **Georgia** | `$portfolio-font-serif` | Quotes only | Pull quotes, block quotes, testimonial text, case study epigraphs. NEVER headings, body, or labels. Even more selective than OneGS (which uses serif for headlines). |
+| **Geist Mono** | `$portfolio-font-mono` | Code only | Code blocks, inline code, terminal output, build hashes. NEVER data numbers, table columns, or stats. Use `font-variant-numeric: tabular-nums` on Geist Sans for numeric alignment. |
+| **Geist Pixel \*** | `$portfolio-font-pixel-*` | Decorative accent | NEVER in interface elements. Only with explicit user instruction. No semantic mixins exist for pixel fonts. |
+
+### 18.2 Semantic Mixin Catalogue (28 mixins, 9 categories)
+
+All mixins are in `src/styles/mixins/_typography.scss`. Usage: `@include heading-1;`
+
+#### Headings — Geist Sans
+
+| Mixin | Size | Weight | Leading | Tracking | Use |
+|-------|------|--------|---------|----------|-----|
+| `heading-display` | 6xl (60px) | Bold 700 | Tight 1.1 | Tight -0.02em | Hero sections |
+| `heading-1` | 5xl (48px) | Bold 700 | Tight 1.1 | Tight -0.02em | Page titles |
+| `heading-2` | 4xl (36px) | Semibold 600 | Snug 1.25 | Tight -0.02em | Section titles |
+| `heading-3` | 3xl (30px) | Semibold 600 | Snug 1.25 | Normal | Subsection titles |
+
+Fluid variants available: `heading-display-fluid`, `heading-1-fluid`, `heading-2-fluid`, `heading-3-fluid` — use `clamp()` to scale between mobile and desktop.
+
+#### Subtitles — Geist Sans (adopted from OneGS)
+
+| Mixin | Size | Weight | Leading | Use |
+|-------|------|--------|---------|-----|
+| `subtitle-1` | xl (20px) | Semibold 600 | Snug 1.25 | Section subheading |
+| `subtitle-1-bold` | xl (20px) | Bold 700 | Snug 1.25 | Emphasized subheading |
+| `subtitle-2` | lg (18px) | Medium 500 | Snug 1.25 | Card/component subheading |
+| `subtitle-2-bold` | lg (18px) | Bold 700 | Snug 1.25 | Emphasized card subheading |
+| `subtitle-3` | base (16px) | Medium 500 | Snug 1.25 | Inline subheading |
+| `subtitle-3-bold` | base (16px) | Bold 700 | Snug 1.25 | Emphasized inline subheading |
+
+#### Body — Geist Sans (weight matrix from OneGS, compact from Carbon)
+
+| Mixin | Size | Weight | Leading | Use |
+|-------|------|--------|---------|-----|
+| `body-lg` | lg (18px) | Regular 400 | Normal 1.5 | Editorial, long-form |
+| `body-lg-light` | lg (18px) | Light 300 | Normal 1.5 | Secondary/supporting large text |
+| `body-base` | base (16px) | Regular 400 | Normal 1.5 | Standard body |
+| `body-base-medium` | base (16px) | Medium 500 | Normal 1.5 | Emphasized body inline |
+| `body-base-light` | base (16px) | Light 300 | Normal 1.5 | Secondary body |
+| `body-sm` | sm (14px) | Regular 400 | Normal 1.5 | Dense UI body |
+| `body-sm-medium` | sm (14px) | Medium 500 | Normal 1.5 | Emphasized small text |
+| `body-compact` | sm (14px) | Regular 400 | Compact 1.15 | Dense panels, sidebars, data tables |
+| `body-compact-xs` | xs (12px) | Regular 400 | Compact 1.15 | Very dense tables, metadata rows |
+
+#### Quotes — Georgia (adopted from OneGS + Carbon)
+
+| Mixin | Size | Weight | Leading | Use |
+|-------|------|--------|---------|-----|
+| `quote-lg` | 2xl (24px) | Regular 400 | Relaxed 1.625 | Pull quotes, testimonials |
+| `quote-base` | xl (20px) | Regular 400 | Relaxed 1.625 | Inline block quotes |
+| `quote-sm` | lg (18px) | Regular 400 | Relaxed 1.625 | Small quotes, attribution |
+
+All quote mixins set `font-style: italic`.
+
+#### Captions — Geist Sans (from OneGS)
+
+| Mixin | Size | Weight | Leading | Use |
+|-------|------|--------|---------|-----|
+| `caption` | xs (12px) | Regular 400 | Normal 1.5 | Image captions, timestamps |
+| `caption-sm` | 2xs (8px) | Regular 400 | Compact 1.15 | Metadata, dense table secondary info |
+
+#### Labels — Geist Sans
+
+| Mixin | Size | Weight | Leading | Use |
+|-------|------|--------|---------|-----|
+| `label` | xs (12px) | Medium 500 | Normal 1.5 | Uppercase, wider tracking. Field labels, category tags. |
+
+#### Utility — Geist Sans (from Carbon)
+
+| Mixin | Size | Weight | Leading | Color | Use |
+|-------|------|--------|---------|-------|-----|
+| `helper-text` | xs (12px) | Regular 400 | Normal 1.5 | Helper (subtle) | Form descriptions below fields |
+| `legal` | xs (12px) | Regular 400 | Normal 1.5 | Secondary | Footer copyright, disclaimers |
+
+#### Code — Geist Mono (replaces former `mono-data`)
+
+| Mixin | Size | Weight | Leading | Use |
+|-------|------|--------|---------|-----|
+| `code-lg` | base (16px) | Regular 400 | Normal 1.5 | Code blocks, large snippets |
+| `code-base` | sm (14px) | Regular 400 | Normal 1.5 | Inline code, terminal output |
+| `code-sm` | xs (12px) | Regular 400 | Compact 1.15 | Annotations, build hashes |
+
+#### Stats — Geist Sans (adapted from OneGS)
+
+| Mixin | Size | Weight | Leading | Use |
+|-------|------|--------|---------|-----|
+| `stat-lg` | 7xl (72px) | Light 300 | Tight 1.1 | Hero numbers, KPI dashboards |
+| `stat-base` | 5xl (48px) | Light 300 | Tight 1.1 | Secondary stat callouts |
+| `stat-sm` | 3xl (30px) | Medium 500 | Snug 1.25 | Tertiary stat callouts |
+
+All stat mixins set `font-variant-numeric: tabular-nums`.
+
+Fluid variants available: `stat-lg-fluid`, `stat-base-fluid`.
+
+### 18.3 Pairing Rules (adopted from Carbon)
+
+Use these pairings to maintain consistent vertical rhythm:
+
+| Heading | Pairs with body | Context |
+|---------|----------------|---------|
+| `heading-display` | `body-lg` | Hero sections, landing pages |
+| `heading-1` | `body-lg` or `body-base` | Page-level content |
+| `heading-2` | `body-base` | Section content |
+| `heading-3` | `body-sm` or `body-compact` | Subsections, cards |
+| `subtitle-1` | `body-base` | Feature descriptions |
+| `subtitle-2` | `body-sm` | Card content |
+| `subtitle-3` | `body-compact` or `body-compact-xs` | Dense list items, table headers |
+
+### 18.4 Enterprise Compact Guidelines
+
+This is a B2B enterprise SaaS product. Dense, compact UI is the norm.
+
+**When 8px (2xs) is acceptable:**
+- `caption-sm`: metadata rows in data tables, secondary timestamps, build version strings
+- Contexts where the information is supplementary and the user is not expected to read continuously
+
+**When 12px (xs) is the floor:**
+- `caption`, `label`, `helper-text`, `legal`, `code-sm`: any text the user needs to read and act on
+- Form labels, error messages, navigation items
+
+**When 14px (sm) is the default:**
+- `body-sm`, `body-compact`, `code-base`: standard dense UI body text
+- Table cell content, sidebar items, dropdown options
+
+**Productive vs Expressive contexts (concept from Carbon):**
+- **Productive contexts** (admin panels, data tables, settings, edit mode): prefer `body-sm`, `body-compact`, `body-compact-xs`, `caption-sm`, `subtitle-3`
+- **Expressive contexts** (case studies, about page, testimonials): prefer `body-lg`, `body-base`, `quote-lg`, `heading-display-fluid`, `stat-lg-fluid`
+
+### 18.5 Type Scale Reference
+
+| Token | rem | px | Added in |
+|-------|-----|-----|----------|
+| `$portfolio-type-2xs` | 0.5 | 8 | Typography revamp (OneGS minimum) |
+| `$portfolio-type-xs` | 0.75 | 12 | Original |
+| `$portfolio-type-sm` | 0.875 | 14 | Original |
+| `$portfolio-type-base` | 1 | 16 | Original |
+| `$portfolio-type-lg` | 1.125 | 18 | Original |
+| `$portfolio-type-xl` | 1.25 | 20 | Original |
+| `$portfolio-type-2xl` | 1.5 | 24 | Original |
+| `$portfolio-type-3xl` | 1.875 | 30 | Original |
+| `$portfolio-type-4xl` | 2.25 | 36 | Original |
+| `$portfolio-type-5xl` | 3 | 48 | Original |
+| `$portfolio-type-6xl` | 3.75 | 60 | Original |
+| `$portfolio-type-7xl` | 4.5 | 72 | Typography revamp (stat display) |
+| `$portfolio-type-8xl` | 6 | 96 | Typography revamp (hero stat display) |
+
+### 18.6 Weight Reference
+
+| Token | Value | Added in |
+|-------|-------|----------|
+| `$portfolio-weight-thin` | 100 | Typography revamp |
+| `$portfolio-weight-extralight` | 200 | Typography revamp |
+| `$portfolio-weight-light` | 300 | Original |
+| `$portfolio-weight-regular` | 400 | Original |
+| `$portfolio-weight-medium` | 500 | Original |
+| `$portfolio-weight-semibold` | 600 | Original |
+| `$portfolio-weight-bold` | 700 | Original |
+
+### 18.7 Migration Candidates (Phase 6 — Incremental)
+
+These components use raw typography tokens where semantic mixins would be more appropriate. Migrate them as each component is touched for other work.
+
+**Serif in non-quote contexts (violates font role rules):**
+- `src/app/(frontend)/contact/page.module.scss` — `.heading` uses serif for a decorative heading. Should evaluate switching to `heading-2-fluid` (sans) or `quote-lg` if the intent is editorial.
+- `src/app/(frontend)/contact/page.module.scss` — `.quoteIcon` uses serif for a quote mark glyph. Acceptable as decorative accent.
+- `src/app/(frontend)/experiments/page.module.scss` — `.heading` and `.rowTitle` use serif for display headings. Should evaluate switching to heading-fluid variants (sans).
+
+**Mono in non-code contexts:**
+- Most mono usage across the codebase (`elan-visuals`, `page.module.scss`, etc.) is for code-like annotations, token names, and technical metadata. These are legitimate code contexts per the typography rules. No migration needed.
+
+**Components with hardcoded px sizes instead of tokens:**
+- `src/components/elan-visuals/elan-visuals.module.scss` — many instances of `font-size: 10px`, `9px`. These should eventually use `$portfolio-type-2xs` (8px) or `$portfolio-type-xs` (12px) depending on density needs.
+- Various components using `font-size: 11px` — not on the token scale. Evaluate case-by-case.

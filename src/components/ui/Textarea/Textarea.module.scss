@@ -1,9 +1,9 @@
-@use '@yilangaodesign/design-system/scss' as *;
+@use '../../../styles' as *;
 
 .wrapper {
   display: flex;
   flex-direction: column;
-  gap: $portfolio-spacing-02;
+  gap: $portfolio-spacer-0-5x;
 }
 
 .label {
@@ -17,7 +17,7 @@
 .textarea {
   width: 100%;
   min-height: 96px;
-  padding: $portfolio-spacing-03 $portfolio-spacing-04;
+  padding: $portfolio-spacer-1x $portfolio-spacer-1-5x;
   font-family: $portfolio-font-sans;
   font-size: $portfolio-type-sm;
   line-height: $portfolio-leading-normal;

@@ -1,0 +1,62 @@
+// =============================================================================
+// Portfolio Design System — Color Tokens
+// Based on IBM Carbon with custom brand extensions
+// =============================================================================
+
+// Accent Color Scale — Signature brand color
+// A deep indigo that conveys design craft and sophistication
+$portfolio-accent-10: #F0F0FF;
+$portfolio-accent-20: #D9D9FF;
+$portfolio-accent-30: #B3B3FF;
+$portfolio-accent-40: #8C8CFF;
+$portfolio-accent-50: #6B5CE7;
+$portfolio-accent-60: #4A3ADB; // Key brand color
+$portfolio-accent-70: #3628B0;
+$portfolio-accent-80: #261C85;
+$portfolio-accent-90: #18115A;
+$portfolio-accent-100: #0C0930;
+
+// Neutral Scale
+$portfolio-neutral-00: #FFFFFF;
+$portfolio-neutral-05: #F9F9F9;
+$portfolio-neutral-10: #F4F4F4;
+$portfolio-neutral-20: #E0E0E0;
+$portfolio-neutral-30: #C6C6C6;
+$portfolio-neutral-40: #A8A8A8;
+$portfolio-neutral-50: #8D8D8D;
+$portfolio-neutral-60: #6F6F6F;
+$portfolio-neutral-70: #525252;
+$portfolio-neutral-80: #393939;
+$portfolio-neutral-90: #262626;
+$portfolio-neutral-100: #161616;
+
+// Semantic Surface
+$portfolio-surface-primary: $portfolio-neutral-00;
+$portfolio-surface-secondary: $portfolio-neutral-05;
+$portfolio-surface-tertiary: $portfolio-neutral-10;
+$portfolio-surface-inverse: $portfolio-neutral-100;
+$portfolio-surface-overlay: rgba(0, 0, 0, 0.5);
+
+// Semantic Text
+$portfolio-text-primary: $portfolio-neutral-100;
+$portfolio-text-secondary: $portfolio-neutral-70;
+$portfolio-text-placeholder: $portfolio-neutral-40;
+$portfolio-text-disabled: $portfolio-neutral-30;
+$portfolio-text-inverse: $portfolio-neutral-00;
+$portfolio-text-link: $portfolio-accent-60;
+
+// Semantic Border
+$portfolio-border-subtle: $portfolio-neutral-20;
+$portfolio-border-strong: $portfolio-neutral-50;
+$portfolio-border-interactive: $portfolio-accent-60;
+$portfolio-border-inverse: $portfolio-neutral-100;
+
+// Support / Feedback
+$portfolio-support-error: #DA1E28;
+$portfolio-support-error-bg: #FFF1F1;
+$portfolio-support-warning: #F1C21B;
+$portfolio-support-warning-bg: #FCF4D6;
+$portfolio-support-success: #198038;
+$portfolio-support-success-bg: #DEFBE6;
+$portfolio-support-info: #0043CE;
+$portfolio-support-info-bg: #E5F6FF;

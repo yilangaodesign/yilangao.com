@@ -1,129 +1,411 @@
-@use '@yilangaodesign/design-system/scss' as *;
+@use '../../../styles' as *;
+
+// =============================================================================
+// Button — Two-Axis Model (Appearance × Emphasis)
+// =============================================================================
+// Appearance: color/intent (neutral, highlight, positive, negative, inverse, always-dark, always-light)
+// Emphasis:   visual weight (bold, regular, subtle, minimal)
+// Reference:  One GS Design System button architecture
+// =============================================================================
 
 .button {
   @include button-reset;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: $portfolio-spacing-03;
+  gap: 0;
   font-family: $portfolio-font-sans;
   font-weight: $portfolio-weight-medium;
   line-height: $portfolio-leading-tight;
   border-radius: $portfolio-radius-sm;
+  border: 1px solid transparent;
   white-space: nowrap;
   user-select: none;
+  cursor: pointer;
   @include transition-fast;
+
+  &:focus-visible {
+    @include focus-ring;
+  }
 
   &:disabled,
   &[aria-disabled='true'] {
     cursor: not-allowed;
-    opacity: 0.5;
+    opacity: 0.4;
     pointer-events: none;
   }
 }
 
 // ---------------------------------------------------------------------------
-// Variants
+// Icon wrapper — bounding-box spacing model
 // ---------------------------------------------------------------------------
 
-.primary {
-  background-color: $portfolio-accent-60;
-  color: $portfolio-text-on-color;
+.iconWrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 
-  &:hover {
-    background-color: $portfolio-accent-70;
-  }
-
-  &:active {
-    background-color: $portfolio-accent-80;
-  }
-}
-
-.secondary {
-  background-color: transparent;
-  color: $portfolio-text-primary;
-  border: 1px solid $portfolio-border-strong;
-
-  &:hover {
-    background-color: $portfolio-surface-tertiary;
-  }
-
-  &:active {
-    background-color: $portfolio-neutral-20;
+  svg {
+    width: 100%;
+    height: 100%;
   }
 }
 
-.ghost {
-  background-color: transparent;
-  color: $portfolio-text-primary;
-
-  &:hover {
-    background-color: $portfolio-surface-tertiary;
-  }
-
-  &:active {
-    background-color: $portfolio-neutral-20;
-  }
+.label {
+  display: inline-flex;
+  align-items: center;
 }
 
-.danger {
-  background-color: $portfolio-support-error;
-  color: $portfolio-text-on-color;
+.trailingSlot {
+  display: inline-flex;
+  align-items: center;
+  margin-inline-start: $portfolio-spacer-0-25x;
+}
 
-  &:hover {
-    background-color: $portfolio-red-70;
+// =============================================================================
+// APPEARANCE × EMPHASIS
+// =============================================================================
+
+// ---------------------------------------------------------------------------
+// Neutral
+// ---------------------------------------------------------------------------
+
+.neutral {
+  &.bold {
+    background-color: $portfolio-surface-inverse-bold;
+    color: $portfolio-text-inverse-bold;
+
+    &:hover:not(:disabled) { background-color: $portfolio-neutral-90; }
+    &:active:not(:disabled) { background-color: $portfolio-neutral-80; }
   }
 
-  &:active {
-    background-color: $portfolio-red-80;
+  &.regular {
+    background-color: transparent;
+    border-color: $portfolio-border-neutral-bold;
+    color: $portfolio-text-neutral-bold;
+
+    &:hover:not(:disabled) { background-color: $portfolio-surface-neutral-subtle; }
+    &:active:not(:disabled) { background-color: $portfolio-surface-neutral-regular; }
+  }
+
+  &.subtle {
+    background-color: $portfolio-surface-neutral-regular;
+    color: $portfolio-text-neutral-bold;
+
+    &:hover:not(:disabled) { background-color: $portfolio-neutral-20; }
+    &:active:not(:disabled) { background-color: $portfolio-neutral-30; }
+  }
+
+  &.minimal {
+    background-color: transparent;
+    color: $portfolio-text-neutral-bold;
+
+    &:hover:not(:disabled) { background-color: $portfolio-surface-neutral-subtle; }
+    &:active:not(:disabled) { background-color: $portfolio-surface-neutral-regular; }
   }
 }
 
 // ---------------------------------------------------------------------------
-// Sizes
+// Highlight (brand accent)
 // ---------------------------------------------------------------------------
+
+.highlight {
+  &.bold {
+    background-color: $portfolio-action-brand-bold;
+    color: $portfolio-text-always-light-bold;
+
+    &:hover:not(:disabled) { background-color: $portfolio-accent-70; }
+    &:active:not(:disabled) { background-color: $portfolio-accent-80; }
+  }
+
+  &.regular {
+    background-color: transparent;
+    border-color: $portfolio-border-brand-bold;
+    color: $portfolio-text-brand-bold;
+
+    &:hover:not(:disabled) { background-color: $portfolio-surface-brand-subtle; }
+    &:active:not(:disabled) { background-color: $portfolio-accent-20; }
+  }
+
+  &.subtle {
+    background-color: $portfolio-surface-brand-subtle;
+    color: $portfolio-text-brand-bold;
+
+    &:hover:not(:disabled) { background-color: $portfolio-accent-20; }
+    &:active:not(:disabled) { background-color: $portfolio-accent-30; }
+  }
+
+  &.minimal {
+    background-color: transparent;
+    color: $portfolio-text-brand-bold;
+
+    &:hover:not(:disabled) { background-color: $portfolio-surface-brand-subtle; }
+    &:active:not(:disabled) { background-color: $portfolio-accent-20; }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Positive
+// ---------------------------------------------------------------------------
+
+.positive {
+  &.bold {
+    background-color: $portfolio-surface-positive-bold;
+    color: $portfolio-text-always-light-bold;
+
+    &:hover:not(:disabled) { background-color: $portfolio-green-70; }
+    &:active:not(:disabled) { background-color: $portfolio-green-80; }
+  }
+
+  &.regular {
+    background-color: transparent;
+    border-color: $portfolio-border-positive;
+    color: $portfolio-text-positive;
+
+    &:hover:not(:disabled) { background-color: $portfolio-surface-positive-subtle; }
+    &:active:not(:disabled) { background-color: $portfolio-green-20; }
+  }
+
+  &.subtle {
+    background-color: $portfolio-surface-positive-subtle;
+    color: $portfolio-text-positive;
+
+    &:hover:not(:disabled) { background-color: $portfolio-green-20; }
+    &:active:not(:disabled) { background-color: $portfolio-green-30; }
+  }
+
+  &.minimal {
+    background-color: transparent;
+    color: $portfolio-text-positive;
+
+    &:hover:not(:disabled) { background-color: $portfolio-surface-positive-subtle; }
+    &:active:not(:disabled) { background-color: $portfolio-green-20; }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Negative
+// ---------------------------------------------------------------------------
+
+.negative {
+  &.bold {
+    background-color: $portfolio-surface-negative-bold;
+    color: $portfolio-text-always-light-bold;
+
+    &:hover:not(:disabled) { background-color: $portfolio-red-70; }
+    &:active:not(:disabled) { background-color: $portfolio-red-80; }
+  }
+
+  &.regular {
+    background-color: transparent;
+    border-color: $portfolio-border-negative;
+    color: $portfolio-text-negative;
+
+    &:hover:not(:disabled) { background-color: $portfolio-surface-negative-subtle; }
+    &:active:not(:disabled) { background-color: $portfolio-red-20; }
+  }
+
+  &.subtle {
+    background-color: $portfolio-surface-negative-subtle;
+    color: $portfolio-text-negative;
+
+    &:hover:not(:disabled) { background-color: $portfolio-red-20; }
+    &:active:not(:disabled) { background-color: $portfolio-red-30; }
+  }
+
+  &.minimal {
+    background-color: transparent;
+    color: $portfolio-text-negative;
+
+    &:hover:not(:disabled) { background-color: $portfolio-surface-negative-subtle; }
+    &:active:not(:disabled) { background-color: $portfolio-red-20; }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Inverse (for use on dark backgrounds)
+// ---------------------------------------------------------------------------
+
+.inverse {
+  &.bold {
+    background-color: $portfolio-action-inverse-bold;
+    color: $portfolio-text-neutral-bold;
+
+    &:hover:not(:disabled) { background-color: $portfolio-neutral-10; }
+    &:active:not(:disabled) { background-color: $portfolio-neutral-20; }
+  }
+
+  &.regular {
+    background-color: transparent;
+    border-color: $portfolio-neutral-00;
+    color: $portfolio-text-inverse-bold;
+
+    &:hover:not(:disabled) { background-color: $portfolio-overlay-white-08; }
+    &:active:not(:disabled) { background-color: $portfolio-overlay-white-16; }
+  }
+
+  &.subtle {
+    background-color: $portfolio-overlay-white-08;
+    color: $portfolio-text-inverse-bold;
+
+    &:hover:not(:disabled) { background-color: $portfolio-overlay-white-12; }
+    &:active:not(:disabled) { background-color: $portfolio-overlay-white-16; }
+  }
+
+  &.minimal {
+    background-color: transparent;
+    color: $portfolio-text-inverse-bold;
+
+    &:hover:not(:disabled) { background-color: $portfolio-overlay-white-08; }
+    &:active:not(:disabled) { background-color: $portfolio-overlay-white-12; }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Always Dark (forced dark regardless of theme)
+// ---------------------------------------------------------------------------
+
+.always-dark {
+  &.bold {
+    background-color: $portfolio-neutral-100;
+    color: $portfolio-neutral-10;
+
+    &:hover:not(:disabled) { background-color: $portfolio-neutral-90; }
+    &:active:not(:disabled) { background-color: $portfolio-neutral-80; }
+  }
+
+  &.regular {
+    background-color: transparent;
+    border-color: $portfolio-neutral-100;
+    color: $portfolio-neutral-100;
+
+    &:hover:not(:disabled) { background-color: $portfolio-overlay-black-04; }
+    &:active:not(:disabled) { background-color: $portfolio-overlay-black-08; }
+  }
+
+  &.subtle {
+    background-color: $portfolio-overlay-black-06;
+    color: $portfolio-neutral-100;
+
+    &:hover:not(:disabled) { background-color: $portfolio-overlay-black-10; }
+    &:active:not(:disabled) { background-color: $portfolio-overlay-black-14; }
+  }
+
+  &.minimal {
+    background-color: transparent;
+    color: $portfolio-neutral-100;
+
+    &:hover:not(:disabled) { background-color: $portfolio-overlay-black-04; }
+    &:active:not(:disabled) { background-color: $portfolio-overlay-black-08; }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Always Light (forced light regardless of theme)
+// ---------------------------------------------------------------------------
+
+.always-light {
+  &.bold {
+    background-color: $portfolio-neutral-10;
+    color: $portfolio-neutral-100;
+
+    &:hover:not(:disabled) { background-color: $portfolio-neutral-20; }
+    &:active:not(:disabled) { background-color: $portfolio-neutral-30; }
+  }
+
+  &.regular {
+    background-color: transparent;
+    border-color: $portfolio-neutral-10;
+    color: $portfolio-neutral-10;
+
+    &:hover:not(:disabled) { background-color: $portfolio-overlay-white-08; }
+    &:active:not(:disabled) { background-color: $portfolio-overlay-white-12; }
+  }
+
+  &.subtle {
+    background-color: $portfolio-overlay-white-08;
+    color: $portfolio-neutral-10;
+
+    &:hover:not(:disabled) { background-color: $portfolio-overlay-white-12; }
+    &:active:not(:disabled) { background-color: $portfolio-overlay-white-16; }
+  }
+
+  &.minimal {
+    background-color: transparent;
+    color: $portfolio-neutral-10;
+
+    &:hover:not(:disabled) { background-color: $portfolio-overlay-white-08; }
+    &:active:not(:disabled) { background-color: $portfolio-overlay-white-12; }
+  }
+}
+
+// =============================================================================
+// SIZES — Token-aligned, bounding-box model
+// =============================================================================
+// Height = primitive spacer, padding = utility spacer, icon = utility spacer.
+// No hardcoded px values for spacing.
+
+.xs {
+  height: $portfolio-spacer-3x;
+  padding: $portfolio-spacer-utility-0-5x $portfolio-spacer-utility-0-75x;
+  font-size: $portfolio-type-xs;
+
+  .iconWrap {
+    padding: $portfolio-spacer-0-25x;
+    width: $portfolio-spacer-utility-1-5x;
+    height: $portfolio-spacer-utility-1-5x;
+  }
+}
 
 .sm {
-  height: 32px;
-  padding: 0 $portfolio-spacing-04;
+  height: $portfolio-spacer-4x;
+  padding: $portfolio-spacer-utility-0-875x $portfolio-spacer-utility-1x;
   font-size: $portfolio-type-xs;
-}
 
-.md {
-  height: 40px;
-  padding: 0 $portfolio-spacing-05;
-  font-size: $portfolio-type-sm;
+  .iconWrap {
+    padding: $portfolio-spacer-0-25x;
+    width: $portfolio-spacer-utility-1-75x;
+    height: $portfolio-spacer-utility-1-75x;
+  }
 }
 
 .lg {
-  height: 48px;
-  padding: 0 $portfolio-spacing-06;
-  font-size: $portfolio-type-base;
+  height: $portfolio-spacer-6x;
+  padding: $portfolio-spacer-utility-1-625x $portfolio-spacer-utility-2x;
+  font-size: $portfolio-type-sm;
+
+  .iconWrap {
+    padding: $portfolio-spacer-0-5x;
+    width: $portfolio-spacer-utility-2-25x;
+    height: $portfolio-spacer-utility-2-25x;
+  }
 }
 
-// ---------------------------------------------------------------------------
-// Icon-only modifier (square aspect ratio)
-// ---------------------------------------------------------------------------
+.xl {
+  height: $portfolio-spacer-7x;
+  padding: $portfolio-spacer-utility-2x $portfolio-spacer-utility-2-5x;
+  font-size: $portfolio-type-base;
+
+  .iconWrap {
+    padding: $portfolio-spacer-0-5x;
+    width: $portfolio-spacer-utility-2-5x;
+    height: $portfolio-spacer-utility-2-5x;
+  }
+}
+
+// =============================================================================
+// MODIFIERS
+// =============================================================================
 
 .iconOnly {
   padding: 0;
 
-  &.sm {
-    width: 32px;
-  }
-
-  &.md {
-    width: 40px;
-  }
-
-  &.lg {
-    width: 48px;
-  }
+  &.xs { width: $portfolio-spacer-3x; }
+  &.sm { width: $portfolio-spacer-4x; }
+  &.lg { width: $portfolio-spacer-6x; }
+  &.xl { width: $portfolio-spacer-7x; }
 }
-
-// ---------------------------------------------------------------------------
-// Full-width modifier
-// ---------------------------------------------------------------------------
 
 .fullWidth {
   width: 100%;

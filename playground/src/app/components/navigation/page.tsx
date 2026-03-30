@@ -6,11 +6,8 @@ import { ComponentPreview, PropsTable } from "@/components/component-preview";
 
 function NavigationDemo() {
   const links = [
-    { href: "/", label: "Home" },
-    { href: "/work", label: "Work" },
-    { href: "/blog", label: "Blog" },
     { href: "/about", label: "About" },
-    { href: "/contact", label: "Contact" },
+    { href: "/experiments", label: "Experiments" },
   ];
 
   return (
@@ -28,7 +25,7 @@ function NavigationDemo() {
           Yilan Gao
         </span>
         <div style={{ display: "flex", alignItems: "center", gap: "1.5rem" }}>
-          {links.slice(1).map((link) => (
+          {links.map((link) => (
             <span
               key={link.href}
               style={{ fontSize: "0.875rem", color: "#525252", cursor: "pointer" }}
@@ -59,15 +56,32 @@ const code = `"use client";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import ThemeToggle from "./ThemeToggle";
+import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 
-const links = [
-  { href: "/", label: "Home" },
-  { href: "/work", label: "Work" },
-  { href: "/blog", label: "Blog" },
+const NAV_LINKS = [
   { href: "/about", label: "About" },
-  { href: "/contact", label: "Contact" },
+  { href: "/experiments", label: "Experiments" },
 ];
+
+function ThemeToggle() {
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
+
+  if (!mounted) return null;
+
+  return (
+    <button
+      type="button"
+      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+      aria-label="Toggle theme"
+    >
+      {theme === "dark" ? "Light" : "Dark"}
+    </button>
+  );
+}
 
 export default function Navigation() {
   const pathname = usePathname();
@@ -86,7 +100,7 @@ export default function Navigation() {
         Yilan Gao
       </Link>
       <div style={{ display: "flex", alignItems: "center", gap: "1.5rem" }}>
-        {links.slice(1).map((link) => (
+        {NAV_LINKS.map((link) => (
           <Link
             key={link.href}
             href={link.href}
@@ -149,7 +163,7 @@ export default function NavigationPage() {
             </li>
             <li className="flex gap-2">
               <span className="text-accent shrink-0">•</span>
-              Embeds <code className="text-xs bg-muted px-1.5 py-0.5 rounded-sm font-mono">ThemeToggle</code> component inline.
+              Theme toggle uses <code className="text-xs bg-muted px-1.5 py-0.5 rounded-sm font-mono">useTheme</code> from <code className="text-xs bg-muted px-1.5 py-0.5 rounded-sm font-mono">next-themes</code> (same pattern as <code className="text-xs bg-muted px-1.5 py-0.5 rounded-sm font-mono">src/components/ThemeToggle.tsx</code>).
             </li>
           </ul>
         </div>

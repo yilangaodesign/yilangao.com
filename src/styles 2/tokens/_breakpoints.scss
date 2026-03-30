@@ -1,0 +1,20 @@
+// =============================================================================
+// Portfolio Design System — Breakpoint Tokens
+// Based on Carbon breakpoints for consistent responsive behavior
+// =============================================================================
+
+$elan-bp-xs: 320px;
+$elan-bp-sm: 672px;
+$elan-bp-md: 1056px;
+$elan-bp-lg: 1312px;
+$elan-bp-xl: 1584px;
+
+// Media query helpers (use with @media)
+$elan-mq-xs: '(min-width: #{$elan-bp-xs})';
+$elan-mq-sm: '(min-width: #{$elan-bp-sm})';
+$elan-mq-md: '(min-width: #{$elan-bp-md})';
+$elan-mq-lg: '(min-width: #{$elan-bp-lg})';
+$elan-mq-xl: '(min-width: #{$elan-bp-xl})';
+
+// Reduced motion
+$elan-mq-reduced-motion: '(prefers-reduced-motion: reduce)';

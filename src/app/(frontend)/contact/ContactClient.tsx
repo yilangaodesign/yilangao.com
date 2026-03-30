@@ -4,19 +4,42 @@ import { useState, FormEvent } from "react";
 import Link from "next/link";
 import AdminBar from "@/components/AdminBar";
 import EditButton from "@/components/EditButton";
+import {
+  InlineEditProvider,
+  EditableText,
+  EditableArray,
+  InlineEditBar,
+  DeleteItemButton,
+  AddItemCard,
+} from "@/components/inline-edit";
+import type { ApiTarget, FieldDefinition } from "@/components/inline-edit";
 import styles from "./page.module.scss";
 
 interface Testimonial {
   id?: number;
   text: string;
+  textHtml?: string;
   name: string;
   role: string;
 }
 
+type ClientEntry = { name: string; url: string };
+
 interface ContactClientProps {
   testimonials: Testimonial[];
-  clients: string[];
+  clients: ClientEntry[];
   isAdmin?: boolean;
+}
+
+const SITE_CONFIG_TARGET: ApiTarget = { type: 'global', slug: 'site-config' };
+
+const CLIENT_FIELDS: FieldDefinition[] = [
+  { name: 'name', label: 'Client name', type: 'text', required: true },
+  { name: 'url', label: 'Website', type: 'url' },
+];
+
+function testimonialTarget(id: number): ApiTarget {
+  return { type: 'collection', slug: 'testimonials', id };
 }
 
 export default function ContactClient({ testimonials, clients, isAdmin }: ContactClientProps) {
@@ -63,8 +86,8 @@ export default function ContactClient({ testimonials, clients, isAdmin }: Contac
 
   const tripled = [...clients, ...clients, ...clients];
 
-  return (
-    <div className={styles.page} style={isAdmin ? { paddingTop: 44 } : undefined}>
+  const page = (
+    <div className={styles.page}>
       {isAdmin && <AdminBar editUrl="/admin/collections/testimonials" editLabel="Manage Testimonials" />}
       <nav className={styles.nav}>
         <div className={styles.navPill}>
@@ -72,8 +95,6 @@ export default function ContactClient({ testimonials, clients, isAdmin }: Contac
           <div className={styles.navLinks}>
             <Link href="/about" className={styles.navLink}>About</Link>
             <Link href="/experiments" className={styles.navLink}>Experiments</Link>
-            <Link href="/reading" className={styles.navLink}>Reading</Link>
-            <Link href="/contact" className={styles.navCta}>Contact</Link>
           </div>
         </div>
       </nav>
@@ -90,31 +111,106 @@ export default function ContactClient({ testimonials, clients, isAdmin }: Contac
               design and technology, I&apos;d love to hear from you.
             </p>
 
-            {testimonials.length > 0 && (
+            {(testimonials.length > 0 || isAdmin) && (
               <div className={styles.testimonialSlider}>
-                <div className={styles.quoteIcon}>&ldquo;</div>
-              <div className={styles.sliderQuote}>
-                <p className={styles.sliderText}>{current.text}</p>
-                <div className={styles.sliderAttrib}>
-                  <span className={styles.sliderName}>
-                    {current.name}
-                    {isAdmin && current.id && <EditButton collection="testimonials" id={current.id} label={`Edit ${current.name}'s testimonial`} />}
-                  </span>
-                  <span className={styles.sliderRole}>{current.role}</span>
-                </div>
-              </div>
-                <div className={styles.sliderControls}>
-                  <button className={styles.sliderBtn} onClick={prev} aria-label="Previous testimonial">
-                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                      <path d="M8.5 3.5L5 7l3.5 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  </button>
-                  <button className={styles.sliderBtn} onClick={next} aria-label="Next testimonial">
-                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                      <path d="M5.5 3.5L9 7l-3.5 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  </button>
-                </div>
+                {current && (
+                  <>
+                    <div
+                      className={[styles.quoteIcon, isAdmin && current.id ? styles.quoteIconEditable : ''].filter(Boolean).join(' ')}
+                      onClick={isAdmin && current.id ? (e: React.MouseEvent) => {
+                        const editable = (e.currentTarget.nextElementSibling?.querySelector('[data-editable]')) as HTMLElement | null;
+                        if (editable) editable.dispatchEvent(new MouseEvent('dblclick', { bubbles: true, cancelable: true }));
+                      } : undefined}
+                    >
+                      &ldquo;
+                    </div>
+                    <div className={styles.sliderQuote}>
+                      {current.id ? (
+                        <EditableText
+                          fieldId={`testimonial:${current.id}:text`}
+                          target={testimonialTarget(current.id)}
+                          fieldPath="text"
+                          as="p"
+                          className={styles.sliderText}
+                          multiline
+                          isRichText
+                          htmlContent={current.textHtml}
+                          label="Quote"
+                        >
+                          {current.text}
+                        </EditableText>
+                      ) : current.textHtml ? (
+                        <p className={styles.sliderText} dangerouslySetInnerHTML={{ __html: current.textHtml }} />
+                      ) : (
+                        <p className={styles.sliderText}>{current.text}</p>
+                      )}
+                      <div className={styles.sliderAttrib}>
+                        <span className={styles.sliderName}>
+                          {current.id ? (
+                            <EditableText
+                              fieldId={`testimonial:${current.id}:name`}
+                              target={testimonialTarget(current.id)}
+                              fieldPath="name"
+                              as="span"
+                              label="Name"
+                            >
+                              {current.name}
+                            </EditableText>
+                          ) : (
+                            current.name
+                          )}
+                          {isAdmin && current.id && <EditButton collection="testimonials" id={current.id} label={`Edit ${current.name}'s testimonial`} />}
+                        </span>
+                        {current.id ? (
+                          <EditableText
+                            fieldId={`testimonial:${current.id}:role`}
+                            target={testimonialTarget(current.id)}
+                            fieldPath="role"
+                            as="span"
+                            className={styles.sliderRole}
+                            label="Role"
+                          >
+                            {current.role}
+                          </EditableText>
+                        ) : (
+                          <span className={styles.sliderRole}>{current.role}</span>
+                        )}
+                      </div>
+                    </div>
+                    <div className={styles.sliderControls}>
+                      <button className={styles.sliderBtn} onClick={prev} aria-label="Previous testimonial">
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                          <path d="M8.5 3.5L5 7l3.5 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      </button>
+                      <button className={styles.sliderBtn} onClick={next} aria-label="Next testimonial">
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                          <path d="M5.5 3.5L9 7l-3.5 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      </button>
+                      {isAdmin && current.id && (
+                        <DeleteItemButton
+                          collection="testimonials"
+                          id={current.id}
+                          itemLabel={`${current.name}'s testimonial`}
+                        />
+                      )}
+                    </div>
+                  </>
+                )}
+                {isAdmin && (
+                  <AddItemCard
+                    collection="testimonials"
+                    defaults={{
+                      text: 'New testimonial quote here.',
+                      name: 'Name',
+                      role: 'Role, Company',
+                      order: testimonials.length + 1,
+                    }}
+                    label="Add testimonial"
+                    className={styles.addTestimonialBtn}
+                  />
+                )}
               </div>
             )}
           </div>
@@ -200,17 +296,44 @@ export default function ContactClient({ testimonials, clients, isAdmin }: Contac
           <div className={styles.trustRow}>
             <span className={styles.trustLabel}>Trusted by</span>
             <div className={styles.marqueeViewport}>
+              <EditableArray<ClientEntry>
+                fieldId="sc:clients"
+                target={SITE_CONFIG_TARGET}
+                fieldPath="clients"
+                items={clients}
+                itemFields={CLIENT_FIELDS}
+                label="Clients"
+                className={styles.marqueeTrack}
+                renderItem={(_item, _i) => null}
+              />
               <div className={styles.marqueeTrack}>
-                {tripled.map((name, i) => (
-                  <span key={`${name}-${i}`} className={styles.logoBlock}>
-                    {name}
-                  </span>
+                {tripled.map((client, i) => (
+                  client.url ? (
+                    <a key={`${client.name}-${i}`} href={client.url} target="_blank" rel="noopener noreferrer" className={styles.logoBlock}>
+                      {client.name}
+                    </a>
+                  ) : (
+                    <span key={`${client.name}-${i}`} className={styles.logoBlock}>
+                      {client.name}
+                    </span>
+                  )
                 ))}
               </div>
             </div>
           </div>
         )}
       </div>
+      {isAdmin && <InlineEditBar />}
     </div>
   );
+
+  if (isAdmin) {
+    return (
+      <InlineEditProvider isAdmin>
+        {page}
+      </InlineEditProvider>
+    );
+  }
+
+  return page;
 }

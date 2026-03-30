@@ -1,15 +1,15 @@
-@use '@yilangaodesign/design-system/scss' as *;
+@use '../../../styles' as *;
 
 .viewport {
   position: fixed;
-  bottom: $portfolio-spacing-07;
-  right: $portfolio-spacing-07;
+  bottom: $portfolio-spacer-4x;
+  right: $portfolio-spacer-4x;
   z-index: $portfolio-z-toast;
   display: flex;
   flex-direction: column;
-  gap: $portfolio-spacing-03;
+  gap: $portfolio-spacer-1x;
   width: 360px;
-  max-width: calc(100vw - #{$portfolio-spacing-07} * 2);
+  max-width: calc(100vw - #{$portfolio-spacer-4x} * 2);
   list-style: none;
   padding: 0;
   margin: 0;
@@ -19,8 +19,8 @@
 .root {
   display: flex;
   align-items: flex-start;
-  gap: $portfolio-spacing-04;
-  padding: $portfolio-spacing-05;
+  gap: $portfolio-spacer-1-5x;
+  padding: $portfolio-spacer-2x;
   background-color: $portfolio-surface-primary;
   border: 1px solid $portfolio-border-subtle;
   border-radius: $portfolio-radius-sm;
@@ -43,6 +43,54 @@
   &[data-swipe='end'] {
     animation: swipeOut $portfolio-duration-fast $portfolio-easing-exit;
   }
+
+  &.success {
+    border-left: 3px solid $portfolio-surface-positive-bold;
+
+    .title {
+      color: $portfolio-text-positive;
+    }
+
+    .description {
+      color: $portfolio-text-positive;
+    }
+  }
+
+  &.error {
+    border-left: 3px solid $portfolio-surface-negative-bold;
+
+    .title {
+      color: $portfolio-text-negative;
+    }
+
+    .description {
+      color: $portfolio-text-negative;
+    }
+  }
+
+  &.warning {
+    border-left: 3px solid $portfolio-surface-warning-bold;
+
+    .title {
+      color: $portfolio-text-warning;
+    }
+
+    .description {
+      color: $portfolio-text-warning;
+    }
+  }
+
+  &.info {
+    border-left: 3px solid $portfolio-accent-60;
+
+    .title {
+      color: $portfolio-text-brand-bold;
+    }
+
+    .description {
+      color: $portfolio-text-brand-bold;
+    }
+  }
 }
 
 .body {
@@ -63,7 +111,7 @@
   font-size: $portfolio-type-xs;
   line-height: $portfolio-leading-normal;
   color: $portfolio-text-secondary;
-  margin-top: $portfolio-spacing-01;
+  margin-top: $portfolio-spacer-0-25x;
 }
 
 .close {
@@ -86,7 +134,7 @@
 
 .action {
   @include button-reset;
-  margin-top: $portfolio-spacing-03;
+  margin-top: $portfolio-spacer-1x;
   font-family: $portfolio-font-sans;
   font-size: $portfolio-type-xs;
   font-weight: $portfolio-weight-medium;

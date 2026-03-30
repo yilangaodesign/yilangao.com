@@ -337,18 +337,37 @@ export const colors = {
 };
 // @sync-tokens:end
 
+export type TypographyMixin = {
+  name: string;
+  font: string;
+  size: string;
+  weight: string;
+  leading: string;
+  tracking?: string;
+  extras?: string;
+  use: string;
+};
+
+export type TypographyCategory = {
+  name: string;
+  description: string;
+  mixins: TypographyMixin[];
+};
+
 export const typography = {
   fonts: [
-    { name: "Geist Sans", value: "var(--font-geist-sans), 'Inter', system-ui, -apple-system, sans-serif", token: "$portfolio-font-sans", category: "Sans-serif" },
-    { name: "Geist Mono", value: "var(--font-geist-mono), 'JetBrains Mono', ui-monospace, monospace", token: "$portfolio-font-mono", category: "Monospace" },
-    { name: "Geist Pixel Square", value: "var(--font-geist-pixel-square), system-ui, sans-serif", token: "$portfolio-font-pixel-square", category: "Display / Pixel" },
-    { name: "Geist Pixel Grid", value: "var(--font-geist-pixel-grid), system-ui, sans-serif", token: "$portfolio-font-pixel-grid", category: "Display / Pixel" },
-    { name: "Geist Pixel Circle", value: "var(--font-geist-pixel-circle), system-ui, sans-serif", token: "$portfolio-font-pixel-circle", category: "Display / Pixel" },
-    { name: "Geist Pixel Triangle", value: "var(--font-geist-pixel-triangle), system-ui, sans-serif", token: "$portfolio-font-pixel-triangle", category: "Display / Pixel" },
-    { name: "Geist Pixel Line", value: "var(--font-geist-pixel-line), system-ui, sans-serif", token: "$portfolio-font-pixel-line", category: "Display / Pixel" },
-    { name: "Georgia (Serif)", value: "'Georgia', 'Times New Roman', serif", token: "$portfolio-font-serif", category: "Serif" },
+    { name: "Geist Sans", value: "var(--font-geist-sans), 'Inter', system-ui, -apple-system, sans-serif", token: "$portfolio-font-sans", category: "Sans-serif", role: "Primary UI — headings, body, labels, stats" },
+    { name: "Georgia (Serif)", value: "'Georgia', 'Times New Roman', serif", token: "$portfolio-font-serif", category: "Serif", role: "Quotes only — never headings or body" },
+    { name: "Geist Mono", value: "var(--font-geist-mono), 'JetBrains Mono', ui-monospace, monospace", token: "$portfolio-font-mono", category: "Monospace", role: "Code only — never data numbers" },
+    { name: "Geist Pixel Square", value: "var(--font-geist-pixel-square), monospace", token: "$portfolio-font-pixel-square", category: "Display / Pixel", role: "Decorative accent only" },
+    { name: "Geist Pixel Grid", value: "var(--font-geist-pixel-grid), monospace", token: "$portfolio-font-pixel-grid", category: "Display / Pixel", role: "Decorative accent only" },
+    { name: "Geist Pixel Circle", value: "var(--font-geist-pixel-circle), monospace", token: "$portfolio-font-pixel-circle", category: "Display / Pixel", role: "Decorative accent only" },
+    { name: "Geist Pixel Triangle", value: "var(--font-geist-pixel-triangle), monospace", token: "$portfolio-font-pixel-triangle", category: "Display / Pixel", role: "Decorative accent only" },
+    { name: "Geist Pixel Line", value: "var(--font-geist-pixel-line), monospace", token: "$portfolio-font-pixel-line", category: "Display / Pixel", role: "Decorative accent only" },
   ],
   weights: [
+    { name: "Thin", value: 100, token: "$portfolio-weight-thin" },
+    { name: "Extralight", value: 200, token: "$portfolio-weight-extralight" },
     { name: "Light", value: 300, token: "$portfolio-weight-light" },
     { name: "Regular", value: 400, token: "$portfolio-weight-regular" },
     { name: "Medium", value: 500, token: "$portfolio-weight-medium" },
@@ -356,6 +375,8 @@ export const typography = {
     { name: "Bold", value: 700, token: "$portfolio-weight-bold" },
   ],
   scale: [
+    { name: "8xl", size: "6rem", px: "96px", token: "$portfolio-type-8xl" },
+    { name: "7xl", size: "4.5rem", px: "72px", token: "$portfolio-type-7xl" },
     { name: "6xl", size: "3.75rem", px: "60px", token: "$portfolio-type-6xl" },
     { name: "5xl", size: "3rem", px: "48px", token: "$portfolio-type-5xl" },
     { name: "4xl", size: "2.25rem", px: "36px", token: "$portfolio-type-4xl" },
@@ -366,8 +387,10 @@ export const typography = {
     { name: "base", size: "1rem", px: "16px", token: "$portfolio-type-base" },
     { name: "sm", size: "0.875rem", px: "14px", token: "$portfolio-type-sm" },
     { name: "xs", size: "0.75rem", px: "12px", token: "$portfolio-type-xs" },
+    { name: "2xs", size: "0.5rem", px: "8px", token: "$portfolio-type-2xs" },
   ],
   leading: [
+    { name: "Compact", value: "1.15", token: "$portfolio-leading-compact" },
     { name: "Tight", value: "1.1", token: "$portfolio-leading-tight" },
     { name: "Snug", value: "1.25", token: "$portfolio-leading-snug" },
     { name: "Normal", value: "1.5", token: "$portfolio-leading-normal" },
@@ -381,38 +404,151 @@ export const typography = {
     { name: "Wider", value: "0.05em", token: "$portfolio-tracking-wider" },
     { name: "Widest", value: "0.1em", token: "$portfolio-tracking-widest" },
   ],
+  categories: [
+    {
+      name: "Headings",
+      description: "Geist Sans, bold/semibold. Fluid variants available for responsive layouts.",
+      mixins: [
+        { name: "heading-display", font: "Sans", size: "6xl (60px)", weight: "Bold 700", leading: "Tight 1.1", tracking: "Tight", use: "Hero sections" },
+        { name: "heading-1", font: "Sans", size: "5xl (48px)", weight: "Bold 700", leading: "Tight 1.1", tracking: "Tight", use: "Page titles" },
+        { name: "heading-2", font: "Sans", size: "4xl (36px)", weight: "Semibold 600", leading: "Snug 1.25", tracking: "Tight", use: "Section titles" },
+        { name: "heading-3", font: "Sans", size: "3xl (30px)", weight: "Semibold 600", leading: "Snug 1.25", use: "Subsection titles" },
+      ],
+    },
+    {
+      name: "Subtitles",
+      description: "Geist Sans, medium/bold weight tracks. Adopted from OneGS subtitle tier.",
+      mixins: [
+        { name: "subtitle-1", font: "Sans", size: "xl (20px)", weight: "Semibold 600", leading: "Snug 1.25", use: "Section subheading" },
+        { name: "subtitle-1-bold", font: "Sans", size: "xl (20px)", weight: "Bold 700", leading: "Snug 1.25", use: "Emphasized subheading" },
+        { name: "subtitle-2", font: "Sans", size: "lg (18px)", weight: "Medium 500", leading: "Snug 1.25", use: "Card/component subheading" },
+        { name: "subtitle-2-bold", font: "Sans", size: "lg (18px)", weight: "Bold 700", leading: "Snug 1.25", use: "Emphasized card subheading" },
+        { name: "subtitle-3", font: "Sans", size: "base (16px)", weight: "Medium 500", leading: "Snug 1.25", use: "Inline subheading" },
+        { name: "subtitle-3-bold", font: "Sans", size: "base (16px)", weight: "Bold 700", leading: "Snug 1.25", use: "Emphasized inline subheading" },
+      ],
+    },
+    {
+      name: "Body",
+      description: "Geist Sans with weight matrix (light/regular/medium) and compact variants for dense UI.",
+      mixins: [
+        { name: "body-lg", font: "Sans", size: "lg (18px)", weight: "Regular 400", leading: "Normal 1.5", use: "Editorial, long-form" },
+        { name: "body-lg-light", font: "Sans", size: "lg (18px)", weight: "Light 300", leading: "Normal 1.5", use: "Secondary/supporting large text" },
+        { name: "body-base", font: "Sans", size: "base (16px)", weight: "Regular 400", leading: "Normal 1.5", use: "Standard body" },
+        { name: "body-base-medium", font: "Sans", size: "base (16px)", weight: "Medium 500", leading: "Normal 1.5", use: "Emphasized body inline" },
+        { name: "body-base-light", font: "Sans", size: "base (16px)", weight: "Light 300", leading: "Normal 1.5", use: "Secondary body" },
+        { name: "body-sm", font: "Sans", size: "sm (14px)", weight: "Regular 400", leading: "Normal 1.5", use: "Dense UI body" },
+        { name: "body-sm-medium", font: "Sans", size: "sm (14px)", weight: "Medium 500", leading: "Normal 1.5", use: "Emphasized small text" },
+        { name: "body-compact", font: "Sans", size: "sm (14px)", weight: "Regular 400", leading: "Compact 1.15", use: "Dense panels, sidebars" },
+        { name: "body-compact-xs", font: "Sans", size: "xs (12px)", weight: "Regular 400", leading: "Compact 1.15", use: "Very dense tables, metadata" },
+      ],
+    },
+    {
+      name: "Quotes",
+      description: "Georgia serif, italic. Serif restricted to quotes per OneGS + Carbon guidance.",
+      mixins: [
+        { name: "quote-lg", font: "Serif", size: "2xl (24px)", weight: "Regular 400", leading: "Relaxed 1.625", extras: "italic", use: "Pull quotes, testimonials" },
+        { name: "quote-base", font: "Serif", size: "xl (20px)", weight: "Regular 400", leading: "Relaxed 1.625", extras: "italic", use: "Inline block quotes" },
+        { name: "quote-sm", font: "Serif", size: "lg (18px)", weight: "Regular 400", leading: "Relaxed 1.625", extras: "italic", use: "Small quotes, attribution" },
+      ],
+    },
+    {
+      name: "Captions",
+      description: "Geist Sans. caption-sm at 8px follows OneGS Caption 02 for enterprise density.",
+      mixins: [
+        { name: "caption", font: "Sans", size: "xs (12px)", weight: "Regular 400", leading: "Normal 1.5", use: "Image captions, timestamps" },
+        { name: "caption-sm", font: "Sans", size: "2xs (8px)", weight: "Regular 400", leading: "Compact 1.15", use: "Metadata, dense table secondary" },
+      ],
+    },
+    {
+      name: "Labels",
+      description: "Geist Sans, uppercase with wider tracking.",
+      mixins: [
+        { name: "label", font: "Sans", size: "xs (12px)", weight: "Medium 500", leading: "Normal 1.5", tracking: "Wider", extras: "uppercase", use: "Field labels, category tags" },
+      ],
+    },
+    {
+      name: "Utility",
+      description: "Helper text and legal copy. Adopted from Carbon.",
+      mixins: [
+        { name: "helper-text", font: "Sans", size: "xs (12px)", weight: "Regular 400", leading: "Normal 1.5", use: "Form descriptions below fields" },
+        { name: "legal", font: "Sans", size: "xs (12px)", weight: "Regular 400", leading: "Normal 1.5", use: "Footer copyright, disclaimers" },
+      ],
+    },
+    {
+      name: "Code",
+      description: "Geist Mono. Replaces former mono-data. Mono restricted to code per Carbon.",
+      mixins: [
+        { name: "code-lg", font: "Mono", size: "base (16px)", weight: "Regular 400", leading: "Normal 1.5", use: "Code blocks, large snippets" },
+        { name: "code-base", font: "Mono", size: "sm (14px)", weight: "Regular 400", leading: "Normal 1.5", use: "Inline code, terminal output" },
+        { name: "code-sm", font: "Mono", size: "xs (12px)", weight: "Regular 400", leading: "Compact 1.15", use: "Annotations, build hashes" },
+      ],
+    },
+    {
+      name: "Stats",
+      description: "Geist Sans Light with tight tracking. Adapted from OneGS Stat styles (uses Sans Light instead of Sans Condensed). All use tabular-nums.",
+      mixins: [
+        { name: "stat-lg", font: "Sans", size: "7xl (72px)", weight: "Light 300", leading: "Tight 1.1", tracking: "Tight", extras: "tabular-nums", use: "Hero numbers, KPI dashboards" },
+        { name: "stat-base", font: "Sans", size: "5xl (48px)", weight: "Light 300", leading: "Tight 1.1", tracking: "Tight", extras: "tabular-nums", use: "Secondary stat callouts" },
+        { name: "stat-sm", font: "Sans", size: "3xl (30px)", weight: "Medium 500", leading: "Snug 1.25", extras: "tabular-nums", use: "Tertiary stat callouts" },
+      ],
+    },
+  ] as TypographyCategory[],
 };
 
 export const spacing = {
   scale: [
-    { name: "01", value: "2px", token: "$portfolio-spacing-01" },
-    { name: "02", value: "4px", token: "$portfolio-spacing-02" },
-    { name: "03", value: "8px", token: "$portfolio-spacing-03" },
-    { name: "04", value: "12px", token: "$portfolio-spacing-04" },
-    { name: "05", value: "16px", token: "$portfolio-spacing-05" },
-    { name: "06", value: "24px", token: "$portfolio-spacing-06" },
-    { name: "07", value: "32px", token: "$portfolio-spacing-07" },
-    { name: "08", value: "40px", token: "$portfolio-spacing-08" },
-    { name: "09", value: "48px", token: "$portfolio-spacing-09" },
-    { name: "10", value: "64px", token: "$portfolio-spacing-10" },
-    { name: "11", value: "80px", token: "$portfolio-spacing-11" },
-    { name: "12", value: "96px", token: "$portfolio-spacing-12" },
-    { name: "13", value: "128px", token: "$portfolio-spacing-13" },
+    { name: "0.125x", value: "1px", token: "$portfolio-spacer-0-125x" },
+    { name: "0.25x", value: "2px", token: "$portfolio-spacer-0-25x" },
+    { name: "0.5x", value: "4px", token: "$portfolio-spacer-0-5x" },
+    { name: "1x", value: "8px", token: "$portfolio-spacer-1x" },
+    { name: "1.5x", value: "12px", token: "$portfolio-spacer-1-5x" },
+    { name: "2x", value: "16px", token: "$portfolio-spacer-2x" },
+    { name: "2.5x", value: "20px", token: "$portfolio-spacer-2-5x" },
+    { name: "3x", value: "24px", token: "$portfolio-spacer-3x" },
+    { name: "4x", value: "32px", token: "$portfolio-spacer-4x" },
+    { name: "5x", value: "40px", token: "$portfolio-spacer-5x" },
+    { name: "6x", value: "48px", token: "$portfolio-spacer-6x" },
+    { name: "7x", value: "56px", token: "$portfolio-spacer-7x" },
+    { name: "8x", value: "64px", token: "$portfolio-spacer-8x" },
+    { name: "9x", value: "72px", token: "$portfolio-spacer-9x" },
+    { name: "10x", value: "80px", token: "$portfolio-spacer-10x" },
+    { name: "11x", value: "88px", token: "$portfolio-spacer-11x" },
+    { name: "12x", value: "96px", token: "$portfolio-spacer-12x" },
+    { name: "13x", value: "104px", token: "$portfolio-spacer-13x" },
+    { name: "14x", value: "112px", token: "$portfolio-spacer-14x" },
+    { name: "15x", value: "120px", token: "$portfolio-spacer-15x" },
+    { name: "16x", value: "128px", token: "$portfolio-spacer-16x" },
+    { name: "17x", value: "136px", token: "$portfolio-spacer-17x" },
+    { name: "18x", value: "144px", token: "$portfolio-spacer-18x" },
+    { name: "19x", value: "152px", token: "$portfolio-spacer-19x" },
+    { name: "20x", value: "160px", token: "$portfolio-spacer-20x" },
   ],
   layout: [
-    { name: "01", value: "16px", token: "$portfolio-layout-01" },
-    { name: "02", value: "24px", token: "$portfolio-layout-02" },
-    { name: "03", value: "32px", token: "$portfolio-layout-03" },
-    { name: "04", value: "48px", token: "$portfolio-layout-04" },
-    { name: "05", value: "64px", token: "$portfolio-layout-05" },
-    { name: "06", value: "96px", token: "$portfolio-layout-06" },
-    { name: "07", value: "128px", token: "$portfolio-layout-07" },
+    { name: "x-compact", value: "8px", token: "$portfolio-spacer-layout-x-compact", ref: "$portfolio-spacer-1x" },
+    { name: "compact", value: "16px", token: "$portfolio-spacer-layout-compact", ref: "$portfolio-spacer-2x" },
+    { name: "standard", value: "24px", token: "$portfolio-spacer-layout-standard", ref: "$portfolio-spacer-3x" },
+    { name: "spacious", value: "32px", token: "$portfolio-spacer-layout-spacious", ref: "$portfolio-spacer-4x" },
+    { name: "x-spacious", value: "48px", token: "$portfolio-spacer-layout-x-spacious", ref: "$portfolio-spacer-6x" },
+    { name: "xx-spacious", value: "64px", token: "$portfolio-spacer-layout-xx-spacious", ref: "$portfolio-spacer-8x" },
+    { name: "xxx-spacious", value: "80px", token: "$portfolio-spacer-layout-xxx-spacious", ref: "$portfolio-spacer-10x" },
+    { name: "xxxx-spacious", value: "96px", token: "$portfolio-spacer-layout-xxxx-spacious", ref: "$portfolio-spacer-12x" },
+  ],
+  utility: [
+    { name: "0.5x", value: "4px", token: "$portfolio-spacer-utility-0-5x" },
+    { name: "0.75x", value: "6px", token: "$portfolio-spacer-utility-0-75x" },
+    { name: "0.875x", value: "7px", token: "$portfolio-spacer-utility-0-875x" },
+    { name: "1x", value: "8px", token: "$portfolio-spacer-utility-1x" },
+    { name: "1.25x", value: "10px", token: "$portfolio-spacer-utility-1-25x" },
+    { name: "1.5x", value: "12px", token: "$portfolio-spacer-utility-1-5x" },
+    { name: "1.625x", value: "13px", token: "$portfolio-spacer-utility-1-625x" },
+    { name: "2x", value: "16px", token: "$portfolio-spacer-utility-2x" },
+    { name: "2.5x", value: "20px", token: "$portfolio-spacer-utility-2-5x" },
+    { name: "3x", value: "24px", token: "$portfolio-spacer-utility-3x" },
   ],
   containers: [
-    { name: "sm", value: "672px", token: "$portfolio-container-sm" },
-    { name: "md", value: "1056px", token: "$portfolio-container-md" },
-    { name: "lg", value: "1312px", token: "$portfolio-container-lg" },
-    { name: "xl", value: "1584px", token: "$portfolio-container-xl" },
+    { name: "narrow", value: "672px", token: "$elan-container-narrow" },
+    { name: "default", value: "1056px", token: "$elan-container-default" },
+    { name: "wide", value: "1440px", token: "$elan-container-wide" },
   ],
 };
 
@@ -482,10 +618,32 @@ export const elevation = {
   ],
 };
 
-export const breakpoints = [
-  { name: "sm", value: "320px", token: "$portfolio-bp-sm" },
-  { name: "md", value: "672px", token: "$portfolio-bp-md" },
-  { name: "lg", value: "1056px", token: "$portfolio-bp-lg" },
-  { name: "xl", value: "1312px", token: "$portfolio-bp-xl" },
-  { name: "2xl", value: "1584px", token: "$portfolio-bp-2xl" },
+export type Breakpoint = {
+  name: string;
+  value: string;
+  token: string;
+  columns: number;
+  origin: string;
+  description: string;
+};
+
+export const breakpoints: Breakpoint[] = [
+  { name: "xs", value: "375px", token: "$elan-bp-xs", columns: 4, origin: "OneGS", description: "Modern smallest phone (iPhone SE)" },
+  { name: "sm", value: "672px", token: "$elan-bp-sm", columns: 8, origin: "Carbon", description: "Large phone landscape / small tablet" },
+  { name: "md", value: "1056px", token: "$elan-bp-md", columns: 16, origin: "Carbon", description: "Standard laptop" },
+  { name: "lg", value: "1440px", token: "$elan-bp-lg", columns: 16, origin: "OneGS", description: "Common laptop / external display" },
+  { name: "xl", value: "1920px", token: "$elan-bp-xl", columns: 16, origin: "OneGS", description: "Full HD desktop monitor" },
+  { name: "2xl", value: "2560px", token: "$elan-bp-2xl", columns: 16, origin: "New", description: "QHD / ultrawide" },
+];
+
+export type DensityMode = {
+  name: string;
+  gutter: string;
+  description: string;
+};
+
+export const densityModes: DensityMode[] = [
+  { name: "Comfortable", gutter: "32px", description: "Editorial content, reading-heavy pages, settings panels" },
+  { name: "Compact", gutter: "16px", description: "Data tables, dashboards, form-heavy admin screens, side panels" },
+  { name: "Condensed", gutter: "1px", description: "Dense dashboards, resource catalogs, tile overviews" },
 ];

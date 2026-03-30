@@ -21,9 +21,8 @@ export default function ScrollSpy({ sections }: ScrollSpyProps) {
 
   const trackRef = useRef<HTMLDivElement>(null);
   const drag = useRef({ active: false, index: -1 });
+  const pointerStart = useRef<{ y: number; index: number } | null>(null);
 
-  // Scroll-position tracking via IntersectionObserver.
-  // Paused during drag so the observer doesn't fight user intent.
   useEffect(() => {
     const elements = sections
       .map((s) => document.getElementById(s.id))
@@ -69,36 +68,45 @@ export default function ScrollSpy({ sections }: ScrollSpyProps) {
     [sections],
   );
 
-  const indexFromPointer = useCallback(
-    (clientY: number): number => {
-      if (!trackRef.current) return 0;
-      const { top, height } = trackRef.current.getBoundingClientRect();
-      const ratio = (clientY - top) / height;
-      const index = Math.round(ratio * (sections.length - 1));
-      return Math.max(0, Math.min(index, sections.length - 1));
-    },
-    [sections.length],
-  );
+  const indexFromPointer = useCallback((clientY: number): number => {
+    const notches =
+      trackRef.current?.querySelectorAll<HTMLElement>("[data-notch-index]");
+    if (!notches || notches.length === 0) return 0;
+    let closest = 0;
+    let minDist = Infinity;
+    notches.forEach((el, i) => {
+      const rect = el.getBoundingClientRect();
+      const dist = Math.abs(clientY - (rect.top + rect.height / 2));
+      if (dist < minDist) {
+        minDist = dist;
+        closest = i;
+      }
+    });
+    return closest;
+  }, []);
 
-  // Pointer capture keeps move/up events on the track even when the
-  // cursor leaves the element, so we never leak window-level listeners.
   const onPointerDown = useCallback(
     (e: React.PointerEvent) => {
       if (e.button !== 0) return;
       e.preventDefault();
       trackRef.current?.setPointerCapture(e.pointerId);
-
       const idx = indexFromPointer(e.clientY);
-      drag.current = { active: true, index: idx };
-      setDragIndex(idx);
-      scrollTo(idx, "instant");
+      pointerStart.current = { y: e.clientY, index: idx };
     },
-    [indexFromPointer, scrollTo],
+    [indexFromPointer],
   );
 
   const onPointerMove = useCallback(
     (e: React.PointerEvent) => {
-      if (!drag.current.active) return;
+      if (!pointerStart.current) return;
+
+      if (!drag.current.active) {
+        if (Math.abs(e.clientY - pointerStart.current.y) < 3) return;
+        drag.current = { active: true, index: pointerStart.current.index };
+        setDragIndex(pointerStart.current.index);
+        scrollTo(pointerStart.current.index, "instant");
+      }
+
       const idx = indexFromPointer(e.clientY);
       if (idx !== drag.current.index) {
         drag.current.index = idx;
@@ -109,10 +117,14 @@ export default function ScrollSpy({ sections }: ScrollSpyProps) {
     [indexFromPointer, scrollTo],
   );
 
-  const endDrag = useCallback(() => {
+  const endInteraction = useCallback(() => {
+    if (pointerStart.current && !drag.current.active) {
+      scrollTo(pointerStart.current.index, "smooth");
+    }
     drag.current = { active: false, index: -1 };
+    pointerStart.current = null;
     setDragIndex(null);
-  }, []);
+  }, [scrollTo]);
 
   if (sections.length < 2) return null;
 
@@ -129,8 +141,8 @@ export default function ScrollSpy({ sections }: ScrollSpyProps) {
         onPointerLeave={() => setIsHovered(false)}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
-        onPointerUp={endDrag}
-        onLostPointerCapture={endDrag}
+        onPointerUp={endInteraction}
+        onLostPointerCapture={endInteraction}
       >
         {sections.map((section, i) => {
           const isActive = i === activeIndex;
@@ -138,7 +150,7 @@ export default function ScrollSpy({ sections }: ScrollSpyProps) {
           const showLabel = isDragging ? isDragTarget : isHovered;
 
           return (
-            <div key={section.id} className={styles.notch}>
+            <div key={section.id} className={styles.notch} data-notch-index={i} data-active={isActive || undefined}>
               <AnimatePresence>
                 {showLabel && (
                   <motion.span

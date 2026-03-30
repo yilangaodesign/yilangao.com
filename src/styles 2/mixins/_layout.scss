@@ -1,0 +1,81 @@
+@use '../tokens/spacing' as *;
+@use '../tokens/breakpoints' as *;
+
+// =============================================================================
+// Portfolio Design System — Layout Mixins
+// =============================================================================
+
+@mixin container {
+  width: 100%;
+  max-width: $elan-container-wide;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: $portfolio-spacing-05;
+  padding-right: $portfolio-spacing-05;
+
+  @media #{$elan-mq-sm} {
+    padding-left: $portfolio-spacing-07;
+    padding-right: $portfolio-spacing-07;
+  }
+
+  @media #{$elan-mq-lg} {
+    padding-left: $portfolio-spacing-09;
+    padding-right: $portfolio-spacing-09;
+  }
+}
+
+@mixin container-narrow {
+  width: 100%;
+  max-width: $elan-container-default;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: $portfolio-spacing-05;
+  padding-right: $portfolio-spacing-05;
+
+  @media #{$elan-mq-sm} {
+    padding-left: $portfolio-spacing-07;
+    padding-right: $portfolio-spacing-07;
+  }
+}
+
+@mixin section-padding {
+  padding-top: $portfolio-layout-05;
+  padding-bottom: $portfolio-layout-05;
+
+  @media #{$elan-mq-sm} {
+    padding-top: $portfolio-layout-06;
+    padding-bottom: $portfolio-layout-06;
+  }
+}
+
+@mixin hero-section {
+  min-height: 90vh;
+  display: flex;
+  align-items: center;
+  padding-top: $portfolio-layout-06;
+  padding-bottom: $portfolio-layout-06;
+}
+
+@mixin grid($columns: 12, $gap: $portfolio-spacing-06) {
+  display: grid;
+  grid-template-columns: repeat($columns, 1fr);
+  gap: $gap;
+}
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin stack($gap: $portfolio-spacing-05) {
+  display: flex;
+  flex-direction: column;
+  gap: $gap;
+}

@@ -1,4 +1,4 @@
-@use '@yilangaodesign/design-system/scss' as *;
+@use '../../../styles' as *;
 
 .page {
   min-height: 100vh;
@@ -8,23 +8,23 @@
 
 .container {
   flex: 1;
-  max-width: 720px;
+  max-width: $elan-container-content;
   margin: 0 auto;
   width: 100%;
-  padding: $portfolio-layout-05 $portfolio-spacing-05;
+  padding: $portfolio-spacer-layout-xx-spacious $portfolio-spacer-2x;
 
-  @media #{$portfolio-mq-md} {
-    padding: $portfolio-layout-06 $portfolio-spacing-07;
+  @media #{$elan-mq-sm} {
+    padding: $portfolio-spacer-layout-xxxx-spacious $portfolio-spacer-4x;
   }
 }
 
 .header {
-  margin-bottom: $portfolio-layout-04;
+  margin-bottom: $portfolio-spacer-layout-x-spacious;
 }
 
 .title {
   @include heading-2;
-  margin-bottom: $portfolio-spacing-04;
+  margin-bottom: $portfolio-spacer-1-5x;
 }
 
 .subtitle {
@@ -32,19 +32,18 @@
 }
 
 .section {
-  margin-bottom: $portfolio-layout-04;
+  margin-bottom: $portfolio-spacer-layout-x-spacious;
+  scroll-margin-top: $portfolio-spacer-layout-x-spacious;
 }
 
 .sectionLabel {
   @include label;
   color: $portfolio-text-placeholder;
-  margin-bottom: $portfolio-spacing-05;
+  margin-bottom: $portfolio-spacer-2x;
 }
 
 .bodyText {
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-base;
-  font-weight: $portfolio-weight-regular;
+  @include body-base;
   line-height: $portfolio-leading-relaxed;
   color: $portfolio-text-secondary;
 }
@@ -64,37 +63,32 @@
 .experienceList {
   display: flex;
   flex-direction: column;
-  gap: $portfolio-spacing-06;
+  gap: $portfolio-spacer-3x;
 }
 
 .experienceItem {
   display: flex;
   flex-direction: column;
-  gap: $portfolio-spacing-02;
+  gap: $portfolio-spacer-0-5x;
 }
 
 .experienceRole {
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-sm;
-  font-weight: $portfolio-weight-medium;
+  @include body-sm-medium;
   color: $portfolio-text-primary;
 }
 
 .experienceCompany {
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-sm;
-  font-weight: $portfolio-weight-regular;
+  @include body-sm;
   color: $portfolio-text-secondary;
 }
 
 .experienceDate {
-  font-family: $portfolio-font-mono;
-  font-size: $portfolio-type-xs;
+  @include code-sm;
   color: $portfolio-text-placeholder;
 }
 
 .divider {
   border: none;
   border-top: 1px solid $portfolio-border-subtle;
-  margin: $portfolio-layout-04 0;
+  margin: $portfolio-spacer-layout-x-spacious 0;
 }

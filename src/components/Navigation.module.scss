@@ -1,4 +1,4 @@
-@use '@yilangaodesign/design-system/scss' as *;
+@use '../styles' as *;
 
 .nav {
   position: sticky;
@@ -13,12 +13,12 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  max-width: $portfolio-container-lg;
+  max-width: $elan-container-wide;
   margin: 0 auto;
-  padding: $portfolio-spacing-04 $portfolio-spacing-05;
+  padding: $portfolio-spacer-1-5x $portfolio-spacer-2x;
 
-  @media #{$portfolio-mq-md} {
-    padding: $portfolio-spacing-04 $portfolio-spacing-07;
+  @media #{$elan-mq-sm} {
+    padding: $portfolio-spacer-1-5x $portfolio-spacer-4x;
   }
 }
 
@@ -38,7 +38,7 @@
 .links {
   display: flex;
   align-items: center;
-  gap: $portfolio-spacing-06;
+  gap: $portfolio-spacer-3x;
 }
 
 .link {

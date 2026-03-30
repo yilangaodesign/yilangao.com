@@ -4,7 +4,7 @@
 >
 > **Who reads this:** AI agents routed here by `AGENTS.md` Pre-Flight. Read the Section Index first, then only the section matching your task.
 > **Who writes this:** AI agents after processing engineering feedback via the `engineering-iteration` skill.
-> **Last updated:** 2026-03-29
+> **Last updated:** 2026-03-30 (§10.5–10.8: automated version analysis, live dev info API, runtime exposure)
 
 ---
 
@@ -23,6 +23,8 @@
 | §8 | Knowledge Enforcement | Recurring incidents, promoting docs to rules layer |
 | §9 | Multi-App Architecture & URL Namespace | Adding routes, new apps, or CMS endpoints |
 | §10 | Design System Versioning (Élan) | Version bumps, releases, checkpoint workflow |
+| §11 | CMS-Frontend Data Parity | Adding/removing/renaming CMS fields, inline edit fields, or frontend types |
+| §12 | Media & File Storage (Supabase Storage) | Uploading files, adding upload collections, storage config |
 | Appendix | Incident Frequency Map | Checking for recurring incident patterns |
 
 ---
@@ -311,6 +313,20 @@ When adding any of the following to the main app, explicitly check whether the p
 5. **After any font change:** Run `grep -r "fontFamily" playground/src/ --include="*.tsx"` to find inline overrides. There should be zero hardcoded font families in component pages (ENG-003).
 6. **After creating any new component in `src/components/`:** Create a playground preview page at `playground/src/app/components/<slug>/page.tsx` and add a sidebar entry in `playground/src/components/sidebar.tsx`. Also add an entry to `archive/registry.json` (ENG-004).
 
+### 6.4 Experiment Propagation Protocol (Bidirectional Sync)
+
+**Severity: Critical** — Three playground experiments (Button, Spacing, Typography) were conducted across sessions without propagating to production, causing a multi-phase alignment effort (ENG-072, EAP-030).
+
+The Cross-App Parity Checklist in `AGENTS.md` is **bidirectional**. It applies in both directions:
+
+| Direction | Trigger | Required Action |
+|-----------|---------|-----------------|
+| Production → Playground | Modified a component in `src/components/` | Update playground Demo* and demo page to match |
+| Playground → Production | Modified a Demo* component or conducted a design experiment | Update production `src/components/ui/` to match the experiment's outcome |
+| Either direction | Changed a token value or component API | Document the decision in the appropriate feedback log |
+
+**End-of-session verification:** Before ending any session that touched DS components or tokens, run the full parity checklist from `AGENTS.md` in BOTH directions. A session is not complete until both apps reflect the same design decisions.
+
 ---
 
 ## 8. Knowledge Enforcement (Rules Layer vs. Docs Layer)
@@ -349,15 +365,16 @@ Recurring incidents should be escalated up this hierarchy until they stop recurr
 
 ### 9.1 The Current Architecture
 
-This project runs three distinct concerns across two Next.js processes:
+This project runs four distinct concerns across three Next.js processes:
 
 | Concern | Audience | Port | Route space | Process |
 |---------|----------|------|-------------|---------|
 | Public portfolio | Visitors | 4000 | `/`, `/reading`, etc. | Main site |
 | CMS admin panel | Site owner (editor) | 4000 | `/admin/*` | Main site (shared) |
 | Design system playground | Developers/designers | 4001 | `/tokens/*`, `/components/*` | Playground (separate) |
+| ASCII Art Studio | Public users | 4002 | `/` (single-page) | ASCII tool (separate) |
 
-The CMS admin and public site share a process and URL namespace. This is a **Payload CMS 3 design constraint** — Payload embeds into your Next.js app and serves admin UI at a configurable route prefix (default `/admin`).
+The CMS admin and public site share a process and URL namespace. This is a **Payload CMS 3 design constraint** — Payload embeds into your Next.js app and serves admin UI at a configurable route prefix (default `/admin`). The ASCII Art Studio is a fully standalone app with its own dependencies (ffmpeg.wasm, idb-keyval) and its own version manifest (`ascii-studio.json`).
 
 ### 9.2 Known Trade-offs
 
@@ -403,8 +420,9 @@ When adding new routes or concerns in the future:
 | 4000 | `/api` | Payload CMS | CMS REST/GraphQL API |
 | 4001 | `/tokens` | Playground | Design token previews |
 | 4001 | `/components` | Playground | Component previews |
+| 4002 | `/` | ASCII Art Studio | Single-page ASCII art/video tool |
 
-Update this table when adding new route prefixes or services.
+Update this table when adding new route prefixes or services. See also the **App Registry** in `AGENTS.md` for the authoritative list of all apps.
 
 ---
 
@@ -446,23 +464,176 @@ The two-branch model maps directly onto the version lifecycle:
 | `npm run version:minor` | Bump dev version minor number |
 | `npm run version:major` | Bump dev version major number |
 | `npm run version:release` | Promote `version` → `release.version`, stamp `releasedAt` |
+| `npm run version:analyze` | Analyze git diff since last release and recommend a bump level |
+| `npm run version:auto` | Analyze + auto-apply the recommended bump |
 
-### 10.5 Release Workflow
+### 10.5 Automated Version Analysis (`scripts/version-analyze.mjs`)
+
+The analysis script scans git diff since the last release and categorizes changes to determine the appropriate semver bump:
+
+| Signal | Bump Level | Example |
+|---|---|---|
+| Component file(s) deleted | **Major** | Removed a shared component |
+| Component file(s) renamed | **Major** | Changed import paths |
+| Token file(s) deleted | **Major** | Removed a token category |
+| New component file(s) added | **Minor** | Created a new DS component |
+| 3+ token files AND 5+ component files modified | **Minor** | Broad design refresh |
+| 15+ total DS files changed | **Minor** | Large scope of work |
+| Everything else | **Patch** | Value tweaks, bug fixes |
+
+The script checks if the current dev version already satisfies the recommended level (e.g., if analysis says "minor" and version is already 1.1.0 vs release 1.0.0, no bump needed).
+
+**Usage patterns:**
+- Run `npm run version:analyze` periodically to check if the current version is appropriate.
+- Run `npm run version:auto` to let the script decide and apply the bump.
+- The playground footer also displays the analysis in real-time during development (via `/api/dev-info`).
+
+### 10.6 Release Workflow
 
 Integrated into the checkpoint workflow (§6.5). Before merging to `main`:
-1. Run `npm run version:release` to stamp the release
-2. Commit the updated `elan.json`
-3. Merge to `main` and push
-4. Return to `dev`, bump to next patch, commit
+1. Run `npm run version:analyze` to verify the version level is appropriate
+2. Run `npm run version:auto` if it recommends a bump
+3. Run `npm run version:release` to stamp the release
+4. Commit the updated `elan.json`
+5. Merge to `main` and push
+6. Return to `dev`, bump to next patch, commit
 
-### 10.6 Runtime Exposure
+### 10.7 Runtime Exposure
 
 - **Main site:** `<meta name="generator" content="Élan x.x.x">` in the HTML head (release version, from `elan.json`)
-- **Playground:** Page-level footnote in the Shell component showing version and last-updated date on every page
+- **Playground footer:** Shows version, live "last updated" date (via `/api/dev-info` in dev, static `releasedAt` in production), and change analysis summary
+- **Playground sidebar header:** Shows `Élan {version}` — live-updated in dev mode via the same API
+
+### 10.8 Live Dev Info API (`playground/src/app/api/dev-info/route.ts`)
+
+In development mode, the playground exposes `/api/dev-info` which returns:
+- `lastModified` — ISO timestamp of the most recent DS file change (git log + uncommitted check)
+- `lastModifiedDate` — date portion for display
+- `currentVersion` / `releaseVersion` — from `elan.json`
+- `analysis` — same change analysis as the standalone script
+
+The `useDevInfo()` hook (`playground/src/hooks/use-dev-info.ts`) polls this endpoint every 60 seconds and provides the data to the Shell footer and Sidebar header components. In production, the endpoint returns 403 and components fall back to the static `elan.ts` data.
 
 ### 10.7 Changelog
 
 `CHANGELOG.md` at repo root follows [Keep a Changelog](https://keepachangelog.com/) format. Update it when bumping versions — document what was Added, Changed, Removed, or Fixed.
+
+---
+
+## 11. CMS-Frontend Data Parity
+
+**Source:** Session 2026-03-29, five incidents in the CMS UX / inline editing category (ENG-027→031). Escalation trigger activated.
+
+### 11.1 The Three-Layer Contract
+
+CMS data flows through three layers that form a single contract. All three must be modified atomically when a field changes:
+
+1. **Schema layer** — `src/globals/*.ts` or `src/collections/*.ts`. Defines what the Payload admin panel shows and what the database stores.
+2. **Data fetch layer** — `src/app/(frontend)/*/page.tsx`. Server components that call `payload.findGlobal()` or `payload.find()` and map CMS data to typed props.
+3. **UI layer** — `src/app/(frontend)/*Client.tsx`. TypeScript types, inline edit `*_FIELDS` definitions, and rendering logic.
+
+### 11.2 Rules
+
+1. **Every CMS field must exist in all three layers.** A field in the schema but not the UI is invisible to the frontend. A field in the UI but not the schema is a save that silently drops data.
+2. **Schema changes require a server restart.** Payload pushes schema to the database only on startup. Without a restart, the column doesn't exist and the API silently strips the field. This is not optional — add it to your task sequence.
+3. **Inline edit `*_FIELDS` must mirror the schema exactly.** Every field the user can edit in the panel must correspond to a real CMS field, and every CMS field should be editable (unless intentionally read-only).
+4. **Fallback data in `page.tsx` must include all fields.** Fallback objects that omit a field (e.g., `{ name: "X" }` when the type requires `{ name: "X", url: "" }`) will cause TypeScript and rendering issues.
+
+### 11.3 Checklist
+
+See `AGENTS.md` → "CMS-Frontend Parity Checklist" for the blocking-gate table.
+
+### 11.4 Verification
+
+After any field change, run:
+```bash
+curl -s http://localhost:4000/api/globals/<slug> | python3 -m json.tool
+```
+Confirm every field in the JSON matches the frontend TypeScript type.
+
+### 11.5 Inline Edit Mutation Tiers
+
+The inline edit system supports three tiers of CMS mutation from the frontend:
+
+1. **Field-level** — `EditableText` edits a single text/richText field on an existing document via `PATCH /api/{collection}/{id}` or `POST /api/globals/{slug}`.
+2. **Array-level** — `EditableArray` manages array fields on globals (add, remove, reorder items) with a modal panel, then saves the entire array via the same global PATCH.
+3. **Collection-level** — `AddItemCard` creates new collection documents (`POST /api/{collection}`) and `DeleteItemButton` removes them (`DELETE /api/{collection}/{id}`), both with confirmation UX and `router.refresh()` after completion.
+
+All three tiers use `credentials: 'include'` to authenticate via the `payload-token` session cookie. Tier 3 is independent of the `InlineEditProvider` dirty-field system — it operates directly on Payload's REST API.
+
+---
+
+## 12. Media & File Storage (Supabase Storage)
+
+**Source:** Session 2026-03-30, ENG-053 — "How do I store assets? Where are thumbnails and resumes stored?"
+
+### 12.1 Architecture
+
+All uploaded files (images, PDFs, documents) are stored in **Supabase Storage** via the `@payloadcms/storage-s3` adapter. Supabase Storage exposes an S3-compatible API, so the adapter connects with `forcePathStyle: true`.
+
+| Layer | Service | What it stores |
+|-------|---------|---------------|
+| **Structured data** | Supabase Postgres (`DATABASE_URL`) | CMS records, file metadata (filename, dimensions, alt text, MIME type) |
+| **Binary files** | Supabase Storage (`S3_ENDPOINT`) | Actual images, PDFs, and documents |
+| **CDN** | Cloudflare (via Supabase) | Public file delivery with caching |
+
+### 12.2 Configuration
+
+The S3 adapter is configured in `src/payload.config.ts` as a plugin:
+
+```ts
+s3Storage({
+  collections: { media: true },
+  bucket: process.env.S3_BUCKET || 'media',
+  config: {
+    credentials: {
+      accessKeyId: process.env.S3_ACCESS_KEY_ID || '',
+      secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || '',
+    },
+    region: process.env.S3_REGION || 'us-east-1',
+    endpoint: process.env.S3_ENDPOINT,
+    forcePathStyle: true,
+  },
+})
+```
+
+Required environment variables (in `.env`):
+
+| Variable | Source |
+|----------|--------|
+| `S3_ENDPOINT` | Supabase Dashboard → Settings → Storage → S3 Connection |
+| `S3_BUCKET` | Name of the storage bucket (currently `media`) |
+| `S3_REGION` | Supabase project region (currently `us-east-1`) |
+| `S3_ACCESS_KEY_ID` | Supabase Dashboard → Settings → Storage → S3 Connection |
+| `S3_SECRET_ACCESS_KEY` | Supabase Dashboard → Settings → Storage → S3 Connection |
+
+### 12.3 Rules
+
+1. **No local `media/` directory in production.** The S3 adapter disables local storage. Files go directly to Supabase Storage.
+2. **Supabase bucket must be set to Public** for images to be served via CDN URLs.
+3. **MIME types:** The Media collection accepts `image/*` and `application/pdf`. To add new file types, update `mimeTypes` in `src/collections/Media.ts`.
+4. **Image sizes:** Payload auto-generates three variants via `sharp`: thumbnail (400x300), card (768x512), hero (1920w). These are stored alongside the original in Supabase Storage.
+5. **When adding a new collection with uploads**, add it to the `s3Storage` plugin's `collections` map.
+6. **Filenames are sanitized before upload.** Supabase Storage's S3 API rejects object keys with square brackets, curly braces, and certain special characters. A `beforeChange` hook on the Media collection strips brackets, replaces spaces and special chars with hyphens, and collapses consecutive hyphens. This runs before the cloud storage plugin's `afterChange` hook, which reads `data.filename` for the S3 key. (ENG-060)
+7. **Every field must have `label`, `admin.description`, and `admin.placeholder`.** Bare fields with technical names ("alt", "caption") are incomprehensible to non-technical users. Every Payload field on an upload collection must include a human-readable label, a one-sentence description, and a placeholder example. The collection itself must include `admin.description` explaining the upload process and automatic transformations. (ENG-061)
+
+### 12.4 Public URL Pattern
+
+Files uploaded to the `media` bucket are publicly accessible at:
+```
+https://<project-ref>.supabase.co/storage/v1/object/public/media/<filename>
+```
+
+### 12.5 Verification
+
+After uploading a file via the Payload admin panel or API:
+```bash
+# Check the file exists in Supabase Storage
+curl -sI "https://lrjliluvnkciwnyshexq.supabase.co/storage/v1/object/public/media/<filename>"
+
+# Verify no local file was created
+ls media/<filename>  # should return "No such file or directory"
+```
 
 ---
 
@@ -476,6 +647,7 @@ Integrated into the checkpoint workflow (§6.5). Before merging to `main`:
 | Port management | 0 | Critical |
 | Localhost verification | 1 | Critical |
 | Build / bundler issues (React 19 compat) | 4 | **Critical — 3 failed fixes (ENG-017→018→019). Rule: no `<script>` in React tree. See EAP-013.** |
+| Turbopack cache corruption | 3 | **High — ENG-047, ENG-056, ENG-067. Stale `.next/` caused runtime TypeError (047), phantom route conflicts with 404s (056), and ghost hydration mismatch from removed component (067). Rule: clear `.next/` when runtime error contradicts source or file structure. See EAP-035.** |
 | Verification gap (reporting done without browser check) | 3 | **Critical — promoted to Hard Guardrail #10 (ENG-020). curl ≠ verification.** |
 | Process automation gaps | 1 | High |
 | Documentation procedure skips | 3 | **Critical — promoted to Hard Guardrail #1 (ENG-012)** |
@@ -484,6 +656,16 @@ Integrated into the checkpoint workflow (§6.5). Before merging to `main`:
 | Node.js version / CLI tool compat | 1 | High — Node 25 breaks Payload CLI (ENG-015); use Node 22 LTS if CLI needed |
 | Git branching / session safety | 1 | Critical |
 | URL namespace / multi-app architecture | 1 | High — documented as ADR, revisit if a third concern lands on port 4000 |
+| CMS UX / inline editing | 27 | **Critical — ESCALATED. ENG-027→039, ENG-042→046, ENG-049→051, ENG-054→058, ENG-062→063, ENG-066→068. ENG-068: ProjectEditModal missing min-height (AP-027 violated 3rd time). Modal dimension template now documented.** |
+| Hydration mismatch (SSR/CSR divergence) | 7 | **Critical — ENG-017/18/19/20, ENG-045, ENG-055, ENG-067. Rule: never branch on client-only values; defer admin-conditional DOM with mounted-state pattern. Stale cache can also cause ghost mismatches (EAP-035). See EAP-014.** |
+| Documentation procedure skips | 7 | **Critical — ESCALATED AGAIN. ENG-008/012 (EAP-010), ENG-044/045/046 (EAP-027), ENG-053 (EAP-032). 7th occurrence. Architectural changes trigger same skip pattern as bug fixes — "get it working" urgency overrides documentation even for non-urgent infrastructure work.** |
+| Design system migration / upstream-first workflow | 1 | High — ENG-040. ScrollSpy promoted to DS; required `transpilePackages` + export path. |
+| Admin IA / discoverability | 3 | **High — ENG-042/043/046. Sidebar nav insufficient; dashboard is the only reliable entry point. Auto-login cookie gap masked the whole inline editing system.** |
+| Infrastructure / storage architecture | 3 | High — ENG-053. Supabase Storage added for cloud file persistence. ENG-055: Added `uploadMedia` API helper for inline file uploads via S3. ENG-060: Filename sanitization for S3-incompatible chars. |
+| Version control / release automation | 1 | High — ENG-069. Stale footer dates and manual-only bumps. Added `/api/dev-info` live endpoint + `version-analyze.mjs` auto-bump script. |
+| Radix primitive internal state vs mirrored props | 1 | Medium — ENG-071. Checkbox indeterminate icon branched on React `checked` while uncontrolled `defaultChecked="indeterminate"` leaves prop undefined; UI must follow `CheckboxIndicator` `data-state` (or context), not props alone. |
+| Scroll hijack on embedded canvas | 1 | High — ENG-072. onWheel handler on embedded DAG canvas intercepted page scroll. Embedded canvases must never capture wheel events; pan via drag only. See EAP-036. |
+| Playground ↔ production drift (one-way experiment) | 2 | **Critical — ENG-073, ENG-074. Drift from non-propagation AND from rebuilding demos with hardcoded values instead of token references. See EAP-030, EAP-055.** |
 
 ---
 

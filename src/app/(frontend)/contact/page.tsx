@@ -1,4 +1,5 @@
 import { getPayloadClient } from "@/lib/payload";
+import { extractLexicalText, lexicalToHtml } from "@/lib/lexical";
 import { isAdminAuthenticated } from "@/lib/admin-auth";
 import { RefreshRouteOnSave } from "@/components/RefreshRouteOnSave";
 import ContactClient from "./ContactClient";
@@ -22,13 +23,13 @@ const FALLBACK_TESTIMONIALS = [
 ];
 
 const FALLBACK_CLIENTS = [
-  "Acme Corp", "Globex", "Initech", "Umbrella", "Stark Ind",
-  "Wayne Corp", "Cyberdyne", "Soylent", "Tyrell", "Weyland",
+  { name: "Acme Corp", url: "" }, { name: "Globex", url: "" }, { name: "Initech", url: "" }, { name: "Umbrella", url: "" }, { name: "Stark Ind", url: "" },
+  { name: "Wayne Corp", url: "" }, { name: "Cyberdyne", url: "" }, { name: "Soylent", url: "" }, { name: "Tyrell", url: "" }, { name: "Weyland", url: "" },
 ];
 
 export default async function ContactPage() {
-  let testimonials: { id?: number; text: string; name: string; role: string }[] = FALLBACK_TESTIMONIALS;
-  let clients = FALLBACK_CLIENTS;
+  let testimonials: { id?: number; text: string; textHtml?: string; name: string; role: string }[] = FALLBACK_TESTIMONIALS;
+  let clients: { name: string; url: string }[] = FALLBACK_CLIENTS;
   const isAdmin = await isAdminAuthenticated();
 
   try {
@@ -41,17 +42,25 @@ export default async function ContactPage() {
     });
 
     if (testimonialsRes.docs.length > 0) {
-      testimonials = testimonialsRes.docs.map((t) => ({
-        id: t.id,
-        text: t.text,
-        name: t.name,
-        role: t.role,
-      }));
+      testimonials = testimonialsRes.docs.map((t) => {
+        const textHtml = lexicalToHtml(t.text);
+        const plain = extractLexicalText(t.text);
+        return {
+          id: t.id,
+          text: plain,
+          textHtml: textHtml !== plain ? textHtml : undefined,
+          name: t.name,
+          role: t.role,
+        };
+      });
     }
 
     const config = await payload.findGlobal({ slug: "site-config" });
     if (config?.clients && config.clients.length > 0) {
-      clients = config.clients.map((c: { name: string }) => c.name);
+      clients = config.clients.map((c: { name: string; url?: string | null }) => ({
+        name: c.name,
+        url: c.url ?? "",
+      }));
     }
   } catch {
     // Payload not connected — use fallback data

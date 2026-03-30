@@ -1,26 +1,179 @@
-$portfolio-spacing-01: 2px;
-$portfolio-spacing-02: 4px;
-$portfolio-spacing-03: 8px;
-$portfolio-spacing-04: 12px;
-$portfolio-spacing-05: 16px;
-$portfolio-spacing-06: 24px;
-$portfolio-spacing-07: 32px;
-$portfolio-spacing-08: 40px;
-$portfolio-spacing-09: 48px;
-$portfolio-spacing-10: 64px;
-$portfolio-spacing-11: 80px;
-$portfolio-spacing-12: 96px;
-$portfolio-spacing-13: 128px;
+// =============================================================================
+// SPACING TOKENS — Three-Tier Architecture (One GS Reference)
+// =============================================================================
+//
+// Naming convention optimized for AI agent comprehension:
+//   Tier 1 (Primitives):  $portfolio-spacer-Nx    — value derivable via N × 8px
+//   Tier 2 (Layout):      $portfolio-spacer-layout-{name} — intent from density name
+//   Tier 3 (Utility):     $portfolio-spacer-utility-Nx    — component-internal spacing
+//
+// Base unit: 8px. Token name = multiplier × base.
+// SCSS encodes decimals as hyphens: spacer-0-5x = 0.5 × 8 = 4px.
+//
+// Tier 1 follows a clean progression: sub-1x halving (0.5, 0.25, 0.125),
+// half-steps through 2.5x, then integer steps 3x–20x.
+// Oddball fractions (0.75x, 0.875x, 1.25x, 1.625x, 1.75x, 2.25x) live ONLY in Tier 3
+// (utility) — they exist to serve component sizing, not the global scale.
+//
+// Reference: One GS Design System — Figma file HGHBk3MfZ5zK5g3EobImPM
+// =============================================================================
 
-$portfolio-layout-01: 16px;
-$portfolio-layout-02: 24px;
-$portfolio-layout-03: 32px;
-$portfolio-layout-04: 48px;
-$portfolio-layout-05: 64px;
-$portfolio-layout-06: 96px;
-$portfolio-layout-07: 128px;
+// ---------------------------------------------------------------------------
+// Tier 1: Primitive Spacer Tokens
+// ---------------------------------------------------------------------------
+// Clean 8px-grid scale. Sub-1x values use halving steps (0.5, 0.25, 0.125).
+// 1x–2.5x use half-steps. 3x+ use integer steps.
+// NO oddball fractions here — those belong in Tier 3 (utility).
 
-$portfolio-container-sm: 672px;
-$portfolio-container-md: 1056px;
-$portfolio-container-lg: 1312px;
-$portfolio-container-xl: 1584px;
+$portfolio-spacer-0-125x: 1px;
+$portfolio-spacer-0-25x: 2px;
+$portfolio-spacer-0-5x: 4px;
+$portfolio-spacer-1x: 8px;
+$portfolio-spacer-1-5x: 12px;
+$portfolio-spacer-2x: 16px;
+$portfolio-spacer-2-5x: 20px;
+$portfolio-spacer-3x: 24px;
+$portfolio-spacer-4x: 32px;
+$portfolio-spacer-5x: 40px;
+$portfolio-spacer-6x: 48px;
+$portfolio-spacer-7x: 56px;
+$portfolio-spacer-8x: 64px;
+$portfolio-spacer-9x: 72px;
+$portfolio-spacer-10x: 80px;
+$portfolio-spacer-11x: 88px;
+$portfolio-spacer-12x: 96px;
+$portfolio-spacer-13x: 104px;
+$portfolio-spacer-14x: 112px;
+$portfolio-spacer-15x: 120px;
+$portfolio-spacer-16x: 128px;
+$portfolio-spacer-17x: 136px;
+$portfolio-spacer-18x: 144px;
+$portfolio-spacer-19x: 152px;
+$portfolio-spacer-20x: 160px;
+
+$portfolio-spacer-scale: (
+  '0.125x': $portfolio-spacer-0-125x,
+  '0.25x': $portfolio-spacer-0-25x,
+  '0.5x': $portfolio-spacer-0-5x,
+  '1x': $portfolio-spacer-1x,
+  '1.5x': $portfolio-spacer-1-5x,
+  '2x': $portfolio-spacer-2x,
+  '2.5x': $portfolio-spacer-2-5x,
+  '3x': $portfolio-spacer-3x,
+  '4x': $portfolio-spacer-4x,
+  '5x': $portfolio-spacer-5x,
+  '6x': $portfolio-spacer-6x,
+  '7x': $portfolio-spacer-7x,
+  '8x': $portfolio-spacer-8x,
+  '9x': $portfolio-spacer-9x,
+  '10x': $portfolio-spacer-10x,
+  '11x': $portfolio-spacer-11x,
+  '12x': $portfolio-spacer-12x,
+  '13x': $portfolio-spacer-13x,
+  '14x': $portfolio-spacer-14x,
+  '15x': $portfolio-spacer-15x,
+  '16x': $portfolio-spacer-16x,
+  '17x': $portfolio-spacer-17x,
+  '18x': $portfolio-spacer-18x,
+  '19x': $portfolio-spacer-19x,
+  '20x': $portfolio-spacer-20x,
+);
+
+// ---------------------------------------------------------------------------
+// Tier 2: Semantic Layout Spacer Tokens
+// ---------------------------------------------------------------------------
+// Density-aware tokens for page-level and section-level spacing.
+// Semantic names enable agents to reason about intent, not pixel values.
+//
+// Default density: Functional (B2B tool UI).
+// Complex and Informational modes can be added later as map variants.
+
+$portfolio-spacer-layout-x-compact: $portfolio-spacer-1x;         //  8px
+$portfolio-spacer-layout-compact: $portfolio-spacer-2x;            // 16px
+$portfolio-spacer-layout-standard: $portfolio-spacer-3x;           // 24px
+$portfolio-spacer-layout-spacious: $portfolio-spacer-4x;           // 32px
+$portfolio-spacer-layout-x-spacious: $portfolio-spacer-6x;         // 48px
+$portfolio-spacer-layout-xx-spacious: $portfolio-spacer-8x;        // 64px
+$portfolio-spacer-layout-xxx-spacious: $portfolio-spacer-10x;      // 80px
+$portfolio-spacer-layout-xxxx-spacious: $portfolio-spacer-12x;     // 96px
+
+$portfolio-spacer-layout: (
+  x-compact:     $portfolio-spacer-layout-x-compact,
+  compact:       $portfolio-spacer-layout-compact,
+  standard:      $portfolio-spacer-layout-standard,
+  spacious:      $portfolio-spacer-layout-spacious,
+  x-spacious:    $portfolio-spacer-layout-x-spacious,
+  xx-spacious:   $portfolio-spacer-layout-xx-spacious,
+  xxx-spacious:  $portfolio-spacer-layout-xxx-spacious,
+  xxxx-spacious: $portfolio-spacer-layout-xxxx-spacious,
+);
+
+// ---------------------------------------------------------------------------
+// Tier 3: Utility Spacer Tokens (Component-Level)
+// ---------------------------------------------------------------------------
+// Component-internal spacing for buttons, inputs, checkboxes.
+// Includes oddball fractional multipliers (0.75x, 0.875x, 1.25x, 1.625x)
+// that serve component sizing but don't belong in the clean primitive grid.
+// These tokens own their pixel values directly — they do NOT reference
+// primitive tokens, because no primitive counterpart exists.
+
+$portfolio-spacer-utility-0-5x: 4px;
+$portfolio-spacer-utility-0-75x: 6px;
+$portfolio-spacer-utility-0-875x: 7px;
+$portfolio-spacer-utility-1x: 8px;
+$portfolio-spacer-utility-1-25x: 10px;
+$portfolio-spacer-utility-1-5x: 12px;
+$portfolio-spacer-utility-1-625x: 13px;
+$portfolio-spacer-utility-1-75x: 14px;
+$portfolio-spacer-utility-2x: 16px;
+$portfolio-spacer-utility-2-25x: 18px;
+$portfolio-spacer-utility-2-5x: 20px;
+$portfolio-spacer-utility-3x: 24px;
+
+// ---------------------------------------------------------------------------
+// Legacy Aliases (Deprecated — migrate to spacer-Nx naming)
+// ---------------------------------------------------------------------------
+// Preserved for backward compatibility. All existing @use references continue
+// to work. Migrate incrementally and remove in a future major version.
+
+// Legacy spacing-NN → spacer-Nx
+$portfolio-spacing-01: $portfolio-spacer-0-25x;    //  2px → spacer-0.25x
+$portfolio-spacing-02: $portfolio-spacer-0-5x;     //  4px → spacer-0.5x
+$portfolio-spacing-03: $portfolio-spacer-1x;        //  8px → spacer-1x
+$portfolio-spacing-04: $portfolio-spacer-1-5x;      // 12px → spacer-1.5x
+$portfolio-spacing-05: $portfolio-spacer-2x;        // 16px → spacer-2x
+$portfolio-spacing-06: $portfolio-spacer-3x;        // 24px → spacer-3x
+$portfolio-spacing-07: $portfolio-spacer-4x;        // 32px → spacer-4x
+$portfolio-spacing-08: $portfolio-spacer-5x;        // 40px → spacer-5x
+$portfolio-spacing-09: $portfolio-spacer-6x;        // 48px → spacer-6x
+$portfolio-spacing-10: $portfolio-spacer-8x;        // 64px → spacer-8x
+$portfolio-spacing-11: $portfolio-spacer-10x;       // 80px → spacer-10x
+$portfolio-spacing-12: $portfolio-spacer-12x;       // 96px → spacer-12x
+$portfolio-spacing-13: $portfolio-spacer-16x;       // 128px → spacer-16x
+
+// Legacy layout-NN → spacer-layout-{name}
+$portfolio-layout-01: $portfolio-spacer-layout-compact;       // 16px → spacer-layout-compact
+$portfolio-layout-02: $portfolio-spacer-layout-standard;      // 24px → spacer-layout-standard
+$portfolio-layout-03: $portfolio-spacer-layout-spacious;      // 32px → spacer-layout-spacious
+$portfolio-layout-04: $portfolio-spacer-layout-x-spacious;    // 48px → spacer-layout-x-spacious
+$portfolio-layout-05: $portfolio-spacer-layout-xx-spacious;   // 64px → spacer-layout-xx-spacious
+$portfolio-layout-06: $portfolio-spacer-layout-xxxx-spacious; // 96px → spacer-layout-xxxx-spacious
+$portfolio-layout-07: $portfolio-spacer-16x;                  // 128px → spacer-16x (no layout semantic — raw value)
+
+// ---------------------------------------------------------------------------
+// Container Widths — Semantic Names (Élan)
+// ---------------------------------------------------------------------------
+// Uses semantic names to avoid collision with breakpoint tier names.
+// E.g., "narrow" instead of "sm" prevents confusion with $elan-bp-sm.
+
+$elan-container-narrow: 672px;   // Long-form reading, blog posts, narrow forms
+$elan-container-content: 720px;  // Case study prose, about page, reading — slightly wider than narrow for comfortable reading length
+$elan-container-default: 1056px; // Standard content pages, case studies
+$elan-container-wide: 1440px;    // Dashboards with moderate density
+// $elan-container-full: 100%    // (use width: 100% directly for full-bleed)
+
+// Legacy aliases (deprecated — migrate to $elan-container-*)
+$portfolio-container-sm: $elan-container-narrow;
+$portfolio-container-md: $elan-container-default;
+$portfolio-container-lg: 1312px;   // No direct semantic equivalent; kept for migration
+$portfolio-container-xl: 1584px;   // No direct semantic equivalent; kept for migration

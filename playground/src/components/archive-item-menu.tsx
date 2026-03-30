@@ -130,7 +130,7 @@ export function ArchiveItemMenu({
               <button
                 role="menuitem"
                 onClick={handleDeleteClick}
-                className="flex items-center gap-2.5 w-full px-3 py-2 text-sm text-left transition-colors hover:bg-red-50 dark:hover:bg-red-950/30 text-[#DA1E28]"
+                className="flex items-center gap-2.5 w-full px-3 py-2 text-sm text-left transition-colors hover:bg-red-50 dark:hover:bg-red-950/30 text-red-600 dark:text-red-500"
               >
                 <Trash2 className="w-3.5 h-3.5" />
                 Delete permanently
@@ -169,7 +169,7 @@ export function ArchiveItemMenu({
                 <div className="p-5 space-y-4">
                   <div className="flex items-start gap-3">
                     <div className="flex items-center justify-center w-9 h-9 rounded-sm bg-red-50 dark:bg-red-950/30 shrink-0">
-                      <AlertTriangle className="w-5 h-5 text-[#DA1E28]" />
+                      <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-500" />
                     </div>
                     <div className="space-y-1.5 min-w-0">
                       <h3 className="text-sm font-medium">Delete permanently?</h3>
@@ -193,7 +193,7 @@ export function ArchiveItemMenu({
                       disabled={deleting}
                       className={cn(
                         "px-3 py-1.5 text-xs font-medium rounded-sm transition-colors text-white",
-                        "bg-[#DA1E28] hover:bg-[#BA1B23]",
+                        "bg-red-600 hover:bg-red-700",
                         "disabled:opacity-60 disabled:cursor-not-allowed",
                       )}
                     >

@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -48,8 +49,17 @@ import {
   Compass,
   Table2,
   Paintbrush,
+  Pipette,
+  SlidersHorizontal,
+  GripHorizontal,
+  Upload,
+  Loader,
+  Columns,
+  Code2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { elan } from "@/lib/elan";
+import { useDevInfo } from "@/hooks/use-dev-info";
 import {
   createContext,
   useContext,
@@ -61,6 +71,7 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import Fuse from "fuse.js";
+import { useSafeTriangle } from "@/hooks/use-safe-triangle";
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
@@ -133,6 +144,7 @@ const componentCategories: NavCategory[] = [
       { href: "/tokens/colors", label: "Colors", icon: Palette },
       { href: "/tokens/typography", label: "Typography", icon: Type },
       { href: "/tokens/spacing", label: "Spacing", icon: Ruler },
+      { href: "/tokens/breakpoints", label: "Breakpoints", icon: Columns },
       { href: "/tokens/motion", label: "Motion", icon: Zap },
       { href: "/tokens/elevation", label: "Elevation", icon: Layers },
     ],
@@ -170,6 +182,31 @@ const componentCategories: NavCategory[] = [
         label: "ThemeToggle",
         icon: ToggleLeft,
       },
+      {
+        href: "/components/color-picker",
+        label: "ColorPicker",
+        icon: Pipette,
+      },
+      {
+        href: "/components/slider",
+        label: "Slider",
+        icon: SlidersHorizontal,
+      },
+      {
+        href: "/components/scrub-input",
+        label: "ScrubInput",
+        icon: GripHorizontal,
+      },
+      {
+        href: "/components/dropzone",
+        label: "Dropzone",
+        icon: Upload,
+      },
+      {
+        href: "/components/segmented-control",
+        label: "SegmentedControl",
+        icon: Columns,
+      },
     ],
   },
   {
@@ -181,6 +218,11 @@ const componentCategories: NavCategory[] = [
       { href: "/components/toast", label: "Toast", icon: BellRing },
       { href: "/components/dialog", label: "Dialog", icon: PanelTopOpen },
       { href: "/components/tooltip", label: "Tooltip", icon: MessageSquare },
+      {
+        href: "/components/progress-bar",
+        label: "ProgressBar",
+        icon: Loader,
+      },
     ],
   },
   {
@@ -202,7 +244,9 @@ const componentCategories: NavCategory[] = [
     label: "Data Display",
     icon: Table2,
     section: "Components",
-    links: [],
+    links: [
+      { href: "/components/code-block", label: "CodeBlock", icon: Code2 },
+    ],
   },
   {
     id: "layout",
@@ -225,6 +269,7 @@ const componentCategories: NavCategory[] = [
     section: "Components",
     links: [
       { href: "/components/marquee", label: "Marquee", icon: Repeat },
+      { href: "/components/testimonial-card", label: "TestimonialCard", icon: MessageSquare },
     ],
   },
   {
@@ -402,7 +447,7 @@ function SidebarSearch({
   const resultsDropdown = showResults && (
     <div className="max-h-[50vh] overflow-y-auto p-1">
       {results.length === 0 ? (
-        <div className="px-3 py-4 text-center text-[12px] text-sidebar-muted-foreground/50">
+        <div className="px-3 py-4 text-center text-xs text-sidebar-muted-foreground/50">
           No results for &ldquo;{query}&rdquo;
         </div>
       ) : (
@@ -412,7 +457,7 @@ function SidebarSearch({
             <button
               key={r.item.href}
               className={cn(
-                "flex items-center gap-2 w-full px-2 h-7 rounded-sm text-[12px] transition-colors text-left",
+                "flex items-center gap-2 w-full px-2 h-7 rounded-sm text-xs transition-colors text-left",
                 idx === selectedIndex
                   ? "bg-sidebar-accent text-sidebar-accent-foreground"
                   : "text-sidebar-foreground hover:bg-sidebar-accent/50"
@@ -422,7 +467,7 @@ function SidebarSearch({
             >
               <Icon className="w-3 h-3 shrink-0 text-sidebar-muted-foreground" />
               <span className="truncate flex-1">{r.item.label}</span>
-              <span className="text-[10px] text-sidebar-muted-foreground/50 shrink-0">
+              <span className="text-xs text-sidebar-muted-foreground/50 shrink-0">
                 {r.item.section}
               </span>
             </button>
@@ -457,7 +502,7 @@ function SidebarSearch({
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  className="w-full h-7 pl-6 pr-2 text-[12px] bg-sidebar-muted/50 rounded-sm border border-accent/50 text-sidebar-foreground placeholder:text-sidebar-muted-foreground/50 focus:outline-none transition-colors"
+                  className="w-full h-7 pl-6 pr-2 text-xs bg-sidebar-muted/50 rounded-sm border border-accent/50 text-sidebar-foreground placeholder:text-sidebar-muted-foreground/50 focus:outline-none transition-colors"
                 />
               </div>
               {resultsDropdown}
@@ -474,11 +519,11 @@ function SidebarSearch({
         <button
           onClick={() => setOpen(true)}
           title="Search (⌘K)"
-          className="flex items-center gap-2 w-full h-7 px-2 rounded-sm text-[12px] bg-sidebar-muted/50 border border-sidebar-border/50 text-sidebar-muted-foreground/50 hover:border-accent/50 hover:text-sidebar-muted-foreground transition-colors"
+          className="flex items-center gap-2 w-full h-7 px-2 rounded-sm text-xs bg-sidebar-muted/50 border border-sidebar-border/50 text-sidebar-muted-foreground/50 hover:border-accent/50 hover:text-sidebar-muted-foreground transition-colors"
         >
           <Search className="w-3 h-3 shrink-0" />
           <span className="flex-1 text-left">Search…</span>
-          <kbd className="text-[10px] font-medium">⌘K</kbd>
+          <kbd className="text-xs font-medium">⌘K</kbd>
         </button>
       ) : (
         <>
@@ -491,13 +536,13 @@ function SidebarSearch({
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={handleKeyDown}
-              className="w-full h-7 pl-6 pr-2 text-[12px] bg-sidebar-muted/50 rounded-sm border border-accent/50 text-sidebar-foreground placeholder:text-sidebar-muted-foreground/50 focus:outline-none transition-colors"
+              className="w-full h-7 pl-6 pr-2 text-xs bg-sidebar-muted/50 rounded-sm border border-accent/50 text-sidebar-foreground placeholder:text-sidebar-muted-foreground/50 focus:outline-none transition-colors"
             />
           </div>
           {showResults && (
             <div className="absolute left-1.5 right-1.5 top-[calc(100%-2px)] z-50 bg-sidebar border border-sidebar-border rounded-sm shadow-lg overflow-hidden">
               {results.length === 0 ? (
-                <div className="px-3 py-4 text-center text-[12px] text-sidebar-muted-foreground/50">
+                <div className="px-3 py-4 text-center text-xs text-sidebar-muted-foreground/50">
                   No results for &ldquo;{query}&rdquo;
                 </div>
               ) : (
@@ -507,7 +552,7 @@ function SidebarSearch({
                     <button
                       key={r.item.href}
                       className={cn(
-                        "flex items-center gap-2 w-full px-2 h-7 text-[12px] transition-colors text-left",
+                        "flex items-center gap-2 w-full px-2 h-7 text-xs transition-colors text-left",
                         idx === selectedIndex
                           ? "bg-sidebar-accent text-sidebar-accent-foreground"
                           : "text-sidebar-foreground hover:bg-sidebar-accent/50"
@@ -517,7 +562,7 @@ function SidebarSearch({
                     >
                       <Icon className="w-3 h-3 shrink-0 text-sidebar-muted-foreground" />
                       <span className="truncate flex-1">{r.item.label}</span>
-                      <span className="text-[10px] text-sidebar-muted-foreground/50 shrink-0">
+                      <span className="text-xs text-sidebar-muted-foreground/50 shrink-0">
                         {r.item.section}
                       </span>
                     </button>
@@ -551,7 +596,7 @@ function renderLinksWithGroups(
       <div key={link.href}>
         {showGroupHeader && (
           <div className="px-2 pt-2 pb-0.5">
-            <span className="text-[9px] font-medium tracking-[0.1em] uppercase text-sidebar-muted-foreground/40">
+            <span className="text-xs font-medium tracking-[0.1em] uppercase text-sidebar-muted-foreground/40">
               {link.group}
             </span>
           </div>
@@ -560,7 +605,7 @@ function renderLinksWithGroups(
           href={link.href}
           onClick={onNavigate}
           className={cn(
-            "flex items-center gap-2 h-7 px-2 rounded-sm text-[13px] transition-colors",
+            "flex items-center gap-2 h-7 px-2 rounded-sm text-sm transition-colors",
             isLinkActive
               ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
               : "text-sidebar-muted-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
@@ -629,7 +674,7 @@ function CategoriesSection({
                   {collapsed ? (
                     <div className="w-full border-t border-sidebar-border" />
                   ) : (
-                    <span className="px-2 text-[9px] font-medium tracking-[0.12em] uppercase text-sidebar-muted-foreground/50">
+                    <span className="px-2 text-xs font-medium tracking-[0.12em] uppercase text-sidebar-muted-foreground/50">
                       {cat.section}
                     </span>
                   )}
@@ -643,7 +688,7 @@ function CategoriesSection({
                   title={collapsed ? cat.label : undefined}
                   className={cn(
                     "flex items-center h-7 rounded-sm transition-colors w-full",
-                    collapsed ? "pl-[7px]" : "gap-2 px-2 text-[13px]",
+                    collapsed ? "pl-[7px]" : "gap-2 px-2 text-sm",
                     isDirectActive
                       ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
                       : "text-sidebar-muted-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
@@ -668,7 +713,7 @@ function CategoriesSection({
                     "flex items-center h-7 rounded-sm transition-colors w-full",
                     collapsed
                       ? "pl-[7px]"
-                      : "gap-2 px-2 text-[13px]",
+                      : "gap-2 px-2 text-sm",
                     isEmpty && "opacity-30 cursor-not-allowed",
                     isOpen
                       ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
@@ -711,25 +756,32 @@ function CategoriesSection({
 
 // ── Category Sliver (desktop flyout panel) ───────────────────────────────────
 
-function CategorySliver({
-  category,
-  pathname,
-  sidebarCollapsed,
-  visible,
-  onMouseEnter,
-  onMouseLeave,
-  onNavigate,
-}: {
-  category: NavCategory;
-  pathname: string;
-  sidebarCollapsed: boolean;
-  visible: boolean;
-  onMouseEnter: () => void;
-  onMouseLeave: () => void;
-  onNavigate?: () => void;
-}) {
+const CategorySliver = React.forwardRef<
+  HTMLDivElement,
+  {
+    category: NavCategory;
+    pathname: string;
+    sidebarCollapsed: boolean;
+    visible: boolean;
+    onMouseEnter: () => void;
+    onMouseLeave: () => void;
+    onNavigate?: () => void;
+  }
+>(function CategorySliver(
+  {
+    category,
+    pathname,
+    sidebarCollapsed,
+    visible,
+    onMouseEnter,
+    onMouseLeave,
+    onNavigate,
+  },
+  ref,
+) {
   return (
     <div
+      ref={ref}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       className={cn(
@@ -738,11 +790,11 @@ function CategorySliver({
         visible
           ? "translate-x-0"
           : "-translate-x-full pointer-events-none",
-        sidebarCollapsed ? "left-[41px]" : "left-[200px]"
+        sidebarCollapsed ? "left-[41px]" : "left-[200px]",
       )}
     >
       <div className="flex items-center h-12 px-3 border-b border-sidebar-border">
-        <span className="text-[12px] font-medium text-sidebar-foreground">
+        <span className="text-xs font-medium text-sidebar-foreground">
           {category.label}
         </span>
       </div>
@@ -751,7 +803,7 @@ function CategorySliver({
       </nav>
     </div>
   );
-}
+});
 
 // ── Mobile Menu Button ───────────────────────────────────────────────────────
 
@@ -770,6 +822,18 @@ export function MobileMenuButton() {
 
 // ── Main Sidebar ─────────────────────────────────────────────────────────────
 
+function VersionLabel() {
+  const { data, isLocal } = useDevInfo();
+  const version = isLocal
+    ? data?.currentVersion ?? elan.version
+    : elan.release.version;
+  return (
+    <span className="font-semibold text-sm whitespace-nowrap">
+      {elan.name} {version}
+    </span>
+  );
+}
+
 export function Sidebar() {
   const pathname = usePathname();
   const { mobileOpen, setMobileOpen, collapsed, setCollapsed } = useSidebar();
@@ -778,11 +842,18 @@ export function Sidebar() {
     null
   );
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const sliverRef = useRef<HTMLDivElement>(null);
 
   const closeMobile = useCallback(() => setMobileOpen(false), [setMobileOpen]);
 
   const isCollapsedDesktop = collapsed && !mobileOpen;
   const isMobile = mobileOpen;
+
+  const { interceptHover, cancelPending } = useSafeTriangle({
+    enabled: openCategory !== null && !isMobile,
+    submenuRef: sliverRef,
+    direction: "right",
+  });
 
   const scheduleClose = useCallback(() => {
     closeTimerRef.current = setTimeout(() => {
@@ -803,12 +874,14 @@ export function Sidebar() {
 
   useEffect(() => {
     closeMobile();
+    cancelPending();
     setOpenCategory(null);
-  }, [pathname, closeMobile]);
+  }, [pathname, closeMobile, cancelPending]);
 
   useEffect(() => {
+    cancelPending();
     setOpenCategory(null);
-  }, [collapsed]);
+  }, [collapsed, cancelPending]);
 
   useEffect(() => {
     return () => {
@@ -834,11 +907,17 @@ export function Sidebar() {
 
   function handleCategoryHover(catId: string) {
     if (!catId) {
+      cancelPending();
       setOpenCategory(null);
       return;
     }
     cancelClose();
-    setOpenCategory(catId);
+
+    if (openCategory && openCategory !== catId) {
+      interceptHover(() => setOpenCategory(catId));
+    } else {
+      setOpenCategory(catId);
+    }
   }
 
   const sliverCategoryData = displayedCategory
@@ -876,22 +955,22 @@ export function Sidebar() {
         <div
           onMouseEnter={() => setOpenCategory(null)}
           className={cn(
-            "flex items-center h-12 border-b border-sidebar-border shrink-0",
-            isCollapsedDesktop ? "px-1.5" : "justify-between px-4"
+            "flex items-center h-12 border-b border-sidebar-border shrink-0 px-1.5",
+            !isCollapsedDesktop && "justify-between"
           )}
         >
           {!isCollapsedDesktop && (
             <Link
               href="/"
-              className="flex items-center gap-2.5 min-w-0"
+              className="flex items-center gap-2.5 min-w-0 px-2"
               onClick={closeMobile}
             >
-              <div className="flex items-center justify-center w-6 h-6 rounded-sm bg-accent text-accent-foreground text-[9px] font-bold shrink-0">
-                DS
-              </div>
-              <span className="font-semibold text-[13px] whitespace-nowrap">
-                Design System
-              </span>
+              <img
+                src="/yg-logo.svg"
+                alt="YG"
+                className="w-6 h-6 shrink-0"
+              />
+              <VersionLabel />
             </Link>
           )}
           {isCollapsedDesktop && (
@@ -913,10 +992,10 @@ export function Sidebar() {
                   setOpenCategory(null);
                 }
               }}
-              className="hidden lg:flex items-center justify-center w-8 h-8 rounded-sm hover:bg-sidebar-accent/50 text-sidebar-muted-foreground hover:text-sidebar-foreground transition-colors shrink-0"
+              className="hidden lg:flex items-center justify-center w-7 h-7 rounded-sm hover:bg-sidebar-accent/50 text-sidebar-muted-foreground hover:text-sidebar-foreground transition-colors shrink-0 mr-2"
               aria-label="Collapse sidebar"
             >
-              <PanelLeftClose className="w-4 h-4" />
+              <PanelLeftClose className="w-3.5 h-3.5" />
             </button>
           )}
         </div>
@@ -952,7 +1031,7 @@ export function Sidebar() {
               "flex items-center h-7 rounded-sm transition-colors",
               isCollapsedDesktop
                 ? "pl-[7px]"
-                : "gap-2 px-2 text-[13px]",
+                : "gap-2 px-2 text-sm",
               pathname === "/archive"
                 ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
                 : "text-sidebar-muted-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
@@ -966,6 +1045,7 @@ export function Sidebar() {
 
       {!isMobile && sliverCategoryData && (
         <CategorySliver
+          ref={sliverRef}
           category={sliverCategoryData}
           pathname={pathname}
           sidebarCollapsed={isCollapsedDesktop}

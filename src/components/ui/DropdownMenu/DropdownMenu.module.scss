@@ -1,4 +1,4 @@
-@use '@yilangaodesign/design-system/scss' as *;
+@use '../../../styles' as *;
 
 .content {
   z-index: $portfolio-z-dropdown;
@@ -8,7 +8,7 @@
   border: 1px solid $portfolio-border-subtle;
   border-radius: $portfolio-radius-sm;
   box-shadow: $portfolio-shadow-lg;
-  padding: $portfolio-spacing-02;
+  padding: $portfolio-spacer-0-5x;
 
   &[data-state='open'] {
     animation: slideDown $portfolio-duration-fast $portfolio-easing-entrance;
@@ -18,8 +18,8 @@
 .item {
   display: flex;
   align-items: center;
-  gap: $portfolio-spacing-03;
-  padding: $portfolio-spacing-03 $portfolio-spacing-04;
+  gap: $portfolio-spacer-1x;
+  padding: $portfolio-spacer-1x $portfolio-spacer-1-5x;
   font-family: $portfolio-font-sans;
   font-size: $portfolio-type-sm;
   line-height: $portfolio-leading-normal;
@@ -50,11 +50,11 @@
 .separator {
   height: 1px;
   background-color: $portfolio-border-subtle;
-  margin: $portfolio-spacing-02 (-$portfolio-spacing-02);
+  margin: $portfolio-spacer-0-5x (-$portfolio-spacer-0-5x);
 }
 
 .label {
-  padding: $portfolio-spacing-03 $portfolio-spacing-04;
+  padding: $portfolio-spacer-1x $portfolio-spacer-1-5x;
   font-family: $portfolio-font-sans;
   font-size: $portfolio-type-xs;
   font-weight: $portfolio-weight-medium;

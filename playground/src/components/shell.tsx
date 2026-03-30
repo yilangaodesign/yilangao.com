@@ -1,29 +1,51 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { Sidebar, MobileMenuButton } from "./sidebar";
 import { ThemeToggle } from "./theme-toggle";
 import { elan } from "@/lib/elan";
+import { useDevInfo } from "@/hooks/use-dev-info";
+
+const BUMP_COLORS: Record<string, string> = {
+  patch: "text-muted-foreground/80",
+  minor: "text-amber-500/80",
+  major: "text-red-500/80",
+};
 
 function DesignSystemFootnote() {
-  const [isLocal, setIsLocal] = useState(false);
+  const { data: devInfo, isLocal } = useDevInfo();
 
-  useEffect(() => {
-    const host = window.location.hostname;
-    setIsLocal(host === "localhost" || host === "127.0.0.1");
-  }, []);
+  const version = isLocal
+    ? devInfo?.currentVersion ?? elan.version
+    : elan.release.version;
 
-  const releaseDate = elan.release.releasedAt.split("T")[0];
+  const displayDate = isLocal
+    ? devInfo?.lastModifiedDate ?? elan.release.releasedAt.split("T")[0]
+    : elan.release.releasedAt.split("T")[0];
+
+  const analysis = devInfo?.analysis;
+  const showBumpHint =
+    isLocal && analysis && analysis.totalFilesChanged > 0;
 
   return (
-    <footer className="h-11 flex items-center border-t border-border px-4 lg:px-5 text-[11px] text-muted-foreground/60 font-mono">
-      <span>
-        {elan.name} {isLocal ? elan.version : elan.release.version}
-        {isLocal && elan.version !== elan.release.version && (
-          <> · v{elan.release.version} released</>
-        )}
-        {" · "}Last updated {releaseDate}
+    <footer className="h-11 flex items-center border-t border-border px-4 lg:px-5 text-xs text-muted-foreground/60 font-mono gap-2">
+      <span className="truncate">
+        {elan.name} {version}
+        {isLocal &&
+          (elan.version as string) !== (elan.release.version as string) && (
+            <> · v{elan.release.version} released</>
+          )}
+        {" · "}Last updated {displayDate}
       </span>
+      {showBumpHint && (
+        <span
+          className={`shrink-0 ${BUMP_COLORS[analysis.level] ?? ""}`}
+          title={analysis.reason}
+        >
+          {analysis.totalFilesChanged} change
+          {analysis.totalFilesChanged !== 1 && "s"} · suggests{" "}
+          {analysis.level}
+        </span>
+      )}
     </footer>
   );
 }

@@ -1,16 +1,11 @@
 // ── Font Stacks ─────────────────────────────────────────────────────────────
-// Each token maps to a specific primary font with system fallbacks.
 //
-//   Token                          → Primary Font          | Category
-//   ──────────────────────────────   ─────────────────────   ──────────
-//   $portfolio-font-sans           → Geist Sans            | Sans-serif (geometric, Swiss-inspired)
-//   $portfolio-font-serif          → Georgia               | Serif (classic, web-safe)
-//   $portfolio-font-mono           → Geist Mono            | Monospace (code, data)
-//   $portfolio-font-pixel-square   → Geist Pixel Square    | Display / pixel art (square dots)
-//   $portfolio-font-pixel-grid     → Geist Pixel Grid      | Display / pixel art (grid pattern)
-//   $portfolio-font-pixel-circle   → Geist Pixel Circle    | Display / pixel art (circular dots)
-//   $portfolio-font-pixel-triangle → Geist Pixel Triangle  | Display / pixel art (triangles)
-//   $portfolio-font-pixel-line     → Geist Pixel Line      | Display / pixel art (scan lines)
+//   Token                          → Primary Font          | Category        | Role
+//   ──────────────────────────────   ─────────────────────   ──────────────   ──────────────────────
+//   $portfolio-font-sans           → Geist Sans            | Sans-serif      | Primary UI, headings, body, labels
+//   $portfolio-font-serif          → Georgia               | Serif           | Quotes only — never headings or body
+//   $portfolio-font-mono           → Geist Mono            | Monospace       | Code only — never data numbers
+//   $portfolio-font-pixel-*        → Geist Pixel variants  | Display/accent  | Decorative only — never UI elements
 
 $portfolio-font-sans: var(--font-geist-sans), 'Inter', system-ui, -apple-system, sans-serif;
 $portfolio-font-serif: 'Georgia', 'Times New Roman', serif;
@@ -21,12 +16,18 @@ $portfolio-font-pixel-circle: var(--font-geist-pixel-circle), monospace;
 $portfolio-font-pixel-triangle: var(--font-geist-pixel-triangle), monospace;
 $portfolio-font-pixel-line: var(--font-geist-pixel-line), monospace;
 
+// ── Font Weights ────────────────────────────────────────────────────────────
+$portfolio-weight-thin: 100;
+$portfolio-weight-extralight: 200;
 $portfolio-weight-light: 300;
 $portfolio-weight-regular: 400;
 $portfolio-weight-medium: 500;
 $portfolio-weight-semibold: 600;
 $portfolio-weight-bold: 700;
 
+// ── Type Scale ──────────────────────────────────────────────────────────────
+// 13-step scale from 8px (enterprise compact minimum, per OneGS) to 96px (hero stats).
+$portfolio-type-2xs: 0.5rem;
 $portfolio-type-xs: 0.75rem;
 $portfolio-type-sm: 0.875rem;
 $portfolio-type-base: 1rem;
@@ -37,13 +38,18 @@ $portfolio-type-3xl: 1.875rem;
 $portfolio-type-4xl: 2.25rem;
 $portfolio-type-5xl: 3rem;
 $portfolio-type-6xl: 3.75rem;
+$portfolio-type-7xl: 4.5rem;
+$portfolio-type-8xl: 6rem;
 
+// ── Line Heights ────────────────────────────────────────────────────────────
+$portfolio-leading-compact: 1.15;
 $portfolio-leading-tight: 1.1;
 $portfolio-leading-snug: 1.25;
 $portfolio-leading-normal: 1.5;
 $portfolio-leading-relaxed: 1.625;
 $portfolio-leading-loose: 2;
 
+// ── Letter Spacing ──────────────────────────────────────────────────────────
 $portfolio-tracking-tight: -0.02em;
 $portfolio-tracking-normal: 0em;
 $portfolio-tracking-wide: 0.02em;

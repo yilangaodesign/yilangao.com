@@ -4,7 +4,7 @@
 >
 > **Who reads this:** AI agents before writing or editing portfolio content — scan for relevant anti-patterns.
 > **Who writes this:** AI agents when a content feedback cycle reveals a new anti-pattern.
-> **Last updated:** 2026-03-29 (initial creation from competitive analysis)
+> **Last updated:** 2026-03-30 (CAP-016: feature-list case study — showing WHAT without WHY)
 
 ---
 
@@ -121,7 +121,48 @@
 
 ---
 
+## CAP-011: Title Inflation in Role Field
+
+**Trigger:** Using a role title that implies a seniority level the designer didn't hold (e.g., "Lead Product Designer" when the actual title was "Design Intern" or "Junior Designer"), justified by the fact that they led the project.
+
+**Why it's wrong:** Hiring managers verify claims. If the reference check reveals the candidate was an intern while the portfolio says "Lead Designer," the dishonesty undermines everything else in the portfolio — even the legitimate achievements. It also fails the specificity principle: if the role is inflated, what else might be? Trust, once lost, doesn't recover.
+
+**Correct alternative:** Use the neutral functional descriptor that accurately reflects what you did without claiming a title you didn't hold. "Product Designer (sole designer)" communicates ownership and scope without inflating title. The scope statement carries the leadership signal: "As the sole designer, I redesigned..." says everything "Lead" would say, with the added credibility of being verifiably true. Never mention the word "intern" — it's a title that carries disproportionate negative signal. The strategy is omission of the limiting title, not inflation of a different one.
+
+---
+
+## CAP-012: Database Column Names as User-Facing Labels
+
+**Trigger:** Using the Payload/database field name (e.g., "name", "url", "href", "period") directly as the user-visible label in an editing panel, form, or admin UI — without translating it to human-readable language.
+
+**Why it's wrong:** Database field names are terse identifiers optimized for code, not comprehension. "name" doesn't tell the user whether it's a person's name, a company name, or a project name. "url" is technical jargon that many non-technical users don't recognize. When labels use internal names, the cognitive burden shifts to the user: they must infer purpose from context, which leads to errors (entering a date into a URL field, for example).
+
+**Correct alternative:** Translate every field name to a specific, human-readable label that communicates exactly what to enter:
+- `name` → "Company" (or "Person", "Project" — be specific)
+- `url` → "Website (e.g., https://example.com)"
+- `period` → "Time Period (e.g., 2023-Present)"
+- `href` → "Link URL"
+- `external` → "Opens in new tab"
+
+For fields with non-obvious formats, add a help line or placeholder with an example. The label answers "what is this?"; the placeholder or help text answers "what format?"
+
+---
+
 ## Entry Template
+
+---
+
+## CAP-013: System Error Dumps as User-Facing Copy
+
+**Trigger:** Displaying raw API error responses, JSON payloads, HTTP status codes, or internal field paths (e.g. `socialLinks.0.href`) directly to the user.
+
+**Why it's wrong:** Users don't speak JSON. Error messages exist to help the user fix the problem — they need to know (1) what went wrong, (2) where, and (3) what to do. A raw error dump communicates none of these. It signals that the system was built for developers, not users. Even technical users find it disorienting because the internal naming conventions don't match the UI labels they see.
+
+**Correct alternative:** Parse structured API errors and translate to natural language:
+- Map internal field names to user-visible labels ("href" → "URL", "socialLinks.0" → "Link 1")
+- Convert validation messages to plain statements ("This field is required" → "is required")
+- Assemble into a single sentence: "Could not save — Link 1 → URL is required."
+- Provide contextual fallbacks for auth errors ("session expired"), server errors ("try again in a moment")
 
 ```markdown
 ## CAP-NNN: [Short Name]
@@ -134,3 +175,39 @@
 
 **Reference:** [Optional — example from competitive analysis]
 ```
+
+---
+
+## CAP-014: Ship Dates in Duration Field (Redundant Metadata)
+
+**Trigger:** Using the Duration metadata field to display when a project shipped (e.g., "Shipped August 2022") instead of how long it took.
+
+**Why it's wrong:** Duration and ship date serve different information jobs. The Duration field in the sidebar is scanned as metadata — the reader expects to calibrate project scope/velocity ("~3 months" signals a focused sprint; "18 months" signals a complex initiative). Ship dates are temporal context that belongs in the scope statement narrative. When the ship date appears in BOTH the duration field and the description, it's redundant — the same information occupies two slots, and the reader learns nothing new from the second occurrence.
+
+**Correct alternative:** Use duration to communicate project length: "~3 months", "6 weeks", "Q2 – Q3 2022", "2024 – Present". Put ship dates in the description text where they provide narrative context. If both need to appear, they must say different things.
+
+**Reference:** CF-004b → CF-010 progression (two rounds of feedback on the same field).
+
+---
+
+## CAP-015: Strategic Transparency Leak
+
+**Trigger:** Including content in a case study that reveals meta-strategy (how you position yourself in the market, your hiring optimization framework, your competitive intelligence approach) rather than demonstrable craft (what you built, why you made specific design decisions, and what trade-offs you navigated).
+
+**Why it's wrong:** A case study's job is to demonstrate capability and decision-making quality. Strategic frameworks — conversion funnels applied to hiring, probability models for recruiter behavior, competitive analysis methodologies — are valuable *because they're not public*. Publishing them doesn't showcase a design skill; it gives away an edge. The hiring manager reads a case study to evaluate "can this person do the job?" not "does this person know growth frameworks?" Revealing the meta-strategy also risks appearing manipulative rather than competent.
+
+**Correct alternative:** Every case study section should pass the "does this showcase what I *built*?" filter. If the answer is "no, this showcases what I *know about positioning*," it doesn't belong. Replace with craft-oriented content: interaction patterns you designed, technical trade-offs you navigated, scaling decisions you made. Keep strategic frameworks as internal decision-making tools, not public portfolio content.
+
+**Reference:** CFB-012 — "Portfolio as Product" replaced with "Interaction Choreography" because the former revealed HM conversion funnel strategy while the latter demonstrates actual design system interaction design.
+
+---
+
+## CAP-016: Feature-List Case Study (Showing WHAT Without WHY)
+
+**Trigger:** A case study section that describes what was built, what tools were used, or what the output looks like — without explaining why those decisions were made, what alternatives were evaluated, or what trade-offs were accepted.
+
+**Why it's wrong:** Feature lists are a junior signal (§6.1). "I built a token architecture using property·role·emphasis naming" tells the reader what happened. "I evaluated IBM Carbon's flat naming, Material Design's role tokens, and Goldman Sachs's property-first hierarchy, then chose property·role·emphasis because the name itself becomes machine-readable documentation for AI agents" tells the reader how this person thinks. Hiring managers at senior levels evaluate decision-making quality, not output volume. A case study that lists features reads like a project brief, not evidence of design leadership.
+
+**Correct alternative:** Every case study section must answer "why I designed it this way" — not just "what I built." Structure: (1) what the problem or decision point was, (2) what alternatives were considered, (3) why this approach was chosen, (4) what trade-offs were accepted. The feature/output is supporting evidence for the decision, not the headline.
+
+**Reference:** CFB-014 — Élan case study restructured from WHAT-focused ("Here's the token architecture") to WHY-focused ("I evaluated three naming conventions and chose property·role·emphasis because agents can parse it without a lookup table").

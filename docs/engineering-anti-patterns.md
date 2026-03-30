@@ -4,7 +4,7 @@
 >
 > **Who reads this:** AI agents before making code changes — scan for relevant anti-patterns.
 > **Who writes this:** AI agents when an incident reveals a new anti-pattern.
-> **Last updated:** 2026-03-29 (EAP-013 corrected: no script tags in React tree at all; EAP-014: hydration mismatch from window checks)
+> **Last updated:** 2026-03-30 (EAP-036: scroll hijack on embedded canvas via onWheel handler)
 
 ---
 
@@ -252,9 +252,426 @@ The initial render matches the server (false). After mount, `useEffect` updates 
 
 ---
 
+## EAP-015: Bare `src/` Paths in Payload Admin Config
+
+**Trigger:** Specifying a Payload admin component path (e.g. `beforeLogin`, `afterLogin`, custom views) using a bare string like `'src/components/admin/Foo'`.
+
+**Why it's wrong:** Payload copies the string verbatim into the generated `importMap.js` as an ES import specifier. Turbopack cannot resolve bare `src/...` paths — they're not relative, not aliased, and not in `node_modules`. This causes a `Module not found` build error that blocks both the admin panel and any SSR page touching the import map.
+
+**Correct alternative:** Use the `@/` path alias: `'@/components/admin/Foo'`. The alias is defined in `tsconfig.json` and resolved by both TypeScript and the bundler.
+
+**Incident:** ENG-019
+
+---
+
+## EAP-016: Conditional Rendering That Hides Inline-Editable Empty State
+
+**Trigger:** Using `{cmsValue ? <EditableText>{cmsValue}</EditableText> : <p>hardcoded fallback</p>}` for an inline-editable field.
+
+**Why it's wrong:** When the CMS field is empty (null, undefined, or empty string), the conditional renders the non-editable fallback. The user sees text on the page but can't edit it — the exact moment they need inline editing most (initial population) is the moment it's unavailable. This creates a chicken-and-egg problem: you can't populate the field because the editable component only appears when the field is already populated.
+
+**Correct alternative:** Always render the EditableText component, passing the CMS value or a placeholder string as children: `<EditableText ...>{cmsValue || "Placeholder text"}</EditableText>`. The placeholder is displayed when empty and replaced on first edit.
+
+**Incident:** ENG-028 — bio paragraph on home page was not editable because CMS bio was empty.
+
+---
+
+## EAP-017: Panel "Done" That Only Stages Without Saving
+
+**Trigger:** A modal/panel edit UI has a "Done" or "Close" button that writes changes to local state only, requiring a separate "Save" action elsewhere on the page to actually persist to the backend.
+
+**Why it's wrong:** Users universally expect the primary action button on a panel to complete the operation. A two-step stage-then-save workflow is a dark pattern that guarantees data loss: the user thinks they've saved, navigates away, and their changes vanish. The bottom save bar may be hidden behind the modal or go unnoticed.
+
+**Correct alternative:** Panel action buttons must persist changes directly to the backend. If a global save bar exists for single-field edits (like `contentEditable` text), array panels should bypass it and call the save API directly when the user clicks "Save & Close". Use `flushSync` to ensure React state is current before the API call.
+
+**Incident:** ENG-030 — EditableArray "Done" button staged data but never saved; user lost Teams edits.
+
+---
+
+## EAP-018: React `useCallback` Save That Reads Stale `dirtyFields` Closure
+
+**Trigger:** A `save()` function created with `useCallback(..., [dirtyFields])` that reads `dirtyFields` from its closure, called immediately after a `setFieldValue()` that queues a state update.
+
+**Why it's wrong:** React 18+ batches state updates. `setFieldValue()` queues a `setDirtyFields(prev => ...)` update but doesn't apply it synchronously. The `save()` callback still sees the OLD `dirtyFields` from the previous render. It saves zero changes and succeeds silently. This is especially insidious because there's no error — the save just does nothing.
+
+**Correct alternative:** Maintain a `dirtyRef = useRef(dirtyFields)` that is updated synchronously inside the state setter: `setDirtyFields(prev => { ...; dirtyRef.current = next; return next })`. The `save()` function reads from `dirtyRef.current`, which always has the latest value regardless of React's batching schedule. This makes `save()` callable immediately after `setFieldValue()`.
+
+**Incident:** ENG-030 — `save()` silently saved zero changes because `dirtyFields` closure was stale.
+
+---
+
+## EAP-019: Single-Layer CMS Field Changes
+
+**Trigger:** Adding a field to the Payload schema, or to the frontend TypeScript type / inline edit fields, without updating all three layers of the CMS data stack (schema → data fetch → UI).
+
+**Why it's wrong:** CMS data flows through three layers that form a single contract: (1) Payload schema defines what the admin panel shows and the database stores, (2) the `page.tsx` data fetch maps CMS data to props, (3) the `*Client.tsx` TypeScript types + inline edit `*_FIELDS` definitions control what the frontend renders and what's editable. A field added to only one or two layers creates silent drift:
+- Schema has it, frontend doesn't → admin panel shows a field the user fills in, but it never appears on the site.
+- Frontend has it, schema doesn't → inline edit lets you type, but save silently drops the value (field doesn't exist in DB).
+- Data fetch skips it → CMS has the data, frontend type expects it, but it's always undefined/empty.
+
+This class of bug is especially dangerous because there are no error messages — the system "works" but silently loses data.
+
+**Correct alternative:** Run the **CMS-Frontend Parity Checklist** (in `AGENTS.md`) after every field change. The checklist maps what you did → what you must also do across all three layers. After schema changes, always restart the dev server (Payload syncs DB schema on startup only).
+
+**Incident:** ENG-031 (systemic, 5th in category) — `clients[].url` existed in CMS but not in frontend; `teams[].period` existed in code but not in running DB due to missing server restart.
+
+---
+
 ## Entry Template
 
+---
+
+## EAP-020: Raw API Response Bodies as User-Facing Error Messages
+
+**Trigger:** Throwing `new Error(\`Failed: ${response.status} — ${await response.text()}\`)` and displaying the result directly in the UI.
+
+**Why it's wrong:** The raw response body from Payload (or any API) is a structured JSON object with internal field paths, validation error arrays, and technical terminology. Users see gibberish. The error message is designed for server logs, not for the person trying to save their work. This violates the separation between internal diagnostics and user-facing communication.
+
+**Correct pattern:** Parse the structured error response, extract the user-relevant parts (which field, what's wrong), translate internal names to UI-visible labels, and assemble a natural-language sentence. Keep the raw response available in console logs for debugging, but never surface it in the UI.
+
+**Example:**
+- Bad: `Failed to update global:site-config: 400 — {"errors":[{"name":"ValidationError","data":{"errors":[{"label":"Links > Social Links 1 > Href","message":"This field is required"}]}}]}`
+- Good: `Could not save — Social Link 1 → URL is required.`
+
+---
+
+## EAP-021: Over-Zealous Required Constraints That Block Partial Saves
+
+**Trigger:** Marking CMS fields as `required: true` based on data completeness ideals rather than user flow requirements.
+
+**Why it's wrong:** A required field that blocks saving forces the user to complete the entire form in one session. This prevents partial progress — users can't save a placeholder item (e.g. a link with a label but no URL yet) and come back later. The "required" constraint should reflect whether the system genuinely cannot function without the value, not whether the value is "nice to have." For a link, a missing URL means the link isn't clickable yet — but the label is still meaningful as a placeholder.
+
+**Correct pattern:** Only mark a field as `required` if the item is meaningless without it (e.g. a link without a label has no identity). All other fields should be optional at the schema level. Use client-side UI cues (asterisks, inline hints) to indicate which fields are recommended, without preventing saves.
+
+**Example:**
+- Bad: `socialLinks[].href` is `required: true` → user can't save "Resume" as a link placeholder
+- Good: `socialLinks[].label` is `required: true` (a link needs a name), `href` is optional (URL can be added later)
+
+---
+
+## EAP-022: Index-as-Key on Draggable Lists Breaks Re-Grab
+
+**Trigger:** Using `key={index}` in `Array.map()` for a drag-and-drop reorderable list.
+
+**Why it's wrong:** When items are reordered, React reconciles by key. With `key={index}`, keys never change (0, 1, 2, …) so React reuses the same physical DOM nodes — it updates their props/content rather than creating new elements. The browser retains drag state on the physical DOM node that just completed a drag operation. On the next drag attempt, that node's stale browser drag state prevents `dragstart` from initiating properly. The drag handle appears visually correct but is non-functional for any item that changed position.
+
+**Correct alternative:** Maintain a parallel `itemKeys` state array of stable, unique string IDs (e.g. `fieldId-item-${Date.now()}-${i}`). Initialize keys when the list opens, and keep them in sync with every mutation: reorder the keys array in `reorderItem`, filter it in `deleteItem`, extend it in `addItem`. Use `key={stableKey}` in the render so React creates a fresh DOM node at each position after a reorder.
+
+**Incident:** ENG-036 (2026-03-29) — Drag handle non-functional after first reorder in EditableArray panel.
+
+---
+
+## EAP-023: Payload `type: 'email'` with contentEditable Inline Editing
+
+**Trigger:** Using Payload's `type: 'email'` field type for a value that is edited inline via `contentEditable`.
+
+**Why it's wrong:** `contentEditable` captures `textContent` from the DOM, which may include trailing whitespace, zero-width spaces, or browser-injected invisible characters. Payload's built-in `email` validator is strict and rejects these. The save silently fails (or shows an error the user doesn't understand), making it appear that inline editing "doesn't work" for email fields.
+
+**Correct alternative:** Use `type: 'text'` with a custom `validate` function that trims whitespace before validation and uses a permissive email regex. Also add `.trim()` to the value captured from `contentEditable` before passing it to the dirty state.
+
+**Incident:** ENG-037 (2026-03-29) — Footer email save appeared to silently fail.
+
+---
+
+## EAP-024: Error-Swallowing Save Functions
+
+**Trigger:** A `save()` function that catches all errors internally (setting error state) without re-throwing, while callers `await save()` expecting to detect failure.
+
+**Why it's wrong:** Callers like `EditableArray.commitPanel()` use `try/catch` or conditional logic after `await save()` to decide what to do next (e.g., close the panel on success, keep it open on failure). If `save()` catches internally and never re-throws, it always resolves successfully from the caller's perspective. The caller closes the panel, the user thinks the save worked, but it didn't. This is a silent data loss pattern.
+
+**Correct alternative:** `save()` should both set error state (for reactive UI like error bars) AND re-throw the error (for imperative callers). Callers that don't need failure handling (like keyboard shortcuts) should add `.catch(() => {})`.
+
+**Incident:** ENG-038 (2026-03-29) — EditableArray panel closed even when save failed.
+
+## EAP-025: Nested Anchor Elements
+
+**Trigger:** Wrapping one `<a>` element inside another `<a>` element — e.g. a card link containing a secondary action link.
+
+**Why it's wrong:** Nested `<a>` tags are invalid HTML per the spec. Browsers "flatten" the nesting by closing the outer `<a>` before the inner one, creating unpredictable click targets. The result is that clicks on the card do nothing, or navigate to the wrong destination. There are no console errors — the failure is completely silent.
+
+**Correct alternative:** Use a `<div role="button">` with `onClick` + `onKeyDown` for the outer container, and a single `<a>` for the inner link. Use `e.stopPropagation()` on the inner link to prevent the card's click handler from firing.
+
+**Incident:** ENG-044 — DashboardPages card `<a>` wrapping pencil `<a>` caused clicks to silently fail.
+
+---
+
+## EAP-026: Cookie-Based Auth Check When Auth Mechanism Doesn't Set Cookies
+
+**Trigger:** Using `cookies().get('payload-token')` to detect whether the user is a Payload admin, when the actual authentication mechanism (auto-login in dev) authenticates server-side without setting a browser cookie.
+
+**Why it's wrong:** Payload's `autoLogin` with `prefillOnly: false` authenticates requests at the framework level — it never issues a `Set-Cookie` header. The `payload-token` cookie only exists when a user manually logs in via the `/admin/login` form. Checking for a cookie that is never set means the auth check always returns `false` in the most common dev workflow. The admin UI (inline editing, admin bar) is permanently hidden, with no error or indication of why.
+
+**Correct alternative:** Layer the auth check:
+1. First, check the `payload-token` cookie (covers production manual login).
+2. Fall back to checking environment signals: `NODE_ENV !== 'production' && PAYLOAD_ADMIN_EMAIL` is set → auto-login is configured, so the admin UI should be active.
+3. Optionally, call Payload's auth API (`payload.auth({ headers })`) for a definitive server-side check.
+
+**Incident:** ENG-046 — Inline editing never activated on the live site despite auto-login being configured.
+
+---
+
+## EAP-027: Documentation Skips During Rapid-Fire Debugging
+
+**Trigger:** A user reports an issue. The agent fixes it and responds. The user immediately reports another issue (often caused by the first fix). The agent enters a tight fix→respond→fix→respond loop. Documentation is deferred "until the chain of issues is resolved." The chain ends but documentation never happens.
+
+**Why it's wrong:** This is a violation of Hard Guardrail #1 ("NEVER respond to the user after fixing a bug without FIRST completing all documentation steps"). The guardrail already exists. The failure is behavioral, not informational — the agent knows the rule but doesn't follow it under time pressure. Each undocumented incident is lost knowledge. When 3 incidents go undocumented in sequence (as in ENG-044→045→046), the cumulative knowledge loss is substantial: root causes, anti-patterns, and principles that would prevent future occurrences are never captured.
+
+**Why it recurs despite EAP-010 and Hard Guardrail #1:** The rule says "NEVER respond without FIRST documenting." But the agent's behavioral priority system ranks "resolve the user's frustration" higher than "follow documentation procedure." When the user is visibly frustrated ("This is so frustrating and so bad"), the urgency signal overrides the process gate. The rule exists in the right place (Hard Guardrails) but lacks a structural mechanism to enforce it.
+
+**Correct alternative:** The documentation step must be baked into the fix workflow itself, not treated as a separate post-fix step. Specifically:
+1. Before writing the code fix, create the feedback log entry stub with Issue + Root Cause.
+2. After the fix, fill in the Resolution section and check for anti-patterns.
+3. Only then respond to the user.
+
+This makes documentation a pre-condition of the response, not a post-condition.
+
+**Incident:** ENG-044, ENG-045, ENG-046 (2026-03-30) — 3 consecutive incidents resolved without any documentation. 6th occurrence of this pattern across the project (also ENG-008, ENG-012 per EAP-010).
+
+---
+
+## EAP-028: Partial Cross-App Sync on Shared Components
+
+**Trigger:** Modifying a component that exists in both `src/components/` and `playground/src/components/` (or its demo page) but only updating one version and not the other.
+
+**Why it's wrong:** The playground is the design system's public documentation surface. When the playground shows outdated behavior or visuals, it teaches consumers the wrong patterns. Worse, when two versions of the same component diverge over multiple sessions, the drift compounds: each version accumulates fixes the other lacks, making reconciliation increasingly expensive. In this case, the main site had outdated behavior (linear interpolation, no dead zone) while the playground had outdated visuals (no label differentiation, AP-031 centering bug) — neither was the "correct" version.
+
+**Correct alternative:** Every change to a shared component must be applied to ALL codebases atomically in the same session. The Cross-App Parity Checklist covers creation but should be extended to cover modification: "Did I change `src/components/X`? → Check `playground/src/components/X` and `playground/src/app/components/X/page.tsx`." The demo page (`page.tsx`) is a third sync target that is easy to forget.
+
+**Incident:** ENG-042 (2026-03-30) — ScrollSpy had 6 discrepancies across 3 codebases after 2 sessions of partial updates.
+
+## EAP-029: New Components Rendering CMS Data Without Inline Edit Wiring
+
+**Trigger:** Creating a new component that renders data from a Payload collection or global, but not wrapping its text fields with `EditableText`, not passing `id`/`isAdmin`, and not including an `EditButton`.
+
+**Why it's wrong:** The inline edit system is a core feature of this site — every piece of CMS-backed text should be editable in-place when the admin is logged in. A component that renders CMS data as plain `<span>` or `<p>` tags creates a dead zone: the admin sees text they should be able to edit but can't. This forces them to leave the page, find the item in the Payload admin panel, edit it there, and come back. It defeats the purpose of inline editing.
+
+The failure mode is especially insidious because the component *looks correct* to the developer — it renders the right data. The missing affordance is invisible unless you're logged in as admin and trying to edit.
+
+**Correct alternative:** When creating any component that renders CMS data:
+
+1. **Accept `id` and `isAdmin` in props** — the server component must pass the document ID.
+2. **Make it a client component** (`"use client"`) if it uses `EditableText` (hooks require client context).
+3. **Wrap every text field** with `EditableText` when `isAdmin && id`:
+   - `fieldId`: `{collection}:{id}:{fieldName}` (unique per field per document)
+   - `target`: `{ type: 'collection', slug: '{collection}', id }`
+   - `fieldPath`: exact Payload field name
+4. **Add `EditButton`** for full admin panel access.
+5. **Fall back to plain elements** when not admin (for SSR / non-admin visitors).
+
+**Checklist (add to CMS-Frontend Parity Checklist):**
+
+| Layer | What to verify |
+|-------|---------------|
+| Props | Component accepts `id?: number` and `isAdmin?: boolean` |
+| Target | `ApiTarget` helper function exists for the collection |
+| Fields | Every CMS-sourced text field wrapped in `EditableText` when admin |
+| Edit button | `EditButton` present with correct `collection` and `id` |
+| Data flow | Server `page.tsx` passes `id` from Payload docs |
+| Parent | Parent component passes `isAdmin` down |
+
+**Incident:** ENG-049 — TestimonialCard created with plain `<p>` and `<span>` tags, no inline edit support.
+
+---
+
+## EAP-030: Filtering on Newly-Added Fields That Have No Data Yet
+
+**Trigger:** Adding a new boolean/enum field to a Payload collection schema and immediately using it as a `where` filter in a query (e.g., `where: { showOnHome: { equals: true } }`).
+
+**Why it's wrong:** When a new field is added to the schema, existing documents in the database don't have it. Even after a server restart, the field defaults to `false`/`null`/`undefined` for all pre-existing documents. A query filtering for `field === true` returns 0 results — silently dropping all existing data from the feature. The consuming code falls back to hardcoded data (which lacks CMS document IDs), breaking downstream features like inline editing that depend on real document IDs.
+
+This is especially insidious because: (a) no errors are thrown, (b) the page still renders (with fallback data), (c) the query is logically correct for future documents, and (d) the developer doesn't realize existing data was silently excluded.
+
+**Correct alternative:** When adding a new filter field:
+1. **Don't filter on it immediately.** Deploy the field, let the admin populate it, then add the filter in a subsequent change.
+2. **Or use an inclusive default.** If the field controls visibility, default it to `true` (opt-out model) rather than `false` (opt-in model) so existing documents aren't excluded.
+3. **Or add a migration step.** After adding the field, bulk-update existing documents to set the desired default: `await payload.update({ collection, where: {}, data: { showOnHome: true } })`.
+
+**Incident:** ENG-050 — `showOnHome: { equals: true }` filter on homepage returned 0 testimonials because existing DB docs didn't have the field set, falling back to data without CMS IDs, which disabled inline editing.
+
+---
+
+## EAP-031: Bare `*` Selector in CSS Modules
+
+**Trigger:** Writing a `*` or `*::before` selector at the top level (or inside `@media`) in a `.module.scss` file.
+
+**Why it's wrong:** CSS Modules requires every selector to contain at least one locally-scoped class or ID. A bare `*` selector is global-scope and cannot be hashed. Turbopack/webpack will reject it at build time: `Selector "*" is not pure. Pure selectors must contain at least one local class or id.`
+
+**Correct alternative:** Scope the wildcard under a local class. Use `:where(*)` inside the local class to keep specificity at 0:
+```scss
+.container {
+  @media (prefers-reduced-motion: reduce) {
+    &, & :where(*) {
+      transition-duration: 0s !important;
+    }
+  }
+}
+```
+
+**Incident:** ENG-052 — `prefers-reduced-motion` rule with `*` selector broke Turbopack compilation for the Élan case study page.
+
+---
+
+## EAP-053: DnD Listeners on Child Element Inside a Link Wrapper
+
+**Trigger:** Placing `@dnd-kit` (or any DnD library) `useSortable` listeners on a `<button>` or `<div>` that is a sibling or child of a `<Link>`/`<a>` element, where the link covers the same visual area as the intended drag target.
+
+**Why it's wrong:** `<a>` tags and Next.js `<Link>` components capture pointer events (mousedown, pointerdown) and initiate navigation. Even with `z-index` layering, the browser's event dispatch reaches the link before or alongside the drag listener. The drag activation constraint (e.g., `distance: 5`) gives the link enough time to trigger navigation. Result: the drag never activates — the page navigates instead.
+
+**Correct alternative:** Attach DnD listeners to the outermost wrapper element. Apply `pointer-events: none` to the inner content that contains links. Add `touch-action: none` and `user-select: none` on the drag wrapper. The drag handle icon becomes a visual indicator only — not the interactive target.
+
+```tsx
+// ✅ Correct: listeners on outer wrapper, inner content blocked
+<div ref={setNodeRef} {...attributes} {...listeners} style={{ touchAction: "none" }}>
+  <div className={styles.dragHandle} aria-hidden="true">⋮⋮</div>
+  <div style={{ pointerEvents: "none" }}>
+    <Link href={...}>...</Link>
+  </div>
+</div>
+
+// ❌ Wrong: listeners on handle, link swallows events
+<div ref={setNodeRef}>
+  <button {...attributes} {...listeners}>⋮⋮</button>
+  <Link href={...}>...</Link>  {/* captures all pointer events */}
+</div>
+```
+
+**Incident:** ENG-020 — "I cannot drag things still"
+
+---
+
+## EAP-054: Client Mutation Without router.refresh() in App Router
+
+**Trigger:** A client component POSTs/PATCHes data to the backend (e.g., CMS global, collection item) and then updates local React state (e.g., exits a modal, clears a form) — but does **not** call `router.refresh()` to re-run the parent server component that originally fetched the data.
+
+**Why it's wrong:** In Next.js App Router, server component props are computed once per navigation/refresh. A client-side `fetch()` to the API updates the database but does NOT trigger the server component tree to re-run. The client component still holds the stale props from the original server render. Any local state derived from those props (e.g., `useMemo` on `savedGridOrder`) will show the old data. The mutation "succeeds" silently while the UI reverts.
+
+**Correct alternative:** After a successful client-side mutation, always call `router.refresh()` (from `next/navigation`). If the UI must reflect the change immediately (no flash of stale data), hold the optimistic result in local state and bridge until the refresh arrives:
+
+```tsx
+const [hasPendingSave, setHasPendingSave] = useState(false);
+
+async function save(newData) {
+  await fetch("/api/...", { method: "POST", body: JSON.stringify(newData) });
+  setHasPendingSave(true);   // hold optimistic state
+  setEditMode(false);
+  router.refresh();           // tell server to re-fetch
+}
+
+useEffect(() => {
+  if (hasPendingSave) { setHasPendingSave(false); return; }
+  setLocalData(serverProp);  // sync when server data arrives
+}, [serverProp, hasPendingSave]);
+
+const display = hasPendingSave ? optimisticData : serverProp;
+```
+
+**Incident:** ENG-021 — grid order saved to CMS but UI reverted to stale order because `router.refresh()` was never called.
+
+---
+
+## EAP-032: Architectural Changes Without engineering.md Update
+
+**Trigger:** Making a significant infrastructure or architecture change (adding a storage adapter, changing the database, adding a new service layer) and only logging it in the feedback log without updating `engineering.md` with the architectural principle and operational details.
+
+**Why it's wrong:** The feedback log is an incident history — it records what happened. `engineering.md` is the operational knowledge base — it tells future agents how the system works and what rules to follow. An architectural change documented only in the feedback log is effectively invisible: no agent will proactively read the feedback log before making infrastructure decisions. The feedback log entry for ENG-053 said "Supabase Storage was added" but didn't create a new section in `engineering.md` explaining the storage architecture, the env vars needed, the bucket configuration, the public URL pattern, or the verification steps. A future agent adding a new upload collection would have no guidance.
+
+This is a variant of EAP-027 (documentation skips during rapid-fire debugging), but applied to non-urgent work. The behavioral pattern is the same: the agent prioritizes "getting it working" (install adapter → configure → test → confirm) and treats documentation as a deferred post-step rather than an integral part of the change. The fact that this was infrastructure work (no user frustration, no time pressure) makes the skip worse — there was no urgency to excuse it.
+
+**Correct alternative:** For any architectural or infrastructure change:
+1. Before implementing, draft the `engineering.md` section header and outline (what section, what subsections).
+2. After implementing and verifying, fill in the section with: architecture diagram/table, configuration details, env vars, rules, verification commands.
+3. Update the Section Index at the top of `engineering.md`.
+4. Only then report the task as done.
+
+**Incident:** ENG-053 (2026-03-30) — Supabase Storage adapter added and verified, but `engineering.md` §12 was not created until the user called it out. 7th documentation skip overall.
+
+---
+
+## EAP-033: Schema Type Change Without Immediate Server Restart
+
+**Trigger:** Changing a Payload field type (e.g. `textarea` → `richText`) in the collection schema file without immediately restarting the dev server before the user can interact with the changed field.
+
+**Why it's wrong:** Payload syncs the database schema only at startup. Between the code change and the restart, the old schema is still active. If the inline edit system saves data in the new format (e.g. Lexical JSON for richText), Payload stores it according to the old field type (e.g. serializes the object to a string for textarea). This creates corrupted data — a JSON object stored as a string — that breaks all downstream consumers expecting either a plain string or a parsed object.
+
+**Correct alternative:** When changing a field's type in a Payload collection or global schema, immediately restart the dev server as part of the same operation. Never defer the restart to the user. The restart is not optional — it's part of the atomic schema change. Additionally, add `ensureParsed()` guards to any function processing CMS data with early `typeof === 'string'` returns, as defensive programming against this exact migration window.
+
+**Incident:** ENG-058 (2026-03-30) — Testimonial `text` changed from textarea to richText. User saved formatted text before restart. Raw Lexical JSON displayed in card.
+
+---
+
+## EAP-034: S3-Compatible Storage Without Filename Sanitization
+
+**Trigger:** Using `@payloadcms/storage-s3` with Supabase Storage (or any S3-compatible provider) without sanitizing filenames before they become S3 object keys.
+
+**Why it's wrong:** Supabase Storage's S3 API rejects object keys containing square brackets (`[]`), curly braces (`{}`), and certain other characters that are valid in local filesystems. The `@payloadcms/storage-s3` plugin passes `data.filename` directly to `PutObject` as the S3 key. When the user uploads a file like `[Gao_Yilan] Resume_2026.pdf`, S3 returns `InvalidKey` (HTTP 400), and Payload surfaces a generic "Something went wrong" toast with no indication of what's actually wrong. The user retries, fails again, and has no path to resolution.
+
+**Correct alternative:** Add a `beforeChange` hook on any upload collection that sanitizes `data.filename` and all `data.sizes[*].filename` by:
+1. Stripping brackets and parentheses
+2. Replacing non-alphanumeric characters (except `.`, `-`, `_`) with hyphens
+3. Collapsing consecutive hyphens
+4. Trimming leading/trailing hyphens
+
+This runs before the cloud storage plugin's `afterChange` hook, which reads `data.filename` for the S3 key.
+
+**Incident:** ENG-060 — `[Gao_Yilan] Resume_2026.pdf` caused `InvalidKey` on Supabase Storage S3.
+
+---
+
+## EAP-035: Stale Turbopack Cache After Component Removal
+
+**Trigger:** Removing a component from source code while the dev server is running (or was previously running), and not clearing the `.next` cache before restarting.
+
+**Why it's wrong:** Turbopack's incremental build cache retains compiled chunks from previous builds. When a component is removed from source (not just modified), the old compiled chunk may persist in `.next/dev/static/chunks/`. If the browser has the old chunk cached or the server serves it from the stale build, the removed component still renders client-side. This causes hydration mismatches because the server no longer produces the component's HTML, but the client bundle still contains and executes it. The error points to a component that doesn't exist in the source — a debugging dead-end that wastes significant investigation time.
+
+**Correct alternative:** After removing a component (especially one involved in hydration-sensitive rendering like admin-only UI inside links), clear the build cache and restart:
+```bash
+rm -rf .next && npm run dev
+```
+A simple server restart is not sufficient — Turbopack may rebuild from its cache. The full `rm -rf .next` ensures a clean compilation.
+
+**Detection:** If a hydration error references a component that `grep -r` cannot find in `src/`, the issue is almost certainly a stale cache.
+
+**Incident:** ENG-067 — `HeroUploadZone` was removed in ENG-066 but Turbopack cache still served the old compiled chunk, causing hydration mismatch.
+
+---
+
+## EAP-036: Scroll Hijack on Embedded Canvas via onWheel Handler
+
+**Trigger:** Adding an `onWheel` handler to an embedded canvas/viewport element that pans the canvas on bare wheel (non-modifier-key) scroll events.
+
+**Why it's wrong:** When a user scrolls through a page and their cursor passes over an embedded canvas, the wheel events get intercepted by the canvas handler. The page stops scrolling (or scroll becomes erratic as both page and canvas respond). This is a scroll hijack — the user's intent is to scroll the page, not to pan an embedded widget. Infinite canvases (Figma, Miro, Google Maps) occupy the full viewport — they OWN the scroll. Embedded canvases inside scrollable pages must defer to the page's scroll.
+
+**Correct alternative:** Embedded canvases should pan via drag only (pointer down + move). Zoom should be via explicit controls (buttons, keyboard shortcuts). `onWheel` should be removed entirely. Set `touch-action: pan-y` on the canvas viewport to allow vertical scroll passthrough on touch devices. Reserve `onWheel` + `e.preventDefault()` for full-page canvas apps where the canvas IS the page.
+
+**Incident:** ENG-072 — Architecture DAG in case study intercepted page scroll with `onWheel` pan handler.
+
+---
+
+## EAP-030: One-Way Playground Experiment
+
+**Trigger:** A design experiment (button API, spacing tokens, typography mixins) is conducted in the playground without propagating the results to production, or vice versa.
+
+**Why it's wrong:** The playground and production are two independent Next.js apps with manually synchronized code. When a component or token is updated in one app without updating the other, they silently drift. The drift compounds across sessions — by the time it's noticed, the gap requires a full audit and multi-phase migration instead of a simple same-session update. Three separate experiments (Button two-axis model, three-tier spacing tokens, semantic typography mixins) all fell into this trap in March 2026, each requiring significant rework to reconcile.
+
+**Correct alternative:** Every playground experiment that changes a component's API, visual behavior, or token usage MUST be propagated to the corresponding production component in the same session. The Cross-App Parity Checklist in AGENTS.md is bidirectional — it includes playground→production rows. Before ending a session that touched playground Demo* components, run the parity checklist.
+
+**Incident:** ENG-073 — Three playground experiments (Button, Spacing, Typography) conducted across multiple sessions were never propagated to production, requiring a 6-phase alignment plan.
+
+---
+
 ```markdown
+## EAP-055: Hardcoded Pixels/Hex in Playground Tailwind When Token CSS Vars Exist
+
+**Trigger:** Building a playground Demo* component using Tailwind arbitrary values with raw pixel or hex values (e.g., `h-[48px]`, `bg-[#161616]`, `bg-emerald-600`) when the corresponding design system CSS custom properties exist or could be trivially added.
+
+**Why it's wrong:** The playground's purpose is to demonstrate the design system — a demo component that bypasses the token layer defeats that purpose. Hardcoded values silently diverge from token source-of-truth if tokens change. They also lose dark-mode adaptivity and make the playground useless as a visual regression tool. Tailwind's default palette colors (emerald, red) are NOT the design system — they have different hue/saturation than the Carbon-sourced palette.
+
+**Correct alternative:** Before building a Demo* component, verify that all needed tokens are exposed as CSS custom properties in `playground/src/app/globals.css`. If a token exists in SCSS but not as a CSS var, add it. Then use `var()` references: `h-[var(--spacer-6x)]` not `h-[48px]`, `bg-[var(--palette-green-60)]` not `bg-emerald-600`. For theme-adaptive states, create semantic CSS vars with `.dark` overrides.
+
+**Incident:** ENG-074 — DemoButton rebuilt with hardcoded pixels and Tailwind default colors instead of token references, requiring full re-tokenization of sizing (20 values), colors (28 values), motion (2 values), and overlay states (8 values).
+
+---
+
 ## EAP-NNN: [Short Name]
 
 **Trigger:** [What action or pattern triggers this]

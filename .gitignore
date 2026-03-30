@@ -21,6 +21,10 @@
 /playground/.next/
 /playground/node_modules/
 
+# ascii-tool (subdirectory Next.js app)
+/ascii-tool/.next/
+/ascii-tool/node_modules/
+
 # production
 /build
 

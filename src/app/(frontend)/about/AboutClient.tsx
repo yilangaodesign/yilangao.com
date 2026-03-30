@@ -5,10 +5,30 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import ScrollSpy from "@/components/ScrollSpy";
 import AdminBar from "@/components/AdminBar";
+import {
+  InlineEditProvider,
+  EditableArray,
+  InlineEditBar,
+} from "@/components/inline-edit";
+import type { ApiTarget, FieldDefinition } from "@/components/inline-edit";
 import styles from "./page.module.scss";
 
 type ExperienceEntry = { role: string; company: string; period: string };
 type EducationEntry = { degree: string; institution: string; period: string };
+
+const SITE_CONFIG_TARGET: ApiTarget = { type: 'global', slug: 'site-config' };
+
+const EXPERIENCE_FIELDS: FieldDefinition[] = [
+  { name: 'role', label: 'Role', type: 'text', required: true },
+  { name: 'company', label: 'Company', type: 'text', required: true },
+  { name: 'period', label: 'Period', type: 'text', required: true },
+];
+
+const EDUCATION_FIELDS: FieldDefinition[] = [
+  { name: 'degree', label: 'Degree', type: 'text', required: true },
+  { name: 'institution', label: 'Institution', type: 'text', required: true },
+  { name: 'period', label: 'Period', type: 'text', required: true },
+];
 
 export default function AboutClient({
   experience,
@@ -25,8 +45,8 @@ export default function AboutClient({
     { id: "education", label: "Education" },
   ];
 
-  return (
-    <main className={styles.page} style={isAdmin ? { paddingTop: 44 } : undefined}>
+  const page = (
+    <main className={styles.page}>
       {isAdmin && <AdminBar editUrl="/admin/globals/site-config" editLabel="Edit Experience & Education" />}
       <Navigation />
       <ScrollSpy sections={spySections} />
@@ -60,15 +80,22 @@ export default function AboutClient({
         <FadeIn delay={0.15}>
           <section id="experience" className={styles.section}>
             <h2 className={styles.sectionLabel}>Experience</h2>
-            <div className={styles.experienceList}>
-              {experience.map((item) => (
-                <div key={item.company + item.period} className={styles.experienceItem}>
+            <EditableArray<ExperienceEntry>
+              fieldId="sc:experience"
+              target={SITE_CONFIG_TARGET}
+              fieldPath="experience"
+              items={experience}
+              itemFields={EXPERIENCE_FIELDS}
+              label="Experience"
+              className={styles.experienceList}
+              renderItem={(item, i) => (
+                <div key={i} className={styles.experienceItem}>
                   <span className={styles.experienceRole}>{item.role}</span>
                   <span className={styles.experienceCompany}>{item.company}</span>
                   <span className={styles.experienceDate}>{item.period}</span>
                 </div>
-              ))}
-            </div>
+              )}
+            />
           </section>
         </FadeIn>
 
@@ -77,19 +104,37 @@ export default function AboutClient({
         <FadeIn delay={0.2}>
           <section id="education" className={styles.section}>
             <h2 className={styles.sectionLabel}>Education</h2>
-            <div className={styles.experienceList}>
-              {education.map((item) => (
-                <div key={item.institution + item.period} className={styles.experienceItem}>
+            <EditableArray<EducationEntry>
+              fieldId="sc:education"
+              target={SITE_CONFIG_TARGET}
+              fieldPath="education"
+              items={education}
+              itemFields={EDUCATION_FIELDS}
+              label="Education"
+              className={styles.experienceList}
+              renderItem={(item, i) => (
+                <div key={i} className={styles.experienceItem}>
                   <span className={styles.experienceRole}>{item.degree}</span>
                   <span className={styles.experienceCompany}>{item.institution}</span>
                   <span className={styles.experienceDate}>{item.period}</span>
                 </div>
-              ))}
-            </div>
+              )}
+            />
           </section>
         </FadeIn>
       </div>
       <Footer />
+      {isAdmin && <InlineEditBar />}
     </main>
   );
+
+  if (isAdmin) {
+    return (
+      <InlineEditProvider isAdmin>
+        {page}
+      </InlineEditProvider>
+    );
+  }
+
+  return page;
 }

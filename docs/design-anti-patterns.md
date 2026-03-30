@@ -4,7 +4,7 @@
 >
 > **Who reads this:** AI agents before making UI changes — scan for relevant anti-patterns.
 > **Who writes this:** AI agents when a feedback cycle reveals a new anti-pattern.
-> **Last updated:** 2026-03-29 (AP-017: shared-stem naming + AP-018: additive gap padding)
+> **Last updated:** 2026-03-30 (AP-040: false affordances on static elements)
 
 ---
 
@@ -228,9 +228,308 @@ This cleanly separates two intents: "I want to go to this specific section" (cli
 
 ---
 
+## AP-019: Hero-Scale Cards in Portfolio Overview
+
+**Trigger:** Using full-width or multi-column-spanning cards (e.g., `grid-column: span 2` with 2:1 aspect ratio) for featured projects in a portfolio homepage grid.
+
+**Why it's wrong:** A portfolio overview page exists for breadth scanning — the visitor wants to quickly assess the range of work. Hero-scale cards force sequential scrolling: each featured project consumes the entire viewport width, so the user can only evaluate one project at a time. This is appropriate for a case study detail page (deep focus on one project) but wrong for the homepage (shallow scan of many projects). The result is that a portfolio with 12 projects requires 6+ viewport heights of scrolling before the visitor has seen all the titles, when a masonry grid would show them all in 2-3 viewport heights.
+
+**Correct alternative:** Use CSS columns masonry (`column-count: 2` or `3`) where all cards occupy one column width. Differentiate featured projects through aspect ratio (4:3 vs 3:2), not column span. This creates the waterfall height variation that makes masonry layouts visually interesting while keeping all cards compact enough for scanning.
+
+**Incident:** FB-036 (2026-03-29) — User explicitly referenced Pinterest as the density benchmark.
+
+---
+
+## AP-020: Unnecessary overflow-y on Fit-Content Containers
+
+**Trigger:** Adding `overflow-y: auto` and `max-height` to a sidebar or panel whose content fits within the viewport height.
+
+**Why it's wrong:** `overflow-y: auto` reserves space for a scrollbar gutter (~15px on most browsers) even when no scrolling is needed. In a fixed-width sidebar (e.g., 300px), this gutter eats into the content area, creating an asymmetric gap between the sidebar content and adjacent elements. The user sees uneven left/right margins and a scrollbar rail that serves no purpose. It signals "there's more content below" when there isn't, undermining layout trust.
+
+**Correct alternative:** For sticky sidebars with known-fit content, use `position: sticky` + `align-self: flex-start` without any `max-height` or `overflow` constraints. The sidebar takes its natural height and sticks. If the sidebar content genuinely risks exceeding the viewport on small screens, handle it at the page level (the whole page scrolls) rather than creating a scroll-within-a-scroll.
+
+**Incident:** FB-038 (2026-03-29)
+
+---
+
+## AP-022: Unprotected Diagonal Mouse Path Between Menu Tiers
+
+**Trigger:** A hover-to-reveal submenu (flyout, sliver panel, mega-dropdown) that instantly switches to a different category when the cursor crosses adjacent parent items during diagonal mouse movement toward the open submenu.
+
+**Why it's wrong:** When a user sees a submenu open and moves their cursor toward an item in it, the natural mouse path is diagonal — from the parent item to the target in the submenu. This diagonal path inevitably crosses other parent items in the list. Without path prediction, each crossing fires `onMouseEnter`, switching the submenu to a different category. The user never reaches their intended target because the submenu keeps changing under their cursor. Amazon identified this as a revenue-impacting UX failure in their mega-dropdown menus. Ben Kamens documented the solution as "menu aim."
+
+**Correct alternative:** Implement the "safe triangle" / submenu aim pattern. Track the cursor's trajectory using slope analysis between successive positions and the submenu's far corners. If the slopes are diverging (cursor is getting closer to the submenu), defer the category switch. Use the `useSafeTriangle` hook with a `submenuRef` and `interceptHover` wrapper around the hover callback. See `design.md` §4.7 for the full specification.
+
+**Frustration caused:** User reported "area for mouse maneuvering is too narrow and it can cause a very bad experience."
+
+---
+
 ## Entry Template
 
 ```markdown
+## AP-021: Global `svg { display: block }` Breaking Inline Icons
+
+**Trigger:** A global CSS reset includes `svg { display: block; max-width: 100%; }`, and then a small SVG icon is placed inside an inline element (like an `<a>` tag within flowing paragraph text).
+
+**Why it's wrong:** The reset was designed for standalone/decorative SVGs and is a common modern pattern (Tailwind Preflight, etc.). But it has a hidden side effect: any SVG used as an inline icon — e.g., an external-link arrow next to a link — becomes a block element, breaking onto its own line and fragmenting the surrounding text flow. The paragraph becomes unreadable.
+
+**Correct alternative:** Keep the global reset for general SVGs, but explicitly override with `display: inline` on any SVG class used as an inline text icon:
+```scss
+.externalIcon {
+  display: inline;
+  vertical-align: super;
+}
+```
+
+**Frustration caused:** 1 round — user saw paragraph text completely fragmented by block-level icons.
+
+---
+
+## AP-023: Form Inputs Without Persistent Labels or Field Type Affordances
+
+**Trigger:** Rendering form inputs in an editing UI (modal, panel, inline editor) with only `placeholder` text and no visible `<label>`, no `type` differentiation (e.g., `type="url"` vs `type="text"`), and no help text.
+
+**Why it's wrong:** Placeholders disappear the moment the user types. A filled input with no label is a mystery — you can't tell whether the value "2023-2024" is in a period field, a URL field, or a name field. Without `type="url"`, the browser provides no validation or affordance (like showing `https://` prefix or URL keyboard on mobile). The user must hold the field's purpose in memory, which violates recognition over recall (Nielsen's 6th heuristic). In practice, users WILL put data in the wrong field and not realize it until something breaks downstream.
+
+**Correct alternative:**
+1. Always render a persistent `<label>` above each input — even in compact panels. Small uppercase labels (10–11px) are sufficient.
+2. Use semantic `type` attributes: `type="url"` for URLs, `type="email"` for emails. This gives browser-native validation and mobile keyboard hints.
+3. For fields with non-obvious formats (dates, periods, slugs), add a one-line `<span>` below the input with an example: "e.g., 2023-Present".
+
+**Frustration caused:** 1 round — user typed period info into a URL field because all fields looked identical.
+
+---
+
+## AP-024: Critical Action Buttons in Scrollable Content Flow
+
+**Trigger:** Placing "Save", "Submit", "Done", or other high-stakes action buttons inside a scrollable container where they can scroll off-screen.
+
+**Why it's wrong:** If the user can't see the Save button, they either (a) don't know it exists, (b) assume their changes are already saved, or (c) have to scroll to find it — adding friction to the most important action in the UI. For CMS editing panels where NOT saving means losing work, an invisible Save button directly causes data loss and frustration.
+
+**Correct alternative:** Use a flex column layout for modal/panel containers: header (`flex-shrink: 0`) → scrollable body (`flex: 1; overflow-y: auto; min-height: 0`) → footer (`flex-shrink: 0`). Only content scrolls. Action buttons in the header and footer are always visible regardless of content length.
+
+**Frustration caused:** 1 round — user couldn't find Save button in a panel with 5+ items.
+
+---
+
+## AP-025: Arrow Buttons for List Reorder When Drag Is Available
+
+**Trigger:** Using up/down arrow buttons as the primary mechanism for reordering list items in a desktop UI.
+
+**Why it's wrong:** Arrow buttons require O(n) clicks to move an item across the list. For a 10-item list, moving item 10 to position 1 takes 9 clicks. This is high-friction, cognitively demanding (count clicks), and doesn't match user expectations — every modern CMS, Figma layer panel, and task manager uses drag-and-drop for reordering. Arrow buttons signal "this tool wasn't designed with real use in mind."
+
+**Correct alternative:** Add a drag handle (6-dot grip icon) to each item. Use HTML5 native drag (or `@dnd-kit` for complex cases) for reordering. During drag, collapse all items to single-line summaries so the user can easily find drop targets without scrolling. Keep the drop indicator clear (a colored line between items).
+
+**Frustration caused:** 1 round — user identified unnecessary friction.
+
+---
+
+## AP-026: Low-Contrast Error States for Critical Actions
+
+**Trigger:** Displaying a save/submit error as small colored text within the existing UI layout, without changing the overall visual state of the containing element.
+
+**Why it's wrong:** For high-stakes actions (save, submit, delete), failure means the user's work is at risk. A small red text label competing with other UI elements for attention fails the "glance test" — the user should know something is wrong within 200ms of looking at the screen. When the error text is the same size as surrounding copy and the container's visual state doesn't change, the error is invisible in peripheral vision.
+
+**Correct alternative:** Transform the entire containing element's visual state on error. For a bottom action bar: change the background to a bold error color (e.g. deep red #991b1b), swap the primary message to the error explanation, change the action button from "Save" to "Retry" with inverted contrast (white button on red bar). The state change should be unmissable from any screen position. Reserve small inline text for non-critical warnings, not for "your data may be lost" scenarios.
+
+**Frustration caused:** 1 round — user called the error treatment "too subtle for something critical."
+
+---
+
+## AP-027: Flex Containers Without Minimum Dimension Constraints
+
+**Trigger:** Using `display: flex; flex-direction: column` on a modal/panel with `max-height` but no `min-height`, causing the container to collapse when children have a flex-basis of 0 or content is empty/short.
+
+**Why it's wrong:** Flex containers size to their content by default. When a child has `flex: 1 1 0` (basis 0), it contributes zero size to the container's intrinsic dimensions. Without a `min-height`, the container collapses to just the non-flexible children (e.g. header + footer), leaving the flexible child invisible. This makes the UI appear broken — users see an empty panel and assume the feature is bugged.
+
+**Correct alternative:** Always set both `min-height` and `max-height` (or use `height: clamp(...)`) on flex modal/panel containers. Use `min()` for the lower bound to respect small viewports: `min-height: min(400px, 60vh)`. Apply the same thinking to width: `min-width: 320px`. The minimum should guarantee enough space for at least 2-3 items plus breathing room. Modal dimension template: `min-height: min(420-520px, 65-70vh)`, `max-height: 88vh`, `min-width: 320px`, `width: min(Npx, 90-92vw)`.
+
+**Frustration caused:** 3 rounds — FB-043 (array panel collapse), FB-045 (array panel too short), FB-062 (ProjectEditModal squeeze). **ESCALATED: violated 3 times despite documentation. Consider extracting a shared SCSS mixin.**
+
+---
+
+## AP-028: Form Fields Without Required Indicators or Client-Side Validation
+
+**Trigger:** Rendering form inputs without visual distinction between required and optional fields, and relying solely on server-side validation to catch empty required fields.
+
+**Why it's wrong:** Two failures compound: (1) The user has no way to know which fields must be filled before attempting to save — they discover requirements only through trial and error. (2) Server-side validation produces a delayed, dislocated error (in a banner, not at the field) that the user must mentally map back to the offending input. Both violate the principle of immediate, proximal feedback.
+
+**Correct alternative:**
+- **Red asterisk** (`*`) after required field labels — universally understood.
+- **Deferred inline validation**: Show errors only after the user's first save attempt (not on open, to avoid premature nagging). Empty required fields get a red border + error text directly under the input.
+- **Disabled save**: Button is disabled while validation errors exist, with a footer message explaining why.
+- **Auto-recovery**: Errors clear in real-time as the user fills in fields.
+
+**Also consider:** Whether "required" is truly necessary. A field that blocks saving should represent a genuine data integrity requirement, not a "nice to have." If the user can meaningfully save without it, make it optional.
+
+**Frustration caused:** 1 round — user couldn't save because an optional-feeling field was silently required.
+
+---
+
+## AP-029: Duplicate Navigation in Footer
+
+**Trigger:** Repeating sidebar or header navigation links in the site footer, especially when the sidebar is persistently visible.
+
+**Why it's wrong:** Duplicate links create two editing surfaces for the same data. If only one surface is editable (e.g., sidebar has `EditableArray`, footer renders plain `<a>` tags), users can't edit the "broken" copy and believe the editing system is bugged. Even if both are editable, changes to one don't visually update the other until a page refresh, creating a confusing inconsistency. For single-page layouts where the sidebar is always visible, footer links add no discoverability value.
+
+**Correct alternative:** Footer should contain only content that is unique to the footer context (CTA, email, copyright). Navigation links that are already persistently visible in the sidebar or header should not be duplicated.
+
+**Frustration caused:** 1 round — user reported footer editing was "broken" because footer links were not editable copies of the sidebar's EditableArray.
+
+---
+
+## AP-030: Inconsistent External Link Indicators
+
+**Trigger:** Some external links show an icon (↗ arrow, external-link SVG) while others in the same layout do not.
+
+**Why it's wrong:** Users rely on visual cues to predict navigation behavior. An external link indicator signals "this will leave the site." When some external links have the indicator and others don't, users lose confidence in the signal. They either start expecting every link to leave the site (over-caution) or stop noticing the indicator entirely (signal blindness). Both undermine the intended UX.
+
+**Correct alternative:** Treat external link indicators as a consistency invariant: every `target="_blank"` link must show the indicator. No exceptions. Audit all link renders in the component after adding new link sections.
+
+**Frustration caused:** 1 round — user noticed the Experience section's company links lacked the ↗ icon present in the Links section.
+
+---
+
+## AP-031: CSS Transform for Centering on Framer-Motion-Animated Elements
+
+**Trigger:** Using `transform: translateY(-50%)` (or `translateX(-50%)`) for centering on an element that also has Framer Motion animation props (`x`, `y`, `scale`, `rotate`).
+
+**Why it's wrong:** Framer Motion manages transforms via inline `style.transform`. When FM animates `x: 4 → 0`, it sets `transform: translateX(0px)` as an inline style — which **overrides** the CSS class's `transform: translateY(-50%)`. The vertical centering is silently dropped. The element's `top: 50%` places its top edge at the center instead of its midpoint, causing a downward shift equal to half the element's height. This is invisible in static CSS inspection (the class looks correct) and only manifests at runtime when FM takes control of the transform property.
+
+**Correct alternative:** Use non-transform centering: `top: 0; height: <parent-height>; display: flex; align-items: center`. This achieves the same vertical centering through flex layout, which FM cannot override. Reserve `transform` for FM-managed properties only.
+
+**Frustration caused:** 4 rounds (FB-030, FB-033, FB-050, FB-053). The user escalated to "IT IS STILL NOT FIXED!!!! What the fuck?" Labels appeared ~6px below their ticks — the exact half-height offset predicted by `translateY(-50%)` being dropped.
+
+---
+
+## AP-032: Static Label Color on Multi-State Controls
+
+**Trigger:** A control has visually distinct states for one visual channel (e.g., tick bar color changes between active/inactive) but uses a single static value for its paired channel (e.g., label text stays the same color for all states).
+
+**Why it's wrong:** When two visual elements are spatially paired (a tick and its label, an icon and its text), users perceive them as a single unit. If one element differentiates states (dark bar = active, light bar = inactive) but the other doesn't (all labels are medium gray), the pairing breaks. The label undermines the bar's state signal — the user sees the bar change but the label doesn't reinforce it. From a Gestalt perspective, inconsistent shared properties (color, weight) across paired elements cause them to be perceived as unrelated, degrading the control's communicative power.
+
+**Correct alternative:** Both visual channels must track the same state. If the tick uses `color-primary` when active and `color-placeholder` when inactive, the label must use the same pair. Add a state attribute (`data-active`) to the shared container and use CSS descendant selectors to style both children from the same state source.
+
+**Frustration caused:** 1 round — user noted "inconsistency between the notes for the notch and the notch's visual."
+
+---
+
+## AP-033: Fixed Toolbars Overlaying Page Content
+
+**Trigger:** Using `position: fixed` on an admin bar, toolbar, or save bar that overlays page content, then compensating with hardcoded `paddingTop` or `paddingBottom` on every page that renders the bar.
+
+**Why it's wrong:** A fixed toolbar is removed from document flow. Every page must independently know the toolbar's exact height and apply padding to avoid content being hidden underneath. This creates fragile coupling: if the toolbar height changes (text wraps on small screens, content is added), every page breaks. The toolbar also blocks interactive elements (navigation links, buttons) behind it. Users literally cannot click buttons that the toolbar covers. The "compensating padding" approach also violates AP-003 (inline styles as workarounds) when implemented as `style={{ paddingTop: N }}`.
+
+**Correct alternative:** Use `position: sticky` instead of `position: fixed`. Sticky positioning keeps the element in document flow (naturally pushing content) while still sticking to the viewport edge during scroll. For a top bar: `position: sticky; top: 0`. For a bottom bar: `position: sticky; bottom: 0`. No compensating padding needed on any page. Prerequisite: no `overflow: hidden` on ancestor elements.
+
+**Frustration caused:** 1 round — user identified admin bar was blocking navigation buttons and called it "very bad practice."
+
+---
+
+## AP-034: Admin Controls in Component Document Flow
+
+**Trigger:** Placing admin-only controls (edit, delete, reorder buttons) as in-flow children inside a component's layout — e.g., adding an edit button as a flex child in an attribution row alongside the real content.
+
+**Why it's wrong:** Admin controls are a separate concern from the component's content. When placed in-flow, they participate in the layout algorithm: they take up space, push siblings, change gap distribution, and alter alignment. This forces compensating changes to the real content (e.g., absolutely positioning the LinkedIn button to make room for admin buttons), which breaks Fitts' law by moving interactive elements away from their semantic context. The component's layout in admin mode diverges from the visitor experience — what the admin sees is not what the visitor sees.
+
+**Correct alternative:** Admin controls must be positioned out of document flow as an overlay:
+1. Wrap admin buttons in an overlay container with `position: absolute` on the card (which has `position: relative`).
+2. Default state: `opacity: 0; pointer-events: none` — invisible and non-interactive.
+3. On parent hover: `opacity: 1; pointer-events: auto` — fades in.
+4. Override child buttons' self-hiding (`button { opacity: 1; transform: scale(1) }` within the hover rule) since the overlay handles group visibility.
+5. Real content (LinkedIn button, avatar, name/role) stays in its natural flow position, identical to visitor view.
+
+**Frustration caused:** 1 round — user identified admin buttons displacing LinkedIn to the wrong position and violating Fitts' law.
+
+---
+
+## AP-035: Small Drag Handle as Sole Drag Target Inside Clickable Card
+
+**Trigger:** Implementing DnD with a small grip icon (e.g., 28×28px) as the only draggable area, while the rest of the tile is a clickable link or button that navigates on pointer events.
+
+**Why it's wrong:** Two failures compound: (1) Fitts' law — a 28×28px target inside a ~300×200px tile means the user must precisely target <2% of the tile surface to initiate a drag. (2) Affordance mismatch — the tile's visual treatment (dashed outline, reorder-mode styling) signals "this entire thing is draggable," but the interaction model says "only this tiny corner works." Users will click-and-drag the tile body, hit the link, and conclude dragging is broken.
+
+**Correct alternative:** The entire tile must be the drag target. The grip icon is a visual indicator ("this tile is draggable") but not the interactive area. During reorder mode, disable all navigation and link behavior on the tile content (`pointer-events: none` on inner content, `cursor: grab` on the wrapper). The perceived drag target and the actual drag target must be identical.
+
+**Frustration caused:** 1 round — user reported "I cannot drag things still" after feature shipped.
+
+---
+
+## AP-036: Bare CMS Fields Without Labels, Descriptions, or Placeholders
+
+**Trigger:** Adding a field to a Payload collection with only `name` and `type`, relying on the auto-generated label (which is just the camelCase field name, title-cased) and providing no `admin.description` or `admin.placeholder`.
+
+**Why it's wrong:** CMS admin forms are used by the site owner, not developers. A field labeled "Alt" with no explanation communicates nothing — the user doesn't know what alt text is, why it's required, or what a good example looks like. Technical field names (alt, slug, href, mime) are meaningless jargon in the admin UI. Without placeholder examples, the user has no model for what to type. Without descriptions, they either guess wrong or skip the field entirely. This is the form-level equivalent of a tooltip-less icon: the affordance exists but the semantics are missing.
+
+**Correct alternative:** Every Payload field must include:
+1. `label` — a human-readable phrase (e.g., "Description (Alt Text)" instead of "Alt")
+2. `admin.description` — one sentence explaining what this field does in the user's context
+3. `admin.placeholder` — a concrete example of valid input (e.g., `"e.g., Team photo from the Q3 design review"`)
+
+For collection-level context, set `admin.description` on the collection config to explain the overall purpose and any automatic behaviors (like filename sanitization).
+
+**Frustration caused:** 1 round — user encountered bare "Alt" and "Caption" fields on Media upload with no explanation, on top of a silent upload failure.
+
+---
+
+## AP-037: Full-Surface Admin Overlays on Navigable Elements
+
+**Trigger:** Rendering an admin-only hover overlay (upload zone, edit zone) that covers the entire surface of a clickable/navigable element (card link, button).
+
+**Why it's wrong:** The overlay captures all pointer events on hover, making the underlying navigation inaccessible. Users can either interact with the admin tool or navigate — never both. This forces admin users to choose between editing and viewing, which is the opposite of inline editing's promise. Click-to-upload inside these overlays also has inconsistent browser behavior when the file input is inside a deeply nested event-stopped context.
+
+**Correct alternative:** Admin actions should be discrete button badges positioned in a corner (e.g., top-right) that open a modal/panel via `createPortal`. The navigable surface remains fully accessible at all times. Hover only reveals the badge, never replaces the content.
+
+**Frustration caused:** 2 rounds — first the hover overlay didn't trigger uploads, then the overlay blocked navigation to detail pages.
+
+---
+
+## AP-038: Mixed Breakpoint Systems Across Apps in a Monorepo
+
+**Trigger:** Creating a new app (Playground, ASCII Tool) with a Tailwind `@theme` block that defines colors, fonts, and spacing but omits `--breakpoint-*` overrides — silently falling through to Tailwind v4's built-in defaults instead of the design system's canonical breakpoints.
+
+**Why it's wrong:** The design system defines breakpoints at 320/672/1056/1312/1584 in SCSS, but Tailwind's defaults are 640/768/1024/1280/1536. When a developer writes `lg:flex` in the Playground, it activates at 1024px. When the same intent is expressed via `$portfolio-mq-lg` in the main site, it activates at 1056px. Same semantic name, different pixel value. This makes responsive behavior non-transferable between apps: a component that looks correct in the Playground breaks at a different width in the main site. Hardcoded media queries (640px in AdminBar, 768px in experiments) compound the problem by introducing a third, implicit scale.
+
+**Correct alternative:** Every app's `globals.css` must include `--breakpoint-*` overrides in the `@theme` block that match the canonical SCSS tokens. The Cross-App Parity Checklist must include breakpoint sync as a mandatory step. Hardcoded media query values must be replaced with token references.
+
+**Frustration caused:** Latent — discovered during audit, not from a user-visible bug. But the divergence affects every responsive utility in 2 of 3 apps.
+
+---
+
+## AP-039: Interactive Elements Without Focus Ring Clearance
+
+**Trigger:** A clickable/focusable element (button, link, input) whose content fills flush to its bounding box, with no padding buffer, placed in a tight-gap container (`gap-1.5` or less).
+
+**Why it's wrong:** When a user clicks an interactive element, the browser draws a focus ring (outline) around it. This ring extends *outside* the element's border box — typically 2–3px. If the element has zero padding and is flush against its container edge or adjacent siblings, the ring gets visually clipped: neighboring elements paint over the top or bottom of the ring, or the ring extends into a parent's hidden overflow. The result is a chopped, incomplete border that looks like a rendering bug. This violates a basic principle: **every interactive element must reserve space for its focus indicator**. An element designed without room for its own focus state is incomplete.
+
+**Correct alternative:**
+1. Add `p-0.5` (2px) padding to the interactive element so the ring renders inside the padding zone.
+2. Suppress the browser's default outline with `outline-none`.
+3. Use `focus-visible:ring-2 focus-visible:ring-ring` for a controlled, Tailwind-managed focus ring (box-shadow based, not affected by overflow clipping).
+4. Adjust the element's width to include the padding (e.g., `w-[52px]` for a 48px swatch + 4px padding).
+5. Alternatively, ensure the container has enough gap (≥ `gap-2.5` / 10px) to visually accommodate outlines without padding changes.
+
+**Rule of thumb:** If an element is interactive, its box model must include at least 2px of breathing room on all sides for the focus indicator. This is not optional — it's a baseline accessibility and visual polish requirement.
+
+**Frustration caused:** 1 round — user identified the brand color swatch's border being "chopped up on the top" in the playground color tokens page.
+
+---
+
+## AP-040: False Affordances on Static Elements
+
+**Trigger:** Styling a non-interactive element (span, div) with visual treatments that universally signal interactivity — accent color highlights, pill shapes with hover-like backgrounds, or differentiated visual states that imply "selected" vs. "unselected."
+
+**Why it's wrong:** Users interpret visual cues before attempting interaction. An accent-highlighted label reads as "this is the currently selected option in a set of clickable options." A pill-shaped tag with a background reads as "click me to filter/toggle." When these elements don't respond to clicks, the user experiences a broken promise — the UI looked interactive but wasn't. This is worse than a plain, obviously-static label because it wastes the user's time and erodes trust in the interface's consistency. If something looks different from its siblings (one label is blue while three are gray), the difference must mean something the user can act on.
+
+**Correct alternative:**
+1. **If the element should be interactive**, make it a `<button>` with click handler, hover state, focus-visible ring, and cursor: pointer.
+2. **If the element is static**, style it identically to its siblings. No accent colors, no differentiated backgrounds. Use plain text, matching weight and color. A static element must look unmistakably static.
+3. **The test:** If a user would try to click it based on its appearance, it must be clickable. If it's not clickable, it must look like it's not.
+
+**Frustration caused:** 1 round — user noted "color is somehow highlighted... it almost implies to me it's an active state that users can just kind of click on those."
+
+---
+
 ## AP-NNN: [Short Name]
 
 **Trigger:** [What action or code pattern triggers this]

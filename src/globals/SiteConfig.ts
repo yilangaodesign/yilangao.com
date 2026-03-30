@@ -4,7 +4,8 @@ export const SiteConfig: GlobalConfig = {
   slug: 'site-config',
   label: 'Site Config',
   admin: {
-    description: 'Global site configuration — bio, teams, links, clients, experience, education.',
+    description: 'Global site configuration — identity, experience, links, clients, and work history. Use the "Pages" section in the nav to open any page with inline editing enabled.',
+    group: 'Settings',
   },
   access: {
     read: () => true,
@@ -15,6 +16,7 @@ export const SiteConfig: GlobalConfig = {
       tabs: [
         {
           label: 'Identity',
+          description: 'Displayed in the home page sidebar header and footer. Editable on the live site via the visual editor.',
           fields: [
             {
               name: 'name',
@@ -35,7 +37,18 @@ export const SiteConfig: GlobalConfig = {
             },
             {
               name: 'email',
-              type: 'email',
+              type: 'text',
+              admin: {
+                description: 'Contact email address (e.g. hello@example.com)',
+              },
+              validate: (value: unknown) => {
+                if (!value || value === '') return true
+                const str = String(value).trim()
+                if (str === '') return true
+                return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(str)
+                  ? true
+                  : 'Please enter a valid email address'
+              },
             },
             {
               name: 'bio',
@@ -44,14 +57,40 @@ export const SiteConfig: GlobalConfig = {
                 description: 'Main bio paragraph shown on the home page and about page',
               },
             },
+            {
+              name: 'aboutLabel',
+              type: 'text',
+              defaultValue: 'ABOUT',
+              admin: {
+                description: 'Section heading shown above the bio on the home page',
+              },
+            },
+            {
+              name: 'footerCta',
+              type: 'text',
+              defaultValue: "Let's build something together.",
+              admin: {
+                description: 'Call-to-action text shown in the site footer',
+              },
+            },
           ],
         },
         {
-          label: 'Teams',
+          label: 'Experience',
+          description: 'Companies displayed in the home page sidebar. The section heading is editable on the live site.',
           fields: [
+            {
+              name: 'teamsLabel',
+              type: 'text',
+              defaultValue: 'EXPERIENCE',
+              admin: {
+                description: 'Section heading shown above the experience list on the home page',
+              },
+            },
             {
               name: 'teams',
               type: 'array',
+              labels: { singular: 'Experience', plural: 'Experience' },
               admin: {
                 description: 'Companies / teams you have worked with',
               },
@@ -60,10 +99,17 @@ export const SiteConfig: GlobalConfig = {
                   name: 'name',
                   type: 'text',
                   required: true,
+                  admin: { description: 'Company or team name' },
                 },
                 {
                   name: 'url',
                   type: 'text',
+                  admin: { description: 'Company website URL (e.g. https://example.com)' },
+                },
+                {
+                  name: 'period',
+                  type: 'text',
+                  admin: { description: 'Time period (e.g. "2023-2024" or "Present")' },
                 },
               ],
             },
@@ -71,7 +117,16 @@ export const SiteConfig: GlobalConfig = {
         },
         {
           label: 'Links',
+          description: 'Social and navigation links displayed in the home page sidebar. Editable on the live site via the visual editor.',
           fields: [
+            {
+              name: 'linksLabel',
+              type: 'text',
+              defaultValue: 'LINKS',
+              admin: {
+                description: 'Section heading shown above the links list on the home page',
+              },
+            },
             {
               name: 'socialLinks',
               type: 'array',
@@ -87,7 +142,6 @@ export const SiteConfig: GlobalConfig = {
                 {
                   name: 'href',
                   type: 'text',
-                  required: true,
                 },
                 {
                   name: 'external',
@@ -100,6 +154,7 @@ export const SiteConfig: GlobalConfig = {
         },
         {
           label: 'Clients',
+          description: 'Displayed on the Contact page in the "Trusted by" section.',
           fields: [
             {
               name: 'clients',
@@ -125,13 +180,27 @@ export const SiteConfig: GlobalConfig = {
           ],
         },
         {
-          label: 'Experience',
+          label: 'Grid Order',
+          description: 'Stores the manually curated tile order for the homepage masonry grid. Managed via the inline drag-and-drop editor — do not edit directly.',
+          fields: [
+            {
+              name: 'gridOrder',
+              type: 'json',
+              admin: {
+                description: 'JSON array of { type: "project"|"testimonial", id: number } entries representing the flat tile sequence on the home page.',
+              },
+            },
+          ],
+        },
+        {
+          label: 'Work History',
+          description: 'Displayed on the About page. Work experience and education entries.',
           fields: [
             {
               name: 'experience',
               type: 'array',
               admin: {
-                description: 'Work experience entries',
+                description: 'Work experience entries shown on the About page',
               },
               fields: [
                 {
@@ -155,7 +224,7 @@ export const SiteConfig: GlobalConfig = {
               name: 'education',
               type: 'array',
               admin: {
-                description: 'Education entries',
+                description: 'Education entries shown on the About page',
               },
               fields: [
                 {

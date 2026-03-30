@@ -152,12 +152,13 @@ export default function ScrollSpy({
             <div
               key={section.id}
               data-notch-index={i}
-              className="relative flex items-center justify-end"
+              data-active={isActive || undefined}
+              className="relative flex items-center justify-end h-4"
             >
               <AnimatePresence>
                 {showLabel && (
                   <motion.span
-                    className="absolute right-[calc(100%+8px)] top-1/2 -translate-y-1/2 text-[11px] font-mono text-muted-foreground whitespace-nowrap pointer-events-none"
+                    className={`absolute right-[calc(100%+8px)] top-0 h-4 flex items-center text-[11px] font-mono whitespace-nowrap pointer-events-none ${isActive ? "text-foreground font-medium" : "text-muted-foreground/60"}`}
                     initial={{ opacity: 0, x: 4 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: 4 }}

@@ -6,9 +6,7 @@ import styles from "./Navigation.module.scss";
 
 const NAV_LINKS = [
   { href: "/about", label: "About" },
-  { href: "/reading", label: "Reading" },
   { href: "/experiments", label: "Experiments" },
-  { href: "/contact", label: "Contact" },
 ];
 
 export default function Navigation() {

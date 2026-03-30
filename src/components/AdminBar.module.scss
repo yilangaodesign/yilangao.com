@@ -1,31 +1,34 @@
+@use '../styles' as *;
+
 .bar {
-  position: fixed;
+  position: sticky;
   top: 0;
-  left: 0;
-  right: 0;
-  z-index: 9999;
-  background: #1a1a2e;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  font-family: var(--font-geist-sans, system-ui, sans-serif);
-  font-size: 13px;
-  color: #e0e0e0;
+  z-index: $portfolio-z-toast;
   backdrop-filter: blur(12px);
 }
 
+.barRow {
+  background: $portfolio-neutral-100;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-sm;
+  color: $portfolio-neutral-20;
+}
+
 .inner {
-  max-width: 1440px;
+  max-width: $elan-container-wide;
   margin: 0 auto;
-  padding: 8px 20px;
+  padding: $portfolio-spacer-1x $portfolio-spacer-2-5x;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: $portfolio-spacer-2x;
 }
 
 .left {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: $portfolio-spacer-utility-1-25x;
   min-width: 0;
 }
 
@@ -33,23 +36,21 @@
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
-  padding: 2px 8px;
-  border-radius: 4px;
-  background: #6c63ff;
-  color: #fff;
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  padding: $portfolio-spacer-0-25x $portfolio-spacer-1x;
+  border-radius: $portfolio-radius-sm;
+  background: $portfolio-accent-60;
+  color: $portfolio-neutral-00;
+  @include label;
+  font-size: $portfolio-type-xs;
 }
 
 .hint {
-  color: #999;
+  color: $portfolio-neutral-40;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 
-  @media (max-width: 640px) {
+  @media (max-width: #{$elan-bp-sm - 1}) {
     display: none;
   }
 }
@@ -57,45 +58,45 @@
 .actions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: $portfolio-spacer-1x;
   flex-shrink: 0;
 }
 
 .editBtn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 5px 12px;
-  border-radius: 6px;
-  background: #6c63ff;
-  color: #fff;
-  font-size: 13px;
-  font-weight: 500;
+  gap: $portfolio-spacer-utility-0-75x;
+  padding: $portfolio-spacer-utility-0-75x $portfolio-spacer-1-5x;
+  border-radius: $portfolio-radius-sm;
+  background: $portfolio-accent-60;
+  color: $portfolio-neutral-00;
+  @include body-compact;
+  font-weight: $portfolio-weight-medium;
   text-decoration: none;
-  transition: background 0.15s;
+  transition: background $portfolio-duration-fast $portfolio-easing-standard;
   white-space: nowrap;
 
   &:hover {
-    background: #5a52e0;
+    background: $portfolio-accent-70;
   }
 }
 
 .dashBtn {
   display: inline-flex;
   align-items: center;
-  padding: 5px 12px;
-  border-radius: 6px;
+  padding: $portfolio-spacer-utility-0-75x $portfolio-spacer-1-5x;
+  border-radius: $portfolio-radius-sm;
   background: rgba(255, 255, 255, 0.08);
-  color: #ccc;
-  font-size: 13px;
-  font-weight: 500;
+  color: $portfolio-neutral-30;
+  @include body-compact;
+  font-weight: $portfolio-weight-medium;
   text-decoration: none;
-  transition: background 0.15s;
+  transition: background $portfolio-duration-fast $portfolio-easing-standard;
   white-space: nowrap;
 
   &:hover {
     background: rgba(255, 255, 255, 0.14);
-    color: #fff;
+    color: $portfolio-neutral-00;
   }
 }
 
@@ -105,15 +106,16 @@
   justify-content: center;
   width: 28px;
   height: 28px;
-  border-radius: 6px;
+  border-radius: $portfolio-radius-sm;
   border: none;
   background: transparent;
-  color: #666;
+  color: $portfolio-neutral-50;
   cursor: pointer;
-  transition: background 0.15s, color 0.15s;
+  transition: background $portfolio-duration-fast $portfolio-easing-standard,
+    color $portfolio-duration-fast $portfolio-easing-standard;
 
   &:hover {
     background: rgba(255, 255, 255, 0.08);
-    color: #ccc;
+    color: $portfolio-neutral-30;
   }
 }

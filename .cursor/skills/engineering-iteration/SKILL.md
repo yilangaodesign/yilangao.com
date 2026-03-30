@@ -13,6 +13,10 @@ Don't just fix the surface symptom. Ask:
 - **Is this an architecture issue?** (the system design makes this failure possible)
 - **Is this the same category as a previous incident?** (check feedback log)
 
+**Cross-category check (mandatory):** Before proceeding, ask: **does this feedback also have a design or content dimension?** User feedback about "confusing UI", "unclear fields", "bad labels", or "missing instructions" is almost always multi-dimensional:
+- A confusing form is a **design** issue (missing labels, bad affordances) AND possibly a **content** issue (poor microcopy, database names as user-facing labels) AND an **engineering** issue (missing schema fields).
+- If other dimensions exist, note them now. You will document them in Step 5.
+
 ### Step 2: Check Existing Knowledge
 
 Before writing code:
@@ -47,6 +51,7 @@ After resolving the issue:
    **Root Cause:** [Technical reason it happened]
    **Resolution:** [What was done to fix it]
    **Principle extracted -> `engineering.md` §N.N: [Section reference]**
+   **Cross-category note:** [If Step 1 identified design/content dimensions, reference them here]
    ```
 
 2. **Update `docs/engineering.md`** if the incident reveals:
@@ -60,6 +65,11 @@ After resolving the issue:
    - A manual process that should be automated
 
 4. **Update the frequency map** in `engineering.md` Appendix if a category gets another hit.
+
+5. **Cross-category documentation (if Step 1 identified other dimensions):**
+   - If design dimension exists → also append to `docs/design-feedback-log.md` and check `docs/design-anti-patterns.md`
+   - If content dimension exists → also append to `docs/content-feedback-log.md` and check `docs/content-anti-patterns.md`
+   - Each cross-category entry should include a "Cross-category note" referencing the engineering entry (e.g., "Also documented as ENG-NNN")
 
 ## Escalation Triggers
 

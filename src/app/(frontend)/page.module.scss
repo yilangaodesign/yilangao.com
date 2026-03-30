@@ -1,4 +1,4 @@
-@use '@yilangaodesign/design-system/scss' as *;
+@use '../../styles' as *;
 
 // ── PAGE ─────────────────────────────────────────────────────────────────────
 
@@ -14,39 +14,42 @@
   display: flex;
   flex-direction: column;
   flex: 1;
-  max-width: $portfolio-container-lg;
+  max-width: $elan-container-wide;
   margin: 0 auto;
   width: 100%;
-  padding: $portfolio-spacing-09 $portfolio-spacing-05;
+  padding: $portfolio-spacer-2x $portfolio-spacer-1-5x;
 
-  @media #{$portfolio-mq-lg} {
+  @media #{$elan-mq-sm} {
+    padding: $portfolio-spacer-3x $portfolio-spacer-2x;
+  }
+
+  @media #{$elan-mq-md} {
     flex-direction: row;
-    gap: $portfolio-spacing-10;
-    padding: $portfolio-layout-06 $portfolio-spacing-09;
+    gap: $portfolio-spacer-4x;
+    padding: $portfolio-spacer-3x $portfolio-spacer-4x;
   }
 }
 
 // ── SIDEBAR (LEFT) ───────────────────────────────────────────────────────────
 
 .sidebar {
-  @media #{$portfolio-mq-lg} {
-    width: 340px;
+  @media #{$elan-mq-md} {
+    width: 300px;
     flex-shrink: 0;
     position: sticky;
-    top: $portfolio-layout-06;
+    top: $portfolio-spacer-3x;
     align-self: flex-start;
-    max-height: calc(100vh - #{$portfolio-layout-06} - #{$portfolio-layout-04});
-    overflow-y: auto;
   }
 }
 
 .sidebarInner {
   display: flex;
   flex-direction: column;
-  gap: $portfolio-spacing-09;
-  padding-bottom: $portfolio-spacing-09;
+  gap: $portfolio-spacer-2x;
+  padding-bottom: $portfolio-spacer-2x;
 
-  @media #{$portfolio-mq-lg} {
+  @media #{$elan-mq-md} {
+    gap: $portfolio-spacer-4x;
     padding-bottom: 0;
   }
 }
@@ -56,7 +59,11 @@
 .identity {
   display: flex;
   flex-direction: column;
-  gap: $portfolio-spacing-02;
+  gap: $portfolio-spacer-0-25x;
+
+  @media #{$elan-mq-md} {
+    gap: $portfolio-spacer-0-5x;
+  }
 }
 
 .name {
@@ -69,16 +76,12 @@
 }
 
 .role {
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-sm;
-  font-weight: $portfolio-weight-regular;
+  @include body-sm;
   color: $portfolio-text-secondary;
 }
 
 .location {
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-sm;
-  font-weight: $portfolio-weight-regular;
+  @include body-sm;
   color: $portfolio-text-placeholder;
 }
 
@@ -86,21 +89,20 @@
 
 .sectionLabel {
   display: block;
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-xs;
+  @include label;
   font-weight: $portfolio-weight-semibold;
-  letter-spacing: $portfolio-tracking-wider;
-  text-transform: uppercase;
   color: $portfolio-text-placeholder;
-  margin-bottom: $portfolio-spacing-05;
+  margin-bottom: $portfolio-spacer-1x;
+
+  @media #{$elan-mq-md} {
+    margin-bottom: $portfolio-spacer-1-5x;
+  }
 }
 
 // ── ABOUT ────────────────────────────────────────────────────────────────────
 
 .aboutText {
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-sm;
-  font-weight: $portfolio-weight-regular;
+  @include body-sm;
   line-height: $portfolio-leading-relaxed;
   color: $portfolio-text-secondary;
 }
@@ -117,25 +119,36 @@
   }
 }
 
+// ── TEAMS + LINKS (SIDE-BY-SIDE) ────────────────────────────────────────────
+
+.teamsAndLinks {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $portfolio-spacer-1-5x;
+
+  @media #{$elan-mq-md} {
+    grid-template-columns: 1fr;
+    gap: $portfolio-spacer-4x;
+  }
+}
+
 // ── TEAMS ────────────────────────────────────────────────────────────────────
 
 .teamsList {
   display: flex;
   flex-direction: column;
-  gap: $portfolio-spacing-03;
+  gap: $portfolio-spacer-1x;
 }
 
 .teamItem {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  gap: $portfolio-spacing-04;
+  gap: $portfolio-spacer-1-5x;
 }
 
 .teamLink {
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-sm;
-  font-weight: $portfolio-weight-medium;
+  @include body-sm-medium;
   color: $portfolio-text-primary;
   text-decoration: none;
   transition: color $portfolio-duration-fast $portfolio-easing-standard;
@@ -146,8 +159,7 @@
 }
 
 .teamNum {
-  font-family: $portfolio-font-mono;
-  font-size: $portfolio-type-xs;
+  @include code-sm;
   color: $portfolio-text-placeholder;
   min-width: 1.5ch;
   text-align: right;
@@ -158,18 +170,16 @@
 .linksList {
   display: flex;
   flex-direction: column;
-  gap: $portfolio-spacing-03;
+  gap: $portfolio-spacer-1x;
 }
 
 .externalLink {
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-sm;
-  font-weight: $portfolio-weight-regular;
+  @include body-sm;
   color: $portfolio-text-secondary;
   text-decoration: none;
   display: inline-flex;
   align-items: center;
-  gap: $portfolio-spacing-02;
+  gap: $portfolio-spacer-0-5x;
   transition: color $portfolio-duration-fast $portfolio-easing-standard;
 
   &:hover {
@@ -178,7 +188,7 @@
 }
 
 .arrow {
-  font-size: $portfolio-type-xs;
+  @include caption;
   opacity: 0.5;
 }
 
@@ -189,30 +199,33 @@
   min-width: 0;
 }
 
-// ── PROJECT GRID ─────────────────────────────────────────────────────────────
+// ── PROJECT GRID (MASONRY / WATERFALL) ───────────────────────────────────────
+// JS-distributed round-robin columns give left-to-right row ordering,
+// so "row 1, column 3" maps intuitively to the 3rd item in the list.
 
-.projectGrid {
+.masonryGrid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: $portfolio-spacing-05;
+  gap: $portfolio-spacer-1-5x;
 
-  @media #{$portfolio-mq-md} {
+  @media #{$elan-mq-sm} {
     grid-template-columns: repeat(2, 1fr);
   }
 
-  @media #{$portfolio-mq-lg} {
-    grid-template-columns: repeat(2, 1fr);
+  @media #{$elan-mq-md} {
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
-.gridItem {
-  grid-column: span 1;
+.masonryColumn {
+  display: flex;
+  flex-direction: column;
+  gap: $portfolio-spacer-1-5x;
 }
 
+.gridItem,
 .gridItemFeatured {
-  @media #{$portfolio-mq-md} {
-    grid-column: span 2;
-  }
+  // Items flow naturally within their column
 }
 
 // ── PROJECT CARD ─────────────────────────────────────────────────────────────
@@ -226,7 +239,8 @@
   transition: transform $portfolio-duration-moderate $portfolio-easing-standard;
 
   &:hover {
-    .projectImage {
+    .projectImage,
+    .projectCoverImg {
       transform: scale(1.02);
     }
     .projectTitle {
@@ -237,23 +251,75 @@
 
 .projectCardFeatured {
   composes: projectCard;
-
-  .projectHero {
-    aspect-ratio: 2 / 1;
-  }
 }
 
 .projectHero {
   position: relative;
   overflow: hidden;
   border-radius: $portfolio-radius-sm;
-  aspect-ratio: 4 / 3;
   background-color: $portfolio-surface-tertiary;
+
+  &:hover .cardAdminActions {
+    opacity: 1;
+    pointer-events: auto;
+
+    button {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+}
+
+.cardAdminActions {
+  position: absolute;
+  top: $portfolio-spacer-1x;
+  right: $portfolio-spacer-1x;
+  display: flex;
+  gap: $portfolio-spacer-0-5x;
+  z-index: 10;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity $portfolio-duration-fast $portfolio-easing-standard;
+}
+
+.cardEditBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: none;
+  border-radius: $portfolio-radius-sm;
+  background: $portfolio-accent-60;
+  color: $portfolio-neutral-00;
+  opacity: 0;
+  transform: scale(0.9);
+  transition: opacity $portfolio-duration-fast $portfolio-easing-standard,
+    transform $portfolio-duration-fast $portfolio-easing-standard,
+    background $portfolio-duration-fast $portfolio-easing-standard;
+  cursor: pointer;
+  flex-shrink: 0;
+  box-shadow: $portfolio-shadow-md;
+  position: relative;
+  z-index: 10;
+
+  *:hover > &,
+  &:focus-visible {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  &:hover {
+    background: $portfolio-accent-70;
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .projectImage {
   width: 100%;
-  height: 100%;
+  aspect-ratio: 3 / 2;
   background: linear-gradient(
     145deg,
     $portfolio-neutral-10 0%,
@@ -263,99 +329,184 @@
   transition: transform $portfolio-duration-slow $portfolio-easing-standard;
 }
 
+.projectCoverImg {
+  width: 100%;
+  height: auto;
+  display: block;
+  transition: transform $portfolio-duration-slow $portfolio-easing-standard;
+}
+
 .projectInfo {
-  padding: $portfolio-spacing-04 $portfolio-spacing-02;
+  padding: $portfolio-spacer-1x $portfolio-spacer-0-25x;
 }
 
 .projectTitle {
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-sm;
-  font-weight: $portfolio-weight-medium;
+  @include body-sm-medium;
   color: $portfolio-text-primary;
-  margin-bottom: $portfolio-spacing-01;
+  margin-bottom: $portfolio-spacer-0-25x;
   transition: color $portfolio-duration-fast $portfolio-easing-standard;
 }
 
 .projectCategory {
+  @include caption;
+  color: $portfolio-text-placeholder;
+}
+
+// ── REORDER MODE (ADMIN DND) ─────────────────────────────────────────────────
+
+.reorderBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $portfolio-spacer-1-5x;
+  padding: $portfolio-spacer-1x $portfolio-spacer-1-5x;
+  margin-bottom: $portfolio-spacer-1-5x;
+  background-color: $portfolio-surface-secondary;
+  border: 1px solid $portfolio-border-subtle;
+  border-radius: $portfolio-radius-sm;
+}
+
+.reorderLabel {
+  @include body-sm-medium;
+  color: $portfolio-text-primary;
+}
+
+.reorderActions {
+  display: flex;
+  gap: $portfolio-spacer-0-5x;
+}
+
+.reorderToggle,
+.reorderCancel,
+.reorderSave {
   font-family: $portfolio-font-sans;
   font-size: $portfolio-type-xs;
-  font-weight: $portfolio-weight-regular;
+  font-weight: $portfolio-weight-medium;
+  padding: $portfolio-spacer-0-5x $portfolio-spacer-1x;
+  border-radius: $portfolio-radius-sm;
+  border: 1px solid $portfolio-border-subtle;
+  background: $portfolio-surface-primary;
+  color: $portfolio-text-primary;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: $portfolio-spacer-0-5x;
+  transition:
+    background-color $portfolio-duration-fast $portfolio-easing-standard,
+    border-color $portfolio-duration-fast $portfolio-easing-standard;
+
+  &:hover {
+    background-color: $portfolio-surface-secondary;
+    border-color: $portfolio-text-placeholder;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.reorderSave {
+  background-color: $portfolio-text-primary;
+  color: $portfolio-surface-primary;
+  border-color: $portfolio-text-primary;
+
+  &:hover {
+    opacity: 0.9;
+    background-color: $portfolio-text-primary;
+  }
+}
+
+.reorderGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $portfolio-spacer-1-5x;
+
+  @media #{$elan-mq-sm} {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media #{$elan-mq-md} {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.sortableTile {
+  position: relative;
+  border-radius: $portfolio-radius-sm;
+  outline: 2px dashed $portfolio-border-subtle;
+  user-select: none;
+
+  &:hover {
+    outline-color: $portfolio-text-placeholder;
+  }
+
+  &:hover .dragHandle {
+    opacity: 1;
+  }
+}
+
+.sortableTileContent {
+  pointer-events: none;
+}
+
+.dragHandle {
+  position: absolute;
+  top: $portfolio-spacer-0-5x;
+  left: $portfolio-spacer-0-5x;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: $portfolio-radius-sm;
+  background-color: $portfolio-surface-primary;
   color: $portfolio-text-placeholder;
+  opacity: 0.7;
+  box-shadow: $portfolio-shadow-sm;
+  transition:
+    opacity $portfolio-duration-fast $portfolio-easing-standard,
+    color $portfolio-duration-fast $portfolio-easing-standard;
+}
+
+.dragOverlay {
+  border-radius: $portfolio-radius-sm;
+  box-shadow: $portfolio-shadow-lg;
+  opacity: 0.92;
+  pointer-events: none;
 }
 
 // ── FOOTER ───────────────────────────────────────────────────────────────────
 
 .footer {
   border-top: 1px solid $portfolio-border-subtle;
-  margin-top: $portfolio-layout-06;
+  margin-top: $portfolio-spacer-6x;
 }
 
 .footerInner {
-  max-width: $portfolio-container-lg;
+  max-width: $elan-container-wide;
   margin: 0 auto;
-  padding: $portfolio-spacing-09 $portfolio-spacing-05;
+  padding: $portfolio-spacer-3x $portfolio-spacer-2x;
   display: flex;
-  flex-direction: column;
-  gap: $portfolio-spacing-06;
-
-  @media #{$portfolio-mq-md} {
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: $portfolio-spacing-07;
-    padding: $portfolio-spacing-09;
-  }
-}
-
-.footerVersion {
-  font-family: $portfolio-font-mono;
-  font-size: $portfolio-type-xs;
-  color: $portfolio-text-placeholder;
-}
-
-.footerUpdated {
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-xs;
-  color: $portfolio-text-placeholder;
-}
-
-.footerLinks {
-  display: flex;
-  gap: $portfolio-spacing-05;
-}
-
-.footerLink {
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-xs;
-  color: $portfolio-text-secondary;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  gap: $portfolio-spacing-01;
-  transition: color $portfolio-duration-fast $portfolio-easing-standard;
-
-  &:hover { color: $portfolio-text-primary; }
+  flex-direction: row;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: $portfolio-spacer-2x;
 }
 
 .footerCta {
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-sm;
-  font-weight: $portfolio-weight-medium;
+  @include body-sm-medium;
   color: $portfolio-text-primary;
-
-  @media #{$portfolio-mq-md} {
-    margin-left: auto;
-  }
 }
 
 .footerEmail {
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-sm;
+  @include body-sm;
   color: $portfolio-text-secondary;
   text-decoration: none;
   display: inline-flex;
   align-items: center;
-  gap: $portfolio-spacing-02;
+  gap: $portfolio-spacer-0-5x;
   transition: color $portfolio-duration-fast $portfolio-easing-standard;
 
   &:hover { color: $portfolio-text-primary; }

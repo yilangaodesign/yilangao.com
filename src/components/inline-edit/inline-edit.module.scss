@@ -1,0 +1,1022 @@
+@use '../../styles' as *;
+
+/* ── Inline Edit Visual Layer ── */
+
+$accent: $portfolio-accent-60;
+$accent-light: rgba(79, 70, 229, 0.06);
+
+/* ── Editable Text ── */
+
+.editable {
+  position: relative;
+  cursor: text;
+  outline: 1.5px solid transparent;
+  outline-offset: 3px;
+  border-radius: 2px;
+  transition: outline-color 150ms ease, background-color 150ms ease;
+
+  &:hover {
+    outline-color: $accent;
+  }
+
+  &:hover::before {
+    content: attr(data-editable-label);
+    position: absolute;
+    top: -22px;
+    left: 0;
+    padding: 1px 6px;
+    font-size: 10px;
+    font-weight: 500;
+    font-family: system-ui, sans-serif;
+    line-height: 16px;
+    letter-spacing: 0.02em;
+    color: #fff;
+    background: $accent;
+    border-radius: 3px;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  &[data-editable-active] {
+    outline-color: $accent;
+    outline-width: 2px;
+    background-color: $accent-light;
+  }
+
+  &[data-editable-dirty] {
+    outline-color: #d97706;
+
+    &::before {
+      background: #d97706;
+    }
+  }
+}
+
+/* ── Editable Array ── */
+
+.editableArray {
+  position: relative;
+  cursor: pointer;
+  outline: 1.5px dashed transparent;
+  outline-offset: 4px;
+  border-radius: 2px;
+  transition: outline-color 150ms ease;
+
+  &:hover {
+    outline-color: $accent;
+  }
+
+  &:hover::before {
+    content: attr(data-editable-label);
+    position: absolute;
+    top: -22px;
+    left: 0;
+    padding: 1px 6px;
+    font-size: 10px;
+    font-weight: 500;
+    font-family: system-ui, sans-serif;
+    line-height: 16px;
+    letter-spacing: 0.02em;
+    color: #fff;
+    background: $accent;
+    border-radius: 3px;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  &[data-editable-dirty] {
+    outline-color: #d97706;
+    outline-style: dashed;
+
+    &::before {
+      background: #d97706;
+    }
+  }
+}
+
+/* ── Array Panel Overlay ── */
+
+.arrayPanel {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10000;
+  width: min(480px, 90vw);
+  min-width: 320px;
+  min-height: min(420px, 65vh);
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: $portfolio-shadow-overlay, 0 0 0 1px rgba(0, 0, 0, 0.05);
+  font-family: system-ui, sans-serif;
+}
+
+.arrayPanelHeader {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.arrayPanelTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.arrayPanelClose {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: none;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #6b7280;
+
+  &:hover {
+    background: #f3f4f6;
+    color: #111827;
+  }
+}
+
+.arrayPanelBody {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 8px 0;
+}
+
+.arrayItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px 16px;
+  border-bottom: 1px solid #f3f4f6;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.arrayItemIndex {
+  flex: 0 0 20px;
+  font-size: $portfolio-type-xs;
+  font-weight: 500;
+  color: #9ca3af;
+  line-height: 32px;
+  text-align: center;
+}
+
+.arrayItemFields {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.arrayFieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.arrayFieldLabel {
+  font-size: 10px;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.requiredMark {
+  color: #dc2626;
+  margin-left: 2px;
+}
+
+.arrayFieldInput {
+  width: 100%;
+  padding: 4px 8px;
+  font-size: 13px;
+  line-height: 22px;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  background: #fff;
+  color: #111827;
+  outline: none;
+  transition: border-color 120ms ease;
+
+  &:focus {
+    border-color: $accent;
+  }
+
+  &::placeholder {
+    color: #9ca3af;
+  }
+}
+
+.arrayFieldInputError {
+  border-color: #dc2626;
+
+  &:focus {
+    border-color: #dc2626;
+  }
+}
+
+.fieldError {
+  font-size: $portfolio-type-xs;
+  color: #dc2626;
+  line-height: 1.2;
+}
+
+.mediaUrlRow {
+  display: flex;
+  gap: 4px;
+  align-items: stretch;
+
+  .arrayFieldInput {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+.mediaUploadBtn {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  padding: 0;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  background: #f9fafb;
+  color: #6b7280;
+  cursor: pointer;
+  transition: border-color 120ms ease, color 120ms ease, background 120ms ease;
+
+  &:hover:not(:disabled) {
+    border-color: $accent;
+    color: $accent;
+    background: #f0f4ff;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.mediaUploadSpinner {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border: 2px solid #e5e7eb;
+  border-top-color: $accent;
+  border-radius: 50%;
+  animation: spin 600ms linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.hiddenFileInput {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.arrayFieldCheckbox {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #6b7280;
+  padding: 2px 0;
+
+  input {
+    accent-color: $accent;
+  }
+}
+
+.dragHandle {
+  flex: 0 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  background: none;
+  border: none;
+  cursor: grab;
+  color: #d1d5db;
+  padding: 0;
+  touch-action: none;
+
+  &:hover {
+    color: #6b7280;
+  }
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+.arrayItemActions {
+  display: flex;
+  align-items: flex-start;
+  padding-top: 2px;
+}
+
+.arrayDeleteBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  cursor: pointer;
+  color: #9ca3af;
+  font-size: 12px;
+
+  &:hover {
+    color: #dc2626;
+    background: #fef2f2;
+    border-color: #fecaca;
+  }
+}
+
+.arrayItemSummary {
+  display: none;
+  flex: 1;
+  font-size: 13px;
+  color: #374151;
+  line-height: 32px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.arrayItemDragging {
+  opacity: 0.3;
+}
+
+.arrayItemDropTarget {
+  box-shadow: 0 -2px 0 0 $accent;
+}
+
+.panelDragging {
+  .arrayItemFields { display: none; }
+  .arrayItemActions { display: none; }
+  .arrayItemSummary { display: block; }
+
+  .arrayItem {
+    padding-top: 6px;
+    padding-bottom: 6px;
+    transition: box-shadow 100ms ease;
+  }
+}
+
+.arrayPanelFooter {
+  flex-shrink: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 12px 16px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.noItemsText {
+  line-height: 28px;
+  color: #9ca3af;
+}
+
+.arrayAddBtn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: $accent;
+  background: none;
+  border: 1px dashed $accent;
+  border-radius: 4px;
+  cursor: pointer;
+
+  &:hover {
+    background: $accent-light;
+  }
+}
+
+.arrayDoneBtn {
+  padding: 6px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  background: $accent;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+
+  &:hover {
+    background: darken($accent, 6%);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.arrayPanelError {
+  width: 100%;
+  font-size: 12px;
+  color: #dc2626;
+}
+
+.arrayBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+/* ── Save / Discard Bar ── */
+
+.editBar {
+  position: sticky;
+  bottom: 0;
+  z-index: 10001;
+  background: #1f2937;
+  border-top: 1px solid #374151;
+  animation: slideUp 200ms ease-out;
+  transition: background-color 200ms ease, border-color 200ms ease;
+}
+
+.editBarErrorState {
+  background: #991b1b;
+  border-top-color: #7f1d1d;
+}
+
+.editBarInner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 10px 20px;
+  gap: 12px;
+}
+
+.editBarCount {
+  font-size: 13px;
+  font-weight: 500;
+  color: #d1d5db;
+  font-family: system-ui, sans-serif;
+}
+
+.editBarMessage {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #fecaca;
+  font-family: system-ui, sans-serif;
+  flex: 1;
+  min-width: 0;
+}
+
+.editBarIcon {
+  flex-shrink: 0;
+  color: #fca5a5;
+}
+
+.editBarHint {
+  color: #6b7280;
+  font-weight: 400;
+}
+
+.editBarActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.editBarDiscard {
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #d1d5db;
+  background: transparent;
+  border: 1px solid #4b5563;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: system-ui, sans-serif;
+
+  &:hover {
+    background: #374151;
+    color: #fff;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .editBarErrorState & {
+    border-color: rgba(255, 255, 255, 0.25);
+    color: #fecaca;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+  }
+}
+
+.editBarSave {
+  padding: 6px 18px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  background: $accent;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: system-ui, sans-serif;
+
+  &:hover {
+    background: darken($accent, 6%);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.editBarRetry {
+  padding: 6px 18px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #991b1b;
+  background: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: system-ui, sans-serif;
+
+  &:hover {
+    background: #fef2f2;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* ── Collection Delete Button ── */
+
+.collectionDeleteBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: none;
+  border-radius: $portfolio-radius-sm;
+  background: #dc2626;
+  color: #fff;
+  opacity: 0;
+  transform: scale(0.9);
+  transition: opacity 0.15s, transform 0.15s, background 0.15s;
+  cursor: pointer;
+  flex-shrink: 0;
+  box-shadow: $portfolio-shadow-md;
+  position: relative;
+  z-index: 10;
+
+  *:hover > &,
+  &:focus-visible {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  &:hover {
+    background: #b91c1c;
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ── Delete Confirmation Dialog ── */
+
+.confirmBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10001;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.confirmDialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10002;
+  width: min(360px, 90vw);
+  padding: 20px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: $portfolio-shadow-overlay, 0 0 0 1px rgba(0, 0, 0, 0.05);
+  font-family: system-ui, sans-serif;
+}
+
+.confirmMessage {
+  font-size: 14px;
+  font-weight: 500;
+  color: #111827;
+  margin: 0 0 16px;
+  line-height: 1.5;
+}
+
+.confirmHint {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  font-weight: 400;
+  color: #6b7280;
+}
+
+.confirmError {
+  font-size: 12px;
+  color: #dc2626;
+  margin: 0 0 12px;
+}
+
+.confirmActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.confirmCancel {
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #374151;
+  background: #fff;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: system-ui, sans-serif;
+
+  &:hover {
+    background: #f3f4f6;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.confirmDelete {
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  background: #dc2626;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: system-ui, sans-serif;
+
+  &:hover {
+    background: #b91c1c;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+/* ── Add Item Card ── */
+
+.addItemCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 140px;
+  padding: 24px 16px;
+  background: none;
+  border: 2px dashed #d1d5db;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: system-ui, sans-serif;
+  color: #9ca3af;
+  transition: border-color 150ms ease, color 150ms ease, background-color 150ms ease;
+  width: 100%;
+
+  &:hover {
+    border-color: $accent;
+    color: $accent;
+    background: $accent-light;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: wait;
+  }
+}
+
+.addItemIcon {
+  opacity: 0.6;
+  transition: opacity 150ms ease;
+
+  .addItemCard:hover & {
+    opacity: 1;
+  }
+}
+
+.addItemLabel {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.addItemError {
+  font-size: $portfolio-type-xs;
+  color: #dc2626;
+  text-align: center;
+}
+
+/* ── Text Format Bar ── */
+
+.formatBar {
+  background: #1a1a2e;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  font-family: var(--font-geist-sans, system-ui, sans-serif);
+  font-size: 12px;
+  color: #e0e0e0;
+  animation: formatBarIn 150ms ease-out;
+}
+
+@keyframes formatBarIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.formatBarInner {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 6px 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.formatGroup {
+  position: relative;
+}
+
+.formatSelect {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  color: #e0e0e0;
+  font-size: $portfolio-type-xs;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  font-family: inherit;
+  white-space: nowrap;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+}
+
+.formatLabel {
+  color: #888;
+  font-weight: 400;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.formatValue {
+  font-weight: 600;
+  color: #fff;
+}
+
+.formatMeta {
+  color: #666;
+  font-family: var(--font-geist-mono, monospace);
+  font-size: 10px;
+}
+
+.formatChevron {
+  color: #666;
+  margin-left: 2px;
+}
+
+.formatDropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 4px;
+  min-width: 300px;
+  max-height: 320px;
+  overflow-y: auto;
+  background: #1a1a2e;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: $portfolio-radius-sm;
+  box-shadow: $portfolio-shadow-lg;
+  z-index: 10003;
+  padding: 4px;
+}
+
+.formatOption {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 6px 10px;
+  background: transparent;
+  border: none;
+  border-radius: 3px;
+  color: #ccc;
+  font-size: $portfolio-type-xs;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  transition: background 0.1s;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+  }
+}
+
+.formatOptionActive {
+  background: rgba(79, 70, 229, 0.2);
+  color: #a5b4fc;
+
+  &:hover {
+    background: rgba(79, 70, 229, 0.3);
+  }
+}
+
+.formatOptionName {
+  font-weight: 500;
+  min-width: 64px;
+}
+
+.formatOptionValue {
+  font-family: var(--font-geist-mono, monospace);
+  font-size: 10px;
+  color: #888;
+  min-width: 52px;
+}
+
+.formatOptionMeta {
+  font-family: var(--font-geist-mono, monospace);
+  font-size: 10px;
+  color: #555;
+}
+
+.formatOptionToken {
+  margin-left: auto;
+  font-family: var(--font-geist-mono, monospace);
+  font-size: 9px;
+  color: $portfolio-accent-60;
+}
+
+.formatDivider {
+  width: 1px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+}
+
+.formatToggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: transparent;
+  color: #888;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  font-family: inherit;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #ccc;
+    border-color: rgba(255, 255, 255, 0.15);
+  }
+}
+
+.formatToggleActive {
+  background: rgba(79, 70, 229, 0.25);
+  color: #a5b4fc;
+  border-color: rgba(79, 70, 229, 0.4);
+
+  &:hover {
+    background: rgba(79, 70, 229, 0.35);
+  }
+}
+
+.formatStyleInfo {
+  display: flex;
+  align-items: center;
+}
+
+.formatStyleLabel {
+  font-size: $portfolio-type-xs;
+  color: #888;
+}
+
+.formatColorInfo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.formatColorSwatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  flex-shrink: 0;
+}
+
+.formatColorName {
+  font-size: $portfolio-type-xs;
+  font-weight: 500;
+  color: #ccc;
+}
+
+.formatColorHex {
+  font-family: var(--font-geist-mono, monospace);
+  font-size: 10px;
+  color: #666;
+}
+
+.formatTokenRef {
+  margin-left: auto;
+  font-family: var(--font-geist-mono, monospace);
+  font-size: 10px;
+  color: $portfolio-accent-60;
+  opacity: 0.8;
+}

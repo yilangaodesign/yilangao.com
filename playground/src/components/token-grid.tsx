@@ -21,22 +21,25 @@ export function ColorSwatch({
   };
 
   return (
-    <button onClick={copy} className="group text-left">
+    <button
+      onClick={copy}
+      className="group text-left w-[52px] p-0.5 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+    >
       <div
-        className="h-14 rounded-sm border border-border/50 relative overflow-hidden transition-transform group-hover:scale-105"
+        className="h-12 w-12 rounded-sm border border-border/50 relative overflow-hidden transition-transform group-hover:scale-105"
         style={{ backgroundColor: color }}
       >
         <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20">
           {copied ? (
-            <Check className="w-4 h-4 text-white" />
+            <Check className="w-3.5 h-3.5 text-white" />
           ) : (
-            <Copy className="w-3.5 h-3.5 text-white" />
+            <Copy className="w-3 h-3 text-white" />
           )}
         </div>
       </div>
-      <p className="mt-1.5 text-xs font-medium truncate">{label}</p>
+      <p className="mt-1 text-[10px] font-medium truncate">{label}</p>
       {sublabel && (
-        <p className="text-[11px] text-muted-foreground font-mono truncate">{sublabel}</p>
+        <p className="text-[9px] text-muted-foreground font-mono truncate">{sublabel}</p>
       )}
     </button>
   );
@@ -110,7 +113,7 @@ export function SubSection({
   children: React.ReactNode;
 }) {
   return (
-    <div id={id} className="mb-12 scroll-mt-16">
+    <div id={id} className="mb-12 scroll-mt-24">
       <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-4">
         {title}
       </h3>

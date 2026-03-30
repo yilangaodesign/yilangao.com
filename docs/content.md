@@ -4,7 +4,7 @@
 >
 > **Who reads this:** AI agents routed here by `AGENTS.md` Pre-Flight. Read the Section Index first, then only the section matching your task.
 > **Who writes this:** AI agents after processing content feedback via the `content-iteration` feedback loop.
-> **Last updated:** 2026-03-29 (updated with RARRA retention model, P(Alive), Magic Number, HM segmentation, intervention matrix, LTV thinking from revised mental model v2)
+> **Last updated:** 2026-03-30 (CFB-020: tab consolidation — organize by user task not data source, color-first token builder)
 
 ---
 
@@ -199,16 +199,16 @@ Borrow from journalism. Lead with the conclusion (impact, outcome, key insight),
 ```
 [Full-width hero image of the product]
 
-# Project Title
-[2-3 word descriptor]
+# Project Title                              [HERO METRIC]
+[2-3 word descriptor]                        [metric label]
 
 [Scope statement: 2-4 sentences]
 
 Role: [Specific title]
-Collaborators: [Named individuals]
-Duration: [Timeframe]
+Collaborators: [Named individuals — one per line]
+Duration: [Project length, e.g. "~3 months", "6 weeks" — NOT ship dates]
 Tools: [Key tools]
-[External links: live product, press, etc.]
+[External links ↗: live product, press, etc.]
 
 ---
 
@@ -232,6 +232,18 @@ Tools: [Key tools]
 [Screenshots of system in use]
 ```
 
+**Time-to-Value Hero:** The hero image is the single most important content element on the case study page. It must show the final design outcome — a polished screenshot or composite of the shipped product. This is not decorative. A visitor evaluates visual quality, product domain, and design sensibility in a single glance (~2 seconds) before reading any text. Starting with text forces sequential processing and delays value perception. Starting with a strong visual establishes credibility instantly and gives the visitor a reason to keep scrolling. Every case study must open with the hero before any description or metadata.
+
+**Hero metric:** Every case study needs a single, visually prominent impact number visible in the first scan — not buried in prose. "2×" or "+40%" displayed large alongside the title. This is the number the hiring manager will remember 30 seconds later when deciding whether to keep reading. Prose metrics are parsed sequentially; visual metrics are parsed in parallel (scanning). For the 10-second scan, a visually distinct metric block beats an embedded sentence.
+
+**External link indicators:** Any link that leaves the portfolio site must have a visual indicator (↗ icon). This is a basic affordance — users should know before clicking that they're leaving the site. It also signals that the link points to real, verifiable external evidence (documentation, press, live products).
+
+**Contemporary relevance framing:** When a project's domain maps to a current industry trend, make the connection explicit in the scope statement. Historical projects gain interview-worthiness when connected to problems the hiring company faces today. Example: "a consumption-based pricing model — the same pay-for-what-you-use approach now standard across AI products."
+
+**Duration field semantics:** The Duration metadata field communicates project length — a velocity and scope signal. Use "~3 months", "6 weeks", "2024 – Present". Never use ship dates here (e.g., "Shipped August 2022"). Ship dates provide temporal context and belong in the scope statement narrative. If a ship date and a duration both appear, they must say different things — otherwise one is wasted metadata. See CAP-014.
+
+**Collaborator display:** Each collaborator/stakeholder group renders on its own line. "Product Management", "Engineering", "Customer Success" are distinct entries, not a comma-separated list. This gives the sidebar a clean, scannable structure where the reader can quickly assess cross-functional scope.
+
 ### 3.3 The Scope Statement (Intro Paragraph)
 
 This is the single most important paragraph in the case study. It must accomplish three things simultaneously in 2-4 sentences:
@@ -239,6 +251,12 @@ This is the single most important paragraph in the case study. It must accomplis
 1. **What the company/product does** (context for readers who don't know it)
 2. **What you specifically did** (ownership claim)
 3. **Evidence of scale or impact** (credibility anchor)
+
+**Visual hierarchy:** The scope statement must be typographically distinct from section body text — larger size and medium weight. This is both a design and content concern: the paragraph is the hiring manager's primary text engagement hook after the hero image. If it visually blends with body text, it fails to signal its importance regardless of how well it's written.
+
+**Social proof via named clients:** When the product serves notable clients, name 1-2 recognizable ones instead of using generic quantifiers. "Serving enterprise clients including Snowflake and LendingTree" is stronger than "serving thousands of enterprise clients." Named social proof triggers trust through association — the reader infers quality from the caliber of the customer base.
+
+**Company name links:** When company names appear in the scope statement, link them to their official landing pages. This adds a layer of verifiability that strengthens credibility. The reader can confirm the companies are real, substantial entities. The links also carry a subtle signal: "I'm confident enough in these claims that I'm inviting you to check."
 
 **Reference — Joseph Zhang, Skiff:**
 > "I led design at Skiff, a productivity company building E2EE collaboration tools. As the first full-time design hire, I helped scale Skiff from beta to over +1,000,000 users."
@@ -260,6 +278,10 @@ Each section follows a consistent rhythm:
 4. **Occasional one-line captions**: Specificity signals beneath images.
 
 **Target per case study:** 3-4 feature sections. Total text under 300 words. Total images: 15-25.
+
+**WHY over WHAT (CAP-016):** Every case study section must answer "why I designed it this way" — not just "what I built." Feature lists are junior signals; design rationale with evaluated alternatives is the senior signal. Structure each section as: (1) what the decision point was, (2) what alternatives were considered, (3) why this approach was chosen, (4) what trade-offs were accepted. The feature/output is supporting evidence for the decision, not the headline.
+
+**Interactive visuals must match section topic:** When embedding interactive demonstrations within case study sections, the visual must be scoped to the section's narrative. A general-purpose widget that shows "everything in the design system" in a section about color identity is a content anti-pattern — it fails the "does this support the narrative?" test. Interactive visual examples within the widget must follow the conventions they describe (e.g., token examples must use the naming convention the section explains).
 
 ### 3.5 What Case Studies Never Include
 
@@ -323,11 +345,13 @@ Active voice. Specific. Ambitious but defensible.
 
 ### 5.2 The Feature Label
 
-Section text serves as a **label for what the images show**, not an explanation of the design process. Each sentence should do one of three things:
+Section text serves as a **label for what the images/visuals show**, not an explanation of the design process. Each sentence should do one of three things:
 
 1. **Name the design intent:** "full of anticipation and delight", "feel luxurious and high-fashion"
 2. **Describe one specific interesting detail:** "Every time someone clicks the white rabbit, a new quote is generated via ChatGPT"
 3. **Establish context:** "marks one of the first high-profile streetwear partnerships between a web3 company and high fashion"
+
+**Hard limit: 1-3 sentences per section body.** If an interactive visual or image already demonstrates the point, the text must not restate it — it labels what the reader is about to see, then gets out of the way. "Adding rationale" does not mean "adding sentences" — it means replacing vague sentences with specific ones. (CFB-015: raised 2× in one session.)
 
 ### 5.3 The Craft Caption
 
@@ -669,7 +693,13 @@ Treat portfolio improvements like a growth experiment: identify the weakest rete
 
 | Pattern | Times Raised | Priority |
 |---------|-------------|----------|
-| (No content feedback processed yet) | 0 | — |
+| **Text verbosity (section body > 3 sentences, scope > 4 sentences)** | **2** | **Critical — escalation threshold** |
+| Interactive visual scoping (widget content must match section topic) | 2 | Medium |
+| Information hierarchy inversion (rationale before outcome, data source over task) | 2 | High |
+| Feature-list case study (WHAT without WHY) — CAP-016 | 1 | High |
+| Section hierarchy (AI-native thread should be the core narrative) | 1 | High |
+| Token naming examples inconsistent with described convention | 1 | Medium |
+| CMS data sync (headings out of sync → visuals silently drop) | 1 | High |
 
 ---
 

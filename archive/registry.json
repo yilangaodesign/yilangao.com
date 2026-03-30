@@ -851,7 +851,7 @@
         "type": "custom"
       },
       "tags": ["ui", "layout", "separator", "primitive"],
-      "hasPreview": false
+      "hasPreview": true
     },
     {
       "id": "shared-ui-avatar",
@@ -951,7 +951,7 @@
       "createdBy": "cursor",
       "origin": { "type": "hybrid", "library": "Radix UI", "url": "https://www.radix-ui.com/primitives/docs/components/tooltip" },
       "tags": ["ui", "overlay", "tooltip", "radix", "primitive"],
-      "hasPreview": false
+      "hasPreview": true
     },
     {
       "id": "shared-ui-dialog",
@@ -979,7 +979,7 @@
       "createdBy": "cursor",
       "origin": { "type": "hybrid", "library": "Radix UI", "url": "https://www.radix-ui.com/primitives/docs/components/dropdown-menu" },
       "tags": ["ui", "overlay", "menu", "dropdown", "radix", "primitive"],
-      "hasPreview": false
+      "hasPreview": true
     },
     {
       "id": "shared-ui-tabs",
@@ -1007,7 +1007,105 @@
       "createdBy": "cursor",
       "origin": { "type": "hybrid", "library": "Radix UI", "url": "https://www.radix-ui.com/primitives/docs/components/toast" },
       "tags": ["ui", "overlay", "notification", "toast", "radix", "primitive"],
-      "hasPreview": false
+      "hasPreview": true
+    },
+    {
+      "id": "shared-testimonial-card",
+      "name": "TestimonialCard",
+      "type": "Component",
+      "experiment": "shared",
+      "status": "active",
+      "description": "Quote card for user testimonials with Geist Pixel quotation mark, attribution (avatar/initials, name, role), and optional LinkedIn link. Designed to sit in the homepage masonry grid alongside project cards.",
+      "sourcePath": "src/components/TestimonialCard.tsx",
+      "createdAt": "2026-03-30T00:00:00Z",
+      "createdBy": "cursor",
+      "origin": { "type": "custom" },
+      "tags": ["ui", "card", "testimonial", "quote", "pixel-font", "homepage"],
+      "hasPreview": true
+    },
+    {
+      "id": "shared-ui-code-block",
+      "name": "CodeBlock",
+      "type": "Component",
+      "experiment": "shared",
+      "status": "active",
+      "description": "Syntax-highlighted code display with optional filename header, copy-to-clipboard, and download controls. Supports scrollable overflow for long snippets.",
+      "sourcePath": "src/components/ui/CodeBlock/CodeBlock.tsx",
+      "createdAt": "2026-03-30T00:00:00Z",
+      "createdBy": "cursor",
+      "origin": { "type": "custom" },
+      "tags": ["ui", "code", "display", "copy", "download"],
+      "hasPreview": true
+    },
+    {
+      "id": "shared-ui-textarea",
+      "name": "Textarea",
+      "type": "Component",
+      "experiment": "shared",
+      "status": "active",
+      "description": "Multi-line text input with optional label, helper text, and error state. Resizable by default and forwards all standard textarea attributes.",
+      "sourcePath": "src/components/ui/Textarea/Textarea.tsx",
+      "createdAt": "2026-03-30T00:00:00Z",
+      "createdBy": "cursor",
+      "origin": { "type": "custom" },
+      "tags": ["ui", "form", "input", "textarea"],
+      "hasPreview": true
+    },
+    {
+      "id": "shared-ui-select",
+      "name": "Select",
+      "type": "Component",
+      "experiment": "shared",
+      "status": "active",
+      "description": "Custom dropdown select with keyboard support, disabled items, and option groups.",
+      "sourcePath": "src/components/ui/Select/Select.tsx",
+      "createdAt": "2026-03-30T00:00:00Z",
+      "createdBy": "cursor",
+      "origin": { "type": "custom" },
+      "tags": ["ui", "form", "select", "dropdown"],
+      "hasPreview": true
+    },
+    {
+      "id": "shared-ui-checkbox",
+      "name": "Checkbox",
+      "type": "Component",
+      "experiment": "shared",
+      "status": "active",
+      "description": "Binary toggle rendered as a styled checkbox with optional label. Supports controlled and uncontrolled modes with proper ARIA attributes.",
+      "sourcePath": "src/components/ui/Checkbox/Checkbox.tsx",
+      "createdAt": "2026-03-30T00:00:00Z",
+      "createdBy": "cursor",
+      "origin": { "type": "custom" },
+      "tags": ["ui", "form", "checkbox", "toggle"],
+      "hasPreview": true
+    },
+    {
+      "id": "shared-ui-toggle",
+      "name": "Toggle",
+      "type": "Component",
+      "experiment": "shared",
+      "status": "active",
+      "description": "Switch control for toggling between on/off states. Supports controlled and uncontrolled modes with proper ARIA role=switch.",
+      "sourcePath": "src/components/ui/Toggle/Toggle.tsx",
+      "createdAt": "2026-03-30T00:00:00Z",
+      "createdBy": "cursor",
+      "origin": { "type": "custom" },
+      "tags": ["ui", "form", "switch", "toggle"],
+      "hasPreview": true
+    },
+    {
+      "id": "shared-ui-avatar",
+      "name": "Avatar",
+      "type": "Component",
+      "experiment": "shared",
+      "status": "active",
+      "description": "Circular avatar with image support and automatic initials fallback. Available in three sizes with graceful error handling for broken image sources.",
+      "sourcePath": "src/components/ui/Avatar/Avatar.tsx",
+      "createdAt": "2026-03-30T00:00:00Z",
+      "createdBy": "cursor",
+      "origin": { "type": "custom" },
+      "tags": ["ui", "display", "avatar", "image", "fallback"],
+      "hasPreview": true
     }
   ]
 }

@@ -1,6 +1,10 @@
 @use '../tokens/typography' as *;
 @use '../tokens/colors' as *;
 
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// HEADINGS (4) — Geist Sans, bold/semibold, tight/snug leading
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 @mixin heading-display {
   font-family: $portfolio-font-sans;
   font-size: $portfolio-type-6xl;
@@ -36,10 +40,76 @@
   color: $portfolio-text-primary;
 }
 
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// SUBTITLES (6) — Geist Sans, medium/bold weight, snug leading
+// Adopted from OneGS subtitle tier. Two weight tracks per size.
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+@mixin subtitle-1 {
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-xl;
+  font-weight: $portfolio-weight-semibold;
+  line-height: $portfolio-leading-snug;
+  color: $portfolio-text-primary;
+}
+
+@mixin subtitle-1-bold {
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-xl;
+  font-weight: $portfolio-weight-bold;
+  line-height: $portfolio-leading-snug;
+  color: $portfolio-text-primary;
+}
+
+@mixin subtitle-2 {
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-lg;
+  font-weight: $portfolio-weight-medium;
+  line-height: $portfolio-leading-snug;
+  color: $portfolio-text-primary;
+}
+
+@mixin subtitle-2-bold {
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-lg;
+  font-weight: $portfolio-weight-bold;
+  line-height: $portfolio-leading-snug;
+  color: $portfolio-text-primary;
+}
+
+@mixin subtitle-3 {
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-base;
+  font-weight: $portfolio-weight-medium;
+  line-height: $portfolio-leading-snug;
+  color: $portfolio-text-primary;
+}
+
+@mixin subtitle-3-bold {
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-base;
+  font-weight: $portfolio-weight-bold;
+  line-height: $portfolio-leading-snug;
+  color: $portfolio-text-primary;
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// BODY (9) — Geist Sans, weight matrix (light/regular/medium) + compact variants
+// Weight matrix adopted from OneGS. Compact variants adopted from Carbon.
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 @mixin body-lg {
   font-family: $portfolio-font-sans;
   font-size: $portfolio-type-lg;
   font-weight: $portfolio-weight-regular;
+  line-height: $portfolio-leading-normal;
+  color: $portfolio-text-secondary;
+}
+
+@mixin body-lg-light {
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-lg;
+  font-weight: $portfolio-weight-light;
   line-height: $portfolio-leading-normal;
   color: $portfolio-text-secondary;
 }
@@ -52,6 +122,22 @@
   color: $portfolio-text-secondary;
 }
 
+@mixin body-base-medium {
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-base;
+  font-weight: $portfolio-weight-medium;
+  line-height: $portfolio-leading-normal;
+  color: $portfolio-text-secondary;
+}
+
+@mixin body-base-light {
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-base;
+  font-weight: $portfolio-weight-light;
+  line-height: $portfolio-leading-normal;
+  color: $portfolio-text-secondary;
+}
+
 @mixin body-sm {
   font-family: $portfolio-font-sans;
   font-size: $portfolio-type-sm;
@@ -59,6 +145,87 @@
   line-height: $portfolio-leading-normal;
   color: $portfolio-text-secondary;
 }
+
+@mixin body-sm-medium {
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-sm;
+  font-weight: $portfolio-weight-medium;
+  line-height: $portfolio-leading-normal;
+  color: $portfolio-text-secondary;
+}
+
+@mixin body-compact {
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-sm;
+  font-weight: $portfolio-weight-regular;
+  line-height: $portfolio-leading-compact;
+  color: $portfolio-text-secondary;
+}
+
+@mixin body-compact-xs {
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-xs;
+  font-weight: $portfolio-weight-regular;
+  line-height: $portfolio-leading-compact;
+  color: $portfolio-text-secondary;
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// QUOTES (3) — Georgia serif, regular weight, relaxed leading
+// Serif restricted to quotes per OneGS + Carbon guidance. More selective than OneGS.
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+@mixin quote-lg {
+  font-family: $portfolio-font-serif;
+  font-size: $portfolio-type-2xl;
+  font-weight: $portfolio-weight-regular;
+  line-height: $portfolio-leading-relaxed;
+  font-style: italic;
+  color: $portfolio-text-primary;
+}
+
+@mixin quote-base {
+  font-family: $portfolio-font-serif;
+  font-size: $portfolio-type-xl;
+  font-weight: $portfolio-weight-regular;
+  line-height: $portfolio-leading-relaxed;
+  font-style: italic;
+  color: $portfolio-text-primary;
+}
+
+@mixin quote-sm {
+  font-family: $portfolio-font-serif;
+  font-size: $portfolio-type-lg;
+  font-weight: $portfolio-weight-regular;
+  line-height: $portfolio-leading-relaxed;
+  font-style: italic;
+  color: $portfolio-text-secondary;
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// CAPTIONS (2) — Geist Sans, regular weight
+// caption-sm at 8px (0.5rem) follows OneGS Caption 02 for enterprise density.
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+@mixin caption {
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-xs;
+  font-weight: $portfolio-weight-regular;
+  line-height: $portfolio-leading-normal;
+  color: $portfolio-text-secondary;
+}
+
+@mixin caption-sm {
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-2xs;
+  font-weight: $portfolio-weight-regular;
+  line-height: $portfolio-leading-compact;
+  color: $portfolio-text-secondary;
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// LABELS (1) — Geist Sans, medium weight, uppercase tracked
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 @mixin label {
   font-family: $portfolio-font-sans;
@@ -70,9 +237,145 @@
   color: $portfolio-text-secondary;
 }
 
-@mixin mono-data {
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// UTILITY (2) — helper-text and legal, adopted from Carbon
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+@mixin helper-text {
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-xs;
+  font-weight: $portfolio-weight-regular;
+  line-height: $portfolio-leading-normal;
+  color: $portfolio-text-helper;
+}
+
+@mixin legal {
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-xs;
+  font-weight: $portfolio-weight-regular;
+  line-height: $portfolio-leading-normal;
+  color: $portfolio-text-secondary;
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// CODE (3) — Geist Mono, regular weight
+// Replaces the former mono-data mixin. Mono restricted to code per Carbon.
+// For numeric alignment in data tables, use font-variant-numeric: tabular-nums
+// on Geist Sans instead.
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+@mixin code-lg {
+  font-family: $portfolio-font-mono;
+  font-size: $portfolio-type-base;
+  font-weight: $portfolio-weight-regular;
+  line-height: $portfolio-leading-normal;
+}
+
+@mixin code-base {
   font-family: $portfolio-font-mono;
   font-size: $portfolio-type-sm;
   font-weight: $portfolio-weight-regular;
   line-height: $portfolio-leading-normal;
+}
+
+@mixin code-sm {
+  font-family: $portfolio-font-mono;
+  font-size: $portfolio-type-xs;
+  font-weight: $portfolio-weight-regular;
+  line-height: $portfolio-leading-compact;
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// STATS (3) — Geist Sans, light/medium weight, tight leading
+// Adapted from OneGS Stat styles. Uses Sans Light + tight tracking instead of
+// Sans Condensed (Geist has no condensed variant).
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+@mixin stat-lg {
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-7xl;
+  font-weight: $portfolio-weight-light;
+  line-height: $portfolio-leading-tight;
+  letter-spacing: $portfolio-tracking-tight;
+  font-variant-numeric: tabular-nums;
+  color: $portfolio-text-primary;
+}
+
+@mixin stat-base {
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-5xl;
+  font-weight: $portfolio-weight-light;
+  line-height: $portfolio-leading-tight;
+  letter-spacing: $portfolio-tracking-tight;
+  font-variant-numeric: tabular-nums;
+  color: $portfolio-text-primary;
+}
+
+@mixin stat-sm {
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-3xl;
+  font-weight: $portfolio-weight-medium;
+  line-height: $portfolio-leading-snug;
+  font-variant-numeric: tabular-nums;
+  color: $portfolio-text-primary;
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// RESPONSIVE HEADING VARIANTS — uses clamp() for fluid scaling
+// xs (<672px) → sm (672-1056px) → md (>1056px) — aligned with Élan breakpoint scale
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+@mixin heading-display-fluid {
+  font-family: $portfolio-font-sans;
+  font-size: clamp(#{$portfolio-type-4xl}, 5vw + 1rem, #{$portfolio-type-6xl});
+  font-weight: $portfolio-weight-bold;
+  line-height: $portfolio-leading-tight;
+  letter-spacing: $portfolio-tracking-tight;
+  color: $portfolio-text-primary;
+}
+
+@mixin heading-1-fluid {
+  font-family: $portfolio-font-sans;
+  font-size: clamp(#{$portfolio-type-3xl}, 4vw + 0.5rem, #{$portfolio-type-5xl});
+  font-weight: $portfolio-weight-bold;
+  line-height: $portfolio-leading-tight;
+  letter-spacing: $portfolio-tracking-tight;
+  color: $portfolio-text-primary;
+}
+
+@mixin heading-2-fluid {
+  font-family: $portfolio-font-sans;
+  font-size: clamp(#{$portfolio-type-2xl}, 3vw + 0.5rem, #{$portfolio-type-4xl});
+  font-weight: $portfolio-weight-semibold;
+  line-height: $portfolio-leading-snug;
+  letter-spacing: $portfolio-tracking-tight;
+  color: $portfolio-text-primary;
+}
+
+@mixin heading-3-fluid {
+  font-family: $portfolio-font-sans;
+  font-size: clamp(#{$portfolio-type-xl}, 2vw + 0.5rem, #{$portfolio-type-3xl});
+  font-weight: $portfolio-weight-semibold;
+  line-height: $portfolio-leading-snug;
+  color: $portfolio-text-primary;
+}
+
+@mixin stat-lg-fluid {
+  font-family: $portfolio-font-sans;
+  font-size: clamp(#{$portfolio-type-5xl}, 6vw + 1rem, #{$portfolio-type-7xl});
+  font-weight: $portfolio-weight-light;
+  line-height: $portfolio-leading-tight;
+  letter-spacing: $portfolio-tracking-tight;
+  font-variant-numeric: tabular-nums;
+  color: $portfolio-text-primary;
+}
+
+@mixin stat-base-fluid {
+  font-family: $portfolio-font-sans;
+  font-size: clamp(#{$portfolio-type-3xl}, 4vw + 0.5rem, #{$portfolio-type-5xl});
+  font-weight: $portfolio-weight-light;
+  line-height: $portfolio-leading-tight;
+  letter-spacing: $portfolio-tracking-tight;
+  font-variant-numeric: tabular-nums;
+  color: $portfolio-text-primary;
 }

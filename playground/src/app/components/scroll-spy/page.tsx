@@ -174,7 +174,7 @@ function ScrollSpyDemo() {
           return (
             <div key={section.id} data-notch-index={i} className="relative flex items-center justify-end py-1">
               {showLabel && (
-                <span className="absolute right-[calc(100%+8px)] top-1/2 -translate-y-1/2 text-[11px] font-mono text-muted-foreground whitespace-nowrap pointer-events-none animate-in fade-in slide-in-from-right-1 duration-100">
+                <span className={`absolute right-[calc(100%+8px)] top-1/2 -translate-y-1/2 text-[11px] font-mono whitespace-nowrap pointer-events-none animate-in fade-in slide-in-from-right-1 duration-100 ${isActive ? "text-foreground font-medium" : "text-muted-foreground/60"}`}>
                   {section.label}
                 </span>
               )}

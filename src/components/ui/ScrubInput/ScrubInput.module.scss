@@ -1,0 +1,98 @@
+@use '../../../styles' as *;
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: $portfolio-spacer-0-5x;
+}
+
+.label {
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-sm;
+  font-weight: $portfolio-weight-medium;
+  line-height: $portfolio-leading-normal;
+  color: $portfolio-text-primary;
+}
+
+.control {
+  display: inline-flex;
+  align-items: center;
+  height: 32px;
+  border: 1px solid $portfolio-border-subtle;
+  border-radius: $portfolio-radius-sm;
+  background-color: $portfolio-surface-primary;
+  cursor: ew-resize;
+  user-select: none;
+  @include transition-fast;
+
+  &:hover {
+    border-color: $portfolio-border-strong;
+  }
+
+  &:focus-visible {
+    outline: none;
+    border-color: $portfolio-focus;
+    box-shadow: 0 0 0 1px $portfolio-focus;
+  }
+}
+
+.dragging {
+  border-color: $portfolio-accent-60;
+  box-shadow: 0 0 0 1px $portfolio-accent-60;
+  cursor: ew-resize;
+}
+
+.stepper {
+  @include button-reset;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 100%;
+  color: $portfolio-text-secondary;
+  flex-shrink: 0;
+  @include transition-fast;
+
+  &:hover:not(:disabled) {
+    color: $portfolio-text-primary;
+    background-color: $portfolio-neutral-10;
+  }
+
+  &:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+}
+
+.display {
+  flex: 1;
+  text-align: center;
+  font-family: $portfolio-font-mono;
+  font-size: $portfolio-type-sm;
+  line-height: $portfolio-leading-normal;
+  color: $portfolio-text-primary;
+  min-width: 32px;
+  padding: 0 $portfolio-spacer-0-25x;
+}
+
+.suffix {
+  font-size: $portfolio-type-xs;
+  color: $portfolio-text-secondary;
+  margin-left: 1px;
+}
+
+.editInput {
+  flex: 1;
+  width: 100%;
+  min-width: 32px;
+  height: 100%;
+  border: none;
+  background: transparent;
+  font-family: $portfolio-font-mono;
+  font-size: $portfolio-type-sm;
+  line-height: $portfolio-leading-normal;
+  color: $portfolio-text-primary;
+  text-align: center;
+  outline: none;
+  padding: 0 $portfolio-spacer-0-25x;
+}

@@ -1,4 +1,4 @@
-@use '@yilangaodesign/design-system/scss' as *;
+@use '../../../styles' as *;
 
 .list {
   display: flex;
@@ -9,7 +9,7 @@
 .trigger {
   @include button-reset;
   position: relative;
-  padding: $portfolio-spacing-03 $portfolio-spacing-05;
+  padding: $portfolio-spacer-1x $portfolio-spacer-2x;
   font-family: $portfolio-font-sans;
   font-size: $portfolio-type-sm;
   font-weight: $portfolio-weight-medium;
@@ -42,7 +42,7 @@
 }
 
 .content {
-  padding-top: $portfolio-spacing-06;
+  padding-top: $portfolio-spacer-3x;
   outline: none;
 
   &:focus-visible {

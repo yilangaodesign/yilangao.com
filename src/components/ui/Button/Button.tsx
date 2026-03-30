@@ -1,36 +1,52 @@
 import { forwardRef, type ButtonHTMLAttributes, type ReactNode } from "react";
 import styles from "./Button.module.scss";
 
-export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger";
-export type ButtonSize = "sm" | "md" | "lg";
+export type ButtonAppearance =
+  | "neutral"
+  | "highlight"
+  | "positive"
+  | "negative"
+  | "inverse"
+  | "always-dark"
+  | "always-light";
+
+export type ButtonEmphasis = "bold" | "regular" | "subtle" | "minimal";
+
+export type ButtonSize = "xs" | "sm" | "lg" | "xl";
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: ButtonVariant;
+  appearance?: ButtonAppearance;
+  emphasis?: ButtonEmphasis;
   size?: ButtonSize;
   iconOnly?: boolean;
   fullWidth?: boolean;
-  leftIcon?: ReactNode;
-  rightIcon?: ReactNode;
+  leadingIcon?: ReactNode;
+  trailingIcon?: ReactNode;
+  trailingSlot?: ReactNode;
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   (
     {
-      variant = "primary",
-      size = "md",
+      appearance = "neutral",
+      emphasis = "bold",
+      size = "lg",
       iconOnly = false,
       fullWidth = false,
-      leftIcon,
-      rightIcon,
+      leadingIcon,
+      trailingIcon,
+      trailingSlot,
       className,
       children,
+      type = "button",
       ...props
     },
     ref,
   ) => {
     const cls = [
       styles.button,
-      styles[variant],
+      styles[appearance],
+      styles[emphasis],
       styles[size],
       iconOnly && styles.iconOnly,
       fullWidth && styles.fullWidth,
@@ -40,10 +56,21 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       .join(" ");
 
     return (
-      <button ref={ref} className={cls} {...props}>
-        {leftIcon && <span aria-hidden="true">{leftIcon}</span>}
-        {children}
-        {rightIcon && <span aria-hidden="true">{rightIcon}</span>}
+      <button ref={ref} type={type} className={cls} {...props}>
+        {leadingIcon && (
+          <span className={styles.iconWrap} aria-hidden="true">
+            {leadingIcon}
+          </span>
+        )}
+        {children && <span className={styles.label}>{children}</span>}
+        {trailingIcon && (
+          <span className={styles.iconWrap} aria-hidden="true">
+            {trailingIcon}
+          </span>
+        )}
+        {trailingSlot && (
+          <span className={styles.trailingSlot}>{trailingSlot}</span>
+        )}
       </button>
     );
   },

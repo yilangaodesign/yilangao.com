@@ -23,8 +23,9 @@
 
 | Service | Default Port | Current Port | Status | PID | Notes |
 |---|---|---|---|---|---|
-| Main site (`yilangao.com`) | 4000 | 4000 | running | 23214 | `npm run dev` |
-| Playground | 4001 | 4001 | running | 58319 | `npm run playground` |
+| Main site (`yilangao.com`) | 4000 | 4000 | running | 33905 | `npm run dev` |
+| Playground | 4001 | 4001 | running | 53499 | `npm run playground` |
+| ASCII Art Studio | 4002 | 4002 | running | 73469 | `npm run ascii-tool` |
 
 ## Change Log
 
@@ -32,3 +33,13 @@
 |---|---|---|---|---|
 | 2026-03-29 01:30 | Main site | started | 4000 | Fresh start after cleanup |
 | 2026-03-29 16:48 | Main site | restarted | 4000 | Restarted with real Supabase DATABASE_URL (pooler) |
+| 2026-03-29 21:25 | Main site | restarted | 4000 | Restarted to sync Payload schema (period field on teams) |
+| 2026-03-29 22:00 | Main site | restarted | 4000 | Restarted to sync Payload schema (removed required on socialLinks.href) |
+| 2026-03-29 22:30 | Main site | restarted | 4000 | Restarted to pick up transpilePackages in next.config.ts (ScrollSpy DS migration) |
+| 2026-03-30 02:00 | Main site | restarted | 4000 | Restarted to pick up admin NavPages, collection groups, and ViewSiteLink rename |
+| 2026-03-30 02:37 | Main site | restarted | 4000 | Cleared .next cache to fix Turbopack module resolution error on isAdminAuthenticated |
+| 2026-03-30 05:15 | Main site | restarted | 4000 | Restarted for DAG rebuild + accessibility changes in elan-visuals |
+| 2026-03-30 05:47 | Main site | restarted | 4000 | Restarted to pick up @payloadcms/storage-s3 plugin (Supabase Storage) |
+| 2026-03-30 04:14 | ASCII Art Studio | started | 4002 | First boot after scaffold |
+| 2026-03-30 09:15 | Main site | restarted | 4000 | Restarted to sync Payload schema (testimonial text: textarea → richText) |
+| 2026-03-30 | Main site | restarted | 4000 | Cleared .next cache to fix stale HeroUploadZone hydration mismatch (ENG-067) |

@@ -1,4 +1,4 @@
-@use '@yilangaodesign/design-system/scss' as *;
+@use '../../../styles' as *;
 
 .overlay {
   position: fixed;
@@ -28,7 +28,7 @@
   border: 1px solid $portfolio-border-subtle;
   border-radius: $portfolio-radius-sm;
   box-shadow: $portfolio-shadow-overlay;
-  padding: $portfolio-spacing-07;
+  padding: $portfolio-spacer-4x;
 
   &:focus {
     outline: none;
@@ -48,7 +48,7 @@
   font-weight: $portfolio-weight-semibold;
   line-height: $portfolio-leading-snug;
   color: $portfolio-text-primary;
-  margin-bottom: $portfolio-spacing-03;
+  margin-bottom: $portfolio-spacer-1x;
 }
 
 .description {
@@ -56,14 +56,14 @@
   font-size: $portfolio-type-sm;
   line-height: $portfolio-leading-normal;
   color: $portfolio-text-secondary;
-  margin-bottom: $portfolio-spacing-06;
+  margin-bottom: $portfolio-spacer-3x;
 }
 
 .close {
   @include button-reset;
   position: absolute;
-  top: $portfolio-spacing-05;
-  right: $portfolio-spacing-05;
+  top: $portfolio-spacer-2x;
+  right: $portfolio-spacer-2x;
   width: 28px;
   height: 28px;
   display: flex;
@@ -82,8 +82,8 @@
 .footer {
   display: flex;
   justify-content: flex-end;
-  gap: $portfolio-spacing-03;
-  margin-top: $portfolio-spacing-06;
+  gap: $portfolio-spacer-1x;
+  margin-top: $portfolio-spacer-3x;
 }
 
 // ---------------------------------------------------------------------------

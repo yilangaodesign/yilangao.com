@@ -5,13 +5,23 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import AdminBar from "@/components/AdminBar";
 import EditButton from "@/components/EditButton";
+import {
+  InlineEditProvider,
+  EditableText,
+  InlineEditBar,
+} from "@/components/inline-edit";
+import type { ApiTarget } from "@/components/inline-edit";
 import styles from "./page.module.scss";
 
 type Book = { id?: number; title: string; url: string };
 
+function bookTarget(id: number): ApiTarget {
+  return { type: 'collection', slug: 'books', id };
+}
+
 export default function ReadingClient({ books, isAdmin }: { books: Book[]; isAdmin?: boolean }) {
-  return (
-    <main className={styles.page} style={isAdmin ? { paddingTop: 44 } : undefined}>
+  const page = (
+    <main className={styles.page}>
       {isAdmin && <AdminBar editUrl="/admin/collections/books" editLabel="Manage Books" />}
       <Navigation />
       <div className={styles.container}>
@@ -30,7 +40,20 @@ export default function ReadingClient({ books, isAdmin }: { books: Book[]; isAdm
           <ul className={styles.bookList}>
             {books.map((book) => (
               <li key={book.id ?? book.title}>
-                <a href={book.url} className={styles.bookLink}>{book.title}</a>
+                {book.id ? (
+                  <EditableText
+                    fieldId={`book:${book.id}:title`}
+                    target={bookTarget(book.id)}
+                    fieldPath="title"
+                    as="a"
+                    className={styles.bookLink}
+                    label="Title"
+                  >
+                    {book.title}
+                  </EditableText>
+                ) : (
+                  <a href={book.url} className={styles.bookLink}>{book.title}</a>
+                )}
                 {isAdmin && book.id && <EditButton collection="books" id={book.id} label={`Edit ${book.title}`} />}
               </li>
             ))}
@@ -38,6 +61,17 @@ export default function ReadingClient({ books, isAdmin }: { books: Book[]; isAdm
         </FadeIn>
       </div>
       <Footer />
+      {isAdmin && <InlineEditBar />}
     </main>
   );
+
+  if (isAdmin) {
+    return (
+      <InlineEditProvider isAdmin>
+        {page}
+      </InlineEditProvider>
+    );
+  }
+
+  return page;
 }

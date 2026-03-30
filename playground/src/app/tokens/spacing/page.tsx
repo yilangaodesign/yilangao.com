@@ -10,15 +10,18 @@ export default function SpacingPage() {
       <div className="max-w-5xl">
         <SectionHeading
           title="Spacing"
-          description="An 8px-grid spacing system with a 13-step component scale, 7-step layout rhythm, and 4 container widths. Inspired by Carbon's spacing methodology."
+          description="Three-tier spacing system based on an 8px base unit (One GS reference). Tier 1: primitive spacer tokens (multiplier-based, value-derivable). Tier 2: semantic layout tokens (density-aware, intent-readable). Tier 3: utility tokens (component-internal spacing). Plus 4 container widths."
         />
 
-        <SubSection title="Spacing Scale">
+        <SubSection title="Primitive Spacers (spacer-Nx)">
+          <p className="text-xs text-muted-foreground mb-3">
+            Base unit: 8px. Token name = multiplier &times; 8. Agent-readable: spacer-3x = 3 &times; 8 = 24px.
+          </p>
           <div className="space-y-1">
             {spacing.scale.map((s) => (
               <TokenRow
                 key={s.name}
-                label={`Spacing ${s.name}`}
+                label={`spacer-${s.name}`}
                 value={s.value}
                 token={s.token}
                 preview={
@@ -34,19 +37,46 @@ export default function SpacingPage() {
           </div>
         </SubSection>
 
-        <SubSection title="Layout Rhythm">
+        <SubSection title="Layout Spacers (spacer-layout-*)">
+          <p className="text-xs text-muted-foreground mb-3">
+            Semantic density names for page/section spacing. Default density: Functional.
+          </p>
           <div className="space-y-1">
             {spacing.layout.map((l) => (
               <TokenRow
                 key={l.name}
-                label={`Layout ${l.name}`}
-                value={l.value}
+                label={`spacer-layout-${l.name}`}
+                value={`${l.value}${"ref" in l ? ` → ${l.ref}` : ""}`}
                 token={l.token}
                 preview={
                   <div className="flex items-center w-24 sm:w-40">
                     <div
                       className="h-3 rounded-sm bg-accent/40"
                       style={{ width: l.value }}
+                    />
+                  </div>
+                }
+              />
+            ))}
+          </div>
+        </SubSection>
+
+        <SubSection title="Utility Spacers (spacer-utility-Nx)">
+          <p className="text-xs text-muted-foreground mb-3">
+            Component-internal spacing for buttons, inputs, checkboxes. Same multiplier values, separate namespace.
+          </p>
+          <div className="space-y-1">
+            {spacing.utility.map((u) => (
+              <TokenRow
+                key={u.name}
+                label={`spacer-utility-${u.name}`}
+                value={u.value}
+                token={u.token}
+                preview={
+                  <div className="flex items-center w-24 sm:w-40">
+                    <div
+                      className="h-3 rounded-sm bg-emerald-500/50"
+                      style={{ width: u.value }}
                     />
                   </div>
                 }

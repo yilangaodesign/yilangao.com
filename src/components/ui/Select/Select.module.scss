@@ -1,9 +1,9 @@
-@use '@yilangaodesign/design-system/scss' as *;
+@use '../../../styles' as *;
 
 .wrapper {
   display: flex;
   flex-direction: column;
-  gap: $portfolio-spacing-02;
+  gap: $portfolio-spacer-0-5x;
 }
 
 .label {
@@ -21,7 +21,7 @@
   justify-content: space-between;
   width: 100%;
   height: 40px;
-  padding: 0 $portfolio-spacing-04;
+  padding: 0 $portfolio-spacer-1-5x;
   font-family: $portfolio-font-sans;
   font-size: $portfolio-type-sm;
   line-height: $portfolio-leading-normal;
@@ -76,14 +76,14 @@
 }
 
 .viewport {
-  padding: $portfolio-spacing-02;
+  padding: $portfolio-spacer-0-5x;
 }
 
 .item {
   display: flex;
   align-items: center;
-  gap: $portfolio-spacing-03;
-  padding: $portfolio-spacing-03 $portfolio-spacing-04;
+  gap: $portfolio-spacer-1x;
+  padding: $portfolio-spacer-1x $portfolio-spacer-1-5x;
   font-family: $portfolio-font-sans;
   font-size: $portfolio-type-sm;
   line-height: $portfolio-leading-normal;
@@ -114,11 +114,11 @@
 .separator {
   height: 1px;
   background-color: $portfolio-border-subtle;
-  margin: $portfolio-spacing-02 0;
+  margin: $portfolio-spacer-0-5x 0;
 }
 
 .groupLabel {
-  padding: $portfolio-spacing-03 $portfolio-spacing-04;
+  padding: $portfolio-spacer-1x $portfolio-spacer-1-5x;
   font-family: $portfolio-font-sans;
   font-size: $portfolio-type-xs;
   font-weight: $portfolio-weight-medium;
