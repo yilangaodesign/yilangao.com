@@ -54,7 +54,9 @@ export const Slider = forwardRef<HTMLInputElement, SliderProps>(
   ) => {
     const autoId = useId();
     const id = idProp ?? autoId;
-    const progressStyle = sliderProgressStyle(value, min, max);
+    const minNum = typeof min === "number" ? min : Number(min) || 0;
+    const maxNum = typeof max === "number" ? max : Number(max) || 100;
+    const progressStyle = sliderProgressStyle(value, minNum, maxNum);
     const inputStyle: CSSProperties = {
       ...(styleProp && typeof styleProp === "object" ? styleProp : {}),
       ...progressStyle,
