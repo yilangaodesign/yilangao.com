@@ -24,8 +24,8 @@ import { CSS } from "@dnd-kit/utilities";
 import AdminBar from "@/components/AdminBar";
 import ProjectEditModal from "@/components/ProjectEditModal";
 import type { ProjectForEdit } from "@/components/ProjectEditModal";
-import TestimonialCard from "@/components/TestimonialCard";
-import type { TestimonialCardProps } from "@/components/TestimonialCard";
+import TestimonialCard from "@/components/ui/TestimonialCard/TestimonialCard";
+import type { TestimonialCardProps } from "@/components/ui/TestimonialCard/TestimonialCard";
 import {
   InlineEditProvider,
   EditableText,

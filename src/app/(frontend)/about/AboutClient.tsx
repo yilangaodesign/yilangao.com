@@ -1,9 +1,9 @@
 "use client";
 
 import { FadeIn } from "@yilangaodesign/design-system";
-import Navigation from "@/components/Navigation";
-import Footer from "@/components/Footer";
-import ScrollSpy from "@/components/ScrollSpy";
+import Navigation from "@/components/ui/Navigation/Navigation";
+import Footer from "@/components/ui/Footer/Footer";
+import ScrollSpy from "@/components/ui/ScrollSpy/ScrollSpy";
 import AdminBar from "@/components/AdminBar";
 import {
   InlineEditProvider,

@@ -4,10 +4,10 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import Link from "next/link";
 import { FadeIn } from "@yilangaodesign/design-system";
 import { StaggerChildren, StaggerItem } from "@yilangaodesign/design-system";
-import { MountEntrance } from "@/components/MountEntrance";
-import { ExpandCollapse } from "@/components/ExpandCollapse";
-import { ArrowReveal } from "@/components/ArrowReveal";
-import { Marquee } from "@/components/Marquee";
+import { MountEntrance } from "@/components/ui/MountEntrance/MountEntrance";
+import { ExpandCollapse } from "@/components/ui/ExpandCollapse/ExpandCollapse";
+import { ArrowReveal } from "@/components/ui/ArrowReveal/ArrowReveal";
+import { Marquee } from "@/components/ui/Marquee/Marquee";
 import {
   DURATION,
   EASING,

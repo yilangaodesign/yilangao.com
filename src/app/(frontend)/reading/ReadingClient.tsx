@@ -1,8 +1,8 @@
 "use client";
 
 import { FadeIn } from "@yilangaodesign/design-system";
-import Navigation from "@/components/Navigation";
-import Footer from "@/components/Footer";
+import Navigation from "@/components/ui/Navigation/Navigation";
+import Footer from "@/components/ui/Footer/Footer";
 import AdminBar from "@/components/AdminBar";
 import EditButton from "@/components/EditButton";
 import {
