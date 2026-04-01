@@ -72,6 +72,7 @@ import {
 import { createPortal } from "react-dom";
 import Fuse from "fuse.js";
 import { useSafeTriangle } from "@/hooks/use-safe-triangle";
+import { Button, Kbd } from "@ds/index";
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
@@ -217,6 +218,7 @@ const componentCategories: NavCategory[] = [
     links: [
       { href: "/components/toast", label: "Toast", icon: BellRing },
       { href: "/components/dialog", label: "Dialog", icon: PanelTopOpen },
+      { href: "/components/sheet", label: "Sheet", icon: PanelLeftOpen },
       { href: "/components/tooltip", label: "Tooltip", icon: MessageSquare },
       {
         href: "/components/progress-bar",
@@ -237,6 +239,8 @@ const componentCategories: NavCategory[] = [
         icon: ListFilter,
       },
       { href: "/components/tabs", label: "Tabs", icon: LayoutList },
+      { href: "/components/nav-item", label: "NavItem", icon: Navigation },
+      { href: "/components/command-menu", label: "CommandMenu", icon: Search },
     ],
   },
   {
@@ -246,6 +250,10 @@ const componentCategories: NavCategory[] = [
     section: "Components",
     links: [
       { href: "/components/code-block", label: "CodeBlock", icon: Code2 },
+      { href: "/components/inline-code", label: "InlineCode", icon: Code2 },
+      { href: "/components/table", label: "Table", icon: Table2 },
+      { href: "/components/kbd", label: "Kbd", icon: Square },
+      { href: "/components/description-list", label: "DescriptionList", icon: LayoutList },
     ],
   },
   {
@@ -523,7 +531,7 @@ function SidebarSearch({
         >
           <Search className="w-3 h-3 shrink-0" />
           <span className="flex-1 text-left">Search…</span>
-          <kbd className="text-xs font-medium">⌘K</kbd>
+          <Kbd>⌘K</Kbd>
         </button>
       ) : (
         <>
@@ -810,13 +818,16 @@ const CategorySliver = React.forwardRef<
 export function MobileMenuButton() {
   const { mobileOpen, setMobileOpen } = useSidebar();
   return (
-    <button
+    <Button
+      iconOnly
+      size="sm"
+      emphasis="minimal"
       onClick={() => setMobileOpen(!mobileOpen)}
-      className="lg:hidden p-1.5 -ml-1.5 rounded-sm hover:bg-muted transition-colors"
+      className="lg:hidden -ml-1.5"
       aria-label="Toggle sidebar"
     >
       <Menu className="w-5 h-5" />
-    </button>
+    </Button>
   );
 }
 
@@ -974,16 +985,22 @@ export function Sidebar() {
             </Link>
           )}
           {isCollapsedDesktop && (
-            <button
+            <Button
+              iconOnly
+              size="xs"
+              emphasis="minimal"
               onClick={() => setCollapsed(false)}
-              className="flex items-center pl-[7px] h-7 rounded-sm hover:bg-sidebar-accent/50 text-sidebar-muted-foreground hover:text-sidebar-foreground transition-colors"
+              className="ml-[3px]"
               aria-label="Expand sidebar"
             >
               <PanelLeftOpen className="w-3.5 h-3.5" />
-            </button>
+            </Button>
           )}
           {!isCollapsedDesktop && (
-            <button
+            <Button
+              iconOnly
+              size="xs"
+              emphasis="minimal"
               onClick={() => {
                 if (mobileOpen) {
                   closeMobile();
@@ -992,11 +1009,11 @@ export function Sidebar() {
                   setOpenCategory(null);
                 }
               }}
-              className="hidden lg:flex items-center justify-center w-7 h-7 rounded-sm hover:bg-sidebar-accent/50 text-sidebar-muted-foreground hover:text-sidebar-foreground transition-colors shrink-0 mr-2"
+              className="hidden lg:flex shrink-0 mr-2"
               aria-label="Collapse sidebar"
             >
               <PanelLeftClose className="w-3.5 h-3.5" />
-            </button>
+            </Button>
           )}
         </div>
 

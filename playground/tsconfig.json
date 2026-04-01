@@ -15,7 +15,11 @@
     "incremental": true,
     "plugins": [{ "name": "next" }],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@ds/*": ["../src/components/ui/*"],
+      "@site/*": ["../src/components/*"],
+      "@lib/*": ["../src/lib/*"],
+      "@hooks/*": ["../src/hooks/*"]
     }
   },
   "include": [

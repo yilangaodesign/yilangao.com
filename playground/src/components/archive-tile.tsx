@@ -1,38 +1,31 @@
 "use client";
 
-import { cn } from "@/lib/utils";
 import type { ArchiveItem, ItemType } from "@/lib/archive-manifest";
 import { PreviewRenderer } from "@/lib/archive-previews";
 import { ArchiveItemMenu } from "./archive-item-menu";
+import { Badge, Card } from "@ds/index";
+import type { BadgeVariant } from "@ds/index";
 
-const TYPE_COLORS: Record<ItemType, { bg: string; text: string }> = {
-  Component: { bg: "bg-blue-100 dark:bg-blue-950", text: "text-blue-700 dark:text-blue-300" },
-  Page: { bg: "bg-cyan-100 dark:bg-cyan-950", text: "text-cyan-700 dark:text-cyan-300" },
-  Token: { bg: "bg-amber-100 dark:bg-amber-950", text: "text-amber-700 dark:text-amber-300" },
-  Style: { bg: "bg-green-100 dark:bg-green-950", text: "text-green-700 dark:text-green-300" },
+const TYPE_VARIANT_MAP: Record<ItemType, BadgeVariant> = {
+  Component: "info",
+  Page: "info",
+  Token: "warning",
+  Style: "success",
 };
 
 export function TypeBadge({ type, size = "sm" }: { type: ItemType; size?: "sm" | "xs" }) {
-  const colors = TYPE_COLORS[type];
   return (
-    <span
-      className={cn(
-        "inline-block font-mono font-medium tracking-wider uppercase rounded-sm shrink-0",
-        size === "sm" ? "text-[10px] px-1.5 py-0.5" : "text-[9px] px-1 py-px",
-        colors.bg,
-        colors.text
-      )}
-    >
+    <Badge variant={TYPE_VARIANT_MAP[type]} shape="squared" mono size={size === "sm" ? "xs" : "xs"}>
       {type}
-    </span>
+    </Badge>
   );
 }
 
 export function ExperimentTag({ experiment }: { experiment: string }) {
   return (
-    <span className="inline-block text-[10px] font-mono text-muted-foreground bg-muted px-1.5 py-0.5 rounded-sm">
+    <Badge variant="muted" shape="squared" mono size="xs">
       {experiment}
-    </span>
+    </Badge>
   );
 }
 
@@ -48,12 +41,13 @@ export function ArchiveTile({
   onDeleted: () => void;
 }) {
   return (
-    <div
+    <Card
+      interactive
+      className="group relative text-left w-full cursor-pointer"
       role="button"
       tabIndex={0}
       onClick={onClick}
       onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") onClick(); }}
-      className="group relative text-left w-full rounded-sm border border-border hover:border-foreground/20 transition-colors overflow-hidden bg-background cursor-pointer"
     >
       <div className="relative h-36 bg-muted/30 overflow-hidden">
         {item.hasPreview ? (
@@ -91,6 +85,6 @@ export function ArchiveTile({
           <ExperimentTag experiment={item.experiment} />
         </div>
       </div>
-    </div>
+    </Card>
   );
 }

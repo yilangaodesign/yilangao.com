@@ -3,6 +3,15 @@
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Eye, Code } from "lucide-react";
+import {
+  Card,
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from "@ds/index";
 
 export function ComponentPreview({
   children,
@@ -18,7 +27,7 @@ export function ComponentPreview({
   const [view, setView] = useState<"preview" | "code">("preview");
 
   return (
-    <div className="rounded-sm border border-border overflow-hidden">
+    <Card>
       {(title || description) && (
         <div className="px-6 pt-5 pb-3">
           {title && <h3 className="text-base font-semibold">{title}</h3>}
@@ -66,7 +75,7 @@ export function ComponentPreview({
           </pre>
         </div>
       )}
-    </div>
+    </Card>
   );
 }
 
@@ -81,29 +90,54 @@ export function PropsTable({
   }[];
 }) {
   return (
-    <div className="rounded-sm border border-border overflow-x-auto">
-      <table className="w-full text-sm min-w-[480px]">
-        <thead>
-          <tr className="bg-muted/50 border-b border-border">
-            <th className="px-4 py-2.5 text-left font-medium text-muted-foreground">Prop</th>
-            <th className="px-4 py-2.5 text-left font-medium text-muted-foreground">Type</th>
-            <th className="px-4 py-2.5 text-left font-medium text-muted-foreground">Default</th>
-            <th className="px-4 py-2.5 text-left font-medium text-muted-foreground">Description</th>
-          </tr>
-        </thead>
-        <tbody>
-          {props.map((prop) => (
-            <tr key={prop.name} className="border-b last:border-b-0 border-border">
-              <td className="px-4 py-2.5 font-mono text-xs font-medium whitespace-nowrap">{prop.name}</td>
-              <td className="px-4 py-2.5 font-mono text-xs text-accent whitespace-nowrap">{prop.type}</td>
-              <td className="px-4 py-2.5 font-mono text-xs text-muted-foreground whitespace-nowrap">
-                {prop.default ?? "—"}
-              </td>
-              <td className="px-4 py-2.5 text-muted-foreground">{prop.description}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Prop</TableHead>
+          <TableHead>Type</TableHead>
+          <TableHead>Default</TableHead>
+          <TableHead>Description</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {props.map((prop) => (
+          <TableRow key={prop.name}>
+            <TableCell mono>{prop.name}</TableCell>
+            <TableCell mono accent>{prop.type}</TableCell>
+            <TableCell mono>{prop.default ?? "—"}</TableCell>
+            <TableCell>{prop.description}</TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  );
+}
+
+export function SourcePath({ path }: { path: string }) {
+  return (
+    <div className="text-xs font-mono text-muted-foreground p-3 rounded-sm bg-muted/50">
+      {path}
     </div>
+  );
+}
+
+export function SubsectionHeading({ children }: { children: string }) {
+  return (
+    <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-3">
+      {children}
+    </h3>
+  );
+}
+
+export function NotesList({ children }: { children: React.ReactNode }) {
+  return <ul className="space-y-1.5 text-sm text-muted-foreground">{children}</ul>;
+}
+
+export function NotesItem({ children }: { children: React.ReactNode }) {
+  return (
+    <li className="flex items-start gap-2">
+      <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-accent flex-shrink-0" />
+      <span>{children}</span>
+    </li>
   );
 }

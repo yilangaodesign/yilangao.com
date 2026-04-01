@@ -4,6 +4,7 @@ import type { ArchiveItem } from "@/lib/archive-manifest";
 import { TypeBadge, ExperimentTag } from "./archive-tile";
 import { PreviewRenderer } from "@/lib/archive-previews";
 import { ArchiveItemMenu } from "./archive-item-menu";
+import { Card } from "@ds/index";
 
 export function ArchiveListRow({
   item,
@@ -25,14 +26,15 @@ export function ArchiveListRow({
     : null;
 
   return (
-    <div
+    <Card
+      interactive
+      className="group flex items-center gap-4 w-full px-3 py-2.5 text-left cursor-pointer border-transparent hover:border-border"
       role="button"
       tabIndex={0}
       onClick={onClick}
       onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") onClick(); }}
-      className="group flex items-center gap-4 w-full px-3 py-2.5 text-left rounded-sm hover:bg-muted/50 transition-colors border border-transparent hover:border-border cursor-pointer"
     >
-      <div className="w-16 h-12 rounded-sm border border-border bg-muted/30 overflow-hidden shrink-0">
+      <Card className="w-16 h-12 overflow-hidden shrink-0" variant="muted">
         {item.hasPreview ? (
           <div className="origin-top-left scale-[0.25] w-[400%] h-[400%] pointer-events-none">
             <div className="p-4 flex items-center justify-center min-h-full">
@@ -47,7 +49,7 @@ export function ArchiveListRow({
             </svg>
           </div>
         )}
-      </div>
+      </Card>
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium truncate">{item.name}</p>
         <p className="text-xs text-muted-foreground truncate mt-0.5">{item.description}</p>
@@ -69,6 +71,6 @@ export function ArchiveListRow({
           onDeleted={onDeleted}
         />
       </div>
-    </div>
+    </Card>
   );
 }

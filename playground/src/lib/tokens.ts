@@ -152,7 +152,7 @@ export const colors = {
           tokens: [
             { emphasis: "bold", value: "#161616", token: "$portfolio-text-neutral-bold", ref: "$portfolio-neutral-100", legacy: "$portfolio-text-primary" },
             { emphasis: "regular", value: "#525252", token: "$portfolio-text-neutral-regular", ref: "$portfolio-neutral-70", legacy: "$portfolio-text-secondary" },
-            { emphasis: "subtle", value: "#6F6F6F", token: "$portfolio-text-neutral-subtle", ref: "$portfolio-neutral-60", legacy: "$portfolio-text-helper" },
+            { emphasis: "subtle", value: "#6F6F6F", token: "$portfolio-text-neutral-subtle", ref: "$portfolio-neutral-60", legacy: "$portfolio-text-tertiary" },
             { emphasis: "minimal", value: "#A8A8A8", token: "$portfolio-text-neutral-minimal", ref: "$portfolio-neutral-40", legacy: "$portfolio-text-placeholder" },
             { emphasis: "disabled", value: "#C6C6C6", token: "$portfolio-text-neutral-disabled", ref: "$portfolio-neutral-30", legacy: "$portfolio-text-disabled" },
           ],
