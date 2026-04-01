@@ -1,14 +1,14 @@
 import { Shell } from "@/components/shell";
 import { SectionHeading } from "@/components/token-grid";
-import { ComponentPreview, PropsTable } from "@/components/component-preview";
+import { ComponentPreview, PropsTable, SourcePath, SubsectionHeading} from "@/components/component-preview";
 import {
   Card,
   CardBody,
   CardFooter,
   CardHeader,
-} from "@/components/ui/Card";
+} from "@ds/Card";
 
-const basicCode = `import { Card, CardBody } from "@/components/ui/Card";
+const basicCode = `import { Card, CardBody } from "@ds/Card";
 
 export function BasicCard() {
   return (
@@ -27,7 +27,7 @@ const structuredCode = `import {
   CardHeader,
   CardBody,
   CardFooter,
-} from "@/components/ui/Card";
+} from "@ds/Card";
 
 export function StructuredCard() {
   return (
@@ -47,7 +47,7 @@ export function StructuredCard() {
   );
 }`;
 
-const elevatedCode = `import { Card, CardBody } from "@/components/ui/Card";
+const elevatedCode = `import { Card, CardBody } from "@ds/Card";
 
 export function ElevatedCard() {
   return (
@@ -61,7 +61,7 @@ export function ElevatedCard() {
   );
 }`;
 
-const interactiveCode = `import { Card, CardBody } from "@/components/ui/Card";
+const interactiveCode = `import { Card, CardBody } from "@ds/Card";
 
 export function InteractiveCard() {
   return (
@@ -155,9 +155,7 @@ export default function CardPage() {
         </ComponentPreview>
 
         <div>
-          <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-3">
-            Props
-          </h3>
+          <SubsectionHeading>Props</SubsectionHeading>
           <p className="text-xs text-muted-foreground mb-4">Card</p>
           <PropsTable
             props={[
@@ -204,9 +202,7 @@ export default function CardPage() {
           />
         </div>
 
-        <div className="text-xs font-mono text-muted-foreground p-3 rounded-sm bg-muted/50">
-          src/components/ui/Card/Card.tsx
-        </div>
+        <SourcePath path="src/components/ui/Card/Card.tsx" />
       </div>
     </Shell>
   );

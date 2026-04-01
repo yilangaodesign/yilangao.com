@@ -3,118 +3,57 @@
 import { useState } from "react";
 import { Shell } from "@/components/shell";
 import { SectionHeading } from "@/components/token-grid";
-import { ComponentPreview, PropsTable } from "@/components/component-preview";
-import { cn } from "@/lib/utils";
-import { Check } from "lucide-react";
-
-// ── Demo Checkbox ────────────────────────────────────────────────────────────
-
-function DemoCheckbox({
-  label,
-  checked: controlledChecked,
-  defaultChecked = false,
-  onCheckedChange,
-  disabled,
-  className,
-}: {
-  label?: string;
-  checked?: boolean;
-  defaultChecked?: boolean;
-  onCheckedChange?: (checked: boolean) => void;
-  disabled?: boolean;
-  className?: string;
-}) {
-  const [internalChecked, setInternalChecked] = useState(defaultChecked);
-  const isControlled = controlledChecked !== undefined;
-  const checked = isControlled ? controlledChecked : internalChecked;
-
-  function toggle() {
-    if (disabled) return;
-    const next = !checked;
-    if (!isControlled) setInternalChecked(next);
-    onCheckedChange?.(next);
-  }
-
-  return (
-    <button
-      type="button"
-      role="checkbox"
-      aria-checked={checked}
-      aria-disabled={disabled}
-      disabled={disabled}
-      onClick={toggle}
-      className={cn("flex items-center gap-2.5 group", className)}
-    >
-      <span
-        className={cn(
-          "flex items-center justify-center w-4 h-4 rounded-sm border transition-colors shrink-0",
-          checked
-            ? "bg-accent border-accent text-white"
-            : "border-border bg-background group-hover:border-accent/50",
-          disabled && "opacity-50 cursor-not-allowed"
-        )}
-      >
-        {checked && <Check className="w-3 h-3" strokeWidth={3} />}
-      </span>
-      {label && (
-        <span
-          className={cn(
-            "text-sm text-foreground select-none",
-            disabled && "opacity-50"
-          )}
-        >
-          {label}
-        </span>
-      )}
-    </button>
-  );
-}
+import { ComponentPreview, PropsTable, SourcePath, SubsectionHeading} from "@/components/component-preview";
+import { Checkbox } from "@ds/Checkbox";
+import type { CheckboxCheckedState } from "@ds/Checkbox";
 
 // ── Code snippets ────────────────────────────────────────────────────────────
 
-const basicCode = `<DemoCheckbox />`;
+const basicCode = `import { Checkbox } from "@ds/Checkbox";
 
-const labelCode = `<DemoCheckbox label="Accept terms and conditions" />`;
+<Checkbox />`;
 
-const checkedCode = `const [agreed, setAgreed] = useState(true);
+const labelCode = `<Checkbox label="Accept terms and conditions" />`;
 
-<DemoCheckbox
+const checkedCode = `const [agreed, setAgreed] = useState<CheckboxCheckedState>(true);
+
+<Checkbox
   label="Send me updates"
   checked={agreed}
   onCheckedChange={setAgreed}
 />`;
 
-const disabledCode = `<DemoCheckbox label="Cannot change this" disabled />
-<DemoCheckbox label="Locked on" checked disabled />`;
+const disabledCode = `<Checkbox label="Cannot change this" disabled />
+<Checkbox label="Locked on" checked disabled />`;
 
 // ── Demos ────────────────────────────────────────────────────────────────────
 
 function BasicDemo() {
-  return <DemoCheckbox />;
+  return <Checkbox />;
 }
 
 function LabelDemo() {
-  return <DemoCheckbox label="Accept terms and conditions" />;
+  return <Checkbox label="Accept terms and conditions" />;
 }
 
 function CheckedDemo() {
-  const [agreed, setAgreed] = useState(true);
-  const [newsletter, setNewsletter] = useState(false);
+  const [agreed, setAgreed] = useState<CheckboxCheckedState>(true);
+  const [newsletter, setNewsletter] = useState<CheckboxCheckedState>(false);
 
   return (
     <div className="flex flex-col gap-3">
-      <DemoCheckbox
+      <Checkbox
         label="Send me updates"
         checked={agreed}
         onCheckedChange={setAgreed}
       />
-      <DemoCheckbox
+      <Checkbox
         label="Subscribe to newsletter"
         checked={newsletter}
         onCheckedChange={setNewsletter}
       />
       <p className="text-xs text-muted-foreground mt-1">
-        Updates: {agreed ? "yes" : "no"} · Newsletter: {newsletter ? "yes" : "no"}
+        Updates: {agreed === true ? "yes" : "no"} · Newsletter: {newsletter === true ? "yes" : "no"}
       </p>
     </div>
   );
@@ -123,8 +62,8 @@ function CheckedDemo() {
 function DisabledDemo() {
   return (
     <div className="flex flex-col gap-3">
-      <DemoCheckbox label="Cannot change this" disabled />
-      <DemoCheckbox label="Locked on" checked disabled />
+      <Checkbox label="Cannot change this" disabled />
+      <Checkbox label="Locked on" checked disabled />
     </div>
   );
 }
@@ -137,7 +76,7 @@ export default function CheckboxPage() {
       <div className="max-w-5xl space-y-10">
         <SectionHeading
           title="Checkbox"
-          description="A binary toggle rendered as a styled checkbox with optional label. Supports controlled and uncontrolled modes with proper ARIA attributes."
+          description="A binary toggle rendered as a styled checkbox with optional label. Built on Radix UI primitives with support for controlled, uncontrolled, and indeterminate states."
         />
 
         <ComponentPreview
@@ -173,9 +112,7 @@ export default function CheckboxPage() {
         </ComponentPreview>
 
         <div>
-          <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-3">
-            Props
-          </h3>
+          <SubsectionHeading>Props</SubsectionHeading>
           <PropsTable
             props={[
               {
@@ -185,18 +122,18 @@ export default function CheckboxPage() {
               },
               {
                 name: "checked",
-                type: "boolean",
-                description: "Controlled checked state",
+                type: "CheckboxCheckedState",
+                description: 'Controlled checked state (boolean or "indeterminate")',
               },
               {
                 name: "defaultChecked",
-                type: "boolean",
+                type: "CheckboxCheckedState",
                 default: "false",
                 description: "Initial checked state (uncontrolled)",
               },
               {
                 name: "onCheckedChange",
-                type: "(checked: boolean) => void",
+                type: "(checked: CheckboxCheckedState) => void",
                 description: "Called when the checked state changes",
               },
               {
@@ -209,9 +146,7 @@ export default function CheckboxPage() {
           />
         </div>
 
-        <div className="text-xs font-mono text-muted-foreground p-3 rounded-sm bg-muted/50">
-          src/components/ui/Checkbox/Checkbox.tsx
-        </div>
+        <SourcePath path="@ds/Checkbox" />
       </div>
     </Shell>
   );

@@ -3,79 +3,25 @@
 import { useState, useEffect } from "react";
 import { Shell } from "@/components/shell";
 import { SectionHeading } from "@/components/token-grid";
-import { ComponentPreview, PropsTable } from "@/components/component-preview";
-import { cn } from "@/lib/utils";
+import { ComponentPreview, PropsTable, SourcePath, SubsectionHeading} from "@/components/component-preview";
+import { ProgressBar } from "@ds/ProgressBar";
 
-function DemoProgressBar({
-  value = 0,
-  max = 100,
-  indeterminate = false,
-  label,
-  showValue = false,
-  size = "md",
-  className,
-}: {
-  value?: number;
-  max?: number;
-  indeterminate?: boolean;
-  label?: string;
-  showValue?: boolean;
-  size?: "sm" | "md";
-  className?: string;
-}) {
-  const pct = indeterminate ? 0 : Math.min(100, (value / max) * 100);
-  const trackH = size === "sm" ? "h-1" : "h-2";
-
-  return (
-    <div className={cn("w-full", className)} role="progressbar" aria-valuenow={indeterminate ? undefined : value} aria-valuemin={0} aria-valuemax={max}>
-      {(label || showValue) && (
-        <div className="flex items-baseline justify-between gap-2 mb-1.5">
-          {label && (
-            <span className="text-sm font-medium text-foreground">{label}</span>
-          )}
-          {showValue && !indeterminate && (
-            <span className="text-xs font-mono text-muted-foreground tabular-nums">
-              {Math.round(pct)}%
-            </span>
-          )}
-        </div>
-      )}
-      <div className={cn("w-full rounded-full bg-muted overflow-hidden", trackH)}>
-        {indeterminate ? (
-          <div
-            className={cn(
-              "h-full w-1/3 rounded-full bg-accent animate-[indeterminate_1.5s_ease-in-out_infinite]"
-            )}
-          />
-        ) : (
-          <div
-            className={cn(
-              "h-full rounded-full bg-accent transition-[width] duration-300 ease-out"
-            )}
-            style={{ width: `${pct}%` }}
-          />
-        )}
-      </div>
-    </div>
-  );
-}
-
-const determinateCode = `import { ProgressBar } from "@/components/ui/ProgressBar/ProgressBar";
+const determinateCode = `import { ProgressBar } from "@ds/ProgressBar";
 
 <ProgressBar value={25} />
 <ProgressBar value={50} />
 <ProgressBar value={75} />
 <ProgressBar value={100} />`;
 
-const indeterminateCode = `import { ProgressBar } from "@/components/ui/ProgressBar/ProgressBar";
+const indeterminateCode = `import { ProgressBar } from "@ds/ProgressBar";
 
 <ProgressBar indeterminate />`;
 
-const labelCode = `import { ProgressBar } from "@/components/ui/ProgressBar/ProgressBar";
+const labelCode = `import { ProgressBar } from "@ds/ProgressBar";
 
 <ProgressBar label="Uploading" value={64} showValue />`;
 
-const sizesCode = `import { ProgressBar } from "@/components/ui/ProgressBar/ProgressBar";
+const sizesCode = `import { ProgressBar } from "@ds/ProgressBar";
 
 <ProgressBar size="sm" label="Small" value={45} showValue />
 <ProgressBar size="md" label="Medium" value={45} showValue />`;
@@ -104,10 +50,10 @@ export default function ProgressBarPage() {
           code={determinateCode}
         >
           <div className="w-full max-w-md space-y-5">
-            <DemoProgressBar value={25} />
-            <DemoProgressBar value={50} />
-            <DemoProgressBar value={75} />
-            <DemoProgressBar value={100} />
+            <ProgressBar value={25} />
+            <ProgressBar value={50} />
+            <ProgressBar value={75} />
+            <ProgressBar value={100} />
           </div>
         </ComponentPreview>
 
@@ -117,7 +63,7 @@ export default function ProgressBarPage() {
           code={indeterminateCode}
         >
           <div className="w-full max-w-md">
-            <DemoProgressBar indeterminate />
+            <ProgressBar indeterminate />
           </div>
         </ComponentPreview>
 
@@ -127,7 +73,7 @@ export default function ProgressBarPage() {
           code={labelCode}
         >
           <div className="w-full max-w-md">
-            <DemoProgressBar
+            <ProgressBar
               label="Uploading"
               value={animated}
               showValue
@@ -141,15 +87,13 @@ export default function ProgressBarPage() {
           code={sizesCode}
         >
           <div className="w-full max-w-md space-y-6">
-            <DemoProgressBar size="sm" label="Small" value={45} showValue />
-            <DemoProgressBar size="md" label="Medium" value={45} showValue />
+            <ProgressBar size="sm" label="Small" value={45} showValue />
+            <ProgressBar size="md" label="Medium" value={45} showValue />
           </div>
         </ComponentPreview>
 
         <div>
-          <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-3">
-            Props
-          </h3>
+          <SubsectionHeading>Props</SubsectionHeading>
           <PropsTable
             props={[
               {
@@ -194,9 +138,7 @@ export default function ProgressBarPage() {
           />
         </div>
 
-        <div className="text-xs font-mono text-muted-foreground p-3 rounded-sm bg-muted/50">
-          src/components/ui/ProgressBar/ProgressBar.tsx
-        </div>
+        <SourcePath path="src/components/ui/ProgressBar/ProgressBar.tsx" />
       </div>
     </Shell>
   );

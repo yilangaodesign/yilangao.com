@@ -3,93 +3,14 @@
 import { useState } from "react";
 import { Shell } from "@/components/shell";
 import { SectionHeading } from "@/components/token-grid";
-import { ComponentPreview, PropsTable } from "@/components/component-preview";
-import { cn } from "@/lib/utils";
+import { ComponentPreview, PropsTable, SourcePath, SubsectionHeading} from "@/components/component-preview";
+import { Slider } from "@ds/Slider";
 
-function DemoSlider({
-  label,
-  value,
-  onChange,
-  min = 0,
-  max = 100,
-  step = 1,
-  showValue = false,
-  suffix = "",
-  disabled = false,
-  className,
-}: {
-  label?: string;
-  value: number;
-  onChange: (value: number) => void;
-  min?: number;
-  max?: number;
-  step?: number;
-  showValue?: boolean;
-  suffix?: string;
-  disabled?: boolean;
-  className?: string;
-}) {
-  const pct = ((value - min) / (max - min)) * 100;
-  const trackH = "h-1";
-  const thumbSize =
-    "[&::-webkit-slider-thumb]:h-3.5 [&::-webkit-slider-thumb]:w-3.5";
-
-  return (
-    <div className={cn("flex flex-col gap-1.5 w-full", className)}>
-      {(label || showValue) && (
-        <div className="flex items-baseline justify-between gap-2">
-          {label && (
-            <label className="text-sm font-medium text-foreground">
-              {label}
-            </label>
-          )}
-          {showValue && (
-            <span className="text-xs font-mono text-muted-foreground tabular-nums">
-              {value}
-              {suffix}
-            </span>
-          )}
-        </div>
-      )}
-      <div className={cn("relative w-full", disabled && "opacity-50")}>
-        <div
-          className={cn(
-            "absolute inset-y-0 my-auto rounded-full bg-muted w-full",
-            trackH
-          )}
-        />
-        <div
-          className={cn(
-            "absolute inset-y-0 my-auto rounded-full bg-accent",
-            trackH
-          )}
-          style={{ width: `${pct}%` }}
-        />
-        <input
-          type="range"
-          min={min}
-          max={max}
-          step={step}
-          value={value}
-          onChange={(e) => onChange(Number(e.target.value))}
-          disabled={disabled}
-          className={cn(
-            "relative w-full appearance-none bg-transparent cursor-pointer",
-            "[&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-foreground [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-background [&::-webkit-slider-thumb]:shadow-sm [&::-webkit-slider-thumb]:transition-transform [&::-webkit-slider-thumb]:hover:scale-110",
-            thumbSize,
-            disabled && "pointer-events-none cursor-not-allowed"
-          )}
-        />
-      </div>
-    </div>
-  );
-}
-
-const basicCode = `import { Slider } from "@/components/ui/Slider/Slider";
+const basicCode = `import { Slider } from "@ds/Slider";
 
 <Slider value={50} onChange={(v) => setValue(v)} />`;
 
-const labelValueCode = `import { Slider } from "@/components/ui/Slider/Slider";
+const labelValueCode = `import { Slider } from "@ds/Slider";
 
 <Slider
   label="Volume"
@@ -99,7 +20,7 @@ const labelValueCode = `import { Slider } from "@/components/ui/Slider/Slider";
   onChange={(v) => setValue(v)}
 />`;
 
-const disabledCode = `import { Slider } from "@/components/ui/Slider/Slider";
+const disabledCode = `import { Slider } from "@ds/Slider";
 
 <Slider label="Locked" value={35} showValue disabled />`;
 
@@ -121,7 +42,7 @@ export default function SliderPage() {
           code={basicCode}
         >
           <div className="w-full max-w-md">
-            <DemoSlider value={basic} onChange={setBasic} />
+            <Slider value={basic} onChange={setBasic} />
           </div>
         </ComponentPreview>
 
@@ -131,7 +52,7 @@ export default function SliderPage() {
           code={labelValueCode}
         >
           <div className="w-full max-w-md">
-            <DemoSlider
+            <Slider
               label="Volume"
               value={volume}
               onChange={setVolume}
@@ -147,14 +68,12 @@ export default function SliderPage() {
           code={disabledCode}
         >
           <div className="w-full max-w-md">
-            <DemoSlider label="Locked" value={35} onChange={() => {}} showValue disabled />
+            <Slider label="Locked" value={35} onChange={() => {}} showValue disabled />
           </div>
         </ComponentPreview>
 
         <div>
-          <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-3">
-            Props
-          </h3>
+          <SubsectionHeading>Props</SubsectionHeading>
           <PropsTable
             props={[
               {
@@ -214,9 +133,7 @@ export default function SliderPage() {
           />
         </div>
 
-        <div className="text-xs font-mono text-muted-foreground p-3 rounded-sm bg-muted/50">
-          src/components/ui/Slider/Slider.tsx
-        </div>
+        <SourcePath path="src/components/ui/Slider/Slider.tsx" />
       </div>
     </Shell>
   );

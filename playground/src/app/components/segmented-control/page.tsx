@@ -1,105 +1,13 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState } from "react";
 import { Shell } from "@/components/shell";
 import { SectionHeading } from "@/components/token-grid";
-import { ComponentPreview, PropsTable } from "@/components/component-preview";
-import { cn } from "@/lib/utils";
+import { ComponentPreview, PropsTable, SourcePath, SubsectionHeading} from "@/components/component-preview";
+import { SegmentedControl } from "@ds/SegmentedControl";
+import type { SegmentedControlItem } from "@ds/SegmentedControl";
 
-type SegmentItem = {
-  label: string;
-  value: string;
-  disabled?: boolean;
-};
-
-function DemoSegmentedControl({
-  items,
-  value,
-  onChange,
-  size = "md",
-  fullWidth = false,
-  disabled = false,
-  className,
-}: {
-  items: SegmentItem[];
-  value: string;
-  onChange: (value: string) => void;
-  size?: "sm" | "md";
-  fullWidth?: boolean;
-  disabled?: boolean;
-  className?: string;
-}) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [indicator, setIndicator] = useState({ left: 0, width: 0 });
-
-  const updateIndicator = useCallback(() => {
-    const container = containerRef.current;
-    if (!container) return;
-    const activeIndex = items.findIndex((item) => item.value === value);
-    if (activeIndex < 0) return;
-    const buttons = container.querySelectorAll<HTMLButtonElement>(
-      "[data-segment-button]"
-    );
-    const btn = buttons[activeIndex];
-    if (!btn) return;
-    setIndicator({
-      left: btn.offsetLeft,
-      width: btn.offsetWidth,
-    });
-  }, [items, value]);
-
-  useEffect(() => {
-    updateIndicator();
-  }, [updateIndicator]);
-
-  useEffect(() => {
-    const ro = new ResizeObserver(updateIndicator);
-    if (containerRef.current) ro.observe(containerRef.current);
-    return () => ro.disconnect();
-  }, [updateIndicator]);
-
-  const sizeClasses = size === "sm" ? "h-8 text-xs" : "h-10 text-sm";
-
-  return (
-    <div
-      ref={containerRef}
-      className={cn(
-        "relative inline-flex items-center p-1 bg-muted rounded-sm",
-        fullWidth && "w-full",
-        disabled && "opacity-50 pointer-events-none",
-        className
-      )}
-    >
-      <div
-        className="absolute top-1 bottom-1 rounded-sm bg-background shadow-sm transition-all duration-200 ease-out"
-        style={{ left: indicator.left, width: indicator.width }}
-      />
-      {items.map((item) => (
-        <button
-          key={item.value}
-          type="button"
-          data-segment-button
-          onClick={() => {
-            if (!item.disabled) onChange(item.value);
-          }}
-          disabled={item.disabled || disabled}
-          className={cn(
-            "relative z-[1] flex-1 flex items-center justify-center px-3 font-medium rounded-sm transition-colors whitespace-nowrap",
-            sizeClasses,
-            item.value === value
-              ? "text-foreground"
-              : "text-muted-foreground hover:text-foreground",
-            item.disabled && "opacity-40 cursor-not-allowed"
-          )}
-        >
-          {item.label}
-        </button>
-      ))}
-    </div>
-  );
-}
-
-const basicCode = `import { SegmentedControl } from "@/components/ui/SegmentedControl/SegmentedControl";
+const basicCode = `import { SegmentedControl } from "@ds/SegmentedControl";
 
 <SegmentedControl
   items={[
@@ -111,16 +19,16 @@ const basicCode = `import { SegmentedControl } from "@/components/ui/SegmentedCo
   onChange={setView}
 />`;
 
-const sizesCode = `import { SegmentedControl } from "@/components/ui/SegmentedControl/SegmentedControl";
+const sizesCode = `import { SegmentedControl } from "@ds/SegmentedControl";
 
 <SegmentedControl size="sm" items={...} value={v} onChange={setV} />
 <SegmentedControl size="md" items={...} value={v} onChange={setV} />`;
 
-const fullWidthCode = `import { SegmentedControl } from "@/components/ui/SegmentedControl/SegmentedControl";
+const fullWidthCode = `import { SegmentedControl } from "@ds/SegmentedControl";
 
 <SegmentedControl fullWidth items={...} value={v} onChange={setV} />`;
 
-const disabledItemsCode = `import { SegmentedControl } from "@/components/ui/SegmentedControl/SegmentedControl";
+const disabledItemsCode = `import { SegmentedControl } from "@ds/SegmentedControl";
 
 <SegmentedControl
   items={[
@@ -139,25 +47,25 @@ export default function SegmentedControlPage() {
   const [full, setFull] = useState("all");
   const [partial, setPartial] = useState("active");
 
-  const viewItems: SegmentItem[] = [
+  const viewItems: SegmentedControlItem[] = [
     { label: "Day", value: "day" },
     { label: "Week", value: "week" },
     { label: "Month", value: "month" },
   ];
 
-  const layoutItems: SegmentItem[] = [
+  const layoutItems: SegmentedControlItem[] = [
     { label: "List", value: "list" },
     { label: "Grid", value: "grid" },
     { label: "Board", value: "board" },
   ];
 
-  const filterItems: SegmentItem[] = [
+  const filterItems: SegmentedControlItem[] = [
     { label: "All", value: "all" },
     { label: "Active", value: "active" },
     { label: "Archived", value: "archived" },
   ];
 
-  const partialItems: SegmentItem[] = [
+  const partialItems: SegmentedControlItem[] = [
     { label: "Active", value: "active" },
     { label: "Pending", value: "pending", disabled: true },
     { label: "Done", value: "done" },
@@ -177,7 +85,7 @@ export default function SegmentedControlPage() {
           code={basicCode}
         >
           <div className="flex items-center justify-center w-full">
-            <DemoSegmentedControl
+            <SegmentedControl
               items={viewItems}
               value={view}
               onChange={setView}
@@ -191,13 +99,13 @@ export default function SegmentedControlPage() {
           code={sizesCode}
         >
           <div className="flex flex-col items-center gap-4 w-full">
-            <DemoSegmentedControl
+            <SegmentedControl
               size="sm"
               items={layoutItems}
               value={sm}
               onChange={setSm}
             />
-            <DemoSegmentedControl
+            <SegmentedControl
               size="md"
               items={layoutItems}
               value={md}
@@ -212,7 +120,7 @@ export default function SegmentedControlPage() {
           code={fullWidthCode}
         >
           <div className="w-full max-w-md">
-            <DemoSegmentedControl
+            <SegmentedControl
               fullWidth
               items={filterItems}
               value={full}
@@ -227,7 +135,7 @@ export default function SegmentedControlPage() {
           code={disabledItemsCode}
         >
           <div className="flex items-center justify-center w-full">
-            <DemoSegmentedControl
+            <SegmentedControl
               items={partialItems}
               value={partial}
               onChange={setPartial}
@@ -236,9 +144,7 @@ export default function SegmentedControlPage() {
         </ComponentPreview>
 
         <div>
-          <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-3">
-            Props
-          </h3>
+          <SubsectionHeading>Props</SubsectionHeading>
           <PropsTable
             props={[
               {
@@ -279,9 +185,7 @@ export default function SegmentedControlPage() {
           />
         </div>
 
-        <div className="text-xs font-mono text-muted-foreground p-3 rounded-sm bg-muted/50">
-          src/components/ui/SegmentedControl/SegmentedControl.tsx
-        </div>
+        <SourcePath path="src/components/ui/SegmentedControl/SegmentedControl.tsx" />
       </div>
     </Shell>
   );

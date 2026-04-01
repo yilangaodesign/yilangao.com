@@ -1,64 +1,9 @@
 "use client";
 
-import { forwardRef, type ReactNode } from "react";
-import * as TabsPrimitive from "@radix-ui/react-tabs";
 import { Shell } from "@/components/shell";
 import { SectionHeading } from "@/components/token-grid";
-import { ComponentPreview, PropsTable } from "@/components/component-preview";
-import { cn } from "@/lib/utils";
-
-const Tabs = TabsPrimitive.Root;
-
-const TabsList = forwardRef<
-  HTMLDivElement,
-  { children: ReactNode; className?: string }
->(({ className, ...props }, ref) => (
-  <TabsPrimitive.List
-    ref={ref}
-    className={cn(
-      "inline-flex h-10 w-full items-center gap-1 border-b border-border text-muted-foreground",
-      className,
-    )}
-    {...props}
-  />
-));
-TabsList.displayName = "TabsList";
-
-const TabsTrigger = forwardRef<
-  HTMLButtonElement,
-  { children: ReactNode; value: string; className?: string; disabled?: boolean }
->(({ className, ...props }, ref) => (
-  <TabsPrimitive.Trigger
-    ref={ref}
-    className={cn(
-      "relative -mb-px inline-flex items-center justify-center whitespace-nowrap px-3 pb-2 pt-1.5 text-sm font-medium transition-colors",
-      "border-b-2 border-transparent bg-transparent text-muted-foreground",
-      "hover:text-foreground",
-      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-      "data-[state=active]:border-accent data-[state=active]:text-foreground",
-      "disabled:pointer-events-none disabled:opacity-50",
-      className,
-    )}
-    {...props}
-  />
-));
-TabsTrigger.displayName = "TabsTrigger";
-
-const TabsContent = forwardRef<
-  HTMLDivElement,
-  { children: ReactNode; value: string; className?: string }
->(({ className, ...props }, ref) => (
-  <TabsPrimitive.Content
-    ref={ref}
-    className={cn(
-      "mt-4 rounded-sm border border-border bg-muted/20 p-4 text-sm text-foreground outline-none",
-      "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-      className,
-    )}
-    {...props}
-  />
-));
-TabsContent.displayName = "TabsContent";
+import { ComponentPreview, PropsTable, SourcePath, SubsectionHeading} from "@/components/component-preview";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@ds/Tabs";
 
 function TabsDemo() {
   return (
@@ -86,46 +31,48 @@ function TabsDemo() {
   );
 }
 
-const code = `"use client";
-
-import * as TabsPrimitive from "@radix-ui/react-tabs";
-
-const Tabs = TabsPrimitive.Root;
-
-const TabsList = forwardRef((props, ref) => (
-  <TabsPrimitive.List
-    ref={ref}
-    className="inline-flex w-full border-b border-border gap-1"
-    {...props}
-  />
-));
-
-const TabsTrigger = forwardRef((props, ref) => (
-  <TabsPrimitive.Trigger
-    ref={ref}
-    className="px-3 pb-2 border-b-2 border-transparent data-[state=active]:border-accent data-[state=active]:text-foreground ..."
-    {...props}
-  />
-));
-
-const TabsContent = forwardRef((props, ref) => (
-  <TabsPrimitive.Content ref={ref} className="mt-4 p-4 ..." {...props} />
-));
-
-export function Example() {
+function DisabledTabDemo() {
   return (
-    <Tabs defaultValue="a">
-      <TabsList>
-        <TabsTrigger value="a">Tab A</TabsTrigger>
-        <TabsTrigger value="b">Tab B</TabsTrigger>
-        <TabsTrigger value="c">Tab C</TabsTrigger>
-      </TabsList>
-      <TabsContent value="a">Panel A</TabsContent>
-      <TabsContent value="b">Panel B</TabsContent>
-      <TabsContent value="c">Panel C</TabsContent>
-    </Tabs>
+    <div className="w-full max-w-xl">
+      <Tabs defaultValue="first" className="w-full">
+        <TabsList aria-label="Disabled tab example">
+          <TabsTrigger value="first">Active</TabsTrigger>
+          <TabsTrigger value="second" disabled>Disabled</TabsTrigger>
+          <TabsTrigger value="third">Another</TabsTrigger>
+        </TabsList>
+        <TabsContent value="first">
+          This tab is active. The middle tab is disabled and cannot be selected.
+        </TabsContent>
+        <TabsContent value="third">
+          Third panel content.
+        </TabsContent>
+      </Tabs>
+    </div>
   );
-}`;
+}
+
+const code = `import { Tabs, TabsList, TabsTrigger, TabsContent } from "@ds/Tabs";
+
+<Tabs defaultValue="overview">
+  <TabsList>
+    <TabsTrigger value="overview">Overview</TabsTrigger>
+    <TabsTrigger value="details">Details</TabsTrigger>
+    <TabsTrigger value="activity">Activity</TabsTrigger>
+  </TabsList>
+  <TabsContent value="overview">Panel A</TabsContent>
+  <TabsContent value="details">Panel B</TabsContent>
+  <TabsContent value="activity">Panel C</TabsContent>
+</Tabs>`;
+
+const disabledCode = `<Tabs defaultValue="first">
+  <TabsList>
+    <TabsTrigger value="first">Active</TabsTrigger>
+    <TabsTrigger value="second" disabled>Disabled</TabsTrigger>
+    <TabsTrigger value="third">Another</TabsTrigger>
+  </TabsList>
+  <TabsContent value="first">Content</TabsContent>
+  <TabsContent value="third">Content</TabsContent>
+</Tabs>`;
 
 export default function TabsPage() {
   return (
@@ -144,10 +91,16 @@ export default function TabsPage() {
           <TabsDemo />
         </ComponentPreview>
 
+        <ComponentPreview
+          title="Disabled tab"
+          description="Individual triggers can be disabled. Disabled triggers are not focusable and show reduced opacity."
+          code={disabledCode}
+        >
+          <DisabledTabDemo />
+        </ComponentPreview>
+
         <div>
-          <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-3">
-            Compound parts
-          </h3>
+          <SubsectionHeading>Compound parts</SubsectionHeading>
           <PropsTable
             props={[
               {
@@ -178,9 +131,7 @@ export default function TabsPage() {
           />
         </div>
 
-        <div className="text-xs font-mono text-muted-foreground p-3 rounded-sm bg-muted/50">
-          src/components/ui/Tabs/Tabs.tsx
-        </div>
+        <SourcePath path="src/components/ui/Tabs/Tabs.tsx · src/components/ui/Tabs/Tabs.module.scss" />
       </div>
     </Shell>
   );

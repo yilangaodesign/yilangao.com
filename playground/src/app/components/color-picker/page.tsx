@@ -3,65 +3,17 @@
 import { useState } from "react";
 import { Shell } from "@/components/shell";
 import { SectionHeading } from "@/components/token-grid";
-import { ComponentPreview, PropsTable } from "@/components/component-preview";
-import { cn } from "@/lib/utils";
+import { ComponentPreview, PropsTable, SourcePath, SubsectionHeading} from "@/components/component-preview";
+import { ColorPicker } from "@ds/ColorPicker";
 
-function DemoColorPicker({
-  label,
-  value,
-  onChange,
-  disabled = false,
-  className,
-}: {
-  label?: string;
-  value: string;
-  onChange: (value: string) => void;
-  disabled?: boolean;
-  className?: string;
-}) {
-  return (
-    <div className={cn("flex flex-col gap-1.5", className)}>
-      {label && (
-        <label className="text-sm font-medium text-foreground">{label}</label>
-      )}
-      <div
-        className={cn(
-          "inline-flex items-center gap-2 h-10 px-2 border border-border rounded-sm bg-background transition-colors",
-          disabled && "opacity-50 pointer-events-none cursor-not-allowed",
-          !disabled && "hover:border-foreground/30"
-        )}
-      >
-        <input
-          type="color"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          disabled={disabled}
-          className="w-7 h-7 rounded-sm border border-border cursor-pointer bg-transparent [&::-webkit-color-swatch-wrapper]:p-0 [&::-webkit-color-swatch]:rounded-sm [&::-webkit-color-swatch]:border-none"
-        />
-        <input
-          type="text"
-          value={value}
-          onChange={(e) => {
-            const v = e.target.value;
-            if (/^#[0-9a-fA-F]{0,6}$/.test(v) || v === "#") onChange(v);
-          }}
-          disabled={disabled}
-          className="w-20 bg-transparent text-sm font-mono text-foreground outline-none placeholder:text-muted-foreground"
-          spellCheck={false}
-        />
-      </div>
-    </div>
-  );
-}
-
-const basicCode = `import { ColorPicker } from "@/components/ui/ColorPicker/ColorPicker";
+const basicCode = `import { ColorPicker } from "@ds/ColorPicker";
 
 <ColorPicker
   value="#6366f1"
   onChange={(color) => console.log(color)}
 />`;
 
-const labelCode = `import { ColorPicker } from "@/components/ui/ColorPicker/ColorPicker";
+const labelCode = `import { ColorPicker } from "@ds/ColorPicker";
 
 <ColorPicker
   label="Brand color"
@@ -69,7 +21,7 @@ const labelCode = `import { ColorPicker } from "@/components/ui/ColorPicker/Colo
   onChange={(color) => console.log(color)}
 />`;
 
-const disabledCode = `import { ColorPicker } from "@/components/ui/ColorPicker/ColorPicker";
+const disabledCode = `import { ColorPicker } from "@ds/ColorPicker";
 
 <ColorPicker
   label="Locked color"
@@ -97,7 +49,7 @@ export default function ColorPickerPage() {
           code={basicCode}
         >
           <div className="flex items-center justify-center w-full">
-            <DemoColorPicker value={basic} onChange={setBasic} />
+            <ColorPicker value={basic} onChange={setBasic} />
           </div>
         </ComponentPreview>
 
@@ -107,7 +59,7 @@ export default function ColorPickerPage() {
           code={labelCode}
         >
           <div className="flex items-center justify-center w-full">
-            <DemoColorPicker
+            <ColorPicker
               label="Brand color"
               value={labeled}
               onChange={setLabeled}
@@ -121,7 +73,7 @@ export default function ColorPickerPage() {
           code={disabledCode}
         >
           <div className="flex items-center justify-center w-full">
-            <DemoColorPicker
+            <ColorPicker
               label="Locked color"
               value={disabled}
               onChange={() => {}}
@@ -131,9 +83,7 @@ export default function ColorPickerPage() {
         </ComponentPreview>
 
         <div>
-          <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-3">
-            Props
-          </h3>
+          <SubsectionHeading>Props</SubsectionHeading>
           <PropsTable
             props={[
               {
@@ -166,9 +116,7 @@ export default function ColorPickerPage() {
           />
         </div>
 
-        <div className="text-xs font-mono text-muted-foreground p-3 rounded-sm bg-muted/50">
-          src/components/ui/ColorPicker/ColorPicker.tsx
-        </div>
+        <SourcePath path="src/components/ui/ColorPicker/ColorPicker.tsx" />
       </div>
     </Shell>
   );

@@ -3,100 +3,36 @@
 import { useState } from "react";
 import { Shell } from "@/components/shell";
 import { SectionHeading } from "@/components/token-grid";
-import { ComponentPreview, PropsTable } from "@/components/component-preview";
-import { cn } from "@/lib/utils";
-
-// ── Demo Toggle (Switch) ────────────────────────────────────────────────────
-
-function DemoToggle({
-  label,
-  checked: controlledChecked,
-  defaultChecked = false,
-  onCheckedChange,
-  disabled,
-  className,
-}: {
-  label?: string;
-  checked?: boolean;
-  defaultChecked?: boolean;
-  onCheckedChange?: (checked: boolean) => void;
-  disabled?: boolean;
-  className?: string;
-}) {
-  const [internalChecked, setInternalChecked] = useState(defaultChecked);
-  const isControlled = controlledChecked !== undefined;
-  const checked = isControlled ? controlledChecked : internalChecked;
-
-  function toggle() {
-    if (disabled) return;
-    const next = !checked;
-    if (!isControlled) setInternalChecked(next);
-    onCheckedChange?.(next);
-  }
-
-  return (
-    <button
-      type="button"
-      role="switch"
-      aria-checked={checked}
-      aria-disabled={disabled}
-      disabled={disabled}
-      onClick={toggle}
-      className={cn("flex items-center gap-3 group", className)}
-    >
-      <span
-        className={cn(
-          "relative inline-flex items-center w-9 h-5 rounded-full transition-colors shrink-0",
-          checked ? "bg-accent" : "bg-border",
-          disabled && "opacity-50 cursor-not-allowed"
-        )}
-      >
-        <span
-          className={cn(
-            "absolute w-3.5 h-3.5 rounded-full bg-white shadow-sm transition-transform",
-            checked ? "translate-x-[18px]" : "translate-x-[3px]"
-          )}
-        />
-      </span>
-      {label && (
-        <span
-          className={cn(
-            "text-sm text-foreground select-none",
-            disabled && "opacity-50"
-          )}
-        >
-          {label}
-        </span>
-      )}
-    </button>
-  );
-}
+import { ComponentPreview, PropsTable, SourcePath, SubsectionHeading} from "@/components/component-preview";
+import { Toggle } from "@ds/Toggle";
 
 // ── Code snippets ────────────────────────────────────────────────────────────
 
-const basicCode = `<DemoToggle />`;
+const basicCode = `import { Toggle } from "@ds/Toggle";
 
-const labelCode = `<DemoToggle label="Enable notifications" />`;
+<Toggle />`;
+
+const labelCode = `<Toggle label="Enable notifications" />`;
 
 const controlledCode = `const [dark, setDark] = useState(false);
 
-<DemoToggle
+<Toggle
   label="Dark mode"
   checked={dark}
   onCheckedChange={setDark}
 />`;
 
-const disabledCode = `<DemoToggle label="Feature locked" disabled />
-<DemoToggle label="Always on" checked disabled />`;
+const disabledCode = `<Toggle label="Feature locked" disabled />
+<Toggle label="Always on" checked disabled />`;
 
 // ── Demos ────────────────────────────────────────────────────────────────────
 
 function BasicDemo() {
-  return <DemoToggle />;
+  return <Toggle />;
 }
 
 function LabelDemo() {
-  return <DemoToggle label="Enable notifications" />;
+  return <Toggle label="Enable notifications" />;
 }
 
 function ControlledDemo() {
@@ -105,8 +41,8 @@ function ControlledDemo() {
 
   return (
     <div className="flex flex-col gap-4">
-      <DemoToggle label="Dark mode" checked={dark} onCheckedChange={setDark} />
-      <DemoToggle
+      <Toggle label="Dark mode" checked={dark} onCheckedChange={setDark} />
+      <Toggle
         label="Auto-save"
         checked={autoSave}
         onCheckedChange={setAutoSave}
@@ -121,8 +57,8 @@ function ControlledDemo() {
 function DisabledDemo() {
   return (
     <div className="flex flex-col gap-4">
-      <DemoToggle label="Feature locked" disabled />
-      <DemoToggle label="Always on" checked disabled />
+      <Toggle label="Feature locked" disabled />
+      <Toggle label="Always on" checked disabled />
     </div>
   );
 }
@@ -135,7 +71,7 @@ export default function TogglePage() {
       <div className="max-w-5xl space-y-10">
         <SectionHeading
           title="Toggle"
-          description="A switch control for toggling between on/off states. Supports controlled and uncontrolled modes with proper ARIA role=switch."
+          description="A switch control for toggling between on/off states. Built on Radix UI primitives with support for controlled and uncontrolled modes and proper ARIA role=switch."
         />
 
         <ComponentPreview
@@ -171,9 +107,7 @@ export default function TogglePage() {
         </ComponentPreview>
 
         <div>
-          <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-3">
-            Props
-          </h3>
+          <SubsectionHeading>Props</SubsectionHeading>
           <PropsTable
             props={[
               {
@@ -207,9 +141,7 @@ export default function TogglePage() {
           />
         </div>
 
-        <div className="text-xs font-mono text-muted-foreground p-3 rounded-sm bg-muted/50">
-          src/components/ui/Toggle/Toggle.tsx
-        </div>
+        <SourcePath path="@ds/Toggle" />
       </div>
     </Shell>
   );

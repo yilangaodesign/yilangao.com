@@ -1,128 +1,23 @@
 "use client";
 
-import { useState, useRef, useCallback, useEffect } from "react";
 import { Shell } from "@/components/shell";
 import { SectionHeading } from "@/components/token-grid";
-import { ComponentPreview, PropsTable } from "@/components/component-preview";
-import { cn } from "@/lib/utils";
+import { ComponentPreview, PropsTable, SourcePath, SubsectionHeading} from "@/components/component-preview";
+import { Tooltip } from "@ds/Tooltip";
+import { Button } from "@ds/Button";
 
-type TooltipSide = "top" | "bottom" | "left" | "right";
+const basicCode = `<Tooltip content="Save your progress" side="top">
+  <Button appearance="neutral" emphasis="regular">Hover me</Button>
+</Tooltip>`;
 
-function DemoTooltip({
-  children,
-  content,
-  side = "top",
-  align = "center",
-  delayDuration = 300,
-}: {
-  children: React.ReactNode;
-  content: string;
-  side?: TooltipSide;
-  align?: "start" | "center" | "end";
-  delayDuration?: number;
-}) {
-  const [visible, setVisible] = useState(false);
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const triggerRef = useRef<HTMLSpanElement>(null);
+const positionsCode = `<Tooltip content="Top" side="top">...</Tooltip>
+<Tooltip content="Bottom" side="bottom">...</Tooltip>
+<Tooltip content="Left" side="left">...</Tooltip>
+<Tooltip content="Right" side="right">...</Tooltip>`;
 
-  const show = useCallback(() => {
-    timerRef.current = setTimeout(() => setVisible(true), delayDuration);
-  }, [delayDuration]);
-
-  const hide = useCallback(() => {
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
-      timerRef.current = null;
-    }
-    setVisible(false);
-  }, []);
-
-  useEffect(() => {
-    return () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
-    };
-  }, []);
-
-  const positionClasses: Record<TooltipSide, string> = {
-    top: "bottom-full left-1/2 -translate-x-1/2 mb-2",
-    bottom: "top-full left-1/2 -translate-x-1/2 mt-2",
-    left: "right-full top-1/2 -translate-y-1/2 mr-2",
-    right: "left-full top-1/2 -translate-y-1/2 ml-2",
-  };
-
-  const arrowClasses: Record<TooltipSide, string> = {
-    top: "top-full left-1/2 -translate-x-1/2 border-t-foreground border-x-transparent border-b-transparent",
-    bottom: "bottom-full left-1/2 -translate-x-1/2 border-b-foreground border-x-transparent border-t-transparent",
-    left: "left-full top-1/2 -translate-y-1/2 border-l-foreground border-y-transparent border-r-transparent",
-    right: "right-full top-1/2 -translate-y-1/2 border-r-foreground border-y-transparent border-l-transparent",
-  };
-
-  const alignOffset =
-    align === "start"
-      ? side === "top" || side === "bottom"
-        ? "!left-2 !translate-x-0"
-        : "!top-2 !translate-y-0"
-      : align === "end"
-        ? side === "top" || side === "bottom"
-          ? "!left-auto !right-2 !translate-x-0"
-          : "!top-auto !bottom-2 !translate-y-0"
-        : "";
-
-  return (
-    <span
-      ref={triggerRef}
-      className="relative inline-flex"
-      onMouseEnter={show}
-      onMouseLeave={hide}
-      onFocus={show}
-      onBlur={hide}
-    >
-      {children}
-      {visible && (
-        <span
-          role="tooltip"
-          className={cn(
-            "absolute z-50 whitespace-nowrap rounded-sm bg-foreground px-2.5 py-1.5 text-xs text-background font-mono pointer-events-none",
-            positionClasses[side],
-            alignOffset,
-          )}
-        >
-          {content}
-          <span
-            className={cn(
-              "absolute w-0 h-0 border-[4px]",
-              arrowClasses[side],
-            )}
-          />
-        </span>
-      )}
-    </span>
-  );
-}
-
-const basicCode = `<DemoTooltip content="Save your progress" side="top">
-  <button className="...">Hover me</button>
-</DemoTooltip>`;
-
-const positionsCode = `<DemoTooltip content="Top" side="top">...</DemoTooltip>
-<DemoTooltip content="Bottom" side="bottom">...</DemoTooltip>
-<DemoTooltip content="Left" side="left">...</DemoTooltip>
-<DemoTooltip content="Right" side="right">...</DemoTooltip>`;
-
-const delayCode = `<DemoTooltip content="Instant" delayDuration={0}>...</DemoTooltip>
-<DemoTooltip content="300ms" delayDuration={300}>...</DemoTooltip>
-<DemoTooltip content="800ms" delayDuration={800}>...</DemoTooltip>`;
-
-function TriggerButton({ children }: { children: React.ReactNode }) {
-  return (
-    <button
-      type="button"
-      className="rounded-sm border border-border bg-background px-4 py-2 text-sm font-medium text-foreground shadow-sm transition-colors hover:bg-muted"
-    >
-      {children}
-    </button>
-  );
-}
+const delayCode = `<Tooltip content="Instant" delayDuration={0}>...</Tooltip>
+<Tooltip content="300ms" delayDuration={300}>...</Tooltip>
+<Tooltip content="800ms" delayDuration={800}>...</Tooltip>`;
 
 export default function TooltipPage() {
   return (
@@ -138,9 +33,9 @@ export default function TooltipPage() {
           description="Hover over the button to reveal a tooltip above the trigger."
           code={basicCode}
         >
-          <DemoTooltip content="Save your progress" side="top">
-            <TriggerButton>Hover me</TriggerButton>
-          </DemoTooltip>
+          <Tooltip content="Save your progress" side="top">
+            <Button appearance="neutral" emphasis="regular">Hover me</Button>
+          </Tooltip>
         </ComponentPreview>
 
         <ComponentPreview
@@ -149,18 +44,18 @@ export default function TooltipPage() {
           code={positionsCode}
         >
           <div className="flex flex-wrap items-center gap-6">
-            <DemoTooltip content="Top tooltip" side="top">
-              <TriggerButton>Top</TriggerButton>
-            </DemoTooltip>
-            <DemoTooltip content="Bottom tooltip" side="bottom">
-              <TriggerButton>Bottom</TriggerButton>
-            </DemoTooltip>
-            <DemoTooltip content="Left tooltip" side="left">
-              <TriggerButton>Left</TriggerButton>
-            </DemoTooltip>
-            <DemoTooltip content="Right tooltip" side="right">
-              <TriggerButton>Right</TriggerButton>
-            </DemoTooltip>
+            <Tooltip content="Top tooltip" side="top">
+              <Button appearance="neutral" emphasis="regular">Top</Button>
+            </Tooltip>
+            <Tooltip content="Bottom tooltip" side="bottom">
+              <Button appearance="neutral" emphasis="regular">Bottom</Button>
+            </Tooltip>
+            <Tooltip content="Left tooltip" side="left">
+              <Button appearance="neutral" emphasis="regular">Left</Button>
+            </Tooltip>
+            <Tooltip content="Right tooltip" side="right">
+              <Button appearance="neutral" emphasis="regular">Right</Button>
+            </Tooltip>
           </div>
         </ComponentPreview>
 
@@ -170,28 +65,26 @@ export default function TooltipPage() {
           code={delayCode}
         >
           <div className="flex flex-wrap items-center gap-6">
-            <DemoTooltip content="Instant" side="top" delayDuration={0}>
-              <TriggerButton>0ms</TriggerButton>
-            </DemoTooltip>
-            <DemoTooltip content="Default delay" side="top" delayDuration={300}>
-              <TriggerButton>300ms</TriggerButton>
-            </DemoTooltip>
-            <DemoTooltip content="Slow reveal" side="top" delayDuration={800}>
-              <TriggerButton>800ms</TriggerButton>
-            </DemoTooltip>
+            <Tooltip content="Instant" side="top" delayDuration={0}>
+              <Button appearance="neutral" emphasis="regular">0ms</Button>
+            </Tooltip>
+            <Tooltip content="Default delay" side="top" delayDuration={300}>
+              <Button appearance="neutral" emphasis="regular">300ms</Button>
+            </Tooltip>
+            <Tooltip content="Slow reveal" side="top" delayDuration={800}>
+              <Button appearance="neutral" emphasis="regular">800ms</Button>
+            </Tooltip>
           </div>
         </ComponentPreview>
 
         <div>
-          <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-3">
-            Props
-          </h3>
+          <SubsectionHeading>Props</SubsectionHeading>
           <PropsTable
             props={[
               {
                 name: "content",
-                type: "string",
-                description: "Text displayed inside the tooltip.",
+                type: "ReactNode",
+                description: "Text or element displayed inside the tooltip.",
               },
               {
                 name: "children",
@@ -220,9 +113,7 @@ export default function TooltipPage() {
           />
         </div>
 
-        <div className="text-xs font-mono text-muted-foreground p-3 rounded-sm bg-muted/50">
-          src/components/ui/Tooltip
-        </div>
+        <SourcePath path="src/components/ui/Tooltip" />
       </div>
     </Shell>
   );

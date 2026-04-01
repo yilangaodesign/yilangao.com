@@ -1,83 +1,34 @@
 "use client";
 
-import { useState } from "react";
 import { Shell } from "@/components/shell";
 import { SectionHeading } from "@/components/token-grid";
-import { ComponentPreview, PropsTable } from "@/components/component-preview";
-import { cn } from "@/lib/utils";
-
-// ── Demo Avatar ──────────────────────────────────────────────────────────────
-
-const sizeMap = {
-  sm: "w-8 h-8 text-xs",
-  md: "w-10 h-10 text-sm",
-  lg: "w-14 h-14 text-lg",
-} as const;
-
-function getInitials(name: string): string {
-  return name
-    .split(" ")
-    .map((part) => part[0])
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
-}
-
-function DemoAvatar({
-  src,
-  name = "",
-  size = "md",
-  className,
-}: {
-  src?: string;
-  name?: string;
-  size?: "sm" | "md" | "lg";
-  className?: string;
-}) {
-  const [imgError, setImgError] = useState(false);
-  const showImage = src && !imgError;
-  const initials = name ? getInitials(name) : "?";
-
-  return (
-    <span
-      className={cn(
-        "relative inline-flex items-center justify-center rounded-full overflow-hidden shrink-0",
-        "bg-muted text-muted-foreground font-medium select-none",
-        sizeMap[size],
-        className
-      )}
-      title={name || undefined}
-    >
-      {showImage ? (
-        <img
-          src={src}
-          alt={name || "Avatar"}
-          onError={() => setImgError(true)}
-          className="w-full h-full object-cover"
-        />
-      ) : (
-        <span>{initials}</span>
-      )}
-    </span>
-  );
-}
+import { ComponentPreview, PropsTable, SourcePath, SubsectionHeading} from "@/components/component-preview";
+import { Avatar } from "@ds/Avatar";
 
 // ── Code snippets ────────────────────────────────────────────────────────────
 
-const imageCode = `<DemoAvatar
+const imageCode = `import { Avatar } from "@ds/Avatar";
+
+<Avatar
   src="https://i.pravatar.cc/150?u=jane"
   name="Jane Doe"
 />`;
 
-const initialsCode = `<DemoAvatar name="Jane Doe" />
-<DemoAvatar name="Alex Rivera" />
-<DemoAvatar name="Kai" />`;
+const initialsCode = `import { Avatar } from "@ds/Avatar";
 
-const sizesCode = `<DemoAvatar name="AB" size="sm" />
-<DemoAvatar name="AB" size="md" />
-<DemoAvatar name="AB" size="lg" />`;
+<Avatar name="Jane Doe" />
+<Avatar name="Alex Rivera" />
+<Avatar name="Kai" />`;
 
-const fallbackCode = `<DemoAvatar
+const sizesCode = `import { Avatar } from "@ds/Avatar";
+
+<Avatar name="AB" size="sm" />
+<Avatar name="AB" size="md" />
+<Avatar name="AB" size="lg" />`;
+
+const fallbackCode = `import { Avatar } from "@ds/Avatar";
+
+<Avatar
   src="https://broken-link.invalid/photo.jpg"
   name="Fallback User"
 />`;
@@ -87,9 +38,9 @@ const fallbackCode = `<DemoAvatar
 function ImageDemo() {
   return (
     <div className="flex items-center gap-4">
-      <DemoAvatar src="https://i.pravatar.cc/150?u=jane" name="Jane Doe" />
-      <DemoAvatar src="https://i.pravatar.cc/150?u=alex" name="Alex Rivera" />
-      <DemoAvatar src="https://i.pravatar.cc/150?u=kai" name="Kai Tanaka" />
+      <Avatar src="https://i.pravatar.cc/150?u=jane" name="Jane Doe" />
+      <Avatar src="https://i.pravatar.cc/150?u=alex" name="Alex Rivera" />
+      <Avatar src="https://i.pravatar.cc/150?u=kai" name="Kai Tanaka" />
     </div>
   );
 }
@@ -97,9 +48,9 @@ function ImageDemo() {
 function InitialsDemo() {
   return (
     <div className="flex items-center gap-4">
-      <DemoAvatar name="Jane Doe" />
-      <DemoAvatar name="Alex Rivera" />
-      <DemoAvatar name="Kai" />
+      <Avatar name="Jane Doe" />
+      <Avatar name="Alex Rivera" />
+      <Avatar name="Kai" />
     </div>
   );
 }
@@ -108,15 +59,15 @@ function SizesDemo() {
   return (
     <div className="flex items-end gap-4">
       <div className="flex flex-col items-center gap-2">
-        <DemoAvatar name="AB" size="sm" />
+        <Avatar name="AB" size="sm" />
         <span className="text-xs text-muted-foreground">sm</span>
       </div>
       <div className="flex flex-col items-center gap-2">
-        <DemoAvatar name="AB" size="md" />
+        <Avatar name="AB" size="md" />
         <span className="text-xs text-muted-foreground">md</span>
       </div>
       <div className="flex flex-col items-center gap-2">
-        <DemoAvatar name="AB" size="lg" />
+        <Avatar name="AB" size="lg" />
         <span className="text-xs text-muted-foreground">lg</span>
       </div>
     </div>
@@ -126,7 +77,7 @@ function SizesDemo() {
 function FallbackDemo() {
   return (
     <div className="flex items-center gap-4">
-      <DemoAvatar
+      <Avatar
         src="https://broken-link.invalid/photo.jpg"
         name="Fallback User"
       />
@@ -181,9 +132,7 @@ export default function AvatarPage() {
         </ComponentPreview>
 
         <div>
-          <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-3">
-            Props
-          </h3>
+          <SubsectionHeading>Props</SubsectionHeading>
           <PropsTable
             props={[
               {
@@ -212,9 +161,7 @@ export default function AvatarPage() {
           />
         </div>
 
-        <div className="text-xs font-mono text-muted-foreground p-3 rounded-sm bg-muted/50">
-          src/components/ui/Avatar/Avatar.tsx
-        </div>
+        <SourcePath path="src/components/ui/Avatar/Avatar.tsx" />
       </div>
     </Shell>
   );

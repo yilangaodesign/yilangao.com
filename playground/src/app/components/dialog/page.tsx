@@ -1,86 +1,43 @@
 "use client";
 
-import { type ReactNode } from "react";
-import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { Shell } from "@/components/shell";
 import { SectionHeading } from "@/components/token-grid";
-import { ComponentPreview, PropsTable } from "@/components/component-preview";
-import { cn } from "@/lib/utils";
-
-const Dialog = DialogPrimitive.Root;
-const DialogTrigger = DialogPrimitive.Trigger;
-const DialogClose = DialogPrimitive.Close;
-
-function DialogContent({
-  className,
-  children,
-}: {
-  className?: string;
-  children: ReactNode;
-}) {
-  return (
-    <DialogPrimitive.Portal>
-      <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-black/50" />
-      <DialogPrimitive.Content
-        className={cn(
-          "fixed left-1/2 top-1/2 z-50 w-full max-w-md -translate-x-1/2 -translate-y-1/2 rounded-sm border border-border bg-background p-6 shadow-lg outline-none",
-          className,
-        )}
-      >
-        {children}
-      </DialogPrimitive.Content>
-    </DialogPrimitive.Portal>
-  );
-}
-
-const DialogTitle = DialogPrimitive.Title;
-const DialogDescription = DialogPrimitive.Description;
-
-function DialogFooter({
-  className,
-  children,
-}: {
-  className?: string;
-  children: ReactNode;
-}) {
-  return (
-    <div className={cn("mt-6 flex flex-row flex-wrap justify-end gap-2", className)}>{children}</div>
-  );
-}
+import { ComponentPreview, PropsTable, SourcePath, SubsectionHeading} from "@/components/component-preview";
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogClose,
+} from "@ds/Dialog";
+import { Button } from "@ds/Button";
 
 function DialogDemo() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <button
-          type="button"
-          className="rounded-sm border border-border bg-background px-4 py-2 text-sm font-medium text-foreground shadow-sm transition-colors hover:bg-muted"
-        >
+        <Button appearance="neutral" emphasis="regular">
           Open dialog
-        </button>
+        </Button>
       </DialogTrigger>
       <DialogContent>
-        <DialogTitle className="text-lg font-semibold text-foreground">Save changes?</DialogTitle>
-        <DialogDescription className="mt-2 text-sm text-muted-foreground">
+        <DialogTitle>Save changes?</DialogTitle>
+        <DialogDescription>
           Your updates will be visible to collaborators. You can undo this action from the history
           panel for 24 hours.
         </DialogDescription>
         <DialogFooter>
           <DialogClose asChild>
-            <button
-              type="button"
-              className="rounded-sm border border-border bg-background px-3 py-2 text-sm font-medium text-foreground hover:bg-muted"
-            >
+            <Button appearance="neutral" emphasis="regular" size="sm">
               Cancel
-            </button>
+            </Button>
           </DialogClose>
           <DialogClose asChild>
-            <button
-              type="button"
-              className="rounded-sm bg-accent px-3 py-2 text-sm font-medium text-accent-foreground hover:bg-accent/90"
-            >
+            <Button appearance="highlight" emphasis="bold" size="sm">
               Confirm
-            </button>
+            </Button>
           </DialogClose>
         </DialogFooter>
       </DialogContent>
@@ -88,48 +45,29 @@ function DialogDemo() {
   );
 }
 
-const code = `"use client";
+const code = `import {
+  Dialog, DialogTrigger, DialogContent,
+  DialogTitle, DialogDescription, DialogFooter, DialogClose,
+} from "@ds/Dialog";
+import { Button } from "@ds/Button";
 
-import * as DialogPrimitive from "@radix-ui/react-dialog";
-
-const Dialog = DialogPrimitive.Root;
-const DialogTrigger = DialogPrimitive.Trigger;
-const DialogClose = DialogPrimitive.Close;
-const DialogTitle = DialogPrimitive.Title;
-const DialogDescription = DialogPrimitive.Description;
-
-function DialogContent({ children, className }: { children: React.ReactNode; className?: string }) {
-  return (
-    <DialogPrimitive.Portal>
-      <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-black/50" />
-      <DialogPrimitive.Content className={cn("fixed left-1/2 top-1/2 z-50 ...", className)}>
-        {children}
-      </DialogPrimitive.Content>
-    </DialogPrimitive.Portal>
-  );
-}
-
-function DialogFooter({ children, className }: { children: React.ReactNode; className?: string }) {
-  return <div className={cn("mt-6 flex justify-end gap-2", className)}>{children}</div>;
-}
-
-export function Example() {
-  return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <button type="button">Open</button>
-      </DialogTrigger>
-      <DialogContent>
-        <DialogTitle>Title</DialogTitle>
-        <DialogDescription>Description</DialogDescription>
-        <DialogFooter>
-          <DialogClose asChild><button type="button">Cancel</button></DialogClose>
-          <DialogClose asChild><button type="button">Confirm</button></DialogClose>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  );
-}`;
+<Dialog>
+  <DialogTrigger asChild>
+    <Button appearance="neutral" emphasis="regular">Open dialog</Button>
+  </DialogTrigger>
+  <DialogContent>
+    <DialogTitle>Save changes?</DialogTitle>
+    <DialogDescription>Description text here.</DialogDescription>
+    <DialogFooter>
+      <DialogClose asChild>
+        <Button appearance="neutral" emphasis="regular" size="sm">Cancel</Button>
+      </DialogClose>
+      <DialogClose asChild>
+        <Button appearance="highlight" emphasis="bold" size="sm">Confirm</Button>
+      </DialogClose>
+    </DialogFooter>
+  </DialogContent>
+</Dialog>`;
 
 export default function DialogPage() {
   return (
@@ -149,9 +87,7 @@ export default function DialogPage() {
         </ComponentPreview>
 
         <div>
-          <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-3">
-            Compound parts
-          </h3>
+          <SubsectionHeading>Compound parts</SubsectionHeading>
           <PropsTable
             props={[
               {
@@ -167,16 +103,16 @@ export default function DialogPage() {
               {
                 name: "DialogContent",
                 type: "{ children, className? }",
-                description: "Portal, overlay, and focus-trapped panel.",
+                description: "Portal, overlay, and focus-trapped panel with built-in close button.",
               },
               {
                 name: "DialogTitle",
-                type: "Title props",
+                type: "{ children, className? }",
                 description: "Accessible title; required for screen readers.",
               },
               {
                 name: "DialogDescription",
-                type: "Description props",
+                type: "{ children, className? }",
                 description: "Secondary text below the title.",
               },
               {
@@ -193,9 +129,7 @@ export default function DialogPage() {
           />
         </div>
 
-        <div className="text-xs font-mono text-muted-foreground p-3 rounded-sm bg-muted/50">
-          src/components/ui/Dialog/Dialog.tsx
-        </div>
+        <SourcePath path="src/components/ui/Dialog/Dialog.tsx · src/components/ui/Dialog/Dialog.module.scss" />
       </div>
     </Shell>
   );

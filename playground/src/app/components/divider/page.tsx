@@ -2,44 +2,26 @@
 
 import { Shell } from "@/components/shell";
 import { SectionHeading } from "@/components/token-grid";
-import { ComponentPreview, PropsTable } from "@/components/component-preview";
-import { cn } from "@/lib/utils";
+import { ComponentPreview, PropsTable, SourcePath, SubsectionHeading} from "@/components/component-preview";
+import { Divider } from "@ds/Divider";
 
-function DemoDivider({
-  orientation = "horizontal",
-  className,
-}: {
-  orientation?: "horizontal" | "vertical";
-  className?: string;
-}) {
-  if (orientation === "vertical") {
-    return (
-      <div
-        role="separator"
-        aria-orientation="vertical"
-        className={cn("w-px self-stretch bg-border", className)}
-      />
-    );
-  }
-  return (
-    <hr
-      className={cn("border-none h-px w-full bg-border", className)}
-    />
-  );
-}
+const horizontalCode = `import { Divider } from "@ds/Divider";
 
-const horizontalCode = `<DemoDivider />
-{/* renders: <hr className="border-none h-px w-full bg-border" /> */}`;
+<Divider />`;
 
-const verticalCode = `<div className="flex items-center gap-4 h-10">
+const verticalCode = `import { Divider } from "@ds/Divider";
+
+<div className="flex items-center gap-4 h-10">
   <span>Left</span>
-  <DemoDivider orientation="vertical" />
+  <Divider orientation="vertical" />
   <span>Right</span>
 </div>`;
 
-const spacingCode = `<DemoDivider className="my-6" />
-<DemoDivider className="my-2" />
-<DemoDivider className="my-0" />`;
+const spacingCode = `import { Divider } from "@ds/Divider";
+
+<Divider className="my-6" />
+<Divider className="my-2" />
+<Divider className="my-0" />`;
 
 export default function DividerPage() {
   return (
@@ -57,9 +39,9 @@ export default function DividerPage() {
         >
           <div className="w-full max-w-md space-y-3">
             <p className="text-sm text-foreground">Section one content</p>
-            <DemoDivider />
+            <Divider />
             <p className="text-sm text-foreground">Section two content</p>
-            <DemoDivider />
+            <Divider />
             <p className="text-sm text-foreground">Section three content</p>
           </div>
         </ComponentPreview>
@@ -72,9 +54,9 @@ export default function DividerPage() {
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-4 h-10 px-4 rounded-sm border border-border bg-background">
               <span className="text-sm text-foreground font-medium">Dashboard</span>
-              <DemoDivider orientation="vertical" />
+              <Divider orientation="vertical" />
               <span className="text-sm text-foreground font-medium">Settings</span>
-              <DemoDivider orientation="vertical" />
+              <Divider orientation="vertical" />
               <span className="text-sm text-foreground font-medium">Profile</span>
             </div>
           </div>
@@ -87,19 +69,17 @@ export default function DividerPage() {
         >
           <div className="w-full max-w-md rounded-sm border border-border bg-background p-4">
             <p className="text-sm text-foreground">Large spacing (my-6)</p>
-            <DemoDivider className="my-6" />
+            <Divider className="my-6" />
             <p className="text-sm text-foreground">Medium spacing (my-3)</p>
-            <DemoDivider className="my-3" />
+            <Divider className="my-3" />
             <p className="text-sm text-foreground">Small spacing (my-1)</p>
-            <DemoDivider className="my-1" />
+            <Divider className="my-1" />
             <p className="text-sm text-foreground">No spacing (my-0)</p>
           </div>
         </ComponentPreview>
 
         <div>
-          <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-3">
-            Props
-          </h3>
+          <SubsectionHeading>Props</SubsectionHeading>
           <PropsTable
             props={[
               {
@@ -119,9 +99,7 @@ export default function DividerPage() {
           />
         </div>
 
-        <div className="text-xs font-mono text-muted-foreground p-3 rounded-sm bg-muted/50">
-          src/components/ui/Divider
-        </div>
+        <SourcePath path="src/components/ui/Divider" />
       </div>
     </Shell>
   );

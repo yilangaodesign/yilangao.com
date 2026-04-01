@@ -1,124 +1,25 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
 import { Shell } from "@/components/shell";
 import { SectionHeading } from "@/components/token-grid";
-import { ComponentPreview, PropsTable } from "@/components/component-preview";
-import { cn } from "@/lib/utils";
-import { Upload, Image, FileText } from "lucide-react";
+import { ComponentPreview, PropsTable, SourcePath, SubsectionHeading} from "@/components/component-preview";
+import { Dropzone } from "@ds/Dropzone";
+import { Image, FileText } from "lucide-react";
 
-function DemoDropzone({
-  accept,
-  multiple = true,
-  onFiles,
-  disabled = false,
-  maxSize,
-  children,
-  className,
-}: {
-  accept?: string;
-  multiple?: boolean;
-  onFiles?: (files: File[]) => void;
-  disabled?: boolean;
-  maxSize?: number;
-  children?: React.ReactNode;
-  className?: string;
-}) {
-  const [isDragOver, setIsDragOver] = useState(false);
-  const [fileNames, setFileNames] = useState<string[]>([]);
-  const inputRef = useRef<HTMLInputElement>(null);
+const noop = () => {};
 
-  const handleFiles = useCallback(
-    (files: FileList | null) => {
-      if (!files || disabled) return;
-      const arr = Array.from(files);
-      const filtered = maxSize ? arr.filter((f) => f.size <= maxSize) : arr;
-      setFileNames(filtered.map((f) => f.name));
-      onFiles?.(filtered);
-    },
-    [disabled, maxSize, onFiles]
-  );
-
-  const handleDrop = useCallback(
-    (e: React.DragEvent) => {
-      e.preventDefault();
-      setIsDragOver(false);
-      handleFiles(e.dataTransfer.files);
-    },
-    [handleFiles]
-  );
-
-  return (
-    <div
-      onDragOver={(e) => {
-        e.preventDefault();
-        if (!disabled) setIsDragOver(true);
-      }}
-      onDragLeave={() => setIsDragOver(false)}
-      onDrop={handleDrop}
-      onClick={() => !disabled && inputRef.current?.click()}
-      className={cn(
-        "relative flex flex-col items-center justify-center gap-3 p-8 border-2 border-dashed rounded-sm transition-colors cursor-pointer min-h-[160px]",
-        isDragOver
-          ? "border-accent bg-accent/5"
-          : "border-border hover:border-foreground/30",
-        disabled && "opacity-50 pointer-events-none cursor-not-allowed",
-        className
-      )}
-    >
-      <input
-        ref={inputRef}
-        type="file"
-        accept={accept}
-        multiple={multiple}
-        onChange={(e) => handleFiles(e.target.files)}
-        className="hidden"
-        disabled={disabled}
-      />
-      {children || (
-        <>
-          <Upload className="w-8 h-8 text-muted-foreground" />
-          <div className="text-center">
-            <p className="text-sm font-medium text-foreground">
-              Drop files here or click to browse
-            </p>
-            {accept && (
-              <p className="text-xs text-muted-foreground mt-1">
-                Accepted: {accept}
-              </p>
-            )}
-          </div>
-        </>
-      )}
-      {fileNames.length > 0 && (
-        <div className="flex flex-wrap gap-2 mt-2">
-          {fileNames.map((name) => (
-            <span
-              key={name}
-              className="inline-flex items-center gap-1 px-2 py-1 text-xs font-mono bg-muted rounded-sm text-muted-foreground"
-            >
-              <FileText className="w-3 h-3" />
-              {name}
-            </span>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-const basicCode = `import { Dropzone } from "@/components/ui/Dropzone/Dropzone";
+const basicCode = `import { Dropzone } from "@ds/Dropzone";
 
 <Dropzone onFiles={(files) => console.log(files)} />`;
 
-const acceptCode = `import { Dropzone } from "@/components/ui/Dropzone/Dropzone";
+const acceptCode = `import { Dropzone } from "@ds/Dropzone";
 
 <Dropzone
   accept="image/*"
   onFiles={(files) => console.log(files)}
 />`;
 
-const customCode = `import { Dropzone } from "@/components/ui/Dropzone/Dropzone";
+const customCode = `import { Dropzone } from "@ds/Dropzone";
 
 <Dropzone accept=".pdf,.doc,.docx" onFiles={...}>
   <div className="text-center">
@@ -128,9 +29,9 @@ const customCode = `import { Dropzone } from "@/components/ui/Dropzone/Dropzone"
   </div>
 </Dropzone>`;
 
-const disabledCode = `import { Dropzone } from "@/components/ui/Dropzone/Dropzone";
+const disabledCode = `import { Dropzone } from "@ds/Dropzone";
 
-<Dropzone disabled />`;
+<Dropzone disabled onFiles={() => {}} />`;
 
 export default function DropzonePage() {
   return (
@@ -147,7 +48,7 @@ export default function DropzonePage() {
           code={basicCode}
         >
           <div className="w-full max-w-md">
-            <DemoDropzone />
+            <Dropzone onFiles={noop} />
           </div>
         </ComponentPreview>
 
@@ -157,7 +58,7 @@ export default function DropzonePage() {
           code={acceptCode}
         >
           <div className="w-full max-w-md">
-            <DemoDropzone accept="image/*" />
+            <Dropzone accept="image/*" onFiles={noop} />
           </div>
         </ComponentPreview>
 
@@ -167,7 +68,7 @@ export default function DropzonePage() {
           code={customCode}
         >
           <div className="w-full max-w-md">
-            <DemoDropzone accept=".pdf,.doc,.docx">
+            <Dropzone accept=".pdf,.doc,.docx" onFiles={noop}>
               <div className="text-center">
                 <Image className="w-10 h-10 mx-auto text-muted-foreground" />
                 <p className="mt-2 text-sm font-medium text-foreground">
@@ -177,7 +78,7 @@ export default function DropzonePage() {
                   PDF, DOC, DOCX up to 10 MB
                 </p>
               </div>
-            </DemoDropzone>
+            </Dropzone>
           </div>
         </ComponentPreview>
 
@@ -187,14 +88,12 @@ export default function DropzonePage() {
           code={disabledCode}
         >
           <div className="w-full max-w-md">
-            <DemoDropzone disabled />
+            <Dropzone disabled onFiles={noop} />
           </div>
         </ComponentPreview>
 
         <div>
-          <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-3">
-            Props
-          </h3>
+          <SubsectionHeading>Props</SubsectionHeading>
           <PropsTable
             props={[
               {
@@ -206,7 +105,7 @@ export default function DropzonePage() {
               {
                 name: "multiple",
                 type: "boolean",
-                default: "true",
+                default: "false",
                 description: "Allow selecting multiple files.",
               },
               {
@@ -236,9 +135,7 @@ export default function DropzonePage() {
           />
         </div>
 
-        <div className="text-xs font-mono text-muted-foreground p-3 rounded-sm bg-muted/50">
-          src/components/ui/Dropzone/Dropzone.tsx
-        </div>
+        <SourcePath path="src/components/ui/Dropzone/Dropzone.tsx" />
       </div>
     </Shell>
   );

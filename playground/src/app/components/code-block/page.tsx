@@ -1,94 +1,9 @@
 "use client";
 
-import { useState, useCallback } from "react";
 import { Shell } from "@/components/shell";
 import { SectionHeading } from "@/components/token-grid";
-import { ComponentPreview, PropsTable } from "@/components/component-preview";
-import { cn } from "@/lib/utils";
-import { Copy, Check, Download } from "lucide-react";
-
-// ── Demo CodeBlock ───────────────────────────────────────────────────────────
-
-function DemoCodeBlock({
-  code,
-  language,
-  filename,
-  showCopy = true,
-  showDownload = false,
-  maxHeight,
-}: {
-  code: string;
-  language?: string;
-  filename?: string;
-  showCopy?: boolean;
-  showDownload?: boolean;
-  maxHeight?: string;
-}) {
-  const [copied, setCopied] = useState(false);
-
-  const handleCopy = useCallback(() => {
-    navigator.clipboard.writeText(code);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  }, [code]);
-
-  const handleDownload = useCallback(() => {
-    const ext = language === "typescript" || language === "tsx" ? ".tsx" : language === "javascript" ? ".js" : language === "css" ? ".css" : ".txt";
-    const name = filename || `snippet${ext}`;
-    const blob = new Blob([code], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = name;
-    a.click();
-    URL.revokeObjectURL(url);
-  }, [code, filename, language]);
-
-  return (
-    <div className="rounded-sm border border-border overflow-hidden bg-muted/30">
-      {(filename || showCopy || showDownload) && (
-        <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-muted/50">
-          {filename && (
-            <span className="text-xs font-mono text-muted-foreground">
-              {filename}
-            </span>
-          )}
-          {!filename && <span />}
-          <div className="flex items-center gap-1">
-            {showDownload && (
-              <button
-                onClick={handleDownload}
-                className="p-1.5 rounded-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-                aria-label="Download"
-              >
-                <Download className="w-3.5 h-3.5" />
-              </button>
-            )}
-            {showCopy && (
-              <button
-                onClick={handleCopy}
-                className="p-1.5 rounded-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-                aria-label="Copy"
-              >
-                {copied ? (
-                  <Check className="w-3.5 h-3.5 text-green-500" />
-                ) : (
-                  <Copy className="w-3.5 h-3.5" />
-                )}
-              </button>
-            )}
-          </div>
-        </div>
-      )}
-      <pre
-        className={cn("p-4 text-sm leading-relaxed font-mono text-foreground overflow-x-auto", maxHeight && "overflow-y-auto")}
-        style={maxHeight ? { maxHeight } : undefined}
-      >
-        <code>{code}</code>
-      </pre>
-    </div>
-  );
-}
+import { ComponentPreview, PropsTable, SourcePath, SubsectionHeading} from "@/components/component-preview";
+import { CodeBlock } from "@ds/CodeBlock";
 
 // ── Code snippets ────────────────────────────────────────────────────────────
 
@@ -196,19 +111,25 @@ export function DataTable<T extends Record<string, unknown>>({
 
 // ── Snippet strings for code preview tab ─────────────────────────────────────
 
-const basicSnippet = `<DemoCodeBlock
+const basicSnippet = `import { CodeBlock } from "@ds/CodeBlock";
+
+<CodeBlock
   code={\`const greeting = "Hello, world!";
 console.log(greeting);\`}
   language="javascript"
 />`;
 
-const filenameSnippet = `<DemoCodeBlock
+const filenameSnippet = `import { CodeBlock } from "@ds/CodeBlock";
+
+<CodeBlock
   code={tsExample}
   language="typescript"
   filename="models/user.ts"
 />`;
 
-const copyDownloadSnippet = `<DemoCodeBlock
+const copyDownloadSnippet = `import { CodeBlock } from "@ds/CodeBlock";
+
+<CodeBlock
   code={cssExample}
   language="css"
   filename="tokens.css"
@@ -216,11 +137,13 @@ const copyDownloadSnippet = `<DemoCodeBlock
   showDownload
 />`;
 
-const scrollableSnippet = `<DemoCodeBlock
+const scrollableSnippet = `import { CodeBlock } from "@ds/CodeBlock";
+
+<CodeBlock
   code={longExample}
   language="typescript"
   filename="components/DataTable.tsx"
-  maxHeight="200px"
+  maxHeight={200}
   showCopy
 />`;
 
@@ -241,7 +164,7 @@ export default function CodeBlockPage() {
           code={basicSnippet}
         >
           <div className="w-full max-w-lg">
-            <DemoCodeBlock code={basicCode} language="javascript" />
+            <CodeBlock code={basicCode} language="javascript" />
           </div>
         </ComponentPreview>
 
@@ -251,7 +174,7 @@ export default function CodeBlockPage() {
           code={filenameSnippet}
         >
           <div className="w-full max-w-lg">
-            <DemoCodeBlock
+            <CodeBlock
               code={tsExample}
               language="typescript"
               filename="models/user.ts"
@@ -265,7 +188,7 @@ export default function CodeBlockPage() {
           code={copyDownloadSnippet}
         >
           <div className="w-full max-w-lg">
-            <DemoCodeBlock
+            <CodeBlock
               code={cssExample}
               language="css"
               filename="tokens.css"
@@ -281,20 +204,18 @@ export default function CodeBlockPage() {
           code={scrollableSnippet}
         >
           <div className="w-full max-w-lg">
-            <DemoCodeBlock
+            <CodeBlock
               code={longExample}
               language="typescript"
               filename="components/DataTable.tsx"
-              maxHeight="200px"
+              maxHeight={200}
               showCopy
             />
           </div>
         </ComponentPreview>
 
         <div>
-          <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-3">
-            Props
-          </h3>
+          <SubsectionHeading>Props</SubsectionHeading>
           <PropsTable
             props={[
               {
@@ -328,17 +249,15 @@ export default function CodeBlockPage() {
               },
               {
                 name: "maxHeight",
-                type: "string",
+                type: "number",
                 description:
-                  'CSS max-height value (e.g. "200px") for scrollable overflow',
+                  "Max height in pixels for scrollable overflow (e.g. 200)",
               },
             ]}
           />
         </div>
 
-        <div className="text-xs font-mono text-muted-foreground p-3 rounded-sm bg-muted/50">
-          src/components/ui/CodeBlock/CodeBlock.tsx
-        </div>
+        <SourcePath path="src/components/ui/CodeBlock/CodeBlock.tsx" />
       </div>
     </Shell>
   );

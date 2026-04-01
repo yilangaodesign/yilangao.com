@@ -3,10 +3,10 @@
 import { useState } from "react";
 import { Shell } from "@/components/shell";
 import { SectionHeading } from "@/components/token-grid";
-import { ComponentPreview, PropsTable } from "@/components/component-preview";
-import { Input } from "@/components/ui/Input";
+import { ComponentPreview, PropsTable, SourcePath, SubsectionHeading} from "@/components/component-preview";
+import { Input } from "@ds/Input";
 
-const defaultCode = `import { Input } from "@/components/ui/Input/Input";
+const defaultCode = `import { Input } from "@ds/Input";
 
 export function DefaultInputExample() {
   const [value, setValue] = useState("");
@@ -21,7 +21,7 @@ export function DefaultInputExample() {
   );
 }`;
 
-const labelHelperCode = `import { Input } from "@/components/ui/Input/Input";
+const labelHelperCode = `import { Input } from "@ds/Input";
 
 export function LabeledInputExample() {
   return (
@@ -33,7 +33,7 @@ export function LabeledInputExample() {
   );
 }`;
 
-const errorCode = `import { Input } from "@/components/ui/Input/Input";
+const errorCode = `import { Input } from "@ds/Input";
 
 export function InputErrorExample() {
   return (
@@ -46,7 +46,7 @@ export function InputErrorExample() {
   );
 }`;
 
-const disabledCode = `import { Input } from "@/components/ui/Input/Input";
+const disabledCode = `import { Input } from "@ds/Input";
 
 export function DisabledInputExample() {
   return (
@@ -158,9 +158,7 @@ export default function InputPage() {
         </ComponentPreview>
 
         <div>
-          <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-3">
-            Props
-          </h3>
+          <SubsectionHeading>Props</SubsectionHeading>
           <PropsTable
             props={[
               {
@@ -188,9 +186,7 @@ export default function InputPage() {
           />
         </div>
 
-        <div className="text-xs font-mono text-muted-foreground p-3 rounded-sm bg-muted/50">
-          src/components/ui/Input/Input.tsx
-        </div>
+        <SourcePath path="@ds/Input" />
       </div>
     </Shell>
   );

@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { Shell } from "@/components/shell";
 import { SectionHeading } from "@/components/token-grid";
-import { ComponentPreview, PropsTable } from "@/components/component-preview";
+import { ComponentPreview, PropsTable, SourcePath, SubsectionHeading} from "@/components/component-preview";
+import { ArrowReveal } from "@ds/ArrowReveal/ArrowReveal";
 
 function ArrowRevealDemo() {
   const [hovered, setHovered] = useState<number | null>(null);
@@ -18,61 +19,22 @@ function ArrowRevealDemo() {
           onMouseLeave={() => setHovered(null)}
         >
           <span className="text-sm font-medium">{text}</span>
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 20 20"
-            fill="none"
-            style={{
-              transform: `translateX(${hovered === i ? 4 : 0}px)`,
-              opacity: hovered === i ? 1 : 0.3,
-              transition: "transform 0.24s cubic-bezier(0.2, 0, 0.38, 0.9), opacity 0.24s cubic-bezier(0.2, 0, 0.38, 0.9)",
-            }}
-          >
-            <path d="M5 10h10m0 0l-4-4m4 4l-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
+          <ArrowReveal active={hovered === i}>
+            <svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path d="M5 10h10m0 0l-4-4m4 4l-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </ArrowReveal>
         </div>
       ))}
     </div>
   );
 }
 
-const code = `"use client";
+const code = `import { ArrowReveal } from "@/components/ArrowReveal";
 
-import { motion, useReducedMotion } from "framer-motion";
-import { TRANSITION_INDICATOR, getReducedTransition } from "@/lib/motion";
-
-export function ArrowReveal({
-  active,
-  children,
-  className,
-  xShift = 4,
-  restingOpacity = 0.3,
-}: {
-  active: boolean;
-  children: React.ReactNode;
-  className?: string;
-  xShift?: number;
-  restingOpacity?: number;
-}) {
-  const prefersReduced = useReducedMotion();
-  const transition = prefersReduced
-    ? getReducedTransition(TRANSITION_INDICATOR)
-    : TRANSITION_INDICATOR;
-
-  return (
-    <motion.div
-      className={className}
-      animate={{
-        x: active ? xShift : 0,
-        opacity: active ? 1 : restingOpacity,
-      }}
-      transition={transition}
-    >
-      {children}
-    </motion.div>
-  );
-}`;
+<ArrowReveal active={isHovered}>
+  <svg>...</svg>
+</ArrowReveal>`;
 
 export default function ArrowRevealPage() {
   return (
@@ -92,9 +54,7 @@ export default function ArrowRevealPage() {
         </ComponentPreview>
 
         <div>
-          <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-3">
-            Props
-          </h3>
+          <SubsectionHeading>Props</SubsectionHeading>
           <PropsTable
             props={[
               { name: "active", type: "boolean", description: "Whether the reveal is active (e.g., parent hovered)" },
@@ -107,28 +67,24 @@ export default function ArrowRevealPage() {
         </div>
 
         <div>
-          <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-3">
-            Motion Tokens Used
-          </h3>
+          <SubsectionHeading>Motion Tokens Used</SubsectionHeading>
           <ul className="space-y-2 text-sm text-muted-foreground">
             <li className="flex gap-2">
-              <span className="text-accent shrink-0">•</span>
+              <span className="text-accent shrink-0">&bull;</span>
               Preset: <code className="text-xs bg-muted px-1.5 py-0.5 rounded-sm font-mono">TRANSITION_INDICATOR</code>
             </li>
             <li className="flex gap-2">
-              <span className="text-accent shrink-0">•</span>
+              <span className="text-accent shrink-0">&bull;</span>
               Duration: <code className="text-xs bg-muted px-1.5 py-0.5 rounded-sm font-mono">DURATION.moderate</code> (0.24s)
             </li>
             <li className="flex gap-2">
-              <span className="text-accent shrink-0">•</span>
+              <span className="text-accent shrink-0">&bull;</span>
               Easing: <code className="text-xs bg-muted px-1.5 py-0.5 rounded-sm font-mono">EASING.standard</code>
             </li>
           </ul>
         </div>
 
-        <div className="text-xs font-mono text-muted-foreground p-3 rounded-sm bg-muted/50">
-          src/components/ArrowReveal.tsx
-        </div>
+        <SourcePath path="src/components/ArrowReveal.tsx" />
       </div>
     </Shell>
   );
