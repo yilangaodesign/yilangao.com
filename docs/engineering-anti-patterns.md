@@ -4,11 +4,13 @@
 >
 > **Who reads this:** AI agents before making code changes — scan for relevant anti-patterns.
 > **Who writes this:** AI agents when an incident reveals a new anti-pattern.
-> **Last updated:** 2026-03-30 (EAP-036: scroll hijack on embedded canvas via onWheel handler)
+> **Last updated:** 2026-03-31 (status markers added, resolved entries compacted)
 
 ---
 
 ## EAP-001: Manual Data Duplication Without Sync
+
+**Status: ACTIVE**
 
 **Trigger:** Defining the same data (colors, tokens, config) in multiple files and relying on manual discipline to keep them in sync.
 
@@ -21,6 +23,8 @@
 ---
 
 ## EAP-002: Killing Ports Without Checking What's Running
+
+**Status: ACTIVE**
 
 **Trigger:** Running `lsof -ti:PORT | xargs kill -9` as a first resort when a port conflict occurs.
 
@@ -36,6 +40,8 @@
 
 ## EAP-003: Assuming Dev Servers Persist Across Sessions
 
+**Status: ACTIVE**
+
 **Trigger:** Making code changes and expecting them to be visible without verifying the dev server is running.
 
 **Why it's wrong:** Dev servers crash, terminals close, machines restart. A server that was running in a previous chat session may be dead. If the agent makes changes but doesn't verify on localhost, the user discovers the issue — wasting their time and eroding trust.
@@ -49,6 +55,8 @@ If no server is running on the expected port, start it before making changes.
 ---
 
 ## EAP-004: Modifying Source of Truth Without Updating Consumers
+
+**Status: ACTIVE**
 
 **Trigger:** Editing a canonical file (e.g., `_colors.scss`) without updating all files that consume or mirror its data.
 
@@ -69,6 +77,8 @@ After modifying any source, run its sync mechanism and verify each consumer.
 
 ## EAP-005: Adding Infrastructure to One App Without Propagating to Co-Deployed Apps
 
+**Status: ACTIVE**
+
 **Trigger:** Installing a font package, adding `next/font` loading, or injecting CSS variables in the main app (`src/`) without doing the equivalent in the playground (`playground/`).
 
 **Why it's wrong:** The main app and the playground are separate Next.js apps with independent `package.json` files, layouts, and CSS. Adding a dependency or font pipeline to one does not affect the other. The playground renders design tokens — if the fonts those tokens reference aren't loaded, every font preview silently falls back to generic system fonts. The playground *appears* to work (no errors, no crashes), but the visual output is wrong. This is especially insidious because the token *data* can be correct (`var(--font-geist-sans)`) while the CSS variable is undefined, causing silent fallback.
@@ -86,6 +96,8 @@ After modifying any source, run its sync mechanism and verify each consumer.
 
 ## EAP-006: Hardcoded Inline Font Overrides in Component Previews
 
+**Status: ACTIVE**
+
 **Trigger:** Using `style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}` in component preview/demo code within the playground.
 
 **Why it's wrong:** Inline styles have maximum CSS specificity. When the body correctly sets `font-family: var(--font-sans)` (which resolves to Geist), an inline `fontFamily` override on any element silently replaces Geist with system fonts. The component looks "fine" (text renders), but it's not using the design system font. This is especially insidious because: (a) it produces no error, (b) system-ui on macOS looks similar to Geist Sans, making the difference hard to spot visually, and (c) the fix appears to work at the layout level while individual components secretly override it.
@@ -99,6 +111,8 @@ After modifying any source, run its sync mechanism and verify each consumer.
 ---
 
 ## EAP-008: Documenting Recurring Fixes in Docs Instead of Promoting to Rules
+
+**Status: ACTIVE**
 
 **Trigger:** A category of incident occurs 3+ times. Each time, the fix is documented in `docs/engineering.md` or `docs/engineering-anti-patterns.md`, but the check is never promoted to the rules layer (`AGENTS.md` Hard Guardrails or mandatory protocols).
 
@@ -116,6 +130,8 @@ After modifying any source, run its sync mechanism and verify each consumer.
 
 ## EAP-007: Adding Components to Main Site Without Playground Preview
 
+**Status: ACTIVE**
+
 **Trigger:** Creating a new reusable component in `src/components/` and integrating it into pages, but not creating a corresponding preview page in the playground (`playground/src/app/components/<slug>/page.tsx`) and not adding it to the sidebar navigation.
 
 **Why it's wrong:** The playground is the design system documentation UI — it's where components are discovered, previewed, and understood. A component that exists in the main site but not the playground is invisible to anyone browsing the design system. It won't appear in search, won't have a code example, won't have a props table, and won't be verifiable in isolation. This is the component-level equivalent of EAP-005 (infrastructure parity).
@@ -132,6 +148,8 @@ After modifying any source, run its sync mechanism and verify each consumer.
 ---
 
 ## EAP-009: Working Directly on `main`
+
+**Status: ACTIVE**
 
 **Trigger:** Starting a coding session and making changes without first creating a feature branch, leaving all work as uncommitted modifications on `main`.
 
@@ -160,6 +178,8 @@ git stash pop
 
 ## EAP-010: Fixing Incidents Without Following Documentation Procedures
 
+**Status: ACTIVE**
+
 **Trigger:** A user reports a bug or build failure mid-task. The agent fixes the immediate problem but does not follow the engineering-iteration skill (Step 5: Close the Loop) — no feedback log entry, no anti-pattern documentation, no engineering.md update.
 
 **Why it's wrong:** The fix itself is only half the value. The other half is the knowledge captured by documentation: what broke, why, and how to prevent it. When an agent context-switches from a current task to fix a bug and skips the documentation step, the incident becomes invisible. The next agent session has no record of it. If the same class of failure recurs, there's no history to detect the pattern.
@@ -179,6 +199,8 @@ Context-switching does not exempt the agent from documentation procedures.
 
 ## EAP-011: Node.js Built-in Imports in next.config.ts (Next.js 16)
 
+**Status: ACTIVE**
+
 **Trigger:** Importing Node.js built-in modules (`path`, `url`, `fs`, etc.) in `next.config.ts` when using Next.js 16.
 
 **Why it's wrong:** Next.js 16 compiles `next.config.ts` into `next.config.compiled.js` via a bundler. When the bundler encounters Node.js built-in imports, it emits CommonJS-style `require()` and `exports` in the output. However, the compiled file is executed in an ESM scope, causing `ReferenceError: exports is not defined in ES module scope`. The server starts, reports "Ready", and then immediately crashes — making it look like a runtime error rather than a config error.
@@ -197,6 +219,8 @@ Context-switching does not exempt the agent from documentation procedures.
 
 ## EAP-012: Installing Alternate Node Versions via Brew Without Checking Shared Library Impact
 
+**Status: ACTIVE**
+
 **Trigger:** Running `brew install node@22` when `node` (v25) is already installed and linked. Brew upgrades shared dependencies (e.g., `simdjson`) to versions incompatible with the existing linked Node.
 
 **Why it's wrong:** Brew's dependency resolution for the new formula can upgrade shared C libraries (simdjson, icu4c, etc.) that the existing linked Node binary was compiled against. This breaks the primary `node` binary with `dyld: Library not loaded` errors, making `npm`, `npx`, and all Node-dependent commands crash.
@@ -211,6 +235,8 @@ Context-switching does not exempt the agent from documentation procedures.
 ---
 
 ## EAP-013: Script Tags in React 19 / Next.js 16 Component Trees
+
+**Status: ACTIVE**
 
 **Trigger:** Rendering a `<script>` element in any React component tree — via raw `<script>`, `dangerouslySetInnerHTML`, or `next/script` (`<Script>`).
 
@@ -234,6 +260,8 @@ If a blocking script is truly required (analytics, third-party SDK), use `next/s
 
 ## EAP-014: Server/Client Branch Causing Hydration Mismatch
 
+**Status: ACTIVE**
+
 **Trigger:** Using `typeof window !== "undefined"` or `window.location` to conditionally render different text or elements in a client component.
 
 **Why it's wrong:** During SSR, `window` is undefined, so the server renders one branch. During client hydration, `window` exists, so the client renders the other branch. React detects the mismatch and throws a recoverable error: "Hydration failed because the server rendered text didn't match the client." The page still works (React re-renders the client tree), but it's a performance hit and a console error.
@@ -254,6 +282,8 @@ The initial render matches the server (false). After mount, `useEffect` updates 
 
 ## EAP-015: Bare `src/` Paths in Payload Admin Config
 
+**Status: ACTIVE**
+
 **Trigger:** Specifying a Payload admin component path (e.g. `beforeLogin`, `afterLogin`, custom views) using a bare string like `'src/components/admin/Foo'`.
 
 **Why it's wrong:** Payload copies the string verbatim into the generated `importMap.js` as an ES import specifier. Turbopack cannot resolve bare `src/...` paths — they're not relative, not aliased, and not in `node_modules`. This causes a `Module not found` build error that blocks both the admin panel and any SSR page touching the import map.
@@ -265,6 +295,8 @@ The initial render matches the server (false). After mount, `useEffect` updates 
 ---
 
 ## EAP-016: Conditional Rendering That Hides Inline-Editable Empty State
+
+**Status: ACTIVE**
 
 **Trigger:** Using `{cmsValue ? <EditableText>{cmsValue}</EditableText> : <p>hardcoded fallback</p>}` for an inline-editable field.
 
@@ -278,6 +310,8 @@ The initial render matches the server (false). After mount, `useEffect` updates 
 
 ## EAP-017: Panel "Done" That Only Stages Without Saving
 
+**Status: ACTIVE**
+
 **Trigger:** A modal/panel edit UI has a "Done" or "Close" button that writes changes to local state only, requiring a separate "Save" action elsewhere on the page to actually persist to the backend.
 
 **Why it's wrong:** Users universally expect the primary action button on a panel to complete the operation. A two-step stage-then-save workflow is a dark pattern that guarantees data loss: the user thinks they've saved, navigates away, and their changes vanish. The bottom save bar may be hidden behind the modal or go unnoticed.
@@ -290,6 +324,8 @@ The initial render matches the server (false). After mount, `useEffect` updates 
 
 ## EAP-018: React `useCallback` Save That Reads Stale `dirtyFields` Closure
 
+**Status: ACTIVE**
+
 **Trigger:** A `save()` function created with `useCallback(..., [dirtyFields])` that reads `dirtyFields` from its closure, called immediately after a `setFieldValue()` that queues a state update.
 
 **Why it's wrong:** React 18+ batches state updates. `setFieldValue()` queues a `setDirtyFields(prev => ...)` update but doesn't apply it synchronously. The `save()` callback still sees the OLD `dirtyFields` from the previous render. It saves zero changes and succeeds silently. This is especially insidious because there's no error — the save just does nothing.
@@ -301,6 +337,8 @@ The initial render matches the server (false). After mount, `useEffect` updates 
 ---
 
 ## EAP-019: Single-Layer CMS Field Changes
+
+**Status: ACTIVE**
 
 **Trigger:** Adding a field to the Payload schema, or to the frontend TypeScript type / inline edit fields, without updating all three layers of the CMS data stack (schema → data fetch → UI).
 
@@ -317,11 +355,9 @@ This class of bug is especially dangerous because there are no error messages �
 
 ---
 
-## Entry Template
-
----
-
 ## EAP-020: Raw API Response Bodies as User-Facing Error Messages
+
+**Status: ACTIVE**
 
 **Trigger:** Throwing `new Error(\`Failed: ${response.status} — ${await response.text()}\`)` and displaying the result directly in the UI.
 
@@ -337,6 +373,8 @@ This class of bug is especially dangerous because there are no error messages �
 
 ## EAP-021: Over-Zealous Required Constraints That Block Partial Saves
 
+**Status: ACTIVE**
+
 **Trigger:** Marking CMS fields as `required: true` based on data completeness ideals rather than user flow requirements.
 
 **Why it's wrong:** A required field that blocks saving forces the user to complete the entire form in one session. This prevents partial progress — users can't save a placeholder item (e.g. a link with a label but no URL yet) and come back later. The "required" constraint should reflect whether the system genuinely cannot function without the value, not whether the value is "nice to have." For a link, a missing URL means the link isn't clickable yet — but the label is still meaningful as a placeholder.
@@ -351,6 +389,8 @@ This class of bug is especially dangerous because there are no error messages �
 
 ## EAP-022: Index-as-Key on Draggable Lists Breaks Re-Grab
 
+**Status: ACTIVE**
+
 **Trigger:** Using `key={index}` in `Array.map()` for a drag-and-drop reorderable list.
 
 **Why it's wrong:** When items are reordered, React reconciles by key. With `key={index}`, keys never change (0, 1, 2, …) so React reuses the same physical DOM nodes — it updates their props/content rather than creating new elements. The browser retains drag state on the physical DOM node that just completed a drag operation. On the next drag attempt, that node's stale browser drag state prevents `dragstart` from initiating properly. The drag handle appears visually correct but is non-functional for any item that changed position.
@@ -362,6 +402,8 @@ This class of bug is especially dangerous because there are no error messages �
 ---
 
 ## EAP-023: Payload `type: 'email'` with contentEditable Inline Editing
+
+**Status: ACTIVE**
 
 **Trigger:** Using Payload's `type: 'email'` field type for a value that is edited inline via `contentEditable`.
 
@@ -375,6 +417,8 @@ This class of bug is especially dangerous because there are no error messages �
 
 ## EAP-024: Error-Swallowing Save Functions
 
+**Status: ACTIVE**
+
 **Trigger:** A `save()` function that catches all errors internally (setting error state) without re-throwing, while callers `await save()` expecting to detect failure.
 
 **Why it's wrong:** Callers like `EditableArray.commitPanel()` use `try/catch` or conditional logic after `await save()` to decide what to do next (e.g., close the panel on success, keep it open on failure). If `save()` catches internally and never re-throws, it always resolves successfully from the caller's perspective. The caller closes the panel, the user thinks the save worked, but it didn't. This is a silent data loss pattern.
@@ -384,6 +428,8 @@ This class of bug is especially dangerous because there are no error messages �
 **Incident:** ENG-038 (2026-03-29) — EditableArray panel closed even when save failed.
 
 ## EAP-025: Nested Anchor Elements
+
+**Status: ACTIVE**
 
 **Trigger:** Wrapping one `<a>` element inside another `<a>` element — e.g. a card link containing a secondary action link.
 
@@ -396,6 +442,8 @@ This class of bug is especially dangerous because there are no error messages �
 ---
 
 ## EAP-026: Cookie-Based Auth Check When Auth Mechanism Doesn't Set Cookies
+
+**Status: ACTIVE**
 
 **Trigger:** Using `cookies().get('payload-token')` to detect whether the user is a Payload admin, when the actual authentication mechanism (auto-login in dev) authenticates server-side without setting a browser cookie.
 
@@ -411,6 +459,8 @@ This class of bug is especially dangerous because there are no error messages �
 ---
 
 ## EAP-027: Documentation Skips During Rapid-Fire Debugging
+
+**Status: ACTIVE**
 
 **Trigger:** A user reports an issue. The agent fixes it and responds. The user immediately reports another issue (often caused by the first fix). The agent enters a tight fix→respond→fix→respond loop. Documentation is deferred "until the chain of issues is resolved." The chain ends but documentation never happens.
 
@@ -431,6 +481,8 @@ This makes documentation a pre-condition of the response, not a post-condition.
 
 ## EAP-028: Partial Cross-App Sync on Shared Components
 
+**Status: ACTIVE**
+
 **Trigger:** Modifying a component that exists in both `src/components/` and `playground/src/components/` (or its demo page) but only updating one version and not the other.
 
 **Why it's wrong:** The playground is the design system's public documentation surface. When the playground shows outdated behavior or visuals, it teaches consumers the wrong patterns. Worse, when two versions of the same component diverge over multiple sessions, the drift compounds: each version accumulates fixes the other lacks, making reconciliation increasingly expensive. In this case, the main site had outdated behavior (linear interpolation, no dead zone) while the playground had outdated visuals (no label differentiation, AP-031 centering bug) — neither was the "correct" version.
@@ -440,6 +492,8 @@ This makes documentation a pre-condition of the response, not a post-condition.
 **Incident:** ENG-042 (2026-03-30) — ScrollSpy had 6 discrepancies across 3 codebases after 2 sessions of partial updates.
 
 ## EAP-029: New Components Rendering CMS Data Without Inline Edit Wiring
+
+**Status: ACTIVE**
 
 **Trigger:** Creating a new component that renders data from a Payload collection or global, but not wrapping its text fields with `EditableText`, not passing `id`/`isAdmin`, and not including an `EditButton`.
 
@@ -475,6 +529,8 @@ The failure mode is especially insidious because the component *looks correct* t
 
 ## EAP-030: Filtering on Newly-Added Fields That Have No Data Yet
 
+**Status: ACTIVE**
+
 **Trigger:** Adding a new boolean/enum field to a Payload collection schema and immediately using it as a `where` filter in a query (e.g., `where: { showOnHome: { equals: true } }`).
 
 **Why it's wrong:** When a new field is added to the schema, existing documents in the database don't have it. Even after a server restart, the field defaults to `false`/`null`/`undefined` for all pre-existing documents. A query filtering for `field === true` returns 0 results — silently dropping all existing data from the feature. The consuming code falls back to hardcoded data (which lacks CMS document IDs), breaking downstream features like inline editing that depend on real document IDs.
@@ -491,6 +547,8 @@ This is especially insidious because: (a) no errors are thrown, (b) the page sti
 ---
 
 ## EAP-031: Bare `*` Selector in CSS Modules
+
+**Status: ACTIVE**
 
 **Trigger:** Writing a `*` or `*::before` selector at the top level (or inside `@media`) in a `.module.scss` file.
 
@@ -512,6 +570,8 @@ This is especially insidious because: (a) no errors are thrown, (b) the page sti
 ---
 
 ## EAP-053: DnD Listeners on Child Element Inside a Link Wrapper
+
+**Status: ACTIVE**
 
 **Trigger:** Placing `@dnd-kit` (or any DnD library) `useSortable` listeners on a `<button>` or `<div>` that is a sibling or child of a `<Link>`/`<a>` element, where the link covers the same visual area as the intended drag target.
 
@@ -540,6 +600,8 @@ This is especially insidious because: (a) no errors are thrown, (b) the page sti
 ---
 
 ## EAP-054: Client Mutation Without router.refresh() in App Router
+
+**Status: ACTIVE**
 
 **Trigger:** A client component POSTs/PATCHes data to the backend (e.g., CMS global, collection item) and then updates local React state (e.g., exits a modal, clears a form) — but does **not** call `router.refresh()` to re-run the parent server component that originally fetched the data.
 
@@ -571,6 +633,8 @@ const display = hasPendingSave ? optimisticData : serverProp;
 
 ## EAP-032: Architectural Changes Without engineering.md Update
 
+**Status: ACTIVE**
+
 **Trigger:** Making a significant infrastructure or architecture change (adding a storage adapter, changing the database, adding a new service layer) and only logging it in the feedback log without updating `engineering.md` with the architectural principle and operational details.
 
 **Why it's wrong:** The feedback log is an incident history — it records what happened. `engineering.md` is the operational knowledge base — it tells future agents how the system works and what rules to follow. An architectural change documented only in the feedback log is effectively invisible: no agent will proactively read the feedback log before making infrastructure decisions. The feedback log entry for ENG-053 said "Supabase Storage was added" but didn't create a new section in `engineering.md` explaining the storage architecture, the env vars needed, the bucket configuration, the public URL pattern, or the verification steps. A future agent adding a new upload collection would have no guidance.
@@ -589,6 +653,8 @@ This is a variant of EAP-027 (documentation skips during rapid-fire debugging), 
 
 ## EAP-033: Schema Type Change Without Immediate Server Restart
 
+**Status: ACTIVE**
+
 **Trigger:** Changing a Payload field type (e.g. `textarea` → `richText`) in the collection schema file without immediately restarting the dev server before the user can interact with the changed field.
 
 **Why it's wrong:** Payload syncs the database schema only at startup. Between the code change and the restart, the old schema is still active. If the inline edit system saves data in the new format (e.g. Lexical JSON for richText), Payload stores it according to the old field type (e.g. serializes the object to a string for textarea). This creates corrupted data — a JSON object stored as a string — that breaks all downstream consumers expecting either a plain string or a parsed object.
@@ -599,25 +665,15 @@ This is a variant of EAP-027 (documentation skips during rapid-fire debugging), 
 
 ---
 
-## EAP-034: S3-Compatible Storage Without Filename Sanitization
+## EAP-034: S3-Compatible Storage Without Filename Sanitization — RESOLVED
 
-**Trigger:** Using `@payloadcms/storage-s3` with Supabase Storage (or any S3-compatible provider) without sanitizing filenames before they become S3 object keys.
-
-**Why it's wrong:** Supabase Storage's S3 API rejects object keys containing square brackets (`[]`), curly braces (`{}`), and certain other characters that are valid in local filesystems. The `@payloadcms/storage-s3` plugin passes `data.filename` directly to `PutObject` as the S3 key. When the user uploads a file like `[Gao_Yilan] Resume_2026.pdf`, S3 returns `InvalidKey` (HTTP 400), and Payload surfaces a generic "Something went wrong" toast with no indication of what's actually wrong. The user retries, fails again, and has no path to resolution.
-
-**Correct alternative:** Add a `beforeChange` hook on any upload collection that sanitizes `data.filename` and all `data.sizes[*].filename` by:
-1. Stripping brackets and parentheses
-2. Replacing non-alphanumeric characters (except `.`, `-`, `_`) with hyphens
-3. Collapsing consecutive hyphens
-4. Trimming leading/trailing hyphens
-
-This runs before the cloud storage plugin's `afterChange` hook, which reads `data.filename` for the S3 key.
-
-**Incident:** ENG-060 — `[Gao_Yilan] Resume_2026.pdf` caused `InvalidKey` on Supabase Storage S3.
+**Status: RESOLVED** — `beforeChange` hook added to all upload collections to sanitize filenames (strip brackets, replace special chars, collapse hyphens) before S3 upload. See ENG-060.
 
 ---
 
 ## EAP-035: Stale Turbopack Cache After Component Removal
+
+**Status: ACTIVE**
 
 **Trigger:** Removing a component from source code while the dev server is running (or was previously running), and not clearing the `.next` cache before restarting.
 
@@ -637,6 +693,8 @@ A simple server restart is not sufficient — Turbopack may rebuild from its cac
 
 ## EAP-036: Scroll Hijack on Embedded Canvas via onWheel Handler
 
+**Status: ACTIVE**
+
 **Trigger:** Adding an `onWheel` handler to an embedded canvas/viewport element that pans the canvas on bare wheel (non-modifier-key) scroll events.
 
 **Why it's wrong:** When a user scrolls through a page and their cursor passes over an embedded canvas, the wheel events get intercepted by the canvas handler. The page stops scrolling (or scroll becomes erratic as both page and canvas respond). This is a scroll hijack — the user's intent is to scroll the page, not to pan an embedded widget. Infinite canvases (Figma, Miro, Google Maps) occupy the full viewport — they OWN the scroll. Embedded canvases inside scrollable pages must defer to the page's scroll.
@@ -647,7 +705,9 @@ A simple server restart is not sufficient — Turbopack may rebuild from its cac
 
 ---
 
-## EAP-030: One-Way Playground Experiment
+## EAP-038: One-Way Playground Experiment
+
+**Status: ACTIVE**
 
 **Trigger:** A design experiment (button API, spacing tokens, typography mixins) is conducted in the playground without propagating the results to production, or vice versa.
 
@@ -659,8 +719,9 @@ A simple server restart is not sufficient — Turbopack may rebuild from its cac
 
 ---
 
-```markdown
 ## EAP-055: Hardcoded Pixels/Hex in Playground Tailwind When Token CSS Vars Exist
+
+**Status: ACTIVE**
 
 **Trigger:** Building a playground Demo* component using Tailwind arbitrary values with raw pixel or hex values (e.g., `h-[48px]`, `bg-[#161616]`, `bg-emerald-600`) when the corresponding design system CSS custom properties exist or could be trivially added.
 
@@ -672,6 +733,35 @@ A simple server restart is not sufficient — Turbopack may rebuild from its cac
 
 ---
 
+## EAP-037: Re-implementing Production Components in Playground Tailwind
+
+**Status: ACTIVE**
+
+**Trigger:** Creating a `DemoButton`, `DemoSlider`, etc. function in a playground demo page that re-implements the production component's behavior and appearance using Tailwind classes, CSS `@keyframes`, or inline `style={{}}` instead of importing the production component.
+
+**Why it's wrong:** This creates parallel implementations of the same component with the same prop API but different CSS systems. Every production component change requires a manual update to the playground's `Demo*` version. With 19+ components, drift is guaranteed — the playground shows a stale or divergent version of the component. Over 2,400 lines of Tailwind re-implementation accumulated before the pattern was recognized. A second audit (ENG-075) found 16 pages still violated the rule even after ENG-073, covering ui components, non-ui site components, motion primitives, and trigger buttons.
+
+**Correct alternative:** Import the production component directly:
+- `@ds/*` for `src/components/ui/` components (TypeScript path alias → `../src/components/ui/*`)
+- `@site/*` for `src/components/` components (TypeScript path alias → `../src/components/*`)
+- Bridge files in `playground/src/lib/` and `playground/src/components/` for `@/` alias resolution conflicts
+
+SCSS Module class names are scoped/hashed and coexist with Tailwind utilities without conflicts. Demo pages should be thin harnesses: import + layout + state + PropsTable. Never write component styling in a demo page.
+
+**Enforcement:** Three-stage pipeline prevents recurrence:
+1. **Intent Gate** (AGENTS.md Engineering Guardrail #18) — central, non-bypassable classification. Component visual changes go to `src/components/`, never playground pages. Documentation/structure edits and shell edits are explicitly allowed.
+2. **ESLint Safety Net** (`eslint.config.mjs` scoped override) — inline custom plugin bans `@radix-ui/*` imports, `<style>` tags, most `style={{}}`, and Tailwind default palette colors in playground component pages.
+3. **Evaluation Gate** (playground skill) — mandatory post-implementation self-check. Agent verifies placement, tech stack match, and visual quality with a 3-attempt correction loop.
+
+Supporting layers: File-scoped rule (`.cursor/rules/playground-components.md`), Skill (`.cursor/skills/playground/SKILL.md`), AGENTS.md Guardrail #17 (mandatory skill read).
+
+**Incident:** ENG-073 (2026-03-30) — initial migration. ENG-075 (2026-03-30) — comprehensive audit + three-layer enforcement. ENG-076 (2026-03-30) — three-stage pipeline (Intent Gate + ESLint + Evaluation Gate).
+
+---
+
+## Entry Template
+
+```markdown
 ## EAP-NNN: [Short Name]
 
 **Trigger:** [What action or pattern triggers this]

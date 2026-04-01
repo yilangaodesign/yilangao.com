@@ -5,6 +5,8 @@
 > **Who reads this:** AI agents at session start (scan recent entries for context), and during content feedback processing (check for recurring patterns).
 > **Who writes this:** AI agents after each content feedback cycle.
 > **Last updated:** 2026-03-30 (CFB-019: Token Architecture tab IA inverted — rationale before anatomy, section blurb missing domain context)
+>
+> **For agent skills:** Read only the first 30 lines of this file (most recent entries) for pattern detection. The full file is a historical audit trail — do not read it in its entirety during normal work.
 
 ---
 

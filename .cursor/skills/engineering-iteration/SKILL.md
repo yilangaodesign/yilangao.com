@@ -1,3 +1,12 @@
+---
+name: engineering-iteration
+description: >-
+  Processes engineering incidents through a structured loop: parse the
+  issue, check existing knowledge, diagnose root cause, implement fix,
+  close the loop with documentation. Use when something is broken, data
+  doesn't save, builds fail, or infrastructure misbehaves.
+---
+
 # Skill: Engineering Iteration Feedback Loop
 
 ## Processing Engineering Feedback
@@ -13,16 +22,23 @@ Don't just fix the surface symptom. Ask:
 - **Is this an architecture issue?** (the system design makes this failure possible)
 - **Is this the same category as a previous incident?** (check feedback log)
 
-**Cross-category check (mandatory):** Before proceeding, ask: **does this feedback also have a design or content dimension?** User feedback about "confusing UI", "unclear fields", "bad labels", or "missing instructions" is almost always multi-dimensional:
+**Cross-category check (mandatory):**
+> If `[ORCHESTRATED]`: skip this cross-category check. The orchestrator already
+> decomposed the request into category-specific tasks.
+
+Before proceeding, ask: **does this feedback also have a design or content dimension?** User feedback about "confusing UI", "unclear fields", "bad labels", or "missing instructions" is almost always multi-dimensional:
 - A confusing form is a **design** issue (missing labels, bad affordances) AND possibly a **content** issue (poor microcopy, database names as user-facing labels) AND an **engineering** issue (missing schema fields).
 - If other dimensions exist, note them now. You will document them in Step 5.
 
 ### Step 2: Check Existing Knowledge
 
-Before writing code:
-1. Read the **full** `docs/engineering.md` — not just the Section Index. Incident processing requires complete context, even if pre-flight only loaded one section.
-2. Read `docs/engineering-anti-patterns.md` for matching anti-patterns.
-3. If a documented solution exists, **apply it directly** — don't re-derive.
+Before making changes:
+1. Read `docs/engineering.md` Section Index — identify sections matching this incident.
+2. Read §0 (Engineering Posture) from the hub file.
+3. Read the matching spoke file(s) from `docs/engineering/` (the Section Index has a File column pointing to each spoke).
+4. Read `docs/engineering-anti-patterns.md` (focus on active entries).
+5. Read the first 30 lines of `docs/engineering-feedback-log.md` (most recent entries) for recurring pattern detection.
+6. If a documented solution exists, **apply it directly** — don't re-derive.
 
 ### Step 3: Reproduce and Diagnose
 
@@ -87,11 +103,25 @@ At the end of a session that involved engineering incidents:
 3. Verify any new sync scripts or automations are working.
 4. Update the "Last updated" date on all modified docs.
 
+## Operating Under Orchestrator Dispatch
+
+When `[ORCHESTRATED]` appears in your context:
+- BEFORE implementation: write the 2-line stub to the feedback log using the
+  pre-assigned ID from your dispatch instructions (entry header + "Resolution
+  pending (orchestrated)"). This must happen before any code changes (per EAP-027).
+- Follow Steps 1-4 as normal (except skip the cross-category check in Step 1)
+- Replace Step 5 with:
+  1. Include a full `## Draft Documentation` section in your response (using the same pre-assigned ID)
+  2. Include a `## Files Modified` section listing every file you created or changed
+  3. Include a `## Server Operations Needed` section if applicable
+- Do NOT write to any docs/ files other than the initial 2-line stub
+
 ## File Map
 
 | File | Purpose | Read When | Write When |
 |------|---------|-----------|------------|
 | `docs/engineering.md` | Accumulated engineering principles | Before any code work | After processing incidents |
+| `docs/engineering/*.md` | Topic-specific engineering principles (spokes) | When the Section Index points to a matching topic | After processing feedback |
 | `docs/engineering-feedback-log.md` | Chronological incident history | Session start, during incidents | After each incident resolution |
 | `docs/engineering-anti-patterns.md` | Things to never do | Before writing code | After discovering a new anti-pattern |
 | `docs/port-registry.md` | Live port assignments | Before starting any server | After starting/stopping servers |

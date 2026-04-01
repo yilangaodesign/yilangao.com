@@ -4,11 +4,13 @@
 >
 > **Who reads this:** AI agents before writing or editing portfolio content — scan for relevant anti-patterns.
 > **Who writes this:** AI agents when a content feedback cycle reveals a new anti-pattern.
-> **Last updated:** 2026-03-30 (CAP-016: feature-list case study — showing WHAT without WHY)
+> **Last updated:** 2026-03-31 (status markers added, resolved entries compacted)
 
 ---
 
 ## CAP-001: Process-First Case Study Narrative
+
+**Status: ACTIVE**
 
 **Trigger:** Opening a case study with "First we did research, then we ideated, then we prototyped, then we tested..."
 
@@ -21,6 +23,8 @@
 ---
 
 ## CAP-002: Generic Positioning Statement
+
+**Status: ACTIVE**
 
 **Trigger:** Using phrases like "I design delightful experiences", "I'm a passionate UX designer", "I create user-centered solutions", or any tagline that could describe every designer on earth.
 
@@ -35,6 +39,8 @@
 
 ## CAP-003: Screenshot Gallery Without Narrative Context
 
+**Status: ACTIVE**
+
 **Trigger:** A page full of screenshots with no text explaining what the reader is looking at, why it matters, or what decisions it represents.
 
 **Why it's wrong:** Visuals matter, but they are evidence, not the argument. A hiring manager looking at 15 uncontextualized screenshots cannot distinguish "this person shipped impressive work" from "this person took screenshots of someone else's work." Without 1-3 sentences of framing per section, the reader can't evaluate the designer's thinking — only their visual output.
@@ -44,6 +50,8 @@
 ---
 
 ## CAP-004: Vague Impact Claims
+
+**Status: ACTIVE**
 
 **Trigger:** "Improved the user experience", "Increased engagement", "Made it easier to use", or any impact statement that cannot be verified or compared.
 
@@ -59,6 +67,8 @@
 
 ## CAP-005: Overloaded Project Count
 
+**Status: ACTIVE**
+
 **Trigger:** Featuring 8-15 projects on the homepage, including uneven quality or projects from significantly different career stages.
 
 **Why it's wrong:** An exhaustive project list signals "I included everything" rather than "I chose what's most relevant." It's the equivalent of a feature-bloated product page. The hiring manager must now evaluate which projects are worth clicking — a job the designer should have done for them. Weak projects dilute the signal from strong ones.
@@ -68,6 +78,8 @@
 ---
 
 ## CAP-006: Burying the Lede
+
+**Status: ACTIVE**
 
 **Trigger:** A case study that opens with 2-3 paragraphs of company background, team structure, or problem context before stating what was actually designed and what happened.
 
@@ -81,6 +93,8 @@
 
 ## CAP-007: Explaining Instead of Showing for Internal Tools
 
+**Status: ACTIVE**
+
 **Trigger:** Writing 3-4 paragraphs describing what an internal tool does because the reader can't access it, instead of showing high-fidelity screenshots and annotated walkthroughs.
 
 **Why it's wrong:** Text-heavy descriptions of internal tools read as "I can't show you the work." This is a red flag for hiring managers who want to evaluate visual and interaction design quality. The constraint of a firewall does not change the hiring manager's need — they still need to SEE the work. More text is not the answer; better visuals are.
@@ -91,6 +105,8 @@
 
 ## CAP-008: Tool Logo Grids on About Page
 
+**Status: ACTIVE**
+
 **Trigger:** A grid of tool/technology logos (Figma, Sketch, Adobe XD, React, etc.) as a way to communicate skills.
 
 **Why it's wrong:** Every product designer uses Figma. Listing tools communicates nothing about how you use them, at what depth, or in what context. A logo grid is visual filler that takes space from more meaningful content. It also dates quickly as tools change.
@@ -100,6 +116,8 @@
 ---
 
 ## CAP-009: Leading with Personal Photo/Bio Before Professional Relevance
+
+**Status: ACTIVE**
 
 **Trigger:** Homepage hero section that features a personal photo or long bio before any evidence of professional work.
 
@@ -113,6 +131,8 @@
 
 ## CAP-010: Overly Experimental Portfolio That Sacrifices Usability
 
+**Status: ACTIVE**
+
 **Trigger:** A portfolio with custom scroll behavior, abstract navigation, unconventional layouts, or creative experiments that make it harder for a hiring manager to find and evaluate case studies.
 
 **Why it's wrong:** The portfolio itself is evaluated as a design artifact. A confusing, inaccessible, or slow portfolio is a silent case study that argues against the designer's judgment. Hiring managers evaluating 30+ portfolios will not spend time learning a novel navigation paradigm. The irony of a UX designer with poor portfolio UX is not lost on them.
@@ -123,6 +143,8 @@
 
 ## CAP-011: Title Inflation in Role Field
 
+**Status: ACTIVE**
+
 **Trigger:** Using a role title that implies a seniority level the designer didn't hold (e.g., "Lead Product Designer" when the actual title was "Design Intern" or "Junior Designer"), justified by the fact that they led the project.
 
 **Why it's wrong:** Hiring managers verify claims. If the reference check reveals the candidate was an intern while the portfolio says "Lead Designer," the dishonesty undermines everything else in the portfolio — even the legitimate achievements. It also fails the specificity principle: if the role is inflated, what else might be? Trust, once lost, doesn't recover.
@@ -132,6 +154,8 @@
 ---
 
 ## CAP-012: Database Column Names as User-Facing Labels
+
+**Status: ACTIVE**
 
 **Trigger:** Using the Payload/database field name (e.g., "name", "url", "href", "period") directly as the user-visible label in an editing panel, form, or admin UI — without translating it to human-readable language.
 
@@ -148,11 +172,9 @@ For fields with non-obvious formats, add a help line or placeholder with an exam
 
 ---
 
-## Entry Template
-
----
-
 ## CAP-013: System Error Dumps as User-Facing Copy
+
+**Status: ACTIVE**
 
 **Trigger:** Displaying raw API error responses, JSON payloads, HTTP status codes, or internal field paths (e.g. `socialLinks.0.href`) directly to the user.
 
@@ -164,21 +186,11 @@ For fields with non-obvious formats, add a help line or placeholder with an exam
 - Assemble into a single sentence: "Could not save — Link 1 → URL is required."
 - Provide contextual fallbacks for auth errors ("session expired"), server errors ("try again in a moment")
 
-```markdown
-## CAP-NNN: [Short Name]
-
-**Trigger:** [What content pattern triggers this]
-
-**Why it's wrong:** [The strategic and perceptual reason]
-
-**Correct alternative:** [What to do instead]
-
-**Reference:** [Optional — example from competitive analysis]
-```
-
 ---
 
 ## CAP-014: Ship Dates in Duration Field (Redundant Metadata)
+
+**Status: ACTIVE**
 
 **Trigger:** Using the Duration metadata field to display when a project shipped (e.g., "Shipped August 2022") instead of how long it took.
 
@@ -192,6 +204,8 @@ For fields with non-obvious formats, add a help line or placeholder with an exam
 
 ## CAP-015: Strategic Transparency Leak
 
+**Status: ACTIVE**
+
 **Trigger:** Including content in a case study that reveals meta-strategy (how you position yourself in the market, your hiring optimization framework, your competitive intelligence approach) rather than demonstrable craft (what you built, why you made specific design decisions, and what trade-offs you navigated).
 
 **Why it's wrong:** A case study's job is to demonstrate capability and decision-making quality. Strategic frameworks — conversion funnels applied to hiring, probability models for recruiter behavior, competitive analysis methodologies — are valuable *because they're not public*. Publishing them doesn't showcase a design skill; it gives away an edge. The hiring manager reads a case study to evaluate "can this person do the job?" not "does this person know growth frameworks?" Revealing the meta-strategy also risks appearing manipulative rather than competent.
@@ -204,6 +218,8 @@ For fields with non-obvious formats, add a help line or placeholder with an exam
 
 ## CAP-016: Feature-List Case Study (Showing WHAT Without WHY)
 
+**Status: ACTIVE**
+
 **Trigger:** A case study section that describes what was built, what tools were used, or what the output looks like — without explaining why those decisions were made, what alternatives were evaluated, or what trade-offs were accepted.
 
 **Why it's wrong:** Feature lists are a junior signal (§6.1). "I built a token architecture using property·role·emphasis naming" tells the reader what happened. "I evaluated IBM Carbon's flat naming, Material Design's role tokens, and Goldman Sachs's property-first hierarchy, then chose property·role·emphasis because the name itself becomes machine-readable documentation for AI agents" tells the reader how this person thinks. Hiring managers at senior levels evaluate decision-making quality, not output volume. A case study that lists features reads like a project brief, not evidence of design leadership.
@@ -211,3 +227,19 @@ For fields with non-obvious formats, add a help line or placeholder with an exam
 **Correct alternative:** Every case study section must answer "why I designed it this way" — not just "what I built." Structure: (1) what the problem or decision point was, (2) what alternatives were considered, (3) why this approach was chosen, (4) what trade-offs were accepted. The feature/output is supporting evidence for the decision, not the headline.
 
 **Reference:** CFB-014 — Élan case study restructured from WHAT-focused ("Here's the token architecture") to WHY-focused ("I evaluated three naming conventions and chose property·role·emphasis because agents can parse it without a lookup table").
+
+---
+
+## Entry Template
+
+```markdown
+## CAP-NNN: [Short Name]
+
+**Trigger:** [What content pattern triggers this]
+
+**Why it's wrong:** [The strategic and perceptual reason]
+
+**Correct alternative:** [What to do instead]
+
+**Reference:** [Optional — example from competitive analysis]
+```

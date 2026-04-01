@@ -1,3 +1,12 @@
+---
+name: doc-audit
+description: >-
+  Periodic health check for the agent knowledge base. Runs static checks
+  (stale references, missing files, formatting) and semantic analysis
+  (contradictions, redundancies). Suggested every 7 days or when docs
+  feel inconsistent.
+---
+
 # Skill: Doc Self-Audit
 
 Periodic health check for the agent knowledge base. Combines static analysis with AI-powered semantic review to keep docs organized, deduplicated, and discoverable.

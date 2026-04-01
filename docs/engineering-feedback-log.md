@@ -4,7 +4,45 @@
 >
 > **Who reads this:** AI agents at session start (scan recent entries for context), and during incident response (check for recurring patterns).
 > **Who writes this:** AI agents after each incident resolution via the `engineering-iteration` skill.
-> **Last updated:** 2026-03-30 (ENG-072: DAG canvas wheel handler hijacks page scroll)
+> **Last updated:** 2026-04-01 (ENG-077: Local dev servers down; playground SCSS undefined semantic tokens)
+>
+> **For agent skills:** Read only the first 30 lines of this file (most recent entries) for pattern detection. The full file is a historical audit trail — do not read it in its entirety during normal work.
+
+---
+
+## Session: 2026-04-01 — Local dev not loading; playground HTTP 500
+
+#### ENG-077: "Playground UI, website UI, and Payload UI not loading on localhost"
+
+**Issue:** No processes were listening on ports 4000 or 4001 — `curl` to both failed. After starting `npm run dev` and `npm run playground`, the main site and `/admin` returned HTTP 200, but the playground root returned 500. Turbopack/Sass reported undefined variables: `$portfolio-text-tertiary` and `$portfolio-overlay-black-40` in multiple `src/components/ui/**/*.module.scss` files (imported via the playground sidebar’s barrel import).
+
+**Root Cause:** (1) Dev servers had not been started in this environment (stale entries in `docs/port-registry.md` implied they were running). (2) Component SCSS referenced semantic token names that were never added to `src/styles/tokens/_colors.scss` — the names were plausible (parallel to `$portfolio-text-secondary`, denser overlay step) but missing from the canonical palette.
+
+**Resolution:** Started `npm run dev` (port 4000) and `npm run playground` (port 4001). Added `$portfolio-text-tertiary` (legacy alias → `$portfolio-text-neutral-subtle`) and `$portfolio-overlay-black-40: rgba(0, 0, 0, 0.40)` to `_colors.scss`, ran `npm run sync-tokens`, restarted the playground dev server so Turbopack picked up the token file. Verified HTTP 200 on `http://127.0.0.1:4000/`, `http://127.0.0.1:4000/admin`, and `http://127.0.0.1:4001/`.
+
+**Cross-category note:** Design tokens / naming consistency — any new semantic SCSS name must exist in `tokens/_colors.scss` before use in components.
+
+---
+
+## Session: 2026-03-30 — Playground Cross-App Import Architecture
+
+#### ENG-073: "Playground should derive component demos from production source, not re-implement them"
+
+**Issue:** All 19 component demo pages in the playground contained `Demo*` functions that re-implemented production components in Tailwind — parallel implementations of the same component with the same prop API but different styling systems (SCSS Modules vs Tailwind). When a component changed in `src/components/ui/`, the playground's `Demo*` version had to be manually updated, creating systematic drift.
+
+**Root Cause:** The playground and main site use different CSS pipelines (Tailwind vs SCSS Modules). The original architecture assumed they couldn't share components, so every demo re-implemented the component from scratch in Tailwind. This was never necessary — SCSS Module class names are scoped/hashed and can coexist with Tailwind utilities in the same page.
+
+**Resolution:**
+1. Added `@ds/*` TypeScript path alias in `playground/tsconfig.json` mapping to `../src/components/ui/*`
+2. Set `turbopack.root` to monorepo root in `playground/next.config.ts` so Turbopack processes files from `src/`
+3. Added `sassOptions.loadPaths` pointing to `src/styles/` for SCSS `@use` resolution
+4. Migrated all 19 demo pages: removed `Demo*` re-implementations, replaced with direct `import { Component } from "@ds/Component"`
+5. Removed `playground/src/components/ui/` (local component copies no longer needed)
+6. Updated `docs/engineering.md` §3.3–3.4 with the new architecture
+
+**Principle extracted → `engineering.md` §3.4: Cross-App Component Imports (`@ds/*`)**
+
+**Lines removed:** ~2,400+ lines of Tailwind re-implementation across 19 files. Demo pages are now thin harnesses (import + layout + state + props table).
 
 ---
 
@@ -1767,6 +1805,50 @@ Additionally, a third file (`playground/src/app/globals.css`) contains yet anoth
 **Cross-category note:** Also a design issue — the DemoButton's visual output now exactly matches production at the token level.
 
 **Principle extracted -> `engineering.md`: Demo components in the playground MUST reference CSS custom property tokens via `var()`, never hardcoded pixel or hex values. When SCSS tokens exist without CSS var counterparts, add them to `globals.css` before building the demo. See EAP-055.**
+
+---
+
+#### ENG-075: "Do a quick audit on the current playground pages and see if any component"
+
+**Issue:** User requested a comprehensive audit of all playground pages to identify components that are hardcoded or re-implemented instead of being imported from the design system source code. Audit found 16 violations across three severity levels: 3 critical (badge, tabs, dialog re-implemented entirely), 5 high (non-ui components like TestimonialCard, ScrollSpy with CSS/inline-style approximations instead of real imports), 5 medium (motion components using CSS @keyframes demos instead of real framer-motion components), 3 low (raw `<button>` elements instead of `@ds/Button`). No deterministic enforcement architecture existed to prevent future violations.
+
+**Root Cause:** Three compounding gaps: (1) No file-scoped rule triggered when agents touched playground pages, (2) No skill document with architecture rules and import decision trees, (3) No `@site/*` path alias for non-ui components in `src/components/`, making direct import impossible for components outside `src/components/ui/`. Additionally, components in `src/components/` use `@/` internally, which resolves to `playground/src/` in the playground context — breaking their transitive dependencies.
+
+**Resolution:**
+1. **Layer 1 — File-scoped rule:** Created `.cursor/rules/playground-components.md` with `playground/src/app/components/**` glob trigger. Forces agents to read the skill before writing code.
+2. **Layer 2 — Skill:** Created `.cursor/skills/playground/SKILL.md` with architecture overview, import decision tree, reference implementation pointer (button/page.tsx), composition rules (MUST/MUST NOT), validation checklist, and file map.
+3. **Layer 3 — AGENTS.md:** Added Engineering Guardrail #17 (mandatory skill read), Design Guardrail #7 (SVG text prohibition), and Pre-Flight Route #9 (playground routing).
+4. **Infrastructure — Path aliases:** Added `@site/*` → `../src/components/*` to `playground/tsconfig.json` for non-ui component imports.
+5. **Infrastructure — Bridge files:** Created `playground/src/lib/motion.ts` (motion constants bridge), `playground/src/components/inline-edit/` (CMS stub), `playground/src/components/EditButton.tsx` (admin stub) to resolve `@/` alias conflicts for cross-app imports.
+6. **Fixes — 16 violations resolved:**
+   - 3 critical: badge, tabs, dialog → replaced re-implementations with `@ds/*` imports
+   - 5 high: navigation, footer, theme-toggle → `@site/*` imports; scroll-spy, testimonial-card → `@site/*` imports with bridge files
+   - 5 medium: mount-entrance, fade-in, arrow-reveal, marquee, expand-collapse → `@site/*` imports using motion bridge
+   - 3 low: toast, dropdown-menu, tooltip → replaced raw `<button>` with `@ds/Button`
+
+**Cross-category note:** Also a design issue — playground demos were showing visually different approximations of production components. See EAP-037.
+
+**Principle extracted -> `engineering.md`: Three-layer enforcement (file-scoped rule + skill + AGENTS.md guardrail) is the pattern for any directory-scoped constraint. Single-layer rules (just a rule, or just a comment) are insufficient — agents need multiple redundant gates. See EAP-037.**
+
+---
+
+#### ENG-076: "Playground Code Enforcement Architecture v3 — three-stage pipeline implementation"
+
+**Issue:** ENG-075 established three layers of enforcement (file-scoped rule, skill, AGENTS.md guardrail) but the agent could still bypass the system via design-iteration or engineering-iteration skill paths. The playground skill also lacked a post-implementation self-check, and ESLint had no hard-coded rules for playground-specific violations.
+
+**Root Cause:** The Intent Gate (classify feedback → route to correct file tree) only existed inside the playground skill, which was only activated via Route #9. Agents entering via design-iteration (Route 4) or engineering-iteration (Route 5) never encountered the classification step. Additionally, there was no ESLint safety net — violations were only caught by agent instructions, not by tooling.
+
+**Resolution:**
+1. **Stage 1 — Central Intent Gate:** Added Engineering guardrail #18 to `AGENTS.md` as a top-level, non-bypassable rule. Three-category classification (Component visual / Documentation-structure / Shell) now applies regardless of which skill activated the task. Expanded Route #9 scope to cover `playground/src/components/` and `playground/src/app/layout.tsx`.
+2. **Stage 2 — ESLint Safety Net:** Added inline custom ESLint plugin (`playground-enforcement`) to `eslint.config.mjs` scoped to `playground/src/app/components/**/*.tsx`. Four rules: (a) ban `@radix-ui/*` imports, (b) ban `<style>` tags, (c) ban `style={{}}` except on `<svg>` and for `transform`/`opacity`/`animationPlayState`, (d) ban Tailwind default palette colors in `className` with allowlist for `bg-neutral-900`, `bg-neutral-800`. No external dependency — plugin defined inline.
+3. **Stage 3 — Evaluation Gate:** Added mandatory post-implementation self-check protocol to playground skill with placement check, stack check, quality check, cleanup, and a 3-attempt loop cap.
+4. **Pre-existing cleanup:** Replaced raw `<button>` elements in fade-in and mount-entrance pages with `@ds/Button`. Documented expand-collapse's raw button as an explicit allowlisted exception.
+5. **Exception protocol:** Added step-by-step exception handling to playground skill for rare user overrides.
+6. **Cross-references:** Updated playground skill and file-scoped rule to reference the central guardrail rather than duplicating it.
+
+**Design decision — inline ESLint plugin over eslint-plugin-tailwindcss:** The plan originally called for `eslint-plugin-tailwindcss`, but the plugin (a) is in beta for Tailwind v4, (b) has no rule for "ban specific valid palette colors," and (c) would add an unstable dependency. A purpose-built inline plugin that only checks `className` JSX attributes provides exactly the detection needed with zero external dependencies.
+
+**Principle extracted -> `engineering.md`: Central guardrails (in AGENTS.md Hard Guardrails) are the only reliable way to enforce cross-skill constraints. Putting a constraint inside a single skill creates a bypass for any path that doesn't activate that skill. See ENG-076.**
 
 ---
 

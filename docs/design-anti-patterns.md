@@ -4,11 +4,13 @@
 >
 > **Who reads this:** AI agents before making UI changes — scan for relevant anti-patterns.
 > **Who writes this:** AI agents when a feedback cycle reveals a new anti-pattern.
-> **Last updated:** 2026-03-30 (AP-040: false affordances on static elements)
+> **Last updated:** 2026-03-31 (status markers added, resolved entries compacted)
 
 ---
 
 ## AP-001: Unlayered CSS Reset with Tailwind v4
+
+**Status: ACTIVE**
 
 **Trigger:** `* { margin: 0; padding: 0; }` placed outside any `@layer`.
 
@@ -27,6 +29,8 @@
 
 ## AP-002: @theme inline for Themeable Values
 
+**Status: ACTIVE**
+
 **Trigger:** Using `@theme inline { --color-background: #fff; }` in Tailwind v4.
 
 **Why it's wrong:** `inline` hardcodes literal color values into utility classes at build time. `bg-background` compiles to `background-color: #ffffff` instead of `background-color: var(--color-background)`. This means `.dark` class CSS variable overrides have zero effect — dark mode is completely broken.
@@ -39,6 +43,8 @@
 
 ## AP-003: Inline Styles as Workarounds
 
+**Status: ACTIVE**
+
 **Trigger:** Using `style={{ padding: 40 }}` or `style={{ width: someVar }}` when Tailwind classes aren't working.
 
 **Why it's wrong:** Inline styles bypass the design token system. They can't be themed, can't respond to breakpoints, can't be audited, and signal that the framework integration is broken. Using them is treating symptoms instead of diagnosing the root cause.
@@ -48,6 +54,8 @@
 ---
 
 ## AP-004: Fixed Sidebar with padding-left Offset
+
+**Status: ACTIVE**
 
 **Trigger:** Using `position: fixed` on a sidebar and adding `pl-60` or `padding-left` to the content wrapper to prevent overlap.
 
@@ -59,6 +67,8 @@
 
 ## AP-005: Centering with w-N mx-auto Inside Padded Containers
 
+**Status: ACTIVE**
+
 **Trigger:** Using `w-10 mx-auto` on an element inside a container that also has horizontal padding.
 
 **Why it's wrong:** `margin: auto` distributes remaining space. If the container is only 40px wide and has `px-1.5` (3px each side), the available width is 34px. A `w-10` (40px) element overflows — `mx-auto` has no space to distribute. The element appears left-aligned.
@@ -69,6 +79,8 @@
 
 ## AP-006: Truncated Dividers in Compact Layouts
 
+**Status: ACTIVE**
+
 **Trigger:** Using `w-4 mx-auto` on a horizontal divider in a collapsed sidebar.
 
 **Why it's wrong:** A divider that doesn't span its container looks like a rendering artifact, not an intentional design element. Users interpret it as broken.
@@ -78,6 +90,8 @@
 ---
 
 ## AP-007: Excessive Content Padding for B2B Interfaces
+
+**Status: ACTIVE**
 
 **Trigger:** Using `p-8` (32px) or larger as base content padding in a tool/dashboard UI.
 
@@ -90,6 +104,8 @@
 ---
 
 ## AP-008: Treating Symptoms Instead of Diagnosing Root Causes
+
+**Status: ACTIVE**
 
 **Trigger:** User says "there's no spacing." Response: add more `p-*` classes to more elements. User says "still no spacing." Response: add even bigger values.
 
@@ -105,6 +121,8 @@
 
 ## AP-009: Inconsistent Spacing Between Toggle States
 
+**Status: ACTIVE**
+
 **Trigger:** A collapsible component (sidebar, accordion, drawer) uses different vertical or horizontal spacing values in its collapsed vs expanded states — e.g., `h-7` tabs when collapsed but `h-8` when expanded, or `mt-4` section gaps when collapsed but `mt-5` when expanded.
 
 **Why it's wrong:** When the user toggles between states, the differing box models cause child elements to visibly shift position. Even with a smooth width transition, the vertical jump is jarring — tabs appear to bounce up or down. Users perceive this as a layout bug rather than a design choice. The root issue is that the two states were styled independently rather than derived from a single canonical spacing model.
@@ -116,6 +134,8 @@
 ---
 
 ## AP-010: Consumer-Grade Corner Radius in B2B
+
+**Status: ACTIVE**
 
 **Trigger:** Using `rounded-md` (6px), `rounded-lg` (8px), `rounded-xl` (12px), or `rounded-2xl` (16px) on any element in a B2B product.
 
@@ -129,6 +149,8 @@
 
 ## AP-011: Linear Interpolation for Pointer-to-Element Mapping
 
+**Status: ACTIVE**
+
 **Trigger:** Using `Math.round((cursorY - containerTop) / containerHeight * (count - 1))` to determine which discrete element (tick, tab, item) the cursor is pointing at.
 
 **Why it's wrong:** This formula assumes elements are evenly distributed from the very top to the very bottom of the container. In practice, containers have padding, centering (`justify-center`), variable gaps, and elements of different sizes. The mathematical zones diverge from the visual positions, causing the wrong element to be selected. Clicking directly on tick 0 might return index 1 because the tick's visual center doesn't align with the top of the interpolation range. The mismatch feels random to the user — they click exactly on a target and get the wrong result.
@@ -140,6 +162,8 @@
 ---
 
 ## AP-012: Entering Drag Mode on Pointer Down
+
+**Status: ACTIVE**
 
 **Trigger:** Calling `setDragActive(true)` or equivalent inside the `onPointerDown` handler of a component that supports both click and drag.
 
@@ -158,6 +182,8 @@ This cleanly separates two intents: "I want to go to this specific section" (cli
 
 ## AP-013: Fixed Positioning Inside Transformed Containers
 
+**Status: ACTIVE**
+
 **Trigger:** Using `position: fixed` on a flyout, modal, or overlay that is a DOM child of an element with any CSS `transform` property — including identity transforms like `translateX(0)` from Tailwind animation classes (`translate-x-0`, `translate-x-full`, etc.).
 
 **Why it's wrong:** CSS `transform` creates a new containing block. `position: fixed` elements inside a transformed ancestor are positioned relative to that ancestor, not the viewport. If the ancestor also has `overflow: hidden`, the "fixed" element is clipped to the ancestor's visible area. The flyout appears trapped inside its parent — invisible, clipped, or overlapping the wrong elements. DevTools will show `position: fixed` but the element behaves as `position: absolute`.
@@ -169,6 +195,8 @@ This cleanly separates two intents: "I want to go to this specific section" (cli
 ---
 
 ## AP-014: Centered Modals for Contextual Actions
+
+**Status: ACTIVE**
 
 **Trigger:** Opening a centered viewport modal for a contextual action that was triggered from a specific UI element (e.g., clicking a search icon in the sidebar opens a centered search modal).
 
@@ -182,6 +210,8 @@ This cleanly separates two intents: "I want to go to this specific section" (cli
 
 ## AP-015: Centering Icons in Collapsed Sidebar
 
+**Status: ACTIVE**
+
 **Trigger:** Using `justify-center w-7 mx-auto` on nav links in collapsed sidebar mode, while expanded mode uses `px-2` for left-aligned icons.
 
 **Why it's wrong:** During the collapse/expand transition, the sidebar width animates from 200px to 40px (or vice versa). If icons are centered in collapsed mode but left-aligned in expanded mode, they shift horizontally during the transition. Users perceive this as unstable layout — the navigation "moves to the middle" instead of smoothly retracting. The sidebar should be anchored to the left edge; only the right edge moves.
@@ -193,6 +223,8 @@ This cleanly separates two intents: "I want to go to this specific section" (cli
 ---
 
 ## AP-016: Click-to-Open for Navigation Sub-Menus
+
+**Status: ACTIVE**
 
 **Trigger:** Requiring a click to open category sub-navigation (sliver/flyout panel) in a sidebar, with a click or backdrop dismiss to close.
 
@@ -206,6 +238,8 @@ This cleanly separates two intents: "I want to go to this specific section" (cli
 
 ## AP-017: Shared-Stem Names at Visible Proximity
 
+**Status: ACTIVE**
+
 **Trigger:** Using "Foundations" as a section header and "Foundational" as a category label in the same sidebar. Any pair of labels sharing a root morpheme (e.g., `found-`) displayed simultaneously.
 
 **Why it's wrong:** Users scan navigation labels quickly. Two names sharing a stem are parsed as the same concept or as a copy error, breaking the taxonomy's credibility. The cognitive cost of distinguishing "Foundations" from "Foundational" exceeds the cost of learning a distinct word.
@@ -217,6 +251,8 @@ This cleanly separates two intents: "I want to go to this specific section" (cli
 ---
 
 ## AP-018: Additive Gap Padding Between Sections
+
+**Status: ACTIVE**
 
 **Trigger:** Using `pb-*` on a container AND `pt-*` on the next container AND `mt-*` on an inner element to control the gap between two visual regions. Each looks "small" individually but they stack.
 
@@ -230,6 +266,8 @@ This cleanly separates two intents: "I want to go to this specific section" (cli
 
 ## AP-019: Hero-Scale Cards in Portfolio Overview
 
+**Status: ACTIVE**
+
 **Trigger:** Using full-width or multi-column-spanning cards (e.g., `grid-column: span 2` with 2:1 aspect ratio) for featured projects in a portfolio homepage grid.
 
 **Why it's wrong:** A portfolio overview page exists for breadth scanning — the visitor wants to quickly assess the range of work. Hero-scale cards force sequential scrolling: each featured project consumes the entire viewport width, so the user can only evaluate one project at a time. This is appropriate for a case study detail page (deep focus on one project) but wrong for the homepage (shallow scan of many projects). The result is that a portfolio with 12 projects requires 6+ viewport heights of scrolling before the visitor has seen all the titles, when a masonry grid would show them all in 2-3 viewport heights.
@@ -241,6 +279,8 @@ This cleanly separates two intents: "I want to go to this specific section" (cli
 ---
 
 ## AP-020: Unnecessary overflow-y on Fit-Content Containers
+
+**Status: ACTIVE**
 
 **Trigger:** Adding `overflow-y: auto` and `max-height` to a sidebar or panel whose content fits within the viewport height.
 
@@ -254,6 +294,8 @@ This cleanly separates two intents: "I want to go to this specific section" (cli
 
 ## AP-022: Unprotected Diagonal Mouse Path Between Menu Tiers
 
+**Status: ACTIVE**
+
 **Trigger:** A hover-to-reveal submenu (flyout, sliver panel, mega-dropdown) that instantly switches to a different category when the cursor crosses adjacent parent items during diagonal mouse movement toward the open submenu.
 
 **Why it's wrong:** When a user sees a submenu open and moves their cursor toward an item in it, the natural mouse path is diagonal — from the parent item to the target in the submenu. This diagonal path inevitably crosses other parent items in the list. Without path prediction, each crossing fires `onMouseEnter`, switching the submenu to a different category. The user never reaches their intended target because the submenu keeps changing under their cursor. Amazon identified this as a revenue-impacting UX failure in their mega-dropdown menus. Ben Kamens documented the solution as "menu aim."
@@ -264,10 +306,9 @@ This cleanly separates two intents: "I want to go to this specific section" (cli
 
 ---
 
-## Entry Template
-
-```markdown
 ## AP-021: Global `svg { display: block }` Breaking Inline Icons
+
+**Status: ACTIVE**
 
 **Trigger:** A global CSS reset includes `svg { display: block; max-width: 100%; }`, and then a small SVG icon is placed inside an inline element (like an `<a>` tag within flowing paragraph text).
 
@@ -287,6 +328,8 @@ This cleanly separates two intents: "I want to go to this specific section" (cli
 
 ## AP-023: Form Inputs Without Persistent Labels or Field Type Affordances
 
+**Status: ACTIVE**
+
 **Trigger:** Rendering form inputs in an editing UI (modal, panel, inline editor) with only `placeholder` text and no visible `<label>`, no `type` differentiation (e.g., `type="url"` vs `type="text"`), and no help text.
 
 **Why it's wrong:** Placeholders disappear the moment the user types. A filled input with no label is a mystery — you can't tell whether the value "2023-2024" is in a period field, a URL field, or a name field. Without `type="url"`, the browser provides no validation or affordance (like showing `https://` prefix or URL keyboard on mobile). The user must hold the field's purpose in memory, which violates recognition over recall (Nielsen's 6th heuristic). In practice, users WILL put data in the wrong field and not realize it until something breaks downstream.
@@ -302,6 +345,8 @@ This cleanly separates two intents: "I want to go to this specific section" (cli
 
 ## AP-024: Critical Action Buttons in Scrollable Content Flow
 
+**Status: ACTIVE**
+
 **Trigger:** Placing "Save", "Submit", "Done", or other high-stakes action buttons inside a scrollable container where they can scroll off-screen.
 
 **Why it's wrong:** If the user can't see the Save button, they either (a) don't know it exists, (b) assume their changes are already saved, or (c) have to scroll to find it — adding friction to the most important action in the UI. For CMS editing panels where NOT saving means losing work, an invisible Save button directly causes data loss and frustration.
@@ -313,6 +358,8 @@ This cleanly separates two intents: "I want to go to this specific section" (cli
 ---
 
 ## AP-025: Arrow Buttons for List Reorder When Drag Is Available
+
+**Status: ACTIVE**
 
 **Trigger:** Using up/down arrow buttons as the primary mechanism for reordering list items in a desktop UI.
 
@@ -326,6 +373,8 @@ This cleanly separates two intents: "I want to go to this specific section" (cli
 
 ## AP-026: Low-Contrast Error States for Critical Actions
 
+**Status: ACTIVE**
+
 **Trigger:** Displaying a save/submit error as small colored text within the existing UI layout, without changing the overall visual state of the containing element.
 
 **Why it's wrong:** For high-stakes actions (save, submit, delete), failure means the user's work is at risk. A small red text label competing with other UI elements for attention fails the "glance test" — the user should know something is wrong within 200ms of looking at the screen. When the error text is the same size as surrounding copy and the container's visual state doesn't change, the error is invisible in peripheral vision.
@@ -338,6 +387,8 @@ This cleanly separates two intents: "I want to go to this specific section" (cli
 
 ## AP-027: Flex Containers Without Minimum Dimension Constraints
 
+**Status: ACTIVE**
+
 **Trigger:** Using `display: flex; flex-direction: column` on a modal/panel with `max-height` but no `min-height`, causing the container to collapse when children have a flex-basis of 0 or content is empty/short.
 
 **Why it's wrong:** Flex containers size to their content by default. When a child has `flex: 1 1 0` (basis 0), it contributes zero size to the container's intrinsic dimensions. Without a `min-height`, the container collapses to just the non-flexible children (e.g. header + footer), leaving the flexible child invisible. This makes the UI appear broken — users see an empty panel and assume the feature is bugged.
@@ -349,6 +400,8 @@ This cleanly separates two intents: "I want to go to this specific section" (cli
 ---
 
 ## AP-028: Form Fields Without Required Indicators or Client-Side Validation
+
+**Status: ACTIVE**
 
 **Trigger:** Rendering form inputs without visual distinction between required and optional fields, and relying solely on server-side validation to catch empty required fields.
 
@@ -368,6 +421,8 @@ This cleanly separates two intents: "I want to go to this specific section" (cli
 
 ## AP-029: Duplicate Navigation in Footer
 
+**Status: ACTIVE**
+
 **Trigger:** Repeating sidebar or header navigation links in the site footer, especially when the sidebar is persistently visible.
 
 **Why it's wrong:** Duplicate links create two editing surfaces for the same data. If only one surface is editable (e.g., sidebar has `EditableArray`, footer renders plain `<a>` tags), users can't edit the "broken" copy and believe the editing system is bugged. Even if both are editable, changes to one don't visually update the other until a page refresh, creating a confusing inconsistency. For single-page layouts where the sidebar is always visible, footer links add no discoverability value.
@@ -379,6 +434,8 @@ This cleanly separates two intents: "I want to go to this specific section" (cli
 ---
 
 ## AP-030: Inconsistent External Link Indicators
+
+**Status: ACTIVE**
 
 **Trigger:** Some external links show an icon (↗ arrow, external-link SVG) while others in the same layout do not.
 
@@ -392,6 +449,8 @@ This cleanly separates two intents: "I want to go to this specific section" (cli
 
 ## AP-031: CSS Transform for Centering on Framer-Motion-Animated Elements
 
+**Status: ACTIVE**
+
 **Trigger:** Using `transform: translateY(-50%)` (or `translateX(-50%)`) for centering on an element that also has Framer Motion animation props (`x`, `y`, `scale`, `rotate`).
 
 **Why it's wrong:** Framer Motion manages transforms via inline `style.transform`. When FM animates `x: 4 → 0`, it sets `transform: translateX(0px)` as an inline style — which **overrides** the CSS class's `transform: translateY(-50%)`. The vertical centering is silently dropped. The element's `top: 50%` places its top edge at the center instead of its midpoint, causing a downward shift equal to half the element's height. This is invisible in static CSS inspection (the class looks correct) and only manifests at runtime when FM takes control of the transform property.
@@ -403,6 +462,8 @@ This cleanly separates two intents: "I want to go to this specific section" (cli
 ---
 
 ## AP-032: Static Label Color on Multi-State Controls
+
+**Status: ACTIVE**
 
 **Trigger:** A control has visually distinct states for one visual channel (e.g., tick bar color changes between active/inactive) but uses a single static value for its paired channel (e.g., label text stays the same color for all states).
 
@@ -416,6 +477,8 @@ This cleanly separates two intents: "I want to go to this specific section" (cli
 
 ## AP-033: Fixed Toolbars Overlaying Page Content
 
+**Status: ACTIVE**
+
 **Trigger:** Using `position: fixed` on an admin bar, toolbar, or save bar that overlays page content, then compensating with hardcoded `paddingTop` or `paddingBottom` on every page that renders the bar.
 
 **Why it's wrong:** A fixed toolbar is removed from document flow. Every page must independently know the toolbar's exact height and apply padding to avoid content being hidden underneath. This creates fragile coupling: if the toolbar height changes (text wraps on small screens, content is added), every page breaks. The toolbar also blocks interactive elements (navigation links, buttons) behind it. Users literally cannot click buttons that the toolbar covers. The "compensating padding" approach also violates AP-003 (inline styles as workarounds) when implemented as `style={{ paddingTop: N }}`.
@@ -427,6 +490,8 @@ This cleanly separates two intents: "I want to go to this specific section" (cli
 ---
 
 ## AP-034: Admin Controls in Component Document Flow
+
+**Status: ACTIVE**
 
 **Trigger:** Placing admin-only controls (edit, delete, reorder buttons) as in-flow children inside a component's layout — e.g., adding an edit button as a flex child in an attribution row alongside the real content.
 
@@ -445,6 +510,8 @@ This cleanly separates two intents: "I want to go to this specific section" (cli
 
 ## AP-035: Small Drag Handle as Sole Drag Target Inside Clickable Card
 
+**Status: ACTIVE**
+
 **Trigger:** Implementing DnD with a small grip icon (e.g., 28×28px) as the only draggable area, while the rest of the tile is a clickable link or button that navigates on pointer events.
 
 **Why it's wrong:** Two failures compound: (1) Fitts' law — a 28×28px target inside a ~300×200px tile means the user must precisely target <2% of the tile surface to initiate a drag. (2) Affordance mismatch — the tile's visual treatment (dashed outline, reorder-mode styling) signals "this entire thing is draggable," but the interaction model says "only this tiny corner works." Users will click-and-drag the tile body, hit the link, and conclude dragging is broken.
@@ -456,6 +523,8 @@ This cleanly separates two intents: "I want to go to this specific section" (cli
 ---
 
 ## AP-036: Bare CMS Fields Without Labels, Descriptions, or Placeholders
+
+**Status: ACTIVE**
 
 **Trigger:** Adding a field to a Payload collection with only `name` and `type`, relying on the auto-generated label (which is just the camelCase field name, title-cased) and providing no `admin.description` or `admin.placeholder`.
 
@@ -474,6 +543,8 @@ For collection-level context, set `admin.description` on the collection config t
 
 ## AP-037: Full-Surface Admin Overlays on Navigable Elements
 
+**Status: ACTIVE**
+
 **Trigger:** Rendering an admin-only hover overlay (upload zone, edit zone) that covers the entire surface of a clickable/navigable element (card link, button).
 
 **Why it's wrong:** The overlay captures all pointer events on hover, making the underlying navigation inaccessible. Users can either interact with the admin tool or navigate — never both. This forces admin users to choose between editing and viewing, which is the opposite of inline editing's promise. Click-to-upload inside these overlays also has inconsistent browser behavior when the file input is inside a deeply nested event-stopped context.
@@ -486,6 +557,8 @@ For collection-level context, set `admin.description` on the collection config t
 
 ## AP-038: Mixed Breakpoint Systems Across Apps in a Monorepo
 
+**Status: ACTIVE**
+
 **Trigger:** Creating a new app (Playground, ASCII Tool) with a Tailwind `@theme` block that defines colors, fonts, and spacing but omits `--breakpoint-*` overrides — silently falling through to Tailwind v4's built-in defaults instead of the design system's canonical breakpoints.
 
 **Why it's wrong:** The design system defines breakpoints at 320/672/1056/1312/1584 in SCSS, but Tailwind's defaults are 640/768/1024/1280/1536. When a developer writes `lg:flex` in the Playground, it activates at 1024px. When the same intent is expressed via `$portfolio-mq-lg` in the main site, it activates at 1056px. Same semantic name, different pixel value. This makes responsive behavior non-transferable between apps: a component that looks correct in the Playground breaks at a different width in the main site. Hardcoded media queries (640px in AdminBar, 768px in experiments) compound the problem by introducing a third, implicit scale.
@@ -497,6 +570,8 @@ For collection-level context, set `admin.description` on the collection config t
 ---
 
 ## AP-039: Interactive Elements Without Focus Ring Clearance
+
+**Status: ACTIVE**
 
 **Trigger:** A clickable/focusable element (button, link, input) whose content fills flush to its bounding box, with no padding buffer, placed in a tight-gap container (`gap-1.5` or less).
 
@@ -517,6 +592,8 @@ For collection-level context, set `admin.description` on the collection config t
 
 ## AP-040: False Affordances on Static Elements
 
+**Status: ACTIVE**
+
 **Trigger:** Styling a non-interactive element (span, div) with visual treatments that universally signal interactivity — accent color highlights, pill shapes with hover-like backgrounds, or differentiated visual states that imply "selected" vs. "unselected."
 
 **Why it's wrong:** Users interpret visual cues before attempting interaction. An accent-highlighted label reads as "this is the currently selected option in a set of clickable options." A pill-shaped tag with a background reads as "click me to filter/toggle." When these elements don't respond to clicks, the user experiences a broken promise — the UI looked interactive but wasn't. This is worse than a plain, obviously-static label because it wastes the user's time and erodes trust in the interface's consistency. If something looks different from its siblings (one label is blue while three are gray), the difference must mean something the user can act on.
@@ -530,6 +607,27 @@ For collection-level context, set `admin.description` on the collection config t
 
 ---
 
+## AP-041: Bounding-Box-With-Padding Icon Sizing in Buttons
+
+**Status: ACTIVE**
+
+**Trigger:** Sizing button icons by giving the icon wrapper a fixed `width`/`height` and then adding internal `padding` to shrink the visible icon area. Using `gap: 0` on the button and relying on the wrapper's padding for icon-to-label spacing.
+
+**Why it's wrong:** This conflates two independent concerns — icon size and icon-to-label spacing — into a single mechanism. The padding eats the wrapper dimensions, producing icons far smaller than intended (e.g., an 18×18 wrapper with 4px padding yields a 10×10 icon — smaller than the 14px label text next to it). Worse, the non-linear padding jumps (2px at sm, 4px at lg) produce size plateaus: sm and lg render the same effective icon despite the button being 50% taller. When `iconOnly` uses a separate code path (children → `.label` instead of `.iconWrap`), icons render at their intrinsic SVG size (24×24) — 2-3x larger than in icon-plus-label mode at the same button size.
+
+**Correct alternative:**
+1. Size the icon wrapper directly to the label's computed line-height — no internal padding.
+2. Use flex `gap` on the button container for icon-to-label spacing.
+3. Route icon-only children through the same `.iconWrap` as `leadingIcon`/`trailingIcon`.
+4. See `design.md` §22 for the complete button sizing model.
+
+**Frustration caused:** 1 round — user identified icons as visually inconsistent and non-proportional across button sizes.
+
+---
+
+## Entry Template
+
+```markdown
 ## AP-NNN: [Short Name]
 
 **Trigger:** [What action or code pattern triggers this]

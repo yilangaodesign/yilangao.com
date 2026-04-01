@@ -24,8 +24,9 @@
 | §9 | About Page & Supporting Content | Editing the about page, contact page, or any non-case-study content |
 | §10 | Portfolio Lifecycle & Intervention Matrix | Mapping hiring stages to lifecycle, adapting for HM segments |
 | §11 | Self-Audit Framework | Evaluating the portfolio against the mental model |
-| §12 | Process Principles | Meta — how to approach content changes |
 | Appendix | Reference Portfolios & Frequency Map | Competitive benchmarks and recurring feedback patterns |
+
+**Process principles & feedback workflow** (formerly §12): covered by the `content-iteration` skill at `.cursor/skills/content-iteration/SKILL.md` — not duplicated in this file.
 
 ---
 
@@ -623,26 +624,6 @@ Use this to evaluate the portfolio against the mental model. The audit follows t
 - Is the path from "I'm interested" to "I've reached out" frictionless?
 - Does the portfolio leave the visitor with a clear sense of what working with you would be like?
 - Would the hiring manager share this portfolio with a colleague? What would they say?
-
----
-
-## 12. Process Principles
-
-### 12.1 Diagnose Before You Rewrite
-
-When content "isn't working," identify which retention layer is failing (§1.2) before rewriting everything. A homepage bounce (Layer 1) is a different problem than a case study engagement drop (Layer 2). **Fix Layer 1 before optimizing Layer 2. Fix Layer 2 before optimizing Layer 3.**
-
-### 12.2 One Change, One Verification
-
-Each content iteration should address one retention layer. Don't rewrite the homepage, restructure a case study, and update the About page simultaneously.
-
-### 12.3 Read the Content.md First
-
-Before writing or editing any portfolio content, read this file. If the task maps to an existing principle, apply the documented approach immediately.
-
-### 12.4 The Portfolio Is Never "Done"
-
-Treat portfolio improvements like a growth experiment: identify the weakest retention layer, form a hypothesis, design a change, test for 2-4 weeks, measure signal (north star metrics from §1.8, not vanity metrics), iterate.
 
 ---
 

@@ -1,3 +1,12 @@
+---
+name: design-iteration
+description: >-
+  Processes user design feedback through a structured loop: parse intent,
+  check existing knowledge, diagnose root cause, implement fix, close the
+  loop with documentation. Use when the user gives visual, spacing,
+  interaction, or layout feedback.
+---
+
 # Skill: Design Iteration Feedback Loop
 
 ## Processing User Feedback
@@ -11,17 +20,24 @@ Don't just fix the surface-level complaint. Ask:
 - **Why does this matter to a UX designer?** (trust, professionalism, usability, consistency)
 - **Is this the same category as a previous complaint?** (check feedback log)
 
-**Cross-category check (mandatory):** Before proceeding, ask: **does this feedback also have an engineering or content dimension?** A visual/UX complaint about forms, labels, or interactions often implies:
+**Cross-category check (mandatory):**
+> If `[ORCHESTRATED]`: skip this cross-category check. The orchestrator already
+> decomposed the request into category-specific tasks.
+
+Before proceeding, ask: **does this feedback also have an engineering or content dimension?** A visual/UX complaint about forms, labels, or interactions often implies:
 - An **engineering** issue (missing data field, broken save flow, wrong schema)
 - A **content** issue (poor labels, bad microcopy, unclear instructions)
 - If other dimensions exist, note them now. You will document them in Step 5.
 
 ### Step 2: Check Existing Knowledge
 
-Before writing code:
-1. Read the **full** `docs/design.md` — not just the Section Index. Feedback processing requires complete context, even if pre-flight only loaded one section.
-2. Read `docs/design-anti-patterns.md` for matching anti-patterns.
-3. If a documented solution exists, **apply it directly** — don't re-derive.
+Before making changes:
+1. Read `docs/design.md` Section Index — identify sections matching this feedback category.
+2. Read §0 (Design Posture) from the hub file.
+3. Read the matching spoke file(s) from `docs/design/` (the Section Index has a File column pointing to each spoke).
+4. Read `docs/design-anti-patterns.md` (focus on active entries).
+5. Read the first 30 lines of `docs/design-feedback-log.md` (most recent entries) for recurring pattern detection.
+6. If a documented solution exists, **apply it directly** — don't re-derive.
 
 ### Step 3: Diagnose Root Cause
 
@@ -83,10 +99,24 @@ At the end of a session that involved design feedback:
 2. Verify `design.md` reflects any new principles discovered.
 3. Update the "Last updated" date on all modified docs.
 
+## Operating Under Orchestrator Dispatch
+
+When `[ORCHESTRATED]` appears in your context:
+- BEFORE implementation: write the 2-line stub to the feedback log using the
+  pre-assigned ID from your dispatch instructions (entry header + "Resolution
+  pending (orchestrated)"). This must happen before any code changes (per EAP-027).
+- Follow Steps 1-4 as normal (except skip the cross-category check in Step 1)
+- Replace Step 5 with:
+  1. Include a full `## Draft Documentation` section in your response (using the same pre-assigned ID)
+  2. Include a `## Files Modified` section listing every file you created or changed
+  3. Include a `## Server Operations Needed` section if applicable
+- Do NOT write to any docs/ files other than the initial 2-line stub
+
 ## File Map
 
 | File | Purpose | Read When | Write When |
 |------|---------|-----------|------------|
 | `docs/design.md` | Accumulated design principles | Before any UI work | After processing feedback |
+| `docs/design/*.md` | Topic-specific design principles (spokes) | When the Section Index points to a matching topic | After processing feedback |
 | `docs/design-feedback-log.md` | Chronological feedback history | Session start, during feedback | After each feedback resolution |
 | `docs/design-anti-patterns.md` | Things to never do | Before writing code | After discovering a new anti-pattern |

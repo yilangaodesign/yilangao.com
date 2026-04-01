@@ -4,7 +4,35 @@
 >
 > **Who reads this:** AI agents at session start (scan recent entries for context), and during feedback processing (check for recurring patterns).
 > **Who writes this:** AI agents after each feedback cycle via the `design-iteration` skill.
-> **Last updated:** 2026-03-30 (FB-068: TokenGrid interactive builder — color-first dropdown, cascading filters, tab consolidation)
+> **Last updated:** 2026-03-30 (FB-069: Button sizing redesign — One GS alignment, icon = line-height, padding-derived height)
+>
+> **For agent skills:** Read only the first 30 lines of this file (most recent entries) for pattern detection. The full file is a historical audit trail — do not read it in its entirety during normal work.
+
+---
+
+## Session: 2026-03-30 — Button Component Sizing Redesign
+
+#### FB-069: "Vertical spacing too big, icons don't scale with label size"
+
+**UX Intent:** The button's internal proportions feel wrong — vertical padding is visually excessive and icons appear tiny/disconnected from the label at larger sizes. The user wants buttons where (a) vertical padding is noticeably tighter than horizontal, producing a wider pill shape, and (b) icons scale proportionally with the label text as button size increases, so all button content forms a cohesive visual unit.
+
+**Root Cause:** Three structural problems in the sizing model:
+
+1. **Bounding-box icon model.** The `.iconWrap` used internal padding that ate the wrapper size, producing effective icons of 8/10/10/12px — far smaller than the label text. The sm and lg sizes produced the same 10px icon despite an 18px font-size difference. The padding was doing double duty: sizing the icon AND creating icon-to-label spacing.
+
+2. **Fixed `height` constraint.** The button used `height` (not `min-height`), making the declared `py` values irrelevant — with small content (12-16px fonts at 1.1 line-height) in large containers (48-56px), the visual vertical space was determined by `(height - content) / 2`, not by `py`. Reducing `py` would have no visible effect.
+
+3. **Disconnected icon-only path.** When `iconOnly` is true, children went through `.label` (no size constraints) instead of `.iconWrap`, rendering at the Lucide default 24×24 regardless of button size — 2-3x larger than the same icon in icon-plus-label mode.
+
+**Resolution:** Redesigned the sizing system following the Goldman Sachs One GS button component reference (extracted from Figma via MCP):
+
+1. **Icon = label line-height.** Icon wrapper dimensions now match the label's computed line-height per size (16/18/20/24px). No internal padding on icon wrappers — direct sizing.
+2. **Gap-based spacing.** Replaced `gap: 0` + bounding-box padding with flex `gap` per size (4/6/10/12px). Icon sizing and icon-to-label spacing are now independent concerns.
+3. **Padding-derived height.** Replaced `height` with `min-height`. Button height = `py + line-height + py`. Vertical padding is now the actual visual control.
+4. **Font size bump.** Increased font sizes — sm: 12→14px, lg: 14→16px, xl: 16→18px — so content fills more of the button and icons are proportionally larger.
+5. **Unified icon-only path.** When `iconOnly` is true, children are now routed through `.iconWrap` instead of `.label`, receiving the same size-constrained treatment.
+
+**Pattern extracted → `design.md` §22: Button Sizing Principles — 5 principles for proportional button construction (icon = line-height, gap-based spacing, padding-derived height, py < px, unified icon path).**
 
 ---
 

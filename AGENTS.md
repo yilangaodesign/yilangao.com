@@ -2,6 +2,16 @@
 
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
 
+# Orchestrator Override
+
+If your context contains the marker `[ORCHESTRATED]`, you are a helper agent
+dispatched by the orchestrator. Follow these rules:
+- **SKIP** Pre-Flight routing (your routing was already done by the orchestrator)
+- **SKIP** Post-Flight documentation (write a stub + draft instead; see dispatch instructions)
+- **SKIP** the cross-category check in your skill's Step 1 (the orchestrator already decomposed the request)
+- **OBEY** all Hard Guardrails below (these always apply)
+- **OBEY** your dispatch instructions (file boundary, server ops, documentation format)
+
 # Hard Guardrails
 
 **Design:**
@@ -11,6 +21,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 4. **NEVER** treat repeated user complaints incrementally — 3+ in the same category means the root cause is architectural
 5. **NEVER** skip dark mode verification when touching colors or backgrounds
 6. **ALWAYS** use flex layout with in-flow spacers for fixed sidebars — never rely on padding-left offsets
+7. **NEVER** use SVG to render text, labels, or component UI — SVG is permitted only for icons, logos, and decorative illustrations. Text in SVG bypasses the typography token system, breaks copy/paste, and is invisible to screen readers.
 
 **Content:**
 1. **NEVER** write case study text that exceeds 4 consecutive sentences without a visual break — the target is 80-85% visual, 15-20% text
@@ -40,8 +51,18 @@ This version has breaking changes — APIs, conventions, and file structure may 
 14. **ALWAYS** run the CMS-Frontend Parity Checklist after adding, removing, or renaming any CMS field or frontend data field. A field that exists in one layer but not all three (schema, data fetch, UI) is a bug. See EAP-019.
 15. **ALWAYS** restart the Payload dev server after modifying any global or collection schema — Payload syncs the database schema only on startup. A schema change without a server restart means the field silently does not exist.
 16. **NEVER** create a component that renders CMS data without inline edit support — every text field from a Payload collection or global MUST be wrapped in `EditableText` (with `fieldId`, `target`, `fieldPath`) when `isAdmin`. The component MUST accept `id` and `isAdmin` props, and include an `EditButton`. A component that renders CMS text as plain elements is incomplete. See EAP-029.
+17. **NEVER** create or modify a playground component page (`playground/src/app/components/*/page.tsx`) without first reading `.cursor/skills/playground/SKILL.md`. Playground pages are thin harnesses that import and render production components — they must never re-implement components in Tailwind, raw HTML, or SVG. See EAP-037.
+18. **NEVER** edit a playground component page (`playground/src/app/components/*/page.tsx`) to fix how a component **looks or behaves** — visual/behavioral changes go to the design system source (`src/components/ui/` or `src/components/`). The playground auto-updates via `@ds/*` imports. Before editing any playground file, classify the task:
+    - **Component visual** (colors, spacing, sizing, states, animations, interaction behavior) → Edit `src/components/` ONLY — NEVER the playground page
+    - **Documentation / page structure** (reordering demo sections, updating props table data, changing code examples, adding new sections, creating a parity page for a new component) → Edit the playground page — this is legitimate
+    - **Shell** (sidebar layout, ComponentPreview rendering, playground-wide IA, theme behavior) → Edit `playground/src/components/` or `playground/src/app/layout.tsx`
+    - **Ambiguous** → Ask the user before proceeding
+    This classification is a **central guardrail** — it applies regardless of which skill or route activated the task (design-iteration, engineering-iteration, or direct playground work). When the user explicitly overrides this gate, document the exception reason and scope before proceeding.
 
 # Pre-Flight: Conditional Reading
+
+> If `[ORCHESTRATED]` appears in your context, skip Pre-Flight entirely.
+> Your routing has been done. Proceed directly to your dispatched task.
 
 Before writing code, classify your task. Read ONLY the docs that match — use the Section Index at the top of each doc to target-read, not read everything.
 
@@ -52,6 +73,17 @@ User feedback is rarely one-dimensional. Before routing, ask: **does this feedba
 - **Content** — microcopy, labels, instructions, UX writing, naming
 
 Example: "It's unclear what this field is" is SIMULTANEOUSLY a design issue (no persistent label, no field type differentiation), an engineering issue (missing schema field), and a content issue (label says "url" instead of "Website"). Do NOT force single-category classification. Route to ALL applicable tracks, implement across all of them, and document in all applicable feedback logs during Post-Flight.
+
+**Multi-Task Detection (Step 0 continued):**
+After classifying categories, check: does this message contain **3+ distinct tasks**,
+OR **2 distinct tasks where at least one involves creating a new component, page,
+or CMS collection from scratch**?
+Signals: numbered lists, "and then", "also", comma-separated, session agendas.
+A single complaint spanning multiple categories is NOT multi-task — Step 0's
+multi-category routing handles it with the existing single-agent flow.
+If YES → activate the orchestrator at `.cursor/skills/orchestrator/SKILL.md`.
+Pre-Flight routes 1-12 do NOT run — the orchestrator handles all routing,
+skill assignment, and gate identification internally.
 
 **Task-based routing (pick all that apply):**
 
@@ -80,7 +112,7 @@ Example: "It's unclear what this field is" is SIMULTANEOUSLY a design issue (no 
 6. **Is there a content dimension? (poor labels, unclear copy, UX microcopy, naming, "this doesn't read well", "it's unclear")**
    → Read `docs/content.md` (full file — content docs are shorter than design/engineering).
    → Read `docs/content-anti-patterns.md`.
-   → Read `docs/content-feedback-log.md` (recent entries for context).
+   → Read the first 30 lines of `docs/content-feedback-log.md` (most recent entries for context).
    → Process feedback, implement changes, then close the loop per Post-Flight.
 
 **Disambiguation defaults (when you're uncertain about a dimension):**
@@ -96,9 +128,29 @@ Example: "It's unclear what this field is" is SIMULTANEOUSLY a design issue (no 
 8. **Is it time for a doc audit?** (check `docs/doc-audit-log.md` — if last audit was 7+ days ago or the file doesn't exist, suggest running one)
    → Activate `doc-audit` skill at `.cursor/skills/doc-audit/SKILL.md`.
 
+9. **Am I touching the playground? (any file under `playground/src/app/components/`, `playground/src/components/`, or `playground/src/app/layout.tsx`)**
+   → Activate `playground` skill at `.cursor/skills/playground/SKILL.md`.
+   → The skill handles architecture rules, composition rules, import decision tree, and post-build parity.
+   → This route is **mandatory** — a file-scoped rule (`.cursor/rules/playground-components.md`) also fires automatically when touching component pages, but the skill must be read in full before writing any code.
+   → **Before any edit**, apply Engineering guardrail #18 (Intent Gate): classify the task as Component visual / Documentation-structure / Shell / Ambiguous. Component visual changes NEVER go to playground pages.
+
+10. **Am I touching CMS fields or frontend data fields?**
+    → Activate `cms-parity` skill at `.cursor/skills/cms-parity/SKILL.md`.
+
+11. **Am I doing a checkpoint, merge to main, or deploy?**
+    → Activate `checkpoint` skill at `.cursor/skills/checkpoint/SKILL.md`.
+
+12. **Am I creating or modifying components in `src/`?**
+    → Activate `cross-app-parity` skill at `.cursor/skills/cross-app-parity/SKILL.md`.
+
 Do NOT read docs that don't match your task. Do NOT read full doc files when only one section is relevant. The Section Index exists so you can target-read.
 
 # Post-Flight: Mandatory Reflection
+
+> If the orchestrator is active for this task, Post-Flight is handled by
+> the orchestrator's Phase 5 (document.md). Do not run Post-Flight separately
+> for orchestrated work. Non-orchestrated tasks in the same session still
+> follow normal Post-Flight.
 
 **After completing any design, engineering, or content work**, close the loop. This is not optional — skipping it means the knowledge generated by the task is lost.
 
@@ -154,169 +206,27 @@ Local `src/styles/` exists for site-specific overrides not yet promoted to the p
 
 # Multi-App Versioning
 
-Each app with its own deployment lifecycle has a version manifest (JSON file at the repo root). The version scripts are data-driven — `scripts/version-bump.mjs` and `scripts/version-release.mjs` contain an `APPS` config map. **When adding a new versioned app, register it in both scripts.**
-
-## Manifest Structure (shared across all apps)
-
-| Field | Meaning |
-|---|---|
-| `version` | The development version (what `dev` branch is building toward) |
-| `release.version` | The deployed version (what's live on Vercel from `main`) |
-| `release.name` | Display name, e.g. "Élan 1.0.0" or "ASCII Art Studio 0.1.0" |
-| `release.releasedAt` | ISO 8601 timestamp of last deploy |
-
-## Registered Apps
-
-| App | Manifest | Sync target | Version commands |
-|-----|----------|-------------|------------------|
-| **Élan** (design system + portfolio) | `elan.json` | `playground/src/lib/elan.ts` | `npm run version:patch/minor/major/release/analyze/auto` |
-| **ASCII Art Studio** | `ascii-studio.json` | `ascii-tool/src/lib/version.ts` | `npm run ascii-tool:version:patch/minor/major/release` |
-
-## Semver Policy (applies to all apps)
-
-- **Patch** (x.y.Z): Bug fixes, value tweaks, minor component adjustments
-- **Minor** (x.Y.0): New features, new components, non-breaking additions
-- **Major** (X.0.0): Breaking changes, API changes, architectural shifts
-
-## Checkpoint Workflow
-
-When the user says "checkpoint", "merge to main", or "deploy":
-
-```bash
-# 1. Verify version level is appropriate (auto-bumps if needed)
-npm run version:auto                       # Analyzes git diff → applies patch/minor/major if needed
-
-# 2. Release ALL apps that have unreleased changes
-npm run version:release                    # Élan
-npm run ascii-tool:version:release         # ASCII Art Studio (skip if no changes)
-
-git add elan.json ascii-studio.json
-git commit -m "release: Élan $(node -p \"require('./elan.json').release.version\"), ASCII Art Studio $(node -p \"require('./ascii-studio.json').release.version\")"
-git checkout main
-git merge dev
-git push origin main
-git checkout dev
-
-# 3. Bump all released apps to next dev patch
-npm run version:patch
-npm run ascii-tool:version:patch
-
-git add elan.json ascii-studio.json
-git commit -m "chore: begin Élan $(node -p \"require('./elan.json').version\"), ASCII Art Studio $(node -p \"require('./ascii-studio.json').version\")"
-git push origin dev
-```
-
-**Runtime exposure:**
-- Main site: `<meta name="generator">` tag contains the Élan release version
-- Playground footer: shows live version, "last updated" date (live in dev via `/api/dev-info`, static in production), and change analysis badge (e.g., "22 changes · suggests minor")
-- Playground sidebar header: shows `Élan {version}` — live-updated in dev mode
-- ASCII Art Studio: version accessible via `ascii-tool/src/lib/version.ts`
-
-**Changelog:** `CHANGELOG.md` at repo root tracks what changed in each version for all apps. Prefix entries with the app name.
+Each app with its own deployment lifecycle has a version manifest at the repo root. For the full versioning workflow, semver policy, and checkpoint procedure, activate the `checkpoint` skill at `.cursor/skills/checkpoint/SKILL.md`.
 
 # Cross-App Parity Checklist
 
-This project has THREE Next.js apps: main site (`src/`), playground (`playground/`), and ASCII Art Studio (`ascii-tool/`). **This is a blocking gate — run after every creation or modification.**
-
-| What you did | What you MUST also do |
-|---|---|
-| Created a new component in `src/components/` | Create `playground/src/app/components/<slug>/page.tsx` preview AND add sidebar entry in `playground/src/components/sidebar.tsx` |
-| Modified a component in `src/components/` | Update `playground/src/components/<name>.tsx` (reusable version) AND `playground/src/app/components/<slug>/page.tsx` (demo). All three must stay in sync — behavior, visuals, and interaction patterns. See EAP-028. |
-| Added a font or dependency to root `package.json` | Add to `playground/package.json` too, wire in `playground/src/app/layout.tsx` |
-| Changed font loading in `src/app/(frontend)/layout.tsx` | Mirror in `playground/src/app/layout.tsx` |
-| Added CSS variables or tokens | Update `playground/src/app/globals.css` AND `ascii-tool/src/app/globals.css` if needed |
-| Modified `src/styles/tokens/` | Run `npm run sync-tokens` to update `playground/src/lib/tokens.ts` |
-| Modified `src/styles/tokens/_breakpoints.scss` | Update `--breakpoint-*` in BOTH `playground/src/app/globals.css` AND `ascii-tool/src/app/globals.css` `@theme` blocks. See AP-038 for why mixed breakpoint systems are an anti-pattern. |
-| Modified a DS component used by ASCII Art Studio | Update the Tailwind version in `ascii-tool/src/components/ui/` to match |
-| Modified a playground `Demo*` component or conducted a design experiment in playground | Update the corresponding production component in `src/components/ui/` to match the experiment's outcome. Document the decision. See EAP-030. |
-| Conducted a design experiment that changes token values or component API | Document the outcome in `docs/design-feedback-log.md` AND propagate to production in the same session |
-| Added a new app to the monorepo | Follow the **New App Onboarding Checklist** below |
+**This is a blocking gate — run after every creation or modification in `src/`.** Activate the `cross-app-parity` skill at `.cursor/skills/cross-app-parity/SKILL.md`.
 
 # New App Onboarding Checklist
 
-When adding a new Next.js app to this monorepo, **all steps are mandatory**. An app that exists without being documented is a maintenance hazard.
-
-| Step | What to do | Where |
-|------|-----------|-------|
-| 1 | Create the app directory with `package.json`, `next.config.ts`, `tsconfig.json`, `postcss.config.mjs` | `<app-dir>/` |
-| 2 | Copy and adapt `globals.css` from playground (synced design tokens via `@theme`) | `<app-dir>/src/app/globals.css` |
-| 3 | Wire Geist fonts + ThemeProvider in `layout.tsx` | `<app-dir>/src/app/layout.tsx` |
-| 4 | Register the port in `docs/port-registry.md` | Port 4000–5000 range |
-| 5 | Add `npm run <app-name>` script to root `package.json` | Root `package.json` |
-| 6 | **Add to the App Registry table in `AGENTS.md`** | This file, App Registry section |
-| 7 | Create a version manifest (`<app-name>.json`) at the repo root if the app has its own release cycle | Root |
-| 8 | Register the app in `scripts/version-bump.mjs` and `scripts/version-release.mjs` APPS config | Scripts |
-| 9 | Add version bump scripts to root `package.json` (`<app>:version:patch/minor/major/release`) | Root `package.json` |
-| 10 | Create a synced version TS file (`<app-dir>/src/lib/version.ts`) and register it as a sync target | App + scripts |
-| 11 | Update the Cross-App Parity Checklist to include the new app | This file |
-| 12 | Update `docs/engineering.md` §9 route namespace table | `docs/engineering.md` |
-| 13 | Document in `docs/engineering-feedback-log.md` | Feedback log |
-
-**Why this exists:** The ASCII Art Studio was the first app added after the initial two (main site + playground). Without this checklist, port registration, version control setup, and architecture documentation were done as afterthoughts rather than as part of the app creation workflow. This checklist makes those steps a first-class requirement.
+When adding a new Next.js app, follow the checklist in the `cross-app-parity` skill at `.cursor/skills/cross-app-parity/SKILL.md` §4.
 
 # CMS-Frontend Parity Checklist
 
-CMS data flows through a **three-layer stack**. A change to any one layer MUST be accompanied by changes to the other two. **This is a blocking gate — run after every field addition, removal, or rename.**
-
-**The four layers:**
-1. **Schema** — `src/globals/*.ts` or `src/collections/*.ts` (what the Payload admin panel shows)
-2. **Data fetch** — `src/app/(frontend)/*/page.tsx` (server component that fetches from CMS and passes to client — MUST include `id`)
-3. **UI** — `src/app/(frontend)/*Client.tsx` (TypeScript types, inline edit `*_FIELDS` definitions, rendering)
-4. **Inline edit** — Every CMS text field wrapped in `EditableText` when admin, with `EditButton` for full admin access
-
-| What you did | What you MUST also do |
-|---|---|
-| Added a field to a Payload global/collection schema | 1. Add to the `page.tsx` data fetch mapping (incl. `id` and fallbacks). 2. Add to the `*Client.tsx` TypeScript type. 3. Add to the inline edit `*_FIELDS` array. 4. Render in the component. 5. Wrap with `EditableText` when admin. 6. **Restart the dev server.** |
-| Added a field to a frontend type or inline edit fields | 1. Add to the Payload schema (`src/globals/` or `src/collections/`). 2. Add to the `page.tsx` data fetch mapping. 3. **Restart the dev server.** |
-| Modified the `page.tsx` data fetch | 1. Verify the Payload schema has the field. 2. Verify the client type and inline edit fields match. |
-| Renamed or changed a field's type | Update **all four layers** atomically. |
-| Removed a field | Remove from all four layers. |
-| Created a new component rendering CMS data | 1. Accept `id` and `isAdmin` props. 2. Wrap text fields in `EditableText` when admin. 3. Add `EditButton`. 4. Pass `id` from server fetch. 5. Pass `isAdmin` from parent. See EAP-029. |
-
-**Quick verification:** After any field change, run `curl -s http://localhost:4000/api/globals/<slug> | python3 -m json.tool` and confirm every field in the JSON response matches the frontend TypeScript type.
-
-**Why this exists:** CMS schema, data fetch, and frontend UI are three separate manual maintenance points. Without atomic updates, fields silently drift: the admin panel shows a field the frontend ignores, or the frontend renders a field the CMS doesn't persist. Five incidents in one session (ENG-027 through ENG-031) proved incremental patching doesn't work — this checklist prevents the class of failure.
+**This is a blocking gate — run after every field addition, removal, or rename.** Activate the `cms-parity` skill at `.cursor/skills/cms-parity/SKILL.md`.
 
 # Token Sync Protocol
 
-When modifying any file in `src/styles/tokens/`:
-1. Make the change in the SCSS source of truth
-2. Run `npm run sync-tokens` to regenerate playground data
-3. Verify: `curl -sI http://localhost:4001/tokens/colors`
-4. If adding new semantic tokens, update `playground/src/app/globals.css`
+When modifying any file in `src/styles/tokens/`, follow the sync protocol in the `cross-app-parity` skill at `.cursor/skills/cross-app-parity/SKILL.md` §2.
 
 # Component Registry
 
-`archive/registry.json` is the **single source of truth** for all design system artifacts.
-
-**When creating a new artifact — all three steps are mandatory:**
-
-**Step 1: Registry entry** — Add to `archive/registry.json`:
-```json
-{
-  "id": "<experiment>-<kebab-name>",
-  "name": "Human-Readable Name",
-  "type": "Component | Page | Token | Style",
-  "experiment": "experiment-XX | shared",
-  "status": "active",
-  "description": "What this artifact does.",
-  "sourcePath": "src/path/to/file",
-  "createdAt": "<ISO 8601 timestamp>",
-  "createdBy": "user | cursor",
-  "origin": { "type": "custom | library | hybrid", "library": "...", "url": "..." },
-  "tags": ["relevant", "tags"],
-  "hasPreview": false
-}
-```
-
-**Step 2: Playground preview** (Components only) —
-Create page at `playground/src/app/components/<kebab-name>/page.tsx` and add sidebar entry in `playground/src/components/sidebar.tsx`. A component without a preview is incomplete.
-
-**Step 3: Cross-app parity check** — Run the checklist above.
-
-**Archiving:** Set `status` to `"archived"`, populate `archivePath`/`archivedAt`/`archivedBy`/`reason`, move file to `archive/`.
-**Restoring:** Set `status` to `"active"`, remove archive fields, move back to `sourcePath`.
-**Origin types:** `custom` (from scratch) · `library` (wrapper/direct usage) · `hybrid` (custom + library)
+`archive/registry.json` is the single source of truth for all design system artifacts. For the full creation/archiving protocol, see the `cross-app-parity` skill at `.cursor/skills/cross-app-parity/SKILL.md` §3.
 
 # Archive — Cold Storage
 

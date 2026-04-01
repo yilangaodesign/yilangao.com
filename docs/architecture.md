@@ -38,6 +38,14 @@ The project is split across **three artifacts** that serve different audiences:
 │  │  Next.js 16 · Tailwind 4                              │ │
 │  │  Port 4001 (dev)                                      │ │
 │  └────────────────────────────────────────────────────────┘ │
+│                                                             │
+│  ┌────────────────────────────────────────────────────────┐ │
+│  │  ascii-tool/  (subdirectory, separate Next.js app)     │ │
+│  │  ──────────────────────────────────────────────        │ │
+│  │  Standalone ASCII art/video creative tool              │ │
+│  │  Next.js 16                                            │ │
+│  │  Port 4002 (dev) · Version manifest: ascii-studio.json │ │
+│  └────────────────────────────────────────────────────────┘ │
 └─────────────────────────────────────────────────────────────┘
 ```
 

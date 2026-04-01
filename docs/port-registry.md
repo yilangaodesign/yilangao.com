@@ -23,14 +23,16 @@
 
 | Service | Default Port | Current Port | Status | PID | Notes |
 |---|---|---|---|---|---|
-| Main site (`yilangao.com`) | 4000 | 4000 | running | 33905 | `npm run dev` |
-| Playground | 4001 | 4001 | running | 53499 | `npm run playground` |
-| ASCII Art Studio | 4002 | 4002 | running | 73469 | `npm run ascii-tool` |
+| Main site (`yilangao.com`) | 4000 | 4000 | running | 70330 | `npm run dev` |
+| Playground | 4001 | 4001 | running | 72072 | `npm run playground` |
+| ASCII Art Studio | 4002 | 4002 | stopped | — | — |
 
 ## Change Log
 
 | Timestamp (UTC) | Service | Action | Port | Reason |
 |---|---|---|---|---|
+| 2026-04-01 13:42 | Main site | started | 4000 | Session boot — nothing listening on 4000 |
+| 2026-04-01 13:42 | Playground | started | 4001 | Session boot — nothing listening on 4001; ENG-077 token fix + restart |
 | 2026-03-29 01:30 | Main site | started | 4000 | Fresh start after cleanup |
 | 2026-03-29 16:48 | Main site | restarted | 4000 | Restarted with real Supabase DATABASE_URL (pooler) |
 | 2026-03-29 21:25 | Main site | restarted | 4000 | Restarted to sync Payload schema (period field on teams) |
