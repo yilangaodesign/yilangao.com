@@ -5,7 +5,8 @@
 // =============================================================================
 // Appearance: color/intent (neutral, highlight, positive, negative, inverse, always-dark, always-light)
 // Emphasis:   visual weight (bold, regular, subtle, minimal)
-// Reference:  One GS Design System button architecture
+// Sizing:     One GS reference — icon = label line-height, padding-derived height,
+//             flex gap for icon-label spacing, py < px at all sizes.
 // =============================================================================
 
 .button {
@@ -13,10 +14,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0;
   font-family: $portfolio-font-sans;
   font-weight: $portfolio-weight-medium;
-  line-height: $portfolio-leading-tight;
   border-radius: $portfolio-radius-sm;
   border: 1px solid transparent;
   white-space: nowrap;
@@ -37,7 +36,7 @@
 }
 
 // ---------------------------------------------------------------------------
-// Icon wrapper — bounding-box spacing model
+// Icon wrapper — direct sizing (icon = label line-height per size)
 // ---------------------------------------------------------------------------
 
 .iconWrap {
@@ -224,6 +223,45 @@
 }
 
 // ---------------------------------------------------------------------------
+// Warning (amber/yellow caution actions)
+// ---------------------------------------------------------------------------
+
+.warning {
+  &.bold {
+    background-color: $portfolio-surface-warning-bold;
+    color: $portfolio-yellow-100;
+
+    &:hover:not(:disabled) { background-color: $portfolio-yellow-40; }
+    &:active:not(:disabled) { background-color: $portfolio-yellow-50; }
+  }
+
+  &.regular {
+    background-color: transparent;
+    border-color: $portfolio-border-warning;
+    color: $portfolio-text-warning;
+
+    &:hover:not(:disabled) { background-color: $portfolio-surface-warning-subtle; }
+    &:active:not(:disabled) { background-color: $portfolio-yellow-20; }
+  }
+
+  &.subtle {
+    background-color: $portfolio-surface-warning-subtle;
+    color: $portfolio-text-warning;
+
+    &:hover:not(:disabled) { background-color: $portfolio-yellow-20; }
+    &:active:not(:disabled) { background-color: $portfolio-yellow-30; }
+  }
+
+  &.minimal {
+    background-color: transparent;
+    color: $portfolio-text-warning;
+
+    &:hover:not(:disabled) { background-color: $portfolio-surface-warning-subtle; }
+    &:active:not(:disabled) { background-color: $portfolio-yellow-20; }
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Inverse (for use on dark backgrounds)
 // ---------------------------------------------------------------------------
 
@@ -341,56 +379,60 @@
 }
 
 // =============================================================================
-// SIZES — Token-aligned, bounding-box model
+// SIZES — One GS reference model
 // =============================================================================
-// Height = primitive spacer, padding = utility spacer, icon = utility spacer.
-// No hardcoded px values for spacing.
+// Icon = label line-height. Padding derives height (py + line-height + py).
+// py < px at every size. Gap for icon-label spacing (no bounding-box padding).
 
 .xs {
-  height: $portfolio-spacer-3x;
+  min-height: $portfolio-spacer-3x;
   padding: $portfolio-spacer-utility-0-5x $portfolio-spacer-utility-0-75x;
   font-size: $portfolio-type-xs;
+  line-height: 16px;
+  gap: $portfolio-spacer-utility-0-5x;
 
   .iconWrap {
-    padding: $portfolio-spacer-0-25x;
-    width: $portfolio-spacer-utility-1-5x;
-    height: $portfolio-spacer-utility-1-5x;
+    width: 16px;
+    height: 16px;
   }
 }
 
 .sm {
-  height: $portfolio-spacer-4x;
+  min-height: $portfolio-spacer-4x;
   padding: $portfolio-spacer-utility-0-875x $portfolio-spacer-utility-1x;
-  font-size: $portfolio-type-xs;
+  font-size: $portfolio-type-sm;
+  line-height: 18px;
+  gap: $portfolio-spacer-utility-0-75x;
 
   .iconWrap {
-    padding: $portfolio-spacer-0-25x;
-    width: $portfolio-spacer-utility-1-75x;
-    height: $portfolio-spacer-utility-1-75x;
+    width: 18px;
+    height: 18px;
   }
 }
 
 .lg {
-  height: $portfolio-spacer-6x;
+  min-height: $portfolio-spacer-6x;
   padding: $portfolio-spacer-utility-1-625x $portfolio-spacer-utility-2x;
-  font-size: $portfolio-type-sm;
+  font-size: $portfolio-type-base;
+  line-height: 20px;
+  gap: $portfolio-spacer-utility-1-25x;
 
   .iconWrap {
-    padding: $portfolio-spacer-0-5x;
-    width: $portfolio-spacer-utility-2-25x;
-    height: $portfolio-spacer-utility-2-25x;
+    width: 20px;
+    height: 20px;
   }
 }
 
 .xl {
-  height: $portfolio-spacer-7x;
+  min-height: $portfolio-spacer-7x;
   padding: $portfolio-spacer-utility-2x $portfolio-spacer-utility-2-5x;
-  font-size: $portfolio-type-base;
+  font-size: $portfolio-type-lg;
+  line-height: 24px;
+  gap: $portfolio-spacer-utility-1-5x;
 
   .iconWrap {
-    padding: $portfolio-spacer-0-5x;
-    width: $portfolio-spacer-utility-2-5x;
-    height: $portfolio-spacer-utility-2-5x;
+    width: 24px;
+    height: 24px;
   }
 }
 
@@ -401,10 +443,10 @@
 .iconOnly {
   padding: 0;
 
-  &.xs { width: $portfolio-spacer-3x; }
-  &.sm { width: $portfolio-spacer-4x; }
-  &.lg { width: $portfolio-spacer-6x; }
-  &.xl { width: $portfolio-spacer-7x; }
+  &.xs { width: $portfolio-spacer-3x;  height: $portfolio-spacer-3x; }
+  &.sm { width: $portfolio-spacer-4x;  height: $portfolio-spacer-4x; }
+  &.lg { width: $portfolio-spacer-6x;  height: $portfolio-spacer-6x; }
+  &.xl { width: $portfolio-spacer-7x;  height: $portfolio-spacer-7x; }
 }
 
 .fullWidth {

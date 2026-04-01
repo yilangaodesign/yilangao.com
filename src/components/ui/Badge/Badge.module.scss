@@ -7,14 +7,41 @@
   font-family: $portfolio-font-sans;
   font-weight: $portfolio-weight-medium;
   line-height: $portfolio-leading-tight;
-  border-radius: $portfolio-radius-full;
   white-space: nowrap;
   user-select: none;
 }
 
 // ---------------------------------------------------------------------------
+// Shape
+// ---------------------------------------------------------------------------
+
+.pill {
+  border-radius: $portfolio-radius-full;
+}
+
+.squared {
+  border-radius: $portfolio-radius-sm;
+}
+
+// ---------------------------------------------------------------------------
+// Mono modifier
+// ---------------------------------------------------------------------------
+
+.mono {
+  font-family: $portfolio-font-mono;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+// ---------------------------------------------------------------------------
 // Sizes
 // ---------------------------------------------------------------------------
+
+.xs {
+  height: 16px;
+  padding: 0 $portfolio-spacer-0-5x;
+  font-size: 0.5625rem; // 9px
+}
 
 .sm {
   height: 20px;
@@ -35,6 +62,11 @@
 .default {
   background-color: $portfolio-surface-tertiary;
   color: $portfolio-text-secondary;
+}
+
+.muted {
+  background-color: $portfolio-surface-neutral-subtle;
+  color: $portfolio-text-tertiary;
 }
 
 .success {

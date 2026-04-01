@@ -8,10 +8,10 @@ export type {
 } from "./Button";
 
 export { Card, CardHeader, CardBody, CardFooter } from "./Card";
-export type { CardProps, CardSectionProps } from "./Card";
+export type { CardProps, CardSectionProps, CardVariant } from "./Card";
 
 export { Badge } from "./Badge";
-export type { BadgeProps, BadgeVariant, BadgeSize } from "./Badge";
+export type { BadgeProps, BadgeVariant, BadgeSize, BadgeShape } from "./Badge";
 
 export { Divider } from "./Divider";
 export type { DividerProps, DividerOrientation } from "./Divider";
@@ -98,3 +98,67 @@ export type { SegmentedControlProps, SegmentedControlItem } from "./SegmentedCon
 
 export { CodeBlock } from "./CodeBlock";
 export type { CodeBlockProps } from "./CodeBlock";
+
+// Tier 5 — Navigation & Layout
+export { NavItem } from "./NavItem";
+export type { NavItemProps, NavItemBaseProps } from "./NavItem";
+
+export {
+  Sheet,
+  SheetTrigger,
+  SheetClose,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+  SheetBody,
+  SheetFooter,
+} from "./Sheet";
+export type { SheetContentProps, SheetSide } from "./Sheet";
+
+export {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from "./Table";
+export type { TableCellProps } from "./Table";
+
+export { InlineCode } from "./InlineCode";
+export type { InlineCodeProps } from "./InlineCode";
+
+export {
+  CommandMenu,
+  CommandInput,
+  CommandList,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem,
+  CommandSeparator,
+  CommandShortcut,
+} from "./CommandMenu";
+export type { CommandMenuProps, CommandInputProps, CommandGroupProps, CommandItemProps } from "./CommandMenu";
+
+export { Kbd } from "./Kbd";
+export type { KbdProps } from "./Kbd";
+
+export { DescriptionList, DescriptionItem } from "./DescriptionList";
+export type { DescriptionListProps, DescriptionItemProps } from "./DescriptionList";
+
+// Tier 6 — Moved site-level components
+export { ArrowReveal } from "./ArrowReveal";
+export { ExpandCollapse } from "./ExpandCollapse";
+export { FadeIn } from "./FadeIn";
+export { Footer } from "./Footer";
+export { Marquee } from "./Marquee";
+export { MountEntrance } from "./MountEntrance";
+export { Navigation } from "./Navigation";
+export { ScrollSpy } from "./ScrollSpy";
+export type { ScrollSpySection } from "./ScrollSpy";
+export { StaggerChildren, StaggerItem } from "./StaggerChildren";
+export { TestimonialCard } from "./TestimonialCard";
+export type { TestimonialCardProps } from "./TestimonialCard";
+export { ThemeProvider } from "./ThemeProvider";
+export { ThemeToggle } from "./ThemeToggle";

@@ -215,6 +215,7 @@ $portfolio-overlay-black-06: rgba(0, 0, 0, 0.06);
 $portfolio-overlay-black-08: rgba(0, 0, 0, 0.08);
 $portfolio-overlay-black-10: rgba(0, 0, 0, 0.10);
 $portfolio-overlay-black-14: rgba(0, 0, 0, 0.14);
+$portfolio-overlay-black-40: rgba(0, 0, 0, 0.40);
 
 // — Text ··································································
 $portfolio-text-neutral-bold: $portfolio-neutral-100;
@@ -279,6 +280,7 @@ $portfolio-surface-inverse: $portfolio-surface-inverse-bold;
 
 $portfolio-text-primary: $portfolio-text-neutral-bold;
 $portfolio-text-secondary: $portfolio-text-neutral-regular;
+$portfolio-text-tertiary: $portfolio-text-neutral-subtle;
 $portfolio-text-helper: $portfolio-text-neutral-subtle;
 $portfolio-text-placeholder: $portfolio-text-neutral-minimal;
 $portfolio-text-disabled: $portfolio-text-neutral-disabled;

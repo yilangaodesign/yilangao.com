@@ -1,15 +1,19 @@
 import { forwardRef, type HTMLAttributes, type ReactNode } from "react";
 import styles from "./Card.module.scss";
 
+export type CardVariant = "default" | "muted";
+
 export interface CardProps extends HTMLAttributes<HTMLDivElement> {
+  variant?: CardVariant;
   elevated?: boolean;
   interactive?: boolean;
 }
 
 export const Card = forwardRef<HTMLDivElement, CardProps>(
-  ({ elevated = false, interactive = false, className, children, ...props }, ref) => {
+  ({ variant = "default", elevated = false, interactive = false, className, children, ...props }, ref) => {
     const cls = [
       styles.card,
+      variant !== "default" && styles[variant],
       elevated && styles.elevated,
       interactive && styles.interactive,
       className,

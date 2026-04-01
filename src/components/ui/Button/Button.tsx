@@ -6,6 +6,7 @@ export type ButtonAppearance =
   | "highlight"
   | "positive"
   | "negative"
+  | "warning"
   | "inverse"
   | "always-dark"
   | "always-light";
@@ -62,7 +63,11 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             {leadingIcon}
           </span>
         )}
-        {children && <span className={styles.label}>{children}</span>}
+        {children && (
+          <span className={iconOnly ? styles.iconWrap : styles.label}>
+            {children}
+          </span>
+        )}
         {trailingIcon && (
           <span className={styles.iconWrap} aria-hidden="true">
             {trailingIcon}

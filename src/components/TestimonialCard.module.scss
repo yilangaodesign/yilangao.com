@@ -1,4 +1,4 @@
-@use '../styles' as *;
+@use '@yilangaodesign/design-system/scss' as *;
 
 // ── TESTIMONIAL CARD ────────────────────────────────────────────────────────
 // Sits in the homepage masonry grid alongside project cards.
@@ -8,8 +8,8 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: $portfolio-spacer-1-5x;
-  padding: $portfolio-spacer-2x;
+  gap: $portfolio-spacing-04;
+  padding: $portfolio-spacing-05;
   background-color: $portfolio-surface-secondary;
   border: 1px solid $portfolio-border-subtle;
   border-radius: $portfolio-radius-sm;
@@ -35,7 +35,7 @@
 .quoteBlock {
   display: flex;
   flex-direction: column;
-  gap: $portfolio-spacer-0-5x;
+  gap: $portfolio-spacing-02;
 }
 
 .quoteMark {
@@ -69,7 +69,7 @@
 .attribution {
   display: flex;
   align-items: center;
-  gap: $portfolio-spacer-1x;
+  gap: $portfolio-spacing-03;
   margin-top: auto;
 }
 
@@ -130,8 +130,8 @@
 
 .adminOverlay {
   position: absolute;
-  top: $portfolio-spacer-1x;
-  right: $portfolio-spacer-1x;
+  top: $portfolio-spacing-03;
+  right: $portfolio-spacing-03;
   display: flex;
   gap: 4px;
   z-index: 10;
@@ -229,9 +229,9 @@
   position: absolute;
   bottom: 100%;
   right: 0;
-  margin-bottom: $portfolio-spacer-0-5x;
+  margin-bottom: $portfolio-spacing-02;
   width: 260px;
-  padding: $portfolio-spacer-1x;
+  padding: $portfolio-spacing-03;
   background: $portfolio-surface-primary;
   border: 1px solid $portfolio-border-subtle;
   border-radius: $portfolio-radius-sm;
@@ -239,7 +239,7 @@
   z-index: 100;
   display: flex;
   flex-direction: column;
-  gap: $portfolio-spacer-0-5x;
+  gap: $portfolio-spacing-02;
 }
 
 .linkedinEditorLabel {
@@ -253,7 +253,7 @@
 
 .linkedinEditorInput {
   width: 100%;
-  padding: $portfolio-spacer-0-5x $portfolio-spacer-1x;
+  padding: $portfolio-spacing-02 $portfolio-spacing-03;
   font-family: $portfolio-font-sans;
   font-size: $portfolio-type-sm;
   line-height: $portfolio-leading-normal;
@@ -280,12 +280,12 @@
 .linkedinEditorActions {
   display: flex;
   justify-content: flex-end;
-  gap: $portfolio-spacer-0-5x;
+  gap: $portfolio-spacing-02;
 }
 
 .linkedinEditorCancel {
   @include button-reset;
-  padding: $portfolio-spacer-0-25x $portfolio-spacer-1x;
+  padding: $portfolio-spacing-01 $portfolio-spacing-03;
   font-family: $portfolio-font-sans;
   font-size: $portfolio-type-xs;
   font-weight: $portfolio-weight-medium;
@@ -306,7 +306,7 @@
 
 .linkedinEditorSave {
   @include button-reset;
-  padding: $portfolio-spacer-0-25x $portfolio-spacer-1x;
+  padding: $portfolio-spacing-01 $portfolio-spacing-03;
   font-family: $portfolio-font-sans;
   font-size: $portfolio-type-xs;
   font-weight: $portfolio-weight-semibold;

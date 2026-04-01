@@ -1,19 +1,19 @@
-@use '../styles' as *;
+@use '@yilangaodesign/design-system/scss' as *;
 
 .footer {
   border-top: 1px solid $portfolio-border-subtle;
 }
 
 .footerInner {
-  max-width: $elan-container-wide;
+  max-width: $portfolio-container-lg;
   margin: 0 auto;
-  padding: $portfolio-spacer-4x $portfolio-spacer-2x;
+  padding: $portfolio-spacing-07 $portfolio-spacing-05;
   display: flex;
   align-items: center;
   justify-content: space-between;
 
-  @media #{$elan-mq-sm} {
-    padding: $portfolio-spacer-4x;
+  @media #{$portfolio-mq-md} {
+    padding: $portfolio-spacing-07;
   }
 }
 
@@ -25,7 +25,7 @@
 
 .footerLinks {
   display: flex;
-  gap: $portfolio-spacer-2x;
+  gap: $portfolio-spacing-05;
 }
 
 .footerLink {
@@ -35,7 +35,7 @@
   text-decoration: none;
   display: inline-flex;
   align-items: center;
-  gap: $portfolio-spacer-0-25x;
+  gap: $portfolio-spacing-01;
   @include transition-fast;
 
   &:hover {

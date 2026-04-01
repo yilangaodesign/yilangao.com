@@ -1,15 +1,15 @@
-@use "../styles" as *;
+@use "@yilangaodesign/design-system/scss" as *;
 
 .rail {
   position: fixed;
-  right: $portfolio-spacer-2x;
+  right: $portfolio-spacing-05;
   top: 50%;
   transform: translateY(-50%);
   z-index: 40;
   display: none;
   pointer-events: none;
 
-  @media #{$elan-mq-md} {
+  @media #{$portfolio-mq-lg} {
     display: flex;
   }
 }
@@ -17,14 +17,14 @@
 .track {
   display: flex;
   flex-direction: column;
-  gap: $portfolio-spacer-1x;
+  gap: $portfolio-spacing-03;
   align-items: flex-end;
   touch-action: none;
   user-select: none;
   cursor: pointer;
   pointer-events: auto;
-  padding: $portfolio-spacer-1-5x;
-  margin: -$portfolio-spacer-1-5x;
+  padding: $portfolio-spacing-04;
+  margin: -$portfolio-spacing-04;
 
   &[data-dragging] {
     cursor: grabbing;
@@ -37,14 +37,14 @@
   align-items: center;
   justify-content: flex-end;
   width: 28px;
-  height: $portfolio-spacer-2x;
+  height: $portfolio-spacing-05;
 }
 
 .label {
   position: absolute;
-  right: calc(100% + #{$portfolio-spacer-1x});
+  right: calc(100% + #{$portfolio-spacing-03});
   top: 0;
-  height: $portfolio-spacer-2x;
+  height: $portfolio-spacing-05;
   display: flex;
   align-items: center;
   font-family: $portfolio-font-mono;
