@@ -4,9 +4,31 @@
 >
 > **Who reads this:** AI agents at session start (scan recent entries for context), and during incident response (check for recurring patterns).
 > **Who writes this:** AI agents after each incident resolution via the `engineering-iteration` skill.
-> **Last updated:** 2026-04-01 (ENG-077: Local dev servers down; playground SCSS undefined semantic tokens)
+> **Last updated:** 2026-04-01 (ENG-078: Version mismatch — 1.1.0 displayed when major bump warranted 2.0.0; ENG-079: Checkpoint release Élan 2.0.0)
 >
 > **For agent skills:** Read only the first 30 lines of this file (most recent entries) for pattern detection. The full file is a historical audit trail — do not read it in its entirety during normal work.
+
+---
+
+## Session: 2026-04-01 — Version mismatch and checkpoint release
+
+#### ENG-078: "Playground footer shows 1.1.0 but suggests major — should be 2.0.0"
+
+**Issue:** The playground footer displayed version `1.1.0` alongside a "suggests major" badge. Under semver, a major bump from release `1.0.0` should yield `2.0.0`, not `1.1.0`. The user correctly identified the inconsistency.
+
+**Root Cause:** A previous session ran `version:minor` (bumping `1.0.0 → 1.1.0`), but subsequent work introduced breaking changes (4 component deletions in `playground/src/components/ui/`). The `version-analyze.mjs` script and the `/api/dev-info` route correctly detected the deletions as a `major`-level change, and the `isVersionSufficient` function correctly reported that `1.1.0` did not satisfy a major bump (`majorDiff = 0`). The system was advisory-only — it flagged the mismatch but did not auto-correct, and no one ran `version:auto --apply` or `version:major` to reconcile.
+
+**Resolution:** Ran `npm run version:major` to bump `1.1.0 → 2.0.0`. Verified with `version-analyze.mjs --quiet` that `alreadySufficient: true`. The analysis and display logic were correct — the version simply hadn't been bumped to match.
+
+**Lesson:** When the version-analyze system flags a mismatch, it should be resolved before committing further work. Consider making `version:auto --apply` part of the pre-commit or pre-checkpoint workflow rather than a manual opt-in step.
+
+#### ENG-079: Checkpoint release Élan 2.0.0, ASCII Art Studio 0.1.0
+
+**Issue:** 130 uncommitted files spanning agent docs, new components, playground infrastructure, and build config needed to be committed and deployed.
+
+**Resolution:** Organized 130 files into 8 logical commits following atomic commit principles (docs → deps → new components → component refinements → frontend pages → playground infra → playground pages → version bump). Then executed the full checkpoint procedure per `.cursor/skills/checkpoint/SKILL.md`: stamped releases for both Élan (2.0.0) and ASCII Art Studio (0.1.0), updated CHANGELOG.md, merged `dev → main` (fast-forward), pushed main to trigger Vercel auto-deploy, switched back to dev, bumped to next dev patches (Élan 2.0.1, ASCII Art Studio 0.1.1), pushed dev.
+
+**Cross-category note:** Version control / release automation — second entry. Frequency map updated below.
 
 ---
 
