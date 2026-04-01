@@ -1,0 +1,17 @@
+@use '../../../styles' as *;
+
+.toggle {
+  @include button-reset;
+  border: 1px solid $portfolio-border-subtle;
+  border-radius: $portfolio-radius-sm;
+  padding: $portfolio-spacer-utility-0-5x $portfolio-spacer-utility-0-75x;
+  cursor: pointer;
+  color: $portfolio-text-primary;
+  @include body-sm;
+  @include transition-fast;
+
+  &:hover {
+    background-color: $portfolio-surface-secondary;
+    border-color: $portfolio-border-strong;
+  }
+}

@@ -1,0 +1,37 @@
+@use '../../../styles' as *;
+
+.list {
+  margin: 0;
+  padding: 0;
+}
+
+.item {
+  display: flex;
+  align-items: baseline;
+  gap: $portfolio-spacer-2x;
+  padding: $portfolio-spacer-1x 0;
+
+  &:not(:last-child) {
+    border-bottom: 1px solid $portfolio-border-subtle;
+  }
+}
+
+.label {
+  flex-shrink: 0;
+  width: 100px;
+  font-family: $portfolio-font-mono;
+  font-size: $portfolio-type-xs;
+  font-weight: $portfolio-weight-medium;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: $portfolio-text-tertiary;
+}
+
+.value {
+  flex: 1;
+  min-width: 0;
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-sm;
+  color: $portfolio-text-primary;
+  margin: 0;
+}

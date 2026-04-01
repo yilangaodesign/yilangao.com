@@ -1,0 +1,49 @@
+@use '../../../styles' as *;
+
+.footer {
+  border-top: 1px solid $portfolio-border-subtle;
+}
+
+.footerInner {
+  max-width: $elan-container-wide;
+  margin: 0 auto;
+  padding: $portfolio-spacer-4x $portfolio-spacer-2x;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  @media #{$elan-mq-sm} {
+    padding: $portfolio-spacer-4x;
+  }
+}
+
+.copyright {
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-xs;
+  color: $portfolio-text-placeholder;
+}
+
+.footerLinks {
+  display: flex;
+  gap: $portfolio-spacer-2x;
+}
+
+.footerLink {
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-xs;
+  color: $portfolio-text-secondary;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: $portfolio-spacer-0-25x;
+  @include transition-fast;
+
+  &:hover {
+    color: $portfolio-text-primary;
+  }
+}
+
+.arrow {
+  font-size: 0.625rem;
+  opacity: 0.5;
+}

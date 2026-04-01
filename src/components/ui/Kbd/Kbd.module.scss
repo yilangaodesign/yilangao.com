@@ -1,0 +1,19 @@
+@use '../../../styles' as *;
+
+.kbd {
+  display: inline-flex;
+  align-items: center;
+  font-family: $portfolio-font-mono;
+  font-size: 10px;
+  font-weight: $portfolio-weight-medium;
+  line-height: 1;
+  color: $portfolio-text-secondary;
+  padding: 2px $portfolio-spacer-0-5x;
+  white-space: nowrap;
+}
+
+.bordered {
+  border: 1px solid $portfolio-border-subtle;
+  border-radius: $portfolio-radius-xs;
+  opacity: 0.6;
+}

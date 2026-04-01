@@ -1,0 +1,63 @@
+@use '../../../styles' as *;
+
+.wrapper {
+  overflow-x: auto;
+  border: 1px solid $portfolio-border-subtle;
+  border-radius: $portfolio-radius-sm;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-sm;
+}
+
+// ---------------------------------------------------------------------------
+// Header
+// ---------------------------------------------------------------------------
+
+.header {
+  background-color: $portfolio-surface-neutral-subtle;
+}
+
+.head {
+  padding: $portfolio-spacer-1x $portfolio-spacer-2x;
+  font-size: $portfolio-type-xs;
+  font-weight: $portfolio-weight-medium;
+  text-align: left;
+  color: $portfolio-text-secondary;
+  white-space: nowrap;
+  border-bottom: 1px solid $portfolio-border-subtle;
+}
+
+// ---------------------------------------------------------------------------
+// Body
+// ---------------------------------------------------------------------------
+
+.body {}
+
+.row {
+  &:not(:last-child) {
+    border-bottom: 1px solid $portfolio-border-subtle;
+  }
+}
+
+.cell {
+  padding: $portfolio-spacer-1x $portfolio-spacer-2x;
+  color: $portfolio-text-primary;
+  vertical-align: top;
+}
+
+// ---------------------------------------------------------------------------
+// Cell modifiers
+// ---------------------------------------------------------------------------
+
+.mono {
+  font-family: $portfolio-font-mono;
+  font-size: $portfolio-type-xs;
+}
+
+.accent {
+  color: $portfolio-text-brand-bold;
+}

@@ -1,0 +1,223 @@
+@use '../../../styles' as *;
+
+// ---------------------------------------------------------------------------
+// Overlay
+// ---------------------------------------------------------------------------
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background-color: $portfolio-overlay-black-40;
+  animation: cmd-overlay-in 150ms ease-out;
+
+  &[data-state='closed'] {
+    animation: cmd-overlay-out 100ms ease-in;
+  }
+}
+
+@keyframes cmd-overlay-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes cmd-overlay-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+// ---------------------------------------------------------------------------
+// Dialog
+// ---------------------------------------------------------------------------
+
+.dialog {
+  position: fixed;
+  z-index: 50;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: 480px;
+  border: 1px solid $portfolio-border-subtle;
+  border-radius: $portfolio-radius-md;
+  background-color: $portfolio-surface-primary;
+  box-shadow: $portfolio-shadow-lg;
+  overflow: hidden;
+  outline: none;
+  animation: cmd-dialog-in 150ms ease-out;
+
+  &[data-state='closed'] {
+    animation: cmd-dialog-out 100ms ease-in;
+  }
+}
+
+@keyframes cmd-dialog-in {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+  }
+}
+
+@keyframes cmd-dialog-out {
+  from {
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-50%) scale(0.96);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Command root
+// ---------------------------------------------------------------------------
+
+.command {
+  display: flex;
+  flex-direction: column;
+}
+
+// ---------------------------------------------------------------------------
+// Input
+// ---------------------------------------------------------------------------
+
+.inputWrapper {
+  display: flex;
+  align-items: center;
+  gap: $portfolio-spacer-1x;
+  padding: $portfolio-spacer-1-5x $portfolio-spacer-2x;
+  border-bottom: 1px solid $portfolio-border-subtle;
+}
+
+.searchIcon {
+  flex-shrink: 0;
+  color: $portfolio-text-tertiary;
+}
+
+.input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-sm;
+  color: $portfolio-text-primary;
+
+  &::placeholder {
+    color: $portfolio-text-tertiary;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// List
+// ---------------------------------------------------------------------------
+
+.list {
+  max-height: 300px;
+  overflow-y: auto;
+  padding: $portfolio-spacer-0-5x;
+}
+
+// ---------------------------------------------------------------------------
+// Empty
+// ---------------------------------------------------------------------------
+
+.empty {
+  padding: $portfolio-spacer-3x $portfolio-spacer-2x;
+  text-align: center;
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-sm;
+  color: $portfolio-text-tertiary;
+}
+
+// ---------------------------------------------------------------------------
+// Group
+// ---------------------------------------------------------------------------
+
+.group {
+  [cmdk-group-heading] {
+    padding: $portfolio-spacer-0-5x $portfolio-spacer-1x;
+    font-family: $portfolio-font-sans;
+    font-size: $portfolio-type-xs;
+    font-weight: $portfolio-weight-medium;
+    color: $portfolio-text-tertiary;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Item
+// ---------------------------------------------------------------------------
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: $portfolio-spacer-1x;
+  padding: $portfolio-spacer-1x $portfolio-spacer-1x;
+  border-radius: $portfolio-radius-sm;
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-sm;
+  color: $portfolio-text-primary;
+  cursor: pointer;
+  user-select: none;
+  @include transition-fast;
+
+  &[data-selected='true'] {
+    background-color: $portfolio-surface-neutral-subtle;
+  }
+
+  &[aria-disabled='true'] {
+    opacity: 0.4;
+    pointer-events: none;
+  }
+}
+
+.itemIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  color: $portfolio-text-secondary;
+
+  svg {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.itemLabel {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// ---------------------------------------------------------------------------
+// Separator
+// ---------------------------------------------------------------------------
+
+.separator {
+  height: 1px;
+  margin: $portfolio-spacer-0-5x 0;
+  background-color: $portfolio-border-subtle;
+}
+
+// ---------------------------------------------------------------------------
+// Shortcut
+// ---------------------------------------------------------------------------
+
+.shortcut {
+  margin-inline-start: auto;
+  font-family: $portfolio-font-mono;
+  font-size: 10px;
+  color: $portfolio-text-tertiary;
+}

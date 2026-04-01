@@ -1,0 +1,199 @@
+@use '../../../styles' as *;
+
+// ---------------------------------------------------------------------------
+// Overlay
+// ---------------------------------------------------------------------------
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background-color: $portfolio-overlay-black-40;
+  animation: sheet-overlay-in 200ms ease-out;
+
+  &[data-state='closed'] {
+    animation: sheet-overlay-out 150ms ease-in;
+  }
+}
+
+@keyframes sheet-overlay-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes sheet-overlay-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+// ---------------------------------------------------------------------------
+// Content panel
+// ---------------------------------------------------------------------------
+
+.content {
+  position: fixed;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  background-color: $portfolio-surface-primary;
+  border: 1px solid $portfolio-border-subtle;
+  box-shadow: $portfolio-shadow-lg;
+  overflow: hidden;
+  outline: none;
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+// Side variants
+.right {
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  max-width: 480px;
+  animation: sheet-slide-in-right 250ms ease-out;
+
+  &[data-state='closed'] {
+    animation: sheet-slide-out-right 200ms ease-in;
+  }
+}
+
+.left {
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  max-width: 480px;
+  animation: sheet-slide-in-left 250ms ease-out;
+
+  &[data-state='closed'] {
+    animation: sheet-slide-out-left 200ms ease-in;
+  }
+}
+
+.top {
+  top: 0;
+  left: 0;
+  right: 0;
+  height: auto;
+  max-height: 50vh;
+  animation: sheet-slide-in-top 250ms ease-out;
+
+  &[data-state='closed'] {
+    animation: sheet-slide-out-top 200ms ease-in;
+  }
+}
+
+.bottom {
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: auto;
+  max-height: 50vh;
+  animation: sheet-slide-in-bottom 250ms ease-out;
+
+  &[data-state='closed'] {
+    animation: sheet-slide-out-bottom 200ms ease-in;
+  }
+}
+
+// Slide keyframes
+@keyframes sheet-slide-in-right {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes sheet-slide-out-right {
+  from { transform: translateX(0); }
+  to { transform: translateX(100%); }
+}
+
+@keyframes sheet-slide-in-left {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes sheet-slide-out-left {
+  from { transform: translateX(0); }
+  to { transform: translateX(-100%); }
+}
+
+@keyframes sheet-slide-in-top {
+  from { transform: translateY(-100%); }
+  to { transform: translateY(0); }
+}
+
+@keyframes sheet-slide-out-top {
+  from { transform: translateY(0); }
+  to { transform: translateY(-100%); }
+}
+
+@keyframes sheet-slide-in-bottom {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+@keyframes sheet-slide-out-bottom {
+  from { transform: translateY(0); }
+  to { transform: translateY(100%); }
+}
+
+// ---------------------------------------------------------------------------
+// Header (sticky)
+// ---------------------------------------------------------------------------
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $portfolio-spacer-2x;
+  padding: $portfolio-spacer-2x $portfolio-spacer-3x;
+  border-bottom: 1px solid $portfolio-border-subtle;
+  background-color: $portfolio-surface-primary;
+  backdrop-filter: blur(8px);
+  flex-shrink: 0;
+}
+
+.title {
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-base;
+  font-weight: $portfolio-weight-semibold;
+  line-height: $portfolio-leading-tight;
+  color: $portfolio-text-primary;
+  margin: 0;
+}
+
+.description {
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-sm;
+  color: $portfolio-text-secondary;
+  margin: 0;
+}
+
+// ---------------------------------------------------------------------------
+// Body (scrollable)
+// ---------------------------------------------------------------------------
+
+.body {
+  flex: 1;
+  overflow-y: auto;
+  padding: $portfolio-spacer-3x;
+}
+
+// ---------------------------------------------------------------------------
+// Footer (pinned)
+// ---------------------------------------------------------------------------
+
+.footer {
+  display: flex;
+  align-items: center;
+  gap: $portfolio-spacer-1x;
+  padding: $portfolio-spacer-2x $portfolio-spacer-3x;
+  border-top: 1px solid $portfolio-border-subtle;
+  flex-shrink: 0;
+}

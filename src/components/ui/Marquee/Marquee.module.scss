@@ -1,0 +1,22 @@
+@use "@yilangaodesign/design-system/scss" as *;
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-33.333%); }
+}
+
+.viewport {
+  overflow: hidden;
+  mask-image: linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%);
+}
+
+.track {
+  display: flex;
+  width: max-content;
+  animation: marquee 25s linear infinite;
+
+  &[data-pause]:hover {
+    animation-play-state: paused;
+  }
+}
