@@ -47,12 +47,29 @@ npm run ascii-tool:version:release  # skip if no changes
 
 git add elan.json ascii-studio.json
 git commit -m "release: Élan $(node -p \"require('./elan.json').release.version\"), ASCII Art Studio $(node -p \"require('./ascii-studio.json').release.version\")"
+
+# 3. BUILD GATE — verify all apps build before merging (mandatory)
+#    If any build fails, STOP. Do not merge to main. Fix the error first.
+npm run build --prefix playground   # Playground (Vercel-deployed)
+npm run build                       # Main site
+npm run build --prefix ascii-tool   # ASCII Art Studio (skip if no changes)
+
+# 4. Merge to main and push
 git checkout main
 git merge dev
 git push origin main
 git checkout dev
 
-# 3. Bump all released apps to next dev patch
+# 5. Post-deploy verification — poll Vercel for deployment status
+#    Wait ~60s for Vercel to pick up the push, then check:
+sleep 60
+vercel ls --prod                    # Check latest deployment status
+#    If status is "Error", diagnose with:
+#      vercel inspect <deploy-url>
+#      Use Vercel API: GET /v2/deployments/<id>/events for build logs
+#    If status is "Ready", deployment succeeded.
+
+# 6. Bump all released apps to next dev patch
 npm run version:patch
 npm run ascii-tool:version:patch
 
@@ -60,6 +77,18 @@ git add elan.json ascii-studio.json
 git commit -m "chore: begin Élan $(node -p \"require('./elan.json').version\"), ASCII Art Studio $(node -p \"require('./ascii-studio.json').version\")"
 git push origin dev
 ```
+
+## Build Gate Details
+
+The build gate (step 3) is **mandatory** — it catches the same errors Vercel would
+encounter, but before the merge to main. Common failures:
+
+- **Module not found**: a dependency used by `src/components/ui/` is missing from
+  `playground/package.json` (Vercel installs from playground root)
+- **TypeScript errors**: type mismatches in component props
+- **Import path errors**: incorrect `@ds/*` aliases or circular imports
+
+If a build fails, fix the error on `dev`, re-run the build gate, then proceed.
 
 ## Pre-Checkpoint Verification
 

@@ -25,6 +25,7 @@
 | §10 | Versioning (Élan) | `docs/engineering/versioning.md` | Version bumps, releases |
 | §11 | CMS-Frontend Parity | `.cursor/skills/cms-parity/SKILL.md` | Adding/renaming CMS fields |
 | §12 | Media Storage | `docs/engineering/storage.md` | Uploading files, storage |
+| §13 | Deployment Verification | `docs/engineering/deployment.md` | Deploying, checking Vercel, build failures |
 | App. | Frequency Map | *(this file)* | Checking recurring patterns |
 
 ---
@@ -124,7 +125,7 @@ Recurring incidents should be escalated up this hierarchy until they stop recurr
 | Design system migration / upstream-first workflow | 1 | High — ENG-040. ScrollSpy promoted to DS; required `transpilePackages` + export path. |
 | Admin IA / discoverability | 3 | **High — ENG-042/043/046. Sidebar nav insufficient; dashboard is the only reliable entry point. Auto-login cookie gap masked the whole inline editing system.** |
 | Infrastructure / storage architecture | 3 | High — ENG-053. Supabase Storage added for cloud file persistence. ENG-055: Added `uploadMedia` API helper for inline file uploads via S3. ENG-060: Filename sanitization for S3-incompatible chars. |
-| Version control / release automation | 3 | **Critical — ENG-069/078/079. ENG-069: Stale footer dates, added `/api/dev-info` + `version-analyze.mjs`. ENG-078: Version 1.1.0 displayed when major warranted 2.0.0 — advisory system flagged it but no one applied the fix. ENG-079: First full checkpoint release (Élan 2.0.0). Consider making `version:auto --apply` a pre-checkpoint gate.** |
+| Version control / release automation | 4 | **Critical — ENG-069/078/079/080. ENG-080: Vercel build failed after checkpoint — monorepo @ds/* imports couldn't resolve node_modules on Vercel (Turbopack resolves relative to file location). Fixed via dual install command + build gate. Build gate now mandatory pre-merge step.** |
 | Radix primitive internal state vs mirrored props | 1 | Medium — ENG-071. Checkbox indeterminate icon branched on React `checked` while uncontrolled `defaultChecked="indeterminate"` leaves prop undefined; UI must follow `CheckboxIndicator` `data-state` (or context), not props alone. |
 | Scroll hijack on embedded canvas | 1 | High — ENG-072. onWheel handler on embedded DAG canvas intercepted page scroll. Embedded canvases must never capture wheel events; pan via drag only. See EAP-036. |
 | Playground ↔ production drift (one-way experiment) | 2 | **Critical — ENG-073, ENG-074. Drift from non-propagation AND from rebuilding demos with hardcoded values instead of token references. See EAP-030, EAP-055.** |

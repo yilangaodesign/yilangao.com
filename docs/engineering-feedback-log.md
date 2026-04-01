@@ -4,9 +4,30 @@
 >
 > **Who reads this:** AI agents at session start (scan recent entries for context), and during incident response (check for recurring patterns).
 > **Who writes this:** AI agents after each incident resolution via the `engineering-iteration` skill.
-> **Last updated:** 2026-04-01 (ENG-078: Version mismatch — 1.1.0 displayed when major bump warranted 2.0.0; ENG-079: Checkpoint release Élan 2.0.0)
+> **Last updated:** 2026-04-01 (ENG-080: Vercel build failure — module resolution for monorepo @ds/* imports)
 >
 > **For agent skills:** Read only the first 30 lines of this file (most recent entries) for pattern detection. The full file is a historical audit trail — do not read it in its entirety during normal work.
+
+---
+
+## Session: 2026-04-01 — Vercel deployment failure after checkpoint
+
+#### ENG-080: "Vercel deployment failed — Module not found for all @ds/* component imports"
+
+**Issue:** After the Élan 2.0.0 checkpoint merge to main, the Vercel deployment failed with `Command "npm run build" exited with 1`. Build logs showed `Module not found: Can't resolve 'next-themes'`, `framer-motion`, and multiple Radix UI packages — all from files in `src/components/ui/` imported via the `@ds/*` alias.
+
+**Root Cause:** The Vercel project `yilangao-design-system` has `rootDirectory: playground`. Vercel runs `npm install` only in `playground/`, creating `playground/node_modules/`. The `@ds/*` path alias resolves to `../src/components/ui/*` — files outside the playground directory. Next.js 16 uses Turbopack for production builds, and Turbopack resolves `node_modules` relative to each file's location. Files in `../src/` walk up to the repo root looking for `node_modules/`, which doesn't exist on Vercel (only `playground/node_modules/` does). Locally the build worked because the root `node_modules/` existed from the main site's `npm install`.
+
+**Resolution:**
+1. Updated Vercel install command via API: `npm install && cd .. && npm install --omit=dev` — ensures `node_modules/` exists at both playground and repo root levels
+2. Added 7 missing Radix/cmdk dependencies to `playground/package.json` (`@radix-ui/react-toast`, `@radix-ui/react-checkbox`, `@radix-ui/react-switch`, `@radix-ui/react-tooltip`, `@radix-ui/react-dropdown-menu`, `@radix-ui/react-select`, `cmdk`)
+3. Added webpack `resolve.modules` config to `playground/next.config.ts` (belt-and-suspenders for any webpack fallback)
+4. Fixed TypeScript error in `src/components/ui/Slider/Slider.tsx` (min/max needed numeric coercion)
+5. Redeployed — status: Ready
+
+**Systemic fix:** Added mandatory Build Gate to checkpoint skill (step 3 in `.cursor/skills/checkpoint/SKILL.md`). All apps must build locally before merging to main. Added post-deploy verification polling (step 5). Created `docs/engineering/deployment.md` (§13) documenting Vercel CLI commands, build log retrieval, and common failure patterns.
+
+**Cross-category note:** Also documented as ENG-079 (checkpoint process). Frequency map updated: Version control / release automation now at 4.
 
 ---
 
