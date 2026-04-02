@@ -413,7 +413,7 @@ function MixingPlayground() {
           className={styles.previewMono}
           style={{
             fontFamily: fontFamilyCSS(monoFont),
-            fontSize: "0.8125rem",
+            fontSize: "0.75rem",
           }}
         >
           <div style={{ marginBottom: "4px", opacity: 0.6 }}>

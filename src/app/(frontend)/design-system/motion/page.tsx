@@ -2,8 +2,8 @@
 
 import { useState, useRef, useCallback, useEffect } from "react";
 import Link from "next/link";
-import { FadeIn } from "@yilangaodesign/design-system";
-import { StaggerChildren, StaggerItem } from "@yilangaodesign/design-system";
+import { FadeIn } from "@/components/ui/FadeIn";
+import { StaggerChildren, StaggerItem } from "@/components/ui/StaggerChildren";
 import { MountEntrance } from "@/components/ui/MountEntrance/MountEntrance";
 import { ExpandCollapse } from "@/components/ui/ExpandCollapse/ExpandCollapse";
 import { ArrowReveal } from "@/components/ui/ArrowReveal/ArrowReveal";
@@ -462,7 +462,7 @@ export default function MotionPlaygroundPage() {
             <div className={styles.demoTitle}>scroll-behavior: smooth</div>
             <div className={styles.demoMeta}>src/app/globals.scss · applied to html element</div>
             <div className={styles.demoArea}>
-              <div style={{ textAlign: "center", fontSize: 13, lineHeight: 1.6 }}>
+              <div style={{ textAlign: "center", fontSize: 12, lineHeight: 1.6 }}>
                 Native smooth-scrolling for anchor navigation.<br />
                 Override per-element with <code>scroll-behavior: auto</code> for instant jumps.
               </div>
@@ -474,7 +474,7 @@ export default function MotionPlaygroundPage() {
             <div className={styles.demoTitle}>prefers-reduced-motion</div>
             <div className={styles.demoMeta}>@include reduced-motion · _interactive.scss</div>
             <div className={styles.demoArea}>
-              <div style={{ textAlign: "center", fontSize: 13, lineHeight: 1.6 }}>
+              <div style={{ textAlign: "center", fontSize: 12, lineHeight: 1.6 }}>
                 All Framer components use <code>useReducedMotion()</code>.<br />
                 CSS mixin zeroes animation/transition durations and resets scroll-behavior.<br />
                 Apply to any element: <code>@include reduced-motion;</code>

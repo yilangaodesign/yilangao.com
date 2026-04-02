@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import Link from "next/link";
-import { FadeIn } from "@yilangaodesign/design-system";
+import { FadeIn } from "@/components/ui/FadeIn";
 import AdminBar from "@/components/AdminBar";
 import ScrollSpy from "@/components/ui/ScrollSpy/ScrollSpy";
 import type { ScrollSpySection } from "@/components/ui/ScrollSpy/ScrollSpy";

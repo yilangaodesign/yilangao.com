@@ -33,7 +33,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={fontVariables}>
+    <html lang="en" data-theme="light" className={fontVariables}>
       <body>{children}</body>
     </html>
   );

@@ -3,8 +3,9 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { FadeIn } from "@yilangaodesign/design-system";
-import { StaggerChildren, StaggerItem } from "@yilangaodesign/design-system";
+import { FadeIn } from "@/components/ui/FadeIn";
+import { StaggerChildren, StaggerItem } from "@/components/ui/StaggerChildren";
+import { BREAKPOINTS } from "@/lib/breakpoints";
 import {
   DndContext,
   closestCenter,
@@ -414,8 +415,8 @@ export default function HomeClient({
   useEffect(() => {
     function update() {
       const w = window.innerWidth;
-      if (w >= 1024) setColumnCount(3);
-      else if (w >= 768) setColumnCount(2);
+      if (w >= BREAKPOINTS.md) setColumnCount(3);
+      else if (w >= BREAKPOINTS.sm) setColumnCount(2);
       else setColumnCount(1);
     }
     update();

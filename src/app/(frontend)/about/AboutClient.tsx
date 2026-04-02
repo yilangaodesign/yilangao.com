@@ -1,6 +1,6 @@
 "use client";
 
-import { FadeIn } from "@yilangaodesign/design-system";
+import { FadeIn } from "@/components/ui/FadeIn";
 import Navigation from "@/components/ui/Navigation/Navigation";
 import Footer from "@/components/ui/Footer/Footer";
 import ScrollSpy from "@/components/ui/ScrollSpy/ScrollSpy";

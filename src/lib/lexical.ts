@@ -53,6 +53,15 @@ export function lexicalToHtml(value: unknown): string {
   if (node.root) return lexicalToHtml(node.root);
 
   if (Array.isArray(node.children)) {
+    if (node.type === 'root') {
+      const paragraphs = node.children.filter((c) => c.type === 'paragraph');
+      if (paragraphs.length > 1) {
+        const result = paragraphs
+          .map((child) => lexicalToHtml(child))
+          .join('<br>');
+        return result;
+      }
+    }
     return node.children.map((child) => lexicalToHtml(child)).join('');
   }
 
@@ -113,10 +122,11 @@ export function extractLexicalText(value: unknown): string {
   if (node.text && typeof node.text === 'string') return node.text;
   if (node.root) return extractLexicalText(node.root);
   if (Array.isArray(node.children)) {
+    const sep = node.type === 'root' ? '\n' : ' ';
     return node.children
       .map((child) => extractLexicalText(child))
       .filter(Boolean)
-      .join(' ')
+      .join(sep)
       .trim();
   }
 
