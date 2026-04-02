@@ -4,7 +4,7 @@
 > and playground UI relate to each other — where code lives, how it flows, how it's
 > published, and how it's deployed.
 >
-> **Last updated:** 2026-04-01
+> **Last updated:** 2026-04-02
 
 ---
 
@@ -297,6 +297,46 @@ The `.vercel/project.json` at repo root links to the **Playground** project
 (`yilangao-design-system`), NOT the main site. Do not confuse them. The main site
 project (`yilangao-portfolio`) is configured via the Vercel dashboard.
 
+### 4.1 Visitor Access Control (Password Gate)
+
+The main site is behind a server-side password gate. All unauthenticated requests
+are redirected to a login page before any HTML is sent.
+
+**How it works:**
+
+```
+proxy.ts (runs before every request)
+├── /for/* , /admin/* , /api/* , static assets  → Allow through
+└── Everything else  → Check portfolio_session cookie
+    ├── Valid signed cookie  → Allow through, set x-company header
+    └── Missing or invalid   → Redirect to /for/unknown
+```
+
+**Company-personalized login:** Each URL like `/for/google` shows a themed login
+page with the company's accent color and greeting. Passwords are unique per company,
+stored in `src/config/companies.json` (server-side only, never sent to client).
+
+**Session cookie:** `portfolio_session` — HMAC-signed with `SESSION_SECRET`, HTTP-only,
+Secure, SameSite=Lax, 30-day expiry. Contains the company slug as payload.
+
+**Case study personalization:** When a visitor with a company session views a case study,
+a "Why this matters to [Company]" callout is rendered if the company config has a
+matching `caseStudyNotes[slug]` entry.
+
+**Files involved:**
+- `src/proxy.ts` — the server-side gate
+- `src/config/companies.json` — company passwords, themes, case study notes
+- `src/lib/company-session.ts` — cookie sign/verify/read utilities
+- `src/app/(frontend)/for/[company]/` — login page (server + client + actions)
+- `src/app/(frontend)/work/[slug]/page.tsx` — reads company session for callout
+- `src/app/(frontend)/work/[slug]/ProjectClient.tsx` — renders the callout
+
+**What's exempt:** Payload CMS admin (`/admin`), API routes (`/api`), and static
+assets are not gated. Payload has its own authentication.
+
+**Future extension:** An `aiNotes` flag per company can trigger live AI generation
+of case study notes instead of using static text from the config.
+
 ---
 
 ## 5. Known Architectural Tensions
@@ -344,13 +384,18 @@ yilangao.com/
 │   ├── app/                      # Next.js App Router pages
 │   │   ├── design-system/        # Motion showcase (uses package)
 │   │   ├── about/ work/ blog/ contact/ reading/ experiments/
+│   │   ├── for/[company]/        # Password gate login page (themed per company)
 │   │   └── api/                  # Payload CMS API routes
 │   ├── components/               # Site components
 │   │   └── ui/                   # Foundational UI primitives (Button, Card, etc.)
+│   ├── config/                   # Static config files
+│   │   └── companies.json        # Company passwords, themes, case study notes
 │   ├── styles/                   # Site-specific SCSS (overrides + local tokens)
 │   │   ├── tokens/               # Local token files
 │   │   └── mixins/               # Local mixins
-│   └── lib/                      # Utilities
+│   ├── lib/                      # Utilities
+│   │   └── company-session.ts    # Password gate session cookie utilities
+│   └── proxy.ts                  # Server-side password gate (Next.js 16 proxy)
 ├── playground/                   # Design system docs UI (separate Next.js app)
 │   ├── src/
 │   │   ├── app/                  # Token galleries, component previews, archive

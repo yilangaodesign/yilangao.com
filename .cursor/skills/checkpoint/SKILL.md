@@ -30,6 +30,11 @@ description: >-
 | **Élan** (design system + portfolio) | `elan.json` | `playground/src/lib/elan.ts` | `npm run version:patch/minor/major/release/analyze/auto` |
 | **ASCII Art Studio** | `ascii-studio.json` | `ascii-tool/src/lib/version.ts` | `npm run ascii-tool:version:patch/minor/major/release` |
 
+**Deployment targets:** See AGENTS.md App Registry for production URLs and Vercel
+project names. The main site deploys to `yilangao-portfolio` (root dir `.`), the
+playground to `yilangao-design-system` (root dir `playground/`). Note that
+`.vercel/project.json` at repo root links to the playground, not the main site.
+
 ## Semver Policy
 
 - **Patch** (x.y.Z): Bug fixes, value tweaks, minor component adjustments

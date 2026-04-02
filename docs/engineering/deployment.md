@@ -41,9 +41,14 @@ A record `76.76.21.21`), and add `yilangao.com` as a domain in the Vercel projec
 | `S3_BUCKET` | Supabase Dashboard → Settings → Storage → S3 Connection | |
 | `S3_ENDPOINT` | Supabase Dashboard → Settings → Storage → S3 Connection | |
 | `S3_REGION` | Supabase Dashboard → Settings → Storage → S3 Connection | |
+| `SESSION_SECRET` | Random hex string (`openssl rand -hex 32`) | Signs the password gate session cookie. Falls back to `PAYLOAD_SECRET` if not set, but a separate secret is recommended. |
+| `SITE_PASSWORD` | Chosen password string | Fallback password for `/for/unknown` (generic login with no company branding). Defaults to `preview-2026` if not set. |
 
 Do NOT set `PAYLOAD_ADMIN_EMAIL` or `PAYLOAD_ADMIN_PASSWORD` in production — those
 enable auto-login and are for local development only.
+
+**Password gate note:** `src/proxy.ts` must be present for the password gate to function.
+If removed, all pages become publicly accessible. See `docs/architecture.md` §4.1.
 
 **Shared infrastructure:** Production and dev share the same Supabase database and
 S3 storage bucket. CMS edits and media uploads in either environment are visible in both.

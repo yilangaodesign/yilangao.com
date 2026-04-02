@@ -35,6 +35,11 @@ Before starting, scan `docs/release-log.md` (first 30 lines) for recent
 pitfalls. Known recurring issues are cataloged in the Known Pitfalls section
 at the bottom of this file — they inform classification and error recovery.
 
+**Deployment targets:** See AGENTS.md App Registry for production URLs and Vercel
+project names. The main site deploys to `yilangao-portfolio` (root dir `.`), the
+playground to `yilangao-design-system` (root dir `playground/`). Note that
+`.vercel/project.json` at repo root links to the playground, not the main site.
+
 ## Phase 1: Analyze
 
 Understand the scope of changes since the last release.

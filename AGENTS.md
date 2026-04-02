@@ -60,6 +60,7 @@ dispatched by the orchestrator. Follow these rules:
     - **Shell** (sidebar layout, ComponentPreview rendering, playground-wide IA, theme behavior) → Edit `playground/src/components/` or `playground/src/app/layout.tsx`
     - **Ambiguous** → Ask the user before proceeding
     This classification is a **central guardrail** — it applies regardless of which skill or route activated the task (design-iteration, engineering-iteration, or direct playground work). When the user explicitly overrides this gate, document the exception reason and scope before proceeding.
+23. **NEVER** modify `src/proxy.ts`, `src/config/companies.json`, or `src/lib/company-session.ts` without first reading `.cursor/skills/password-gate/SKILL.md`. These files form the visitor access boundary — incorrect changes can expose the site publicly or lock out all visitors.
 
 # Pre-Flight: Conditional Reading
 
