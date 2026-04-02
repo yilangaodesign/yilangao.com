@@ -1,13 +1,13 @@
 @use '../styles' as *;
 
-$accent: #4f46e5;
-$accent-light: rgba(79, 70, 229, 0.06);
+$accent: $portfolio-accent-60;
+$accent-light: rgba($portfolio-accent-60, 0.06);
 
 .backdrop {
   position: fixed;
   inset: 0;
-  z-index: 9999;
-  background: rgba(0, 0, 0, 0.25);
+  z-index: var(--portfolio-z-admin-modal);
+  background: var(--portfolio-overlay-black-25);
 }
 
 .modal {
@@ -15,7 +15,7 @@ $accent-light: rgba(79, 70, 229, 0.06);
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  z-index: 10000;
+  z-index: var(--portfolio-z-admin-modal);
   width: min(520px, 92vw);
   min-width: 320px;
   min-height: min(520px, 70vh);
@@ -23,11 +23,11 @@ $accent-light: rgba(79, 70, 229, 0.06);
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: #fff;
-  border: 1px solid #e5e7eb;
+  background: var(--portfolio-surface-primary);
+  border: 1px solid var(--portfolio-border-subtle);
   border-radius: 10px;
-  box-shadow: $portfolio-shadow-overlay, 0 0 0 1px rgba(0, 0, 0, 0.05);
-  font-family: system-ui, sans-serif;
+  box-shadow: var(--portfolio-shadow-overlay), 0 0 0 1px rgba(0, 0, 0, 0.05);
+  font-family: var(--portfolio-font-sans);
 }
 
 /* ── Header ── */
@@ -38,13 +38,13 @@ $accent-light: rgba(79, 70, 229, 0.06);
   align-items: center;
   justify-content: space-between;
   padding: 14px 20px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--portfolio-border-subtle);
 }
 
 .headerTitle {
   font-size: 14px;
   font-weight: 600;
-  color: #111827;
+  color: var(--portfolio-text-primary);
 }
 
 .closeBtn {
@@ -54,14 +54,14 @@ $accent-light: rgba(79, 70, 229, 0.06);
   width: 28px;
   height: 28px;
   background: none;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--portfolio-border-subtle);
   border-radius: 5px;
   cursor: pointer;
-  color: #6b7280;
+  color: var(--portfolio-text-secondary);
 
   &:hover {
-    background: #f3f4f6;
-    color: #111827;
+    background: var(--portfolio-surface-secondary);
+    color: var(--portfolio-text-primary);
   }
 }
 
@@ -88,10 +88,10 @@ $accent-light: rgba(79, 70, 229, 0.06);
 .coverPreview {
   width: 100%;
   aspect-ratio: 3 / 2;
-  border-radius: $portfolio-radius-sm;
+  border-radius: var(--portfolio-radius-sm);
   overflow: hidden;
-  background: #f3f4f6;
-  border: 1px solid #e5e7eb;
+  background: var(--portfolio-surface-secondary);
+  border: 1px solid var(--portfolio-border-subtle);
 }
 
 .coverImg {
@@ -109,7 +109,7 @@ $accent-light: rgba(79, 70, 229, 0.06);
   align-items: center;
   justify-content: center;
   gap: 6px;
-  color: #9ca3af;
+  color: var(--portfolio-text-placeholder);
   font-size: 12px;
 }
 
@@ -125,17 +125,17 @@ $accent-light: rgba(79, 70, 229, 0.06);
   padding: 6px 12px;
   font-size: 12px;
   font-weight: 500;
-  font-family: system-ui, sans-serif;
-  color: #374151;
-  background: #fff;
-  border: 1px solid #d1d5db;
+  font-family: var(--portfolio-font-sans);
+  color: var(--portfolio-text-neutral-bold);
+  background: var(--portfolio-surface-primary);
+  border: 1px solid var(--portfolio-border-subtle);
   border-radius: 5px;
   cursor: pointer;
-  transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
+  transition: background var(--portfolio-duration-fast) var(--portfolio-easing-standard), border-color var(--portfolio-duration-fast) var(--portfolio-easing-standard), color var(--portfolio-duration-fast) var(--portfolio-easing-standard);
 
   &:hover:not(:disabled) {
-    background: #f3f4f6;
-    border-color: #9ca3af;
+    background: var(--portfolio-surface-secondary);
+    border-color: var(--portfolio-border-neutral-bold);
   }
 
   &:disabled {
@@ -162,12 +162,12 @@ $accent-light: rgba(79, 70, 229, 0.06);
 /* ── Media Browser ── */
 
 .mediaBrowser {
-  border: 1px solid #e5e7eb;
-  border-radius: $portfolio-radius-sm;
+  border: 1px solid var(--portfolio-border-subtle);
+  border-radius: var(--portfolio-radius-sm);
   padding: 8px;
   max-height: 200px;
   overflow-y: auto;
-  background: #fafafa;
+  background: var(--portfolio-surface-secondary);
 }
 
 .mediaLoading,
@@ -178,7 +178,7 @@ $accent-light: rgba(79, 70, 229, 0.06);
   gap: 6px;
   padding: 20px;
   font-size: 12px;
-  color: #9ca3af;
+  color: var(--portfolio-text-placeholder);
 }
 
 .mediaGrid {
@@ -193,19 +193,19 @@ $accent-light: rgba(79, 70, 229, 0.06);
   border-radius: 4px;
   overflow: hidden;
   border: 2px solid transparent;
-  background: #e5e7eb;
+  background: var(--portfolio-surface-tertiary);
   cursor: pointer;
   padding: 0;
   transition: border-color 120ms ease, box-shadow 120ms ease;
 
   &:hover {
-    border-color: #9ca3af;
+    border-color: var(--portfolio-border-neutral-bold);
   }
 }
 
 .mediaThumbnailSelected {
   border-color: $accent;
-  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.25);
+  box-shadow: var(--portfolio-shadow-focus);
 }
 
 .mediaThumbnailImg {
@@ -224,9 +224,9 @@ $accent-light: rgba(79, 70, 229, 0.06);
 }
 
 .fieldLabel {
-  font-size: $portfolio-type-xs;
+  font-size: var(--portfolio-type-xs);
   font-weight: 600;
-  color: #6b7280;
+  color: var(--portfolio-text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
@@ -234,22 +234,22 @@ $accent-light: rgba(79, 70, 229, 0.06);
 .fieldInput {
   width: 100%;
   padding: 6px 10px;
-  font-size: 13px;
+  font-size: var(--portfolio-type-sm);
   line-height: 22px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--portfolio-border-subtle);
   border-radius: 5px;
-  background: #fff;
-  color: #111827;
+  background: var(--portfolio-surface-primary);
+  color: var(--portfolio-text-primary);
   outline: none;
-  font-family: system-ui, sans-serif;
-  transition: border-color 120ms ease;
+  font-family: var(--portfolio-font-sans);
+  transition: border-color var(--portfolio-duration-fast) var(--portfolio-easing-standard);
 
   &:focus {
     border-color: $accent;
   }
 
   &::placeholder {
-    color: #9ca3af;
+    color: var(--portfolio-text-placeholder);
   }
 }
 
@@ -263,13 +263,13 @@ $accent-light: rgba(79, 70, 229, 0.06);
   justify-content: flex-end;
   gap: 8px;
   padding: 14px 20px;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--portfolio-border-subtle);
 }
 
 .errorText {
   flex: 1 1 100%;
   font-size: 12px;
-  color: #dc2626;
+  color: var(--portfolio-text-error);
   line-height: 1.3;
 }
 
@@ -280,18 +280,18 @@ $accent-light: rgba(79, 70, 229, 0.06);
   padding: 6px 12px;
   font-size: 12px;
   font-weight: 500;
-  font-family: system-ui, sans-serif;
-  color: #6b7280;
+  font-family: var(--portfolio-font-sans);
+  color: var(--portfolio-text-secondary);
   background: none;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--portfolio-border-subtle);
   border-radius: 5px;
   cursor: pointer;
   transition: background 120ms ease, color 120ms ease;
   margin-right: auto;
 
   &:hover {
-    background: #f3f4f6;
-    color: #374151;
+    background: var(--portfolio-surface-secondary);
+    color: var(--portfolio-text-neutral-bold);
   }
 }
 
@@ -299,13 +299,13 @@ $accent-light: rgba(79, 70, 229, 0.06);
   padding: 7px 20px;
   font-size: 12px;
   font-weight: 600;
-  font-family: system-ui, sans-serif;
-  color: #fff;
+  font-family: var(--portfolio-font-sans);
+  color: var(--portfolio-text-always-light-bold);
   background: $accent;
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  transition: background 120ms ease;
+  transition: background var(--portfolio-duration-fast) var(--portfolio-easing-standard);
 
   &:hover {
     background: darken($accent, 6%);
@@ -323,10 +323,10 @@ $accent-light: rgba(79, 70, 229, 0.06);
   display: inline-block;
   width: 12px;
   height: 12px;
-  border: 2px solid #d1d5db;
+  border: 2px solid var(--portfolio-border-subtle);
   border-top-color: $accent;
   border-radius: 50%;
-  animation: spin 600ms linear infinite;
+  animation: spin var(--portfolio-duration-slower) linear infinite;
 }
 
 @keyframes spin {

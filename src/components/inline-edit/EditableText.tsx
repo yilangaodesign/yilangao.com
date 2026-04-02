@@ -53,6 +53,7 @@ export default function EditableText({
   const [hydrated, setHydrated] = useState(false)
   const originalTextRef = useRef<string>('')
   const originalHtmlRef = useRef<string>('')
+  const pendingValueRef = useRef<string | null>(null)
 
   useEffect(() => {
     setHydrated(true)
@@ -79,6 +80,13 @@ export default function EditableText({
     })
   }, [ctx, isAdmin, fieldId, target, fieldPath, childText, isRichText])
 
+  const flushPendingValue = useCallback(() => {
+    if (pendingValueRef.current !== null && ctx) {
+      ctx.setFieldValue(fieldId, pendingValueRef.current)
+      pendingValueRef.current = null
+    }
+  }, [ctx, fieldId])
+
   const activate = useCallback(() => {
     if (!isAdmin || !ctx) return
     setIsEditing(true)
@@ -98,41 +106,50 @@ export default function EditableText({
   }, [ctx, isAdmin, fieldId])
 
   const deactivate = useCallback(() => {
+    flushPendingValue()
     setIsEditing(false)
     ctx?.setActiveField(null)
-  }, [ctx])
+  }, [ctx, flushPendingValue])
 
   const handleClick = useCallback(
     (e: MouseEvent) => {
       if (!isAdmin) return
+      // #region agent log
+      fetch('http://127.0.0.1:7531/ingest/d75fbc74-5683-4bca-8930-5a05041b716d',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'e6568c'},body:JSON.stringify({sessionId:'e6568c',location:'EditableText.tsx:handleClick',message:'click fired',data:{fieldId,isEditing,contentEditable:elRef.current?.contentEditable},timestamp:Date.now(),hypothesisId:'B'})}).catch(()=>{});
+      // #endregion
+      if (isEditing) return
       e.preventDefault()
       e.stopPropagation()
     },
-    [isAdmin],
+    [isAdmin, fieldId, isEditing],
   )
 
   const handleDoubleClick = useCallback(
     (e: MouseEvent) => {
       if (!isAdmin) return
+      if (isEditing) return
       e.preventDefault()
       e.stopPropagation()
       activate()
     },
-    [isAdmin, activate],
+    [isAdmin, isEditing, activate],
   )
 
   const handleInput = useCallback(() => {
     const el = elRef.current
     if (!el || !ctx) return
-    if (isRichText) {
-      ctx.setFieldValue(fieldId, el.innerHTML)
-    } else {
-      ctx.setFieldValue(fieldId, (el.textContent ?? '').trim())
-    }
+    const val = isRichText ? el.innerHTML : (el.textContent ?? '').trim()
+    // #region agent log
+    fetch('http://127.0.0.1:7531/ingest/d75fbc74-5683-4bca-8930-5a05041b716d',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'e6568c'},body:JSON.stringify({sessionId:'e6568c',location:'EditableText.tsx:handleInput',message:'input event fired',data:{fieldId,isRichText,capturedValue:val?.substring?.(0,100),contentEditable:el.contentEditable,deferred:true},timestamp:Date.now(),hypothesisId:'FIX'})}).catch(()=>{});
+    // #endregion
+    pendingValueRef.current = val
   }, [ctx, fieldId, isRichText])
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
+      // #region agent log
+      fetch('http://127.0.0.1:7531/ingest/d75fbc74-5683-4bca-8930-5a05041b716d',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'e6568c'},body:JSON.stringify({sessionId:'e6568c',location:'EditableText.tsx:handleKeyDown',message:'keydown fired',data:{fieldId,key:e.key,code:e.code,metaKey:e.metaKey,ctrlKey:e.ctrlKey,defaultPrevented:e.defaultPrevented,isEditing,contentEditable:elRef.current?.contentEditable},timestamp:Date.now(),hypothesisId:'E'})}).catch(()=>{});
+      // #endregion
       const mod = e.metaKey || e.ctrlKey
 
       if (mod && e.key === 'b') {
@@ -177,6 +194,7 @@ export default function EditableText({
             el.textContent = originalTextRef.current
           }
         }
+        pendingValueRef.current = null
         ctx?.setFieldValue(fieldId, originalTextRef.current)
         deactivate()
       }
@@ -189,8 +207,11 @@ export default function EditableText({
   )
 
   const handleBlur = useCallback(() => {
+    // #region agent log
+    fetch('http://127.0.0.1:7531/ingest/d75fbc74-5683-4bca-8930-5a05041b716d',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'e6568c'},body:JSON.stringify({sessionId:'e6568c',location:'EditableText.tsx:handleBlur',message:'blur fired - deactivating',data:{fieldId,isEditing,hasPendingValue:pendingValueRef.current!==null,activeElement:document.activeElement?.tagName},timestamp:Date.now(),hypothesisId:'FIX'})}).catch(()=>{});
+    // #endregion
     deactivate()
-  }, [deactivate])
+  }, [deactivate, fieldId, isEditing])
 
   if (!isAdmin || !ctx) {
     if (htmlContent) {
@@ -203,12 +224,17 @@ export default function EditableText({
     return createElement(Tag, { ...htmlAttrs, className }, children)
   }
 
-  const dirty = ctx.isDirty(fieldId)
-  const dirtyValue = dirty
+  const dirty = ctx.isDirty(fieldId) || pendingValueRef.current !== null
+  const dirtyValue = ctx.isDirty(fieldId)
     ? (ctx.dirtyFields.get(fieldId)?.currentValue as string)
     : undefined
 
   const showDirtyText = dirtyValue !== undefined && !isEditing
+  // #region agent log
+  if (isEditing) {
+    fetch('http://127.0.0.1:7531/ingest/d75fbc74-5683-4bca-8930-5a05041b716d',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'e6568c'},body:JSON.stringify({sessionId:'e6568c',location:'EditableText.tsx:render',message:'render while editing (post-fix)',data:{fieldId,isEditing,dirty,showDirtyText,hasHtmlContent:!!htmlContent,hasPendingValue:pendingValueRef.current!==null},timestamp:Date.now(),hypothesisId:'FIX'})}).catch(()=>{});
+  }
+  // #endregion
   const displayProps: Record<string, unknown> = {
     ...htmlAttrs,
     ref: elRef,

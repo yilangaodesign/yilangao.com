@@ -59,13 +59,84 @@ function mergeAdjacentNodes(nodes: LexicalTextNode[]): LexicalTextNode[] {
   return merged
 }
 
+function isBlockTag(tag: string): boolean {
+  return tag === 'DIV' || tag === 'P' || tag === 'BLOCKQUOTE' || tag === 'SECTION'
+}
+
+function makeLexicalParagraphNode(children: LexicalTextNode[]) {
+  return {
+    type: 'paragraph' as const,
+    format: '' as const,
+    indent: 0,
+    version: 1,
+    children,
+    direction: 'ltr' as const,
+    textFormat: 0,
+    textStyle: '',
+  }
+}
+
+function splitIntoBlocks(container: Node): LexicalTextNode[][] {
+  const blocks: LexicalTextNode[][] = []
+  let inline: LexicalTextNode[] = []
+
+  for (const child of Array.from(container.childNodes)) {
+    if (child.nodeType === Node.ELEMENT_NODE) {
+      const el = child as HTMLElement
+      const tag = el.tagName
+
+      if (tag === 'BR') {
+        blocks.push(inline)
+        inline = []
+        continue
+      }
+
+      if (isBlockTag(tag)) {
+        if (inline.length > 0) {
+          blocks.push(inline)
+          inline = []
+        }
+        const nested = splitIntoBlocks(el)
+        blocks.push(...(nested.length > 0 ? nested : [[]]))
+        continue
+      }
+
+      let f = 0
+      if (tag === 'B' || tag === 'STRONG') f |= 1
+      if (tag === 'I' || tag === 'EM') f |= 2
+      if (tag === 'U') f |= 8
+      if (tag === 'S' || tag === 'STRIKE' || tag === 'DEL') f |= 4
+      inline.push(...collectTextNodes(el, f))
+    } else if (child.nodeType === Node.TEXT_NODE) {
+      const text = child.textContent || ''
+      if (text) {
+        inline.push({
+          mode: 'normal',
+          text,
+          type: 'text',
+          style: '',
+          detail: 0,
+          format: 0,
+          version: 1,
+        })
+      }
+    }
+  }
+
+  if (inline.length > 0) {
+    blocks.push(inline)
+  }
+
+  return blocks
+}
+
 function htmlToLexicalDocument(html: string) {
   const container = document.createElement('div')
   container.innerHTML = html
 
-  const textNodes = mergeAdjacentNodes(collectTextNodes(container, 0))
+  const blocks = splitIntoBlocks(container)
 
-  if (textNodes.length === 0) {
+  if (blocks.length === 0) {
     return makeLexicalParagraph('')
   }
 
@@ -75,18 +146,9 @@ function htmlToLexicalDocument(html: string) {
       format: '' as const,
       indent: 0,
       version: 1,
-      children: [
-        {
-          type: 'paragraph' as const,
-          format: '' as const,
-          indent: 0,
-          version: 1,
-          children: textNodes,
-          direction: 'ltr' as const,
-          textFormat: 0,
-          textStyle: '',
-        },
-      ],
+      children: blocks.map((nodes) =>
+        makeLexicalParagraphNode(mergeAdjacentNodes(nodes)),
+      ),
       direction: 'ltr' as const,
     },
   }
@@ -294,9 +356,15 @@ export async function saveFields(
       let value: unknown = field.currentValue
       if (field.isRichText) {
         const str = String(value)
+        // #region agent log
+        fetch('http://127.0.0.1:7531/ingest/d75fbc74-5683-4bca-8930-5a05041b716d',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'e6568c'},body:JSON.stringify({sessionId:'e6568c',location:'api.ts:saveFields',message:'converting richText to lexical',data:{fieldPath:field.fieldPath,htmlSnippet:str.substring(0,200),hasHtmlTags:str.includes('<')},timestamp:Date.now(),hypothesisId:'PARA'})}).catch(()=>{});
+        // #endregion
         value = str.includes('<')
           ? htmlToLexicalDocument(str)
           : makeLexicalParagraph(str)
+        // #region agent log
+        fetch('http://127.0.0.1:7531/ingest/d75fbc74-5683-4bca-8930-5a05041b716d',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'e6568c'},body:JSON.stringify({sessionId:'e6568c',location:'api.ts:saveFields',message:'lexical output',data:{fieldPath:field.fieldPath,paragraphCount:(value as {root?:{children?:unknown[]}})?.root?.children?.length,lexicalSnippet:JSON.stringify(value).substring(0,300)},timestamp:Date.now(),hypothesisId:'PARA'})}).catch(()=>{});
+        // #endregion
       }
       setNested(body, field.fieldPath, value)
     }

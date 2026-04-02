@@ -3,7 +3,7 @@
 /* ── Inline Edit Visual Layer ── */
 
 $accent: $portfolio-accent-60;
-$accent-light: rgba(79, 70, 229, 0.06);
+$accent-light: rgba($portfolio-accent-60, 0.06);
 
 /* ── Editable Text ── */
 
@@ -30,12 +30,12 @@ $accent-light: rgba(79, 70, 229, 0.06);
     font-family: system-ui, sans-serif;
     line-height: 16px;
     letter-spacing: 0.02em;
-    color: #fff;
+    color: var(--portfolio-text-always-light-bold);
     background: $accent;
     border-radius: 3px;
     white-space: nowrap;
     pointer-events: none;
-    z-index: 1000;
+    z-index: var(--portfolio-z-admin);
   }
 
   &[data-editable-active] {
@@ -45,10 +45,10 @@ $accent-light: rgba(79, 70, 229, 0.06);
   }
 
   &[data-editable-dirty] {
-    outline-color: #d97706;
+    outline-color: $portfolio-orange-50;
 
     &::before {
-      background: #d97706;
+      background: $portfolio-orange-50;
     }
   }
 }
@@ -78,20 +78,20 @@ $accent-light: rgba(79, 70, 229, 0.06);
     font-family: system-ui, sans-serif;
     line-height: 16px;
     letter-spacing: 0.02em;
-    color: #fff;
+    color: var(--portfolio-text-always-light-bold);
     background: $accent;
     border-radius: 3px;
     white-space: nowrap;
     pointer-events: none;
-    z-index: 1000;
+    z-index: var(--portfolio-z-admin);
   }
 
   &[data-editable-dirty] {
-    outline-color: #d97706;
+    outline-color: $portfolio-orange-50;
     outline-style: dashed;
 
     &::before {
-      background: #d97706;
+      background: $portfolio-orange-50;
     }
   }
 }
@@ -103,7 +103,7 @@ $accent-light: rgba(79, 70, 229, 0.06);
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  z-index: 10000;
+  z-index: var(--portfolio-z-admin-modal);
   width: min(480px, 90vw);
   min-width: 320px;
   min-height: min(420px, 65vh);
@@ -111,10 +111,10 @@ $accent-light: rgba(79, 70, 229, 0.06);
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: #fff;
-  border: 1px solid #e5e7eb;
+  background: var(--portfolio-surface-primary);
+  border: 1px solid var(--portfolio-border-subtle);
   border-radius: 8px;
-  box-shadow: $portfolio-shadow-overlay, 0 0 0 1px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--portfolio-shadow-overlay), 0 0 0 1px var(--portfolio-overlay-black-06);
   font-family: system-ui, sans-serif;
 }
 
@@ -124,13 +124,13 @@ $accent-light: rgba(79, 70, 229, 0.06);
   align-items: center;
   justify-content: space-between;
   padding: 12px 16px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--portfolio-border-subtle);
 }
 
 .arrayPanelTitle {
-  font-size: 13px;
+  font-size: var(--portfolio-type-xs);
   font-weight: 600;
-  color: #111827;
+  color: var(--portfolio-text-primary);
 }
 
 .arrayPanelClose {
@@ -140,14 +140,14 @@ $accent-light: rgba(79, 70, 229, 0.06);
   width: 28px;
   height: 28px;
   background: none;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--portfolio-border-subtle);
   border-radius: 4px;
   cursor: pointer;
-  color: #6b7280;
+  color: var(--portfolio-text-secondary);
 
   &:hover {
-    background: #f3f4f6;
-    color: #111827;
+    background: var(--portfolio-surface-secondary);
+    color: var(--portfolio-text-primary);
   }
 }
 
@@ -163,7 +163,7 @@ $accent-light: rgba(79, 70, 229, 0.06);
   align-items: flex-start;
   gap: 8px;
   padding: 8px 16px;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid var(--portfolio-border-subtle);
 
   &:last-child {
     border-bottom: none;
@@ -172,9 +172,9 @@ $accent-light: rgba(79, 70, 229, 0.06);
 
 .arrayItemIndex {
   flex: 0 0 20px;
-  font-size: $portfolio-type-xs;
+  font-size: var(--portfolio-type-xs);
   font-weight: 500;
-  color: #9ca3af;
+  color: var(--portfolio-text-placeholder);
   line-height: 32px;
   text-align: center;
 }
@@ -195,25 +195,25 @@ $accent-light: rgba(79, 70, 229, 0.06);
 .arrayFieldLabel {
   font-size: 10px;
   font-weight: 600;
-  color: #6b7280;
+  color: var(--portfolio-text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
 .requiredMark {
-  color: #dc2626;
+  color: var(--portfolio-text-error);
   margin-left: 2px;
 }
 
 .arrayFieldInput {
   width: 100%;
   padding: 4px 8px;
-  font-size: 13px;
+  font-size: var(--portfolio-type-sm);
   line-height: 22px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--portfolio-border-subtle);
   border-radius: 4px;
-  background: #fff;
-  color: #111827;
+  background: var(--portfolio-surface-primary);
+  color: var(--portfolio-text-primary);
   outline: none;
   transition: border-color 120ms ease;
 
@@ -222,21 +222,21 @@ $accent-light: rgba(79, 70, 229, 0.06);
   }
 
   &::placeholder {
-    color: #9ca3af;
+    color: var(--portfolio-text-placeholder);
   }
 }
 
 .arrayFieldInputError {
-  border-color: #dc2626;
+  border-color: var(--portfolio-border-negative);
 
   &:focus {
-    border-color: #dc2626;
+    border-color: var(--portfolio-border-negative);
   }
 }
 
 .fieldError {
-  font-size: $portfolio-type-xs;
-  color: #dc2626;
+  font-size: var(--portfolio-type-xs);
+  color: var(--portfolio-text-error);
   line-height: 1.2;
 }
 
@@ -258,17 +258,17 @@ $accent-light: rgba(79, 70, 229, 0.06);
   justify-content: center;
   width: 32px;
   padding: 0;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--portfolio-border-subtle);
   border-radius: 4px;
-  background: #f9fafb;
-  color: #6b7280;
+  background: $portfolio-neutral-05;
+  color: var(--portfolio-text-secondary);
   cursor: pointer;
   transition: border-color 120ms ease, color 120ms ease, background 120ms ease;
 
   &:hover:not(:disabled) {
     border-color: $accent;
     color: $accent;
-    background: #f0f4ff;
+    background: $portfolio-accent-10;
   }
 
   &:disabled {
@@ -281,7 +281,7 @@ $accent-light: rgba(79, 70, 229, 0.06);
   display: inline-block;
   width: 12px;
   height: 12px;
-  border: 2px solid #e5e7eb;
+  border: 2px solid var(--portfolio-border-subtle);
   border-top-color: $accent;
   border-radius: 50%;
   animation: spin 600ms linear infinite;
@@ -305,7 +305,7 @@ $accent-light: rgba(79, 70, 229, 0.06);
   align-items: center;
   gap: 6px;
   font-size: 12px;
-  color: #6b7280;
+  color: var(--portfolio-text-secondary);
   padding: 2px 0;
 
   input {
@@ -322,12 +322,12 @@ $accent-light: rgba(79, 70, 229, 0.06);
   background: none;
   border: none;
   cursor: grab;
-  color: #d1d5db;
+  color: $portfolio-neutral-20;
   padding: 0;
   touch-action: none;
 
   &:hover {
-    color: #6b7280;
+    color: var(--portfolio-text-secondary);
   }
 
   &:active {
@@ -351,21 +351,21 @@ $accent-light: rgba(79, 70, 229, 0.06);
   border: 1px solid transparent;
   border-radius: 3px;
   cursor: pointer;
-  color: #9ca3af;
+  color: var(--portfolio-text-placeholder);
   font-size: 12px;
 
   &:hover {
-    color: #dc2626;
-    background: #fef2f2;
-    border-color: #fecaca;
+    color: var(--portfolio-text-error);
+    background: var(--portfolio-surface-negative-subtle);
+    border-color: var(--portfolio-border-negative);
   }
 }
 
 .arrayItemSummary {
   display: none;
   flex: 1;
-  font-size: 13px;
-  color: #374151;
+  font-size: var(--portfolio-type-xs);
+  color: var(--portfolio-text-neutral-bold);
   line-height: 32px;
   white-space: nowrap;
   overflow: hidden;
@@ -400,12 +400,12 @@ $accent-light: rgba(79, 70, 229, 0.06);
   justify-content: space-between;
   gap: 6px;
   padding: 12px 16px;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--portfolio-border-subtle);
 }
 
 .noItemsText {
   line-height: 28px;
-  color: #9ca3af;
+  color: var(--portfolio-text-placeholder);
 }
 
 .arrayAddBtn {
@@ -430,7 +430,7 @@ $accent-light: rgba(79, 70, 229, 0.06);
   padding: 6px 16px;
   font-size: 12px;
   font-weight: 600;
-  color: #fff;
+  color: var(--portfolio-text-always-light-bold);
   background: $accent;
   border: none;
   border-radius: 4px;
@@ -449,31 +449,31 @@ $accent-light: rgba(79, 70, 229, 0.06);
 .arrayPanelError {
   width: 100%;
   font-size: 12px;
-  color: #dc2626;
+  color: var(--portfolio-text-error);
 }
 
 .arrayBackdrop {
   position: fixed;
   inset: 0;
-  z-index: 9999;
-  background: rgba(0, 0, 0, 0.2);
+  z-index: var(--portfolio-z-admin-modal);
+  background: var(--portfolio-overlay-black-20);
 }
 
-/* ── Save / Discard Bar ── */
+/* ── Save / Discard Bar (always-dark) ── */
 
 .editBar {
   position: sticky;
   bottom: 0;
-  z-index: 10001;
-  background: #1f2937;
-  border-top: 1px solid #374151;
+  z-index: calc(var(--portfolio-z-admin-modal) + 1);
+  background: $portfolio-neutral-90;
+  border-top: 1px solid $portfolio-neutral-80;
   animation: slideUp 200ms ease-out;
   transition: background-color 200ms ease, border-color 200ms ease;
 }
 
 .editBarErrorState {
-  background: #991b1b;
-  border-top-color: #7f1d1d;
+  background: $portfolio-red-70;
+  border-top-color: $portfolio-red-80;
 }
 
 .editBarInner {
@@ -487,9 +487,9 @@ $accent-light: rgba(79, 70, 229, 0.06);
 }
 
 .editBarCount {
-  font-size: 13px;
+  font-size: var(--portfolio-type-xs);
   font-weight: 500;
-  color: #d1d5db;
+  color: $portfolio-neutral-20;
   font-family: system-ui, sans-serif;
 }
 
@@ -497,9 +497,9 @@ $accent-light: rgba(79, 70, 229, 0.06);
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 13px;
+  font-size: var(--portfolio-type-sm);
   font-weight: 500;
-  color: #fecaca;
+  color: $portfolio-red-20;
   font-family: system-ui, sans-serif;
   flex: 1;
   min-width: 0;
@@ -507,11 +507,11 @@ $accent-light: rgba(79, 70, 229, 0.06);
 
 .editBarIcon {
   flex-shrink: 0;
-  color: #fca5a5;
+  color: $portfolio-red-40;
 }
 
 .editBarHint {
-  color: #6b7280;
+  color: $portfolio-neutral-60;
   font-weight: 400;
 }
 
@@ -526,16 +526,16 @@ $accent-light: rgba(79, 70, 229, 0.06);
   padding: 6px 14px;
   font-size: 12px;
   font-weight: 500;
-  color: #d1d5db;
+  color: $portfolio-neutral-20;
   background: transparent;
-  border: 1px solid #4b5563;
+  border: 1px solid $portfolio-neutral-70;
   border-radius: 4px;
   cursor: pointer;
   font-family: system-ui, sans-serif;
 
   &:hover {
-    background: #374151;
-    color: #fff;
+    background: $portfolio-neutral-80;
+    color: $portfolio-neutral-00;
   }
 
   &:disabled {
@@ -544,12 +544,12 @@ $accent-light: rgba(79, 70, 229, 0.06);
   }
 
   .editBarErrorState & {
-    border-color: rgba(255, 255, 255, 0.25);
-    color: #fecaca;
+    border-color: var(--portfolio-overlay-white-25);
+    color: $portfolio-red-20;
 
     &:hover {
-      background: rgba(255, 255, 255, 0.1);
-      color: #fff;
+      background: var(--portfolio-overlay-white-12);
+      color: $portfolio-neutral-00;
     }
   }
 }
@@ -558,7 +558,7 @@ $accent-light: rgba(79, 70, 229, 0.06);
   padding: 6px 18px;
   font-size: 12px;
   font-weight: 600;
-  color: #fff;
+  color: $portfolio-neutral-00;
   background: $accent;
   border: none;
   border-radius: 4px;
@@ -579,15 +579,15 @@ $accent-light: rgba(79, 70, 229, 0.06);
   padding: 6px 18px;
   font-size: 12px;
   font-weight: 600;
-  color: #991b1b;
-  background: #fff;
+  color: $portfolio-red-70;
+  background: $portfolio-neutral-00;
   border: none;
   border-radius: 4px;
   cursor: pointer;
   font-family: system-ui, sans-serif;
 
   &:hover {
-    background: #fef2f2;
+    background: $portfolio-red-10;
   }
 
   &:disabled {
@@ -615,17 +615,17 @@ $accent-light: rgba(79, 70, 229, 0.06);
   height: 26px;
   padding: 0;
   border: none;
-  border-radius: $portfolio-radius-sm;
-  background: #dc2626;
-  color: #fff;
+  border-radius: var(--portfolio-radius-sm);
+  background: $portfolio-red-60;
+  color: var(--portfolio-text-always-light-bold);
   opacity: 0;
   transform: scale(0.9);
   transition: opacity 0.15s, transform 0.15s, background 0.15s;
   cursor: pointer;
   flex-shrink: 0;
-  box-shadow: $portfolio-shadow-md;
+  box-shadow: var(--portfolio-shadow-md);
   position: relative;
-  z-index: 10;
+  z-index: var(--portfolio-z-control);
 
   *:hover > &,
   &:focus-visible {
@@ -634,7 +634,7 @@ $accent-light: rgba(79, 70, 229, 0.06);
   }
 
   &:hover {
-    background: #b91c1c;
+    background: $portfolio-red-70;
     opacity: 1;
     transform: scale(1);
   }
@@ -645,8 +645,8 @@ $accent-light: rgba(79, 70, 229, 0.06);
 .confirmBackdrop {
   position: fixed;
   inset: 0;
-  z-index: 10001;
-  background: rgba(0, 0, 0, 0.3);
+  z-index: calc(var(--portfolio-z-admin-modal) + 1);
+  background: var(--portfolio-overlay-black-30);
 }
 
 .confirmDialog {
@@ -654,20 +654,20 @@ $accent-light: rgba(79, 70, 229, 0.06);
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  z-index: 10002;
+  z-index: calc(var(--portfolio-z-admin-modal) + 2);
   width: min(360px, 90vw);
   padding: 20px;
-  background: #fff;
-  border: 1px solid #e5e7eb;
+  background: var(--portfolio-surface-primary);
+  border: 1px solid var(--portfolio-border-subtle);
   border-radius: 8px;
-  box-shadow: $portfolio-shadow-overlay, 0 0 0 1px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--portfolio-shadow-overlay), 0 0 0 1px var(--portfolio-overlay-black-06);
   font-family: system-ui, sans-serif;
 }
 
 .confirmMessage {
   font-size: 14px;
   font-weight: 500;
-  color: #111827;
+  color: var(--portfolio-text-primary);
   margin: 0 0 16px;
   line-height: 1.5;
 }
@@ -677,12 +677,12 @@ $accent-light: rgba(79, 70, 229, 0.06);
   margin-top: 4px;
   font-size: 12px;
   font-weight: 400;
-  color: #6b7280;
+  color: var(--portfolio-text-secondary);
 }
 
 .confirmError {
   font-size: 12px;
-  color: #dc2626;
+  color: var(--portfolio-text-error);
   margin: 0 0 12px;
 }
 
@@ -696,15 +696,15 @@ $accent-light: rgba(79, 70, 229, 0.06);
   padding: 6px 14px;
   font-size: 12px;
   font-weight: 500;
-  color: #374151;
-  background: #fff;
-  border: 1px solid #d1d5db;
+  color: var(--portfolio-text-neutral-bold);
+  background: var(--portfolio-surface-primary);
+  border: 1px solid var(--portfolio-border-subtle);
   border-radius: 4px;
   cursor: pointer;
   font-family: system-ui, sans-serif;
 
   &:hover {
-    background: #f3f4f6;
+    background: var(--portfolio-surface-secondary);
   }
 
   &:disabled {
@@ -717,15 +717,15 @@ $accent-light: rgba(79, 70, 229, 0.06);
   padding: 6px 14px;
   font-size: 12px;
   font-weight: 600;
-  color: #fff;
-  background: #dc2626;
+  color: var(--portfolio-text-always-light-bold);
+  background: $portfolio-red-60;
   border: none;
   border-radius: 4px;
   cursor: pointer;
   font-family: system-ui, sans-serif;
 
   &:hover {
-    background: #b91c1c;
+    background: $portfolio-red-70;
   }
 
   &:disabled {
@@ -745,11 +745,11 @@ $accent-light: rgba(79, 70, 229, 0.06);
   min-height: 140px;
   padding: 24px 16px;
   background: none;
-  border: 2px dashed #d1d5db;
+  border: 2px dashed var(--portfolio-border-subtle);
   border-radius: 8px;
   cursor: pointer;
   font-family: system-ui, sans-serif;
-  color: #9ca3af;
+  color: var(--portfolio-text-placeholder);
   transition: border-color 150ms ease, color 150ms ease, background-color 150ms ease;
   width: 100%;
 
@@ -775,25 +775,25 @@ $accent-light: rgba(79, 70, 229, 0.06);
 }
 
 .addItemLabel {
-  font-size: 13px;
+  font-size: var(--portfolio-type-xs);
   font-weight: 500;
 }
 
 .addItemError {
-  font-size: $portfolio-type-xs;
-  color: #dc2626;
+  font-size: var(--portfolio-type-xs);
+  color: var(--portfolio-text-error);
   text-align: center;
 }
 
-/* ── Text Format Bar ── */
+/* ── Text Format Bar (always-dark) ── */
 
 .formatBar {
   background: #1a1a2e;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid var(--portfolio-overlay-white-08);
+  border-bottom: 1px solid var(--portfolio-overlay-white-08);
   font-family: var(--font-geist-sans, system-ui, sans-serif);
   font-size: 12px;
-  color: #e0e0e0;
+  color: $portfolio-neutral-20;
   animation: formatBarIn 150ms ease-out;
 }
 
@@ -826,24 +826,24 @@ $accent-light: rgba(79, 70, 229, 0.06);
   align-items: center;
   gap: 6px;
   padding: 3px 8px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--portfolio-overlay-white-08);
+  border: 1px solid var(--portfolio-overlay-white-12);
   border-radius: 4px;
-  color: #e0e0e0;
-  font-size: $portfolio-type-xs;
+  color: $portfolio-neutral-20;
+  font-size: var(--portfolio-type-xs);
   cursor: pointer;
   transition: background 0.15s, border-color 0.15s;
   font-family: inherit;
   white-space: nowrap;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.2);
+    background: var(--portfolio-overlay-white-12);
+    border-color: var(--portfolio-overlay-white-20);
   }
 }
 
 .formatLabel {
-  color: #888;
+  color: $portfolio-neutral-50;
   font-weight: 400;
   font-size: 10px;
   text-transform: uppercase;
@@ -852,17 +852,17 @@ $accent-light: rgba(79, 70, 229, 0.06);
 
 .formatValue {
   font-weight: 600;
-  color: #fff;
+  color: $portfolio-neutral-00;
 }
 
 .formatMeta {
-  color: #666;
+  color: $portfolio-neutral-60;
   font-family: var(--font-geist-mono, monospace);
   font-size: 10px;
 }
 
 .formatChevron {
-  color: #666;
+  color: $portfolio-neutral-60;
   margin-left: 2px;
 }
 
@@ -875,10 +875,10 @@ $accent-light: rgba(79, 70, 229, 0.06);
   max-height: 320px;
   overflow-y: auto;
   background: #1a1a2e;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: $portfolio-radius-sm;
-  box-shadow: $portfolio-shadow-lg;
-  z-index: 10003;
+  border: 1px solid var(--portfolio-overlay-white-12);
+  border-radius: var(--portfolio-radius-sm);
+  box-shadow: var(--portfolio-shadow-lg);
+  z-index: calc(var(--portfolio-z-admin-modal) + 3);
   padding: 4px;
 }
 
@@ -891,25 +891,25 @@ $accent-light: rgba(79, 70, 229, 0.06);
   background: transparent;
   border: none;
   border-radius: 3px;
-  color: #ccc;
-  font-size: $portfolio-type-xs;
+  color: $portfolio-neutral-30;
+  font-size: var(--portfolio-type-xs);
   cursor: pointer;
   text-align: left;
   font-family: inherit;
   transition: background 0.1s;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.08);
-    color: #fff;
+    background: var(--portfolio-overlay-white-08);
+    color: $portfolio-neutral-00;
   }
 }
 
 .formatOptionActive {
-  background: rgba(79, 70, 229, 0.2);
-  color: #a5b4fc;
+  background: rgba($portfolio-accent-60, 0.2);
+  color: $portfolio-accent-30;
 
   &:hover {
-    background: rgba(79, 70, 229, 0.3);
+    background: rgba($portfolio-accent-60, 0.3);
   }
 }
 
@@ -921,14 +921,14 @@ $accent-light: rgba(79, 70, 229, 0.06);
 .formatOptionValue {
   font-family: var(--font-geist-mono, monospace);
   font-size: 10px;
-  color: #888;
+  color: $portfolio-neutral-50;
   min-width: 52px;
 }
 
 .formatOptionMeta {
   font-family: var(--font-geist-mono, monospace);
   font-size: 10px;
-  color: #555;
+  color: $portfolio-neutral-70;
 }
 
 .formatOptionToken {
@@ -941,7 +941,7 @@ $accent-light: rgba(79, 70, 229, 0.06);
 .formatDivider {
   width: 1px;
   height: 20px;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--portfolio-overlay-white-12);
   flex-shrink: 0;
 }
 
@@ -952,28 +952,28 @@ $accent-light: rgba(79, 70, 229, 0.06);
   width: 26px;
   height: 26px;
   border-radius: 4px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--portfolio-overlay-white-08);
   background: transparent;
-  color: #888;
+  color: $portfolio-neutral-50;
   font-size: 12px;
   cursor: pointer;
   transition: background 0.15s, color 0.15s, border-color 0.15s;
   font-family: inherit;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.08);
-    color: #ccc;
-    border-color: rgba(255, 255, 255, 0.15);
+    background: var(--portfolio-overlay-white-08);
+    color: $portfolio-neutral-30;
+    border-color: var(--portfolio-overlay-white-16);
   }
 }
 
 .formatToggleActive {
-  background: rgba(79, 70, 229, 0.25);
-  color: #a5b4fc;
-  border-color: rgba(79, 70, 229, 0.4);
+  background: rgba($portfolio-accent-60, 0.25);
+  color: $portfolio-accent-30;
+  border-color: rgba($portfolio-accent-60, 0.4);
 
   &:hover {
-    background: rgba(79, 70, 229, 0.35);
+    background: rgba($portfolio-accent-60, 0.35);
   }
 }
 
@@ -983,8 +983,8 @@ $accent-light: rgba(79, 70, 229, 0.06);
 }
 
 .formatStyleLabel {
-  font-size: $portfolio-type-xs;
-  color: #888;
+  font-size: var(--portfolio-type-xs);
+  color: $portfolio-neutral-50;
 }
 
 .formatColorInfo {
@@ -997,20 +997,20 @@ $accent-light: rgba(79, 70, 229, 0.06);
   width: 14px;
   height: 14px;
   border-radius: 3px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid var(--portfolio-overlay-white-16);
   flex-shrink: 0;
 }
 
 .formatColorName {
-  font-size: $portfolio-type-xs;
+  font-size: var(--portfolio-type-xs);
   font-weight: 500;
-  color: #ccc;
+  color: $portfolio-neutral-30;
 }
 
 .formatColorHex {
   font-family: var(--font-geist-mono, monospace);
   font-size: 10px;
-  color: #666;
+  color: $portfolio-neutral-60;
 }
 
 .formatTokenRef {

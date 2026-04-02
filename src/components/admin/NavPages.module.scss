@@ -1,5 +1,3 @@
-@use '../../styles' as *;
-
 .container {
   padding: 16px 0 8px;
   border-top: 1px solid var(--theme-elevation-150);
@@ -44,12 +42,12 @@
 }
 
 .pageName {
-  font-size: 13px;
+  font-size: var(--portfolio-type-sm);
   line-height: 1.3;
 }
 
 .pageHint {
-  font-size: $portfolio-type-xs;
+  font-size: var(--portfolio-type-xs);
   color: var(--theme-elevation-450);
   white-space: nowrap;
   overflow: hidden;

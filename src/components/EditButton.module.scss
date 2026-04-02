@@ -8,19 +8,19 @@
   height: 26px;
   padding: 0;
   border: none;
-  border-radius: $portfolio-radius-sm;
-  background: $portfolio-accent-60;
-  color: $portfolio-neutral-00;
+  border-radius: var(--portfolio-radius-sm);
+  background: var(--portfolio-action-brand-bold);
+  color: var(--portfolio-text-always-light-bold);
   opacity: 0;
   transform: scale(0.9);
-  transition: opacity $portfolio-duration-fast $portfolio-easing-standard,
-    transform $portfolio-duration-fast $portfolio-easing-standard,
-    background $portfolio-duration-fast $portfolio-easing-standard;
+  transition: opacity var(--portfolio-duration-fast) var(--portfolio-easing-standard),
+    transform var(--portfolio-duration-fast) var(--portfolio-easing-standard),
+    background var(--portfolio-duration-fast) var(--portfolio-easing-standard);
   cursor: pointer;
   flex-shrink: 0;
-  box-shadow: $portfolio-shadow-md;
+  box-shadow: var(--portfolio-shadow-md);
   position: relative;
-  z-index: 10;
+  z-index: var(--portfolio-z-control);
 
   *:hover > &,
   &:focus-visible {
@@ -29,7 +29,7 @@
   }
 
   &:hover {
-    background: $portfolio-accent-70;
+    background: var(--portfolio-action-brand-bold-hover);
     opacity: 1;
     transform: scale(1);
   }

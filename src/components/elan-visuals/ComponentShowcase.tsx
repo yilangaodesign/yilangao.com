@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback } from "react";
-import { FadeIn } from "@yilangaodesign/design-system";
+import { FadeIn } from "@/components/ui/FadeIn";
 import styles from "./elan-visuals.module.scss";
 
 const COMPONENTS = [

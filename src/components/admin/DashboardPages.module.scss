@@ -1,5 +1,3 @@
-@use '../../styles' as *;
-
 .container {
   margin-bottom: 40px;
 }
@@ -16,7 +14,7 @@
 }
 
 .subtitle {
-  font-size: 13px;
+  font-size: var(--portfolio-type-sm);
   color: var(--theme-elevation-500);
   margin: 0;
 }
@@ -43,7 +41,7 @@
   &:hover,
   &:focus-visible {
     border-color: var(--theme-elevation-300);
-    box-shadow: $portfolio-shadow-md;
+    box-shadow: var(--portfolio-shadow-md);
   }
 
   &:hover .cardPreview,
@@ -83,14 +81,14 @@
 
 .cardName {
   display: block;
-  font-size: 13px;
+  font-size: var(--portfolio-type-sm);
   font-weight: 600;
   line-height: 1.3;
 }
 
 .cardDesc {
   display: block;
-  font-size: $portfolio-type-xs;
+  font-size: var(--portfolio-type-xs);
   color: var(--theme-elevation-500);
   line-height: 1.3;
   white-space: nowrap;
