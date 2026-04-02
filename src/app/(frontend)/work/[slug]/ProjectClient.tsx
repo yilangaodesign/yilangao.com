@@ -20,6 +20,7 @@ import {
   InteractionShowcase,
   IncidentDensityMap,
 } from "@/components/elan-visuals";
+import { Badge } from "@/components/ui/Badge";
 import elanStyles from "@/components/elan-visuals/elan-visuals.module.scss";
 import styles from "./page.module.scss";
 
@@ -322,13 +323,13 @@ export default function ProjectClient({
                       label="Tools"
                       className={styles.toolTags}
                       renderItem={(t, i) => (
-                        <span key={i} className={styles.toolTag}>{t.name}</span>
+                        <Badge key={i} appearance="neutral" emphasis="subtle" size="sm" shape="squared">{t.name}</Badge>
                       )}
                     />
                   ) : (
                     <div className={styles.toolTags}>
                       {p.tools.map((t, i) => (
-                        <span key={i} className={styles.toolTag}>{t.name}</span>
+                        <Badge key={i} appearance="neutral" emphasis="subtle" size="sm" shape="squared">{t.name}</Badge>
                       ))}
                     </div>
                   )}

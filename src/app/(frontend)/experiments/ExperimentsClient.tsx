@@ -11,6 +11,7 @@ import {
   InlineEditBar,
 } from "@/components/inline-edit";
 import type { ApiTarget } from "@/components/inline-edit";
+import { Badge } from "@/components/ui/Badge";
 import styles from "./page.module.scss";
 
 export interface Experiment {
@@ -111,7 +112,7 @@ function ExperimentRow({
         </AnimatePresence>
         <div className={styles.rowTags}>
           {item.tags.map((t) => (
-            <span key={t} className={styles.tag}>{t}</span>
+            <Badge key={t} appearance="always-light" emphasis="regular" size="sm" shape="pill" mono className={styles.tag}>{t}</Badge>
           ))}
         </div>
       </div>

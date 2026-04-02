@@ -134,7 +134,6 @@
 
 .metaLabel {
   @include label;
-  font-weight: $portfolio-weight-semibold;
   color: $portfolio-text-placeholder;
 }
 
@@ -147,15 +146,6 @@
   display: flex;
   flex-wrap: wrap;
   gap: $portfolio-spacer-1x;
-}
-
-.toolTag {
-  @include caption;
-  font-weight: $portfolio-weight-medium;
-  color: $portfolio-text-secondary;
-  background-color: $portfolio-surface-tertiary;
-  padding: $portfolio-spacer-0-5x $portfolio-spacer-1-5x;
-  border-radius: $portfolio-radius-sm;
 }
 
 .metaLinks {
@@ -430,7 +420,6 @@
 
 .projectNavLabel {
   @include label;
-  font-weight: $portfolio-weight-semibold;
   color: $portfolio-text-placeholder;
 }
 

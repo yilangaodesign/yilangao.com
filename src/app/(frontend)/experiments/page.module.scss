@@ -28,23 +28,21 @@
     max-width: 880px;
 
     .navPill {
-      background-color: rgba(255, 255, 255, 0.06);
+      background-color: $portfolio-overlay-white-06;
       backdrop-filter: blur(20px) saturate(180%);
-      border-color: rgba(255, 255, 255, 0.1);
+      border-color: $portfolio-overlay-white-10;
       box-shadow: $portfolio-shadow-lg;
     }
   }
 }
 
 .navPill {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  @include flex-between;
   padding: $portfolio-spacer-1x $portfolio-spacer-2x;
   border-radius: $portfolio-radius-full;
-  background-color: rgba(255, 255, 255, 0.04);
+  background-color: $portfolio-overlay-white-04;
   backdrop-filter: blur(12px) saturate(140%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid $portfolio-overlay-white-08;
   transition:
     background-color $portfolio-duration-moderate $portfolio-easing-standard,
     border-color $portfolio-duration-moderate $portfolio-easing-standard,
@@ -52,9 +50,7 @@
 }
 
 .logo {
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-base;
-  font-weight: $portfolio-weight-bold;
+  @include subtitle-3-bold;
   color: $portfolio-text-always-light-bold;
   white-space: nowrap;
 }
@@ -70,12 +66,11 @@
 }
 
 .navLink {
-  font-size: $portfolio-type-sm;
-  font-weight: $portfolio-weight-medium;
-  color: rgba(255, 255, 255, 0.6);
+  @include body-sm-medium;
+  color: $portfolio-overlay-white-60;
   text-decoration: none;
   white-space: nowrap;
-  transition: color $portfolio-duration-fast $portfolio-easing-standard;
+  @include transition-fast;
 
   &:hover {
     color: $portfolio-text-always-light-bold;
@@ -87,18 +82,16 @@
 }
 
 .navCta {
-  font-size: $portfolio-type-sm;
+  @include body-sm-medium;
   font-weight: $portfolio-weight-semibold;
   color: $portfolio-text-always-light-bold;
   background-color: transparent;
   padding: $portfolio-spacer-0-5x $portfolio-spacer-2x;
   border-radius: $portfolio-radius-full;
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  border: 1px solid $portfolio-overlay-white-40;
   text-decoration: none;
   white-space: nowrap;
-  transition:
-    background-color $portfolio-duration-fast $portfolio-easing-standard,
-    color $portfolio-duration-fast $portfolio-easing-standard;
+  @include transition-fast;
 
   &:hover {
     background-color: $portfolio-neutral-00;
@@ -133,14 +126,14 @@
 
 .headingItalic {
   font-style: italic;
-  color: rgba(255, 255, 255, 0.6);
+  color: $portfolio-overlay-white-60;
 }
 
 .sub {
   font-family: $portfolio-font-sans;
   font-size: clamp(1rem, 1.5vw, $portfolio-type-lg);
   line-height: $portfolio-leading-relaxed;
-  color: rgba(255, 255, 255, 0.5);
+  color: $portfolio-overlay-white-50;
   max-width: 520px;
 }
 
@@ -153,7 +146,7 @@
 }
 
 .listInner {
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid $portfolio-overlay-white-10;
 }
 
 // ── ROW ─────────────────────────────────────────────────────────────────────
@@ -164,7 +157,7 @@
   align-items: center;
   gap: $portfolio-spacer-3x;
   padding: $portfolio-spacer-4x 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid $portfolio-overlay-white-10;
   text-decoration: none;
   color: $portfolio-text-always-light-bold;
   cursor: pointer;
@@ -176,7 +169,7 @@
   }
 
   &:hover {
-    border-color: rgba(255, 255, 255, 0.25);
+    border-color: $portfolio-overlay-white-25;
   }
 }
 
@@ -221,7 +214,7 @@
 .rowNum {
   font-family: $portfolio-font-mono;
   font-size: $portfolio-type-sm;
-  color: rgba(255, 255, 255, 0.35);
+  color: $portfolio-overlay-white-35;
   letter-spacing: $portfolio-tracking-wide;
   white-space: nowrap;
   transition: color $portfolio-duration-moderate $portfolio-easing-standard;
@@ -240,7 +233,7 @@
 .rowTitle {
   @include heading-3;
   font-size: clamp(1.125rem, 2vw, $portfolio-type-2xl);
-  color: rgba(255, 255, 255, 0.75);
+  color: $portfolio-overlay-white-75;
   transition: color $portfolio-duration-moderate $portfolio-easing-standard;
 }
 
@@ -248,7 +241,7 @@
   font-family: $portfolio-font-sans;
   font-size: $portfolio-type-sm;
   line-height: $portfolio-leading-relaxed;
-  color: rgba(255, 255, 255, 0.45);
+  color: $portfolio-overlay-white-45;
   max-width: 480px;
   overflow: hidden;
 }
@@ -261,22 +254,16 @@
 }
 
 .tag {
-  font-family: $portfolio-font-mono;
-  font-size: $portfolio-type-xs;
-  letter-spacing: $portfolio-tracking-wide;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.4);
-  padding: $portfolio-spacer-0-25x $portfolio-spacer-utility-1-25x;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: $portfolio-radius-full;
-  white-space: nowrap;
+  background-color: transparent;
+  border-color: $portfolio-overlay-white-12;
+  color: $portfolio-overlay-white-40;
 }
 
 // Date
 .rowDate {
   font-family: $portfolio-font-mono;
   font-size: $portfolio-type-xs;
-  color: rgba(255, 255, 255, 0.3);
+  color: $portfolio-overlay-white-30;
   letter-spacing: $portfolio-tracking-wide;
   text-transform: uppercase;
   white-space: nowrap;
@@ -288,7 +275,7 @@
 
 // Arrow
 .rowArrow {
-  color: rgba(255, 255, 255, 0.5);
+  color: $portfolio-overlay-white-50;
   flex-shrink: 0;
 
   @media (max-width: #{$elan-bp-sm - 1}) {
@@ -303,13 +290,13 @@
   max-width: $elan-container-wide;
   margin: 0 auto;
   text-align: center;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid $portfolio-overlay-white-08;
 }
 
 .footerCtaText {
   font-family: $portfolio-font-sans;
   font-size: $portfolio-type-lg;
-  color: rgba(255, 255, 255, 0.4);
+  color: $portfolio-overlay-white-40;
   margin-bottom: $portfolio-spacer-3x;
 }
 

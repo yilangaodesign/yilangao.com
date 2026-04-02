@@ -90,7 +90,6 @@
 .sectionLabel {
   display: block;
   @include label;
-  font-weight: $portfolio-weight-semibold;
   color: $portfolio-text-placeholder;
   margin-bottom: $portfolio-spacer-1x;
 
@@ -276,7 +275,7 @@
   right: $portfolio-spacer-1x;
   display: flex;
   gap: $portfolio-spacer-0-5x;
-  z-index: 10;
+  z-index: $portfolio-z-control;
   opacity: 0;
   pointer-events: none;
   transition: opacity $portfolio-duration-fast $portfolio-easing-standard;
@@ -302,7 +301,7 @@
   flex-shrink: 0;
   box-shadow: $portfolio-shadow-md;
   position: relative;
-  z-index: 10;
+  z-index: $portfolio-z-control;
 
   *:hover > &,
   &:focus-visible {
@@ -454,7 +453,7 @@
   position: absolute;
   top: $portfolio-spacer-0-5x;
   left: $portfolio-spacer-0-5x;
-  z-index: 20;
+  z-index: $portfolio-z-control;
   display: flex;
   align-items: center;
   justify-content: center;

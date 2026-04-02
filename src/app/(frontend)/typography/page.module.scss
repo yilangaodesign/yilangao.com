@@ -369,9 +369,7 @@
 }
 
 .previewLabel {
-  line-height: $portfolio-leading-normal;
-  letter-spacing: $portfolio-tracking-wider;
-  text-transform: uppercase;
+  @include label;
   color: $portfolio-text-placeholder;
   margin-bottom: $portfolio-spacer-1-5x;
 }
