@@ -10,6 +10,7 @@ import {
 } from "geist/font/pixel";
 import { ThemeProvider } from "@/components/theme-provider";
 import { SidebarProvider } from "@/components/sidebar";
+import "./ds-tokens.scss";
 import "./globals.css";
 
 export const metadata: Metadata = {

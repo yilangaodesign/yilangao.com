@@ -41,7 +41,7 @@ function ExpandCollapseDemo() {
   );
 }
 
-const code = `import { ExpandCollapse } from "@/components/ExpandCollapse";
+const code = `import { ExpandCollapse } from "@/components/ui/ExpandCollapse";
 
 const [open, setOpen] = useState(false);
 

@@ -4,7 +4,8 @@ import { Shell } from "@/components/shell";
 import { SectionHeading } from "@/components/token-grid";
 import { ComponentPreview, PropsTable, SourcePath, SubsectionHeading} from "@/components/component-preview";
 import { Dropzone } from "@ds/Dropzone";
-import { Image, FileText } from "lucide-react";
+import Image from "lucide-react/dist/esm/icons/image";
+import FileText from "lucide-react/dist/esm/icons/file-text";
 
 const noop = () => {};
 

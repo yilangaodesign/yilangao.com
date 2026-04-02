@@ -3,7 +3,7 @@ import { SectionHeading } from "@/components/token-grid";
 import { ComponentPreview, PropsTable, SourcePath, SubsectionHeading} from "@/components/component-preview";
 import TestimonialCard from "@ds/TestimonialCard/TestimonialCard";
 
-const basicCode = `import TestimonialCard from "@/components/TestimonialCard";
+const basicCode = `import TestimonialCard from "@/components/ui/TestimonialCard";
 
 <TestimonialCard
   text="Working with Yilan was a transformative experience. The attention to detail elevated our product."

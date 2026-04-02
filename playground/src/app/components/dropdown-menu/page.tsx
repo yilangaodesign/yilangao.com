@@ -13,17 +13,15 @@ import {
   DropdownMenuLabel,
 } from "@ds/DropdownMenu";
 import { Button } from "@ds/Button";
-import {
-  Copy,
-  Pencil,
-  Trash2,
-  Share,
-  LogOut,
-  Settings,
-  User,
-  CreditCard,
-  Keyboard,
-} from "lucide-react";
+import Copy from "lucide-react/dist/esm/icons/copy";
+import CreditCard from "lucide-react/dist/esm/icons/credit-card";
+import Keyboard from "lucide-react/dist/esm/icons/keyboard";
+import LogOut from "lucide-react/dist/esm/icons/log-out";
+import Pencil from "lucide-react/dist/esm/icons/pencil";
+import Settings from "lucide-react/dist/esm/icons/settings";
+import Share from "lucide-react/dist/esm/icons/share";
+import Trash2 from "lucide-react/dist/esm/icons/trash-2";
+import User from "lucide-react/dist/esm/icons/user";
 
 const basicCode = `<DropdownMenu>
   <DropdownMenuTrigger asChild>

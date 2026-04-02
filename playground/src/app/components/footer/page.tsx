@@ -3,7 +3,7 @@ import { SectionHeading } from "@/components/token-grid";
 import { ComponentPreview, PropsTable, SourcePath, SubsectionHeading} from "@/components/component-preview";
 import Footer from "@ds/Footer/Footer";
 
-const code = `import Footer from "@/components/Footer";
+const code = `import Footer from "@/components/ui/Footer";
 
 // Footer is self-contained — no props needed.
 // Renders copyright text and social links.

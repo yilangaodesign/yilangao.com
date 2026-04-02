@@ -141,6 +141,18 @@ export const colors = {
             { emphasis: "", value: "rgba(0, 0, 0, 0.5)", token: "$portfolio-surface-overlay" },
           ],
         },
+        {
+          role: "always-dark",
+          tokens: [
+            { emphasis: "", value: "#161616", token: "$portfolio-surface-always-dark", ref: "$portfolio-neutral-100" },
+          ],
+        },
+        {
+          role: "always-light",
+          tokens: [
+            { emphasis: "", value: "#FFFFFF", token: "$portfolio-surface-always-light", ref: "$portfolio-neutral-00" },
+          ],
+        },
       ],
     },
     {
@@ -176,6 +188,12 @@ export const colors = {
           ],
         },
         {
+          role: "always-dark",
+          tokens: [
+            { emphasis: "bold", value: "#161616", token: "$portfolio-text-always-dark-bold", ref: "$portfolio-neutral-100" },
+          ],
+        },
+        {
           role: "negative",
           tokens: [
             { emphasis: "", value: "#DA1E28", token: "$portfolio-text-negative", ref: "$portfolio-red-60", legacy: "$portfolio-text-error" },
@@ -190,7 +208,7 @@ export const colors = {
         {
           role: "warning",
           tokens: [
-            { emphasis: "", value: "#F1C21B", token: "$portfolio-text-warning", ref: "$portfolio-yellow-30" },
+            { emphasis: "", value: "#8E6A00", token: "$portfolio-text-warning", ref: "$portfolio-yellow-60" },
           ],
         },
       ],
@@ -206,6 +224,7 @@ export const colors = {
             { emphasis: "regular", value: "#525252", token: "$portfolio-icon-neutral-regular", ref: "$portfolio-neutral-70" },
             { emphasis: "subtle", value: "#6F6F6F", token: "$portfolio-icon-neutral-subtle", ref: "$portfolio-neutral-60" },
             { emphasis: "minimal", value: "#A8A8A8", token: "$portfolio-icon-neutral-minimal", ref: "$portfolio-neutral-40" },
+            { emphasis: "disabled", value: "#C6C6C6", token: "$portfolio-icon-neutral-disabled", ref: "$portfolio-neutral-30" },
           ],
         },
         {
@@ -218,6 +237,18 @@ export const colors = {
           role: "inverse",
           tokens: [
             { emphasis: "bold", value: "#FFFFFF", token: "$portfolio-icon-inverse-bold", ref: "$portfolio-neutral-00" },
+          ],
+        },
+        {
+          role: "always-light",
+          tokens: [
+            { emphasis: "bold", value: "#FFFFFF", token: "$portfolio-icon-always-light-bold", ref: "$portfolio-neutral-00" },
+          ],
+        },
+        {
+          role: "always-dark",
+          tokens: [
+            { emphasis: "bold", value: "#161616", token: "$portfolio-icon-always-dark-bold", ref: "$portfolio-neutral-100" },
           ],
         },
         {
@@ -235,7 +266,7 @@ export const colors = {
         {
           role: "warning",
           tokens: [
-            { emphasis: "", value: "#F1C21B", token: "$portfolio-icon-warning", ref: "$portfolio-yellow-30" },
+            { emphasis: "", value: "#8E6A00", token: "$portfolio-icon-warning", ref: "$portfolio-yellow-60" },
           ],
         },
       ],
@@ -265,6 +296,18 @@ export const colors = {
           ],
         },
         {
+          role: "always-light",
+          tokens: [
+            { emphasis: "", value: "#FFFFFF", token: "$portfolio-border-always-light", ref: "$portfolio-neutral-00" },
+          ],
+        },
+        {
+          role: "always-dark",
+          tokens: [
+            { emphasis: "", value: "#161616", token: "$portfolio-border-always-dark", ref: "$portfolio-neutral-100" },
+          ],
+        },
+        {
           role: "negative",
           tokens: [
             { emphasis: "", value: "#DA1E28", token: "$portfolio-border-negative", ref: "$portfolio-red-60" },
@@ -279,7 +322,7 @@ export const colors = {
         {
           role: "warning",
           tokens: [
-            { emphasis: "", value: "#F1C21B", token: "$portfolio-border-warning", ref: "$portfolio-yellow-30" },
+            { emphasis: "", value: "#8E6A00", token: "$portfolio-border-warning", ref: "$portfolio-yellow-60" },
           ],
         },
       ],
@@ -293,6 +336,9 @@ export const colors = {
           tokens: [
             { emphasis: "bold", value: "#3336FF", token: "$portfolio-action-brand-bold", ref: "$portfolio-accent-60" },
             { emphasis: "subtle", value: "#D5E0FC", token: "$portfolio-action-brand-subtle", ref: "$portfolio-accent-20" },
+            { emphasis: "bold-hover", value: "#0004E2", token: "$portfolio-action-brand-bold-hover", ref: "$portfolio-accent-70" },
+            { emphasis: "bold-pressed", value: "#0003A7", token: "$portfolio-action-brand-bold-pressed", ref: "$portfolio-accent-80" },
+            { emphasis: "bold-disabled", value: "#B3C5FC", token: "$portfolio-action-brand-bold-disabled", ref: "$portfolio-accent-30" },
           ],
         },
         {
@@ -300,12 +346,26 @@ export const colors = {
           tokens: [
             { emphasis: "bold", value: "#161616", token: "$portfolio-action-neutral-bold", ref: "$portfolio-neutral-100" },
             { emphasis: "regular", value: "#F4F4F4", token: "$portfolio-action-neutral-regular", ref: "$portfolio-neutral-10" },
+            { emphasis: "bold-hover", value: "#393939", token: "$portfolio-action-neutral-bold-hover", ref: "$portfolio-neutral-80" },
+            { emphasis: "bold-disabled", value: "#C6C6C6", token: "$portfolio-action-neutral-bold-disabled", ref: "$portfolio-neutral-30" },
           ],
         },
         {
           role: "inverse",
           tokens: [
             { emphasis: "bold", value: "#FFFFFF", token: "$portfolio-action-inverse-bold", ref: "$portfolio-neutral-00" },
+          ],
+        },
+        {
+          role: "always-dark",
+          tokens: [
+            { emphasis: "", value: "#161616", token: "$portfolio-action-always-dark", ref: "$portfolio-neutral-100" },
+          ],
+        },
+        {
+          role: "always-light",
+          tokens: [
+            { emphasis: "", value: "#FFFFFF", token: "$portfolio-action-always-light", ref: "$portfolio-neutral-00" },
           ],
         },
         {
@@ -323,7 +383,7 @@ export const colors = {
         {
           role: "warning",
           tokens: [
-            { emphasis: "", value: "#F1C21B", token: "$portfolio-action-warning", ref: "$portfolio-yellow-30" },
+            { emphasis: "", value: "#8E6A00", token: "$portfolio-action-warning", ref: "$portfolio-yellow-60" },
           ],
         },
       ],

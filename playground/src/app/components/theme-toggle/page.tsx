@@ -5,7 +5,7 @@ import { SectionHeading } from "@/components/token-grid";
 import { ComponentPreview, PropsTable, SourcePath, SubsectionHeading} from "@/components/component-preview";
 import ThemeToggle from "@ds/ThemeToggle/ThemeToggle";
 
-const code = `import ThemeToggle from "@/components/ThemeToggle";
+const code = `import ThemeToggle from "@/components/ui/ThemeToggle";
 
 // ThemeToggle is self-contained — no props needed.
 // Uses useTheme() from next-themes with a hydration guard.

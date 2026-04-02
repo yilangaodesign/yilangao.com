@@ -7,8 +7,8 @@ import { useDevInfo } from "@/hooks/use-dev-info";
 
 const BUMP_COLORS: Record<string, string> = {
   patch: "text-muted-foreground/80",
-  minor: "text-amber-500/80",
-  major: "text-red-500/80",
+  minor: "text-amber-600/80 dark:text-amber-400/80",
+  major: "text-red-600/80 dark:text-red-400/80",
 };
 
 function DesignSystemFootnote() {
@@ -27,7 +27,7 @@ function DesignSystemFootnote() {
     isLocal && analysis && analysis.totalFilesChanged > 0;
 
   return (
-    <footer className="h-11 flex items-center border-t border-border px-4 lg:px-5 text-xs text-muted-foreground/60 font-mono gap-2">
+    <footer className="h-11 flex items-center border-t border-border px-3.5 text-xs text-muted-foreground/60 font-mono gap-2">
       <span className="truncate">
         {elan.name} {version}
         {isLocal &&
@@ -55,14 +55,14 @@ export function Shell({ children, title }: { children: React.ReactNode; title?: 
     <div className="flex min-h-screen">
       <Sidebar />
       <div className="flex-1 min-w-0 flex flex-col">
-        <header className="sticky top-0 z-10 flex items-center justify-between h-12 px-4 lg:px-5 border-b bg-background/80 backdrop-blur-sm border-border gap-4">
+        <header className="sticky top-0 z-10 flex items-center justify-between h-12 px-3.5 border-b bg-background/80 backdrop-blur-sm border-border gap-4">
           <div className="flex items-center gap-3 min-w-0">
             <MobileMenuButton />
             {title && <h1 className="text-sm font-medium truncate">{title}</h1>}
           </div>
           <ThemeToggle />
         </header>
-        <main className="flex-1 px-4 py-4 lg:px-5 lg:py-5">{children}</main>
+        <main className="flex-1 px-3.5 py-4 lg:py-5">{children}</main>
         <DesignSystemFootnote />
       </div>
     </div>

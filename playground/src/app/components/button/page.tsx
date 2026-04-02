@@ -1,16 +1,21 @@
-import { Plus, ChevronRight, ArrowRight, Download } from "lucide-react";
+import ArrowRight from "lucide-react/dist/esm/icons/arrow-right";
+import ChevronRight from "lucide-react/dist/esm/icons/chevron-right";
+import Download from "lucide-react/dist/esm/icons/download";
+import Plus from "lucide-react/dist/esm/icons/plus";
 import { Shell } from "@/components/shell";
 import { SectionHeading } from "@/components/token-grid";
 import { ComponentPreview, PropsTable, SourcePath, SubsectionHeading} from "@/components/component-preview";
 import ScrollSpy from "@/components/scroll-spy";
 import { Button } from "@ds/Button";
 import type { ButtonAppearance, ButtonEmphasis, ButtonSize } from "@ds/Button";
+import surfaces from "./surfaces.module.css";
 
 const SIZE_TOKEN_DOCS: Record<ButtonSize, { height: string; px: string; py: string; font: string; icon: string; gap: string }> = {
   xs: { height: "min 24", px: "utility-0.75x (6)", py: "utility-0.5x (4)", font: "xs (12)", icon: "16", gap: "utility-0.5x (4)" },
   sm: { height: "min 32", px: "utility-1x (8)", py: "utility-0.875x (7)", font: "sm (14)", icon: "18", gap: "utility-0.75x (6)" },
-  lg: { height: "min 48", px: "utility-2x (16)", py: "utility-1.625x (13)", font: "base (16)", icon: "20", gap: "utility-1.25x (10)" },
-  xl: { height: "min 56", px: "utility-2.5x (20)", py: "utility-2x (16)", font: "lg (18)", icon: "24", gap: "utility-1.5x (12)" },
+  md: { height: "min 40", px: "utility-1.5x (12)", py: "utility-1.25x (10)", font: "base (16)", icon: "20", gap: "utility-1x (8)" },
+  lg: { height: "min 48", px: "utility-2x (16)", py: "utility-1.625x (13)", font: "lg (18)", icon: "22", gap: "utility-1.5x (12)" },
+  xl: { height: "min 56", px: "utility-3x (24)", py: "utility-2x (16)", font: "lg (18)", icon: "24", gap: "utility-2x (16)" },
 };
 
 const scrollSpySections = [
@@ -31,13 +36,15 @@ const CORE_APPEARANCES: ButtonAppearance[] = [
   "highlight",
   "positive",
   "negative",
+  "warning",
 ];
+const INVERSE_EMPHASIS: ButtonEmphasis[] = ["bold", "regular"];
 const CONTEXT_APPEARANCES: ButtonAppearance[] = [
   "inverse",
   "always-dark",
   "always-light",
 ];
-const SIZES: ButtonSize[] = ["xs", "sm", "lg", "xl"];
+const SIZES: ButtonSize[] = ["xs", "sm", "md", "lg", "xl"];
 
 export default function ButtonPage() {
   return (
@@ -116,27 +123,36 @@ export default function ButtonPage() {
 
                 <div className="space-y-3">
                   <p className="text-xs text-muted-foreground font-medium">
-                    Context Appearances (on dark surfaces)
+                    Inverse (theme-responsive — Bold + Regular only)
                   </p>
-                  <div className="rounded-sm bg-neutral-900 p-6 flex flex-wrap items-center justify-center gap-3">
-                    {CONTEXT_APPEARANCES.filter((a) => a !== "always-dark").map(
-                      (a) =>
-                        EMPHASIS_LEVELS.map((e) => (
-                          <Button key={`${a}-${e}`} appearance={a} emphasis={e} size="sm">
-                            {a} / {e}
-                          </Button>
-                        )),
-                    )}
+                  <div className={`rounded-sm p-6 flex flex-wrap items-center justify-center gap-3 ${surfaces.surfaceInverse}`}>
+                    {INVERSE_EMPHASIS.map((e) => (
+                      <Button key={`inverse-${e}`} appearance="inverse" emphasis={e} size="sm">
+                        inverse / {e}
+                      </Button>
+                    ))}
                   </div>
-                  <div className="rounded-sm bg-white border border-border p-6 flex flex-wrap items-center justify-center gap-3">
+                </div>
+                <div className="space-y-3">
+                  <p className="text-xs text-muted-foreground font-medium">
+                    Always Dark (locked dark — toggle theme to verify)
+                  </p>
+                  <div className={`rounded-sm p-6 flex flex-wrap items-center justify-center gap-4 ${surfaces.surfaceAlwaysLight}`}>
                     {EMPHASIS_LEVELS.map((e) => (
-                      <Button
-                        key={`always-dark-${e}`}
-                        appearance="always-dark"
-                        emphasis={e}
-                        size="sm"
-                      >
+                      <Button key={`always-dark-${e}`} appearance="always-dark" emphasis={e} size="sm">
                         always-dark / {e}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <p className="text-xs text-muted-foreground font-medium">
+                    Always Light (locked light — toggle theme to verify)
+                  </p>
+                  <div className={`rounded-sm p-6 flex flex-wrap items-center justify-center gap-4 ${surfaces.surfaceAlwaysDark}`}>
+                    {EMPHASIS_LEVELS.map((e) => (
+                      <Button key={`always-light-${e}`} appearance="always-light" emphasis={e} size="sm">
+                        always-light / {e}
                       </Button>
                     ))}
                   </div>
@@ -149,9 +165,10 @@ export default function ButtonPage() {
           <section id="size-scale">
             <ComponentPreview
               title="Size Scale"
-              description="Four sizes (no 'md'). All dimensions use spacer tokens — zero hardcoded px for spacing."
+              description="Five sizes on an 8px height grid (24–32–40–48–56). All dimensions use spacer tokens — zero hardcoded px for spacing."
               code={`<Button size="xs">Extra Small</Button>
 <Button size="sm">Small</Button>
+<Button size="md">Medium</Button>
 <Button size="lg">Large</Button>  {/* default */}
 <Button size="xl">Extra Large</Button>`}
             >
@@ -189,6 +206,7 @@ export default function ButtonPage() {
               description="Side-by-side size comparison aligned by baseline."
               code={`<Button size="xs">XS</Button>
 <Button size="sm">SM</Button>
+<Button size="md">MD</Button>
 <Button size="lg">LG</Button>
 <Button size="xl">XL</Button>`}
             >
@@ -322,7 +340,7 @@ export default function ButtonPage() {
 <Button fullWidth appearance="neutral" emphasis="regular">Full width neutral regular</Button>
 <Button fullWidth appearance="neutral" emphasis="subtle">Full width neutral subtle</Button>`}
             >
-              <div className="w-full max-w-sm mx-auto space-y-2">
+              <div className="w-full max-w-sm mx-auto flex flex-col gap-3">
                 <Button fullWidth appearance="highlight">
                   Full width bold
                 </Button>
@@ -343,9 +361,9 @@ export default function ButtonPage() {
               props={[
                 {
                   name: "appearance",
-                  type: '"neutral" | "highlight" | "positive" | "negative" | "inverse" | "always-dark" | "always-light"',
+                  type: '"neutral" | "highlight" | "positive" | "negative" | "warning" | "inverse" | "always-dark" | "always-light"',
                   default: '"neutral"',
-                  description: "Color/intent axis — what semantic color family the button uses.",
+                  description: "Color/intent axis — what semantic color family the button uses. Inverse supports Bold + Regular only.",
                 },
                 {
                   name: "emphasis",
@@ -356,10 +374,10 @@ export default function ButtonPage() {
                 },
                 {
                   name: "size",
-                  type: '"xs" | "sm" | "lg" | "xl"',
+                  type: '"xs" | "sm" | "md" | "lg" | "xl"',
                   default: '"lg"',
                   description:
-                    "Button size controlling min-height, padding, font size, icon size (= line-height), and gap. No 'md' — use 'lg' as default.",
+                    "Button size on an 8px height grid (24–56). Controls min-height, padding, font size, icon size (= line-height), and gap.",
                 },
                 {
                   name: "iconOnly",

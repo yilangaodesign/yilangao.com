@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Check, Copy } from "lucide-react";
+import Check from "lucide-react/dist/esm/icons/check";
+import Copy from "lucide-react/dist/esm/icons/copy";
 
 export function ColorSwatch({
   color,
@@ -77,7 +78,7 @@ export function TokenRow({
       <div className="text-xs font-mono text-muted-foreground tabular-nums shrink-0">{value}</div>
       <div className="w-5 shrink-0">
         {copied ? (
-          <Check className="w-3.5 h-3.5 text-green-600" />
+          <Check className="w-3.5 h-3.5 text-green-600 dark:text-green-400" />
         ) : (
           <Copy className="w-3.5 h-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
         )}

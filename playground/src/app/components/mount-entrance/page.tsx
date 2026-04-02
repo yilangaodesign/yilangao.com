@@ -28,7 +28,7 @@ function MountEntranceDemo() {
   );
 }
 
-const code = `import { MountEntrance } from "@/components/MountEntrance";
+const code = `import { MountEntrance } from "@/components/ui/MountEntrance";
 
 <MountEntrance>
   <div>Hero content — fades up on mount</div>

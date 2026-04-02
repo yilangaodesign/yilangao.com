@@ -42,10 +42,7 @@ function resolve(theme: Theme): ResolvedTheme {
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>(() => {
-    if (typeof window === "undefined") return "light";
-    return (localStorage.getItem(STORAGE_KEY) as Theme) || "light";
-  });
+  const [theme, setThemeState] = useState<Theme>("light");
 
   const resolved = resolve(theme);
 
@@ -63,6 +60,14 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     },
     [applyTheme],
   );
+
+  useEffect(() => {
+    const stored = localStorage.getItem(STORAGE_KEY) as Theme;
+    if (stored) {
+      setThemeState(stored);
+      applyTheme(resolve(stored));
+    }
+  }, [applyTheme]);
 
   useEffect(() => {
     applyTheme(resolved);

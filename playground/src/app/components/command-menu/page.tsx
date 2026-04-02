@@ -6,7 +6,10 @@ import { SectionHeading } from "@/components/token-grid";
 import { ComponentPreview, PropsTable, SourcePath, SubsectionHeading } from "@/components/component-preview";
 import { CommandMenu, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem } from "@ds/CommandMenu";
 import { Button } from "@ds/Button";
-import { Home, Palette, Layers, Square } from "lucide-react";
+import Home from "lucide-react/dist/esm/icons/home";
+import Layers from "lucide-react/dist/esm/icons/layers";
+import Palette from "lucide-react/dist/esm/icons/palette";
+import Square from "lucide-react/dist/esm/icons/square";
 
 const code = `import { CommandMenu, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem } from "@ds/CommandMenu";
 

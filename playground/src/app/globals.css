@@ -37,6 +37,22 @@
   --font-sans: var(--font-geist-sans), "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), "JetBrains Mono", ui-monospace, monospace;
 
+  /* Type scale — mirror of SCSS _typography.scss $portfolio-type-* tokens */
+  --type-3xs: 0.5rem;
+  --type-2xs: 0.625rem;
+  --type-xs: 0.75rem;
+  --type-sm: 0.875rem;
+  --type-base: 1rem;
+  --type-lg: 1.125rem;
+  --type-xl: 1.25rem;
+  --type-2xl: 1.5rem;
+  --type-3xl: 1.875rem;
+  --type-4xl: 2.25rem;
+  --type-5xl: 3rem;
+  --type-6xl: 3.75rem;
+  --type-7xl: 4.5rem;
+  --type-8xl: 6rem;
+
   /* Line heights — override Tailwind defaults to match SCSS _typography.scss */
   --leading-compact: 1.15;
   --leading-tight: 1.1;
@@ -111,99 +127,6 @@
   --color-code-foreground: #f4f4f4;
   --color-preview-bg: #1e1e1e;
   --color-preview-border: #393939;
-}
-
-/* ========================================================================= */
-/* Design system tokens — CSS custom properties                               */
-/* Mirror of SCSS _colors.scss palette for Tailwind arbitrary-value use        */
-/* ========================================================================= */
-
-:root {
-  /* Palette — Neutral Gray (Carbon Gray) */
-  --palette-neutral-00: #FFFFFF;
-  --palette-neutral-05: #F9F9F9;
-  --palette-neutral-10: #F4F4F4;
-  --palette-neutral-20: #E0E0E0;
-  --palette-neutral-30: #C6C6C6;
-  --palette-neutral-40: #A8A8A8;
-  --palette-neutral-50: #8D8D8D;
-  --palette-neutral-60: #6F6F6F;
-  --palette-neutral-70: #525252;
-  --palette-neutral-80: #393939;
-  --palette-neutral-90: #262626;
-  --palette-neutral-100: #161616;
-
-  /* Palette — Accent (Lumen Blue-Violet) */
-  --palette-accent-10: #F0F5FD;
-  --palette-accent-20: #D5E0FC;
-  --palette-accent-30: #B3C5FC;
-  --palette-accent-40: #8DA3FC;
-  --palette-accent-50: #7182FD;
-  --palette-accent-60: #3336FF;
-  --palette-accent-70: #0004E2;
-  --palette-accent-80: #0003A7;
-
-  /* Palette — Red (Carbon Red) */
-  --palette-red-10: #FFF1F1;
-  --palette-red-20: #FFD7D9;
-  --palette-red-30: #FFB3B8;
-  --palette-red-60: #DA1E28;
-  --palette-red-70: #A2191F;
-  --palette-red-80: #750E13;
-
-  /* Palette — Green (Carbon Green) */
-  --palette-green-10: #DEFBE6;
-  --palette-green-20: #A7F0BA;
-  --palette-green-30: #6FDC8C;
-  --palette-green-60: #198038;
-  --palette-green-70: #0E6027;
-  --palette-green-80: #044317;
-
-  /* Overlay interaction tokens */
-  --overlay-white-08: rgba(255, 255, 255, 0.08);
-  --overlay-white-12: rgba(255, 255, 255, 0.12);
-  --overlay-white-16: rgba(255, 255, 255, 0.16);
-  --overlay-black-04: rgba(0, 0, 0, 0.04);
-  --overlay-black-06: rgba(0, 0, 0, 0.06);
-  --overlay-black-08: rgba(0, 0, 0, 0.08);
-  --overlay-black-10: rgba(0, 0, 0, 0.10);
-  --overlay-black-14: rgba(0, 0, 0, 0.14);
-
-  /* Motion tokens */
-  --duration-fast: 110ms;
-  --duration-moderate: 240ms;
-  --easing-standard: cubic-bezier(0.2, 0, 0.38, 0.9);
-
-  /* Button — Neutral state tokens (theme-adaptive) */
-  --btn-neutral-bold-hover: var(--palette-neutral-90);
-  --btn-neutral-bold-active: var(--palette-neutral-80);
-  --btn-neutral-border: var(--palette-neutral-50);
-  --btn-neutral-surface-subtle: var(--palette-neutral-05);
-  --btn-neutral-surface-regular: var(--palette-neutral-10);
-  --btn-neutral-step-20: var(--palette-neutral-20);
-  --btn-neutral-step-30: var(--palette-neutral-30);
-
-  /* Button — Highlight state tokens (theme-adaptive) */
-  --btn-highlight-bold-hover: var(--palette-accent-70);
-  --btn-highlight-bold-active: var(--palette-accent-80);
-  --btn-highlight-surface-subtle: var(--palette-accent-10);
-  --btn-highlight-step-20: var(--palette-accent-20);
-  --btn-highlight-step-30: var(--palette-accent-30);
-}
-
-.dark {
-  --btn-neutral-bold-hover: var(--palette-neutral-20);
-  --btn-neutral-bold-active: var(--palette-neutral-30);
-  --btn-neutral-surface-subtle: var(--palette-neutral-90);
-  --btn-neutral-surface-regular: var(--palette-neutral-80);
-  --btn-neutral-step-20: var(--palette-neutral-80);
-  --btn-neutral-step-30: var(--palette-neutral-70);
-
-  --btn-highlight-bold-hover: var(--palette-accent-50);
-  --btn-highlight-bold-active: var(--palette-accent-60);
-  --btn-highlight-surface-subtle: color-mix(in srgb, var(--palette-accent-40) 15%, transparent);
-  --btn-highlight-step-20: color-mix(in srgb, var(--palette-accent-40) 20%, transparent);
-  --btn-highlight-step-30: color-mix(in srgb, var(--palette-accent-40) 30%, transparent);
 }
 
 @keyframes indeterminate {

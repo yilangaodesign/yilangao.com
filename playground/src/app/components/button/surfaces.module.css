@@ -1,0 +1,11 @@
+.surfaceInverse {
+  background-color: var(--portfolio-surface-inverse-bold);
+}
+
+.surfaceAlwaysDark {
+  background-color: var(--portfolio-surface-always-dark);
+}
+
+.surfaceAlwaysLight {
+  background-color: var(--portfolio-surface-always-light);
+}

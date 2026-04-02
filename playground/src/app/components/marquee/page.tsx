@@ -7,7 +7,7 @@ import { Marquee } from "@ds/Marquee/Marquee";
 
 const ITEMS = ["Token", "Mixin", "Component", "Pattern", "Recipe", "Layout", "Interaction", "Motion"];
 
-const code = `import { Marquee } from "@/components/Marquee";
+const code = `import { Marquee } from "@/components/ui/Marquee";
 
 <Marquee duration={20} pauseOnHover>
   {items.map((item) => (

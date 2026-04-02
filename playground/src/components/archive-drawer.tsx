@@ -1,7 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { X, RotateCcw, User, Bot, ExternalLink } from "lucide-react";
+import X from "lucide-react/dist/esm/icons/x";
+import RotateCcw from "lucide-react/dist/esm/icons/rotate-ccw";
+import User from "lucide-react/dist/esm/icons/user";
+import Bot from "lucide-react/dist/esm/icons/bot";
+import ExternalLink from "lucide-react/dist/esm/icons/external-link";
 import { cn } from "@/lib/utils";
 import type { ArchiveItem } from "@/lib/archive-manifest";
 import { PreviewRenderer } from "@/lib/archive-previews";
@@ -90,7 +94,7 @@ export function ArchiveDrawer({
                 <TypeBadge type={item.type} />
                 <ExperimentTag experiment={item.experiment} />
                 {item.tags.map((tag) => (
-                  <Badge key={tag} shape="squared" mono size="xs" variant="default">
+                  <Badge key={tag} shape="squared" mono size="xs" appearance="neutral" emphasis="subtle">
                     {tag}
                   </Badge>
                 ))}
@@ -110,7 +114,7 @@ export function ArchiveDrawer({
                   <DescriptionList>
                     <DescriptionItem label="Origin">
                       <div className="flex items-center gap-1.5 flex-wrap">
-                        <Badge shape="squared" mono size="xs">{item.origin.type}</Badge>
+                        <Badge shape="squared" mono size="xs" appearance="neutral" emphasis="subtle">{item.origin.type}</Badge>
                         {item.origin.library && (
                           <span className="text-xs">{item.origin.library}</span>
                         )}

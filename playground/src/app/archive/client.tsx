@@ -8,7 +8,10 @@ import { ArchiveListRow } from "@/components/archive-list-row";
 import { ArchiveDrawer } from "@/components/archive-drawer";
 import { getArchivedItems, getUniqueExperiments, getUniqueTypes } from "@/lib/archive-manifest";
 import type { ArchiveItem, ItemType, Experiment } from "@/lib/archive-manifest";
-import { LayoutGrid, List, Search, ArrowUpDown } from "lucide-react";
+import LayoutGrid from "lucide-react/dist/esm/icons/layout-grid";
+import List from "lucide-react/dist/esm/icons/list";
+import Search from "lucide-react/dist/esm/icons/search";
+import ArrowUpDown from "lucide-react/dist/esm/icons/arrow-up-down";
 import { cn } from "@/lib/utils";
 
 type ViewMode = "gallery" | "list";

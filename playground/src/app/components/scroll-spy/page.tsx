@@ -22,8 +22,8 @@ const sectionContent = [
   "Notes section — the component is hidden on mobile. On desktop, it appears fixed on the right edge of the viewport.",
 ];
 
-const scrollSpyCode = `import ScrollSpy from "@/components/ScrollSpy";
-import type { ScrollSpySection } from "@/components/ScrollSpy";
+const scrollSpyCode = `import ScrollSpy from "@/components/ui/ScrollSpy";
+import type { ScrollSpySection } from "@/components/ui/ScrollSpy";
 
 const sections: ScrollSpySection[] = [
   { id: "intro", label: "Introduction" },

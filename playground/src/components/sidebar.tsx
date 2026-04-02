@@ -3,62 +3,59 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import {
-  Palette,
-  Type,
-  Zap,
-  Layers,
-  Navigation,
-  PanelBottom,
-  ToggleLeft,
-  MousePointerClick,
-  Home,
-  Ruler,
-  Menu,
-  PanelLeftClose,
-  PanelLeftOpen,
-  Archive,
-  Play,
-  ChevronsUpDown,
-  ArrowRight,
-  Repeat,
-  Search,
-  PanelTop,
-  Sparkles,
-  MousePointer2,
-  Newspaper,
-  TextCursorInput,
-  Bell,
-  ChevronRight,
-  GripVertical,
-  RectangleHorizontal,
-  Square,
-  Tag,
-  SeparatorHorizontal,
-  CircleUser,
-  FormInput,
-  AlignLeft,
-  ListFilter,
-  CheckSquare,
-  ToggleRight,
-  MessageSquare,
-  PanelTopOpen,
-  LayoutList,
-  BellRing,
-  Shapes,
-  Compass,
-  Table2,
-  Paintbrush,
-  Pipette,
-  SlidersHorizontal,
-  GripHorizontal,
-  Upload,
-  Loader,
-  Columns,
-  Code2,
-} from "lucide-react";
+import Palette from "lucide-react/dist/esm/icons/palette";
+import Type from "lucide-react/dist/esm/icons/type";
+import Zap from "lucide-react/dist/esm/icons/zap";
+import Layers from "lucide-react/dist/esm/icons/layers";
+import Navigation from "lucide-react/dist/esm/icons/navigation";
+import PanelBottom from "lucide-react/dist/esm/icons/panel-bottom";
+import ToggleLeft from "lucide-react/dist/esm/icons/toggle-left";
+import MousePointerClick from "lucide-react/dist/esm/icons/mouse-pointer-click";
+import Home from "lucide-react/dist/esm/icons/home";
+import Ruler from "lucide-react/dist/esm/icons/ruler";
+import Menu from "lucide-react/dist/esm/icons/menu";
+import PanelLeftClose from "lucide-react/dist/esm/icons/panel-left-close";
+import PanelLeftOpen from "lucide-react/dist/esm/icons/panel-left-open";
+import Archive from "lucide-react/dist/esm/icons/archive";
+import Play from "lucide-react/dist/esm/icons/play";
+import ChevronsUpDown from "lucide-react/dist/esm/icons/chevrons-up-down";
+import ArrowRight from "lucide-react/dist/esm/icons/arrow-right";
+import Repeat from "lucide-react/dist/esm/icons/repeat";
+import Search from "lucide-react/dist/esm/icons/search";
+import Sparkles from "lucide-react/dist/esm/icons/sparkles";
+import Newspaper from "lucide-react/dist/esm/icons/newspaper";
+import TextCursorInput from "lucide-react/dist/esm/icons/text-cursor-input";
+import Bell from "lucide-react/dist/esm/icons/bell";
+import ChevronRight from "lucide-react/dist/esm/icons/chevron-right";
+import GripVertical from "lucide-react/dist/esm/icons/grip-vertical";
+import RectangleHorizontal from "lucide-react/dist/esm/icons/rectangle-horizontal";
+import Square from "lucide-react/dist/esm/icons/square";
+import Tag from "lucide-react/dist/esm/icons/tag";
+import SeparatorHorizontal from "lucide-react/dist/esm/icons/separator-horizontal";
+import CircleUser from "lucide-react/dist/esm/icons/circle-user";
+import FormInput from "lucide-react/dist/esm/icons/form-input";
+import AlignLeft from "lucide-react/dist/esm/icons/align-left";
+import ListFilter from "lucide-react/dist/esm/icons/list-filter";
+import CheckSquare from "lucide-react/dist/esm/icons/check-square";
+import ToggleRight from "lucide-react/dist/esm/icons/toggle-right";
+import MessageSquare from "lucide-react/dist/esm/icons/message-square";
+import PanelTopOpen from "lucide-react/dist/esm/icons/panel-top-open";
+import LayoutList from "lucide-react/dist/esm/icons/layout-list";
+import BellRing from "lucide-react/dist/esm/icons/bell-ring";
+import Shapes from "lucide-react/dist/esm/icons/shapes";
+import Compass from "lucide-react/dist/esm/icons/compass";
+import Table2 from "lucide-react/dist/esm/icons/table-2";
+import Paintbrush from "lucide-react/dist/esm/icons/paintbrush";
+import Pipette from "lucide-react/dist/esm/icons/pipette";
+import SlidersHorizontal from "lucide-react/dist/esm/icons/sliders-horizontal";
+import GripHorizontal from "lucide-react/dist/esm/icons/grip-horizontal";
+import Upload from "lucide-react/dist/esm/icons/upload";
+import Loader from "lucide-react/dist/esm/icons/loader";
+import Columns from "lucide-react/dist/esm/icons/columns";
+import Code2 from "lucide-react/dist/esm/icons/code-2";
 import { cn } from "@/lib/utils";
 import { elan } from "@/lib/elan";
+import styles from "./sidebar.module.css";
 import { useDevInfo } from "@/hooks/use-dev-info";
 import {
   createContext,
@@ -156,91 +153,46 @@ const componentCategories: NavCategory[] = [
     icon: Shapes,
     section: "Components",
     links: [
-      { href: "/components/button", label: "Button", icon: Square },
-      { href: "/components/badge", label: "Badge", icon: Tag },
-      { href: "/components/avatar", label: "Avatar", icon: CircleUser },
-      { href: "/components/card", label: "Card", icon: RectangleHorizontal },
-      {
-        href: "/components/divider",
-        label: "Divider",
-        icon: SeparatorHorizontal,
-      },
+      { href: "/components/button", label: "Button", icon: Square, group: "Action" },
+      { href: "/components/avatar", label: "Avatar", icon: CircleUser, group: "Display" },
+      { href: "/components/badge", label: "Badge", icon: Tag, group: "Display" },
+      { href: "/components/badge-overlay", label: "BadgeOverlay", icon: Bell, group: "Display" },
+      { href: "/components/card", label: "Card", icon: RectangleHorizontal, group: "Display" },
+      { href: "/components/divider", label: "Divider", icon: SeparatorHorizontal, group: "Display" },
+      { href: "/components/inline-code", label: "InlineCode", icon: Code2, group: "Inline" },
+      { href: "/components/kbd", label: "Kbd", icon: Square, group: "Inline" },
     ],
   },
   {
     id: "forms",
-    label: "Forms & Controls",
+    label: "Forms & Inputs",
     icon: TextCursorInput,
     section: "Components",
     links: [
-      { href: "/components/input", label: "Input", icon: FormInput },
-      { href: "/components/textarea", label: "Textarea", icon: AlignLeft },
-      { href: "/components/select", label: "Select", icon: ListFilter },
-      { href: "/components/checkbox", label: "Checkbox", icon: CheckSquare },
-      { href: "/components/toggle", label: "Toggle", icon: ToggleRight },
-      {
-        href: "/components/theme-toggle",
-        label: "ThemeToggle",
-        icon: ToggleLeft,
-      },
-      {
-        href: "/components/color-picker",
-        label: "ColorPicker",
-        icon: Pipette,
-      },
-      {
-        href: "/components/slider",
-        label: "Slider",
-        icon: SlidersHorizontal,
-      },
-      {
-        href: "/components/scrub-input",
-        label: "ScrubInput",
-        icon: GripHorizontal,
-      },
-      {
-        href: "/components/dropzone",
-        label: "Dropzone",
-        icon: Upload,
-      },
-      {
-        href: "/components/segmented-control",
-        label: "SegmentedControl",
-        icon: Columns,
-      },
+      { href: "/components/input", label: "Input", icon: FormInput, group: "Text" },
+      { href: "/components/textarea", label: "Textarea", icon: AlignLeft, group: "Text" },
+      { href: "/components/checkbox", label: "Checkbox", icon: CheckSquare, group: "Selection" },
+      { href: "/components/select", label: "Select", icon: ListFilter, group: "Selection" },
+      { href: "/components/toggle", label: "Toggle", icon: ToggleRight, group: "Selection" },
+      { href: "/components/color-picker", label: "ColorPicker", icon: Pipette, group: "Specialized" },
+      { href: "/components/dropzone", label: "Dropzone", icon: Upload, group: "Specialized" },
+      { href: "/components/scrub-input", label: "ScrubInput", icon: GripHorizontal, group: "Specialized" },
+      { href: "/components/slider", label: "Slider", icon: SlidersHorizontal, group: "Specialized" },
     ],
   },
   {
-    id: "feedback",
-    label: "Feedback & Overlay",
-    icon: Bell,
-    section: "Components",
-    links: [
-      { href: "/components/toast", label: "Toast", icon: BellRing },
-      { href: "/components/dialog", label: "Dialog", icon: PanelTopOpen },
-      { href: "/components/sheet", label: "Sheet", icon: PanelLeftOpen },
-      { href: "/components/tooltip", label: "Tooltip", icon: MessageSquare },
-      {
-        href: "/components/progress-bar",
-        label: "ProgressBar",
-        icon: Loader,
-      },
-    ],
-  },
-  {
-    id: "nav-menus",
-    label: "Navigation & Menus",
+    id: "nav-layout",
+    label: "Navigation & Layout",
     icon: Compass,
     section: "Components",
     links: [
-      {
-        href: "/components/dropdown-menu",
-        label: "DropdownMenu",
-        icon: ListFilter,
-      },
-      { href: "/components/tabs", label: "Tabs", icon: LayoutList },
-      { href: "/components/nav-item", label: "NavItem", icon: Navigation },
-      { href: "/components/command-menu", label: "CommandMenu", icon: Search },
+      { href: "/components/footer", label: "Footer", icon: PanelBottom, group: "Structure" },
+      { href: "/components/navigation", label: "Navigation", icon: Navigation, group: "Structure" },
+      { href: "/components/nav-item", label: "NavItem", icon: ChevronRight, group: "Structure" },
+      { href: "/components/button-select", label: "ButtonSelect", icon: Columns, group: "View Switching" },
+      { href: "/components/tabs", label: "Tabs", icon: LayoutList, group: "View Switching" },
+      { href: "/components/scroll-spy", label: "ScrollSpy", icon: GripVertical, group: "Utilities" },
+      { href: "/components/theme-toggle", label: "ThemeToggle", icon: ToggleLeft, group: "Utilities" },
     ],
   },
   {
@@ -250,24 +202,23 @@ const componentCategories: NavCategory[] = [
     section: "Components",
     links: [
       { href: "/components/code-block", label: "CodeBlock", icon: Code2 },
-      { href: "/components/inline-code", label: "InlineCode", icon: Code2 },
-      { href: "/components/table", label: "Table", icon: Table2 },
-      { href: "/components/kbd", label: "Kbd", icon: Square },
       { href: "/components/description-list", label: "DescriptionList", icon: LayoutList },
+      { href: "/components/table", label: "Table", icon: Table2 },
     ],
   },
   {
-    id: "layout",
-    label: "Layout & Shell",
-    icon: PanelTop,
+    id: "feedback",
+    label: "Overlays & Feedback",
+    icon: Bell,
     section: "Components",
     links: [
-      {
-        href: "/components/navigation",
-        label: "Navigation",
-        icon: Navigation,
-      },
-      { href: "/components/footer", label: "Footer", icon: PanelBottom },
+      { href: "/components/command-menu", label: "CommandMenu", icon: Search, group: "Overlays" },
+      { href: "/components/dialog", label: "Dialog", icon: PanelTopOpen, group: "Overlays" },
+      { href: "/components/dropdown-menu", label: "DropdownMenu", icon: ListFilter, group: "Overlays" },
+      { href: "/components/sheet", label: "Sheet", icon: PanelLeftOpen, group: "Overlays" },
+      { href: "/components/progress-bar", label: "ProgressBar", icon: Loader, group: "Feedback" },
+      { href: "/components/toast", label: "Toast", icon: BellRing, group: "Feedback" },
+      { href: "/components/tooltip", label: "Tooltip", icon: MessageSquare, group: "Feedback" },
     ],
   },
   {
@@ -281,44 +232,15 @@ const componentCategories: NavCategory[] = [
     ],
   },
   {
-    id: "entrance",
-    label: "Entrance & Reveal",
+    id: "motion",
+    label: "Motion & Entrance",
     icon: Sparkles,
     section: "Components",
     links: [
-      {
-        href: "/components/fade-in",
-        label: "FadeIn & Stagger",
-        icon: MousePointerClick,
-      },
-      {
-        href: "/components/mount-entrance",
-        label: "MountEntrance",
-        icon: Play,
-      },
-    ],
-  },
-  {
-    id: "interaction",
-    label: "Interaction",
-    icon: MousePointer2,
-    section: "Components",
-    links: [
-      {
-        href: "/components/expand-collapse",
-        label: "ExpandCollapse",
-        icon: ChevronsUpDown,
-      },
-      {
-        href: "/components/arrow-reveal",
-        label: "ArrowReveal",
-        icon: ArrowRight,
-      },
-      {
-        href: "/components/scroll-spy",
-        label: "ScrollSpy",
-        icon: GripVertical,
-      },
+      { href: "/components/arrow-reveal", label: "ArrowReveal", icon: ArrowRight },
+      { href: "/components/expand-collapse", label: "ExpandCollapse", icon: ChevronsUpDown },
+      { href: "/components/fade-in", label: "FadeIn & Stagger", icon: MousePointerClick },
+      { href: "/components/mount-entrance", label: "MountEntrance", icon: Play },
     ],
   },
 ];
@@ -467,8 +389,8 @@ function SidebarSearch({
               className={cn(
                 "flex items-center gap-2 w-full px-2 h-7 rounded-sm text-xs transition-colors text-left",
                 idx === selectedIndex
-                  ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                  : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+                  ? "bg-foreground/7 text-black dark:text-white"
+                  : "text-sidebar-foreground hover:bg-foreground/7"
               )}
               onMouseEnter={() => setSelectedIndex(idx)}
               onClick={() => navigateTo(r.item.href)}
@@ -490,7 +412,7 @@ function SidebarSearch({
       <div ref={containerRef} onMouseEnter={onMouseEnter} className="shrink-0 pt-2 px-1.5">
         <button
           onClick={() => setOpen(!open)}
-          className="flex items-center pl-[7px] h-7 rounded-sm text-sidebar-muted-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-foreground transition-colors"
+          className="flex items-center pl-[7px] h-7 rounded-sm text-sidebar-muted-foreground hover:bg-foreground/7 hover:text-black dark:hover:text-white transition-colors"
           title="Search (⌘K)"
         >
           <Search className="w-3.5 h-3.5" />
@@ -562,8 +484,8 @@ function SidebarSearch({
                       className={cn(
                         "flex items-center gap-2 w-full px-2 h-7 text-xs transition-colors text-left",
                         idx === selectedIndex
-                          ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                          : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+                          ? "bg-foreground/7 text-black dark:text-white"
+                          : "text-sidebar-foreground hover:bg-foreground/7"
                       )}
                       onMouseEnter={() => setSelectedIndex(idx)}
                       onClick={() => navigateTo(r.item.href)}
@@ -604,7 +526,7 @@ function renderLinksWithGroups(
       <div key={link.href}>
         {showGroupHeader && (
           <div className="px-2 pt-2 pb-0.5">
-            <span className="text-xs font-medium tracking-[0.1em] uppercase text-sidebar-muted-foreground/40">
+            <span className={styles.groupLabel}>
               {link.group}
             </span>
           </div>
@@ -615,8 +537,8 @@ function renderLinksWithGroups(
           className={cn(
             "flex items-center gap-2 h-7 px-2 rounded-sm text-sm transition-colors",
             isLinkActive
-              ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
-              : "text-sidebar-muted-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
+              ? "text-accent font-medium hover:bg-accent/7"
+              : "text-sidebar-muted-foreground hover:bg-foreground/7 hover:text-black dark:hover:text-white"
           )}
         >
           <LinkIcon className="w-3.5 h-3.5 shrink-0" />
@@ -682,7 +604,7 @@ function CategoriesSection({
                   {collapsed ? (
                     <div className="w-full border-t border-sidebar-border" />
                   ) : (
-                    <span className="px-2 text-xs font-medium tracking-[0.12em] uppercase text-sidebar-muted-foreground/50">
+                    <span className={cn("px-2", styles.sectionLabel)}>
                       {cat.section}
                     </span>
                   )}
@@ -698,8 +620,8 @@ function CategoriesSection({
                     "flex items-center h-7 rounded-sm transition-colors w-full",
                     collapsed ? "pl-[7px]" : "gap-2 px-2 text-sm",
                     isDirectActive
-                      ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
-                      : "text-sidebar-muted-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
+                      ? "text-accent font-medium hover:bg-accent/7"
+                      : "text-sidebar-muted-foreground hover:bg-foreground/7 hover:text-black dark:hover:text-white"
                   )}
                 >
                   <Icon className="w-3.5 h-3.5 shrink-0" />
@@ -723,11 +645,11 @@ function CategoriesSection({
                       ? "pl-[7px]"
                       : "gap-2 px-2 text-sm",
                     isEmpty && "opacity-30 cursor-not-allowed",
-                    isOpen
-                      ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
-                      : isCatActive && !isEmpty
-                        ? "text-accent font-medium"
-                        : "text-sidebar-muted-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
+                    isCatActive && !isEmpty
+                      ? "text-accent font-medium hover:bg-accent/7"
+                      : isOpen
+                        ? "text-black dark:text-white font-medium hover:bg-foreground/7"
+                        : "text-sidebar-muted-foreground hover:bg-foreground/7 hover:text-black dark:hover:text-white"
                   )}
                 >
                   <Icon className="w-3.5 h-3.5 shrink-0" />
@@ -967,7 +889,7 @@ export function Sidebar() {
           onMouseEnter={() => setOpenCategory(null)}
           className={cn(
             "flex items-center h-12 border-b border-sidebar-border shrink-0 px-1.5",
-            !isCollapsedDesktop && "justify-between"
+            isCollapsedDesktop ? "justify-center" : "justify-between"
           )}
         >
           {!isCollapsedDesktop && (
@@ -990,7 +912,6 @@ export function Sidebar() {
               size="xs"
               emphasis="minimal"
               onClick={() => setCollapsed(false)}
-              className="ml-[3px]"
               aria-label="Expand sidebar"
             >
               <PanelLeftOpen className="w-3.5 h-3.5" />
@@ -1050,8 +971,8 @@ export function Sidebar() {
                 ? "pl-[7px]"
                 : "gap-2 px-2 text-sm",
               pathname === "/archive"
-                ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
-                : "text-sidebar-muted-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
+                ? "text-accent font-medium hover:bg-accent/7"
+                : "text-sidebar-muted-foreground hover:bg-foreground/7 hover:text-black dark:hover:text-white"
             )}
           >
             <Archive className="w-3.5 h-3.5 shrink-0" />

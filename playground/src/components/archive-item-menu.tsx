@@ -1,7 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { MoreVertical, RotateCcw, Trash2, AlertTriangle } from "lucide-react";
+import MoreVertical from "lucide-react/dist/esm/icons/more-vertical";
+import RotateCcw from "lucide-react/dist/esm/icons/rotate-ccw";
+import Trash2 from "lucide-react/dist/esm/icons/trash-2";
+import AlertTriangle from "lucide-react/dist/esm/icons/alert-triangle";
 import {
   Button,
   DropdownMenu,

@@ -4,18 +4,18 @@ import type { ArchiveItem, ItemType } from "@/lib/archive-manifest";
 import { PreviewRenderer } from "@/lib/archive-previews";
 import { ArchiveItemMenu } from "./archive-item-menu";
 import { Badge, Card } from "@ds/index";
-import type { BadgeVariant } from "@ds/index";
+import type { BadgeAppearance } from "@ds/index";
 
-const TYPE_VARIANT_MAP: Record<ItemType, BadgeVariant> = {
-  Component: "info",
-  Page: "info",
+const TYPE_APPEARANCE_MAP: Record<ItemType, BadgeAppearance> = {
+  Component: "highlight",
+  Page: "highlight",
   Token: "warning",
-  Style: "success",
+  Style: "positive",
 };
 
 export function TypeBadge({ type, size = "sm" }: { type: ItemType; size?: "sm" | "xs" }) {
   return (
-    <Badge variant={TYPE_VARIANT_MAP[type]} shape="squared" mono size={size === "sm" ? "xs" : "xs"}>
+    <Badge appearance={TYPE_APPEARANCE_MAP[type]} emphasis="subtle" shape="squared" mono size="xs">
       {type}
     </Badge>
   );
@@ -23,7 +23,7 @@ export function TypeBadge({ type, size = "sm" }: { type: ItemType; size?: "sm" |
 
 export function ExperimentTag({ experiment }: { experiment: string }) {
   return (
-    <Badge variant="muted" shape="squared" mono size="xs">
+    <Badge appearance="neutral" emphasis="minimal" shape="squared" mono size="xs">
       {experiment}
     </Badge>
   );

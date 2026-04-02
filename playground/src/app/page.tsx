@@ -4,14 +4,12 @@ import Link from "next/link";
 import { Shell } from "@/components/shell";
 import { elan } from "@/lib/elan";
 import { colors, typography, spacing, motion, elevation } from "@/lib/tokens";
-import {
-  Palette,
-  Type,
-  Ruler,
-  Zap,
-  Layers,
-  ArrowRight,
-} from "lucide-react";
+import ArrowRight from "lucide-react/dist/esm/icons/arrow-right";
+import Layers from "lucide-react/dist/esm/icons/layers";
+import Palette from "lucide-react/dist/esm/icons/palette";
+import Ruler from "lucide-react/dist/esm/icons/ruler";
+import Type from "lucide-react/dist/esm/icons/type";
+import Zap from "lucide-react/dist/esm/icons/zap";
 
 const stylePages = [
   {
@@ -107,9 +105,9 @@ export default function OverviewPage() {
         </div>
 
         {/* About sections */}
-        <div className="grid gap-6 mb-12">
+        <div className="grid gap-4 mb-12">
           <div className="p-5 rounded-sm border border-border bg-card">
-            <h3 className="text-[13px] font-semibold uppercase tracking-[0.06em] text-muted-foreground mb-2">
+            <h3 className="text-xs font-semibold uppercase tracking-[0.06em] text-muted-foreground mb-2">
               Intended Use
             </h3>
             <p className="text-sm text-muted-foreground leading-relaxed">
@@ -121,17 +119,20 @@ export default function OverviewPage() {
             </p>
           </div>
           <div className="p-5 rounded-sm border border-border bg-card">
-            <h3 className="text-[13px] font-semibold uppercase tracking-[0.06em] text-muted-foreground mb-2">
+            <h3 className="text-xs font-semibold uppercase tracking-[0.06em] text-muted-foreground mb-2">
               How It&apos;s Built
             </h3>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Élan draws from personal design sensibility and established
-              open-source design systems. The spacing and motion scales are
-              influenced by IBM Carbon; the color system follows a structured
-              property·role·emphasis naming convention inspired by Goldman
-              Sachs&apos;s One GS. Components are built from scratch or adapted
-              from open-source libraries with custom styling that conforms to
-              the token system. Based on an 8px grid.
+              Élan draws from personal design sensibility and production-grade
+              open-source references. Spacing and easing curves are sourced
+              directly from IBM Carbon&apos;s productive motion set; the color
+              palette is drawn from{" "}
+              <span className="font-mono text-xs">@carbon/colors</span> v11.
+              Semantic tokens
+              follow a property·role·emphasis naming convention inspired by
+              Goldman Sachs One GS. Components are built from scratch or
+              adapted from open-source libraries to conform to the token system.
+              Based on an 8px grid.
             </p>
           </div>
         </div>

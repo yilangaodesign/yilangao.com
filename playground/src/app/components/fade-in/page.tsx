@@ -50,7 +50,7 @@ function StaggerDemo() {
   );
 }
 
-const fadeInCode = `import { FadeIn } from "@/components/FadeIn";
+const fadeInCode = `import { FadeIn } from "@/components/ui/FadeIn";
 
 <FadeIn>
   <div>Fades in on scroll</div>
@@ -60,7 +60,7 @@ const fadeInCode = `import { FadeIn } from "@/components/FadeIn";
   <div>Delayed with larger offset</div>
 </FadeIn>`;
 
-const staggerCode = `import { StaggerChildren, StaggerItem } from "@/components/StaggerChildren";
+const staggerCode = `import { StaggerChildren, StaggerItem } from "@/components/ui/StaggerChildren";
 
 <StaggerChildren className="grid grid-cols-4 gap-3">
   {items.map((item) => (

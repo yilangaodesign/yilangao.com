@@ -30,7 +30,7 @@ function ArrowRevealDemo() {
   );
 }
 
-const code = `import { ArrowReveal } from "@/components/ArrowReveal";
+const code = `import { ArrowReveal } from "@/components/ui/ArrowReveal";
 
 <ArrowReveal active={isHovered}>
   <svg>...</svg>

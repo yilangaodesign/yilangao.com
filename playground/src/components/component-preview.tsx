@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { Eye, Code } from "lucide-react";
+import Eye from "lucide-react/dist/esm/icons/eye";
+import Code from "lucide-react/dist/esm/icons/code";
 import {
   Card,
   Table,

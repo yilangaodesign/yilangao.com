@@ -5,7 +5,7 @@ import { SectionHeading } from "@/components/token-grid";
 import { ComponentPreview, PropsTable, SourcePath, SubsectionHeading} from "@/components/component-preview";
 import Navigation from "@ds/Navigation/Navigation";
 
-const code = `import Navigation from "@/components/Navigation";
+const code = `import Navigation from "@/components/ui/Navigation";
 
 // Navigation is self-contained — no props needed.
 // Uses usePathname() for active link detection and
