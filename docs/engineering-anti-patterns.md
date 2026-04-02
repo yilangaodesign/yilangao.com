@@ -20,8 +20,8 @@
 | Documentation Process | EAP-008, EAP-010, EAP-027, EAP-032 | 4 active | 4 |
 | Dev Workflow | EAP-002, EAP-003, EAP-009 | 3 active | 3 |
 | Interaction / DOM | EAP-025, EAP-036, EAP-053 | 3 active | 3 |
-| Deployment / CI Build | EAP-060 | 1 active | 1 |
-| **Total** | | **47 active · 1 resolved** | **48** |
+| Deployment / CI Build | EAP-060, EAP-061 | 2 active | 2 |
+| **Total** | | **48 active · 1 resolved** | **49** |
 
 > † EAP-038 "One-Way Playground Experiment" · ‡ EAP-038 "SCSS Modules with `@use` Under Turbopack" — duplicate ID, two distinct entries.
 
@@ -965,6 +965,18 @@ Do NOT skip any step. Do NOT try HMR first. Do NOT tell the user to "hard refres
 **Verification:** Run `next build` in a clean checkout (or `git stash --include-untracked && next build && git stash pop`) to catch missing files before they break CI.
 
 **Incident:** ENG-096 (2026-04-02) — Payload's `importMap.js` was gitignored, causing three `Module not found` errors on first Vercel deploy. Also: `resend` was dynamically imported but not in `package.json` — Turbopack resolves all imports at build time.
+
+---
+
+## EAP-061: File Conventions Leak Across Monorepo Apps via turbopack.root
+
+**Trigger:** Adding a Next.js 16 file convention (e.g., `proxy.ts`, `layout.tsx`) to one app in a monorepo where another app uses `turbopack: { root: monorepoRoot }` in its `next.config.ts`.
+
+**Why it's wrong:** `turbopack.root` extends Turbopack's file resolution to the parent directory. This is intended for module imports (`@ds/*` → `../src/`), but it also affects file convention detection. Next.js scans for `proxy.ts` at the level of `app/`, and if the root is the monorepo, it finds proxy files from sibling apps. Those files import modules that don't exist in the current app, breaking the build.
+
+**Correct alternative:** When adding a file convention to any monorepo app, check if sibling apps have `turbopack.root` overrides. If so, create a no-op version of that file convention in the sibling app to shadow the parent. Example: `playground/src/proxy.ts` returning `NextResponse.next()`.
+
+**Incident:** ENG-097 (2026-04-02) — Main site's `src/proxy.ts` (password gate) was detected by the playground's build via `turbopack.root: monorepoRoot`. Build failed because `@/lib/company-session` doesn't exist in `playground/src/lib/`.
 
 ---
 

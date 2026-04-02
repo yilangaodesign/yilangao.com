@@ -140,3 +140,12 @@ After any change to the password gate system:
 | `SITE_PASSWORD` | Optional | `preview-2026` | Fallback password for unknown companies |
 
 Both must be set in the Vercel dashboard for the `yilangao-portfolio` project.
+
+## Cross-App Consideration
+
+The playground's `turbopack.root` is set to the monorepo root so `@ds/*` imports
+resolve correctly. This causes Next.js 16 to detect file conventions (like `proxy.ts`)
+from the monorepo root, not just from `playground/`. A no-op `playground/src/proxy.ts`
+shadows the main site's proxy to prevent the collision. See EAP-061.
+
+If you rename or move `src/proxy.ts`, verify the playground build still passes.

@@ -4,7 +4,7 @@
 >
 > **Who reads this:** AI agents at session start (scan recent entries for context), and during incident response (check for recurring patterns).
 > **Who writes this:** AI agents after each incident resolution via the `engineering-iteration` skill.
-> **Last updated:** 2026-04-02 (ENG-096: Vercel build failures on first production deploy of main site)
+> **Last updated:** 2026-04-02 (ENG-097: Playground proxy collision — turbopack.root causes Next.js 16 to detect main site's proxy.ts)
 >
 > **For agent skills:** Read only the first 30 lines of this file (most recent entries) for pattern detection.
 > **Older entries:** Synthesized in `docs/engineering-feedback-synthesis.md`. Raw archive in `docs/engineering-feedback-log-archive.md`.
@@ -725,5 +725,17 @@ This is an instance of EAP-016 (conditional rendering hiding inline-editable emp
 3. Build succeeded on retry. Production deployment Ready in ~2 minutes.
 
 **Lesson:** Local dev environments mask two categories of build failure: (a) framework-generated files that exist locally but aren't committed (test with a clean `git clone` + `next build`), and (b) dynamic imports that Turbopack resolves statically — there's no such thing as a "runtime-only" import in the build step. See EAP-060.
+
+---
+
+### ENG-097: Playground build failure — parent proxy.ts collision via turbopack.root
+
+**Issue:** After adding `src/proxy.ts` (password gate) to the main site, the playground's Vercel build failed with `Module not found: Can't resolve '@/lib/company-session'` in `./src/proxy.ts`. The playground was detecting and trying to build the main site's proxy file.
+
+**Root Cause:** The playground's `next.config.ts` sets `turbopack: { root: monorepoRoot }` (one level above `playground/`) so that `@ds/*` imports to `../src/components/ui/*` resolve correctly. This causes Next.js 16's proxy file detection to scan from the monorepo root, where it finds `src/proxy.ts`. The proxy imports `@/lib/company-session`, which resolves to `playground/src/lib/company-session` in the playground's context — a file that doesn't exist.
+
+**Resolution:** Created a no-op `playground/src/proxy.ts` that simply returns `NextResponse.next()`. This shadows the parent proxy and prevents the collision. The playground has no authentication gate — it's a design system documentation tool.
+
+**Lesson:** When a monorepo app sets `turbopack.root` to a parent directory, ALL file conventions detected by Next.js 16 (proxy.ts, layout.tsx, etc.) may be resolved from that parent root, not just module imports. Adding a new file convention to any app in the monorepo requires checking whether sibling apps with `turbopack.root` overrides will accidentally pick it up. See EAP-061.
 
 ---
