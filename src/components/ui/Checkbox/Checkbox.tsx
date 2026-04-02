@@ -8,8 +8,27 @@ import styles from "./Checkbox.module.scss";
 /** Radix checkbox value: `true`, `false`, or `"indeterminate"` (partial / mixed). */
 export type CheckboxCheckedState = RadixCheckedState;
 
+export type CheckboxAppearance =
+  | "neutral"
+  | "highlight"
+  | "positive"
+  | "negative"
+  | "warning"
+  | "inverse"
+  | "always-dark"
+  | "always-light";
+
+export type CheckboxSize = "sm" | "md" | "lg" | "xl";
+
+export type CheckboxLabelPlacement = "right" | "left";
+
 export interface CheckboxProps {
+  appearance?: CheckboxAppearance;
+  size?: CheckboxSize;
   label?: string;
+  description?: string;
+  error?: string;
+  labelPlacement?: CheckboxLabelPlacement;
   checked?: CheckboxCheckedState;
   defaultChecked?: CheckboxCheckedState;
   onCheckedChange?: (checked: CheckboxCheckedState) => void;
@@ -22,14 +41,42 @@ export interface CheckboxProps {
 
 export const Checkbox = forwardRef<HTMLButtonElement, CheckboxProps>(
   (
-    { label, checked, defaultChecked, onCheckedChange, disabled, name, value, className, id: idProp },
+    {
+      appearance = "highlight",
+      size = "md",
+      label,
+      description,
+      error,
+      labelPlacement = "right",
+      checked,
+      defaultChecked,
+      onCheckedChange,
+      disabled,
+      name,
+      value,
+      className,
+      id: idProp,
+    },
     ref,
   ) => {
     const autoId = useId();
     const id = idProp ?? autoId;
+    const hasError = !!error;
+    const hasContent = !!(label || description || error);
+
+    const wrapperCls = [
+      styles.wrapper,
+      styles[size],
+      styles[appearance],
+      styles[labelPlacement],
+      hasError && styles.error,
+      className,
+    ]
+      .filter(Boolean)
+      .join(" ");
 
     return (
-      <div className={[styles.wrapper, className].filter(Boolean).join(" ")}>
+      <div className={wrapperCls}>
         <CheckboxPrimitive.Root
           ref={ref}
           id={id}
@@ -42,23 +89,46 @@ export const Checkbox = forwardRef<HTMLButtonElement, CheckboxProps>(
           value={value}
         >
           <CheckboxPrimitive.Indicator className={styles.indicator}>
-            {/* Icons follow Indicator `data-state` (Radix context), not the `checked` prop — required when uncontrolled + defaultChecked indeterminate */}
             <span className={styles.iconChecked} aria-hidden="true">
-              <CheckIcon />
+              <span className={styles.iconWrap}>
+                <CheckIcon />
+              </span>
             </span>
             <span className={styles.iconIndeterminate} aria-hidden="true">
-              <MinusIcon />
+              <span className={styles.iconWrap}>
+                <MinusIcon />
+              </span>
             </span>
           </CheckboxPrimitive.Indicator>
         </CheckboxPrimitive.Root>
-        {label && (
-          <label
-            htmlFor={id}
-            className={styles.label}
-            data-disabled={disabled || undefined}
-          >
-            {label}
-          </label>
+        {hasContent && (
+          <div className={styles.content}>
+            {label && (
+              <label
+                htmlFor={id}
+                className={styles.label}
+                data-disabled={disabled || undefined}
+              >
+                {label}
+              </label>
+            )}
+            {hasError ? (
+              <span
+                className={styles.errorMessage}
+                data-disabled={disabled || undefined}
+                role="alert"
+              >
+                {error}
+              </span>
+            ) : description ? (
+              <span
+                className={styles.description}
+                data-disabled={disabled || undefined}
+              >
+                {description}
+              </span>
+            ) : null}
+          </div>
         )}
       </div>
     );
@@ -69,16 +139,27 @@ Checkbox.displayName = "Checkbox";
 
 function CheckIcon() {
   return (
-    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-      <path d="M10 3L4.5 8.5L2 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    <svg viewBox="0 0 12 12" fill="none" aria-hidden="true">
+      <path
+        d="M10 3L4.5 8.5L2 6"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }
 
 function MinusIcon() {
   return (
-    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-      <path d="M2.5 6H9.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    <svg viewBox="0 0 12 12" fill="none" aria-hidden="true">
+      <path
+        d="M2.5 6H9.5"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
     </svg>
   );
 }

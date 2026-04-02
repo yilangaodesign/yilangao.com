@@ -1,43 +1,179 @@
 @use '../../../styles' as *;
 
-$_checkbox-size: 18px;
+// =============================================================================
+// Checkbox — Appearance × Size Model (1GS-inspired)
+// =============================================================================
+// Appearance: checked fill intent (neutral, highlight, positive, negative,
+//             warning, inverse, always-dark, always-light)
+// Size:       sm (16px), md (18px), lg (20px), xl (24px)
+//             Derived from Button icon sizes, cross-referenced with Badge heights.
+// Status:     error (orthogonal — overrides appearance when active)
+// =============================================================================
+
+// ── Component tokens ─────────────────────────────────────────────────────────
+$_box-sm: 16px;  $_icon-sm: 10px;
+$_box-md: 18px;  $_icon-md: 12px;
+$_box-lg: 20px;  $_icon-lg: 14px;
+$_box-xl: 24px;  $_icon-xl: 16px;
+
+// =============================================================================
+// WRAPPER — outer flex container (checkbox + label content)
+// =============================================================================
 
 .wrapper {
-  display: flex;
+  display: inline-flex;
   align-items: flex-start;
-  gap: var(--portfolio-spacer-1x);
 }
+
+.right {
+  flex-direction: row;
+}
+
+.left {
+  flex-direction: row-reverse;
+
+  .content {
+    align-items: flex-end;
+    text-align: right;
+  }
+}
+
+// =============================================================================
+// CHECKBOX — the square control
+// =============================================================================
 
 .checkbox {
   @include button-reset;
   flex-shrink: 0;
-  width: $_checkbox-size;
-  height: $_checkbox-size;
-  margin-top: 2px;
-  border: 1px solid var(--portfolio-border-strong);
-  border-radius: 2px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--portfolio-surface-primary);
+  background-color: var(--portfolio-surface-neutral-minimal);
+  border: $portfolio-border-width-thin solid var(--portfolio-border-neutral-bold);
+  border-radius: $portfolio-radius-xs;
   @include transition-fast;
 
-  &:hover:not([data-disabled]) {
-    border-color: var(--portfolio-border-brand-bold);
-  }
-
-  &[data-state='checked'],
-  &[data-state='indeterminate'] {
-    background-color: var(--portfolio-action-brand-bold);
-    border-color: var(--portfolio-action-brand-bold);
-    color: var(--portfolio-text-on-color);
+  &:focus-visible {
+    @include focus-ring;
   }
 
   &[data-disabled] {
-    opacity: 0.5;
+    opacity: 0.4;
     cursor: not-allowed;
+    pointer-events: none;
   }
 }
+
+// =============================================================================
+// SIZES
+// =============================================================================
+// Box = button icon size at the corresponding step.
+// Gap scales like Button: sm/md tighter, lg/xl standard.
+
+.sm {
+  .checkbox {
+    width: $_box-sm;
+    height: $_box-sm;
+  }
+
+  .iconWrap svg {
+    width: $_icon-sm;
+    height: $_icon-sm;
+  }
+
+  &.wrapper { gap: $portfolio-spacer-utility-0-5x; }
+
+  .label {
+    font-size: var(--portfolio-type-xs);
+    line-height: $_box-sm;
+  }
+
+  .description,
+  .errorMessage {
+    font-size: var(--portfolio-type-2xs);
+    line-height: $_box-sm;
+  }
+}
+
+.md {
+  .checkbox {
+    width: $_box-md;
+    height: $_box-md;
+  }
+
+  .iconWrap svg {
+    width: $_icon-md;
+    height: $_icon-md;
+  }
+
+  &.wrapper { gap: $portfolio-spacer-utility-0-75x; }
+
+  .label {
+    font-size: var(--portfolio-type-sm);
+    line-height: $_box-md;
+  }
+
+  .description,
+  .errorMessage {
+    font-size: var(--portfolio-type-xs);
+    line-height: $_box-sm;
+  }
+}
+
+.lg {
+  .checkbox {
+    width: $_box-lg;
+    height: $_box-lg;
+  }
+
+  .iconWrap svg {
+    width: $_icon-lg;
+    height: $_icon-lg;
+  }
+
+  &.wrapper { gap: $portfolio-spacer-utility-1x; }
+
+  .label {
+    font-size: var(--portfolio-type-base);
+    line-height: $_box-lg;
+  }
+
+  .description,
+  .errorMessage {
+    font-size: var(--portfolio-type-sm);
+    line-height: $_box-md;
+  }
+}
+
+.xl {
+  .checkbox {
+    width: $_box-xl;
+    height: $_box-xl;
+    border-radius: 3px;
+  }
+
+  .iconWrap svg {
+    width: $_icon-xl;
+    height: $_icon-xl;
+  }
+
+  &.wrapper { gap: $portfolio-spacer-utility-1x; }
+
+  .label {
+    font-size: var(--portfolio-type-lg);
+    line-height: $_box-xl;
+  }
+
+  .description,
+  .errorMessage {
+    font-size: var(--portfolio-type-base);
+    line-height: $_box-lg;
+  }
+}
+
+// =============================================================================
+// INDICATOR — icon visibility logic (Radix data-state driven)
+// =============================================================================
 
 .indicator {
   display: flex;
@@ -60,16 +196,264 @@ $_checkbox-size: 18px;
   }
 }
 
+.iconWrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    display: block;
+  }
+}
+
+// =============================================================================
+// CONTENT — vStack: label + description/error
+// =============================================================================
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+}
+
 .label {
   font-family: var(--portfolio-font-sans);
-  font-size: var(--portfolio-type-sm);
-  line-height: var(--portfolio-leading-normal);
-  color: var(--portfolio-text-primary);
+  color: var(--portfolio-text-neutral-bold);
   cursor: pointer;
   user-select: none;
 
   &[data-disabled] {
-    color: var(--portfolio-text-disabled);
+    color: var(--portfolio-text-neutral-disabled);
     cursor: not-allowed;
+  }
+}
+
+.description {
+  font-family: var(--portfolio-font-sans);
+  color: var(--portfolio-text-neutral-subtle);
+
+  &[data-disabled] {
+    color: var(--portfolio-text-neutral-disabled);
+  }
+}
+
+.errorMessage {
+  font-family: var(--portfolio-font-sans);
+  color: var(--portfolio-text-negative);
+
+  &[data-disabled] {
+    color: var(--portfolio-text-neutral-disabled);
+  }
+}
+
+// =============================================================================
+// APPEARANCE — checked fill colors (mirrors Button bold tier)
+// =============================================================================
+// Unchecked: all appearances share neutral bg + neutral border.
+// Hover (unchecked): border shifts toward the appearance's accent.
+// Checked/indeterminate: solid fill per appearance.
+// Hover (checked): fill deepens one step.
+
+.neutral {
+  .checkbox {
+    &:hover:not([data-disabled]) {
+      border-color: var(--portfolio-surface-inverse-bold);
+    }
+
+    &[data-state='checked'],
+    &[data-state='indeterminate'] {
+      background-color: var(--portfolio-surface-inverse-bold);
+      border-color: var(--portfolio-surface-inverse-bold);
+      color: var(--portfolio-text-inverse-bold);
+
+      &:hover:not([data-disabled]) { background-color: $portfolio-neutral-90; }
+      &:active:not([data-disabled]) { background-color: $portfolio-neutral-80; }
+
+      :global([data-theme="dark"]) &,
+      :global(.dark) & {
+        &:hover:not([data-disabled]) { background-color: $portfolio-neutral-20; }
+        &:active:not([data-disabled]) { background-color: $portfolio-neutral-30; }
+      }
+    }
+  }
+}
+
+.highlight {
+  .checkbox {
+    &:hover:not([data-disabled]) {
+      border-color: var(--portfolio-border-brand-bold);
+    }
+
+    &[data-state='checked'],
+    &[data-state='indeterminate'] {
+      background-color: var(--portfolio-action-brand-bold);
+      border-color: var(--portfolio-action-brand-bold);
+      color: var(--portfolio-text-always-light-bold);
+
+      :global([data-theme="dark"]) &,
+      :global(.dark) & {
+        background-color: $portfolio-accent-60;
+      }
+
+      &:hover:not([data-disabled]) { background-color: $portfolio-accent-70; }
+      &:active:not([data-disabled]) { background-color: $portfolio-accent-80; }
+    }
+  }
+}
+
+.positive {
+  .checkbox {
+    &:hover:not([data-disabled]) {
+      border-color: var(--portfolio-border-positive);
+    }
+
+    &[data-state='checked'],
+    &[data-state='indeterminate'] {
+      background-color: var(--portfolio-surface-positive-bold);
+      border-color: var(--portfolio-surface-positive-bold);
+      color: var(--portfolio-text-always-light-bold);
+
+      &:hover:not([data-disabled]) { background-color: $portfolio-green-70; }
+      &:active:not([data-disabled]) { background-color: $portfolio-green-80; }
+
+      :global([data-theme="dark"]) &,
+      :global(.dark) & {
+        &:hover:not([data-disabled]) { background-color: $portfolio-green-80; }
+        &:active:not([data-disabled]) { background-color: $portfolio-green-90; }
+      }
+    }
+  }
+}
+
+.negative {
+  .checkbox {
+    &:hover:not([data-disabled]) {
+      border-color: var(--portfolio-border-negative);
+    }
+
+    &[data-state='checked'],
+    &[data-state='indeterminate'] {
+      background-color: var(--portfolio-surface-negative-bold);
+      border-color: var(--portfolio-surface-negative-bold);
+      color: var(--portfolio-text-always-light-bold);
+
+      &:hover:not([data-disabled]) { background-color: $portfolio-red-70; }
+      &:active:not([data-disabled]) { background-color: $portfolio-red-80; }
+
+      :global([data-theme="dark"]) &,
+      :global(.dark) & {
+        &:hover:not([data-disabled]) { background-color: $portfolio-red-80; }
+        &:active:not([data-disabled]) { background-color: $portfolio-red-90; }
+      }
+    }
+  }
+}
+
+.warning {
+  .checkbox {
+    &:hover:not([data-disabled]) {
+      border-color: var(--portfolio-border-warning);
+    }
+
+    &[data-state='checked'],
+    &[data-state='indeterminate'] {
+      background-color: var(--portfolio-surface-warning-bold);
+      border-color: var(--portfolio-surface-warning-bold);
+      color: $portfolio-yellow-100;
+
+      &:hover:not([data-disabled]) { background-color: $portfolio-yellow-40; }
+      &:active:not([data-disabled]) { background-color: $portfolio-yellow-50; }
+    }
+  }
+}
+
+.inverse {
+  .checkbox {
+    &:hover:not([data-disabled]) {
+      border-color: var(--portfolio-text-inverse-bold);
+    }
+
+    &[data-state='checked'],
+    &[data-state='indeterminate'] {
+      background-color: var(--portfolio-action-inverse-bold);
+      border-color: var(--portfolio-action-inverse-bold);
+      color: var(--portfolio-text-neutral-bold);
+
+      &:hover:not([data-disabled]) { background-color: $portfolio-neutral-10; }
+      &:active:not([data-disabled]) { background-color: $portfolio-neutral-20; }
+
+      :global([data-theme="dark"]) &,
+      :global(.dark) & {
+        &:hover:not([data-disabled]) { background-color: $portfolio-neutral-90; }
+        &:active:not([data-disabled]) { background-color: $portfolio-neutral-80; }
+      }
+    }
+  }
+}
+
+.always-dark {
+  .checkbox {
+    &:hover:not([data-disabled]) {
+      border-color: var(--portfolio-border-always-dark);
+    }
+
+    &[data-state='checked'],
+    &[data-state='indeterminate'] {
+      background-color: var(--portfolio-action-always-dark);
+      border-color: var(--portfolio-action-always-dark);
+      color: var(--portfolio-text-always-light-bold);
+
+      &:hover:not([data-disabled]) { background-color: $portfolio-neutral-90; }
+      &:active:not([data-disabled]) { background-color: $portfolio-neutral-80; }
+    }
+  }
+}
+
+.always-light {
+  .checkbox {
+    &:hover:not([data-disabled]) {
+      border-color: var(--portfolio-border-always-light);
+    }
+
+    &[data-state='checked'],
+    &[data-state='indeterminate'] {
+      background-color: var(--portfolio-action-always-light);
+      border-color: var(--portfolio-action-always-light);
+      color: var(--portfolio-text-always-dark-bold);
+
+      &:hover:not([data-disabled]) { background-color: $portfolio-neutral-20; }
+      &:active:not([data-disabled]) { background-color: $portfolio-neutral-30; }
+    }
+  }
+}
+
+// =============================================================================
+// ERROR STATUS — orthogonal override (takes precedence over appearance)
+// =============================================================================
+
+.error {
+  .checkbox {
+    border-color: var(--portfolio-border-negative);
+
+    &:hover:not([data-disabled]) {
+      border-color: var(--portfolio-border-negative);
+    }
+
+    &[data-state='checked'],
+    &[data-state='indeterminate'] {
+      background-color: var(--portfolio-surface-negative-bold);
+      border-color: var(--portfolio-surface-negative-bold);
+      color: var(--portfolio-text-always-light-bold);
+
+      &:hover:not([data-disabled]) { background-color: $portfolio-red-70; }
+      &:active:not([data-disabled]) { background-color: $portfolio-red-80; }
+
+      :global([data-theme="dark"]) &,
+      :global(.dark) & {
+        &:hover:not([data-disabled]) { background-color: $portfolio-red-80; }
+        &:active:not([data-disabled]) { background-color: $portfolio-red-90; }
+      }
+    }
   }
 }

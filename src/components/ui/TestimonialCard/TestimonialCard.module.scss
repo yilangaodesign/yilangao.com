@@ -249,12 +249,7 @@ $_testimonial-admin-gap: 4px;
 }
 
 .linkedinEditorLabel {
-  font-family: var(--portfolio-font-sans);
-  font-size: var(--portfolio-type-xs);
-  font-weight: var(--portfolio-weight-medium);
-  color: var(--portfolio-text-secondary);
-  text-transform: uppercase;
-  letter-spacing: var(--portfolio-tracking-wider);
+  @include label;
 }
 
 .linkedinEditorInput {

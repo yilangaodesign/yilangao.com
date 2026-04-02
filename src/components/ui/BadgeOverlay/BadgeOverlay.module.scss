@@ -295,7 +295,7 @@
 
 .badge-slot {
   position: absolute;
-  z-index: 1;
+  z-index: $portfolio-z-raised;
   line-height: 0;
 }
 

@@ -122,13 +122,9 @@ $_select-indicator-size: 16px;
 }
 
 .groupLabel {
+  @include label;
   padding: var(--portfolio-spacer-1x) var(--portfolio-spacer-1-5x);
-  font-family: var(--portfolio-font-sans);
-  font-size: var(--portfolio-type-xs);
-  font-weight: var(--portfolio-weight-medium);
   color: var(--portfolio-text-helper);
-  text-transform: uppercase;
-  letter-spacing: var(--portfolio-tracking-wider);
 }
 
 // ---------------------------------------------------------------------------

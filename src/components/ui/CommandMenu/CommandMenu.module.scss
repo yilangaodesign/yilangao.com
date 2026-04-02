@@ -146,13 +146,9 @@ $_cmd-icon-size: 16px;
 
 .group {
   [cmdk-group-heading] {
+    @include label;
     padding: var(--portfolio-spacer-0-5x) var(--portfolio-spacer-1x);
-    font-family: var(--portfolio-font-sans);
-    font-size: var(--portfolio-type-xs);
-    font-weight: var(--portfolio-weight-medium);
     color: var(--portfolio-text-tertiary);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
   }
 }
 
@@ -223,6 +219,6 @@ $_cmd-icon-size: 16px;
 .shortcut {
   margin-inline-start: auto;
   font-family: var(--portfolio-font-mono);
-  font-size: 10px;
+  font-size: $portfolio-type-2xs;
   color: var(--portfolio-text-tertiary);
 }
