@@ -1,0 +1,414 @@
+// =============================================================================
+// CSS Custom Property Output Layer
+// =============================================================================
+//
+// Generates :root (light) and [data-theme="dark"] CSS custom property blocks
+// from the SCSS token source of truth. Components migrate from consuming
+// $portfolio-* SCSS variables to var(--portfolio-*) CSS custom properties.
+//
+// Architecture:
+//   Primitives ($portfolio-accent-60)  →  SCSS only (compile-time, shared)
+//   Semantics  ($portfolio-surface-*)  →  CSS custom properties (swap per mode)
+//   Components (var(--portfolio-*))    →  runtime consumption
+//
+// For rgba() calls on primitives that don't swap between modes, keep using
+// SCSS variables directly. Semantic tokens are the ones that swap.
+// =============================================================================
+
+@use 'tokens/colors' as *;
+@use 'tokens/typography' as *;
+@use 'tokens/spacing' as *;
+@use 'tokens/elevation' as *;
+@use 'tokens/motion' as *;
+@use 'tokens/breakpoints' as *;
+@use 'tokens/borders' as *;
+@use 'tokens/opacity' as *;
+
+// =============================================================================
+// :root — Light Mode (default)
+// =============================================================================
+
+:root {
+  // ── Surface ──────────────────────────────────────────────────────────────
+  --portfolio-surface-neutral-minimal: #{$portfolio-surface-neutral-minimal};
+  --portfolio-surface-neutral-subtle: #{$portfolio-surface-neutral-subtle};
+  --portfolio-surface-neutral-regular: #{$portfolio-surface-neutral-regular};
+  --portfolio-surface-inverse-bold: #{$portfolio-surface-inverse-bold};
+  --portfolio-surface-brand-bold: #{$portfolio-surface-brand-bold};
+  --portfolio-surface-brand-subtle: #{$portfolio-surface-brand-subtle};
+  --portfolio-surface-negative-bold: #{$portfolio-surface-negative-bold};
+  --portfolio-surface-negative-subtle: #{$portfolio-surface-negative-subtle};
+  --portfolio-surface-positive-bold: #{$portfolio-surface-positive-bold};
+  --portfolio-surface-positive-subtle: #{$portfolio-surface-positive-subtle};
+  --portfolio-surface-warning-bold: #{$portfolio-surface-warning-bold};
+  --portfolio-surface-warning-subtle: #{$portfolio-surface-warning-subtle};
+  --portfolio-surface-overlay: #{$portfolio-surface-overlay};
+  --portfolio-surface-always-dark: #{$portfolio-surface-always-dark};
+  --portfolio-surface-always-light: #{$portfolio-surface-always-light};
+
+  // ── Overlay interaction states ───────────────────────────────────────────
+  --portfolio-overlay-white-08: #{$portfolio-overlay-white-08};
+  --portfolio-overlay-white-10: #{$portfolio-overlay-white-10};
+  --portfolio-overlay-white-12: #{$portfolio-overlay-white-12};
+  --portfolio-overlay-white-14: #{$portfolio-overlay-white-14};
+  --portfolio-overlay-white-16: #{$portfolio-overlay-white-16};
+  --portfolio-overlay-white-20: #{$portfolio-overlay-white-20};
+  --portfolio-overlay-white-25: #{$portfolio-overlay-white-25};
+  --portfolio-overlay-black-04: #{$portfolio-overlay-black-04};
+  --portfolio-overlay-black-06: #{$portfolio-overlay-black-06};
+  --portfolio-overlay-black-08: #{$portfolio-overlay-black-08};
+  --portfolio-overlay-black-10: #{$portfolio-overlay-black-10};
+  --portfolio-overlay-black-14: #{$portfolio-overlay-black-14};
+  --portfolio-overlay-black-20: #{$portfolio-overlay-black-20};
+  --portfolio-overlay-black-25: #{$portfolio-overlay-black-25};
+  --portfolio-overlay-black-30: #{$portfolio-overlay-black-30};
+  --portfolio-overlay-black-40: #{$portfolio-overlay-black-40};
+
+  // ── Text ─────────────────────────────────────────────────────────────────
+  --portfolio-text-neutral-bold: #{$portfolio-text-neutral-bold};
+  --portfolio-text-neutral-regular: #{$portfolio-text-neutral-regular};
+  --portfolio-text-neutral-subtle: #{$portfolio-text-neutral-subtle};
+  --portfolio-text-neutral-minimal: #{$portfolio-text-neutral-minimal};
+  --portfolio-text-neutral-disabled: #{$portfolio-text-neutral-disabled};
+  --portfolio-text-brand-bold: #{$portfolio-text-brand-bold};
+  --portfolio-text-inverse-bold: #{$portfolio-text-inverse-bold};
+  --portfolio-text-always-light-bold: #{$portfolio-text-always-light-bold};
+  --portfolio-text-always-dark-bold: #{$portfolio-text-always-dark-bold};
+  --portfolio-text-negative: #{$portfolio-text-negative};
+  --portfolio-text-positive: #{$portfolio-text-positive};
+  --portfolio-text-warning: #{$portfolio-text-warning};
+
+  // ── Icon ─────────────────────────────────────────────────────────────────
+  --portfolio-icon-neutral-bold: #{$portfolio-icon-neutral-bold};
+  --portfolio-icon-neutral-regular: #{$portfolio-icon-neutral-regular};
+  --portfolio-icon-neutral-subtle: #{$portfolio-icon-neutral-subtle};
+  --portfolio-icon-neutral-minimal: #{$portfolio-icon-neutral-minimal};
+  --portfolio-icon-neutral-disabled: #{$portfolio-icon-neutral-disabled};
+  --portfolio-icon-brand-bold: #{$portfolio-icon-brand-bold};
+  --portfolio-icon-inverse-bold: #{$portfolio-icon-inverse-bold};
+  --portfolio-icon-always-light-bold: #{$portfolio-icon-always-light-bold};
+  --portfolio-icon-always-dark-bold: #{$portfolio-icon-always-dark-bold};
+  --portfolio-icon-negative: #{$portfolio-icon-negative};
+  --portfolio-icon-positive: #{$portfolio-icon-positive};
+  --portfolio-icon-warning: #{$portfolio-icon-warning};
+
+  // ── Border ───────────────────────────────────────────────────────────────
+  --portfolio-border-neutral-bold: #{$portfolio-border-neutral-bold};
+  --portfolio-border-neutral-subtle: #{$portfolio-border-neutral-subtle};
+  --portfolio-border-neutral-disabled: #{$portfolio-border-neutral-disabled};
+  --portfolio-border-brand-bold: #{$portfolio-border-brand-bold};
+  --portfolio-border-inverse-bold: #{$portfolio-border-inverse-bold};
+  --portfolio-border-always-light: #{$portfolio-border-always-light};
+  --portfolio-border-always-dark: #{$portfolio-border-always-dark};
+  --portfolio-border-negative: #{$portfolio-border-negative};
+  --portfolio-border-positive: #{$portfolio-border-positive};
+  --portfolio-border-warning: #{$portfolio-border-warning};
+
+  // ── Action ───────────────────────────────────────────────────────────────
+  --portfolio-action-brand-bold: #{$portfolio-action-brand-bold};
+  --portfolio-action-brand-subtle: #{$portfolio-action-brand-subtle};
+  --portfolio-action-neutral-bold: #{$portfolio-action-neutral-bold};
+  --portfolio-action-neutral-regular: #{$portfolio-action-neutral-regular};
+  --portfolio-action-inverse-bold: #{$portfolio-action-inverse-bold};
+  --portfolio-action-always-dark: #{$portfolio-action-always-dark};
+  --portfolio-action-always-light: #{$portfolio-action-always-light};
+  --portfolio-action-negative: #{$portfolio-action-negative};
+  --portfolio-action-positive: #{$portfolio-action-positive};
+  --portfolio-action-warning: #{$portfolio-action-warning};
+  --portfolio-action-brand-bold-hover: #{$portfolio-action-brand-bold-hover};
+  --portfolio-action-brand-bold-pressed: #{$portfolio-action-brand-bold-pressed};
+  --portfolio-action-brand-bold-disabled: #{$portfolio-action-brand-bold-disabled};
+  --portfolio-action-neutral-bold-hover: #{$portfolio-action-neutral-bold-hover};
+  --portfolio-action-neutral-bold-disabled: #{$portfolio-action-neutral-bold-disabled};
+
+  // ── Focus & Highlight ────────────────────────────────────────────────────
+  --portfolio-focus: #{$portfolio-focus};
+  --portfolio-focus-inset: #{$portfolio-focus-inset};
+  --portfolio-highlight: #{$portfolio-highlight};
+
+  // ── Legacy color aliases (reference semantic custom properties) ──────────
+  --portfolio-surface-primary: var(--portfolio-surface-neutral-minimal);
+  --portfolio-surface-secondary: var(--portfolio-surface-neutral-subtle);
+  --portfolio-surface-tertiary: var(--portfolio-surface-neutral-regular);
+  --portfolio-surface-inverse: var(--portfolio-surface-inverse-bold);
+  --portfolio-text-primary: var(--portfolio-text-neutral-bold);
+  --portfolio-text-secondary: var(--portfolio-text-neutral-regular);
+  --portfolio-text-tertiary: var(--portfolio-text-neutral-subtle);
+  --portfolio-text-helper: var(--portfolio-text-neutral-subtle);
+  --portfolio-text-placeholder: var(--portfolio-text-neutral-minimal);
+  --portfolio-text-disabled: var(--portfolio-text-neutral-disabled);
+  --portfolio-text-inverse: var(--portfolio-text-inverse-bold);
+  --portfolio-text-on-color: var(--portfolio-text-always-light-bold);
+  --portfolio-text-link: var(--portfolio-text-brand-bold);
+  --portfolio-text-error: var(--portfolio-text-negative);
+  --portfolio-border-subtle: var(--portfolio-border-neutral-subtle);
+  --portfolio-border-strong: var(--portfolio-border-neutral-bold);
+  --portfolio-border-interactive: var(--portfolio-border-brand-bold);
+  --portfolio-border-inverse: var(--portfolio-border-inverse-bold);
+  --portfolio-border-disabled: var(--portfolio-border-neutral-disabled);
+
+  // ── Typography ───────────────────────────────────────────────────────────
+  --portfolio-font-sans: #{$portfolio-font-sans};
+  --portfolio-font-serif: #{$portfolio-font-serif};
+  --portfolio-font-mono: #{$portfolio-font-mono};
+
+  --portfolio-weight-regular: #{$portfolio-weight-regular};
+  --portfolio-weight-medium: #{$portfolio-weight-medium};
+  --portfolio-weight-semibold: #{$portfolio-weight-semibold};
+  --portfolio-weight-bold: #{$portfolio-weight-bold};
+
+  --portfolio-type-3xs: #{$portfolio-type-3xs};
+  --portfolio-type-2xs: #{$portfolio-type-2xs};
+  --portfolio-type-xs: #{$portfolio-type-xs};
+  --portfolio-type-sm: #{$portfolio-type-sm};
+  --portfolio-type-base: #{$portfolio-type-base};
+  --portfolio-type-lg: #{$portfolio-type-lg};
+  --portfolio-type-xl: #{$portfolio-type-xl};
+  --portfolio-type-2xl: #{$portfolio-type-2xl};
+  --portfolio-type-3xl: #{$portfolio-type-3xl};
+  --portfolio-type-4xl: #{$portfolio-type-4xl};
+  --portfolio-type-5xl: #{$portfolio-type-5xl};
+  --portfolio-type-6xl: #{$portfolio-type-6xl};
+  --portfolio-type-7xl: #{$portfolio-type-7xl};
+  --portfolio-type-8xl: #{$portfolio-type-8xl};
+
+  --portfolio-leading-compact: #{$portfolio-leading-compact};
+  --portfolio-leading-tight: #{$portfolio-leading-tight};
+  --portfolio-leading-snug: #{$portfolio-leading-snug};
+  --portfolio-leading-normal: #{$portfolio-leading-normal};
+  --portfolio-leading-relaxed: #{$portfolio-leading-relaxed};
+  --portfolio-leading-loose: #{$portfolio-leading-loose};
+
+  --portfolio-tracking-tight: #{$portfolio-tracking-tight};
+  --portfolio-tracking-normal: #{$portfolio-tracking-normal};
+  --portfolio-tracking-wide: #{$portfolio-tracking-wide};
+  --portfolio-tracking-wider: #{$portfolio-tracking-wider};
+  --portfolio-tracking-widest: #{$portfolio-tracking-widest};
+
+  --portfolio-paragraph-spacing-sm: #{$portfolio-paragraph-spacing-sm};
+  --portfolio-paragraph-spacing-md: #{$portfolio-paragraph-spacing-md};
+  --portfolio-paragraph-spacing-lg: #{$portfolio-paragraph-spacing-lg};
+
+  // ── Spacing (Tier 1 primitives) ──────────────────────────────────────────
+  --portfolio-spacer-0-125x: #{$portfolio-spacer-0-125x};
+  --portfolio-spacer-0-25x: #{$portfolio-spacer-0-25x};
+  --portfolio-spacer-0-5x: #{$portfolio-spacer-0-5x};
+  --portfolio-spacer-1x: #{$portfolio-spacer-1x};
+  --portfolio-spacer-1-5x: #{$portfolio-spacer-1-5x};
+  --portfolio-spacer-2x: #{$portfolio-spacer-2x};
+  --portfolio-spacer-2-5x: #{$portfolio-spacer-2-5x};
+  --portfolio-spacer-3x: #{$portfolio-spacer-3x};
+  --portfolio-spacer-4x: #{$portfolio-spacer-4x};
+  --portfolio-spacer-5x: #{$portfolio-spacer-5x};
+  --portfolio-spacer-6x: #{$portfolio-spacer-6x};
+  --portfolio-spacer-7x: #{$portfolio-spacer-7x};
+  --portfolio-spacer-8x: #{$portfolio-spacer-8x};
+  --portfolio-spacer-9x: #{$portfolio-spacer-9x};
+  --portfolio-spacer-10x: #{$portfolio-spacer-10x};
+  --portfolio-spacer-12x: #{$portfolio-spacer-12x};
+  --portfolio-spacer-16x: #{$portfolio-spacer-16x};
+  --portfolio-spacer-20x: #{$portfolio-spacer-20x};
+
+  // ── Spacing (Tier 2 layout) ──────────────────────────────────────────────
+  --portfolio-spacer-layout-x-compact: #{$portfolio-spacer-layout-x-compact};
+  --portfolio-spacer-layout-compact: #{$portfolio-spacer-layout-compact};
+  --portfolio-spacer-layout-standard: #{$portfolio-spacer-layout-standard};
+  --portfolio-spacer-layout-spacious: #{$portfolio-spacer-layout-spacious};
+  --portfolio-spacer-layout-x-spacious: #{$portfolio-spacer-layout-x-spacious};
+  --portfolio-spacer-layout-xx-spacious: #{$portfolio-spacer-layout-xx-spacious};
+  --portfolio-spacer-layout-xxx-spacious: #{$portfolio-spacer-layout-xxx-spacious};
+  --portfolio-spacer-layout-xxxx-spacious: #{$portfolio-spacer-layout-xxxx-spacious};
+
+  // ── Elevation (composed shadows) ─────────────────────────────────────────
+  --portfolio-shadow-none: #{$portfolio-shadow-none};
+  --portfolio-shadow-sm: #{$portfolio-shadow-sm};
+  --portfolio-shadow-md: #{$portfolio-shadow-md};
+  --portfolio-shadow-lg: #{$portfolio-shadow-lg};
+  --portfolio-shadow-xl: #{$portfolio-shadow-xl};
+  --portfolio-shadow-overlay: #{$portfolio-shadow-overlay};
+  --portfolio-shadow-focus: #{$portfolio-shadow-focus};
+
+  // ── Elevation (decomposed) ───────────────────────────────────────────────
+  --portfolio-elevation-shadow-color: #{$portfolio-elevation-shadow-color};
+  --portfolio-elevation-sm-y: #{$portfolio-elevation-sm-y};
+  --portfolio-elevation-sm-blur: #{$portfolio-elevation-sm-blur};
+  --portfolio-elevation-sm-opacity: #{$portfolio-elevation-sm-opacity};
+  --portfolio-elevation-md-y: #{$portfolio-elevation-md-y};
+  --portfolio-elevation-md-blur: #{$portfolio-elevation-md-blur};
+  --portfolio-elevation-md-opacity: #{$portfolio-elevation-md-opacity};
+  --portfolio-elevation-lg-y: #{$portfolio-elevation-lg-y};
+  --portfolio-elevation-lg-blur: #{$portfolio-elevation-lg-blur};
+  --portfolio-elevation-lg-opacity: #{$portfolio-elevation-lg-opacity};
+  --portfolio-elevation-xl-y: #{$portfolio-elevation-xl-y};
+  --portfolio-elevation-xl-blur: #{$portfolio-elevation-xl-blur};
+  --portfolio-elevation-xl-opacity: #{$portfolio-elevation-xl-opacity};
+
+  // ── Border radius ────────────────────────────────────────────────────────
+  --portfolio-radius-none: #{$portfolio-radius-none};
+  --portfolio-radius-xs: #{$portfolio-radius-xs};
+  --portfolio-radius-sm: #{$portfolio-radius-sm};
+  --portfolio-radius-md: #{$portfolio-radius-md};
+  --portfolio-radius-lg: #{$portfolio-radius-lg};
+  --portfolio-radius-xl: #{$portfolio-radius-xl};
+  --portfolio-radius-2xl: #{$portfolio-radius-2xl};
+  --portfolio-radius-full: #{$portfolio-radius-full};
+
+  // ── Border widths ────────────────────────────────────────────────────────
+  --portfolio-border-width-none: #{$portfolio-border-width-none};
+  --portfolio-border-width-thin: #{$portfolio-border-width-thin};
+  --portfolio-border-width-regular: #{$portfolio-border-width-regular};
+  --portfolio-border-width-thick: #{$portfolio-border-width-thick};
+
+  // ── Motion ───────────────────────────────────────────────────────────────
+  --portfolio-duration-fast: #{$portfolio-duration-fast};
+  --portfolio-duration-moderate: #{$portfolio-duration-moderate};
+  --portfolio-duration-slow: #{$portfolio-duration-slow};
+  --portfolio-duration-slower: #{$portfolio-duration-slower};
+
+  --portfolio-easing-standard: #{$portfolio-easing-standard};
+  --portfolio-easing-entrance: #{$portfolio-easing-entrance};
+  --portfolio-easing-exit: #{$portfolio-easing-exit};
+  --portfolio-easing-expressive: #{$portfolio-easing-expressive};
+
+  // ── Z-index ──────────────────────────────────────────────────────────────
+  --portfolio-z-base: #{$portfolio-z-base};
+  --portfolio-z-raised: #{$portfolio-z-raised};
+  --portfolio-z-control: #{$portfolio-z-control};
+  --portfolio-z-scrollspy: #{$portfolio-z-scrollspy};
+  --portfolio-z-dropdown: #{$portfolio-z-dropdown};
+  --portfolio-z-sticky: #{$portfolio-z-sticky};
+  --portfolio-z-overlay: #{$portfolio-z-overlay};
+  --portfolio-z-modal: #{$portfolio-z-modal};
+  --portfolio-z-toast: #{$portfolio-z-toast};
+  --portfolio-z-tooltip: #{$portfolio-z-tooltip};
+  --portfolio-z-admin-bar: #{$portfolio-z-admin-bar};
+  --portfolio-z-admin: #{$portfolio-z-admin};
+  --portfolio-z-admin-modal: #{$portfolio-z-admin-modal};
+
+  // ── Opacity ──────────────────────────────────────────────────────────────
+  --portfolio-opacity-disabled: #{$portfolio-opacity-disabled};
+  --portfolio-opacity-hover: #{$portfolio-opacity-hover};
+  --portfolio-opacity-subtle: #{$portfolio-opacity-subtle};
+  --portfolio-opacity-overlay-light: #{$portfolio-opacity-overlay-light};
+  --portfolio-opacity-overlay-heavy: #{$portfolio-opacity-overlay-heavy};
+}
+
+// =============================================================================
+// [data-theme="dark"] — Dark Mode Overrides
+// =============================================================================
+// Only semantic color tokens that change between modes are listed here.
+// Typography, spacing, motion, and z-index tokens do NOT change per mode.
+// "always-*" tokens are intentionally omitted — they are mode-invariant.
+//
+// Dark palette design rationale (One GS + Carbon patterns):
+//   - Surfaces invert: light backgrounds → dark, layered with subtle lifts
+//   - Text inverts: dark text → light, maintaining WCAG contrast
+//   - Brand shifts lighter: accent-60 → accent-40/50 for contrast on dark bg
+//   - Shadows intensify: dark backgrounds absorb shadow, need more opacity
+//   - Overlays may need stronger opacity on dark backgrounds
+
+[data-theme="dark"], .dark {
+  // ── Surface ──────────────────────────────────────────────────────────────
+  --portfolio-surface-neutral-minimal: #{$portfolio-neutral-100};
+  --portfolio-surface-neutral-subtle: #{$portfolio-neutral-90};
+  --portfolio-surface-neutral-regular: #{$portfolio-neutral-80};
+  --portfolio-surface-inverse-bold: #{$portfolio-neutral-00};
+  --portfolio-surface-brand-bold: #{$portfolio-accent-50};
+  --portfolio-surface-brand-subtle: #{$portfolio-accent-100};
+  --portfolio-surface-negative-bold: #{$portfolio-red-70};
+  --portfolio-surface-negative-subtle: #{$portfolio-red-100};
+  --portfolio-surface-positive-bold: #{$portfolio-green-70};
+  --portfolio-surface-positive-subtle: #{$portfolio-green-100};
+  --portfolio-surface-warning-bold: #{$portfolio-yellow-30};
+  --portfolio-surface-warning-subtle: #{$portfolio-yellow-100};
+  --portfolio-surface-overlay: rgba(0, 0, 0, 0.7);
+
+  // ── Overlay interaction states ───────────────────────────────────────────
+  --portfolio-overlay-white-08: rgba(255, 255, 255, 0.08);
+  --portfolio-overlay-white-10: rgba(255, 255, 255, 0.10);
+  --portfolio-overlay-white-12: rgba(255, 255, 255, 0.12);
+  --portfolio-overlay-white-14: rgba(255, 255, 255, 0.14);
+  --portfolio-overlay-white-16: rgba(255, 255, 255, 0.16);
+  --portfolio-overlay-white-20: rgba(255, 255, 255, 0.20);
+  --portfolio-overlay-white-25: rgba(255, 255, 255, 0.25);
+  --portfolio-overlay-black-04: rgba(255, 255, 255, 0.04);
+  --portfolio-overlay-black-06: rgba(255, 255, 255, 0.06);
+  --portfolio-overlay-black-08: rgba(255, 255, 255, 0.08);
+  --portfolio-overlay-black-10: rgba(255, 255, 255, 0.10);
+  --portfolio-overlay-black-14: rgba(255, 255, 255, 0.14);
+  --portfolio-overlay-black-20: rgba(255, 255, 255, 0.20);
+  --portfolio-overlay-black-25: rgba(255, 255, 255, 0.25);
+  --portfolio-overlay-black-30: rgba(255, 255, 255, 0.30);
+  --portfolio-overlay-black-40: rgba(255, 255, 255, 0.40);
+
+  // ── Text ─────────────────────────────────────────────────────────────────
+  --portfolio-text-neutral-bold: #{$portfolio-neutral-00};
+  --portfolio-text-neutral-regular: #{$portfolio-neutral-30};
+  --portfolio-text-neutral-subtle: #{$portfolio-neutral-40};
+  --portfolio-text-neutral-minimal: #{$portfolio-neutral-60};
+  --portfolio-text-neutral-disabled: #{$portfolio-neutral-70};
+  --portfolio-text-brand-bold: #{$portfolio-accent-40};
+  --portfolio-text-inverse-bold: #{$portfolio-neutral-100};
+  --portfolio-text-negative: #{$portfolio-red-40};
+  --portfolio-text-positive: #{$portfolio-green-40};
+  --portfolio-text-warning: #{$portfolio-yellow-40};
+
+  // ── Icon ─────────────────────────────────────────────────────────────────
+  --portfolio-icon-neutral-bold: #{$portfolio-neutral-00};
+  --portfolio-icon-neutral-regular: #{$portfolio-neutral-30};
+  --portfolio-icon-neutral-subtle: #{$portfolio-neutral-40};
+  --portfolio-icon-neutral-minimal: #{$portfolio-neutral-60};
+  --portfolio-icon-neutral-disabled: #{$portfolio-neutral-70};
+  --portfolio-icon-brand-bold: #{$portfolio-accent-40};
+  --portfolio-icon-inverse-bold: #{$portfolio-neutral-100};
+  --portfolio-icon-negative: #{$portfolio-red-40};
+  --portfolio-icon-positive: #{$portfolio-green-40};
+  --portfolio-icon-warning: #{$portfolio-yellow-40};
+
+  // ── Border ───────────────────────────────────────────────────────────────
+  --portfolio-border-neutral-bold: #{$portfolio-neutral-60};
+  --portfolio-border-neutral-subtle: #{$portfolio-neutral-80};
+  --portfolio-border-neutral-disabled: #{$portfolio-neutral-70};
+  --portfolio-border-brand-bold: #{$portfolio-accent-50};
+  --portfolio-border-inverse-bold: #{$portfolio-neutral-00};
+  --portfolio-border-negative: #{$portfolio-red-50};
+  --portfolio-border-positive: #{$portfolio-green-50};
+  --portfolio-border-warning: #{$portfolio-yellow-50};
+
+  // ── Action ───────────────────────────────────────────────────────────────
+  --portfolio-action-brand-bold: #{$portfolio-accent-50};
+  --portfolio-action-brand-subtle: #{$portfolio-accent-90};
+  --portfolio-action-neutral-bold: #{$portfolio-neutral-00};
+  --portfolio-action-neutral-regular: #{$portfolio-neutral-90};
+  --portfolio-action-inverse-bold: #{$portfolio-neutral-100};
+  --portfolio-action-negative: #{$portfolio-red-50};
+  --portfolio-action-positive: #{$portfolio-green-50};
+  --portfolio-action-warning: #{$portfolio-yellow-50};
+  --portfolio-action-brand-bold-hover: #{$portfolio-accent-40};
+  --portfolio-action-brand-bold-pressed: #{$portfolio-accent-30};
+  --portfolio-action-brand-bold-disabled: #{$portfolio-accent-80};
+  --portfolio-action-neutral-bold-hover: #{$portfolio-neutral-20};
+  --portfolio-action-neutral-bold-disabled: #{$portfolio-neutral-70};
+
+  // ── Focus & Highlight ────────────────────────────────────────────────────
+  --portfolio-focus: #{$portfolio-accent-50};
+  --portfolio-focus-inset: #{$portfolio-neutral-100};
+  --portfolio-highlight: #{$portfolio-accent-90};
+
+  // ── Elevation (shadows intensify on dark backgrounds) ────────────────────
+  --portfolio-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --portfolio-shadow-md: 0 4px 8px rgba(0, 0, 0, 0.25);
+  --portfolio-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.35);
+  --portfolio-shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.4);
+  --portfolio-shadow-overlay: 0 24px 64px rgba(0, 0, 0, 0.5);
+  --portfolio-shadow-focus: 0 0 0 2px rgba(#{$portfolio-accent-50}, 0.35);
+  --portfolio-elevation-shadow-color: rgba(0, 0, 0, 1);
+  --portfolio-elevation-sm-opacity: 0.2;
+  --portfolio-elevation-md-opacity: 0.25;
+  --portfolio-elevation-lg-opacity: 0.35;
+  --portfolio-elevation-xl-opacity: 0.4;
+
+  // ── Opacity (unchanged for dark, but included for potential tuning) ──────
+  --portfolio-opacity-disabled: 0.4;
+  --portfolio-opacity-hover: 0.85;
+}

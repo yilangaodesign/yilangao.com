@@ -5,7 +5,7 @@
 // ── Focus ────────────────────────────────────────────────────────────────────
 
 @mixin focus-ring {
-  outline: 2px solid $portfolio-accent-60;
+  outline: 2px solid var(--portfolio-focus);
   outline-offset: 2px;
 }
 
@@ -27,7 +27,7 @@
 
   &:hover {
     transform: translateY(-4px);
-    box-shadow: $portfolio-shadow-lg;
+    box-shadow: var(--portfolio-shadow-lg);
   }
 }
 
@@ -38,12 +38,12 @@
               transform $portfolio-duration-fast $portfolio-easing-standard;
 
   &:hover:not(:disabled) {
-    opacity: 0.88;
+    opacity: var(--portfolio-opacity-hover);
     transform: translateY(-1px);
   }
 
   &:disabled {
-    opacity: 0.6;
+    opacity: var(--portfolio-opacity-subtle);
     cursor: not-allowed;
   }
 }
@@ -73,7 +73,7 @@
       transform: scale(1.02);
     }
     #{$title-selector} {
-      color: $portfolio-text-link;
+      color: var(--portfolio-text-link);
     }
   }
 }

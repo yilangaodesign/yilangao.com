@@ -1,9 +1,51 @@
+@use 'colors' as *;
+
 $portfolio-shadow-none: none;
 $portfolio-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
 $portfolio-shadow-md: 0 4px 8px rgba(0, 0, 0, 0.08);
 $portfolio-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
 $portfolio-shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.16);
 $portfolio-shadow-overlay: 0 24px 64px rgba(0, 0, 0, 0.2);
+$portfolio-shadow-focus: 0 0 0 2px rgba($portfolio-accent-60, 0.25);
+
+// ── Decomposed Elevation Tokens ──────────────────────────────────────────────
+// Atomic shadow properties for independent theming and animation.
+// One GS reference: elevation/shadow, elevation/xoffset, elevation/yoffset,
+// elevation/spread, elevation/blur — each independently overridable per mode.
+
+$portfolio-elevation-shadow-color: rgba(0, 0, 0, 1);
+
+$portfolio-elevation-sm-x: 0;
+$portfolio-elevation-sm-y: 1px;
+$portfolio-elevation-sm-blur: 2px;
+$portfolio-elevation-sm-spread: 0;
+$portfolio-elevation-sm-opacity: 0.05;
+
+$portfolio-elevation-md-x: 0;
+$portfolio-elevation-md-y: 4px;
+$portfolio-elevation-md-blur: 8px;
+$portfolio-elevation-md-spread: 0;
+$portfolio-elevation-md-opacity: 0.08;
+
+$portfolio-elevation-lg-x: 0;
+$portfolio-elevation-lg-y: 8px;
+$portfolio-elevation-lg-blur: 24px;
+$portfolio-elevation-lg-spread: 0;
+$portfolio-elevation-lg-opacity: 0.12;
+
+$portfolio-elevation-xl-x: 0;
+$portfolio-elevation-xl-y: 16px;
+$portfolio-elevation-xl-blur: 48px;
+$portfolio-elevation-xl-spread: 0;
+$portfolio-elevation-xl-opacity: 0.16;
+
+$portfolio-elevation-overlay-x: 0;
+$portfolio-elevation-overlay-y: 24px;
+$portfolio-elevation-overlay-blur: 64px;
+$portfolio-elevation-overlay-spread: 0;
+$portfolio-elevation-overlay-opacity: 0.2;
+
+// ── Border Radius ───────────────────────────────────────────────────────────
 
 $portfolio-radius-none: 0px;
 $portfolio-radius-xs: 2px;

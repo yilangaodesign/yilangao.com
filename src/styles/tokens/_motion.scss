@@ -24,13 +24,23 @@ $portfolio-easing-exit: cubic-bezier(0.2, 0, 1, 0.9);
 $portfolio-easing-expressive: cubic-bezier(0.4, 0.14, 0.3, 1);
 
 // ── Z-index scale ────────────────────────────────────────────────────────────
+// 13-tier scale derived from actual component usage across the system.
+// Local stacking (base, raised, control) is context-relative but named for documentation.
+// Global layers (dropdown → admin-modal) use 100-step increments for breathing room.
 
-$portfolio-z-base: 0;
-$portfolio-z-dropdown: 100;
-$portfolio-z-sticky: 200;
-$portfolio-z-overlay: 300;
-$portfolio-z-modal: 400;
-$portfolio-z-toast: 600;
+$portfolio-z-base:         0;     // Default stacking
+$portfolio-z-raised:       1;     // Local lift above siblings (ButtonSelect focus, Sheet header)
+$portfolio-z-control:     10;     // Floating controls on hover (EditButton, admin overlays on cards)
+$portfolio-z-scrollspy:   40;     // Fixed scroll-position rail
+$portfolio-z-dropdown:   100;     // DropdownMenu, Select, popover content
+$portfolio-z-sticky:     200;     // Sticky site navigation
+$portfolio-z-overlay:    300;     // Sheet / CommandMenu backdrop + content
+$portfolio-z-modal:      400;     // Dialog overlay + content
+$portfolio-z-toast:      500;     // Toast viewport
+$portfolio-z-tooltip:    600;     // Tooltip (floats above everything except admin)
+$portfolio-z-admin-bar:  700;     // AdminBar sticky bar
+$portfolio-z-admin:      800;     // Inline-edit bar, edit overlays, format bar
+$portfolio-z-admin-modal: 900;    // ProjectEditModal, array panel, confirm dialogs
 
 // ── Global scroll behavior ───────────────────────────────────────────────────
 // scroll-behavior: smooth is set globally on <html> in globals.scss.

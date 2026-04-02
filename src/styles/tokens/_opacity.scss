@@ -1,0 +1,9 @@
+// ── Opacity Tokens ───────────────────────────────────────────────────────────
+// Standardized opacity values for interaction states and overlays.
+// Previously scattered as raw decimals (0.4, 0.6, 0.88) across components.
+
+$portfolio-opacity-disabled: 0.4;
+$portfolio-opacity-hover: 0.88;
+$portfolio-opacity-subtle: 0.6;
+$portfolio-opacity-overlay-light: 0.5;
+$portfolio-opacity-overlay-heavy: 0.75;

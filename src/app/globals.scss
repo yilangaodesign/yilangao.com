@@ -1,5 +1,6 @@
-@use "@yilangaodesign/design-system/scss/tokens/colors" as *;
-@use "@yilangaodesign/design-system/scss/tokens/typography" as *;
+@use "../styles/tokens/colors" as *;
+@use "../styles/tokens/typography" as *;
+@use "../styles/custom-properties";
 
 @layer base {
   *,
@@ -17,11 +18,11 @@
   }
 
   body {
-    font-family: $portfolio-font-sans;
-    font-weight: $portfolio-weight-regular;
-    line-height: $portfolio-leading-normal;
-    color: $portfolio-text-primary;
-    background: $portfolio-surface-primary;
+    font-family: var(--portfolio-font-sans);
+    font-weight: var(--portfolio-weight-regular);
+    line-height: var(--portfolio-leading-normal);
+    color: var(--portfolio-text-primary);
+    background: var(--portfolio-surface-primary);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -45,7 +46,7 @@
   }
 
   ::selection {
-    background-color: $portfolio-accent-20;
-    color: $portfolio-accent-90;
+    background-color: var(--portfolio-highlight);
+    color: #{$portfolio-accent-90};
   }
 }

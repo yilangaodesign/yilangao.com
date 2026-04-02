@@ -26,8 +26,9 @@ $portfolio-weight-semibold: 600;
 $portfolio-weight-bold: 700;
 
 // ── Type Scale ──────────────────────────────────────────────────────────────
-// 13-step scale from 8px (enterprise compact minimum, per OneGS) to 96px (hero stats).
-$portfolio-type-2xs: 0.5rem;
+// 14-step scale from 8px (enterprise compact minimum, per OneGS) to 96px (hero stats).
+$portfolio-type-3xs: 0.5rem;
+$portfolio-type-2xs: 0.625rem;
 $portfolio-type-xs: 0.75rem;
 $portfolio-type-sm: 0.875rem;
 $portfolio-type-base: 1rem;
@@ -55,3 +56,10 @@ $portfolio-tracking-normal: 0em;
 $portfolio-tracking-wide: 0.02em;
 $portfolio-tracking-wider: 0.05em;
 $portfolio-tracking-widest: 0.1em;
+
+// ── Paragraph Spacing ────────────────────────────────────────────────────────
+// Vertical rhythm between text blocks. One GS includes paragraphSpacing as a
+// typography primitive alongside fontSize, lineHeight, fontWeight, letterSpacing.
+$portfolio-paragraph-spacing-sm: 0.75rem;
+$portfolio-paragraph-spacing-md: 1rem;
+$portfolio-paragraph-spacing-lg: 1.5rem;

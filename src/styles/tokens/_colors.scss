@@ -206,15 +206,26 @@ $portfolio-surface-warning-bold: $portfolio-yellow-30;
 $portfolio-surface-warning-subtle: $portfolio-yellow-10;
 $portfolio-surface-overlay: rgba(0, 0, 0, 0.5);
 
+// — Always tokens (invariant across color modes — One GS surface/always pattern)
+$portfolio-surface-always-dark: $portfolio-neutral-100;
+$portfolio-surface-always-light: $portfolio-neutral-00;
+
 // — Overlay interaction states (semi-transparent for dark/light surface contexts)
 $portfolio-overlay-white-08: rgba(255, 255, 255, 0.08);
+$portfolio-overlay-white-10: rgba(255, 255, 255, 0.10);
 $portfolio-overlay-white-12: rgba(255, 255, 255, 0.12);
+$portfolio-overlay-white-14: rgba(255, 255, 255, 0.14);
 $portfolio-overlay-white-16: rgba(255, 255, 255, 0.16);
+$portfolio-overlay-white-20: rgba(255, 255, 255, 0.20);
+$portfolio-overlay-white-25: rgba(255, 255, 255, 0.25);
 $portfolio-overlay-black-04: rgba(0, 0, 0, 0.04);
 $portfolio-overlay-black-06: rgba(0, 0, 0, 0.06);
 $portfolio-overlay-black-08: rgba(0, 0, 0, 0.08);
 $portfolio-overlay-black-10: rgba(0, 0, 0, 0.10);
 $portfolio-overlay-black-14: rgba(0, 0, 0, 0.14);
+$portfolio-overlay-black-20: rgba(0, 0, 0, 0.20);
+$portfolio-overlay-black-25: rgba(0, 0, 0, 0.25);
+$portfolio-overlay-black-30: rgba(0, 0, 0, 0.30);
 $portfolio-overlay-black-40: rgba(0, 0, 0, 0.40);
 
 // — Text ··································································
@@ -226,9 +237,10 @@ $portfolio-text-neutral-disabled: $portfolio-neutral-30;
 $portfolio-text-brand-bold: $portfolio-accent-60;
 $portfolio-text-inverse-bold: $portfolio-neutral-00;
 $portfolio-text-always-light-bold: $portfolio-neutral-00;
+$portfolio-text-always-dark-bold: $portfolio-neutral-100;
 $portfolio-text-negative: $portfolio-red-60;
 $portfolio-text-positive: $portfolio-green-60;
-$portfolio-text-warning: $portfolio-yellow-30;
+$portfolio-text-warning: $portfolio-yellow-60;
 
 // — Icon ··································································
 $portfolio-icon-neutral-bold: $portfolio-neutral-100;
@@ -236,10 +248,13 @@ $portfolio-icon-neutral-regular: $portfolio-neutral-70;
 $portfolio-icon-neutral-subtle: $portfolio-neutral-60;
 $portfolio-icon-neutral-minimal: $portfolio-neutral-40;
 $portfolio-icon-brand-bold: $portfolio-accent-60;
+$portfolio-icon-neutral-disabled: $portfolio-neutral-30;
 $portfolio-icon-inverse-bold: $portfolio-neutral-00;
+$portfolio-icon-always-light-bold: $portfolio-neutral-00;
+$portfolio-icon-always-dark-bold: $portfolio-neutral-100;
 $portfolio-icon-negative: $portfolio-red-60;
 $portfolio-icon-positive: $portfolio-green-60;
-$portfolio-icon-warning: $portfolio-yellow-30;
+$portfolio-icon-warning: $portfolio-yellow-60;
 
 // — Border ································································
 $portfolio-border-neutral-bold: $portfolio-neutral-50;
@@ -247,9 +262,11 @@ $portfolio-border-neutral-subtle: $portfolio-neutral-20;
 $portfolio-border-neutral-disabled: $portfolio-neutral-30;
 $portfolio-border-brand-bold: $portfolio-accent-60;
 $portfolio-border-inverse-bold: $portfolio-neutral-100;
+$portfolio-border-always-light: $portfolio-neutral-00;
+$portfolio-border-always-dark: $portfolio-neutral-100;
 $portfolio-border-negative: $portfolio-red-60;
 $portfolio-border-positive: $portfolio-green-60;
-$portfolio-border-warning: $portfolio-yellow-30;
+$portfolio-border-warning: $portfolio-yellow-60;
 
 // — Action ································································
 $portfolio-action-brand-bold: $portfolio-accent-60;
@@ -257,9 +274,18 @@ $portfolio-action-brand-subtle: $portfolio-accent-20;
 $portfolio-action-neutral-bold: $portfolio-neutral-100;
 $portfolio-action-neutral-regular: $portfolio-neutral-10;
 $portfolio-action-inverse-bold: $portfolio-neutral-00;
+$portfolio-action-always-dark: $portfolio-neutral-100;
+$portfolio-action-always-light: $portfolio-neutral-00;
 $portfolio-action-negative: $portfolio-red-60;
 $portfolio-action-positive: $portfolio-green-60;
-$portfolio-action-warning: $portfolio-yellow-30;
+$portfolio-action-warning: $portfolio-yellow-60;
+
+// — Action state tokens (hover, pressed, disabled)
+$portfolio-action-brand-bold-hover: $portfolio-accent-70;
+$portfolio-action-brand-bold-pressed: $portfolio-accent-80;
+$portfolio-action-brand-bold-disabled: $portfolio-accent-30;
+$portfolio-action-neutral-bold-hover: $portfolio-neutral-80;
+$portfolio-action-neutral-bold-disabled: $portfolio-neutral-30;
 
 // — Focus & Highlight (interaction states — no property dimension)
 $portfolio-focus: $portfolio-accent-60;
