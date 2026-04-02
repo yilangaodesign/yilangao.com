@@ -521,9 +521,10 @@ export const typography = {
     },
     {
       name: "Labels",
-      description: "Geist Sans, uppercase with wider tracking.",
+      description: "Geist Sans, regular weight, uppercase with wider tracking. Uppercase + tracking provides inherent emphasis — weight stays light to avoid double emphasis.",
       mixins: [
-        { name: "label", font: "Sans", size: "xs (12px)", weight: "Medium 500", leading: "Normal 1.5", tracking: "Wider", extras: "uppercase", use: "Field labels, category tags" },
+        { name: "label", font: "Sans", size: "xs (12px)", weight: "Regular 400", leading: "Normal 1.5", tracking: "Wider", extras: "uppercase", use: "Section headers, field labels, category tags, meta labels" },
+        { name: "label-sm", font: "Sans", size: "2xs (10px)", weight: "Regular 400", leading: "Compact 1.3", tracking: "Wider", extras: "uppercase", use: "Compact labels, data-viz section headers, group sub-headers" },
       ],
     },
     {

@@ -189,6 +189,7 @@ const componentCategories: NavCategory[] = [
       { href: "/components/footer", label: "Footer", icon: PanelBottom, group: "Structure" },
       { href: "/components/navigation", label: "Navigation", icon: Navigation, group: "Structure" },
       { href: "/components/nav-item", label: "NavItem", icon: ChevronRight, group: "Structure" },
+      { href: "/components/vertical-nav", label: "VerticalNav", icon: Navigation, group: "Structure" },
       { href: "/components/button-select", label: "ButtonSelect", icon: Columns, group: "View Switching" },
       { href: "/components/tabs", label: "Tabs", icon: LayoutList, group: "View Switching" },
       { href: "/components/scroll-spy", label: "ScrollSpy", icon: GripVertical, group: "Utilities" },
@@ -412,7 +413,7 @@ function SidebarSearch({
       <div ref={containerRef} onMouseEnter={onMouseEnter} className="shrink-0 pt-2 px-1.5">
         <button
           onClick={() => setOpen(!open)}
-          className="flex items-center pl-[7px] h-7 rounded-sm text-sidebar-muted-foreground hover:bg-foreground/7 hover:text-black dark:hover:text-white transition-colors"
+          className="flex items-center justify-center w-7 h-7 rounded-sm text-sidebar-muted-foreground hover:bg-foreground/7 hover:text-black dark:hover:text-white transition-colors"
           title="Search (⌘K)"
         >
           <Search className="w-3.5 h-3.5" />
