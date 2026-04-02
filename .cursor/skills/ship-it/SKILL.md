@@ -23,8 +23,8 @@ description: >-
 |-------|------|-----------|
 | 1 | Analyze diff | Nothing |
 | 2 | Clean junk files | Nothing |
-| 3 | Generate commit plan | User approval |
-| 4 | Execute commits | Phase 3 approval |
+| 3 | Generate commit plan | Nothing |
+| 4 | Execute commits | Phase 3 complete |
 | 5 | Handoff to checkpoint | Phase 4 complete |
 
 ---
@@ -98,18 +98,13 @@ For each populated layer, create one commit entry:
 
 Present to the user:
 1. A **summary table** with commit number, type, file count, and message
-2. A **mermaid dependency diagram** showing commit order
-3. A **semver recommendation** (see Semver Decision section below)
+2. A **semver recommendation** (see Semver Decision section below)
 
-**STOP and wait for user approval.** The user may:
-- Approve as-is
-- Ask to merge/split layers
-- Change commit messages
-- Override the semver recommendation
+Then proceed directly to Phase 4. Do NOT pause for approval.
 
 ## Phase 4: Execute
 
-After approval, execute each commit sequentially:
+Execute each commit sequentially:
 
 ```bash
 # For each commit in the plan:
