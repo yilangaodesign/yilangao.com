@@ -43,16 +43,18 @@ dispatched by the orchestrator. Follow these rules:
 8. **NEVER** use ports below 4000 — they are reserved for other projects
 9. **NEVER** assume a dev server from a previous session is still running — verify it
 10. **ALWAYS** verify changes on localhost after implementation — HTTP 200 is NOT sufficient. For any change that touches React components, open the page in the browser (via `browser-use` subagent or equivalent) and check for console errors, hydration mismatches, and runtime warnings BEFORE reporting the task as done. `curl` only checks the server; React errors only appear in the browser.
-11. **ALWAYS** trace data flow (source → build → server → browser) when debugging visibility issues
-12a. **NEVER** render `<script>` elements in the React component tree (raw, `dangerouslySetInnerHTML`, or `next/script`) — React 19 warns on all of them. See EAP-013.
-12b. **NEVER** branch rendered output on `typeof window` or `window.location` in client components — this causes hydration mismatches. Use `useState` + `useEffect` to defer client-only values. See EAP-014.
-12. **ALWAYS** run the Cross-App Parity Checklist after creating or modifying anything in `src/`
-13. **NEVER** merge to `main` without first running `npm run version:release` for each app with unreleased changes — every checkpoint is a versioned release. Check all manifests (`elan.json`, `ascii-studio.json`, etc.) to see if `version` differs from `release.version`.
-14. **ALWAYS** run the CMS-Frontend Parity Checklist after adding, removing, or renaming any CMS field or frontend data field. A field that exists in one layer but not all three (schema, data fetch, UI) is a bug. See EAP-019.
-15. **ALWAYS** restart the Payload dev server after modifying any global or collection schema — Payload syncs the database schema only on startup. A schema change without a server restart means the field silently does not exist.
-16. **NEVER** create a component that renders CMS data without inline edit support — every text field from a Payload collection or global MUST be wrapped in `EditableText` (with `fieldId`, `target`, `fieldPath`) when `isAdmin`. The component MUST accept `id` and `isAdmin` props, and include an `EditButton`. A component that renders CMS text as plain elements is incomplete. See EAP-029.
-17. **NEVER** create or modify a playground component page (`playground/src/app/components/*/page.tsx`) without first reading `.cursor/skills/playground/SKILL.md`. Playground pages are thin harnesses that import and render production components — they must never re-implement components in Tailwind, raw HTML, or SVG. See EAP-037.
-18. **NEVER** edit a playground component page (`playground/src/app/components/*/page.tsx`) to fix how a component **looks or behaves** — visual/behavioral changes go to the design system source (`src/components/ui/` or `src/components/`). The playground auto-updates via `@ds/*` imports. Before editing any playground file, classify the task:
+11. **ALWAYS** verify playground edits reached the browser — Turbopack HMR is unreliable for the playground (cross-directory `@ds/*` imports, stale WebSocket connections, incremental cache). After editing any playground file: (1) curl the page and confirm the specific change is in the response, (2) tell the user to hard-refresh (Cmd+Shift+R), (3) if the user still can't see it, `rm -rf playground/.next` + restart the server. NEVER report a playground edit as done without this verification. Violated 4+ times — see EAP-042.
+12. **ALWAYS** trace data flow (source → build → server → browser) when debugging visibility issues
+13. **NEVER** render `<script>` elements in the React component tree (raw, `dangerouslySetInnerHTML`, or `next/script`) — React 19 warns on all of them. See EAP-013.
+14. **NEVER** branch rendered output on `typeof window` or `window.location` in client components — this causes hydration mismatches. Use `useState` + `useEffect` to defer client-only values. See EAP-014.
+15. **NEVER** use barrel imports from `lucide-react` in the playground (`import { X } from "lucide-react"`) — Turbopack's `optimizePackageImports` resolves named exports to wrong icon components on server vs client, causing hydration mismatches. Use individual imports: `import X from "lucide-react/dist/esm/icons/x"`. This also applies to any large barrel-export package in `playground/` where SSR parity matters. See EAP-056.
+16. **ALWAYS** run the Cross-App Parity Checklist after creating or modifying anything in `src/`
+17. **NEVER** merge to `main` without first running `npm run version:release` for each app with unreleased changes — every checkpoint is a versioned release. Check all manifests (`elan.json`, `ascii-studio.json`, etc.) to see if `version` differs from `release.version`.
+18. **ALWAYS** run the CMS-Frontend Parity Checklist after adding, removing, or renaming any CMS field or frontend data field. A field that exists in one layer but not all three (schema, data fetch, UI) is a bug. See EAP-019.
+19. **ALWAYS** restart the Payload dev server after modifying any global or collection schema — Payload syncs the database schema only on startup. A schema change without a server restart means the field silently does not exist.
+20. **NEVER** create a component that renders CMS data without inline edit support — every text field from a Payload collection or global MUST be wrapped in `EditableText` (with `fieldId`, `target`, `fieldPath`) when `isAdmin`. The component MUST accept `id` and `isAdmin` props, and include an `EditButton`. A component that renders CMS text as plain elements is incomplete. See EAP-029.
+21. **NEVER** create or modify a playground component page (`playground/src/app/components/*/page.tsx`) without first reading `.cursor/skills/playground/SKILL.md`. Playground pages are thin harnesses that import and render production components — they must never re-implement components in Tailwind, raw HTML, or SVG. See EAP-037.
+22. **NEVER** edit a playground component page (`playground/src/app/components/*/page.tsx`) to fix how a component **looks or behaves** — visual/behavioral changes go to the design system source (`src/components/ui/` or `src/components/`). The playground auto-updates via `@ds/*` imports. Before editing any playground file, classify the task:
     - **Component visual** (colors, spacing, sizing, states, animations, interaction behavior) → Edit `src/components/` ONLY — NEVER the playground page
     - **Documentation / page structure** (reordering demo sections, updating props table data, changing code examples, adding new sections, creating a parity page for a new component) → Edit the playground page — this is legitimate
     - **Shell** (sidebar layout, ComponentPreview rendering, playground-wide IA, theme behavior) → Edit `playground/src/components/` or `playground/src/app/layout.tsx`
@@ -110,10 +112,8 @@ skill assignment, and gate identification internally.
    → The skill handles full doc reading + incident processing.
 
 6. **Is there a content dimension? (poor labels, unclear copy, UX microcopy, naming, "this doesn't read well", "it's unclear")**
-   → Read `docs/content.md` (full file — content docs are shorter than design/engineering).
-   → Read `docs/content-anti-patterns.md`.
-   → Read the first 30 lines of `docs/content-feedback-log.md` (most recent entries for context).
-   → Process feedback, implement changes, then close the loop per Post-Flight.
+   → Activate `content-iteration` skill at `.cursor/skills/content-iteration/SKILL.md`.
+   → The skill handles full doc reading + feedback log processing.
 
 **Disambiguation defaults (when you're uncertain about a dimension):**
 - "it looks wrong" → always includes Design
@@ -132,7 +132,7 @@ skill assignment, and gate identification internally.
    → Activate `playground` skill at `.cursor/skills/playground/SKILL.md`.
    → The skill handles architecture rules, composition rules, import decision tree, and post-build parity.
    → This route is **mandatory** — a file-scoped rule (`.cursor/rules/playground-components.md`) also fires automatically when touching component pages, but the skill must be read in full before writing any code.
-   → **Before any edit**, apply Engineering guardrail #18 (Intent Gate): classify the task as Component visual / Documentation-structure / Shell / Ambiguous. Component visual changes NEVER go to playground pages.
+   → **Before any edit**, apply Engineering guardrail #21 (Intent Gate): classify the task as Component visual / Documentation-structure / Shell / Ambiguous. Component visual changes NEVER go to playground pages.
 
 10. **Am I touching CMS fields or frontend data fields?**
     → Activate `cms-parity` skill at `.cursor/skills/cms-parity/SKILL.md`.
@@ -172,6 +172,8 @@ If Pre-Flight Step 0 identified multiple categories, you MUST document in ALL ap
 1. Append to `docs/content-feedback-log.md` — what was the intent, what was decided, what was learned.
 2. Update `docs/content.md` if the work reveals a new content principle, refines an existing one, or establishes a policy.
 3. Update `docs/content-anti-patterns.md` if the work exposed a content pattern to avoid.
+
+**Feedback log cap (30 entries):** After appending a new entry, if the active log exceeds 30 entries, archive the oldest entry to the corresponding archive file (`docs/*-feedback-log-archive.md`) and update the synthesis file (`docs/*-feedback-synthesis.md`) if the archived entry reveals a pattern not yet captured. The synthesis files are the distilled lessons from all archived entries — they ensure historical knowledge survives archival.
 
 **Why this exists:** The default execution loop is explore → implement → verify → report. That loop captures what was *done* but not what was *learned*. Every task — even proactive work that isn't responding to a complaint — generates design, engineering, or content knowledge. Without a mandatory reflection gate, that knowledge evaporates at session end. Forcing single-category classification compounds the loss — a design insight captured only in the engineering log is invisible to future design work.
 

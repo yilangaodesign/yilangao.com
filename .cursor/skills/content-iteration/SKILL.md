@@ -30,11 +30,13 @@ Before proceeding, ask: **does this feedback also have a design or engineering d
 ### Step 2: Check Existing Knowledge
 
 Before making changes:
-1. Read `docs/content.md` Section Index — identify sections matching this feedback.
-2. Read §0 (Content Posture) + the matching section(s).
-3. Read `docs/content-anti-patterns.md` for matching anti-patterns.
-4. Read the first 30 lines of `docs/content-feedback-log.md` (most recent entries) for recurring patterns.
-5. If a documented solution exists, **apply it directly** — don't re-derive.
+1. Read `docs/content.md` Section Index — identify the spoke file(s) matching this feedback.
+2. Read §0 (Content Posture) from the hub (always).
+3. Read the matching spoke file(s) from `docs/content/` (e.g., `docs/content/case-study.md` for case study feedback).
+4. Read `docs/content-anti-patterns.md` for matching anti-patterns.
+5. Read the first 30 lines of `docs/content-feedback-log.md` (most recent entries) for recurring patterns.
+6. If the feedback touches an area covered by archived entries, skim `docs/content-feedback-synthesis.md` (when it exists) for historical context.
+7. If a documented solution exists, **apply it directly** — don't re-derive.
 
 ### Step 3: Diagnose Root Cause
 
@@ -98,6 +100,8 @@ When `[ORCHESTRATED]` appears in your context:
 
 | File | Purpose | Read When | Write When |
 |------|---------|-----------|------------|
-| `docs/content.md` | Accumulated content principles | Before any content work | After processing feedback |
-| `docs/content-feedback-log.md` | Chronological feedback history | Session start, during feedback | After each feedback resolution |
+| `docs/content.md` | Content strategy hub (Section Index + §0 Posture) | Before any content work (always) | After processing feedback (update frequency map) |
+| `docs/content/*.md` | Spoke files: conversion funnel, homepage, case study, visual economy, language patterns, seniority signals, internal tools, project selection, about page, portfolio lifecycle, self-audit, reference portfolios | Read the spoke matching the feedback topic | After updating a content principle |
+| `docs/content-feedback-log.md` | Chronological feedback history (30 most recent entries) | Session start, during feedback | After each feedback resolution |
 | `docs/content-anti-patterns.md` | Things to never do | Before writing content | After discovering a new anti-pattern |
+| `docs/content-feedback-synthesis.md` | Distilled lessons from archived entries | When historical context needed | When archiving entries reveals new patterns |
