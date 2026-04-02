@@ -1,7 +1,7 @@
 "use client";
 import { cn } from "@/lib/utils";
 import { Undo2, Redo2, RotateCcw } from "lucide-react";
-import { SegmentedControl } from "@/components/ui/segmented-control";
+import { ButtonSelect, ButtonSelectItem } from "@/components/ui/button-select";
 
 const ASPECT_PRESETS = [
   { value: "16:9", label: "16:9", ratio: 16 / 9 },
@@ -70,12 +70,17 @@ export function Toolbar({
 
       <div className="w-px h-5 bg-border mx-1" />
 
-      <SegmentedControl
-        items={ASPECT_PRESETS.map((p) => ({ value: p.value, label: p.label }))}
+      <ButtonSelect
         value={aspectPreset}
-        onChange={onAspectPresetChange}
+        onValueChange={onAspectPresetChange}
         size="sm"
-      />
+      >
+        {ASPECT_PRESETS.map((p) => (
+          <ButtonSelectItem key={p.value} value={p.value}>
+            {p.label}
+          </ButtonSelectItem>
+        ))}
+      </ButtonSelect>
 
       <div className="flex items-center gap-1.5 ml-2">
         <label className="flex items-center gap-1">

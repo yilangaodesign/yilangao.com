@@ -3,7 +3,7 @@
 import { useCallback, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import type { AsciiSettings } from "@/hooks/use-ascii-renderer";
-import { SegmentedControl } from "@/components/ui/segmented-control";
+import { ButtonSelect, ButtonSelectItem } from "@/components/ui/button-select";
 import { ColorPicker } from "@/components/ui/color-picker";
 import { Slider } from "@/components/ui/slider";
 import { ScrubInput } from "@/components/ui/scrub-input";
@@ -15,7 +15,7 @@ interface ControlPanelProps {
   className?: string;
 }
 
-const MODE_ITEMS = [
+const MODE_OPTIONS = [
   { value: "charGrid", label: "Characters" },
   { value: "wordFill", label: "Word Fill" },
 ];
@@ -50,13 +50,18 @@ export function ControlPanel({ settings, onSettingsChange, className }: ControlP
 
       {/* Mode */}
       <Section label="Mode">
-        <SegmentedControl
-          items={MODE_ITEMS}
+        <ButtonSelect
           value={settings.mode}
-          onChange={(v) => update("mode", v as AsciiSettings["mode"])}
+          onValueChange={(v) => update("mode", v as AsciiSettings["mode"])}
           fullWidth
           size="sm"
-        />
+        >
+          {MODE_OPTIONS.map((opt) => (
+            <ButtonSelectItem key={opt.value} value={opt.value}>
+              {opt.label}
+            </ButtonSelectItem>
+          ))}
+        </ButtonSelect>
       </Section>
 
       {/* Text Settings */}
