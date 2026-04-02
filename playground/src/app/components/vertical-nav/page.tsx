@@ -450,10 +450,10 @@ export default function VerticalNavPage() {
           </div>
         </ComponentPreview>
 
-        <SubsectionHeading
-          title="Subcomponents"
-          description="VerticalNav is composed of several subcomponents, each with a specific role."
-        />
+        <SubsectionHeading>Subcomponents</SubsectionHeading>
+        <p className="text-sm text-muted-foreground mb-4">
+          VerticalNav is composed of several subcomponents, each with a specific role.
+        </p>
 
         <div className="space-y-6">
           <div>
