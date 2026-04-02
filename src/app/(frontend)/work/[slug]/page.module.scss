@@ -427,3 +427,27 @@
   @include body-sm-medium;
   color: inherit;
 }
+
+// ── COMPANY CALLOUT ────────────────────────────────────────────────────────
+
+.companyCallout {
+  padding: $portfolio-spacer-4x $portfolio-spacer-5x;
+  margin-bottom: $portfolio-spacer-6x;
+  background: var(--portfolio-surface-neutral-minimal);
+  border-left: 3px solid var(--portfolio-border-brand-bold);
+  border-radius: 0 8px 8px 0;
+  display: flex;
+  flex-direction: column;
+  gap: $portfolio-spacer-1-5x;
+}
+
+.companyCalloutLabel {
+  @include label;
+  color: var(--portfolio-text-brand-bold);
+}
+
+.companyCalloutText {
+  @include body-sm;
+  color: var(--portfolio-text-neutral-regular);
+  line-height: var(--portfolio-leading-relaxed);
+}

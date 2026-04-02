@@ -168,6 +168,7 @@ export default function ProjectClient({
   isAdmin,
   interactiveVisuals,
   coverImage,
+  companyNote,
 }: {
   project: ProjectData;
   prevProject?: AdjacentProject;
@@ -175,6 +176,7 @@ export default function ProjectClient({
   isAdmin?: boolean;
   interactiveVisuals?: Record<string, InteractiveVisualConfig>;
   coverImage?: string;
+  companyNote?: { companyName: string; note: string };
 }) {
   const p = project;
 
@@ -404,6 +406,19 @@ export default function ProjectClient({
               )}
             </div>
           </FadeIn>
+
+          {companyNote && (
+            <FadeIn>
+              <aside className={styles.companyCallout}>
+                <span className={styles.companyCalloutLabel}>
+                  Why this matters to {companyNote.companyName}
+                </span>
+                <p className={styles.companyCalloutText}>
+                  {companyNote.note}
+                </p>
+              </aside>
+            </FadeIn>
+          )}
 
           {p.sections.map((section, i) => (
             <section key={i} id={slugify(section.heading)} className={styles.contentSection}>

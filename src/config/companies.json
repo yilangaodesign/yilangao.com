@@ -1,0 +1,26 @@
+{
+  "google": {
+    "name": "Google",
+    "password": "goog-preview-2026",
+    "theme": {
+      "accent": "#4285F4",
+      "greeting": "Hi, Google team"
+    },
+    "caseStudyNotes": {
+      "lacework": "This cloud security redesign mirrors the complexity of managing visibility across sprawling infrastructure — similar challenges to those faced by Google Cloud Console teams.",
+      "meteor": "The trust calibration framework I designed parallels challenges in enterprise ML tooling: how do you help expert users trust automated outputs without removing their agency?"
+    }
+  },
+  "meta": {
+    "name": "Meta",
+    "password": "meta-preview-2026",
+    "theme": {
+      "accent": "#0866FF",
+      "greeting": "Hi, Meta team"
+    },
+    "caseStudyNotes": {
+      "lacework": "The information architecture redesign I led required balancing power-user density with progressive disclosure — a tension familiar to anyone building internal tools at Meta's scale.",
+      "elan-design-system": "Élan was built to solve the same problem every fast-moving product org faces: how do you maintain design consistency when shipping velocity is the priority?"
+    }
+  }
+}

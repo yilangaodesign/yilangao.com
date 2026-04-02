@@ -2,8 +2,19 @@ import { notFound } from "next/navigation";
 import { getPayloadClient } from "@/lib/payload";
 import { extractLexicalText } from "@/lib/lexical";
 import { isAdminAuthenticated } from "@/lib/admin-auth";
+import { getCompanyFromSession } from "@/lib/company-session";
 import { RefreshRouteOnSave } from "@/components/RefreshRouteOnSave";
 import ProjectClient from "./ProjectClient";
+import companiesData from "@/config/companies.json";
+
+type CompanyConfig = {
+  name: string;
+  password: string;
+  theme: { accent: string; greeting: string };
+  caseStudyNotes: Record<string, string>;
+};
+
+const companies = companiesData as Record<string, CompanyConfig>;
 
 const HERO_METRICS: Record<string, { value: string; label: string }> = {
   lacework: { value: "2×", label: "page discoverability" },
@@ -211,6 +222,16 @@ export default async function ProjectPage({ params }: Props) {
   const interactiveVisuals = INTERACTIVE_VISUALS[slug] ?? undefined;
   const coverImage = COVER_IMAGES[slug] ?? undefined;
 
+  let companyNote: { companyName: string; note: string } | undefined;
+  const companySess = await getCompanyFromSession();
+  if (companySess && companies[companySess]) {
+    const cfg = companies[companySess];
+    const noteText = cfg.caseStudyNotes[slug];
+    if (noteText) {
+      companyNote = { companyName: cfg.name, note: noteText };
+    }
+  }
+
   return (
     <>
       <RefreshRouteOnSave />
@@ -221,6 +242,7 @@ export default async function ProjectPage({ params }: Props) {
         isAdmin={isAdmin}
         interactiveVisuals={interactiveVisuals}
         coverImage={coverImage}
+        companyNote={companyNote}
       />
     </>
   );
