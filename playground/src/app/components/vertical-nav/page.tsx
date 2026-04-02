@@ -487,7 +487,7 @@ export default function VerticalNavPage() {
           </div>
         </div>
 
-        <SourcePath>src/components/ui/VerticalNav/VerticalNav.tsx</SourcePath>
+        <SourcePath path="src/components/ui/VerticalNav/VerticalNav.tsx · VerticalNav.module.scss" />
       </div>
     </Shell>
   );
