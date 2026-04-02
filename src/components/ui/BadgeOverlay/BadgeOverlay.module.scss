@@ -1,0 +1,324 @@
+@use '../../../styles' as *;
+
+// =============================================================================
+// BadgeOverlay — Notification Counter & Status Dot
+// =============================================================================
+// A compact, circular indicator for overlay on avatars, icons, and buttons.
+// Two modes:
+//   With children → counter pill (number label inside)
+//   Without children (.dot) → pure colored dot
+//
+// Axes:
+//   Appearance: neutral, highlight, inverse, always-dark, always-light
+//   Status: success, warning, error  (overrides appearance when set)
+//   Emphasis: bold, regular, subtle
+//   Size: xs (16 px counter / 8 px dot), sm (20 px counter / 12 px dot)
+//   Bordered: optional contrasting outline ring for busy backgrounds
+//
+// Unsupported: inverse / always-dark / always-light + subtle → falls back to
+//              regular emphasis visually.
+// =============================================================================
+
+.badge-overlay {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--portfolio-radius-full);
+  font-family: var(--portfolio-font-sans);
+  font-weight: var(--portfolio-weight-medium);
+  line-height: 1;
+  white-space: nowrap;
+  user-select: none;
+  border: 0 solid transparent;
+  @include transition-fast;
+}
+
+// ---------------------------------------------------------------------------
+// Inner label (counter text)
+// ---------------------------------------------------------------------------
+
+.label {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// =============================================================================
+// SIZES — Counter mode
+// =============================================================================
+
+.xs {
+  min-height: var(--portfolio-spacer-2x);    // 16 px
+  min-width: var(--portfolio-spacer-2x);
+  padding: 2px var(--portfolio-spacer-0-5x); // 2px 4px
+  font-size: 0.625rem;                       // 10 px — below token scale
+
+  &.dot {
+    min-height: 0;
+    min-width: 0;
+    width: 8px;
+    height: 8px;
+    padding: 0;
+  }
+}
+
+.sm {
+  min-height: var(--portfolio-spacer-2-5x);  // 20 px
+  min-width: var(--portfolio-spacer-2-5x);
+  padding: 2px 6px;
+  font-size: var(--portfolio-type-xs);       // 12 px
+
+  &.dot {
+    min-height: 0;
+    min-width: 0;
+    width: 12px;
+    height: 12px;
+    padding: 0;
+  }
+}
+
+// =============================================================================
+// DOT modifier (label-less mode)
+// =============================================================================
+
+.dot {
+  .label {
+    display: none;
+  }
+}
+
+// =============================================================================
+// APPEARANCE × EMPHASIS
+// =============================================================================
+
+// ---------------------------------------------------------------------------
+// Neutral
+// ---------------------------------------------------------------------------
+
+.neutral {
+  &.bold {
+    background-color: var(--portfolio-surface-inverse-bold);
+    color: var(--portfolio-text-inverse-bold);
+  }
+
+  &.regular {
+    background-color: var(--portfolio-surface-neutral-minimal);
+    border-color: var(--portfolio-border-neutral-subtle);
+    border-width: 1px;
+    color: var(--portfolio-text-neutral-bold);
+  }
+
+  &.subtle {
+    background-color: var(--portfolio-surface-neutral-subtle);
+    color: var(--portfolio-text-neutral-bold);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Highlight (brand accent)
+// ---------------------------------------------------------------------------
+
+.highlight {
+  &.bold {
+    background-color: var(--portfolio-surface-brand-bold);
+    color: var(--portfolio-text-inverse-bold);
+  }
+
+  &.regular {
+    background-color: var(--portfolio-surface-neutral-minimal);
+    border-color: var(--portfolio-border-neutral-subtle);
+    border-width: 1px;
+    color: var(--portfolio-text-brand-bold);
+  }
+
+  &.subtle {
+    background-color: var(--portfolio-surface-brand-subtle);
+    color: var(--portfolio-text-brand-bold);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Inverse — Bold + Regular only (subtle falls back to regular)
+// ---------------------------------------------------------------------------
+
+.inverse {
+  &.bold {
+    background-color: var(--portfolio-action-inverse-bold);
+    color: var(--portfolio-text-neutral-bold);
+  }
+
+  &.regular,
+  &.subtle {
+    background-color: var(--portfolio-action-inverse-bold);
+    border-color: var(--portfolio-border-neutral-bold);
+    border-width: 1px;
+    color: var(--portfolio-text-neutral-bold);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Always Dark — Bold + Regular only (subtle falls back to regular)
+// ---------------------------------------------------------------------------
+
+.always-dark {
+  &.bold {
+    background-color: var(--portfolio-surface-always-dark);
+    color: var(--portfolio-text-always-light-bold);
+  }
+
+  &.regular,
+  &.subtle {
+    background-color: var(--portfolio-surface-always-dark);
+    border-color: var(--portfolio-border-always-light);
+    border-width: 1px;
+    color: var(--portfolio-text-always-light-bold);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Always Light — Bold + Regular only (subtle falls back to regular)
+// ---------------------------------------------------------------------------
+
+.always-light {
+  &.bold {
+    background-color: var(--portfolio-surface-always-light);
+    color: var(--portfolio-text-always-dark-bold);
+  }
+
+  &.regular,
+  &.subtle {
+    background-color: var(--portfolio-surface-always-light);
+    border-color: var(--portfolio-border-always-dark);
+    border-width: 1px;
+    color: var(--portfolio-text-always-dark-bold);
+  }
+}
+
+// =============================================================================
+// STATUS VARIANTS (override appearance)
+// =============================================================================
+
+// ---------------------------------------------------------------------------
+// Success
+// ---------------------------------------------------------------------------
+
+.success {
+  &.bold {
+    background-color: var(--portfolio-surface-positive-bold);
+    color: var(--portfolio-text-inverse-bold);
+  }
+
+  &.regular {
+    background-color: var(--portfolio-surface-neutral-minimal);
+    border-color: var(--portfolio-border-neutral-subtle);
+    border-width: 1px;
+    color: var(--portfolio-text-positive);
+  }
+
+  &.subtle {
+    background-color: var(--portfolio-surface-positive-subtle);
+    color: var(--portfolio-text-positive);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Warning
+// ---------------------------------------------------------------------------
+
+.warning {
+  &.bold {
+    background-color: var(--portfolio-surface-warning-bold);
+    color: var(--portfolio-text-always-dark-bold);
+  }
+
+  &.regular {
+    background-color: var(--portfolio-surface-neutral-minimal);
+    border-color: var(--portfolio-border-neutral-subtle);
+    border-width: 1px;
+    color: var(--portfolio-text-warning);
+  }
+
+  &.subtle {
+    background-color: var(--portfolio-surface-warning-subtle);
+    color: var(--portfolio-text-warning);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Error
+// ---------------------------------------------------------------------------
+
+.error {
+  &.bold {
+    background-color: var(--portfolio-surface-negative-bold);
+    color: var(--portfolio-text-inverse-bold);
+  }
+
+  &.regular {
+    background-color: var(--portfolio-surface-neutral-minimal);
+    border-color: var(--portfolio-border-neutral-subtle);
+    border-width: 1px;
+    color: var(--portfolio-text-negative);
+  }
+
+  &.subtle {
+    background-color: var(--portfolio-surface-negative-subtle);
+    color: var(--portfolio-text-negative);
+  }
+}
+
+// =============================================================================
+// BORDERED modifier — declared after appearance/status blocks so its
+// border-width and border-color reliably override the regular emphasis's
+// inherent 1px border. Compound selector matches the (0,2,0) specificity
+// of .appearance.emphasis rules.
+// =============================================================================
+// "Knockout ring" — a thin sliver of page background separates the badge from
+// its anchor element. Uses the page surface token so it adapts to light/dark.
+// 1.5px is proportionate to the 16-20px badge sizes (9.4% of xs height).
+
+.badge-overlay.bordered {
+  border-width: 1.5px;
+  border-style: solid;
+  border-color: var(--portfolio-surface-neutral-minimal);
+}
+
+// =============================================================================
+// ANCHOR — Positioning wrapper
+// =============================================================================
+
+.anchor {
+  position: relative;
+  display: inline-flex;
+}
+
+.badge-slot {
+  position: absolute;
+  z-index: 1;
+  line-height: 0;
+}
+
+.top-right {
+  top: 14%;
+  right: 14%;
+  transform: translate(50%, -50%);
+}
+
+.top-left {
+  top: 14%;
+  left: 14%;
+  transform: translate(-50%, -50%);
+}
+
+.bottom-right {
+  bottom: 14%;
+  right: 14%;
+  transform: translate(50%, 50%);
+}
+
+.bottom-left {
+  bottom: 14%;
+  left: 14%;
+  transform: translate(-50%, 50%);
+}

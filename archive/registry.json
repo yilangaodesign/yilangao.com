@@ -838,6 +838,24 @@
       "hasPreview": false
     },
     {
+      "id": "shared-ui-badge-overlay",
+      "name": "BadgeOverlay",
+      "type": "Component",
+      "experiment": "shared",
+      "status": "active",
+      "description": "Compact notification counter and status dot indicator. Designed to overlay on avatars, icons, and buttons. Includes BadgeOverlayAnchor positioning wrapper. Inspired by One GS Badge Overlay.",
+      "sourcePath": "src/components/ui/BadgeOverlay/BadgeOverlay.tsx",
+      "createdAt": "2026-04-01T00:00:00Z",
+      "createdBy": "cursor",
+      "origin": {
+        "type": "hybrid",
+        "library": "One GS Design System",
+        "url": "https://www.figma.com/design/MoZ2aLe1MQK88V57lnMxUf/-One-GS--Components?node-id=3-927"
+      },
+      "tags": ["ui", "notification", "counter", "status", "overlay", "primitive"],
+      "hasPreview": true
+    },
+    {
       "id": "shared-ui-divider",
       "name": "Divider",
       "type": "Component",
@@ -1105,6 +1123,23 @@
       "createdBy": "cursor",
       "origin": { "type": "custom" },
       "tags": ["ui", "display", "avatar", "image", "fallback"],
+      "hasPreview": true
+    },
+    {
+      "id": "shared-ui-button-select",
+      "name": "ButtonSelect",
+      "type": "Component",
+      "experiment": "shared",
+      "status": "active",
+      "description": "Single-select toggle group with appearance × emphasis two-axis styling. Built on Radix ToggleGroup. Supports neutral/highlight appearance, bold/regular/subtle emphasis, five sizes (xs–xl), icon-only items, and full-width layout. Replaces SegmentedControl.",
+      "sourcePath": "src/components/ui/ButtonSelect/ButtonSelect.tsx",
+      "createdAt": "2026-04-01T12:00:00Z",
+      "createdBy": "cursor",
+      "origin": {
+        "type": "hybrid",
+        "library": "@radix-ui/react-toggle-group"
+      },
+      "tags": ["ui", "selection", "toggle-group", "button", "segmented-control", "radix"],
       "hasPreview": true
     }
   ]

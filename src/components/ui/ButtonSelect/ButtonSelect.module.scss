@@ -1,0 +1,283 @@
+@use '../../../styles' as *;
+
+// =============================================================================
+// ButtonSelect — Two-Axis Selection Group (Appearance × Emphasis)
+// =============================================================================
+// A single-select toggle group where each item inherits the Button taxonomy.
+// Container: bordered inline-flex row with shared radius.
+// Items: button-like segments, selected state driven by emphasis.
+//
+// Appearance: neutral | highlight
+// Emphasis:   bold | regular | subtle
+// Size:       xs | sm | md | lg | xl
+// =============================================================================
+
+// ---------------------------------------------------------------------------
+// Group (container)
+// ---------------------------------------------------------------------------
+
+.group {
+  display: inline-flex;
+  align-items: stretch;
+  border: 1px solid var(--portfolio-border-subtle);
+  border-radius: var(--portfolio-radius-sm);
+  overflow: hidden;
+}
+
+.fullWidth {
+  display: flex;
+  width: 100%;
+}
+
+// ---------------------------------------------------------------------------
+// Item (individual toggle)
+// ---------------------------------------------------------------------------
+
+.item {
+  @include button-reset;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  font-family: var(--portfolio-font-sans);
+  font-weight: var(--portfolio-weight-medium);
+  white-space: nowrap;
+  user-select: none;
+  cursor: pointer;
+  background-color: transparent;
+  color: var(--portfolio-text-secondary);
+  border-right: 1px solid var(--portfolio-border-subtle);
+  @include transition-fast;
+
+  &:last-child {
+    border-right: none;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+    z-index: var(--portfolio-z-raised);
+  }
+
+  &:hover:not(:disabled):not([data-state='on']) {
+    color: var(--portfolio-text-primary);
+    background-color: var(--portfolio-surface-neutral-subtle);
+  }
+
+  &:disabled,
+  &[data-disabled] {
+    cursor: not-allowed;
+    opacity: 0.4;
+    pointer-events: none;
+  }
+}
+
+.fullWidth .item {
+  flex: 1;
+}
+
+// ---------------------------------------------------------------------------
+// Icon wrapper
+// ---------------------------------------------------------------------------
+
+.iconWrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  svg {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+// =============================================================================
+// APPEARANCE × EMPHASIS — selected state
+// =============================================================================
+
+// ---------------------------------------------------------------------------
+// Neutral
+// ---------------------------------------------------------------------------
+
+.neutral {
+  .item[data-state='on'] {
+    border-right-color: transparent;
+
+    + .item {
+      border-left-color: transparent;
+    }
+  }
+
+  &.bold .item[data-state='on'] {
+    background-color: var(--portfolio-surface-inverse-bold);
+    color: var(--portfolio-text-inverse-bold);
+
+    &:hover:not(:disabled) { background-color: $portfolio-neutral-90; }
+    &:active:not(:disabled) { background-color: $portfolio-neutral-80; }
+
+    :global([data-theme="dark"]) &,
+    :global(.dark) & {
+      &:hover:not(:disabled) { background-color: $portfolio-neutral-20; }
+      &:active:not(:disabled) { background-color: $portfolio-neutral-30; }
+    }
+  }
+
+  &.regular .item[data-state='on'] {
+    background-color: var(--portfolio-surface-neutral-regular);
+    color: var(--portfolio-text-neutral-bold);
+
+    &:hover:not(:disabled) { background-color: $portfolio-neutral-20; }
+    &:active:not(:disabled) { background-color: $portfolio-neutral-30; }
+
+    :global([data-theme="dark"]) &,
+    :global(.dark) & {
+      &:hover:not(:disabled) { background-color: $portfolio-neutral-70; }
+      &:active:not(:disabled) { background-color: $portfolio-neutral-60; }
+    }
+  }
+
+  &.subtle .item[data-state='on'] {
+    background-color: var(--portfolio-surface-neutral-subtle);
+    color: var(--portfolio-text-neutral-bold);
+
+    &:hover:not(:disabled) { background-color: $portfolio-neutral-10; }
+    &:active:not(:disabled) { background-color: $portfolio-neutral-20; }
+
+    :global([data-theme="dark"]) &,
+    :global(.dark) & {
+      &:hover:not(:disabled) { background-color: $portfolio-neutral-80; }
+      &:active:not(:disabled) { background-color: $portfolio-neutral-70; }
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Highlight (brand accent)
+// ---------------------------------------------------------------------------
+
+.highlight {
+  .item[data-state='on'] {
+    border-right-color: transparent;
+
+    + .item {
+      border-left-color: transparent;
+    }
+  }
+
+  &.bold .item[data-state='on'] {
+    background-color: var(--portfolio-action-brand-bold);
+    color: var(--portfolio-text-always-light-bold);
+
+    :global([data-theme="dark"]) &,
+    :global(.dark) & {
+      background-color: $portfolio-accent-60;
+    }
+
+    &:hover:not(:disabled) { background-color: $portfolio-accent-70; }
+    &:active:not(:disabled) { background-color: $portfolio-accent-80; }
+  }
+
+  &.regular .item[data-state='on'] {
+    background-color: var(--portfolio-surface-brand-subtle);
+    color: var(--portfolio-text-brand-bold);
+
+    &:hover:not(:disabled) { background-color: $portfolio-accent-20; }
+    &:active:not(:disabled) { background-color: $portfolio-accent-30; }
+
+    :global([data-theme="dark"]) &,
+    :global(.dark) & {
+      &:hover:not(:disabled) { background-color: $portfolio-accent-90; }
+      &:active:not(:disabled) { background-color: $portfolio-accent-80; }
+    }
+  }
+
+  &.subtle .item[data-state='on'] {
+    background-color: $portfolio-accent-10;
+    color: var(--portfolio-text-brand-bold);
+
+    &:hover:not(:disabled) { background-color: $portfolio-accent-20; }
+    &:active:not(:disabled) { background-color: $portfolio-accent-30; }
+
+    :global([data-theme="dark"]) &,
+    :global(.dark) & {
+      background-color: $portfolio-accent-100;
+      &:hover:not(:disabled) { background-color: $portfolio-accent-90; }
+      &:active:not(:disabled) { background-color: $portfolio-accent-80; }
+    }
+  }
+}
+
+// =============================================================================
+// SIZES
+// =============================================================================
+
+$_icon-xs: 16px;
+$_icon-sm: 18px;
+$_icon-md: 18px;
+$_icon-lg: 20px;
+$_icon-xl: var(--portfolio-spacer-3x);
+
+.xs .item {
+  min-height: var(--portfolio-spacer-3x);
+  padding: 0 var(--portfolio-spacer-1x);
+  font-size: var(--portfolio-type-2xs);
+  line-height: $_icon-xs;
+  gap: $portfolio-spacer-utility-0-5x;
+
+  .iconWrap { width: $_icon-xs; height: $_icon-xs; }
+}
+
+.sm .item {
+  min-height: var(--portfolio-spacer-4x);
+  padding: 0 $portfolio-spacer-utility-1-5x;
+  font-size: var(--portfolio-type-xs);
+  line-height: $_icon-sm;
+  gap: $portfolio-spacer-utility-0-75x;
+
+  .iconWrap { width: $_icon-sm; height: $_icon-sm; }
+}
+
+.md .item {
+  min-height: var(--portfolio-spacer-5x);
+  padding: 0 var(--portfolio-spacer-2x);
+  font-size: var(--portfolio-type-sm);
+  line-height: $_icon-md;
+  gap: $portfolio-spacer-utility-0-75x;
+
+  .iconWrap { width: $_icon-md; height: $_icon-md; }
+}
+
+.lg .item {
+  min-height: var(--portfolio-spacer-6x);
+  padding: 0 $portfolio-spacer-utility-2-5x;
+  font-size: var(--portfolio-type-base);
+  line-height: $_icon-lg;
+  gap: $portfolio-spacer-utility-1-25x;
+
+  .iconWrap { width: $_icon-lg; height: $_icon-lg; }
+}
+
+.xl .item {
+  min-height: var(--portfolio-spacer-7x);
+  padding: 0 var(--portfolio-spacer-3x);
+  font-size: var(--portfolio-type-base);
+  line-height: $_icon-xl;
+  gap: $portfolio-spacer-utility-1-5x;
+
+  .iconWrap { width: $_icon-xl; height: $_icon-xl; }
+}
+
+// =============================================================================
+// ICON ONLY — square items
+// =============================================================================
+
+.iconOnly {
+  padding: 0 !important;
+}
+
+.xs .iconOnly { width: var(--portfolio-spacer-3x); }
+.sm .iconOnly { width: var(--portfolio-spacer-4x); }
+.md .iconOnly { width: var(--portfolio-spacer-5x); }
+.lg .iconOnly { width: var(--portfolio-spacer-6x); }
+.xl .iconOnly { width: var(--portfolio-spacer-7x); }

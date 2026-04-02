@@ -11,7 +11,24 @@ export { Card, CardHeader, CardBody, CardFooter } from "./Card";
 export type { CardProps, CardSectionProps, CardVariant } from "./Card";
 
 export { Badge } from "./Badge";
-export type { BadgeProps, BadgeVariant, BadgeSize, BadgeShape } from "./Badge";
+export type {
+  BadgeProps,
+  BadgeAppearance,
+  BadgeEmphasis,
+  BadgeSize,
+  BadgeShape,
+} from "./Badge";
+
+export { BadgeOverlay, BadgeOverlayAnchor } from "./BadgeOverlay";
+export type {
+  BadgeOverlayProps,
+  BadgeOverlayAnchorProps,
+  BadgeOverlayAppearance,
+  BadgeOverlayStatus,
+  BadgeOverlayEmphasis,
+  BadgeOverlaySize,
+  BadgeOverlayPlacement,
+} from "./BadgeOverlay";
 
 export { Divider } from "./Divider";
 export type { DividerProps, DividerOrientation } from "./Divider";
@@ -93,8 +110,14 @@ export type { DropzoneProps } from "./Dropzone";
 export { ProgressBar } from "./ProgressBar";
 export type { ProgressBarProps } from "./ProgressBar";
 
-export { SegmentedControl } from "./SegmentedControl";
-export type { SegmentedControlProps, SegmentedControlItem } from "./SegmentedControl";
+export { ButtonSelect, ButtonSelectItem } from "./ButtonSelect";
+export type {
+  ButtonSelectProps,
+  ButtonSelectItemProps,
+  ButtonSelectAppearance,
+  ButtonSelectEmphasis,
+  ButtonSelectSize,
+} from "./ButtonSelect";
 
 export { CodeBlock } from "./CodeBlock";
 export type { CodeBlockProps } from "./CodeBlock";
