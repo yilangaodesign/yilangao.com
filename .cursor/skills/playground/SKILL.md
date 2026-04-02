@@ -215,6 +215,21 @@ AFTER you finish writing code:
 
 ## Post-Build
 
+### Mandatory Flush-and-Restart (EAP-042 — no exceptions)
+
+After ANY edit to a playground file or a `src/` file consumed by the playground, you MUST flush and restart before reporting the task as done. Turbopack HMR is fundamentally unreliable for the playground — it fails more often than it succeeds. This is NOT a fallback step; it is the default.
+
+1. **Kill** the playground server: `lsof -ti :4001 | xargs kill -9`
+2. **Delete** the Turbopack cache: `rm -rf playground/.next`
+3. **Restart** the server: `npm run playground` (background it)
+4. **Wait** for HTTP 200: poll `curl -s -o /dev/null -w "%{http_code}" http://localhost:4001/components/<slug>` until 200
+5. **Verify** the specific change is in the response: `curl -s http://localhost:4001/components/<slug> | grep '<distinctive string from your edit>'`
+6. **Only then** report the task as done.
+
+Do NOT skip any step. Do NOT rely on HMR. Do NOT tell the user to "hard refresh" as the primary strategy. This protocol exists because the previous "try HMR first" approach failed 6+ times.
+
+### Cross-App Parity
+
 After building or modifying a playground page, run the Cross-App Parity Checklist from `AGENTS.md`. Key checks:
 
 1. If you created a new component in `src/components/ui/` to support this page, verify it works in the main site too

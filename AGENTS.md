@@ -43,7 +43,7 @@ dispatched by the orchestrator. Follow these rules:
 8. **NEVER** use ports below 4000 — they are reserved for other projects
 9. **NEVER** assume a dev server from a previous session is still running — verify it
 10. **ALWAYS** verify changes on localhost after implementation — HTTP 200 is NOT sufficient. For any change that touches React components, open the page in the browser (via `browser-use` subagent or equivalent) and check for console errors, hydration mismatches, and runtime warnings BEFORE reporting the task as done. `curl` only checks the server; React errors only appear in the browser.
-11. **ALWAYS** verify playground edits reached the browser — Turbopack HMR is unreliable for the playground (cross-directory `@ds/*` imports, stale WebSocket connections, incremental cache). After editing any playground file: (1) curl the page and confirm the specific change is in the response, (2) tell the user to hard-refresh (Cmd+Shift+R), (3) if the user still can't see it, `rm -rf playground/.next` + restart the server. NEVER report a playground edit as done without this verification. Violated 4+ times — see EAP-042.
+11. **ALWAYS** flush and restart the playground after ANY playground edit — Turbopack HMR is fundamentally unreliable for the playground (cross-directory `@ds/*` imports, stale WebSocket connections, incremental cache). HMR delivery fails more often than it succeeds. The flush-and-restart is NOT a fallback — it is the mandatory default step. After editing any playground file or any `src/` file consumed by the playground: (1) kill the playground server, (2) `rm -rf playground/.next`, (3) restart the server, (4) curl the page and confirm the specific change is in the HTML response, (5) ONLY THEN report as done. NEVER rely on HMR to deliver changes. NEVER skip the flush. NEVER report a playground edit as done without completing all 5 steps. Violated 6+ times — see EAP-042.
 12. **ALWAYS** trace data flow (source → build → server → browser) when debugging visibility issues
 13. **NEVER** render `<script>` elements in the React component tree (raw, `dangerouslySetInnerHTML`, or `next/script`) — React 19 warns on all of them. See EAP-013.
 14. **NEVER** branch rendered output on `typeof window` or `window.location` in client components — this causes hydration mismatches. Use `useState` + `useEffect` to defer client-only values. See EAP-014.
@@ -138,12 +138,38 @@ skill assignment, and gate identification internally.
     → Activate `cms-parity` skill at `.cursor/skills/cms-parity/SKILL.md`.
 
 11. **Am I doing a checkpoint, merge to main, or deploy?**
-    → Activate `checkpoint` skill at `.cursor/skills/checkpoint/SKILL.md`.
+    → If changes are already committed on `dev`: activate `checkpoint` skill directly at `.cursor/skills/checkpoint/SKILL.md`.
+    → If there are uncommitted changes and the user wants to release: activate `ship-it` skill instead (it will hand off to checkpoint after committing).
 
 12. **Am I creating or modifying components in `src/`?**
     → Activate `cross-app-parity` skill at `.cursor/skills/cross-app-parity/SKILL.md`.
 
+13. **Am I shipping / releasing / publishing all local changes?**
+    (triggers: "ship it", "publish", "release everything", "push it live", "deploy everything", "go live")
+    → Activate `ship-it` skill at `.cursor/skills/ship-it/SKILL.md`.
+    → This skill handles diff analysis, commit batching, and hands off to `checkpoint` for the release pipeline.
+
 Do NOT read docs that don't match your task. Do NOT read full doc files when only one section is relevant. The Section Index exists so you can target-read.
+
+# Mid-Flight: Verification Gate
+
+> **This gate runs AFTER implementation and BEFORE responding to the user or starting Post-Flight.**
+> You CANNOT skip this. You CANNOT respond to the user until every applicable check passes.
+> This exists because documentation alone does not change behavior — 6+ violations of playground verification prove that guardrails in reference files get forgotten mid-task. This gate is positioned at the point of failure: the moment between "I finished coding" and "I'm about to respond."
+
+**Check 1 — Playground delivery (if you touched ANY file under `playground/` or any `src/` file imported by the playground):**
+1. Kill the playground server (`lsof -ti :4001 | xargs kill -9`)
+2. Delete cache (`rm -rf playground/.next`)
+3. Restart (`npm run playground`, background it)
+4. Wait for HTTP 200 on the affected page
+5. `curl` the page and grep for a distinctive string from your edit to confirm it's in the response
+6. Only then proceed to Post-Flight / respond
+
+**Check 2 — Main site delivery (if you touched `src/` files that affect the main site):**
+1. Verify the main site dev server is running on port 4000
+2. `curl` the affected page and confirm HTTP 200
+
+**If a check fails, fix it before proceeding. Do NOT document or respond with "please hard refresh."**
 
 # Post-Flight: Mandatory Reflection
 

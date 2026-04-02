@@ -6,9 +6,20 @@ globs: playground/src/app/components/**
 
 **STOP. Read `.cursor/skills/playground/SKILL.md` before writing any code in this directory.**
 
+## Flush-and-Restart Gate (BLOCKING — runs after EVERY edit)
+
+**You are editing a playground file. When you finish, you MUST flush and restart before responding to the user.** Turbopack HMR does not reliably deliver changes to the playground. This has failed 6+ times. Do not skip this.
+
+1. Kill server: `lsof -ti :4001 | xargs kill -9`
+2. Clear cache: `rm -rf playground/.next`
+3. Restart: `npm run playground` (background)
+4. Wait for 200: `curl -s -o /dev/null -w "%{http_code}" http://localhost:4001/components/<slug>`
+5. Verify your change: `curl -s http://localhost:4001/components/<slug> | grep '<string from your edit>'`
+6. THEN respond.
+
 ## Intent Gate (Central Guardrail)
 
-**BEFORE editing**, classify the task per `AGENTS.md` Engineering guardrail #18:
+**BEFORE editing**, classify the task per `AGENTS.md` Engineering guardrail #22 (Intent Gate):
 - **Component visual** changes (how the component looks/behaves) → Edit `src/components/`, NOT this file. The playground auto-updates via `@ds/*` imports.
 - **Documentation / page structure** changes (demo sections, props tables, code examples, new parity pages) → Edit this file. This is legitimate.
 - **Shell** changes (sidebar, layout, IA, theme, ComponentPreview rendering) → Edit `playground/src/components/` or `playground/src/app/layout.tsx`, not this file.

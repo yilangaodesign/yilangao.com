@@ -10,6 +10,9 @@ description: >-
 
 - User says "checkpoint", "merge to main", or "deploy"
 - User asks about version bumps or release workflow
+- **Automatically activated by the `ship-it` skill** after commits are
+  batched and pushed — in this case, a semver recommendation will be
+  provided; confirm with the user before proceeding
 
 ## Manifest Structure (shared across all apps)
 
