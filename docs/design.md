@@ -4,7 +4,7 @@
 >
 > **Who reads this:** AI agents routed here by `AGENTS.md` Pre-Flight. Read the Section Index first, then open only the spoke file matching your task.
 > **Who writes this:** AI agents after processing user feedback via the `design-iteration` skill.
-> **Last updated:** 2026-04-01 (FB-082: Badge overlay contrast rule — visual hierarchy in navigation count +1)
+> **Last updated:** 2026-04-02 (FB-084: AdminBar — informational neutral Badge on chrome)
 
 ---
 
@@ -129,7 +129,9 @@ Before implementing or modifying any interactive component, enumerate **every vi
 | DS compliance (token adoption, mixin usage, brand color) | 1 | High |
 | Undocumented patterns (gradient bg, masonry, dark surface alpha) | 1 | Medium |
 | Button component sizing (icon/label proportionality, vertical padding) | 1 | High |
-| WCAG contrast for functional elements in dark mode | 4 | Critical |
+| NavItem sizing (padding, gap, trailing icon parity, touch tier) | 1 | High |
+| WCAG contrast for functional elements in dark mode | 5 | Critical |
+| Spacing must account for visual overflow, not box-model edges | 1 | High |
 
 ---
 

@@ -24,11 +24,13 @@ The admin/CMS editing UI (`src/components/ProjectEditModal.module.scss`, `src/co
 
 **Source:** DS compliance audit, 2026-03-30.
 
-### 19.1 When to Use the DS Button
+### 20.1 When to Use the DS Button
 
-**Rule:** Any new button that performs a standard action (submit, confirm, cancel, navigate) MUST use `Button` from `src/components/ui/Button/`. Available variants: `primary`, `secondary`, `ghost`, `danger`. Available sizes: `xs`, `sm`, `md`, `lg`, `xl`.
+**Rule:** Any new button that performs a standard action (submit, confirm, cancel, navigate) MUST use `Button` from `src/components/ui/Button/`. Available appearances: `neutral`, `highlight`, `positive`, `negative`, `warning`, `inverse`, `always-dark`, `always-light` (with `emphasis` and `size`). For `<a href="…">` navigation that must look like a button, compose the same appearance classes from `Button.module.scss` onto `Link` (see `AdminBar.tsx`) so hover, focus-visible, and dark-mode contrast fixes stay aligned with the DS.
 
-### 19.2 When Raw `<button>` + `@include button-reset` Is Acceptable
+**Reference composition — `AdminBar`:** The role label is **informational**, not a status or call-to-action — the toolbar copy and layout already explain edit mode, so the chip must not compete with primary actions. Use `<Badge appearance="neutral" emphasis="regular" size="sm" shape="squared">` (no `mono`, no brand `highlight`). **Always-dark chrome caveat:** `neutral`/`regular` maps `surface-neutral-minimal` to the same value as `surface-always-dark` when the site is in dark theme; `AdminBar.module.scss` adds `.adminContextBadge` to bump the fill to `surface-neutral-subtle` in `[data-theme="dark"]` / `.dark` so the bordered pill stays visible. Primary edit and secondary Dashboard links stay on `Button` module classes (`highlight`/`bold`/`sm` and `alwaysLight`/`subtle`/`sm`); dismiss uses `<Button appearance="always-light" emphasis="minimal" iconOnly>`.
+
+### 20.2 When Raw `<button>` + `@include button-reset` Is Acceptable
 
 Raw buttons are acceptable ONLY when all three conditions are met:
 1. The button has a highly custom visual identity that doesn't map to any DS Button variant (e.g., circular icon-only overlay, slider thumb, scrub control tick)
@@ -41,7 +43,7 @@ Raw buttons are acceptable ONLY when all three conditions are met:
 - **Testimonial slider arrows** — dark-surface navigation arrows
 - **Drag handles** — DnD affordance, not a standard button
 
-### 19.3 Missing Button Variant: Inverse
+### 20.3 Missing Button Variant: Inverse
 
 The contact page submit button uses `$portfolio-surface-inverse` background (black on light mode) — a pattern not covered by the current DS Button variants. Consider adding a `variant="inverse"` to the Button component.
 

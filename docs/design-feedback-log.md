@@ -4,10 +4,54 @@
 >
 > **Who reads this:** AI agents at session start (scan recent entries for context), and during feedback processing (check for recurring patterns).
 > **Who writes this:** AI agents after each feedback cycle via the `design-iteration` skill.
-> **Last updated:** 2026-04-01 (FB-082: Badge overlay contrast on collapsed NavItem)
+> **Last updated:** 2026-04-02 (FB-085: NavItemTrigger missing parent active state in playground demo)
 >
 > **For agent skills:** Read only the first 30 lines of this file (most recent entries) for pattern detection.
 > **Older entries:** Synthesized in `docs/design-feedback-synthesis.md`. Raw archive in `docs/design-feedback-log-archive.md`.
+
+---
+
+## Session: 2026-04-02 — Parent nav item active state propagation
+
+#### FB-085: "Parent nav items containing active children should also show active state (brand color)"
+
+**UX Intent:** In a tiered/hierarchical navigation, when a child item is active, the parent trigger must also reflect the active state. This is a basic navigation contract — the parent shows "you are in this section" while the child shows "you are on this page."
+
+**Root Cause:** The playground demo `TriggerCompositionDemo` in `vertical-nav/page.tsx` marked a child `NavItem` ("Badge") as `active activeAppearance="brand"` but did not pass `active` or `activeAppearance` to the parent `NavItemTrigger`. The design system component (`NavItemTrigger`) already supports these props — this was a demo authoring oversight, not a component logic gap. The real sidebar (`sidebar.tsx`) handles this correctly via `getCategoryForPath()` which computes active state for categories based on child path matching.
+
+**Resolution:** Added `active activeAppearance="brand"` to the `NavItemTrigger` in `TriggerCompositionDemo` and updated the code example string to show the correct pattern (including a comment reinforcing that parent active state must be explicitly set when a child is active).
+
+**Classification:** Playground documentation/demo fix — not a design system component change.
+
+**Principles reinforced:** Playground demos must correctly demonstrate the intended usage patterns of design system components, including state propagation conventions. A demo that shows incorrect state handling teaches consumers the wrong pattern.
+
+---
+
+## Session: 2026-04-02 — AdminBar role label (informational vs brand)
+
+#### FB-084: "Admin badge should be neutral regular — not bold brand; banner already explains context"
+
+**UX Intent:** The "Admin" chip is a **quiet role descriptor**, not a warning, success state, or primary affordance. The sticky bar and hint line already establish that the user is in edit mode. Using `highlight`/`bold`/`mono` overstates importance, pulls attention away from real actions (Edit / Dashboard), and violates informational hierarchy.
+
+**Root Cause:** The first AdminBar DS pass reused the most salient badge recipe (`highlight` + `bold`) suitable for **status** or **calls-to-action**, without separating **chrome metadata** (who you are / what mode) from **actionable emphasis** (what to do next).
+
+**Resolution:** Switched to `<Badge appearance="neutral" emphasis="regular" size="sm" shape="squared">`, removed `mono` (no tracked shout label). Added `.adminContextBadge` on the bar only: in dark site theme, `neutral`/`regular`'s minimal surface equals the always-dark bar color — one-tier surface lift to `surface-neutral-subtle` preserves border legibility. Documented rationale in `docs/design/admin-ui.md` §20 (AdminBar reference composition).
+
+**Pattern extracted → admin UI policy: On admin chrome, role/mode labels = `neutral` + `regular` (or softer); reserve `highlight`/`bold` for states and primary-adjacent emphasis.**
+
+---
+
+## Session: 2026-04-02 — AdminBar accessibility & design system alignment
+
+#### FB-083: "Admin edit view accessibility is horrible — use correct DS components and primitives"
+
+**UX Intent:** The sticky admin toolbar must meet WCAG contrast for all functional text and labels. It should read as part of the same design system as the rest of the product (Badge for status, Button for actions) rather than bespoke SCSS that drifts from token rules.
+
+**Root Cause:** `AdminBar` styled the "Admin" pill with `color: var(--portfolio-text-always-light-bold)` followed by `@include label`, and the primary CTA with `color: var(--portfolio-text-always-light-bold)` followed by `@include body-compact`. Both typography mixins assign `color: var(--portfolio-text-secondary)`, which **overrode** the intended on-brand / on-color text. In light mode that resolves to neutral-70 on accent-60 — failing contrast and matching the reported "unreadable Admin badge." Raw `<a>` / `<button>` markup also skipped DS `Button` behaviors (focus ring, dark-mode `highlight.bold` deepening to accent-60 for AA on filled brand buttons).
+
+**Resolution:** Replaced the custom badge with `<Badge appearance="highlight" emphasis="bold" size="sm" shape="squared" mono>`. Composed primary and secondary actions from `Button.module.scss` classes on `next/link` `<Link>` (plus a local `text-decoration: none` helper) for `highlight`/`bold`/`sm` and `alwaysLight`/`subtle`/`sm` respectively. Replaced the dismiss control with `<Button appearance="always-light" emphasis="minimal" iconOnly …>`. Wrapped the toolbar in `<aside aria-label="Admin editing toolbar">`.
+
+**Pattern extracted → `design-anti-patterns.md` AP-052: Typography mixins that set `color` must not be applied after explicit on-color text without re-overriding — prefer DS components on tinted surfaces. AdminBar called out in `docs/design/admin-ui.md` §20 as a reference composition.**
 
 ---
 
@@ -739,4 +783,207 @@ From Tailwind — **Partially adapt:** as implementation mechanism (`@theme` ove
 **Resolution:** Changed `highlight.bold` text color from `var(--portfolio-text-always-dark-bold)` to `var(--portfolio-text-inverse-bold)`, matching the Badge component's token assignment. White text on the brand-blue background exceeds WCAG AA for both normal and large text.
 
 **Pattern extracted -> `design.md`:** When creating companion components (e.g., BadgeOverlay from Badge), always cross-reference the parent component's token assignments for each variant. Saturated brand surfaces (≤ 50% lightness) require inverse (light) text — never dark text tokens. Audit every `appearance × emphasis` cell against WCAG AA (4.5:1) before shipping.
+
+---
+
+### Session: 2026-04-02 — Collapsed NavItem Badge Overlay Vertical Spacing
+
+#### FB-053: "The vertical spacing is cramped — badges are sticking out and there's barely any breathing room"
+
+**UX Intent:** When stacking collapsed NavItems with badge overlays vertically, the visual gap between items should feel open and breathable — not crowded by badges that overflow the element's bounding box.
+
+**Root Cause:** The playground "Collapsed with Badge Overlay" section used `gap-1` (4px) between vertically stacked collapsed NavItems. This gap is measured between the NavItem's CSS box-model edges — but badge overlays are `position: absolute` and extend ~6-10px beyond the top-right corner of the bounding box. The human eye perceives spacing as the distance between the closest *visible* elements, not between invisible box edges. With badges protruding upward and the next item's badge protruding downward, the *visual* gap was effectively 0px despite a 4px *layout* gap. This violates the design language's spacing principle: spacing must account for what the eye sees, not what the box model measures.
+
+**Resolution:** Increased gap from `gap-1` (4px) to `gap-3` (12px) in the "Collapsed with Badge Overlay" section. The 12px gap provides enough clearance for the badge overlay's visual footprint (~8px protrusion) plus minimum perceivable breathing room (~4px). Other sections without overflow elements retain `gap-1` since their box-model edges match their visual edges.
+
+**Pattern extracted -> `design.md`:** When stacking elements that contain positioned overlays (badge overlays, tooltips, status dots), the vertical/horizontal gap must account for the overlay's visual footprint, not just the parent element's box-model bounds. Rule of thumb: `gap ≥ overlay protrusion + minimum breathing room (4px)`.
+
+**Cross-category note:** Also documented as ENG-089/ENG-090 (engineering) for the `href="#"` breakage and `preventDefault` fix that occurred during the same session.
+
+---
+
+### Session: 2026-04-02 — VerticalNav Component & NavItem Brand Active Variant
+
+#### FB-054: "Build a VerticalNav design system component mirroring the playground sidebar"
+
+**UX Intent:** Promote the playground sidebar's interaction model and layout into a reusable design system component. The sidebar's 4-state model (default, hover, expanded, active with brand accent) should be formally available through the NavItem component.
+
+**Root Cause (NavItem active state gap):** NavItem's `.active` class used neutral colors (`surface-neutral-regular` background, `text-primary` text) — a generic active treatment. The playground sidebar's documented 4-state model (§4.5b) uses brand accent color for active state (`text-brand-bold`, no resting background, `surface-brand-subtle` hover). NavItem lacked this variant because it was built as a generic primitive before the sidebar's state model was formalized.
+
+**Resolution:**
+1. Added `activeAppearance` prop to NavItem: `"neutral"` (default, backward-compatible) and `"brand"` (accent color, no resting bg, brand-tinted hover). The brand variant maps to the playground sidebar's §4.5b active state.
+2. Added polymorphic `as` prop to NavItem for framework-agnostic link rendering (consumers pass `next/link` or any router component).
+3. Created VerticalNav compound component (`src/components/ui/VerticalNav/`) with Provider, Header, Content, Section, Group, Category, Footer, and SliverPortal subcomponents. All values use DS semantic tokens — no Tailwind, no inline styles.
+4. Added `$portfolio-duration-nav` (200ms) and `$portfolio-easing-nav` (ease-out) motion tokens for navigation spatial transitions.
+
+**Pattern extracted -> `design.md`:** NavItem supports two active appearance modes. Use `"brand"` in sidebar/vertical navigation contexts where accent color signals location. Use `"neutral"` in contexts where a subtle background-based active state is preferred (horizontal nav, settings panels).
+
+**Cross-category note:** Also documented as ENG-091 (engineering) for the motion token addition and VerticalNav component architecture.
+
+---
+
+### Session: 2026-04-02 — NavItem Tiered Architecture (Expanded State + NavItemTrigger + NavItemChildren)
+
+#### FB-055: "Category button states should belong to NavItem, not VerticalNav — need parent/children tier"
+
+**UX Intent:** The NavItem component should be the single source of truth for all navigation item visual states and behaviors, including expandable parent items. The tiered navigation pattern (parent with children) should be defined at the NavItem primitive level, not reimplemented at the sidebar layout level.
+
+**Root Cause:** VerticalNavCategory was a "shadow NavItem" — a complete parallel implementation (~80% shared visual DNA, zero shared code) with its own `.categoryButton`, `.categoryActive`, `.categoryExpanded`, `.categoryCollapsed`, `.categoryDisabled` SCSS classes. NavItem's 4-state model was incomplete: the design doc (§4.5b) defined four states (default, hover, expanded, active) but NavItem only implemented three — the "expanded" state (bold text, medium weight, no resting bg) was missing. This forced VerticalNavCategory to build it from scratch. The parent/children tier concept existed only inside VerticalNav, making it impossible to reuse in other contexts (horizontal nav, mobile drawer, settings panels).
+
+**Resolution:**
+1. Added `expanded` prop to NavItem (the missing 4th state): bold primary text, medium weight, no resting background. State priority: `active` > `expanded` > default.
+2. Created `NavItemTrigger` — an expandable parent that composes NavItem internally, adding an auto-rotating chevron in the trailing slot and controlled/uncontrolled expand/collapse behavior (`expanded`, `defaultExpanded`, `onExpandedChange`).
+3. Created `NavItemChildren` — an animated collapsible container using the nav motion token (200ms ease-out) for smooth height transitions.
+4. Refactored `VerticalNavCategory` to compose `NavItem` + `NavItemChildren` instead of raw `<button>` — eliminated all 11 duplicate SCSS classes (`.categoryButton`, `.categoryCollapsed`, `.categoryActive`, `.categoryExpanded`, `.categoryDisabled`, `.categoryIcon`, `.categoryLabel`, `.chevron`, `.chevronRotated`, `.mobileSubmenu`) from `VerticalNav.module.scss`.
+
+**Pattern extracted -> `design.md`:** Navigation tier behavior (expandable parent, collapsible children) belongs at the nav item primitive level, not the layout level. Layout components (VerticalNav, HorizontalNav) add spatial concerns (flyout portals, fixed positioning) but compose — never reimplement — the primitive. This follows the Carbon/Fluent UI "School A" pattern (separate leaf vs parent components).
+
+**Cross-category note:** Also documented as ENG-093 (engineering) for the architectural refactoring and duplication elimination.
+
+### Session: 2026-04-02 — NavItem Expanded Chevron, Expandable Badge, Trailing Spacing
+
+#### FB-056: "Expanded state has no chevron — and expandable items can have badges too"
+
+**UX Intent:** (1) The "Expanded" visual state demo should show the complete expandable appearance — including the rotated chevron — because users will never see an expanded item without one. (2) Expandable nav items can carry badges (notification counts, status indicators) alongside the chevron. (3) The trailing slot (chevron) should be right-aligned consistently with how badges are right-aligned.
+
+**Root Cause:** Three issues: (a) The "Four Visual States" section used a bare `<NavItem expanded>` which showed bold text but no chevron — misleading because in practice the expanded state always appears on a `NavItemTrigger` which includes the chevron. (b) `NavItemTrigger` did not support the `badge` prop, so there was no way to compose badges with expandable items. (c) The `.trailing` CSS class lacked `margin-inline-start: auto`, while `.badge` had it — this meant the trailing slot relied solely on `.label { flex: 1 }` for right-alignment instead of having its own explicit push-to-right behavior matching the badge.
+
+**Resolution:**
+1. Replaced `<NavItem expanded>` with a controlled `<NavItemTrigger expanded={true} onExpandedChange={() => {}}>` in the "Four Visual States" demo — now shows the complete expandable appearance with rotated chevron.
+2. Added `badge?: ReactNode` prop to `NavItemTrigger` (pass-through to NavItem). Badge renders between label and chevron.
+3. Added `margin-inline-start: auto` to `.trailing` in `NavItem.module.scss`, matching `.badge`'s existing right-alignment pattern. Both trailing content types now use the same CSS mechanism.
+4. Added "Expandable with Badge" demo section showing all three sizes with various badge types + chevrons.
+
+**Cross-category note:** Also documented as ENG-094 (engineering) for the component API addition and CSS fix.
+
+### Session: 2026-04-02 — DS Parity Remediation (Primitives Pass)
+
+#### FB-057: Systematic DS primitive adoption across portfolio site
+
+**UX Intent:** Bring all site-level SCSS into alignment with Elan design system primitives — tokens, typography mixins, layout mixins, interactive mixins, spacing, color, elevation, border, and z-index scales. No component swaps; restyle existing code using DS fundamentals. Motion explicitly deferred.
+
+**Root Cause:** Site code predated the design system's token and mixin expansion. Many values were hardcoded (font-family, font-size, font-weight, border-radius, padding, gap, z-index, rgba overlays) despite equivalent DS tokens/mixins existing. This created drift: a token change wouldn't propagate to site code.
+
+**Resolution:**
+1. **Contact page:** Replaced manual form focus/hover CSS with `@include form-field-focus` and `@include hover-micro-lift`; nav pill with `@include flex-between`; transitions with `@include transition-fast`. Extracted gradient to scoped custom properties. Replaced all 15+ `rgba(255,255,255,N)` with overlay tokens.
+2. **Experiments page:** Replaced nav font declarations with `@include body-sm-medium`, `@include subtitle-3-bold`; replaced all ~18 `rgba(255,255,255,N)` with overlay tokens.
+3. **elan-visuals:** Replaced `rgba(0,0,0,0.1)` with `$portfolio-overlay-black-10`, `border-radius: 2px/3px` with `$portfolio-radius-xs`, `z-index: 3` with `$portfolio-z-raised`.
+4. **inline-edit:** Replaced 9 instances of `font-family: system-ui` with `$portfolio-font-sans`, 20+ `font-weight` literals with weight tokens, 15+ `border-radius` values with radius tokens, 15+ `padding/gap` pixel values with spacer tokens.
+5. **ProjectEditModal:** Same pattern — `font-size`, `font-weight`, `border-radius`, `padding`, `gap`, `box-shadow` all moved to tokens.
+6. **Type scale:** Added `$portfolio-type-4xs` (9px). Bulk-replaced 28+ `font-size: 10px` → `$portfolio-type-2xs` and 5 `font-size: 9px` → `$portfolio-type-4xs` across 6 files.
+7. **Overlay tokens:** Extended `$portfolio-overlay-white-*` from 7 to 19 steps (04–75). Updated `_custom-properties.scss` to reference SCSS vars instead of hardcoding rgba.
+8. **z-index:** Replaced all 9 hardcoded `z-index: N` literals with semantic tokens across 6 files.
+9. **Cleanup:** Deleted dead `src/styles 2/` directory (11 files). Removed unused `tailwind-merge` + `clsx` deps and dead `cn()` utility.
+
+**Cross-category note:** Also documented as ENG-095 (engineering) for token sync, build verification, and dependency cleanup.
+
+#### FB-058: NavItem sizing adjustments informed by cross-system audit
+
+**UX Intent:** Align NavItem sizing with industry best practices from MUI, IBM Carbon, shadcn/ui, Ant Design, and Adobe Spectrum while preserving the design system's identity. Four specific adjustments: (1) increase sm horizontal padding from 6px to 8px to match md, (2) flatten md/lg gap from 8/10px to 8/8px, (3) unify trailing icon size with leading icon at every size, (4) add a touch-optimized size tier at 44px (Apple HIG minimum tap target).
+
+**Root Cause:** Cross-system audit revealed the sm padding (6px) was tighter than any major system, the lg gap (10px vs md's 8px) added complexity without perceptual benefit, trailing icons being 2px smaller than leading added specification overhead with no industry precedent, and the system lacked a mobile/touch tier that most modern systems include.
+
+**Resolution:**
+1. sm padding: 6px → 8px (now matches md; tokens: `$portfolio-spacer-utility-0-75x` → `var(--portfolio-spacer-1x)`)
+2. lg gap: 10px → 8px (flat with md; token: `$portfolio-spacer-utility-1-25x` → `var(--portfolio-spacer-1x)`)
+3. Trailing icon = leading icon at all sizes (deleted `$_nav-trailing-*` variables; `.trailing svg` now uses `$_nav-icon-*`)
+4. New `touch` size: 44px height, 16px font, 20px icon, 16px padding, 8px gap — content stays at lg scale, only the container grows
+5. Updated TypeScript type (`NavItemSize`), badge size map, and all playground demos
+
+**Principles reinforced:** Height is the primary size differentiator; icon and font can be held constant across larger sizes. Trailing icons should match leading icons unless there's a strong visual reason to differentiate. Touch targets are a first-class concern, not an afterthought.
+
+---
+
+#### FB-059: Hardcoded tool/technology tags should use DS Badge component
+
+**UX Intent:** Tool and technology tags displayed on case study detail pages and the experiments listing page were rendering as raw `<span>` elements with custom SCSS, bypassing the existing DS Badge component. The user requested an audit to identify all such instances and swap them with the Badge component for consistency.
+
+**Root Cause:** The tool tags predated the Badge component's creation. When Badge was added to the DS, existing pages were not retroactively updated. Two locations were hardcoded:
+1. **Case study detail pages** (`ProjectClient.tsx`) — `.toolTag` spans with custom caption styling, tertiary surface bg, and squared radius
+2. **Experiments listing** (`ExperimentsClient.tsx`) — `.tag` spans with custom mono/uppercase pill styling, transparent bg, and faint white border on dark background
+
+**Resolution:**
+1. Case study tools → `<Badge appearance="neutral" emphasis="subtle" size="sm" shape="squared">` — direct structural match; removed custom `.toolTag` SCSS class entirely
+2. Experiments tags → `<Badge appearance="always-light" emphasis="regular" size="sm" shape="pill" mono>` with a page-level `.tag` className override for dark-surface color adaptation (transparent bg, 12% white border, 40% white text). Badge handles shape, sizing, typography, and mono formatting; page handles context-specific color.
+3. Added Badge import to both client components
+
+**Principles reinforced:** When a DS component exists for a pattern (tags, badges, pills), always use it rather than recreating with raw elements + SCSS. Context-specific color overrides via className are acceptable when the Badge's structural CSS remains canonical.
+
+---
+
+#### FB-060: Uppercase label typography inconsistency — handrolled patterns replaced with `@include label` / `@include label-sm`
+
+**UX Intent:** All uppercase section labels, group headers, and category titles across the site should use the DS `label` or `label-sm` typography mixin for consistency. The user flagged "ROLE" / "TEAM" / "DURATION" / "TOOLS" labels on case study pages and asked whether all similar uppercase text uses the same DS style.
+
+**Root Cause:** The `label` and `label-sm` mixins existed in the DS but were not consistently adopted. Many components and pages recreated the same uppercase + tracked + small-font pattern with raw CSS properties, often with drifting letter-spacing values (`0.04em`, `0.05em`, `0.08em`, `0.1em` vs the canonical `$portfolio-tracking-wider: 0.05em`).
+
+**Resolution — 14 classes across 9 files replaced with mixin + overrides:**
+
+| File | Class(es) | Was | Now |
+|------|-----------|-----|-----|
+| CommandMenu.module.scss | `[cmdk-group-heading]` | raw props, `0.05em` | `@include label` + color override |
+| Select.module.scss | `.groupLabel` | raw props, tracking-wider | `@include label` + color override |
+| DropdownMenu.module.scss | `.label` | raw props, tracking-wider | `@include label` + color override |
+| TestimonialCard.module.scss | `.linkedinEditorLabel` | raw props, tracking-wider | `@include label` (exact match) |
+| DescriptionList.module.scss | `.label` | raw props, `0.05em`, mono | `@include label` + mono/color override |
+| ProjectEditModal.module.scss | `.fieldLabel` | raw props, `0.04em` | `@include label` + weight override |
+| inline-edit.module.scss | `.arrayFieldLabel`, `.formatLabel` | raw props, `0.05em` / `0.04em` | `@include label-sm` + overrides |
+| typography/page.module.scss | `.previewLabel` | partial raw props | `@include label` + color override |
+| elan-visuals.module.scss | 7 classes (section/dimension/group titles) | raw props, tracking-wider | `@include label-sm` or `@include label` + overrides |
+
+**Intentionally not changed:**
+- VerticalNav `.sectionLabel` / `.groupLabel` — uses `tracking-wide` (0.02em) instead of `tracking-wider` (0.05em), likely an intentional tighter tracking for the compact sidebar context
+- TestimonialCard `.avatarInitials` — `text-transform: uppercase` is for display initials (e.g., "JD"), conceptually different from a section label
+- Typography page mono labels (`.fontCategory`, `.specimenLabel`, `.controlLabel`) — mono-font demo labels, different pattern
+- Experiments `.rowDate` — mono-font date display on dark bg, different pattern
+- Admin NavPages — Payload admin context, cannot use SCSS `@include` (no `@use` import); uses CSS custom properties
+- Elan-visuals micro-labels (`type-4xs`, mono, brand-colored) — specialized data-viz annotations, too divergent from label mixin
+
+**Principles reinforced:** Typography mixins exist to prevent letter-spacing drift. When a class matches a mixin's intent (small uppercase tracked text used as a section/group/meta label), always use the mixin and override only the properties that differ (color, weight, font-family). This ensures that future type-scale changes propagate automatically.
+
+---
+
+#### FB-061: "Label text is too thick — uppercase labels should use regular (400) weight"
+
+**UX Intent:** The user found the uppercase "ROLE" / "TEAM" / "DURATION" / "TOOLS" labels on the case study sidebar too heavy and asked for a thinner weight — specifically at the design system mixin level, not as a one-off page fix.
+
+**Root Cause:** The `label` and `label-sm` mixins used `$portfolio-weight-medium` (500) as their default, and ~10 consumers further overrode to `$portfolio-weight-semibold` (600). Uppercase glyphs + wide letter-spacing (`tracking-wider: 0.05em`) already provide substantial visual weight — stacking `medium` or `semibold` on top creates double emphasis that competes with actual headings. Industry precedent (IBM Carbon, Adobe Spectrum) uses `regular` (400) for uppercase tracked labels.
+
+**Resolution:**
+1. Changed `@mixin label` and `@mixin label-sm` from `$portfolio-weight-medium` (500) → `$portfolio-weight-regular` (400)
+2. Removed all `font-weight: semibold` overrides from 10 consumers across 6 files:
+   - `work/[slug]/page.module.scss` — `.metaLabel`, `.projectNavLabel`
+   - `page.module.scss` — `.sectionLabel`
+   - `ProjectEditModal.module.scss` — `.fieldLabel`
+   - `inline-edit.module.scss` — `.arrayFieldLabel`, `.formatLabel` (was regular, now redundant)
+   - `elan-visuals.module.scss` — 6 section/group title classes
+
+**Principles reinforced:** Uppercase + tracking is itself an emphasis mechanism — the font-weight should compensate downward, not stack upward. Consumer overrides that contradict the mixin's canonical weight are a design system smell — if many consumers override the same property, the mixin default is wrong.
+
+---
+
+#### FB-062: "Zoom buttons and other elan-visual elements not using DS components"
+
+**UX Intent:** The user observed that the ArchitectureDag zoom buttons (+, −, ↺) were raw `<button>` elements with custom CSS instead of using the DS `Button` component. Audit revealed additional non-DS elements across all elan-visual case study components.
+
+**Root Cause:** The elan-visual components were built as bespoke case study visualizations before the DS component library reached full coverage. Custom implementations of buttons, tabs, and badges duplicated patterns already solved by DS components — creating maintenance burden and visual inconsistency.
+
+**Resolution:**
+1. **Zoom buttons** (EscalationTimeline.tsx) → DS `Button` with `iconOnly size="xs" appearance="neutral" emphasis="regular"` — removed `.dagZoomBtn` CSS class
+2. **Tab bars** in all 4 elan-visual components (EscalationTimeline, InteractionShowcase, ComponentShowcase, TokenGrid) → DS `Tabs` / `TabsList` / `TabsTrigger` / `TabsContent` (Radix UI) — eliminated ~80 lines of manual keyboard navigation and ARIA handling per component. Removed `.tabBar`, `.tab`, `.tabActive` CSS classes.
+3. **Badges** — `.escalationBadge` (EscalationTimeline) → DS `Badge appearance="highlight" emphasis="subtle" size="xs"`. `.densityBadge` (IncidentDensityMap) → DS `Badge appearance="highlight" emphasis="subtle" size="xxs" mono`.
+4. Removed dead CSS: `.closestMethodToggle`, `.tabWrong` (unreferenced in any TSX)
+5. Added `.tabList` override class for `overflow-x: auto` on DS TabsList
+
+**Elements intentionally kept as custom implementations:**
+- DAG nodes (`.dagNodeBox`) — absolute-positioned diagram elements with tier-specific coloring; no DS component equivalent
+- Escalation strikes (`.escalationStrike`) — interactive disclosure cards with custom layout
+- Density map rows (`.densityRow`) — accordion-like expandable items
+- Naming pills (`.namingPill`) — interactive dimension pickers in token builder
+- Color dropdown (`.colorDropdownTrigger`) — specialized picker UI
+- Funnel stages — data visualization bars
+
+These remain custom because they are purpose-built visualization primitives with no clean DS component mapping, but they all use DS tokens (colors, spacing, typography, radii) as their foundation.
+
+**Principles reinforced:** When a DS component exists for a pattern (Button, Tabs, Badge), use the component — even in bespoke visualizations. Custom CSS that reimplements DS component behavior is maintenance debt. Visualization-specific elements that don't map to any DS component are acceptable when they use DS tokens.
 

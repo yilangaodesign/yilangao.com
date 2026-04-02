@@ -4,7 +4,7 @@
 >
 > **Who reads this:** AI agents before making UI changes — scan for relevant anti-patterns.
 > **Who writes this:** AI agents when a feedback cycle reveals a new anti-pattern.
-> **Last updated:** 2026-04-01 (AP-050: Subtle-emphasis overlay badges blending with parent surface)
+> **Last updated:** 2026-04-02 (AP-052: Typography mixin color clobbering on-color text)
 
 ---
 
@@ -18,10 +18,10 @@
 | Theming & Dark Mode | AP-042, AP-043, AP-044, AP-047 | 4 | 4 |
 | Interaction & Pointer Behavior | AP-011, AP-012, AP-022, AP-025, AP-035 | 5 | 5 |
 | Navigation & Menus | AP-014, AP-015, AP-016, AP-029, AP-046, AP-049 | 6 | 6 |
-| Visual Hierarchy & Affordances | AP-010, AP-017, AP-019, AP-026, AP-030, AP-032, AP-039, AP-040, AP-041, AP-048‡, AP-050 | 11 | 11 |
+| Visual Hierarchy & Affordances | AP-010, AP-017, AP-019, AP-026, AP-030, AP-032, AP-039, AP-040, AP-041, AP-048‡, AP-050, AP-051, AP-052 | 13 | 13 |
 | Form & Input UX | AP-023, AP-024, AP-028, AP-036 | 4 | 4 |
 | Admin UI Patterns | AP-034, AP-037 | 2 | 2 |
-| **Total** | | **51** | **51** |
+| **Total** | | **53** | **53** |
 
 > **†** AP-048 "Independent Padding Decisions Across Adjacent Panels" (spacing entry)
 > **‡** AP-048 "Incremental State-by-State Implementation Without a Holistic Model" (state modeling entry)
@@ -788,6 +788,62 @@ Use `var(--ds-*, #{$scss-fallback})`. The CSS custom property adapts at runtime;
 **Correct alternative:** Overlay badges must always use `emphasis="bold"` (inverse surface = maximum contrast: black-on-white in light, white-on-black in dark). When the parent component enters an active/selected state that uses the brand color, the badge must also switch to `appearance="highlight"` to maintain visual coherence — active state must propagate to all nested semantic elements (icon, label, badge).
 
 **Frustration caused:** 1 round (FB-082). The gray badge blended completely with the NavItem surface, making the notification indicator invisible.
+
+---
+
+## AP-051: Box-Model Gap on Elements with Positioned Overlays
+
+**Trigger:** Using standard flex/grid `gap` values (e.g., `gap-1`) between stacked elements that contain `position: absolute` overlay indicators (badge overlays, status dots, notification pips) without accounting for the overlay's visual protrusion.
+
+**Why it's wrong:** CSS `gap` measures distance between box-model edges, but positioned overlays extend beyond those edges. The human eye perceives spacing as the distance between the closest *visible* elements. When overlays protrude 6-10px beyond the box and the gap is only 4px, the visual spacing is effectively zero — badges from adjacent items appear to touch or overlap. This makes the layout feel cramped and violates the design language's breathing-room principle.
+
+**Correct alternative:** When stacking elements with overflow overlays, set `gap ≥ overlay protrusion + minimum breathing room (4px)`. For NavItem collapsed badge overlays (~8px protrusion), use `gap-3` (12px) minimum. For elements without overflow, `gap-1` (4px) remains appropriate since box-model edges match visual edges.
+
+**Frustration caused:** 2 rounds (FB-053). User flagged the section as "cramped" and "violating design principles."
+
+---
+
+## AP-051: Recreating Badge/Tag/Pill Styling with Raw `<span>` + Custom SCSS
+
+**Status: ACTIVE**
+
+**Trigger:** Rendering a list of labels (tools, technologies, skills, categories) as plain `<span>` elements with bespoke SCSS classes (`.toolTag`, `.tag`, `.chip`, etc.) instead of using the DS `Badge` component.
+
+**Why it's wrong:** The DS Badge component already encodes the correct sizing, spacing, typography, shape, and theming logic across all appearance×emphasis combinations. Custom SCSS reimplementations diverge from the canonical styling, don't benefit from future Badge improvements, and create maintenance burden — every visual refinement to Badge must be manually replicated in every custom tag class. The pattern also makes auditing impossible: searching for `<Badge>` usage won't reveal these shadow implementations.
+
+**Correct alternative:** Use `<Badge>` with the appropriate `appearance`, `emphasis`, `size`, `shape`, and `mono` props. When the page context requires color adaptation (e.g., dark-surface backgrounds where no Badge appearance exactly matches), pass a `className` override for only the color/border/background properties — let Badge handle structure, shape, sizing, and typography.
+
+**Frustration caused:** 1 round (FB-059). Found during audit — 2 locations (case study detail + experiments listing) were using custom spans instead of Badge.
+
+---
+
+## AP-052: Typography Mixin Color Clobbering On-Color Text
+
+**Status: ACTIVE**
+
+**Trigger:** Setting `color: var(--portfolio-text-always-light-bold)` (or any on-surface / on-color token) on a branded pill, filled button, or tinted chip, then calling `@include label`, `@include body-compact`, or another typography mixin that **also** sets `color` to a neutral semantic token (`--portfolio-text-secondary`, etc.).
+
+**Why it's wrong:** Sass emits declarations in source order. The mixin’s `color` wins, replacing the intended high-contrast pairing. On brand fills this often yields dark gray on saturated blue — failing WCAG and defeating the purpose of `always-light` / `text-on-color` tokens.
+
+**Correct alternative:** Use DS components (`Badge`, `Button`) whose SCSS pairs background and text in one place. If mixing custom layout with mixins, **apply the mixin first**, then set `color` again afterward — or extract a typography-only mixin without `color`. For navigation styled as buttons, reuse `Button.module.scss` classes on `<Link>` so dark-mode contrast fixes (e.g. `highlight.bold` on `[data-theme="dark"]`) stay centralized.
+
+**Frustration caused:** 1 round (FB-083). Admin toolbar "Admin" badge and primary CTA were effectively using body/label text colors on brand backgrounds.
+
+---
+
+---
+
+## AP-053: Reimplementing DS Components in Bespoke Visualizations
+
+**Status: ACTIVE**
+
+**Trigger:** Creating raw `<button>`, `<div role="tablist">`, or `<span class="badge">` elements with custom CSS in visualization components when the DS already provides `Button`, `Tabs`, or `Badge` components with the same semantics.
+
+**Why it's wrong:** Custom implementations duplicate behavior the DS already provides — keyboard navigation, ARIA attributes, focus management, hover/active states, dark mode support. Each custom reimplementation is a maintenance fork that won't benefit from DS improvements. Even when styling needs to be compact (e.g., `xs` buttons in a diagram toolbar), the DS components support size variants.
+
+**Correct alternative:** Always check the DS component library first. If a DS component exists for the pattern, use it with appropriate `size`/`emphasis`/`appearance` props. Add a CSS module override class only for context-specific adjustments (e.g., `overflow-x: auto` on a TabsList). Reserve custom implementations for truly novel visualization primitives (diagram nodes, density dots, funnel bars) that have no DS component equivalent — but still use DS tokens.
+
+**Frustration caused:** 1 round (FB-062). 4 components × 3 element types (buttons, tabs, badges) were all using custom implementations.
 
 ---
 

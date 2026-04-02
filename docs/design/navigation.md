@@ -4,6 +4,16 @@
 
 ## §4 Navigation Design
 
+**Canonical implementation:** `src/components/ui/VerticalNav/` — the design system's compound sidebar component. All principles documented below are encoded in this component's SCSS and behavior. The playground sidebar (`playground/src/components/sidebar.tsx`) was the original reference implementation; VerticalNav is the production DS equivalent.
+
+**Component hierarchy:**
+- **NavItem** (leaf) — link or button. Four visual states: default, hover, expanded, active (neutral or brand).
+- **NavItemTrigger** (expandable parent) — composes NavItem internally with auto-rotating chevron. Supports controlled (`expanded` + `onExpandedChange`) and uncontrolled (`defaultExpanded`) modes. Renders as `<button>` — parent items don't navigate, their children do.
+- **NavItemChildren** (collapsible container) — animated expand/collapse using nav motion token (200ms ease-out). Indented child layout.
+- **VerticalNavCategory** (layout-level composition) — composes NavItem + NavItemChildren. Adds desktop sliver flyout via `useSafeTriangle` + `createPortal`. Mobile uses NavItemChildren for inline accordion.
+
+**Design principle:** Navigation tier behavior (expandable parent, collapsible children) is defined at the NavItem primitive level, not the layout level. Layout components (VerticalNav) add spatial concerns (flyout portals, fixed positioning) but compose — never reimplement — the nav item primitive. This follows the Carbon/Fluent UI "School A" pattern.
+
 ### 4.1 Collapsible Sidebar (Left-Anchored, Collapsed-First Spacing)
 
 Every persistent sidebar must support two states:

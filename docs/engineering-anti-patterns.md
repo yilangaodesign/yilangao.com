@@ -4,7 +4,7 @@
 >
 > **Who reads this:** AI agents before making code changes — scan for relevant anti-patterns.
 > **Who writes this:** AI agents when an incident reveals a new anti-pattern.
-> **Last updated:** 2026-04-01 (EAP-042: Reporting playground changes without verifying browser delivery — recurring pattern, 4+ incidents)
+> **Last updated:** 2026-04-02 (EAP-042 ESCALATED: Flush-and-restart is now mandatory default, not fallback — 6+ violations. Previous soft protocol failed repeatedly.)
 
 ## Category Index
 
@@ -870,36 +870,86 @@ The `--ds-*` custom property adapts at runtime; the SCSS interpolation `#{$scss-
 
 ---
 
-## EAP-042: Reporting Playground Changes as Done Without Verifying Browser Delivery
+## EAP-042: Reporting Playground Changes as Done Without Flushing Cache and Restarting
 
-**Status: ACTIVE**
+**Status: ACTIVE — ESCALATED (6+ violations)**
 
-**Trigger:** Editing a playground file (`playground/src/app/components/*/page.tsx` or any playground source file), confirming the edit in the source code, and reporting the task as complete — without verifying the change is visible in the browser.
+**Trigger:** Editing a playground file (or any `src/` file consumed by the playground) and reporting the task as complete without flushing the Turbopack cache and restarting the server.
 
-**Why it's wrong:** Turbopack's Hot Module Replacement (HMR) in the playground is unreliable. Multiple environmental factors cause the browser to show stale content even after a successful file edit:
-1. **HMR doesn't trigger:** The file watcher may not detect the change, or the WebSocket push may fail silently. The server-side render updates (curl returns correct HTML) but the client bundle stays stale.
-2. **Dead WebSocket connections:** Previous server restarts leave `CLOSE_WAIT` connections that the browser holds open. The HMR client may be connected to a dead socket.
+**Why it's wrong:** Turbopack's Hot Module Replacement (HMR) in the playground is **fundamentally unreliable**. HMR delivery fails more often than it succeeds. Multiple environmental factors cause the browser to show stale content:
+1. **HMR doesn't trigger:** The file watcher may not detect the change, or the WebSocket push may fail silently.
+2. **Dead WebSocket connections:** Previous server restarts leave `CLOSE_WAIT` connections.
 3. **Turbopack incremental cache:** `.next/` retains compiled chunks that may not invalidate correctly, especially for files with cross-directory imports (`@ds/*` → `../src/components/`).
-4. **Browser cache:** Even with fresh server output, the browser may serve a cached page if the HMR notification never arrived.
+4. **Browser cache:** Even with fresh server output, the browser may serve a cached page.
 
-The technical issues are environmental constraints of the development stack (Next.js 16 + Turbopack + cross-directory imports). They may improve in future versions but are not currently fixable. The agent's process must work around them.
+These are not edge cases — they are the **default behavior**. The previous version of this protocol treated flush-and-restart as a fallback. That approach failed 6+ times because the agent kept hoping HMR would work and only flushed when the user complained. The user should NEVER have to ask for this.
 
-**Correct alternative — mandatory post-edit verification protocol:**
-1. After editing any playground file, **curl the page** and verify the specific change appears in the HTML response.
-2. If the change IS in the curl response:
-   - Tell the user to **hard refresh** (Cmd+Shift+R / Ctrl+Shift+R).
-   - If the user still can't see it, proceed to step 3.
-3. If the change is NOT in the curl response, or hard refresh didn't work:
-   - Kill the playground server process.
-   - Clear the Turbopack cache: `rm -rf playground/.next`
-   - Restart: `npm run playground`
-   - Wait for compilation, verify via curl again.
-   - Tell the user to hard refresh.
-4. **Never report a playground edit as complete until the user confirms they can see it, or a browser agent has verified it.**
+**Correct alternative — mandatory flush-and-restart protocol (no exceptions):**
 
-**Recurring pattern:** 4+ occurrences across sessions. The user has explicitly called out the repetition and expressed frustration. Each time the cycle is: edit → "done" → user can't see → diagnose → kill + restart → works. The diagnostic step is wasted user time that could be eliminated by verifying proactively.
+After editing ANY playground file or ANY `src/` file consumed by the playground:
 
-**Incident:** ENG-085 (2026-04-01), plus 3+ undocumented prior occurrences across sessions.
+1. **Kill** the playground server process.
+2. **Delete** the Turbopack cache: `rm -rf playground/.next`
+3. **Restart** the server: `npm run playground`
+4. **Wait** for the server to be ready (poll with `curl` until HTTP 200).
+5. **Verify** the specific change appears in the HTML response (grep for a distinctive string from the edit).
+6. **Only then** report the task as done.
+
+Do NOT skip any step. Do NOT try HMR first. Do NOT tell the user to "hard refresh" as the primary strategy. The flush-and-restart IS the verification — it costs 10 seconds and eliminates 100% of the stale-cache incidents.
+
+**Why the previous protocol failed:** The old protocol was: curl → tell user to hard-refresh → if still broken, then flush. This three-step escalation path introduced two failure points (curl succeeds but browser is stale; user hard-refreshes but WebSocket is dead) before reaching the step that actually works. The agent repeatedly stopped at step 1 or 2 and reported success. The root cause was treating the flush as expensive/disruptive when it's actually cheap (10s) compared to the user's debugging time (minutes).
+
+**ENFORCEMENT:** AGENTS.md Hard Guardrail #11 now mandates flush-and-restart as the default — not the fallback. Any agent that reports a playground edit as done without completing all 6 steps above is in violation.
+
+**Recurring pattern:** 6+ occurrences across sessions (ENG-085, ENG-094, plus 4+ undocumented). User has explicitly called out the repetition multiple times: "This process has been repeated again and again and again. I have to ask you multiple times to redo this, and you don't seem to have learned the lesson."
+
+---
+
+## EAP-057: Placeholder `href="#"` on Static Component Demos
+
+**Trigger:** Playground or docs pages render link-styled components with `href="#"` (or `href=""`) so "something is focusable," but the demo must not navigate.
+
+**Why it's wrong:** `href="#"` triggers fragment navigation on the current URL. Browsers scroll to the top (or toggle history), which feels like a broken interaction and confuses users reviewing visual-only previews.
+
+**Instead:** Omit `href` when the component supports button mode (e.g. `NavItem` → `<button type="button">`) — **but only after verifying the component's SCSS fully resets `<button>` UA defaults** (font, padding, text-align, line-height). If the SCSS does not normalize `<a>` vs `<button>`, removing `href` will cause visible layout breakage because browser default button styles interfere with the component's flex layout. **Keep `href="#"` with `onClick={(e) => e.preventDefault()}` as the safe fallback** until the component's SCSS is updated to include button resets.
+
+**Incident:** ENG-088 (2026-04-01), ENG-089 (2026-04-02) — `playground/src/app/components/nav-item/page.tsx`. ENG-089: bulk `href` removal broke NavItem icon-label spacing across all playground sections. Reverted.
+
+---
+
+## EAP-058: Embedding Fixed-Position Layout Components in Preview Containers
+
+**Trigger:** Creating a playground demo page that renders a full-page layout component (`position: fixed`, `createPortal(document.body)`) inside a bounded preview `<div>`.
+
+**Why it's wrong:** `position: fixed` escapes all ancestor containers — CSS `overflow: hidden` and inline style overrides don't contain it. `createPortal(document.body)` renders DOM nodes at the body level regardless of the React tree structure. The result: the layout component's panels (sidebars, slivers, backdrops) cover the real page, including the playground shell's own navigation. Inline style hacks (`style={{ position: "relative" }}`) lose to SCSS module specificity.
+
+**Correct alternative:** For full-page layout components (VerticalNav, AppShell, etc.): (1) demonstrate embeddable subcomponents individually (section dividers, group headers, nav items), (2) show the full composition API via code examples only, (3) point users to the layout component's actual usage (e.g., "this playground's sidebar IS the live demo"). Never instantiate the layout root component inside a `ComponentPreview`.
+
+**Incident:** ENG-092 (2026-04-02) — `playground/src/app/components/vertical-nav/page.tsx`. `MiniSidebarDemo` embedded `VerticalNav` + `SliverPortal` inside a 400px div. Sliver portaled to body at `position: fixed; top: 0; left: 200px; height: 100vh`, covering the entire playground shell sidebar.
+
+---
+
+## EAP-058: Assuming spacer-NNx exists without utility- prefix
+
+**Trigger:** Writing `$portfolio-spacer-0-75x` or other sub-grid spacer values without the `utility-` prefix.
+
+**Why it's wrong:** Sub-grid spacer tokens (those not on the 8px base grid) use a `utility-` prefix: `$portfolio-spacer-utility-0-75x`, `$portfolio-spacer-utility-1-25x`, etc. The non-utility shorthand does not exist and causes SCSS compilation failure.
+
+**Correct alternative:** Always check the spacer token file or use the `utility-` prefix for non-grid-aligned values (0.75x, 0.875x, 1.25x, 1.75x, 2.25x, etc.).
+
+**Incident:** ENG-095 (2026-04-02) — 20 instances of `$portfolio-spacer-0-75x` caused build failure.
+
+---
+
+## EAP-059: Using SCSS variables in Payload admin SCSS files
+
+**Trigger:** Bulk-replacing CSS values with `$portfolio-*` SCSS variables in files under `src/components/admin/`.
+
+**Why it's wrong:** Payload admin SCSS files don't `@use` the DS styles barrel. They use Payload's `--theme-*` CSS custom properties. Injecting an SCSS variable without the `@use` import causes an "undefined variable" compilation error.
+
+**Correct alternative:** In admin-scoped SCSS files, use CSS custom properties (`var(--portfolio-*)`) instead of SCSS variables.
+
+**Incident:** ENG-095 (2026-04-02) — `NavPages.module.scss` build failure from `$portfolio-type-2xs` without import.
 
 ---
 

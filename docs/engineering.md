@@ -4,7 +4,7 @@
 >
 > **Who reads this:** AI agents routed here by `AGENTS.md` Pre-Flight. Read the Section Index first, then follow the link to the spoke file matching your task.
 > **Who writes this:** AI agents after processing engineering feedback via the `engineering-iteration` skill.
-> **Last updated:** 2026-04-01 (ENG-085: Playground HMR verification failure — escalated to Critical, EAP-042)
+> **Last updated:** 2026-04-02 (ENG-095: Playground flush-and-restart protocol escalation — guardrail #11 rewritten, EAP-042 escalated)
 
 ---
 
@@ -110,7 +110,7 @@ Recurring incidents should be escalated up this hierarchy until they stop recurr
 | Port management | 0 | Critical |
 | Localhost verification | 1 | Critical |
 | Build / bundler issues (React 19 compat) | 4 | **Critical — 3 failed fixes (ENG-017→018→019). Rule: no `<script>` in React tree. See EAP-013.** |
-| Turbopack cache / HMR delivery failure | 4+ | **Critical — ESCALATED. ENG-047, ENG-056, ENG-067, ENG-085 + 3 undocumented. Stale `.next/` caused runtime TypeError (047), phantom route conflicts (056), ghost hydration mismatch (067), and recurring playground edit invisibility (085). Rule: after every playground edit, verify via curl + instruct user to hard-refresh. If change not visible, `rm -rf playground/.next` + restart. NEVER report a playground edit as done without verification. See EAP-035, EAP-042.** |
+| Turbopack cache / HMR delivery failure | 6+ | **Critical — ESCALATED TWICE. ENG-047, ENG-056, ENG-067, ENG-085, ENG-094, ENG-095 + undocumented. Previous "soft" protocol (curl → hard-refresh → flush as fallback) failed 6+ times because the agent stopped at step 1-2 and reported success. AGENTS.md #11 REWRITTEN: flush-and-restart is now the MANDATORY DEFAULT, not a fallback. After ANY playground edit: kill server → `rm -rf playground/.next` → restart → curl verify → report done. No HMR reliance. No exceptions. See EAP-042 (escalated).** |
 | Verification gap (reporting done without browser check) | 3 | **Critical — promoted to Hard Guardrail #10 (ENG-020). curl ≠ verification.** |
 | Process automation gaps | 1 | High |
 | Documentation procedure skips | 3 | **Critical — promoted to Hard Guardrail #1 (ENG-012)** |
@@ -131,6 +131,12 @@ Recurring incidents should be escalated up this hierarchy until they stop recurr
 | Playground ↔ production drift (one-way experiment) | 2 | **Critical — ENG-073, ENG-074. Drift from non-propagation AND from rebuilding demos with hardcoded values instead of token references. See EAP-030, EAP-055.** |
 | Playground component re-implementation drift | 3 | **Resolved — ENG-073/075/076. Three-stage enforcement pipeline: (1) Central Intent Gate in AGENTS.md #18 blocks component visual edits to playground, (2) ESLint inline plugin catches forbidden patterns in playground pages, (3) Evaluation Gate with correction loop in playground skill. See EAP-037.** |
 | SCSS token theme adaptability | 2 | **Resolved — ENG-082/083. Full CSS custom property output layer (`_custom-properties.scss`) now generates `:root` (light) and `[data-theme="dark"]` blocks. ~40 SCSS modules migrated from `$portfolio-*` to `var(--portfolio-*)`. 43 component-level `$_` tokens introduced for hardcoded px values. Remaining 202 SCSS refs are documented exceptions (rgba(), always-dark surfaces, interaction state tints).** |
+| Playground demo placeholder links | 3 | **High — ENG-088/089/090. ENG-088: `href="#"` scrolls to top. ENG-089: removing `href` broke NavItem layout because SCSS doesn't reset `<button>` UA defaults. ENG-090: resolved with `onClick={prevent}` + `"use client"` — keeps `<a>` rendering for correct SCSS while suppressing navigation. See EAP-057.** |
+| Token expansion (motion) | 1 | Low — ENG-091. Added `$portfolio-duration-nav` (200ms) and `$portfolio-easing-nav` (ease-out) for navigation spatial transitions. Fills gap between fast (110ms) and moderate (240ms). |
+| Fixed-position component in preview container | 1 | High — ENG-092. Embedding `position: fixed` + `createPortal(body)` layout components in playground preview divs causes DOM escape. Layout components demo via code + subcomponent previews only. See EAP-058. |
+| Component duplication / shadow implementation | 1 | High — ENG-093. VerticalNavCategory reimplemented ~80% of NavItem's visual DNA with 11 parallel SCSS classes. Resolved by adding `expanded` state to NavItem + creating NavItemTrigger/NavItemChildren primitives. Layout components must compose — never reimplement — the nav item primitive. |
+| Component API prop pass-through gap | 1 | Medium — ENG-094. NavItemTrigger lacked `badge` prop pass-through to NavItem. Wrapper components must forward all visual props of the inner primitive they compose. |
+| CSS alignment inconsistency (.badge vs .trailing) | 1 | Medium — ENG-094. `.badge` had `margin-inline-start: auto` but `.trailing` didn't. Both right-aligned slots should use the same CSS mechanism. |
 
 ---
 
