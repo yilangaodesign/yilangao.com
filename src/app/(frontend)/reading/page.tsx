@@ -17,7 +17,7 @@ const FALLBACK_BOOKS = [
 ];
 
 export default async function ReadingPage() {
-  let books: { id?: number; title: string; url: string }[] = FALLBACK_BOOKS;
+  let books: { id?: string | number; title: string; url: string }[] = FALLBACK_BOOKS;
   const isAdmin = await isAdminAuthenticated();
 
   try {

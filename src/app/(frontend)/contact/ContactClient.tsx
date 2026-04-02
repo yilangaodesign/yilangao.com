@@ -16,7 +16,7 @@ import type { ApiTarget, FieldDefinition } from "@/components/inline-edit";
 import styles from "./page.module.scss";
 
 interface Testimonial {
-  id?: number;
+  id?: string | number;
   text: string;
   textHtml?: string;
   name: string;
@@ -38,8 +38,8 @@ const CLIENT_FIELDS: FieldDefinition[] = [
   { name: 'url', label: 'Website', type: 'url' },
 ];
 
-function testimonialTarget(id: number): ApiTarget {
-  return { type: 'collection', slug: 'testimonials', id };
+function testimonialTarget(id: string | number): ApiTarget {
+  return { type: 'collection', slug: 'testimonials', id: id as number };
 }
 
 export default function ContactClient({ testimonials, clients, isAdmin }: ContactClientProps) {

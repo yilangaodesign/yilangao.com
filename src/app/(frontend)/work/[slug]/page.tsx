@@ -136,7 +136,7 @@ type Props = {
 export default async function ProjectPage({ params }: Props) {
   const { slug } = await params;
 
-  let project: typeof FALLBACK_PROJECT & { id?: number } = FALLBACK_PROJECT;
+  let project: typeof FALLBACK_PROJECT & { id?: string | number } = FALLBACK_PROJECT;
   let prevProject: AdjacentProject = null;
   let nextProject: AdjacentProject = null;
   const isAdmin = await isAdminAuthenticated();

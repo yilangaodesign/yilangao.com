@@ -13,7 +13,7 @@ import type { ReactNode } from "react";
 
 export type ApiTarget =
   | { type: "global"; slug: string }
-  | { type: "collection"; slug: string; id: number };
+  | { type: "collection"; slug: string; id: number | string };
 
 export interface DirtyField {
   target: ApiTarget;
@@ -56,7 +56,7 @@ export function EditableText(props: {
 
 export function DeleteItemButton(_props: {
   collection: string;
-  id: number;
+  id: number | string;
   itemLabel?: string;
 }) {
   return null;

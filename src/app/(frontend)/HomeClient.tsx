@@ -39,13 +39,13 @@ import type { ApiTarget, FieldDefinition } from "@/components/inline-edit";
 import styles from "./page.module.scss";
 
 type Project = {
-  id?: number;
+  id?: string | number;
   slug: string;
   title: string;
   category: string;
   featured: boolean;
   coverImage?: string | null;
-  heroImageId?: number | null;
+  heroImageId?: string | number | null;
 };
 
 type Team = { name: string; url: string; period: string };
@@ -69,7 +69,7 @@ const LINK_FIELDS: FieldDefinition[] = [
   { name: 'external', label: 'Open in new tab', type: 'checkbox' },
 ];
 
-function projectTarget(id: number): ApiTarget {
+function projectTarget(id: string | number): ApiTarget {
   return { type: 'collection', slug: 'projects', id };
 }
 
@@ -133,7 +133,7 @@ type GridItem =
   | { type: "project"; data: Project }
   | { type: "testimonial"; data: TestimonialCardProps };
 
-type GridOrderEntry = { type: string; id: number };
+type GridOrderEntry = { type: string; id: string | number };
 
 function gridItemId(item: GridItem): string {
   if (item.type === "project") return `project-${(item.data as Project).id}`;

@@ -36,7 +36,7 @@ type Tool = { name: string };
 type ExternalLink = { label: string; href: string };
 
 type ProjectData = {
-  id?: number;
+  id?: string | number;
   title: string;
   category: string;
   description: string;

@@ -13,9 +13,9 @@ import {
 import type { ApiTarget } from "@/components/inline-edit";
 import styles from "./page.module.scss";
 
-type Book = { id?: number; title: string; url: string };
+type Book = { id?: string | number; title: string; url: string };
 
-function bookTarget(id: number): ApiTarget {
+function bookTarget(id: string | number): ApiTarget {
   return { type: 'collection', slug: 'books', id };
 }
 

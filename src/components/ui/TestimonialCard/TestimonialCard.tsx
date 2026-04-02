@@ -10,7 +10,7 @@ import EditButton from "@/components/EditButton";
 import styles from "./TestimonialCard.module.scss";
 
 export type TestimonialCardProps = {
-  id?: number;
+  id?: string | number;
   text: string;
   textHtml?: string;
   name: string;
@@ -29,7 +29,7 @@ function getInitials(name: string): string {
     .toUpperCase();
 }
 
-function testimonialTarget(id: number): ApiTarget {
+function testimonialTarget(id: string | number): ApiTarget {
   return { type: "collection", slug: "testimonials", id };
 }
 
@@ -52,7 +52,7 @@ function LinkedInEditor({
   currentUrl,
   onClose,
 }: {
-  id: number;
+  id: string | number;
   currentUrl: string;
   onClose: () => void;
 }) {
@@ -140,7 +140,7 @@ function AvatarUpload({
   personName,
   currentUrl,
 }: {
-  id: number;
+  id: string | number;
   personName: string;
   currentUrl?: string | null;
 }) {

@@ -14,11 +14,11 @@ interface MediaDoc {
 }
 
 export interface ProjectForEdit {
-  id: number
+  id: string | number
   title: string
   category: string
   coverImage?: string | null
-  heroImageId?: number | null
+  heroImageId?: string | number | null
 }
 
 interface ProjectEditModalProps {

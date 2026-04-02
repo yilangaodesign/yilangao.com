@@ -11,13 +11,13 @@
 export async function uploadMedia(
   _file: File,
   _alt?: string,
-): Promise<{ id: number; url: string }> {
+): Promise<{ id: number | string; url: string }> {
   throw new Error("uploadMedia is not available in the playground");
 }
 
 export async function updateCollectionField(
   _slug: string,
-  _id: number,
+  _id: number | string,
   _fieldPath: string,
   _value: unknown,
 ): Promise<void> {

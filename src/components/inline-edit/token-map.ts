@@ -42,7 +42,7 @@ const COLOR_TOKENS = [
 
 export function matchFontSize(computedFontSize: string): TokenMatch {
   const px = parseFloat(computedFontSize)
-  let closest = TYPE_SCALE[2]
+  let closest: (typeof TYPE_SCALE)[number] = TYPE_SCALE[2]
   let minDiff = Infinity
 
   for (const entry of TYPE_SCALE) {
@@ -63,7 +63,7 @@ export function matchFontSize(computedFontSize: string): TokenMatch {
 
 export function matchFontWeight(computedWeight: string): TokenMatch {
   const w = parseInt(computedWeight, 10) || 400
-  let closest = WEIGHT_SCALE[1]
+  let closest: (typeof WEIGHT_SCALE)[number] = WEIGHT_SCALE[1]
   let minDiff = Infinity
 
   for (const entry of WEIGHT_SCALE) {

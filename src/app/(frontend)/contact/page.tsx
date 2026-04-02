@@ -28,7 +28,7 @@ const FALLBACK_CLIENTS = [
 ];
 
 export default async function ContactPage() {
-  let testimonials: { id?: number; text: string; textHtml?: string; name: string; role: string }[] = FALLBACK_TESTIMONIALS;
+  let testimonials: { id?: string | number; text: string; textHtml?: string; name: string; role: string }[] = FALLBACK_TESTIMONIALS;
   let clients: { name: string; url: string }[] = FALLBACK_CLIENTS;
   const isAdmin = await isAdminAuthenticated();
 

@@ -21,7 +21,7 @@ export function ComponentPreview({
   description,
 }: {
   children: React.ReactNode;
-  code: string;
+  code?: string;
   title?: string;
   description?: string;
 }) {
