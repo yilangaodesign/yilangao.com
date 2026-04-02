@@ -6,6 +6,7 @@
 // Slower: choreographic entrances (scroll-reveal, page-load)
 
 $portfolio-duration-fast: 110ms;
+$portfolio-duration-nav: 200ms;
 $portfolio-duration-moderate: 240ms;
 $portfolio-duration-slow: 400ms;
 $portfolio-duration-slower: 600ms;
@@ -22,6 +23,7 @@ $portfolio-easing-standard: cubic-bezier(0.2, 0, 0.38, 0.9);
 $portfolio-easing-entrance: cubic-bezier(0, 0, 0.38, 0.9);
 $portfolio-easing-exit: cubic-bezier(0.2, 0, 1, 0.9);
 $portfolio-easing-expressive: cubic-bezier(0.4, 0.14, 0.3, 1);
+$portfolio-easing-nav: ease-out;
 
 // ── Z-index scale ────────────────────────────────────────────────────────────
 // 13-tier scale derived from actual component usage across the system.

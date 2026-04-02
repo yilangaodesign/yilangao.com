@@ -211,6 +211,10 @@ $portfolio-surface-always-dark: $portfolio-neutral-100;
 $portfolio-surface-always-light: $portfolio-neutral-00;
 
 // — Overlay interaction states (semi-transparent for dark/light surface contexts)
+$portfolio-overlay-white-04: rgba(255, 255, 255, 0.04);
+$portfolio-overlay-white-05: rgba(255, 255, 255, 0.05);
+$portfolio-overlay-white-06: rgba(255, 255, 255, 0.06);
+$portfolio-overlay-white-07: rgba(255, 255, 255, 0.07);
 $portfolio-overlay-white-08: rgba(255, 255, 255, 0.08);
 $portfolio-overlay-white-10: rgba(255, 255, 255, 0.10);
 $portfolio-overlay-white-12: rgba(255, 255, 255, 0.12);
@@ -218,6 +222,14 @@ $portfolio-overlay-white-14: rgba(255, 255, 255, 0.14);
 $portfolio-overlay-white-16: rgba(255, 255, 255, 0.16);
 $portfolio-overlay-white-20: rgba(255, 255, 255, 0.20);
 $portfolio-overlay-white-25: rgba(255, 255, 255, 0.25);
+$portfolio-overlay-white-30: rgba(255, 255, 255, 0.30);
+$portfolio-overlay-white-35: rgba(255, 255, 255, 0.35);
+$portfolio-overlay-white-40: rgba(255, 255, 255, 0.40);
+$portfolio-overlay-white-45: rgba(255, 255, 255, 0.45);
+$portfolio-overlay-white-50: rgba(255, 255, 255, 0.50);
+$portfolio-overlay-white-60: rgba(255, 255, 255, 0.60);
+$portfolio-overlay-white-65: rgba(255, 255, 255, 0.65);
+$portfolio-overlay-white-75: rgba(255, 255, 255, 0.75);
 $portfolio-overlay-black-04: rgba(0, 0, 0, 0.04);
 $portfolio-overlay-black-06: rgba(0, 0, 0, 0.06);
 $portfolio-overlay-black-08: rgba(0, 0, 0, 0.08);

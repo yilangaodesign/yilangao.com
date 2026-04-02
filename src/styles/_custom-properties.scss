@@ -157,6 +157,7 @@
   --portfolio-weight-semibold: #{$portfolio-weight-semibold};
   --portfolio-weight-bold: #{$portfolio-weight-bold};
 
+  --portfolio-type-4xs: #{$portfolio-type-4xs};
   --portfolio-type-3xs: #{$portfolio-type-3xs};
   --portfolio-type-2xs: #{$portfolio-type-2xs};
   --portfolio-type-xs: #{$portfolio-type-xs};
@@ -261,6 +262,7 @@
 
   // ── Motion ───────────────────────────────────────────────────────────────
   --portfolio-duration-fast: #{$portfolio-duration-fast};
+  --portfolio-duration-nav: #{$portfolio-duration-nav};
   --portfolio-duration-moderate: #{$portfolio-duration-moderate};
   --portfolio-duration-slow: #{$portfolio-duration-slow};
   --portfolio-duration-slower: #{$portfolio-duration-slower};
@@ -269,6 +271,7 @@
   --portfolio-easing-entrance: #{$portfolio-easing-entrance};
   --portfolio-easing-exit: #{$portfolio-easing-exit};
   --portfolio-easing-expressive: #{$portfolio-easing-expressive};
+  --portfolio-easing-nav: #{$portfolio-easing-nav};
 
   // ── Z-index ──────────────────────────────────────────────────────────────
   --portfolio-z-base: #{$portfolio-z-base};
@@ -324,22 +327,34 @@
   --portfolio-surface-overlay: rgba(0, 0, 0, 0.7);
 
   // ── Overlay interaction states ───────────────────────────────────────────
-  --portfolio-overlay-white-08: rgba(255, 255, 255, 0.08);
-  --portfolio-overlay-white-10: rgba(255, 255, 255, 0.10);
-  --portfolio-overlay-white-12: rgba(255, 255, 255, 0.12);
-  --portfolio-overlay-white-14: rgba(255, 255, 255, 0.14);
-  --portfolio-overlay-white-16: rgba(255, 255, 255, 0.16);
-  --portfolio-overlay-white-20: rgba(255, 255, 255, 0.20);
-  --portfolio-overlay-white-25: rgba(255, 255, 255, 0.25);
-  --portfolio-overlay-black-04: rgba(255, 255, 255, 0.04);
-  --portfolio-overlay-black-06: rgba(255, 255, 255, 0.06);
-  --portfolio-overlay-black-08: rgba(255, 255, 255, 0.08);
-  --portfolio-overlay-black-10: rgba(255, 255, 255, 0.10);
-  --portfolio-overlay-black-14: rgba(255, 255, 255, 0.14);
-  --portfolio-overlay-black-20: rgba(255, 255, 255, 0.20);
-  --portfolio-overlay-black-25: rgba(255, 255, 255, 0.25);
-  --portfolio-overlay-black-30: rgba(255, 255, 255, 0.30);
-  --portfolio-overlay-black-40: rgba(255, 255, 255, 0.40);
+  --portfolio-overlay-white-04: #{$portfolio-overlay-white-04};
+  --portfolio-overlay-white-05: #{$portfolio-overlay-white-05};
+  --portfolio-overlay-white-06: #{$portfolio-overlay-white-06};
+  --portfolio-overlay-white-07: #{$portfolio-overlay-white-07};
+  --portfolio-overlay-white-08: #{$portfolio-overlay-white-08};
+  --portfolio-overlay-white-10: #{$portfolio-overlay-white-10};
+  --portfolio-overlay-white-12: #{$portfolio-overlay-white-12};
+  --portfolio-overlay-white-14: #{$portfolio-overlay-white-14};
+  --portfolio-overlay-white-16: #{$portfolio-overlay-white-16};
+  --portfolio-overlay-white-20: #{$portfolio-overlay-white-20};
+  --portfolio-overlay-white-25: #{$portfolio-overlay-white-25};
+  --portfolio-overlay-white-30: #{$portfolio-overlay-white-30};
+  --portfolio-overlay-white-35: #{$portfolio-overlay-white-35};
+  --portfolio-overlay-white-40: #{$portfolio-overlay-white-40};
+  --portfolio-overlay-white-45: #{$portfolio-overlay-white-45};
+  --portfolio-overlay-white-50: #{$portfolio-overlay-white-50};
+  --portfolio-overlay-white-60: #{$portfolio-overlay-white-60};
+  --portfolio-overlay-white-65: #{$portfolio-overlay-white-65};
+  --portfolio-overlay-white-75: #{$portfolio-overlay-white-75};
+  --portfolio-overlay-black-04: #{$portfolio-overlay-black-04};
+  --portfolio-overlay-black-06: #{$portfolio-overlay-black-06};
+  --portfolio-overlay-black-08: #{$portfolio-overlay-black-08};
+  --portfolio-overlay-black-10: #{$portfolio-overlay-black-10};
+  --portfolio-overlay-black-14: #{$portfolio-overlay-black-14};
+  --portfolio-overlay-black-20: #{$portfolio-overlay-black-20};
+  --portfolio-overlay-black-25: #{$portfolio-overlay-black-25};
+  --portfolio-overlay-black-30: #{$portfolio-overlay-black-30};
+  --portfolio-overlay-black-40: #{$portfolio-overlay-black-40};
 
   // ── Text ─────────────────────────────────────────────────────────────────
   --portfolio-text-neutral-bold: #{$portfolio-neutral-00};

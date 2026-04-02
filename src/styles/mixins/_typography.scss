@@ -224,13 +224,13 @@
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// LABELS (2) — Geist Sans, medium weight, uppercase tracked
+// LABELS (2) — Geist Sans, regular weight, uppercase tracked
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 @mixin label {
   font-family: $portfolio-font-sans;
   font-size: $portfolio-type-xs;
-  font-weight: $portfolio-weight-medium;
+  font-weight: $portfolio-weight-regular;
   line-height: $portfolio-leading-normal;
   letter-spacing: $portfolio-tracking-wider;
   text-transform: uppercase;
@@ -240,7 +240,7 @@
 @mixin label-sm {
   font-family: $portfolio-font-sans;
   font-size: $portfolio-type-2xs;
-  font-weight: $portfolio-weight-medium;
+  font-weight: $portfolio-weight-regular;
   line-height: $portfolio-leading-compact;
   letter-spacing: $portfolio-tracking-wider;
   text-transform: uppercase;
