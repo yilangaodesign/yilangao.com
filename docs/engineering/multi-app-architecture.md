@@ -64,3 +64,34 @@ When adding new routes or concerns in the future:
 | 4002 | `/` | ASCII Art Studio | Single-page ASCII art/video tool |
 
 Update this table when adding new route prefixes or services. See also the **App Registry** in `AGENTS.md` for the authoritative list of all apps.
+
+## 9.6 Production Build Boundaries
+
+When Vercel builds the root Next.js app (`next build` at repo root), the build
+includes **only** what the root `package.json` and `next.config.ts` reference:
+
+| Included in root build | Why |
+|------------------------|-----|
+| `src/app/(frontend)/` — portfolio pages | Root app's page routes |
+| `src/app/(payload)/` — CMS admin + API | Root app's page routes (Payload embedded) |
+| `src/components/` — UI components, admin, inline-edit | Imported by pages above |
+| `src/styles/` — SCSS tokens, mixins, custom properties | Imported by components above |
+| `public/` — static assets at repo root | Next.js convention |
+
+| NOT included in root build | Why |
+|---------------------------|-----|
+| `playground/` | Separate `package.json` + `next.config.ts` — requires its own Vercel project with root dir `playground/` |
+| `ascii-tool/` | Separate `package.json` + `next.config.ts` — requires its own Vercel project with root dir `ascii-tool/` |
+
+This boundary is **structural** (separate `package.json`, separate `next.config.ts`),
+not configured. No build settings, `vercel.json`, or ignore patterns are needed to
+exclude them — Next.js simply does not traverse into sibling app directories.
+
+**Source code security:** The Élan DS components (`src/components/ui/`) ship as
+compiled, minified, tree-shaken code inside the website build. SCSS source files,
+token architecture, component TSX, and design system organizational structure are
+never exposed to browsers or crawlers. Only compiled CSS (with hashed class names),
+minified client JS, and HTML structure are publicly visible. Server Components are
+never sent to the browser at all.
+
+See `docs/architecture.md` §4 for the full deployment map and DNS configuration.

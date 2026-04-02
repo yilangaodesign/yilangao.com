@@ -187,19 +187,81 @@ relative paths. This works in local development. In production (Vercel):
 
 ## 4. Deployment
 
-| Artifact | Target | Status | Notes |
-|----------|--------|--------|-------|
-| Design system package | GitHub Packages | **Deployed** (v1.0.0) | Changesets + CI publish |
-| Main site | Vercel | **Ready to deploy** | Needs `.npmrc` auth + `NPM_TOKEN` env var |
-| Playground UI | Vercel | **Ready to deploy** | Separate Vercel project, root dir = `playground/` |
+| Artifact | Target | Status | Production URL | Vercel Project | Notes |
+|----------|--------|--------|---------------|----------------|-------|
+| Design system package | GitHub Packages | **Deployed** (v1.0.0) | — | — | Changesets + CI publish |
+| Main site | Vercel | **Deployed** | `new.yilangao.com` (interim) | `yilangao-portfolio` | Root dir `.`, production branch `main` |
+| Playground UI | Vercel | **Deployed** | — | `yilangao-design-system` | Root dir `playground/`, production branch `main` |
+| ASCII Art Studio | Vercel | Not deployed | — | — | Standalone, would need its own project |
+
+### Domain & DNS Architecture
+
+```
+yilangao.com (Cloudflare zone)
+├── @ (root)     → 301 redirect to Figma prototype (Cloudflare Page Rule)
+│                  A records: 104.21.64.128, 172.67.150.217 (Cloudflare proxy IPs)
+├── new          → CNAME to cname.vercel-dns.com (DNS-only / grey cloud)
+│                  Vercel provisions SSL, hosts Next.js app
+└── (future)     → Root domain cutover: delete Figma redirect, point @ to Vercel
+```
+
+**Cloudflare's role is DNS only** for the `new` subdomain — the orange cloud proxy
+is turned off so Vercel can manage its own SSL certificate and edge network.
+
+**Staged migration approach:** The subdomain approach (`new.yilangao.com`) was chosen
+over a subpath (`yilangao.com/new`) because subpath requires `basePath` in
+`next.config.ts`, which breaks Payload CMS admin routes, prefixes all asset URLs,
+and requires a code change to remove on cutover. The subdomain approach requires
+zero code changes — cutover to the root domain is a pure DNS swap.
+
+**Future cutover to root domain:**
+1. Delete the Cloudflare redirect rule that sends `yilangao.com` to Figma
+2. Update DNS: root `yilangao.com` → `cname.vercel-dns.com` (or A record to `76.76.21.21`)
+3. Add `yilangao.com` as a domain in Vercel (alongside `new.yilangao.com`)
+4. Optionally redirect `new.yilangao.com` → `yilangao.com`
+
+### Source Code Security
+
+When `next build` runs, all source is compiled, minified, tree-shaken, and bundled.
+**None of the following are exposed to browsers or crawlers:**
+- SCSS source files and token architecture (`src/styles/tokens/`)
+- Component source code (TSX/TypeScript)
+- Design system organizational structure and mixins
+- Server Components (never sent to the browser)
+- Payload CMS internals, API route logic, database queries
+
+**What IS publicly visible** (same as any website):
+- Compiled CSS with hashed class names (e.g., `.Button_button__x7k2q`)
+- Minified, uglified client-side JavaScript bundles
+- HTML structure and rendered DOM
+- Visual design decisions (colors, spacing, typography)
+
+Deploying the website exposes no more design system information than a screenshot would.
+
+### Production Build Boundaries
+
+When Vercel builds the root app (`next build` at repo root), it includes ONLY `src/`:
+- Personal website pages (`src/app/(frontend)/`)
+- Payload CMS admin (`src/app/(payload)/`)
+- All components in `src/components/` (bundled as compiled code)
+
+`playground/` and `ascii-tool/` are **NOT** included — they are structurally separate
+Next.js apps (own `package.json`, own `next.config.ts`). No build settings needed
+to exclude them; the boundary is structural.
 
 ### Deploying the Main Site to Vercel
 
 1. Create a new Vercel project linked to this GitHub repo
 2. Root Directory: `.` (default)
 3. Framework: Next.js (auto-detected)
-4. Environment variable: `NPM_TOKEN` = a GitHub PAT with `read:packages` scope
-   (needed because `.npmrc` points `@yilangaodesign` to GitHub Packages)
+4. Required environment variables: `DATABASE_URL`, `PAYLOAD_SECRET`,
+   `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_PAYLOAD_URL`, `S3_ACCESS_KEY_ID`,
+   `S3_SECRET_ACCESS_KEY`, `S3_BUCKET`, `S3_ENDPOINT`, `S3_REGION`
+5. Production branch: `main`
+
+**Shared infrastructure note:** Production and dev currently share the same Supabase
+database and S3 storage bucket. Media uploads and CMS edits in either environment
+are visible in both.
 
 ### Deploying the Playground UI to Vercel
 
@@ -228,6 +290,12 @@ Vercel supports multiple projects from the same GitHub repo. Each project has it
 own root directory, build settings, and domain. Pushes to the repo trigger builds
 for both projects. Use the Vercel dashboard's "Ignored Build Step" setting if you
 want to skip playground rebuilds when only `src/` changes (and vice versa).
+
+### Local `.vercel/project.json`
+
+The `.vercel/project.json` at repo root links to the **Playground** project
+(`yilangao-design-system`), NOT the main site. Do not confuse them. The main site
+project (`yilangao-portfolio`) is configured via the Vercel dashboard.
 
 ---
 

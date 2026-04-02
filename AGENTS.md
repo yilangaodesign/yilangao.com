@@ -207,13 +207,17 @@ If Pre-Flight Step 0 identified multiple categories, you MUST document in ALL ap
 
 This monorepo contains multiple Next.js apps. **This is the single source of truth for what exists.** Before creating a new app, consult this table. Before starting any server, check the port column.
 
-| App | Directory | Port | Version manifest | Script | Audience | Description |
-|-----|-----------|------|------------------|--------|----------|-------------|
-| **Main site** | `src/` (root) | 4000 | `elan.json` | `npm run dev` | Visitors, editors | Portfolio + Payload CMS admin |
-| **Playground** | `playground/` | 4001 | — (reads `elan.json` via synced `elan.ts`) | `npm run playground` | Developers/designers | Design system component previews + token explorer |
-| **ASCII Art Studio** | `ascii-tool/` | 4002 | `ascii-studio.json` | `npm run ascii-tool` | Public users | Standalone ASCII art/video creative tool |
+| App | Directory | Port | Version manifest | Script | Audience | Production URL | Vercel Project | Hosting |
+|-----|-----------|------|------------------|--------|----------|---------------|----------------|---------|
+| **Main site** | `src/` (root) | 4000 | `elan.json` | `npm run dev` | Visitors, editors | `new.yilangao.com` (interim) | `yilangao-portfolio` | Vercel |
+| **Playground** | `playground/` | 4001 | — (reads `elan.json` via synced `elan.ts`) | `npm run playground` | Developers/designers | — | `yilangao-design-system` | Vercel |
+| **ASCII Art Studio** | `ascii-tool/` | 4002 | `ascii-studio.json` | `npm run ascii-tool` | Public users | — | — | Not deployed |
 
 **Pattern:** Each app owns its own `package.json`, `next.config.ts`, `tsconfig.json`, and `postcss.config.mjs`. Design tokens are shared via manually synced `globals.css` (Tailwind `@theme` block). Each app may have its own version manifest at the repo root.
+
+**Hosting:** All deployed apps use Vercel. Domain DNS is managed by Cloudflare (`yilangao.com` zone). The root domain currently 301-redirects to a Figma prototype; `new.yilangao.com` is a CNAME to `cname.vercel-dns.com` (grey cloud / DNS-only). See `docs/architecture.md` §4 and `docs/engineering/deployment.md` for full DNS and env var configuration.
+
+**`.vercel/project.json` at repo root** links to the **Playground** project (`yilangao-design-system`), NOT the main site. Do not confuse them when running Vercel CLI commands.
 
 **When this table gets out of date:** If you encounter an app directory that isn't listed here, stop and update this table before proceeding. An undocumented app is a maintenance hazard.
 
