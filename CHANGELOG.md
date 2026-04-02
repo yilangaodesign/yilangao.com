@@ -4,6 +4,51 @@ All notable changes to the Élan design system are documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] — 2026-04-02
+
+Minor release: new components, expanded token system, legacy cleanup, and playground improvements.
+
+### Added
+
+- **BadgeOverlay component**: compact notification counter and status dot indicator for avatars, icons, and buttons
+- **ButtonSelect component**: single-select toggle group with appearance × emphasis two-axis styling, built on Radix ToggleGroup — replaces SegmentedControl
+- **Design tokens**: borders, opacity, and custom properties files; expanded color, elevation, motion, and typography tokens
+- **Breakpoints utility**: shared `BREAKPOINTS` constants (`src/lib/breakpoints.ts`)
+- **Content strategy guides**: 13 docs under `docs/content/` (case-study, homepage, seniority-signals, visual-economy, etc.)
+- **Feedback log archives**: design and engineering feedback log archives with synthesis summaries
+- **Playground pages**: BadgeOverlay, ButtonSelect component pages; sidebar module CSS; ds-tokens SCSS
+
+### Changed
+
+- **Badge API**: `BadgeVariant` renamed to `BadgeAppearance` + `BadgeEmphasis` (two-axis model)
+- **30+ UI component SCSS modules**: migrated to expanded token system with CSS custom properties
+- **Frontend pages**: migrated from `@yilangaodesign/design-system` package imports to local `@/components/ui/` paths
+- **Playground infrastructure**: refactored sidebar, shell, theme-provider; simplified globals.css
+- **globals.scss**: migrated from design-system package SCSS imports to local tokens + CSS custom properties
+- **NavItem**: expanded with additional variants (+45 lines)
+- **Inline-edit system**: updated EditableText, API, and styles
+- **Agent guardrails**: renumbered (11-22), added playground HMR verification, lucide-react barrel import ban, feedback log cap
+
+### Removed
+
+- **SegmentedControl**: removed from design system, playground, and ASCII Art Studio (replaced by ButtonSelect)
+- **12 legacy component wrappers**: ArrowReveal, ExpandCollapse, FadeIn, Footer, Marquee, MountEntrance, Navigation, ScrollSpy, StaggerChildren, TestimonialCard, ThemeProvider, ThemeToggle — all migrated to `src/components/ui/` in 2.0.0
+
+### Fixed
+
+- **Lexical rendering**: multi-paragraph support with proper line breaks
+- **Frontend layout**: added `data-theme="light"` to root html element
+
+---
+
+## ASCII Art Studio [0.2.0] — 2026-04-02
+
+### Changed
+
+- Replaced SegmentedControl with ButtonSelect in control-panel and toolbar
+
+---
+
 ## [2.0.0] — 2026-04-01
 
 Major release with 19 new design system components, playground architecture overhaul, and expanded documentation.
