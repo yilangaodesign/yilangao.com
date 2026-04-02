@@ -4,7 +4,7 @@
 > and playground UI relate to each other — where code lives, how it flows, how it's
 > published, and how it's deployed.
 >
-> **Last updated:** 2026-03-29
+> **Last updated:** 2026-04-01
 
 ---
 
@@ -154,7 +154,7 @@ import { Button, Card, Badge } from "@/components/ui";
 ### What It Provides
 
 - **Token galleries** — color, typography, spacing, motion, elevation
-- **Component previews** — FadeIn, Marquee, ArrowReveal, ExpandCollapse, MountEntrance, Navigation, Footer, ThemeToggle
+- **Component previews** — FadeIn, Marquee, ArrowReveal, ExpandCollapse, MountEntrance, Navigation, Footer, ThemeToggle, Button, ScrollSpy, TestimonialCard
 - **Archive browser** — UI for browsing, restoring, and managing archived experiments
 - **Fuzzy search** — Fuse.js-powered sidebar search across all pages
 
@@ -233,21 +233,17 @@ want to skip playground rebuilds when only `src/` changes (and vice versa).
 
 ## 5. Known Architectural Tensions
 
-### 5.1 Dual Token Sources
+### 5.1 Dual Token Sources (Partially Resolved)
 
 Tokens have two paths:
 - **Package path:** `@yilangaodesign/design-system/scss/tokens/*` → consumed by main site via `@use`
 - **Local path:** `src/styles/tokens/*` → consumed by `sync-tokens` → feeds playground
 
-These can drift. The canonical source should be the published package, with
-`sync-tokens` reading from the package rather than from local SCSS files.
+The SCSS-to-CSS custom property migration (ENG-082/083/084) has partially resolved this drift. Components now consume `var(--portfolio-*)` CSS custom properties instead of SCSS variables directly. The `_custom-properties.scss` file generates both `:root` and `.dark` blocks, which are the runtime source of truth for theming. SCSS tokens remain the build-time source that feeds into the custom property generation.
 
-### 5.2 Playground Token Independence
+### 5.2 Playground Token Independence (Partially Resolved)
 
-The playground's token data comes from `src/styles/tokens/` (via `sync-tokens`),
-not from the published `@yilangaodesign/design-system` package. This is workable
-— the `prebuild` script ensures tokens are fresh at build time — but long-term
-the playground should consume the package directly for full alignment.
+The playground now imports `_custom-properties.scss` from the main site (via the `@ds/*` alias), giving it access to the same CSS custom properties that production components use. The `sync-tokens` script still feeds `tokens.ts` for the token gallery data display, but component rendering uses the shared custom properties rather than independent token values. Long-term, the playground should consume the published package directly for full alignment.
 
 ### 5.3 Archive in Production
 
@@ -299,9 +295,16 @@ yilangao.com/
 │   └── sync-tokens.mjs           # SCSS → playground token sync
 ├── docs/
 │   ├── architecture.md           # ← This file
-│   ├── engineering.md            # Engineering knowledge base
-│   ├── port-registry.md          # Dev server port assignments
-│   └── design.md                 # Site-level design knowledge
+│   ├── design.md                 # Design knowledge hub → docs/design/*.md spokes
+│   ├── engineering.md            # Engineering knowledge hub
+│   ├── content.md                # Content strategy hub → docs/content/*.md spokes
+│   ├── design/                   # Design spoke files (color, spacing, navigation, etc.)
+│   ├── content/                  # Content spoke files (case-study, homepage, etc.)
+│   ├── *-anti-patterns.md        # Anti-pattern catalogs (design, engineering, content)
+│   ├── *-feedback-log.md         # Active feedback logs (30 entries each)
+│   ├── *-feedback-log-archive.md # Archived feedback entries (cold storage)
+│   ├── *-feedback-synthesis.md   # Distilled lessons from archived entries
+│   └── port-registry.md          # Dev server port assignments
 ├── AGENTS.md                     # AI agent rules and protocols
 ├── renovate.json                 # Auto-update design system dependency
 └── package.json                  # Main site dependencies

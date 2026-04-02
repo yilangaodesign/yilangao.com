@@ -4,7 +4,7 @@
 >
 > **Who reads this:** AI agents routed here by `AGENTS.md` Pre-Flight. Read the Section Index first, then open only the spoke file matching your task.
 > **Who writes this:** AI agents after processing user feedback via the `design-iteration` skill.
-> **Last updated:** 2026-03-30 (FB-069: Button sizing redesign — One GS alignment, icon = line-height, padding-derived height)
+> **Last updated:** 2026-04-01 (FB-082: Badge overlay contrast rule — visual hierarchy in navigation count +1)
 
 ---
 
@@ -75,19 +75,35 @@ Each iteration should fix one conceptual problem. Don't scatter changes across 1
 
 Before writing UI code, read this file. If the user's feedback maps to an existing principle, apply the documented solution immediately.
 
+### 7.4 Model All States Before Writing Any Code
+
+Before implementing or modifying any interactive component, enumerate **every visual state** the component can be in and define the full class set for each. Write this out as a state table (even if just mental) before touching code. The table must answer, for each state: text color, icon color, font weight, resting background, and hover background.
+
+**Why this exists:** Session 2026-04-01 required 5 rounds of feedback to reach a correct four-state model for sidebar navigation items (Default, Hover, Expanded, Active). Each round fixed one state while inadvertently breaking or neglecting another — because no complete state model was defined upfront. The root cause was incremental, state-by-state implementation instead of holistic state modeling.
+
+**The protocol:**
+1. List every state the component can be in (resting, hover, focus, active, expanded, disabled, loading, etc.).
+2. For each state, define what visual properties change and what semantic message they communicate (interaction vs. location vs. status).
+3. Verify that no two states share identical styling unless they are semantically equivalent.
+4. Verify that the same semantic state uses identical styling across all instances of the component (no divergence between parent/child/sibling variants).
+5. Only then write the conditional class logic.
+
+**Anti-pattern:** Implementing active state for one nav item type, then copy-pasting a different treatment for another type, then patching hover as a separate concern. This produces frankenstate — a component where each state was designed in isolation and they don't form a coherent system. See AP-046.
+
 ---
 
 ## Appendix: Feedback Frequency Map
 
 | Pattern | Times Raised | Priority |
 |---------|-------------|----------|
-| Spacing / Padding / Breathing Room | 12 | Critical |
-| State transition consistency (toggle jump / layout shift / mode coherence) | 6 | Critical |
+| Spacing / Padding / Breathing Room | 14 | Critical |
+| State transition consistency (toggle jump / layout shift / mode coherence) | 8 | Critical |
+| Component state modeling (define all states before coding) | 1 | Critical |
 | Layout integrity (no overlapping, cross-panel alignment) | 5 | Critical |
 | Interactive control design (hit zones, gestures, mapping, color-first builders) | 4 | High |
 | Dark mode / Theming | 3 | High |
 | Overlay / flyout positioning (stacking contexts, portals) | 3 | High |
-| Visual hierarchy in navigation | 2 | High |
+| Visual hierarchy in navigation | 3 | High |
 | Information architecture / taxonomy / naming / tab consolidation | 5 | Critical |
 | Visual identity across spatial contexts (size/alignment consistency) | 4 | High |
 | Centering / Symmetry | 4 | Critical |
@@ -113,6 +129,7 @@ Before writing UI code, read this file. If the user's feedback maps to an existi
 | DS compliance (token adoption, mixin usage, brand color) | 1 | High |
 | Undocumented patterns (gradient bg, masonry, dark surface alpha) | 1 | Medium |
 | Button component sizing (icon/label proportionality, vertical padding) | 1 | High |
+| WCAG contrast for functional elements in dark mode | 4 | Critical |
 
 ---
 

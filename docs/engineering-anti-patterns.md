@@ -4,7 +4,25 @@
 >
 > **Who reads this:** AI agents before making code changes — scan for relevant anti-patterns.
 > **Who writes this:** AI agents when an incident reveals a new anti-pattern.
-> **Last updated:** 2026-03-31 (status markers added, resolved entries compacted)
+> **Last updated:** 2026-04-01 (EAP-042: Reporting playground changes without verifying browser delivery — recurring pattern, 4+ incidents)
+
+## Category Index
+
+| Category | Entries | Status | Count |
+|----------|---------|--------|-------|
+| Cross-App Parity & Token Sync | EAP-001, EAP-004, EAP-005, EAP-007, EAP-028, EAP-041 | 6 active | 6 |
+| Playground | EAP-006, EAP-037, EAP-038†, EAP-042, EAP-055 | 5 active | 5 |
+| CMS / Payload Schema | EAP-015, EAP-019, EAP-021, EAP-026, EAP-030, EAP-033, EAP-034 | 6 active · 1 resolved | 7 |
+| CMS / Inline Edit | EAP-016, EAP-023, EAP-029 | 3 active | 3 |
+| Save Flow / Error Handling | EAP-017, EAP-018, EAP-020, EAP-024 | 4 active | 4 |
+| Hydration / SSR / React State | EAP-013, EAP-014, EAP-022, EAP-054, EAP-056 | 5 active | 5 |
+| Build / Toolchain / CSS | EAP-011, EAP-012, EAP-031, EAP-035, EAP-038‡, EAP-039, EAP-040 | 7 active | 7 |
+| Documentation Process | EAP-008, EAP-010, EAP-027, EAP-032 | 4 active | 4 |
+| Dev Workflow | EAP-002, EAP-003, EAP-009 | 3 active | 3 |
+| Interaction / DOM | EAP-025, EAP-036, EAP-053 | 3 active | 3 |
+| **Total** | | **46 active · 1 resolved** | **47** |
+
+> † EAP-038 "One-Way Playground Experiment" · ‡ EAP-038 "SCSS Modules with `@use` Under Turbopack" — duplicate ID, two distinct entries.
 
 ---
 
@@ -759,9 +777,132 @@ Supporting layers: File-scoped rule (`.cursor/rules/playground-components.md`), 
 
 ---
 
+## EAP-038: SCSS Modules with `@use` Imports Under Turbopack
+
+**Status: ACTIVE**
+
+**Trigger:** Creating a `.module.scss` file that uses `@use` to import SCSS mixins/tokens via `sassOptions.loadPaths`, then importing it in a `'use client'` component.
+
+**Why it's wrong:** Turbopack (Next.js 16.x dev mode) compiles SCSS modules separately for server-side rendering and client-side rendering. When the SCSS file depends on `sassOptions.loadPaths` for `@use` resolution, the two compilations can produce different CSS module class name mappings, causing a hydration mismatch. The server HTML receives one set of class names while the client JS expects another.
+
+**Correct alternative:** Use plain `.module.css` files with CSS custom properties (`var(--token-name)`) instead of SCSS `@use`/`@include` mixins. CSS custom properties defined in `globals.css` are available everywhere without build-time path resolution. Reserve `.scss` files for non-module use cases (global styles, `@layer` blocks) where server/client parity is not required.
+
+**Incident:** ENG-081 (2026-04-01) — Playground sidebar section labels hydration mismatch.
+
+---
+
+## EAP-056: Barrel Imports from Large Packages in Turbopack SSR Components
+
+**Status: ACTIVE**
+
+**Trigger:** Using barrel imports (`import { Foo, Bar } from "large-package"`) in a `"use client"` component that is server-side rendered by Turbopack, where `large-package` is in Next.js's `optimizePackageImports` default list (e.g., `lucide-react`, `@radix-ui/*`, `date-fns`, `lodash-es`).
+
+**Why it's wrong:** Turbopack's `optimizePackageImports` rewrites barrel imports to individual module imports automatically, but the server-side and client-side bundles may resolve the **same named export to different concrete modules**. For `lucide-react` (v0.469.0, 3,496 icon files), this caused `Compass` to resolve to the Bell icon on the server and the correct Compass icon on the client — a hydration mismatch that is invisible in source code and only detectable by comparing server HTML against client render.
+
+The bug is positional — icons at indices 0-3 and 7-8 resolved correctly; only indices 4-6 (Bell, Compass, Table2) were swapped. This suggests the optimization pass processes import specifiers in a non-deterministic order that differs between the server and client compilation passes.
+
+**Correct alternative:** Use individual default imports that bypass the optimization entirely:
+```tsx
+import Compass from "lucide-react/dist/esm/icons/compass";
+import Bell from "lucide-react/dist/esm/icons/bell";
+```
+
+Add a TypeScript declaration for the wildcard import path:
+```ts
+// playground/src/types/lucide-icons.d.ts
+declare module "lucide-react/dist/esm/icons/*" {
+  import type { LucideIcon } from "lucide-react";
+  const icon: LucideIcon;
+  export default icon;
+}
+```
+
+**Detection:** `grep -r 'from "lucide-react"' playground/src/` should return zero matches. Any barrel import is a potential hydration mismatch.
+
+**Scope:** This guardrail applies to the **playground** app specifically because it uses Turbopack SSR with `turbopack.root` set to the monorepo root. The main site may also be affected but hasn't exhibited the bug. When in doubt, use individual imports for any package with 100+ exports.
+
+**Incident:** ENG-087 (2026-04-01) — Playground sidebar icons rendered wrong SVGs on server (Bell where Compass should be), causing persistent hydration mismatch on every page load.
+
+---
+
 ## Entry Template
 
 ```markdown
+## EAP-039: SCSS Compile-Time Tokens as Sole Color Source in Themeable Components
+
+**Status: ACTIVE**
+
+**Trigger:** Writing `.module.scss` that uses `$portfolio-*` SCSS variables for all color/surface/border values, without `var()` fallback, when the component will render in the playground or any context with runtime theme switching.
+
+**Why it's wrong:** Sass variables resolve at compile time to static hex values (e.g., `$portfolio-surface-primary` → `#FFFFFF`). The compiled CSS cannot respond to runtime class-based theme switching (`.dark`). When the playground toggles dark mode, SCSS-only components retain light-mode colors, creating contrast mismatches.
+
+**Correct alternative:**
+```scss
+background-color: var(--ds-surface-primary, #{$portfolio-surface-primary});
+```
+The `--ds-*` custom property adapts at runtime; the SCSS interpolation `#{$scss-var}` provides a fallback for hosts that don't define the property (main site). See `playground/src/app/globals.css` for the full `--ds-*` token set with `.dark` overrides.
+
+**Incident:** ENG-082 — Card/Input/Table dark mode adaptation
+
+---
+
+## EAP-040: Using SCSS Primitives Where Semantic Tokens Exist
+
+**Trigger:** Writing `$portfolio-neutral-20` (a primitive) for a border instead of `var(--portfolio-border-subtle)` (a semantic token), or using `$portfolio-neutral-00` for a surface instead of `var(--portfolio-surface-primary)`.
+
+**Why it's wrong:** Primitives don't swap in dark mode. Semantic CSS custom properties do. Using a primitive where a semantic token exists defeats the theme architecture. The component will display light-mode colors in dark mode.
+
+**Correct alternative:** Use `var(--portfolio-*)` semantic CSS custom properties for all theme-aware values. Only use SCSS primitives when: (a) inside `rgba()`/`darken()`/other compile-time functions, (b) intentionally building an always-dark/always-light surface, or (c) using specific color tints without a semantic equivalent (document the exception in the component).
+
+**Incident:** ENG-083 — full codebase migration from SCSS vars to CSS custom properties.
+
+---
+
+## EAP-041: Manually Duplicating Design System Token Variables in Consumer Apps
+
+**Trigger:** Creating a separate set of CSS custom properties (e.g., `--ds-*`, `--palette-*`) in a consumer app's stylesheet that mirrors the design system's source tokens, instead of importing from the single source.
+
+**Why it's wrong:** Duplicated variable definitions drift silently from the source. When the source changes namespace (e.g., `--ds-*` → `--portfolio-*`), output format, or adds new tokens, the consumer's copy becomes stale. Components start resolving to empty values without any build error, making the failure invisible until visual regression is noticed. The duplication also means dark mode overrides must be maintained in two places — they inevitably diverge.
+
+**Correct alternative:** Consumer apps import the design system's compiled CSS custom properties from the single source. In a monorepo, this means an SCSS file that `@use`s the source `_custom-properties.scss` (leveraging `sassOptions.loadPaths`). For external consumers, this means `@import '@yilangaodesign/design-system/css/tokens'`. No consumer should define `--portfolio-*` variables — they come from one place.
+
+**Incident:** ENG-084 — playground's manually-duplicated `--ds-*`/`--palette-*` variables broke after SCSS→CSS custom property migration changed all components to `var(--portfolio-*)`.
+
+---
+
+## EAP-042: Reporting Playground Changes as Done Without Verifying Browser Delivery
+
+**Status: ACTIVE**
+
+**Trigger:** Editing a playground file (`playground/src/app/components/*/page.tsx` or any playground source file), confirming the edit in the source code, and reporting the task as complete — without verifying the change is visible in the browser.
+
+**Why it's wrong:** Turbopack's Hot Module Replacement (HMR) in the playground is unreliable. Multiple environmental factors cause the browser to show stale content even after a successful file edit:
+1. **HMR doesn't trigger:** The file watcher may not detect the change, or the WebSocket push may fail silently. The server-side render updates (curl returns correct HTML) but the client bundle stays stale.
+2. **Dead WebSocket connections:** Previous server restarts leave `CLOSE_WAIT` connections that the browser holds open. The HMR client may be connected to a dead socket.
+3. **Turbopack incremental cache:** `.next/` retains compiled chunks that may not invalidate correctly, especially for files with cross-directory imports (`@ds/*` → `../src/components/`).
+4. **Browser cache:** Even with fresh server output, the browser may serve a cached page if the HMR notification never arrived.
+
+The technical issues are environmental constraints of the development stack (Next.js 16 + Turbopack + cross-directory imports). They may improve in future versions but are not currently fixable. The agent's process must work around them.
+
+**Correct alternative — mandatory post-edit verification protocol:**
+1. After editing any playground file, **curl the page** and verify the specific change appears in the HTML response.
+2. If the change IS in the curl response:
+   - Tell the user to **hard refresh** (Cmd+Shift+R / Ctrl+Shift+R).
+   - If the user still can't see it, proceed to step 3.
+3. If the change is NOT in the curl response, or hard refresh didn't work:
+   - Kill the playground server process.
+   - Clear the Turbopack cache: `rm -rf playground/.next`
+   - Restart: `npm run playground`
+   - Wait for compilation, verify via curl again.
+   - Tell the user to hard refresh.
+4. **Never report a playground edit as complete until the user confirms they can see it, or a browser agent has verified it.**
+
+**Recurring pattern:** 4+ occurrences across sessions. The user has explicitly called out the repetition and expressed frustration. Each time the cycle is: edit → "done" → user can't see → diagnose → kill + restart → works. The diagnostic step is wasted user time that could be eliminated by verifying proactively.
+
+**Incident:** ENG-085 (2026-04-01), plus 3+ undocumented prior occurrences across sessions.
+
+---
+
 ## EAP-NNN: [Short Name]
 
 **Trigger:** [What action or pattern triggers this]

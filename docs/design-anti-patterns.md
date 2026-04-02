@@ -4,7 +4,28 @@
 >
 > **Who reads this:** AI agents before making UI changes — scan for relevant anti-patterns.
 > **Who writes this:** AI agents when a feedback cycle reveals a new anti-pattern.
-> **Last updated:** 2026-03-31 (status markers added, resolved entries compacted)
+> **Last updated:** 2026-04-01 (AP-050: Subtle-emphasis overlay badges blending with parent surface)
+
+---
+
+## Category Index
+
+| Category | Entries | Count | Active |
+|----------|---------|------:|-------:|
+| CSS Cascade & Build | AP-001, AP-002, AP-003, AP-008, AP-021, AP-038 | 6 | 6 |
+| Spacing & Layout | AP-004, AP-005, AP-006, AP-007, AP-009, AP-018, AP-020, AP-027, AP-045, AP-048† | 10 | 10 |
+| Positioning & Transforms | AP-013, AP-031, AP-033 | 3 | 3 |
+| Theming & Dark Mode | AP-042, AP-043, AP-044, AP-047 | 4 | 4 |
+| Interaction & Pointer Behavior | AP-011, AP-012, AP-022, AP-025, AP-035 | 5 | 5 |
+| Navigation & Menus | AP-014, AP-015, AP-016, AP-029, AP-046, AP-049 | 6 | 6 |
+| Visual Hierarchy & Affordances | AP-010, AP-017, AP-019, AP-026, AP-030, AP-032, AP-039, AP-040, AP-041, AP-048‡, AP-050 | 11 | 11 |
+| Form & Input UX | AP-023, AP-024, AP-028, AP-036 | 4 | 4 |
+| Admin UI Patterns | AP-034, AP-037 | 2 | 2 |
+| **Total** | | **51** | **51** |
+
+> **†** AP-048 "Independent Padding Decisions Across Adjacent Panels" (spacing entry)
+> **‡** AP-048 "Incremental State-by-State Implementation Without a Holistic Model" (state modeling entry)
+> **Note:** AP-048 is a duplicate ID — two distinct anti-patterns share the same number.
 
 ---
 
@@ -622,6 +643,151 @@ For collection-level context, set `admin.description` on the collection config t
 4. See `design.md` §22 for the complete button sizing model.
 
 **Frustration caused:** 1 round — user identified icons as visually inconsistent and non-proportional across button sizes.
+
+---
+
+## AP-042: SCSS-Only Color Tokens in Multi-Theme Contexts
+
+**Status: ACTIVE**
+
+**Trigger:** Using raw SCSS variables (`$portfolio-surface-primary`, `$portfolio-text-primary`, etc.) as the sole color source in component `.module.scss` files when the component will be rendered in a context that supports runtime theme switching (dark mode via `.dark` class).
+
+**Why it's wrong:** Sass variables are compile-time constants. They resolve to hardcoded hex values during the build (e.g., `background: #FFFFFF`). When the host app toggles a `.dark` class at runtime, the compiled CSS doesn't respond — backgrounds stay white, borders stay light gray, and text colors become unreadable. The mismatch creates illegible component UIs in dark mode.
+
+**Correct alternative:**
+```scss
+background-color: var(--ds-surface-primary, #{$portfolio-surface-primary});
+border: 1px solid var(--ds-border-subtle, #{$portfolio-border-subtle});
+color: var(--ds-text-primary, #{$portfolio-text-primary});
+```
+Use `var(--ds-*, #{$scss-fallback})`. The CSS custom property adapts at runtime; the SCSS fallback preserves backward compatibility for hosts that don't define `--ds-*` properties. The `--ds-*` namespace is the design system's theming API — hosts populate it to control the theme.
+
+**Components migrated:** Card, Input, Table. Remaining SCSS modules should follow the same pattern when touched.
+
+---
+
+## AP-043: Raw Primitives in Locked-Appearance Component Styles
+
+**Trigger:** Using `$portfolio-neutral-100` or `$portfolio-neutral-10` directly in "always-dark" / "always-light" component SCSS instead of semantic tokens like `$portfolio-action-always-dark` / `$portfolio-text-always-light-bold`.
+
+**Why it's wrong:** Raw primitives obscure intent. A developer reading `$portfolio-neutral-100` cannot tell whether this is an "always dark" value, a "neutral bold surface," or an "inverse" value — they're all the same hex. Semantic tokens make the intent explicit and enable future value changes without hunting through component files. Additionally, using the wrong primitive (e.g., `$portfolio-neutral-10` for Always Light background instead of `$portfolio-neutral-00`) silently produces the wrong shade.
+
+**Correct alternative:** Use semantic tokens: `var(--portfolio-action-always-dark)`, `var(--portfolio-text-always-light-bold)`, `var(--portfolio-border-always-dark)`, etc. Even though always-* tokens are mode-invariant, they should still be CSS custom properties for consistency with the rest of the token system.
+
+**Frustration caused:** 1 round (FB-071). Always Light Bold was light gray instead of white because it used the wrong primitive.
+
+---
+
+## AP-044: Hardcoded SCSS Palette Values for Hover/Active in Theme-Responsive Components
+
+**Status: ACTIVE**
+
+**Trigger:** Using compile-time SCSS palette variables (`$portfolio-neutral-90`, `$portfolio-red-70`, `$portfolio-accent-20`, etc.) for hover/active background colors in components that also use CSS custom properties for their default state. The default state adapts to dark mode via custom properties, but hover/active compile to static hex values that stay fixed.
+
+**Why it's wrong:** Two distinct failure modes: (1) **Invisible text** — neutral bold's default inverts to white in dark mode, but hover stays hardcoded to near-black, making dark text invisible (1.20:1 contrast). (2) **Zero feedback** — positive/negative bold's default shifts to a deeper shade in dark mode that happens to equal the hardcoded hover value, so hover produces no visible change. Both undermine interaction confidence. The same issue affects subtle/regular/minimal variants, not just bold. Hardcoded light palette values like `$portfolio-accent-20` flash to bright pastels on dark surfaces, making dark-adapted text invisible.
+
+**Correct alternative:** For every appearance-emphasis variant, add a `:global([data-theme="dark"]) &, :global(.dark) &` block that overrides hover/active to dark-appropriate palette steps. The pattern: one step deeper than the dark-mode default for hover, two steps deeper for active. Verify each with WCAG AA contrast math before shipping. Variants using `var(--portfolio-*)` custom properties for hover are already safe and don't need overrides.
+
+**Frustration caused:** 2 rounds (FB-072, FB-073). First caught on highlight bold WCAG contrast, then expanded when neutral bold hover was found invisible in dark mode.
+
+---
+
+## AP-045: Adjacent Buttons Without Minimum Gap
+
+**Status: ACTIVE**
+
+**Trigger:** Placing two or more buttons directly next to each other (horizontally or vertically) with `gap-0`, `gap-1` (4px), or no gap at all — outside of a dedicated button group component.
+
+**Why it's wrong:** Buttons are discrete interactive elements. When placed flush or near-flush, they visually merge into a single block — users can't tell where one button ends and the next begins, especially when both have filled backgrounds or borders. This creates a false affordance (looks like one wide button) and violates the principle that each interactive element must be visually distinct. The problem is worse for full-width stacked buttons, where the entire width of adjacent backgrounds creates a wall of color with no separation. Even 4px is too small to read as intentional separation at normal viewing distances.
+
+**Correct alternative:** Use a minimum gap of 8px (`gap-2` / `spacer-1x`) between adjacent buttons. The recommended default is 12px (`gap-3` / `spacer-1.5x`). The only exception is a dedicated button group component (`ButtonGroup`, `SegmentedControl`) that uses shared borders or internal dividers to communicate "these are facets of one control." See `design.md` → `docs/design/spacing.md` §1.3.
+
+**Frustration caused:** 1 round — user identified the full-width button section as "horrible design practice" due to cramped stacking.
+
+---
+
+## AP-046: Inconsistent Active/Hover Treatment Across Nav Item Types
+
+**Status: ACTIVE**
+
+**Trigger:** Applying different active-state styling to different nav item types in the same sidebar — e.g., category buttons get `text-accent` (blue) but sub-nav links, direct links, and pinned items get `bg-sidebar-accent text-sidebar-accent-foreground` (background highlight with generic foreground).
+
+**Why it's wrong:** "Active" is a system-wide contract — it signals "you are here." When different nav item types use different visual treatments for the same semantic state, the user can't form a consistent mental model. A blue category label next to a background-highlighted sub-link looks like two different states, not one. Additionally, using `hover:text-sidebar-foreground` (#161616, dark gray) instead of `hover:text-black` (#000) for hover text reduces contrast against the hover background — the user perceives the text as "not changing enough" on hover.
+
+**Correct alternative:**
+- **Default**: `text-sidebar-muted-foreground` — dark gray, normal weight, no bg.
+- **Hover (non-active)**: `hover:bg-foreground/7 hover:text-black dark:hover:text-white` — neutral gray bg, absolute darkest text.
+- **Expanded (non-active parent)**: `text-black dark:text-white font-medium hover:bg-foreground/7` — black text, medium weight, neutral gray hover, no resting bg.
+- **Active (current page)**: `text-accent font-medium hover:bg-accent/7` — blue text, medium weight, brand-tinted hover bg.
+- **Category `isCatActive`** must take priority over `isOpen` in conditional chains.
+
+**Frustration caused:** 5 rounds — each round fixed one state while inadvertently breaking or neglecting another, because no complete state model was defined upfront. See §7.4 ("Model All States Before Writing Any Code").
+
+---
+
+## AP-047: Static Colored Text Palette Step Across Both Modes
+
+**Status: ACTIVE**
+
+**Trigger:** Using the same palette step for a functional text or icon color token in both light and dark mode (e.g., `$portfolio-text-warning: yellow-30` with no dark-mode override, or using a raw Tailwind class like `text-red-500` without a `dark:` variant).
+
+**Why it's wrong:** Colored text that doesn't adapt to the background luminance fails WCAG contrast in one mode or the other. Yellow-30 on white gives 1.68:1 (unreadable), while on dark surfaces it gives 10.75:1 (overkill). The system already has an established step-60 (light) / step-40 (dark) pattern for brand, negative, and positive text — warning was the exception. Similarly, static Tailwind color classes in the playground (like `text-red-500/80`) provide no mode adaptation, producing dim text on dark surfaces.
+
+**Correct alternative:** For DS tokens: use step-60 as the SCSS source value for light mode, and add a step-40 override in the `[data-theme="dark"]` block of `_custom-properties.scss`. For Tailwind utility contexts: use `dark:` variant with a lighter step (e.g., `text-red-600/80 dark:text-red-400/80`). Always verify contrast against both the light surface (white) and dark surface (#161616). See §9.12 in `docs/design/color.md` for the complete rule.
+
+**Frustration caused:** 3 rounds across sessions (FB-072: button text, FB-073: button hover states, FB-076: text color tokens). The pattern was partially implemented but not systematically enforced.
+
+---
+
+## AP-048: Incremental State-by-State Implementation Without a Holistic Model
+
+**Status: ACTIVE**
+
+**Trigger:** Implementing or modifying an interactive component's visual states one at a time — e.g., fixing the active state, then addressing hover as a separate pass, then patching the expanded state, then realizing the hover background is wrong — without first defining the complete state model.
+
+**Why it's wrong:** Each state of an interactive component exists in relation to every other state. Active must be visually distinct from hover. Hover must be visually distinct from expanded. The same semantic state (e.g., "active") must use identical treatment across all instances. When states are implemented incrementally, each fix is locally correct but globally incoherent — fixing one state inadvertently changes the relative contrast or visual weight of another. The result is a "frankenstate" component where no two rounds of feedback produce the same state table, because no state table was defined upfront.
+
+**Correct alternative:** Before writing any conditional class logic, enumerate every visual state the component can be in. For each state, define: text color, icon color, font weight, resting background, and hover background. Define what semantic message each state communicates (interaction vs. location vs. status). Verify that no two different semantic states share identical styling. Only then write the code. See §7.4 in `design.md`.
+
+**Frustration caused:** 5 rounds on sidebar navigation items (FB-075). Each round fixed one dimension while neglecting the complete model. The final four-state table could have been defined in round 1 if the state model had been the starting point rather than the end product.
+
+---
+
+## AP-048: Independent Padding Decisions Across Adjacent Panels
+
+**Status: ACTIVE**
+
+**Trigger:** Setting horizontal padding on a content area (`px-4 lg:px-5`) without checking the adjacent sidebar's effective content offset.
+
+**Why it's wrong:** When a sidebar and content area share a vertical border, the human eye aligns content across both panels along horizontal scan lines. If the sidebar's content starts at 14px from its edge but the adjacent content area starts at 16–20px, the misalignment is visible — especially on desktop where both panels are always in view. A responsive step-up (`lg:px-5`) amplifies the problem at exactly the breakpoint where both panels appear.
+
+**Correct alternative:** Derive the content area's horizontal padding from the sidebar's effective content offset. In this system, the sidebar uses container `px-1.5` (6px) + item `px-2` (8px) = 14px. The content area must use `px-3.5` (14px) to match. Document the alignment relationship in `spacing.md` §1.1 so future changes to sidebar padding automatically flag a content area update.
+
+**Frustration caused:** 1 round (FB-079). Low damage because it was caught early, but the pattern of deciding panel padding independently is systemic.
+
+---
+
+## AP-049: Taxonomy-Based Navigation Grouping That Splits Related Components
+
+**Trigger:** Organizing a component sidebar by abstract type ("what it is") rather than usage context ("where/how a developer uses it"), causing parent-child or sibling components to land in different categories.
+
+**Why it's wrong:** Users navigate by task, not by ontology. When NavItem and Navigation are in different tabs, the user must remember which abstract category each belongs to. Grab-bag categories like "Navigation & Menus" — mixing overlay menus, tab patterns, and nav primitives — provide no predictive value: knowing the category name doesn't tell you what's inside.
+
+**Correct alternative:** Group by usage context. Components that a developer uses together in the same workflow belong in the same category. Parent-child components (Navigation → NavItem) must always be colocated. When a category has only 2 items, consider merging it into an adjacent group rather than adding sidebar noise.
+
+**Frustration caused:** 1 round (FB-080). The user couldn't find NavItem relative to Navigation and questioned the entire IA.
+
+---
+
+## AP-050: Subtle-Emphasis Overlay Badges Blending with Parent Surface
+
+**Trigger:** Using `emphasis="subtle"` (gray tinted fill) on a Badge that overlays a neutral-surface component (e.g., collapsed NavItem, toolbar button, avatar). The subtle fill has near-zero contrast against the parent's own neutral background.
+
+**Why it's wrong:** Overlay badges exist to convey urgency at a glance — unread counts, new flags, status indicators. A badge that blends with its parent surface is invisible, defeating its purpose. The same subtle emphasis that works inline (where surrounding label text provides context) fails catastrophically in overlay position (where the badge floats alone over a small icon).
+
+**Correct alternative:** Overlay badges must always use `emphasis="bold"` (inverse surface = maximum contrast: black-on-white in light, white-on-black in dark). When the parent component enters an active/selected state that uses the brand color, the badge must also switch to `appearance="highlight"` to maintain visual coherence — active state must propagate to all nested semantic elements (icon, label, badge).
+
+**Frustration caused:** 1 round (FB-082). The gray badge blended completely with the NavItem surface, making the notification indicator invisible.
 
 ---
 

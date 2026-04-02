@@ -53,3 +53,25 @@ Applied at the component SCSS module level. FadeIn entrance animations, tab tran
 - Drag-to-pan canvas → arrow key panning + zoom buttons
 - Hover tooltips → click-to-reveal on touch; focus-triggered on keyboard
 - Scrub/slider controls → arrow key increment + click-to-jump
+
+### 17.6 Functional vs. Decorative WCAG Contrast Split
+
+**Source:** Session 2026-04-01, feedback "I doubt that bold style buttons pass WCAG in dark theme"
+
+**Rule:** Functional interactive elements (buttons, form controls, links with action intent) must meet WCAG 2.1 AA contrast (4.5:1 normal text, 3:1 large text) in both light and dark mode — no exceptions. Decorative or emphasis elements (brand badges, accent surfaces, illustrated color blocks) may relax strict contrast when their purpose is identity expression rather than action affordance.
+
+**Rationale:** The brand accent shifts lighter in dark mode (accent-60 → accent-50) for better visibility against dark backgrounds. This is the right tradeoff for non-interactive elements that need to "pop." But buttons carry action affordance — a user must be able to read the label to know what the button does. Readability is non-negotiable for functional elements.
+
+**Implementation:**
+- Buttons with brand bold backgrounds get a dark-mode SCSS override pinning the background to the deeper shade (accent-60) that passes AA with white text (6.75:1)
+- The shared `--portfolio-action-brand-bold` token stays at accent-50 in dark mode for non-button contexts
+- When adding new functional components that use brand color backgrounds with light text, verify contrast in both modes before shipping
+- Contrast audit checklist for bold button variants:
+
+| Variant | Dark mode | Ratio | Status |
+|---|---|---|---|
+| Highlight | accent-60 (override) | 6.75:1 | AA |
+| Positive | green-70 | 7.72:1 | AAA |
+| Negative | red-70 | 7.79:1 | AAA |
+| Warning | yellow-30 / yellow-100 text | 10.78:1 | AAA |
+| Neutral | neutral-00 / neutral-100 text | ~18:1 | AAA |

@@ -24,8 +24,8 @@
 | Service | Default Port | Current Port | Status | PID | Notes |
 |---|---|---|---|---|---|
 | Main site (`yilangao.com`) | 4000 | 4000 | running | 70330 | `npm run dev` |
-| Playground | 4001 | 4001 | running | 72072 | `npm run playground` |
-| ASCII Art Studio | 4002 | 4002 | stopped | — | — |
+| Playground | 4001 | 4001 | running | 29257 | `npm run playground` |
+| ASCII Art Studio | 4002 | 4002 | running | 19736 | `npm run ascii-tool` |
 
 ## Change Log
 
@@ -45,3 +45,9 @@
 | 2026-03-30 04:14 | ASCII Art Studio | started | 4002 | First boot after scaffold |
 | 2026-03-30 09:15 | Main site | restarted | 4000 | Restarted to sync Payload schema (testimonial text: textarea → richText) |
 | 2026-03-30 | Main site | restarted | 4000 | Cleared .next cache to fix stale HeroUploadZone hydration mismatch (ENG-067) |
+| 2026-04-01 | ASCII Art Studio | started | 4002 | Session boot — port was free |
+| 2026-04-01 | Playground | restarted | 4001 | Restarted to pick up ds-tokens.scss (design system CSS custom property import) |
+| 2026-04-01 | Playground | restarted | 4001 | Restarted for inverse/always taxonomy fix (new tokens + SCSS changes) |
+| 2026-04-01 | Playground | restarted | 4001 | Cleared .next + restarted — Turbopack HMR failed to push button page edit to browser (ENG-085) |
+| 2026-04-01 | Playground | restarted | 4001 | Cleared .next + restarted — ThemeProvider hydration fix (ENG-086) |
+| 2026-04-01 | Playground | restarted | 4001 | Cleared .next + restarted — stale HMR after adding md button size + updating Lg/Xl gaps/padding |

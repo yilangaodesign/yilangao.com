@@ -19,7 +19,7 @@ The interface should remain **predominantly neutral with minimal, intentional hi
 
 ### 9.3 Brand Accent: Lumen Blue-Violet
 
-**Adopted 2026-03-29.** The accent scale is ported from the Cadence Design System's "Lumen" color family, originally designed for the IBM Carbon project. Lumen is a perceptually uniform blue-violet ramp with no hue discontinuity — the previous accent had a visible hue jump at step 50 where desaturated blue-gray shifted abruptly to warm indigo.
+**Adopted 2026-03-29.** Lumen is a custom blue-violet accent scale designed for this system. It is a perceptually uniform ramp with no hue discontinuity — the previous accent had a visible hue jump at step 50 where desaturated blue-gray shifted abruptly to warm indigo.
 
 | Aspect | yilangao.com | IBM Carbon |
 |--------|-------------|------------|
@@ -193,11 +193,45 @@ The following color families are defined in `_colors.scss` but have no current U
 | **Purple** (Carbon's) | Visited links, special states, data series | Different hue from our accent — our accent is purple-indigo, Carbon's purple is more violet |
 | **Magenta** | Tags, decorative elements, data series | Warm accent — use very sparingly in B2B context |
 
+### 9.12 Text Color Brightness Inversion Rule
+
+**Source:** Session 2026-04-01, feedback "For the footer, the dark mode color should be slightly lighter"
+
+**Rule: All functional color tokens must follow a brightness inversion pattern — darker steps in light mode, lighter steps in dark mode.** The exact step offset depends on the property type and its WCAG threshold:
+
+- **Text tokens** (4.5:1 threshold): step-60 (light) / step-40 (dark)
+- **Icon tokens** (3:1 threshold): step-60 (light) / step-40 (dark) — mirrors text for visual consistency
+- **Border tokens** (3:1 threshold per WCAG 1.4.11): step-60 (light) / step-50 (dark)
+- **Action tokens** (background fills): step-60 (light) / step-50 (dark) — matches border pattern
+
+**Rationale:** The user observed that brand text already inverts well (accent-60 on white, accent-40 on dark) and asked why other colored text didn't follow the same rule. Warning tokens across all properties used yellow-30 in both modes — yielding 1.68:1 on white (catastrophic fail). The fix aligns all properties to systematic step offsets.
+
+**Implementation — complete token map (text/icon):**
+
+| Role | Light mode (`:root`) | Dark mode (`[data-theme="dark"]`) | Light contrast on white | Dark contrast on #161616 |
+|------|---------------------|----------------------------------|------------------------|-------------------------|
+| Brand | accent-60 (#3336FF) | accent-40 (#8DA3FC) | 6.75:1 | 7.56:1 |
+| Negative | red-60 (#DA1E28) | red-40 (#FF8389) | 5.00:1 | 7.63:1 |
+| Positive | green-60 (#198038) | green-40 (#42BE65) | 5.02:1 | 7.57:1 |
+| Warning | yellow-60 (#8E6A00) | yellow-40 (#D2A106) | 4.99:1 | 7.62:1 |
+
+**Implementation — border/action token map (step-60/step-50):**
+
+| Role | Light mode (`:root`) | Dark mode (`[data-theme="dark"]`) | Light contrast on white | Dark contrast on #161616 |
+|------|---------------------|----------------------------------|------------------------|-------------------------|
+| Negative | red-60 (#DA1E28) | red-50 (#FA4D56) | 5.00:1 | 5.40:1 |
+| Positive | green-60 (#198038) | green-50 (#24A148) | 5.02:1 | 5.40:1 |
+| Warning | yellow-60 (#8E6A00) | yellow-50 (#B28600) | 4.99:1 | 5.43:1 |
+
+**When adding a new functional color role** (e.g., `info`), apply the same rules: step-60 as the light-mode SCSS source, step-40 dark override for text/icon, step-50 dark override for border/action. Verify contrast against both white and #161616 before shipping.
+
+**For non-DS contexts** (Tailwind utility classes in the playground, one-off components): use the `dark:` variant with a lighter step. The pattern: one Tailwind step darker for light mode, one step lighter for dark mode (e.g., `text-red-600 dark:text-red-400`).
+
 ### 9.11 Open Issues (Future Work)
 
 | Issue | Status | Notes |
 |-------|--------|-------|
 | **Accent scale perceptual jump at step 50** | **Resolved** | Replaced with Lumen scale from Cadence Design System. Lumen is perceptually uniform blue-violet with no hue discontinuity. |
 | **Carbon Purple vs. Accent overlap** | Flagged | Two purple families exist (brand accent + Carbon purple). Consider dropping Carbon purple or adding clear gating rules. |
-| **Dark mode semantic tokens** | Not started | SCSS defines only light-mode semantics. Dark mode is handled ad-hoc in playground CSS. Canonical dark-mode mappings needed in SCSS when dark mode is prioritized. |
+| **Dark mode semantic tokens** | Mostly resolved | Text/icon (step-60/step-40) and border/action (step-60/step-50) tokens for all four functional roles now have canonical dark-mode overrides (§9.12). Surface tokens remain: `surface-warning-bold` uses yellow-30 in both modes intentionally (bright attention-grabbing background). |
 | **`support-info` and `support-caution-major` migration** | Pending | These legacy tokens have no direct equivalent in the new architecture. `info` may warrant its own role; `caution-major` (orange-40) remains legacy-only. |

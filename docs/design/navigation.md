@@ -56,6 +56,36 @@ When a category contains many links, group them with optional sub-headers inside
 - Not all categories need groups — only those where 8+ links benefit from visual chunking.
 - Sub-headers use the same visual treatment as sidebar section dividers: minimal weight, clearly subordinate to the links.
 
+### 4.5b Unified Four-State Model for All Sidebar Nav Items
+
+**Source:** Session 2026-04-01, iterative refinement across multiple rounds.
+
+Every nav item in the sidebar — parent categories, direct links (Overview), sub-nav links (Button, Badge…), and pinned items (Archive) — follows one unified state model. No exceptions based on nav item type.
+
+Two visual dimensions communicate two different things:
+- **Neutral colors (gray/black)** = "you are interacting with this"
+- **Brand accent color (blue)** = "this is where you actually are"
+- **Font weight (medium)** = "this has been clicked/activated" (expanded OR active)
+
+**1. Default state:** `text-sidebar-muted-foreground`
+- Dark gray text and icon. Normal weight. No background.
+
+**2. Hover state (non-active items):** `hover:bg-foreground/7 hover:text-black dark:hover:text-white`
+- Neutral gray background (7% of foreground color). Text goes to absolute black/white for maximum contrast. Normal weight.
+- Background must be neutral (foreground-derived), never brand-colored.
+
+**3. Expanded state (non-active parent, flyout open):** `text-black dark:text-white font-medium hover:bg-foreground/7`
+- Black text, medium weight — signals "you clicked/expanded this." No resting background.
+- Hover background is still neutral gray — because the user is not ON this page, just interacting with it.
+- For category buttons: `isCatActive` takes priority over `isOpen`. If the category contains the current page, it gets Active state, not Expanded.
+
+**4. Active state (current page):** `text-accent font-medium hover:bg-accent/7`
+- Blue accent text, medium weight — signals "this is where you are."
+- Hover background is brand-tinted (7% of accent color) — same brightness as neutral hover but preserving brand identity.
+- Icons inherit blue via `currentColor`.
+
+**Anti-pattern:** Applying different state styling to different nav item types, or using a permanent background for the Expanded state. See AP-046.
+
 ### 4.6 Hover-to-Reveal Category Sliver
 
 **Source:** Session 2026-03-29, "side panel should slide out on hover, not require clicking"

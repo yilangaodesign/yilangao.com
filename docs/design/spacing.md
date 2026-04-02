@@ -4,13 +4,12 @@
 
 **Severity: Critical** — This was the #1 recurring frustration (8 of 18 feedback messages).
 
-### 1.1 Content Area Padding (B2B Density)
+### 1.1 Content Area Padding (Cross-Panel Alignment)
 
-- Content areas adjacent to navigation use **16px (`px-4`) base**, scaling to **20px (`px-5`) at `lg`**. This is B2B-appropriate density — not cramped, but not wasteful.
-- Vertical padding from top nav to content: **16px (`py-4`) base**, **20px (`py-5`) at `lg`**.
-- Header horizontal padding matches main content: `px-4 lg:px-5`.
-- Responsive padding should increase modestly, not double. The jump from 16→20px is sufficient.
-- **Supersedes earlier "32px minimum" guidance** — that was appropriate for consumer spacing but too loose for B2B tool interfaces.
+- **Horizontal padding in content areas adjacent to a sidebar must match the sidebar's effective content offset.** The sidebar's content starts 14px from its edge (container `px-1.5` + item `px-2`). The content area (header, main, footer) uses **`px-3.5` (14px)** to align. This creates a consistent visual rhythm across both panels.
+- **Never use a responsive step-up** (`lg:px-5`) for horizontal padding in sidebar-adjacent content — it breaks alignment at exactly the breakpoint where both panels are visible.
+- Vertical padding from top nav to content: **16px (`py-4`) base**, **20px (`py-5`) at `lg`** — vertical can step up because there is no cross-panel vertical alignment to maintain.
+- **Supersedes earlier "16px base, 20px at lg" horizontal guidance** (pre-FB-079) — that was set independently of the sidebar and created a visible 6px misalignment on desktop.
 
 ### 1.2 Three-Tier Spacing Token Architecture (One GS Reference)
 
@@ -66,11 +65,22 @@ Clean progression: sub-1x uses halving (0.5, 0.25, 0.125), 1x–2.5x use half-st
 
 **Migration from legacy names:** All old `spacing-NN` and `layout-NN` tokens are preserved as deprecated aliases. See `_spacing.scss` for the full mapping. When in doubt, round up to the next multiplier step.
 
-### 1.3 Never Zero
+### 1.3 Minimum Inter-Component Gap for Buttons
+
+Buttons must never be placed directly adjacent to each other — horizontally or vertically — without a gap. This applies universally unless a dedicated button group component explicitly overrides it (e.g., a segmented control or split button with internal border separators).
+
+- **Minimum gap between adjacent buttons:** 8px (`gap-2` / `spacer-1x`). This is the floor — not a target.
+- **Recommended gap for side-by-side buttons:** 12px (`gap-3` / `spacer-1.5x`). This is the standard for button rows in forms, toolbars, and previews.
+- **Recommended gap for stacked full-width buttons:** 12px (`space-y-3` / `spacer-1.5x`). Full-width buttons each carry their own background/border, so the gap between them must be large enough to read as distinct elements, not a single merged block.
+- **Why not 4px?** While 4px (`gap-1`) is technically non-zero, it's visually indistinguishable from touching at normal viewing distances, especially between elements with filled backgrounds. 8px is the practical minimum where two adjacent buttons read as separate entities.
+
+**Button group exception:** A component that explicitly groups buttons into a unified control (e.g., `ButtonGroup`, `SegmentedControl`) may use `gap-0` with internal dividers or shared borders. This is a deliberate design decision, not an accident. The visual cohesion of the group communicates "these are facets of one control."
+
+### 1.4 Never Zero
 
 Every container boundary (sidebar edge, card edge, header edge) must have **visible** padding separating it from its children. If you can't see the gap, it's wrong.
 
-### 1.4 Sidebar Internal Spacing (Collapsed-First)
+### 1.5 Sidebar Internal Spacing (Collapsed-First)
 
 The collapsed state is the **canonical spacing reference**. The expanded state must match it exactly on every shared vertical axis so that toggling never causes tabs to jump.
 

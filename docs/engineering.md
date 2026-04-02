@@ -4,7 +4,7 @@
 >
 > **Who reads this:** AI agents routed here by `AGENTS.md` Pre-Flight. Read the Section Index first, then follow the link to the spoke file matching your task.
 > **Who writes this:** AI agents after processing engineering feedback via the `engineering-iteration` skill.
-> **Last updated:** 2026-03-30 (hub-and-spoke restructure)
+> **Last updated:** 2026-04-01 (ENG-085: Playground HMR verification failure — escalated to Critical, EAP-042)
 
 ---
 
@@ -104,13 +104,13 @@ Recurring incidents should be escalated up this hierarchy until they stop recurr
 
 | Pattern | Times Raised | Priority |
 |---------|-------------|----------|
-| Data sync / token drift | 1 | Critical |
+| Data sync / token drift | 2 | **Critical — ENG-084. Playground maintained manually-duplicated `--ds-*` namespace; migrating source to `--portfolio-*` broke all consumer color resolution. Consumer apps must import from single source, not maintain parallel definitions.** |
 | Cross-app infrastructure parity | 3 | Critical |
 | Rules-layer enforcement gap | 1 | Critical |
 | Port management | 0 | Critical |
 | Localhost verification | 1 | Critical |
 | Build / bundler issues (React 19 compat) | 4 | **Critical — 3 failed fixes (ENG-017→018→019). Rule: no `<script>` in React tree. See EAP-013.** |
-| Turbopack cache corruption | 3 | **High — ENG-047, ENG-056, ENG-067. Stale `.next/` caused runtime TypeError (047), phantom route conflicts with 404s (056), and ghost hydration mismatch from removed component (067). Rule: clear `.next/` when runtime error contradicts source or file structure. See EAP-035.** |
+| Turbopack cache / HMR delivery failure | 4+ | **Critical — ESCALATED. ENG-047, ENG-056, ENG-067, ENG-085 + 3 undocumented. Stale `.next/` caused runtime TypeError (047), phantom route conflicts (056), ghost hydration mismatch (067), and recurring playground edit invisibility (085). Rule: after every playground edit, verify via curl + instruct user to hard-refresh. If change not visible, `rm -rf playground/.next` + restart. NEVER report a playground edit as done without verification. See EAP-035, EAP-042.** |
 | Verification gap (reporting done without browser check) | 3 | **Critical — promoted to Hard Guardrail #10 (ENG-020). curl ≠ verification.** |
 | Process automation gaps | 1 | High |
 | Documentation procedure skips | 3 | **Critical — promoted to Hard Guardrail #1 (ENG-012)** |
@@ -120,7 +120,7 @@ Recurring incidents should be escalated up this hierarchy until they stop recurr
 | Git branching / session safety | 1 | Critical |
 | URL namespace / multi-app architecture | 1 | High — documented as ADR, revisit if a third concern lands on port 4000 |
 | CMS UX / inline editing | 27 | **Critical — ESCALATED. ENG-027→039, ENG-042→046, ENG-049→051, ENG-054→058, ENG-062→063, ENG-066→068. ENG-068: ProjectEditModal missing min-height (AP-027 violated 3rd time). Modal dimension template now documented.** |
-| Hydration mismatch (SSR/CSR divergence) | 7 | **Critical — ENG-017/18/19/20, ENG-045, ENG-055, ENG-067. Rule: never branch on client-only values; defer admin-conditional DOM with mounted-state pattern. Stale cache can also cause ghost mismatches (EAP-035). See EAP-014.** |
+| Hydration mismatch (SSR/CSR divergence) | 10 | **Critical — ESCALATED. ENG-017/18/19/20, ENG-045, ENG-055, ENG-067, ENG-081, ENG-086, ENG-087. Three root cause families: (1) Turbopack bundle divergence — barrel import resolution (EAP-056), SCSS @use compilation (EAP-038), stale cache (EAP-035); (2) typeof window branching (EAP-014); (3) invalid HTML nesting. Barrel imports from lucide-react now banned via Hard Guardrail #15. See EAP-056.** |
 | Documentation procedure skips | 7 | **Critical — ESCALATED AGAIN. ENG-008/012 (EAP-010), ENG-044/045/046 (EAP-027), ENG-053 (EAP-032). 7th occurrence. Architectural changes trigger same skip pattern as bug fixes — "get it working" urgency overrides documentation even for non-urgent infrastructure work.** |
 | Design system migration / upstream-first workflow | 1 | High — ENG-040. ScrollSpy promoted to DS; required `transpilePackages` + export path. |
 | Admin IA / discoverability | 3 | **High — ENG-042/043/046. Sidebar nav insufficient; dashboard is the only reliable entry point. Auto-login cookie gap masked the whole inline editing system.** |
@@ -130,6 +130,7 @@ Recurring incidents should be escalated up this hierarchy until they stop recurr
 | Scroll hijack on embedded canvas | 1 | High — ENG-072. onWheel handler on embedded DAG canvas intercepted page scroll. Embedded canvases must never capture wheel events; pan via drag only. See EAP-036. |
 | Playground ↔ production drift (one-way experiment) | 2 | **Critical — ENG-073, ENG-074. Drift from non-propagation AND from rebuilding demos with hardcoded values instead of token references. See EAP-030, EAP-055.** |
 | Playground component re-implementation drift | 3 | **Resolved — ENG-073/075/076. Three-stage enforcement pipeline: (1) Central Intent Gate in AGENTS.md #18 blocks component visual edits to playground, (2) ESLint inline plugin catches forbidden patterns in playground pages, (3) Evaluation Gate with correction loop in playground skill. See EAP-037.** |
+| SCSS token theme adaptability | 2 | **Resolved — ENG-082/083. Full CSS custom property output layer (`_custom-properties.scss`) now generates `:root` (light) and `[data-theme="dark"]` blocks. ~40 SCSS modules migrated from `$portfolio-*` to `var(--portfolio-*)`. 43 component-level `$_` tokens introduced for hardcoded px values. Remaining 202 SCSS refs are documented exceptions (rgba(), always-dark surfaces, interaction state tints).** |
 
 ---
 
