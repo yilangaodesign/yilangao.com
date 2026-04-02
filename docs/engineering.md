@@ -137,6 +137,7 @@ Recurring incidents should be escalated up this hierarchy until they stop recurr
 | Component duplication / shadow implementation | 1 | High — ENG-093. VerticalNavCategory reimplemented ~80% of NavItem's visual DNA with 11 parallel SCSS classes. Resolved by adding `expanded` state to NavItem + creating NavItemTrigger/NavItemChildren primitives. Layout components must compose — never reimplement — the nav item primitive. |
 | Component API prop pass-through gap | 1 | Medium — ENG-094. NavItemTrigger lacked `badge` prop pass-through to NavItem. Wrapper components must forward all visual props of the inner primitive they compose. |
 | CSS alignment inconsistency (.badge vs .trailing) | 1 | Medium — ENG-094. `.badge` had `margin-inline-start: auto` but `.trailing` didn't. Both right-aligned slots should use the same CSS mechanism. |
+| Deployment / Vercel build | 1 | **High — ENG-096. First main site deploy failed: Payload `importMap.js` was gitignored (Vercel needs it at build time), `resend` dynamically imported but not in `package.json` (Turbopack resolves all imports statically). See EAP-060.** |
 
 ---
 

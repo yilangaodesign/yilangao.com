@@ -4,7 +4,7 @@
 >
 > **Who reads this:** AI agents at session start (scan recent entries for context), and during incident response (check for recurring patterns).
 > **Who writes this:** AI agents after each incident resolution via the `engineering-iteration` skill.
-> **Last updated:** 2026-04-01 (ENG-088: Playground NavItem demos used `href="#"` → scroll-to-top on click)
+> **Last updated:** 2026-04-02 (ENG-096: Vercel build failures on first production deploy of main site)
 >
 > **For agent skills:** Read only the first 30 lines of this file (most recent entries) for pattern detection.
 > **Older entries:** Synthesized in `docs/engineering-feedback-synthesis.md`. Raw archive in `docs/engineering-feedback-log-archive.md`.
@@ -708,5 +708,22 @@ This is an instance of EAP-016 (conditional rendering hiding inline-editable emp
 **Lesson:** Payload admin SCSS files under `(payload)/` don't import the DS styles barrel — they use CSS custom properties directly. When bulk-replacing SCSS variables in admin components, use `var(--portfolio-*)` not `$portfolio-*`. Also, `$portfolio-spacer-utility-*` tokens have the `utility-` prefix for sub-grid values — never assume the shorthand exists.
 
 **Cross-category note:** Also documented as FB-057 (design).
+
+---
+
+### ENG-096: Vercel build failures on first production deploy of main site
+
+**Issue:** First deploy of the main site to Vercel (`yilangao-portfolio`) failed with three `Module not found` errors for `../importMap` in Payload admin files, and one `Module not found` for `resend` in the contact API route.
+
+**Root Cause:** Two distinct issues:
+1. Payload CMS auto-generates `importMap.js` during local dev, but it was in `.gitignore`. The file existed locally but never reached GitHub, so Vercel's clean checkout couldn't find it.
+2. The contact route used `await import("resend")` behind a runtime guard (`if (!process.env.RESEND_API_KEY)`), with `@ts-expect-error` since `resend` wasn't in `package.json`. Turbopack resolves all imports at build time regardless of runtime conditions — the guard doesn't matter.
+
+**Resolution:**
+1. Removed `/src/app/(payload)/admin/importMap.js` from `.gitignore` and committed the generated file.
+2. Added `resend` as a real dependency in `package.json`. Removed the `@ts-expect-error` comment.
+3. Build succeeded on retry. Production deployment Ready in ~2 minutes.
+
+**Lesson:** Local dev environments mask two categories of build failure: (a) framework-generated files that exist locally but aren't committed (test with a clean `git clone` + `next build`), and (b) dynamic imports that Turbopack resolves statically — there's no such thing as a "runtime-only" import in the build step. See EAP-060.
 
 ---

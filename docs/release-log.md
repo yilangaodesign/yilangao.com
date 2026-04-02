@@ -4,7 +4,31 @@
 >
 > **Who reads this:** AI agents when the `ship-it` skill is activated — scan recent entries for recurring pitfalls before starting a new release.
 > **Who writes this:** AI agents after each ship-it run via the Post-Release Audit protocol in `ship-it/SKILL.md`.
-> **Last updated:** 2026-04-02 (REL-001: Élan 2.2.0, ASCII Art Studio 0.2.1)
+> **Last updated:** 2026-04-02 (REL-002: Main site deployed to new.yilangao.com)
+
+---
+
+## REL-002 — Main site deployed to new.yilangao.com (2026-04-02)
+
+**Scope:** First production deployment of the portfolio site. Documentation updates (4 files) + build fixes (5 files).
+**Vercel project:** `yilangao-portfolio` (root dir `.`, production branch `main`)
+**Domain:** `new.yilangao.com` (Cloudflare CNAME → `cname.vercel-dns.com`, grey cloud / DNS-only)
+
+**Incidents during deployment:**
+
+1. **Build failure #1 — Payload `importMap.js` gitignored** (→ ENG-096, EAP-060)
+   Payload auto-generates `importMap.js` during local dev. The file was in `.gitignore`, so it never reached GitHub. Vercel build failed with `Module not found: Can't resolve '../importMap'` in three Payload admin files. Fixed by removing from `.gitignore` and committing the generated file.
+
+2. **Build failure #2 — `resend` not in `package.json`** (→ ENG-096)
+   The contact route used `await import("resend")` with a runtime guard and `@ts-expect-error`. Turbopack resolves all imports at build time regardless of runtime conditions. Fixed by adding `resend` to `package.json` and removing the `@ts-expect-error`.
+
+**Documentation updates shipped with deployment:**
+- `docs/architecture.md` §4: production deployment table, domain/DNS architecture, source code security, staged migration rationale, build boundaries
+- `docs/engineering/deployment.md`: main site Vercel mapping, DNS config, env vars
+- `docs/engineering/multi-app-architecture.md`: Section 9.6 production build boundaries
+- `AGENTS.md`: App Registry with production URLs, Vercel project names, hosting columns
+
+**Outcome:** Build succeeded after fix commit. Production deployment Ready in ~2 minutes. Domain verified, SSL provisioned by Vercel. Site accessible at `https://new.yilangao.com`.
 
 ---
 
