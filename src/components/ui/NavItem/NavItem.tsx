@@ -2,17 +2,20 @@ import {
   forwardRef,
   type AnchorHTMLAttributes,
   type ButtonHTMLAttributes,
+  type ElementType,
   type ReactNode,
 } from "react";
 import { Badge, type BadgeSize } from "../Badge/Badge";
 import styles from "./NavItem.module.scss";
 
-export type NavItemSize = "sm" | "md" | "lg";
+export type NavItemSize = "sm" | "md" | "lg" | "touch";
+export type NavItemActiveAppearance = "neutral" | "brand";
 
 const BADGE_SIZE: Record<NavItemSize, { expanded: BadgeSize; overlay: BadgeSize }> = {
-  sm: { expanded: "xxs", overlay: "xxs" },
-  md: { expanded: "xs",  overlay: "xxs" },
-  lg: { expanded: "sm",  overlay: "xs" },
+  sm:    { expanded: "xxs", overlay: "xxs" },
+  md:    { expanded: "xs",  overlay: "xxs" },
+  lg:    { expanded: "sm",  overlay: "xs" },
+  touch: { expanded: "sm",  overlay: "xs" },
 };
 
 interface RenderBadgeOpts {
@@ -38,6 +41,8 @@ export interface NavItemBaseProps {
   icon: ReactNode;
   size?: NavItemSize;
   active?: boolean;
+  activeAppearance?: NavItemActiveAppearance;
+  expanded?: boolean;
   collapsed?: boolean;
   badge?: ReactNode;
   trailing?: ReactNode;
@@ -47,6 +52,7 @@ export interface NavItemBaseProps {
 export type NavItemAsLink = NavItemBaseProps &
   Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "children"> & {
     href: string;
+    as?: ElementType;
     children?: ReactNode;
   };
 
@@ -71,6 +77,8 @@ export const NavItem = forwardRef<
       icon,
       size = "md",
       active = false,
+      activeAppearance = "neutral",
+      expanded = false,
       collapsed = false,
       badge,
       trailing,
@@ -81,10 +89,18 @@ export const NavItem = forwardRef<
     },
     ref,
   ) => {
+    const stateClass = active
+      ? activeAppearance === "brand"
+        ? styles.brandActive
+        : styles.active
+      : expanded
+        ? styles.expanded
+        : undefined;
+
     const cls = [
       styles.navItem,
       styles[size],
-      active && styles.active,
+      stateClass,
       collapsed && styles.collapsed,
       disabled && styles.disabled,
       className,
@@ -119,9 +135,9 @@ export const NavItem = forwardRef<
     );
 
     if (isLink({ ...rest, icon, children } as NavItemProps)) {
-      const { href, ...anchorProps } = rest as Omit<NavItemAsLink, keyof NavItemBaseProps>;
+      const { href, as: LinkComponent = "a", ...anchorProps } = rest as Omit<NavItemAsLink, keyof NavItemBaseProps>;
       return (
-        <a
+        <LinkComponent
           ref={ref as React.Ref<HTMLAnchorElement>}
           href={href}
           className={cls}
@@ -131,7 +147,7 @@ export const NavItem = forwardRef<
           {...anchorProps}
         >
           {inner}
-        </a>
+        </LinkComponent>
       );
     }
 

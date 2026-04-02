@@ -47,7 +47,13 @@ export { Select, SelectItem, SelectGroup, SelectLabel, SelectSeparator } from ".
 export type { SelectProps, SelectItemProps } from "./Select";
 
 export { Checkbox } from "./Checkbox";
-export type { CheckboxCheckedState, CheckboxProps } from "./Checkbox";
+export type {
+  CheckboxAppearance,
+  CheckboxCheckedState,
+  CheckboxLabelPlacement,
+  CheckboxProps,
+  CheckboxSize,
+} from "./Checkbox";
 
 export { Toggle } from "./Toggle";
 export type { ToggleProps } from "./Toggle";

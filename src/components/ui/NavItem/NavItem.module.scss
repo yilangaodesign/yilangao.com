@@ -1,21 +1,22 @@
 @use '../../../styles' as *;
 
 // =============================================================================
-// NavItem — 3-Size Model (sm / md / lg)
+// NavItem — 4-Size Model (sm / md / lg / touch)
 // =============================================================================
-// NavItem's size range maps to the lower half of Button's scale.
-// Icon-to-height ratio is 0.5 at every size (nav icons are wayfinding cues,
+// sm/md/lg map to the lower half of Button's scale.
+// touch (44px) meets Apple HIG minimum tap target — content stays at lg scale,
+// only the container grows.
+// Icon-to-height ratio is ~0.5 at sm/md/lg (nav icons are wayfinding cues,
 // not primary affordances — the label dominates).
-// Trailing icon is 2px smaller than leading icon at each size.
+// Trailing icon matches leading icon at every size.
 // =============================================================================
 
 // Component tokens — icon dimensions per size
 $_nav-icon-sm: 12px;
 $_nav-icon-md: 16px;
 $_nav-icon-lg: 20px;
-$_nav-trailing-sm: 10px;
-$_nav-trailing-md: 14px;
-$_nav-trailing-lg: 18px;
+$_nav-icon-touch: 20px;
+$_nav-height-touch: 44px;
 
 .navItem {
   @include button-reset;
@@ -50,6 +51,20 @@ $_nav-trailing-lg: 18px;
   &:hover:not(.disabled) {
     background-color: var(--portfolio-surface-neutral-regular);
   }
+}
+
+.brandActive {
+  color: var(--portfolio-text-brand-bold);
+  font-weight: var(--portfolio-weight-medium);
+
+  &:hover:not(.disabled) {
+    background-color: var(--portfolio-surface-brand-subtle);
+  }
+}
+
+.expanded {
+  color: var(--portfolio-text-primary);
+  font-weight: var(--portfolio-weight-medium);
 }
 
 .disabled {
@@ -90,7 +105,7 @@ $_nav-trailing-lg: 18px;
   top: 0;
   right: 0;
   transform: translate(25%, -25%);
-  z-index: 1;
+  z-index: $portfolio-z-raised;
   pointer-events: none;
 }
 
@@ -98,6 +113,7 @@ $_nav-trailing-lg: 18px;
   display: inline-flex;
   align-items: center;
   flex-shrink: 0;
+  margin-inline-start: auto;
   color: var(--portfolio-text-tertiary);
 }
 
@@ -107,12 +123,12 @@ $_nav-trailing-lg: 18px;
 
 .sm {
   min-height: var(--portfolio-spacer-3x);
-  padding: 0 $portfolio-spacer-utility-0-75x;
+  padding: 0 var(--portfolio-spacer-1x);
   font-size: var(--portfolio-type-xs);
   gap: $portfolio-spacer-utility-0-75x;
 
   .icon { width: $_nav-icon-sm; height: $_nav-icon-sm; }
-  .trailing svg { width: $_nav-trailing-sm; height: $_nav-trailing-sm; }
+  .trailing svg { width: $_nav-icon-sm; height: $_nav-icon-sm; }
 
   &.collapsed {
     width: var(--portfolio-spacer-3x);
@@ -126,7 +142,7 @@ $_nav-trailing-lg: 18px;
   gap: var(--portfolio-spacer-1x);
 
   .icon { width: $_nav-icon-md; height: $_nav-icon-md; }
-  .trailing svg { width: $_nav-trailing-md; height: $_nav-trailing-md; }
+  .trailing svg { width: $_nav-icon-md; height: $_nav-icon-md; }
 
   &.collapsed {
     width: var(--portfolio-spacer-4x);
@@ -137,13 +153,27 @@ $_nav-trailing-lg: 18px;
   min-height: var(--portfolio-spacer-5x);
   padding: 0 $portfolio-spacer-utility-1-5x;
   font-size: var(--portfolio-type-base);
-  gap: $portfolio-spacer-utility-1-25x;
+  gap: var(--portfolio-spacer-1x);
 
   .icon { width: $_nav-icon-lg; height: $_nav-icon-lg; }
-  .trailing svg { width: $_nav-trailing-lg; height: $_nav-trailing-lg; }
+  .trailing svg { width: $_nav-icon-lg; height: $_nav-icon-lg; }
 
   &.collapsed {
     width: var(--portfolio-spacer-5x);
+  }
+}
+
+.touch {
+  min-height: $_nav-height-touch;
+  padding: 0 $portfolio-spacer-2x;
+  font-size: var(--portfolio-type-base);
+  gap: var(--portfolio-spacer-1x);
+
+  .icon { width: $_nav-icon-touch; height: $_nav-icon-touch; }
+  .trailing svg { width: $_nav-icon-touch; height: $_nav-icon-touch; }
+
+  &.collapsed {
+    width: $_nav-height-touch;
   }
 }
 
@@ -154,4 +184,30 @@ $_nav-trailing-lg: 18px;
 .collapsed {
   justify-content: center;
   padding: 0;
+}
+
+// =============================================================================
+// NavItemTrigger — chevron + children container
+// =============================================================================
+
+.chevron {
+  flex-shrink: 0;
+  @include transition-fast;
+  color: var(--portfolio-text-tertiary);
+}
+
+.chevronExpanded {
+  transform: rotate(90deg);
+}
+
+.childrenContainer {
+  overflow: hidden;
+  transition: height $portfolio-duration-nav $portfolio-easing-nav;
+}
+
+.childrenInner {
+  padding-left: $portfolio-spacer-2x;
+  display: flex;
+  flex-direction: column;
+  gap: $portfolio-spacer-0-125x;
 }

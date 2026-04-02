@@ -1141,6 +1141,20 @@
       },
       "tags": ["ui", "selection", "toggle-group", "button", "segmented-control", "radix"],
       "hasPreview": true
+    },
+    {
+      "id": "shared-ui-vertical-nav",
+      "name": "VerticalNav",
+      "type": "Component",
+      "experiment": "shared",
+      "status": "active",
+      "description": "Compound sidebar navigation component with collapsible/expanded states, mobile overlay, hover-to-reveal category slivers with safe-triangle protection, section dividers, and polymorphic link support. Mirrors the Élan playground shell sidebar.",
+      "sourcePath": "src/components/ui/VerticalNav/VerticalNav.tsx",
+      "createdAt": "2026-04-02T00:00:00Z",
+      "createdBy": "cursor",
+      "origin": { "type": "custom" },
+      "tags": ["ui", "navigation", "sidebar", "vertical-nav", "collapsible", "compound"],
+      "hasPreview": true
     }
   ]
 }

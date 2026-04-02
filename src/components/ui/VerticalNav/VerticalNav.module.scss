@@ -1,0 +1,205 @@
+@use '../../../styles' as *;
+
+// =============================================================================
+// VerticalNav — Compound Sidebar Component
+// =============================================================================
+// Mirrors the Élan playground shell's sidebar: collapsible, mobile-aware,
+// with hover-to-reveal category slivers and safe-triangle protection.
+// All values derived from DS tokens — no Tailwind, no inline styles.
+// =============================================================================
+
+// ── Component tokens ─────────────────────────────────────────────────────────
+
+$_nav-width-expanded: 200px;
+$_nav-width-collapsed: 41px;
+$_nav-footer-height: 44px;
+
+// ── Root (aside) ─────────────────────────────────────────────────────────────
+
+.root {
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: $_nav-width-expanded;
+  background-color: var(--portfolio-surface-neutral-subtle);
+  color: var(--portfolio-text-secondary);
+  border-right: $portfolio-border-width-thin solid var(--portfolio-border-neutral-subtle);
+  z-index: $portfolio-z-sticky;
+  overflow: hidden;
+  transition: width $portfolio-duration-nav $portfolio-easing-nav,
+              transform $portfolio-duration-nav $portfolio-easing-nav;
+  transform: translateX(-100%);
+
+  @media #{$elan-mq-md} {
+    transform: translateX(0);
+  }
+}
+
+.collapsed {
+  width: $_nav-width-collapsed;
+}
+
+.mobileOpen {
+  transform: translateX(0);
+  width: $_nav-width-expanded;
+}
+
+// ── Spacer (pushes main content right) ───────────────────────────────────────
+
+.spacer {
+  display: none;
+  flex-shrink: 0;
+  transition: width $portfolio-duration-nav $portfolio-easing-nav;
+
+  @media #{$elan-mq-md} {
+    display: block;
+  }
+}
+
+// ── Mobile backdrop ──────────────────────────────────────────────────────────
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: $portfolio-z-dropdown;
+  background-color: var(--portfolio-surface-overlay);
+
+  @media #{$elan-mq-md} {
+    display: none;
+  }
+}
+
+// ── Header ───────────────────────────────────────────────────────────────────
+
+.header {
+  display: flex;
+  align-items: center;
+  height: var(--portfolio-spacer-6x);
+  padding: 0 $portfolio-spacer-utility-0-75x;
+  border-bottom: $portfolio-border-width-thin solid var(--portfolio-border-neutral-subtle);
+  flex-shrink: 0;
+}
+
+// ── Content (scrollable middle) ──────────────────────────────────────────────
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0 $portfolio-spacer-utility-0-75x $portfolio-spacer-2x;
+}
+
+.contentNav {
+  display: flex;
+  flex-direction: column;
+  gap: $portfolio-spacer-0-125x;
+}
+
+// ── Footer ───────────────────────────────────────────────────────────────────
+
+.footer {
+  flex-shrink: 0;
+  height: $_nav-footer-height;
+  display: flex;
+  align-items: center;
+  padding: 0 $portfolio-spacer-utility-0-75x;
+  border-top: $portfolio-border-width-thin solid var(--portfolio-border-neutral-subtle);
+}
+
+// ── Section divider ──────────────────────────────────────────────────────────
+
+.sectionDivider {
+  display: flex;
+  align-items: center;
+  height: var(--portfolio-spacer-3x);
+}
+
+.sectionLabel {
+  padding: 0 var(--portfolio-spacer-1x);
+  font-family: var(--portfolio-font-sans);
+  font-size: var(--portfolio-type-2xs);
+  font-weight: var(--portfolio-weight-medium);
+  line-height: var(--portfolio-leading-compact);
+  letter-spacing: var(--portfolio-tracking-wide);
+  text-transform: uppercase;
+  color: var(--portfolio-text-secondary);
+  opacity: $portfolio-opacity-overlay-light;
+}
+
+.sectionRule {
+  width: 100%;
+  border-top: $portfolio-border-width-thin solid var(--portfolio-border-neutral-subtle);
+}
+
+// ── Group sub-header ─────────────────────────────────────────────────────────
+
+.groupHeader {
+  padding: var(--portfolio-spacer-1x) var(--portfolio-spacer-1x) $portfolio-spacer-0-25x;
+}
+
+.groupLabel {
+  font-family: var(--portfolio-font-sans);
+  font-size: var(--portfolio-type-2xs);
+  font-weight: var(--portfolio-weight-medium);
+  line-height: var(--portfolio-leading-compact);
+  letter-spacing: var(--portfolio-tracking-wide);
+  text-transform: uppercase;
+  color: var(--portfolio-text-secondary);
+  opacity: $portfolio-opacity-disabled;
+}
+
+// ── Category item (thin override on NavItem) ─────────────────────────────────
+// VerticalNavCategory now composes NavItem directly. This class only
+// provides the collapsed-state padding tweak specific to the sidebar layout.
+
+.categoryItem {
+  text-align: left;
+}
+
+// ── Sliver (flyout panel) ────────────────────────────────────────────────────
+
+.sliver {
+  position: fixed;
+  top: 0;
+  height: 100vh;
+  width: $_nav-width-expanded;
+  z-index: $portfolio-z-dropdown;
+  background-color: var(--portfolio-surface-neutral-subtle);
+  border-right: $portfolio-border-width-thin solid var(--portfolio-border-neutral-subtle);
+  box-shadow: var(--portfolio-shadow-lg);
+  transition: transform $portfolio-duration-nav $portfolio-easing-nav;
+}
+
+.sliverVisible {
+  transform: translateX(0);
+}
+
+.sliverHidden {
+  transform: translateX(-100%);
+  pointer-events: none;
+}
+
+.sliverHeader {
+  display: flex;
+  align-items: center;
+  height: var(--portfolio-spacer-6x);
+  padding: 0 var(--portfolio-spacer-1-5x);
+  border-bottom: $portfolio-border-width-thin solid var(--portfolio-border-neutral-subtle);
+}
+
+.sliverTitle {
+  font-family: var(--portfolio-font-sans);
+  font-size: var(--portfolio-type-xs);
+  font-weight: var(--portfolio-weight-medium);
+  color: var(--portfolio-text-primary);
+}
+
+.sliverNav {
+  padding: $portfolio-spacer-utility-0-75x;
+  display: flex;
+  flex-direction: column;
+  gap: $portfolio-spacer-0-125x;
+}
