@@ -20,7 +20,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: true, mode: "dev" });
     }
 
-    // @ts-expect-error resend is an optional runtime dependency
     const { Resend } = await import("resend");
     const resend = new Resend(process.env.RESEND_API_KEY);
 

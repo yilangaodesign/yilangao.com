@@ -50,6 +50,6 @@ yarn-error.log*
 next-env.d.ts
 
 # payload
-/src/app/(payload)/admin/importMap.js
+# importMap.js must be committed — Payload generates it locally but Vercel needs it at build time
 /src/payload-types.ts
 /media
