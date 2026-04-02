@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState } from "react";
 import { FadeIn } from "@/components/ui/FadeIn";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/Tabs";
 import styles from "./elan-visuals.module.scss";
 
 const COMPONENTS = [
@@ -23,47 +24,20 @@ const CATEGORIES = ["All", "Animation", "Navigation", "Disclosure", "Interaction
 
 export default function ComponentShowcase() {
   const [filter, setFilter] = useState<string>("All");
-  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
-
-  const handleTabKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      const idx = CATEGORIES.indexOf(filter as typeof CATEGORIES[number]);
-      let next = idx;
-      if (e.key === "ArrowRight") next = (idx + 1) % CATEGORIES.length;
-      else if (e.key === "ArrowLeft") next = (idx - 1 + CATEGORIES.length) % CATEGORIES.length;
-      else if (e.key === "Home") next = 0;
-      else if (e.key === "End") next = CATEGORIES.length - 1;
-      else return;
-      e.preventDefault();
-      setFilter(CATEGORIES[next]);
-      tabRefs.current[next]?.focus();
-    },
-    [filter],
-  );
 
   const filtered = filter === "All" ? COMPONENTS : COMPONENTS.filter((c) => c.category === filter);
 
   return (
-    <div className={styles.visualContainer}>
-      <div className={styles.tabBar} role="tablist" aria-label="Component categories" onKeyDown={handleTabKeyDown}>
-        {CATEGORIES.map((cat, i) => (
-          <button
-            key={cat}
-            ref={(el) => { tabRefs.current[i] = el; }}
-            role="tab"
-            id={`compShowcase-tab-${cat}`}
-            aria-selected={filter === cat}
-            aria-controls="compShowcase-panel"
-            tabIndex={filter === cat ? 0 : -1}
-            className={`${styles.tab} ${filter === cat ? styles.tabActive : ""}`}
-            onClick={() => setFilter(cat)}
-          >
+    <Tabs value={filter} onValueChange={setFilter} className={styles.visualContainer}>
+      <TabsList className={styles.tabList}>
+        {CATEGORIES.map((cat) => (
+          <TabsTrigger key={cat} value={cat}>
             {cat}
-          </button>
+          </TabsTrigger>
         ))}
-      </div>
+      </TabsList>
 
-      <div className={styles.componentGrid} role="tabpanel" id="compShowcase-panel" aria-labelledby={`compShowcase-tab-${filter}`}>
+      <TabsContent value={filter} className={styles.componentGrid}>
         {filtered.map((comp) => (
           <FadeIn key={comp.name}>
             <div className={styles.componentCard}>
@@ -75,7 +49,7 @@ export default function ComponentShowcase() {
             </div>
           </FadeIn>
         ))}
-      </div>
-    </div>
+      </TabsContent>
+    </Tabs>
   );
 }

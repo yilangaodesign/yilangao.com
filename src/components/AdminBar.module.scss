@@ -9,7 +9,7 @@
 
 .barRow {
   background: var(--portfolio-surface-always-dark);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid $portfolio-overlay-white-08;
   font-family: var(--portfolio-font-sans);
   font-size: var(--portfolio-type-sm);
   color: $portfolio-neutral-20;
@@ -32,16 +32,17 @@
   min-width: 0;
 }
 
-.badge {
-  flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  padding: var(--portfolio-spacer-0-25x) var(--portfolio-spacer-1x);
-  border-radius: var(--portfolio-radius-sm);
-  background: var(--portfolio-action-brand-bold);
-  color: var(--portfolio-text-always-light-bold);
-  @include label;
-  font-size: var(--portfolio-type-xs);
+// Neutral+regular Badge uses theme "minimal" surface. On always-dark admin chrome, dark site theme
+// maps minimal to the same #161616 as the bar — lift one tier so border + fill remain visible.
+.adminContextBadge {
+  :global([data-theme='dark']) &,
+  :global(.dark) & {
+    background-color: var(--portfolio-surface-neutral-subtle);
+  }
+}
+
+.anchorAsButton {
+  text-decoration: none;
 }
 
 .hint {
@@ -62,60 +63,3 @@
   flex-shrink: 0;
 }
 
-.editBtn {
-  display: inline-flex;
-  align-items: center;
-  gap: $portfolio-spacer-utility-0-75x;
-  padding: $portfolio-spacer-utility-0-75x var(--portfolio-spacer-1-5x);
-  border-radius: var(--portfolio-radius-sm);
-  background: var(--portfolio-action-brand-bold);
-  color: var(--portfolio-text-always-light-bold);
-  @include body-compact;
-  font-weight: var(--portfolio-weight-medium);
-  text-decoration: none;
-  transition: background var(--portfolio-duration-fast) var(--portfolio-easing-standard);
-  white-space: nowrap;
-
-  &:hover {
-    background: var(--portfolio-action-brand-bold-hover);
-  }
-}
-
-.dashBtn {
-  display: inline-flex;
-  align-items: center;
-  padding: $portfolio-spacer-utility-0-75x var(--portfolio-spacer-1-5x);
-  border-radius: var(--portfolio-radius-sm);
-  background: rgba(255, 255, 255, 0.08);
-  color: $portfolio-neutral-30;
-  @include body-compact;
-  font-weight: var(--portfolio-weight-medium);
-  text-decoration: none;
-  transition: background var(--portfolio-duration-fast) var(--portfolio-easing-standard);
-  white-space: nowrap;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.14);
-    color: var(--portfolio-text-always-light-bold);
-  }
-}
-
-.closeBtn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: var(--portfolio-radius-sm);
-  border: none;
-  background: transparent;
-  color: $portfolio-neutral-50;
-  cursor: pointer;
-  transition: background var(--portfolio-duration-fast) var(--portfolio-easing-standard),
-    color var(--portfolio-duration-fast) var(--portfolio-easing-standard);
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.08);
-    color: $portfolio-neutral-30;
-  }
-}

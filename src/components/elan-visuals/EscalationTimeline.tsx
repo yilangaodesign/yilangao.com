@@ -1,6 +1,9 @@
 "use client";
 
 import { useState, useRef, useCallback } from "react";
+import { Button } from "@/components/ui/Button";
+import { Badge } from "@/components/ui/Badge";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/Tabs";
 import styles from "./elan-visuals.module.scss";
 
 type Tab = "architecture" | "escalation" | "timeline";
@@ -133,21 +136,30 @@ function ArchitectureDag() {
   return (
     <div className={styles.dagWrapper}>
       <div className={styles.dagControls}>
-        <button
-          className={styles.dagZoomBtn}
+        <Button
+          iconOnly
+          size="xs"
+          appearance="neutral"
+          emphasis="regular"
           onClick={() => setZoom((z) => Math.min(z + 0.15, 2))}
           aria-label="Zoom in"
-        >+</button>
-        <button
-          className={styles.dagZoomBtn}
+        >+</Button>
+        <Button
+          iconOnly
+          size="xs"
+          appearance="neutral"
+          emphasis="regular"
           onClick={() => setZoom((z) => Math.max(z - 0.15, 0.5))}
           aria-label="Zoom out"
-        >&minus;</button>
-        <button
-          className={styles.dagZoomBtn}
+        >&minus;</Button>
+        <Button
+          iconOnly
+          size="xs"
+          appearance="neutral"
+          emphasis="regular"
           onClick={() => { setPan({ x: 0, y: 0 }); setZoom(1); }}
           aria-label="Reset view"
-        >&#8634;</button>
+        >&#8634;</Button>
       </div>
 
       <div
@@ -376,7 +388,7 @@ function IncidentTimeline() {
           <div className={styles.timelineContent}>
             <div className={styles.timelineHeader}>
               <span className={styles.timelineId}>{inc.id}</span>
-              {inc.escalated && <span className={styles.escalationBadge}>3-strike escalation</span>}
+              {inc.escalated && <Badge appearance="highlight" emphasis="subtle" size="xs">3-strike escalation</Badge>}
             </div>
             <span className={styles.timelineTitle}>{inc.title}</span>
             <span className={styles.timelineCause}>{inc.cause}</span>
@@ -389,61 +401,25 @@ function IncidentTimeline() {
 }
 
 export default function EscalationTimeline() {
-  const [activeTab, setActiveTab] = useState<Tab>("architecture");
-  const tabs = Object.keys(TAB_LABELS) as Tab[];
-  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
-
-  const handleTabKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      const idx = tabs.indexOf(activeTab);
-      let next = idx;
-      if (e.key === "ArrowRight") next = (idx + 1) % tabs.length;
-      else if (e.key === "ArrowLeft") next = (idx - 1 + tabs.length) % tabs.length;
-      else if (e.key === "Home") next = 0;
-      else if (e.key === "End") next = tabs.length - 1;
-      else return;
-      e.preventDefault();
-      setActiveTab(tabs[next]);
-      tabRefs.current[next]?.focus();
-    },
-    [activeTab, tabs],
-  );
-
   return (
-    <div className={styles.visualContainer}>
-      <div className={styles.tabBar} role="tablist" aria-label="Agent harness architecture views" onKeyDown={handleTabKeyDown}>
-        {tabs.map((tab, i) => (
-          <button
-            key={tab}
-            ref={(el) => { tabRefs.current[i] = el; }}
-            role="tab"
-            id={`escalation-tab-${tab}`}
-            aria-selected={activeTab === tab}
-            aria-controls={`escalation-panel-${tab}`}
-            tabIndex={activeTab === tab ? 0 : -1}
-            className={`${styles.tab} ${activeTab === tab ? styles.tabActive : ""}`}
-            onClick={() => setActiveTab(tab)}
-          >
+    <Tabs defaultValue="architecture" className={styles.visualContainer}>
+      <TabsList className={styles.tabList}>
+        {(Object.keys(TAB_LABELS) as Tab[]).map((tab) => (
+          <TabsTrigger key={tab} value={tab}>
             {TAB_LABELS[tab]}
-          </button>
+          </TabsTrigger>
         ))}
-      </div>
+      </TabsList>
 
-      {activeTab === "architecture" && (
-        <div className={styles.visualBody} role="tabpanel" id="escalation-panel-architecture" aria-labelledby="escalation-tab-architecture">
-          <ArchitectureDag />
-        </div>
-      )}
-      {activeTab === "escalation" && (
-        <div className={styles.visualBody} role="tabpanel" id="escalation-panel-escalation" aria-labelledby="escalation-tab-escalation">
-          <EscalationExample />
-        </div>
-      )}
-      {activeTab === "timeline" && (
-        <div role="tabpanel" id="escalation-panel-timeline" aria-labelledby="escalation-tab-timeline">
-          <IncidentTimeline />
-        </div>
-      )}
-    </div>
+      <TabsContent value="architecture" className={styles.visualBody}>
+        <ArchitectureDag />
+      </TabsContent>
+      <TabsContent value="escalation" className={styles.visualBody}>
+        <EscalationExample />
+      </TabsContent>
+      <TabsContent value="timeline">
+        <IncidentTimeline />
+      </TabsContent>
+    </Tabs>
   );
 }

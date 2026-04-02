@@ -9,41 +9,10 @@
   overflow: hidden;
 }
 
-.tabBar {
-  display: flex;
-  gap: 0;
-  border-bottom: 1px solid var(--portfolio-border-subtle);
+// DS Tabs override for compact elan-visual context
+.tabList {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-}
-
-.tab {
-  flex-shrink: 0;
-  padding: var(--portfolio-spacer-1x) var(--portfolio-spacer-2x);
-  font-family: var(--portfolio-font-sans);
-  font-size: var(--portfolio-type-xs);
-  font-weight: var(--portfolio-weight-medium);
-  color: var(--portfolio-text-placeholder);
-  background: none;
-  border: none;
-  border-bottom: 2px solid transparent;
-  cursor: pointer;
-  @include transition-fast;
-  white-space: nowrap;
-
-  &:hover {
-    color: var(--portfolio-text-secondary);
-  }
-
-  &:focus-visible {
-    outline: 2px solid var(--portfolio-focus);
-    outline-offset: 2px;
-  }
-}
-
-.tabActive {
-  color: var(--portfolio-text-primary);
-  border-bottom-color: var(--portfolio-action-brand-bold);
 }
 
 .visualBody {
@@ -77,14 +46,14 @@
 
 .colorLabel {
   font-family: var(--portfolio-font-mono);
-  font-size: 10px;
+  font-size: $portfolio-type-2xs;
   font-weight: var(--portfolio-weight-medium);
   color: var(--portfolio-text-secondary);
 }
 
 .colorHex {
   font-family: var(--portfolio-font-mono);
-  font-size: 9px;
+  font-size: $portfolio-type-4xs;
   color: var(--portfolio-text-placeholder);
 }
 
@@ -132,7 +101,7 @@
 
 .scalingLegendText {
   font-family: var(--portfolio-font-mono);
-  font-size: 10px;
+  font-size: $portfolio-type-2xs;
   color: var(--portfolio-text-placeholder);
 }
 
@@ -151,12 +120,8 @@
 }
 
 .extendedFamilyName {
+  @include label-sm;
   font-family: var(--portfolio-font-mono);
-  font-size: 10px;
-  font-weight: var(--portfolio-weight-semibold);
-  color: var(--portfolio-text-secondary);
-  text-transform: uppercase;
-  letter-spacing: var(--portfolio-tracking-wider);
 }
 
 .extendedRow {
@@ -175,7 +140,7 @@
 
 .extendedNote {
   font-family: var(--portfolio-font-mono);
-  font-size: 10px;
+  font-size: $portfolio-type-2xs;
   color: var(--portfolio-text-placeholder);
   margin-top: var(--portfolio-spacer-0-5x);
   padding-top: var(--portfolio-spacer-1x);
@@ -207,7 +172,7 @@
 
 .rationaleCode {
   font-family: var(--portfolio-font-mono);
-  font-size: 10px;
+  font-size: $portfolio-type-2xs;
   color: var(--portfolio-text-brand-bold);
   background: rgba($portfolio-accent-60, 0.06);
   padding: 1px var(--portfolio-spacer-0-5x);
@@ -233,20 +198,20 @@
 
 .rationaleSystem {
   font-family: var(--portfolio-font-mono);
-  font-size: 10px;
+  font-size: $portfolio-type-2xs;
   font-weight: var(--portfolio-weight-semibold);
   color: var(--portfolio-text-primary);
 }
 
 .rationaleApproach {
   font-family: var(--portfolio-font-mono);
-  font-size: 10px;
+  font-size: $portfolio-type-2xs;
   color: var(--portfolio-text-secondary);
 }
 
 .rationaleLimitation {
   font-family: var(--portfolio-font-sans);
-  font-size: 10px;
+  font-size: $portfolio-type-2xs;
   color: var(--portfolio-text-placeholder);
 }
 
@@ -279,12 +244,7 @@
 }
 
 .namingSectionTitle {
-  font-family: var(--portfolio-font-sans);
-  font-size: 10px;
-  font-weight: var(--portfolio-weight-semibold);
-  color: var(--portfolio-text-secondary);
-  text-transform: uppercase;
-  letter-spacing: var(--portfolio-tracking-wider);
+  @include label-sm;
 }
 
 .namingSectionDesc {
@@ -390,17 +350,12 @@
 }
 
 .namingDimensionTitle {
-  font-family: var(--portfolio-font-sans);
-  font-size: 10px;
-  font-weight: var(--portfolio-weight-semibold);
-  color: var(--portfolio-text-secondary);
-  text-transform: uppercase;
-  letter-spacing: var(--portfolio-tracking-wider);
+  @include label-sm;
 }
 
 .namingDimensionDesc {
   font-family: var(--portfolio-font-sans);
-  font-size: 10px;
+  font-size: $portfolio-type-2xs;
   color: var(--portfolio-text-placeholder);
 }
 
@@ -416,7 +371,7 @@
   text-align: left;
   line-height: 1.4;
   font-family: var(--portfolio-font-mono);
-  font-size: 10px;
+  font-size: $portfolio-type-2xs;
   color: var(--portfolio-text-secondary);
   background: var(--portfolio-surface-secondary);
   padding: 2px var(--portfolio-spacer-0-5x);
@@ -486,8 +441,8 @@
 .colorDropdownSwatchPreview {
   width: 12px;
   height: 12px;
-  border-radius: 2px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: $portfolio-radius-xs;
+  border: 1px solid $portfolio-overlay-black-10;
   flex-shrink: 0;
 }
 
@@ -514,12 +469,8 @@
 }
 
 .colorDropdownGroupName {
+  @include label-sm;
   font-family: var(--portfolio-font-mono);
-  font-size: 10px;
-  font-weight: var(--portfolio-weight-semibold);
-  color: var(--portfolio-text-secondary);
-  text-transform: uppercase;
-  letter-spacing: var(--portfolio-tracking-wider);
   display: flex;
   align-items: center;
   gap: var(--portfolio-spacer-0-5x);
@@ -542,7 +493,7 @@
   margin: 0;
   width: 24px;
   height: 24px;
-  border-radius: 3px;
+  border-radius: $portfolio-radius-xs;
   border: 1px solid var(--portfolio-overlay-black-08);
   cursor: pointer;
   padding: 0;
@@ -577,8 +528,8 @@
 .namingComposedSwatch {
   width: 16px;
   height: 16px;
-  border-radius: 3px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: $portfolio-radius-xs;
+  border: 1px solid $portfolio-overlay-black-10;
   flex-shrink: 0;
 }
 
@@ -665,25 +616,13 @@
 
 .densityCount {
   font-family: var(--portfolio-font-mono);
-  font-size: 10px;
+  font-size: $portfolio-type-2xs;
   font-weight: var(--portfolio-weight-semibold);
   color: var(--portfolio-text-placeholder);
   min-width: 20px;
   text-align: right;
 }
 
-.densityBadge {
-  font-family: var(--portfolio-font-mono);
-  font-size: 9px;
-  font-weight: var(--portfolio-weight-semibold);
-  text-transform: uppercase;
-  letter-spacing: var(--portfolio-tracking-wider);
-  color: var(--portfolio-text-brand-bold);
-  background: rgba($portfolio-accent-60, 0.08);
-  padding: 1px var(--portfolio-spacer-0-5x);
-  border-radius: var(--portfolio-radius-sm);
-  flex-shrink: 0;
-}
 
 .densityInsight {
   font-family: var(--portfolio-font-sans);
@@ -703,7 +642,7 @@
   align-items: center;
   gap: var(--portfolio-spacer-0-5x);
   font-family: var(--portfolio-font-mono);
-  font-size: 10px;
+  font-size: $portfolio-type-2xs;
   color: var(--portfolio-text-placeholder);
 }
 
@@ -749,12 +688,8 @@
 }
 
 .componentCategory {
-  font-family: var(--portfolio-font-sans);
-  font-size: 10px;
-  font-weight: var(--portfolio-weight-medium);
+  @include label-sm;
   color: var(--portfolio-text-brand-bold);
-  text-transform: uppercase;
-  letter-spacing: var(--portfolio-tracking-wider);
 }
 
 .componentDesc {
@@ -777,35 +712,9 @@
   right: var(--portfolio-spacer-1x);
   display: flex;
   gap: var(--portfolio-spacer-0-5x);
-  z-index: 3;
+  z-index: $portfolio-z-raised;
 }
 
-.dagZoomBtn {
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--portfolio-font-mono);
-  font-size: var(--portfolio-type-sm);
-  font-weight: var(--portfolio-weight-semibold);
-  color: var(--portfolio-text-secondary);
-  background: var(--portfolio-surface-primary);
-  border: 1px solid var(--portfolio-border-subtle);
-  border-radius: var(--portfolio-radius-sm);
-  cursor: pointer;
-  @include transition-fast;
-
-  &:hover {
-    border-color: $portfolio-accent-40;
-    color: var(--portfolio-text-primary);
-  }
-
-  &:focus-visible {
-    outline: 2px solid var(--portfolio-focus);
-    outline-offset: 2px;
-  }
-}
 
 .dagViewport {
   position: relative;
@@ -973,7 +882,7 @@
 
 .escalationStrikeNum {
   font-family: var(--portfolio-font-mono);
-  font-size: 10px;
+  font-size: $portfolio-type-2xs;
   font-weight: var(--portfolio-weight-semibold);
   color: var(--portfolio-text-brand-bold);
 }
@@ -987,7 +896,7 @@
 
 .escalationResponseLabel {
   font-family: var(--portfolio-font-mono);
-  font-size: 9px;
+  font-size: $portfolio-type-4xs;
   font-weight: var(--portfolio-weight-semibold);
   text-transform: uppercase;
   letter-spacing: var(--portfolio-tracking-wider);
@@ -1022,7 +931,7 @@
   flex-direction: column;
   justify-content: space-between;
   font-family: var(--portfolio-font-mono);
-  font-size: 9px;
+  font-size: $portfolio-type-4xs;
   color: var(--portfolio-text-placeholder);
 
   span {
@@ -1095,20 +1004,11 @@
 
 .timelineId {
   font-family: var(--portfolio-font-mono);
-  font-size: 10px;
+  font-size: $portfolio-type-2xs;
   font-weight: var(--portfolio-weight-semibold);
   color: var(--portfolio-text-placeholder);
 }
 
-.escalationBadge {
-  font-family: var(--portfolio-font-sans);
-  font-size: 10px;
-  font-weight: var(--portfolio-weight-semibold);
-  color: var(--portfolio-text-brand-bold);
-  background: rgba($portfolio-accent-60, 0.08);
-  padding: 1px var(--portfolio-spacer-1x);
-  border-radius: var(--portfolio-radius-sm);
-}
 
 .timelineTitle {
   font-family: var(--portfolio-font-sans);
@@ -1243,15 +1143,6 @@
 
 // ── CLOSEST ELEMENT ────────────────────────────────────────────────────────
 
-.closestMethodToggle {
-  display: flex;
-  border-bottom: 1px solid var(--portfolio-border-subtle);
-}
-
-.tabWrong {
-  color: var(--portfolio-text-error) !important;
-  border-bottom-color: var(--portfolio-text-error) !important;
-}
 
 .closestElementArea {
   position: relative;
@@ -1267,7 +1158,7 @@
   background: var(--portfolio-action-brand-bold);
   opacity: 0.4;
   pointer-events: none;
-  z-index: 1;
+  z-index: $portfolio-z-raised;
 }
 
 .closestItem {
@@ -1303,7 +1194,7 @@
 
 .closestItemDist {
   font-family: var(--portfolio-font-mono);
-  font-size: 10px;
+  font-size: $portfolio-type-2xs;
   color: var(--portfolio-text-placeholder);
 }
 
@@ -1369,7 +1260,7 @@
 
 .transformCode {
   font-family: var(--portfolio-font-mono);
-  font-size: 10px;
+  font-size: $portfolio-type-2xs;
   color: var(--portfolio-text-placeholder);
   padding: var(--portfolio-spacer-0-5x) var(--portfolio-spacer-1x);
   background: var(--portfolio-surface-secondary);
@@ -1407,12 +1298,7 @@
 }
 
 .beforeAfterLabel {
-  font-family: var(--portfolio-font-sans);
-  font-size: var(--portfolio-type-xs);
-  font-weight: var(--portfolio-weight-semibold);
-  text-transform: uppercase;
-  letter-spacing: var(--portfolio-tracking-wider);
-  color: var(--portfolio-text-secondary);
+  @include label;
   padding-bottom: var(--portfolio-spacer-1x);
   border-bottom: 1px solid var(--portfolio-border-subtle);
 }
@@ -1438,11 +1324,7 @@
 }
 
 .pairedColumnLabel {
-  font-family: var(--portfolio-font-sans);
-  font-size: 10px;
-  font-weight: var(--portfolio-weight-semibold);
-  text-transform: uppercase;
-  letter-spacing: var(--portfolio-tracking-wider);
+  @include label-sm;
   color: var(--portfolio-text-placeholder);
 }
 
@@ -1501,7 +1383,7 @@
   align-items: flex-start;
   gap: var(--portfolio-spacer-0-5x);
   font-family: var(--portfolio-font-mono);
-  font-size: 10px;
+  font-size: $portfolio-type-2xs;
   color: var(--portfolio-text-error);
   padding: var(--portfolio-spacer-0-5x) var(--portfolio-spacer-1x);
   background: rgba($portfolio-red-60, 0.06);
@@ -1513,7 +1395,7 @@
   align-items: flex-start;
   gap: var(--portfolio-spacer-0-5x);
   font-family: var(--portfolio-font-mono);
-  font-size: 10px;
+  font-size: $portfolio-type-2xs;
   color: $portfolio-green-60;
   padding: var(--portfolio-spacer-0-5x) var(--portfolio-spacer-1x);
   background: rgba($portfolio-green-50, 0.06);

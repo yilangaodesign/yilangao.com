@@ -12,7 +12,7 @@ $accent-light: rgba($portfolio-accent-60, 0.06);
   cursor: text;
   outline: 1.5px solid transparent;
   outline-offset: 3px;
-  border-radius: 2px;
+  border-radius: $portfolio-radius-xs;
   transition: outline-color 150ms ease, background-color 150ms ease;
 
   &:hover {
@@ -25,14 +25,14 @@ $accent-light: rgba($portfolio-accent-60, 0.06);
     top: -22px;
     left: 0;
     padding: 1px 6px;
-    font-size: 10px;
-    font-weight: 500;
-    font-family: system-ui, sans-serif;
+    font-size: $portfolio-type-2xs;
+    font-weight: $portfolio-weight-medium;
+    font-family: $portfolio-font-sans;
     line-height: 16px;
     letter-spacing: 0.02em;
     color: var(--portfolio-text-always-light-bold);
     background: $accent;
-    border-radius: 3px;
+    border-radius: $portfolio-radius-xs;
     white-space: nowrap;
     pointer-events: none;
     z-index: var(--portfolio-z-admin);
@@ -60,7 +60,7 @@ $accent-light: rgba($portfolio-accent-60, 0.06);
   cursor: pointer;
   outline: 1.5px dashed transparent;
   outline-offset: 4px;
-  border-radius: 2px;
+  border-radius: $portfolio-radius-xs;
   transition: outline-color 150ms ease;
 
   &:hover {
@@ -73,9 +73,9 @@ $accent-light: rgba($portfolio-accent-60, 0.06);
     top: -22px;
     left: 0;
     padding: 1px 6px;
-    font-size: 10px;
-    font-weight: 500;
-    font-family: system-ui, sans-serif;
+    font-size: $portfolio-type-2xs;
+    font-weight: $portfolio-weight-medium;
+    font-family: $portfolio-font-sans;
     line-height: 16px;
     letter-spacing: 0.02em;
     color: var(--portfolio-text-always-light-bold);
@@ -113,9 +113,9 @@ $accent-light: rgba($portfolio-accent-60, 0.06);
   overflow: hidden;
   background: var(--portfolio-surface-primary);
   border: 1px solid var(--portfolio-border-subtle);
-  border-radius: 8px;
+  border-radius: $portfolio-radius-md;
   box-shadow: var(--portfolio-shadow-overlay), 0 0 0 1px var(--portfolio-overlay-black-06);
-  font-family: system-ui, sans-serif;
+  font-family: $portfolio-font-sans;
 }
 
 .arrayPanelHeader {
@@ -123,13 +123,13 @@ $accent-light: rgba($portfolio-accent-60, 0.06);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 16px;
+  padding: $portfolio-spacer-1-5x $portfolio-spacer-2x;
   border-bottom: 1px solid var(--portfolio-border-subtle);
 }
 
 .arrayPanelTitle {
   font-size: var(--portfolio-type-xs);
-  font-weight: 600;
+  font-weight: $portfolio-weight-semibold;
   color: var(--portfolio-text-primary);
 }
 
@@ -141,7 +141,7 @@ $accent-light: rgba($portfolio-accent-60, 0.06);
   height: 28px;
   background: none;
   border: 1px solid var(--portfolio-border-subtle);
-  border-radius: 4px;
+  border-radius: $portfolio-radius-sm;
   cursor: pointer;
   color: var(--portfolio-text-secondary);
 
@@ -155,14 +155,14 @@ $accent-light: rgba($portfolio-accent-60, 0.06);
   flex: 1 1 0;
   min-height: 0;
   overflow-y: auto;
-  padding: 8px 0;
+  padding: $portfolio-spacer-1x 0;
 }
 
 .arrayItem {
   display: flex;
   align-items: flex-start;
-  gap: 8px;
-  padding: 8px 16px;
+  gap: $portfolio-spacer-1x;
+  padding: $portfolio-spacer-1x $portfolio-spacer-2x;
   border-bottom: 1px solid var(--portfolio-border-subtle);
 
   &:last-child {
@@ -173,7 +173,7 @@ $accent-light: rgba($portfolio-accent-60, 0.06);
 .arrayItemIndex {
   flex: 0 0 20px;
   font-size: var(--portfolio-type-xs);
-  font-weight: 500;
+  font-weight: $portfolio-weight-medium;
   color: var(--portfolio-text-placeholder);
   line-height: 32px;
   text-align: center;
@@ -183,21 +183,17 @@ $accent-light: rgba($portfolio-accent-60, 0.06);
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: $portfolio-spacer-0-5x;
 }
 
 .arrayFieldGroup {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: $portfolio-spacer-0-25x;
 }
 
 .arrayFieldLabel {
-  font-size: 10px;
-  font-weight: 600;
-  color: var(--portfolio-text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  @include label-sm;
 }
 
 .requiredMark {
@@ -207,11 +203,11 @@ $accent-light: rgba($portfolio-accent-60, 0.06);
 
 .arrayFieldInput {
   width: 100%;
-  padding: 4px 8px;
+  padding: $portfolio-spacer-0-5x $portfolio-spacer-1x;
   font-size: var(--portfolio-type-sm);
   line-height: 22px;
   border: 1px solid var(--portfolio-border-subtle);
-  border-radius: 4px;
+  border-radius: $portfolio-radius-sm;
   background: var(--portfolio-surface-primary);
   color: var(--portfolio-text-primary);
   outline: none;
@@ -242,7 +238,7 @@ $accent-light: rgba($portfolio-accent-60, 0.06);
 
 .mediaUrlRow {
   display: flex;
-  gap: 4px;
+  gap: $portfolio-spacer-0-5x;
   align-items: stretch;
 
   .arrayFieldInput {
@@ -259,7 +255,7 @@ $accent-light: rgba($portfolio-accent-60, 0.06);
   width: 32px;
   padding: 0;
   border: 1px solid var(--portfolio-border-subtle);
-  border-radius: 4px;
+  border-radius: $portfolio-radius-sm;
   background: $portfolio-neutral-05;
   color: var(--portfolio-text-secondary);
   cursor: pointer;
@@ -303,8 +299,8 @@ $accent-light: rgba($portfolio-accent-60, 0.06);
 .arrayFieldCheckbox {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 12px;
+  gap: $portfolio-spacer-utility-0-75x;
+  font-size: $portfolio-type-xs;
   color: var(--portfolio-text-secondary);
   padding: 2px 0;
 
@@ -349,10 +345,10 @@ $accent-light: rgba($portfolio-accent-60, 0.06);
   height: 24px;
   background: none;
   border: 1px solid transparent;
-  border-radius: 3px;
+  border-radius: $portfolio-radius-xs;
   cursor: pointer;
   color: var(--portfolio-text-placeholder);
-  font-size: 12px;
+  font-size: $portfolio-type-xs;
 
   &:hover {
     color: var(--portfolio-text-error);
@@ -398,8 +394,8 @@ $accent-light: rgba($portfolio-accent-60, 0.06);
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 6px;
-  padding: 12px 16px;
+  gap: $portfolio-spacer-utility-0-75x;
+  padding: $portfolio-spacer-1-5x $portfolio-spacer-2x;
   border-top: 1px solid var(--portfolio-border-subtle);
 }
 
@@ -411,14 +407,14 @@ $accent-light: rgba($portfolio-accent-60, 0.06);
 .arrayAddBtn {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 6px 12px;
-  font-size: 12px;
-  font-weight: 500;
+  gap: $portfolio-spacer-0-5x;
+  padding: $portfolio-spacer-utility-0-75x $portfolio-spacer-1-5x;
+  font-size: $portfolio-type-xs;
+  font-weight: $portfolio-weight-medium;
   color: $accent;
   background: none;
   border: 1px dashed $accent;
-  border-radius: 4px;
+  border-radius: $portfolio-radius-sm;
   cursor: pointer;
 
   &:hover {
@@ -427,13 +423,13 @@ $accent-light: rgba($portfolio-accent-60, 0.06);
 }
 
 .arrayDoneBtn {
-  padding: 6px 16px;
-  font-size: 12px;
-  font-weight: 600;
+  padding: $portfolio-spacer-utility-0-75x $portfolio-spacer-2x;
+  font-size: $portfolio-type-xs;
+  font-weight: $portfolio-weight-semibold;
   color: var(--portfolio-text-always-light-bold);
   background: $accent;
   border: none;
-  border-radius: 4px;
+  border-radius: $portfolio-radius-sm;
   cursor: pointer;
 
   &:hover {
@@ -448,7 +444,7 @@ $accent-light: rgba($portfolio-accent-60, 0.06);
 
 .arrayPanelError {
   width: 100%;
-  font-size: 12px;
+  font-size: $portfolio-type-xs;
   color: var(--portfolio-text-error);
 }
 
@@ -482,25 +478,25 @@ $accent-light: rgba($portfolio-accent-60, 0.06);
   justify-content: space-between;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 10px 20px;
-  gap: 12px;
+  padding: $portfolio-spacer-utility-1-25x $portfolio-spacer-2-5x;
+  gap: $portfolio-spacer-1-5x;
 }
 
 .editBarCount {
   font-size: var(--portfolio-type-xs);
-  font-weight: 500;
+  font-weight: $portfolio-weight-medium;
   color: $portfolio-neutral-20;
-  font-family: system-ui, sans-serif;
+  font-family: $portfolio-font-sans;
 }
 
 .editBarMessage {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: $portfolio-spacer-1x;
   font-size: var(--portfolio-type-sm);
-  font-weight: 500;
+  font-weight: $portfolio-weight-medium;
   color: $portfolio-red-20;
-  font-family: system-ui, sans-serif;
+  font-family: $portfolio-font-sans;
   flex: 1;
   min-width: 0;
 }
@@ -512,26 +508,26 @@ $accent-light: rgba($portfolio-accent-60, 0.06);
 
 .editBarHint {
   color: $portfolio-neutral-60;
-  font-weight: 400;
+  font-weight: $portfolio-weight-regular;
 }
 
 .editBarActions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: $portfolio-spacer-1x;
   flex-shrink: 0;
 }
 
 .editBarDiscard {
-  padding: 6px 14px;
-  font-size: 12px;
-  font-weight: 500;
+  padding: $portfolio-spacer-utility-0-75x $portfolio-spacer-utility-1-75x;
+  font-size: $portfolio-type-xs;
+  font-weight: $portfolio-weight-medium;
   color: $portfolio-neutral-20;
   background: transparent;
   border: 1px solid $portfolio-neutral-70;
-  border-radius: 4px;
+  border-radius: $portfolio-radius-sm;
   cursor: pointer;
-  font-family: system-ui, sans-serif;
+  font-family: $portfolio-font-sans;
 
   &:hover {
     background: $portfolio-neutral-80;
@@ -555,15 +551,15 @@ $accent-light: rgba($portfolio-accent-60, 0.06);
 }
 
 .editBarSave {
-  padding: 6px 18px;
-  font-size: 12px;
-  font-weight: 600;
+  padding: $portfolio-spacer-utility-0-75x $portfolio-spacer-2-5x;
+  font-size: $portfolio-type-xs;
+  font-weight: $portfolio-weight-semibold;
   color: $portfolio-neutral-00;
   background: $accent;
   border: none;
-  border-radius: 4px;
+  border-radius: $portfolio-radius-sm;
   cursor: pointer;
-  font-family: system-ui, sans-serif;
+  font-family: $portfolio-font-sans;
 
   &:hover {
     background: darken($accent, 6%);
@@ -576,15 +572,15 @@ $accent-light: rgba($portfolio-accent-60, 0.06);
 }
 
 .editBarRetry {
-  padding: 6px 18px;
-  font-size: 12px;
-  font-weight: 600;
+  padding: $portfolio-spacer-utility-0-75x $portfolio-spacer-2-5x;
+  font-size: $portfolio-type-xs;
+  font-weight: $portfolio-weight-semibold;
   color: $portfolio-red-70;
   background: $portfolio-neutral-00;
   border: none;
-  border-radius: 4px;
+  border-radius: $portfolio-radius-sm;
   cursor: pointer;
-  font-family: system-ui, sans-serif;
+  font-family: $portfolio-font-sans;
 
   &:hover {
     background: $portfolio-red-10;
@@ -656,52 +652,52 @@ $accent-light: rgba($portfolio-accent-60, 0.06);
   transform: translate(-50%, -50%);
   z-index: calc(var(--portfolio-z-admin-modal) + 2);
   width: min(360px, 90vw);
-  padding: 20px;
+  padding: $portfolio-spacer-2-5x;
   background: var(--portfolio-surface-primary);
   border: 1px solid var(--portfolio-border-subtle);
-  border-radius: 8px;
+  border-radius: $portfolio-radius-md;
   box-shadow: var(--portfolio-shadow-overlay), 0 0 0 1px var(--portfolio-overlay-black-06);
-  font-family: system-ui, sans-serif;
+  font-family: $portfolio-font-sans;
 }
 
 .confirmMessage {
-  font-size: 14px;
-  font-weight: 500;
+  font-size: $portfolio-type-sm;
+  font-weight: $portfolio-weight-medium;
   color: var(--portfolio-text-primary);
-  margin: 0 0 16px;
+  margin: 0 0 $portfolio-spacer-2x;
   line-height: 1.5;
 }
 
 .confirmHint {
   display: block;
-  margin-top: 4px;
-  font-size: 12px;
-  font-weight: 400;
+  margin-top: $portfolio-spacer-0-5x;
+  font-size: $portfolio-type-xs;
+  font-weight: $portfolio-weight-regular;
   color: var(--portfolio-text-secondary);
 }
 
 .confirmError {
-  font-size: 12px;
+  font-size: $portfolio-type-xs;
   color: var(--portfolio-text-error);
-  margin: 0 0 12px;
+  margin: 0 0 $portfolio-spacer-1-5x;
 }
 
 .confirmActions {
   display: flex;
   justify-content: flex-end;
-  gap: 8px;
+  gap: $portfolio-spacer-1x;
 }
 
 .confirmCancel {
-  padding: 6px 14px;
-  font-size: 12px;
-  font-weight: 500;
+  padding: $portfolio-spacer-utility-0-75x $portfolio-spacer-utility-1-75x;
+  font-size: $portfolio-type-xs;
+  font-weight: $portfolio-weight-medium;
   color: var(--portfolio-text-neutral-bold);
   background: var(--portfolio-surface-primary);
   border: 1px solid var(--portfolio-border-subtle);
-  border-radius: 4px;
+  border-radius: $portfolio-radius-sm;
   cursor: pointer;
-  font-family: system-ui, sans-serif;
+  font-family: $portfolio-font-sans;
 
   &:hover {
     background: var(--portfolio-surface-secondary);
@@ -714,15 +710,15 @@ $accent-light: rgba($portfolio-accent-60, 0.06);
 }
 
 .confirmDelete {
-  padding: 6px 14px;
-  font-size: 12px;
-  font-weight: 600;
+  padding: $portfolio-spacer-utility-0-75x $portfolio-spacer-utility-1-75x;
+  font-size: $portfolio-type-xs;
+  font-weight: $portfolio-weight-semibold;
   color: var(--portfolio-text-always-light-bold);
   background: $portfolio-red-60;
   border: none;
-  border-radius: 4px;
+  border-radius: $portfolio-radius-sm;
   cursor: pointer;
-  font-family: system-ui, sans-serif;
+  font-family: $portfolio-font-sans;
 
   &:hover {
     background: $portfolio-red-70;
@@ -741,14 +737,14 @@ $accent-light: rgba($portfolio-accent-60, 0.06);
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: $portfolio-spacer-1x;
   min-height: 140px;
-  padding: 24px 16px;
+  padding: $portfolio-spacer-3x $portfolio-spacer-2x;
   background: none;
   border: 2px dashed var(--portfolio-border-subtle);
-  border-radius: 8px;
+  border-radius: $portfolio-radius-md;
   cursor: pointer;
-  font-family: system-ui, sans-serif;
+  font-family: $portfolio-font-sans;
   color: var(--portfolio-text-placeholder);
   transition: border-color 150ms ease, color 150ms ease, background-color 150ms ease;
   width: 100%;
@@ -776,7 +772,7 @@ $accent-light: rgba($portfolio-accent-60, 0.06);
 
 .addItemLabel {
   font-size: var(--portfolio-type-xs);
-  font-weight: 500;
+  font-weight: $portfolio-weight-medium;
 }
 
 .addItemError {
@@ -791,8 +787,8 @@ $accent-light: rgba($portfolio-accent-60, 0.06);
   background: #1a1a2e;
   border-top: 1px solid var(--portfolio-overlay-white-08);
   border-bottom: 1px solid var(--portfolio-overlay-white-08);
-  font-family: var(--font-geist-sans, system-ui, sans-serif);
-  font-size: 12px;
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-xs;
   color: $portfolio-neutral-20;
   animation: formatBarIn 150ms ease-out;
 }
@@ -811,10 +807,10 @@ $accent-light: rgba($portfolio-accent-60, 0.06);
 .formatBarInner {
   max-width: 1440px;
   margin: 0 auto;
-  padding: 6px 20px;
+  padding: $portfolio-spacer-utility-0-75x $portfolio-spacer-2-5x;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: $portfolio-spacer-1x;
 }
 
 .formatGroup {
@@ -824,11 +820,11 @@ $accent-light: rgba($portfolio-accent-60, 0.06);
 .formatSelect {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 3px 8px;
+  gap: $portfolio-spacer-utility-0-75x;
+  padding: 3px $portfolio-spacer-1x;
   background: var(--portfolio-overlay-white-08);
   border: 1px solid var(--portfolio-overlay-white-12);
-  border-radius: 4px;
+  border-radius: $portfolio-radius-sm;
   color: $portfolio-neutral-20;
   font-size: var(--portfolio-type-xs);
   cursor: pointer;
@@ -843,22 +839,19 @@ $accent-light: rgba($portfolio-accent-60, 0.06);
 }
 
 .formatLabel {
+  @include label-sm;
   color: $portfolio-neutral-50;
-  font-weight: 400;
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
 }
 
 .formatValue {
-  font-weight: 600;
+  font-weight: $portfolio-weight-semibold;
   color: $portfolio-neutral-00;
 }
 
 .formatMeta {
   color: $portfolio-neutral-60;
   font-family: var(--font-geist-mono, monospace);
-  font-size: 10px;
+  font-size: $portfolio-type-2xs;
 }
 
 .formatChevron {
@@ -870,7 +863,7 @@ $accent-light: rgba($portfolio-accent-60, 0.06);
   position: absolute;
   top: 100%;
   left: 0;
-  margin-top: 4px;
+  margin-top: $portfolio-spacer-0-5x;
   min-width: 300px;
   max-height: 320px;
   overflow-y: auto;
@@ -879,18 +872,18 @@ $accent-light: rgba($portfolio-accent-60, 0.06);
   border-radius: var(--portfolio-radius-sm);
   box-shadow: var(--portfolio-shadow-lg);
   z-index: calc(var(--portfolio-z-admin-modal) + 3);
-  padding: 4px;
+  padding: $portfolio-spacer-0-5x;
 }
 
 .formatOption {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: $portfolio-spacer-1x;
   width: 100%;
-  padding: 6px 10px;
+  padding: $portfolio-spacer-utility-0-75x $portfolio-spacer-utility-1-25x;
   background: transparent;
   border: none;
-  border-radius: 3px;
+  border-radius: $portfolio-radius-xs;
   color: $portfolio-neutral-30;
   font-size: var(--portfolio-type-xs);
   cursor: pointer;
@@ -914,27 +907,27 @@ $accent-light: rgba($portfolio-accent-60, 0.06);
 }
 
 .formatOptionName {
-  font-weight: 500;
+  font-weight: $portfolio-weight-medium;
   min-width: 64px;
 }
 
 .formatOptionValue {
   font-family: var(--font-geist-mono, monospace);
-  font-size: 10px;
+  font-size: $portfolio-type-2xs;
   color: $portfolio-neutral-50;
   min-width: 52px;
 }
 
 .formatOptionMeta {
   font-family: var(--font-geist-mono, monospace);
-  font-size: 10px;
+  font-size: $portfolio-type-2xs;
   color: $portfolio-neutral-70;
 }
 
 .formatOptionToken {
   margin-left: auto;
   font-family: var(--font-geist-mono, monospace);
-  font-size: 9px;
+  font-size: $portfolio-type-4xs;
   color: $portfolio-accent-60;
 }
 
@@ -951,11 +944,11 @@ $accent-light: rgba($portfolio-accent-60, 0.06);
   justify-content: center;
   width: 26px;
   height: 26px;
-  border-radius: 4px;
+  border-radius: $portfolio-radius-sm;
   border: 1px solid var(--portfolio-overlay-white-08);
   background: transparent;
   color: $portfolio-neutral-50;
-  font-size: 12px;
+  font-size: $portfolio-type-xs;
   cursor: pointer;
   transition: background 0.15s, color 0.15s, border-color 0.15s;
   font-family: inherit;
@@ -990,33 +983,33 @@ $accent-light: rgba($portfolio-accent-60, 0.06);
 .formatColorInfo {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: $portfolio-spacer-utility-0-75x;
 }
 
 .formatColorSwatch {
   width: 14px;
   height: 14px;
-  border-radius: 3px;
+  border-radius: $portfolio-radius-xs;
   border: 1px solid var(--portfolio-overlay-white-16);
   flex-shrink: 0;
 }
 
 .formatColorName {
   font-size: var(--portfolio-type-xs);
-  font-weight: 500;
+  font-weight: $portfolio-weight-medium;
   color: $portfolio-neutral-30;
 }
 
 .formatColorHex {
   font-family: var(--font-geist-mono, monospace);
-  font-size: 10px;
+  font-size: $portfolio-type-2xs;
   color: $portfolio-neutral-60;
 }
 
 .formatTokenRef {
   margin-left: auto;
   font-family: var(--font-geist-mono, monospace);
-  font-size: 10px;
+  font-size: $portfolio-type-2xs;
   color: $portfolio-accent-60;
   opacity: 0.8;
 }

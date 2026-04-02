@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback } from "react";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/Tabs";
 import styles from "./elan-visuals.module.scss";
 
 type Tab = "deadZone" | "closestElement" | "transformConflict" | "pairedChannels";
@@ -385,52 +386,28 @@ function PairedChannelsDiagram() {
 // ── Main Showcase ───────────────────────────────────────────────────────────
 
 export default function InteractionShowcase() {
-  const [activeTab, setActiveTab] = useState<Tab>("deadZone");
-  const tabs = Object.keys(TAB_LABELS) as Tab[];
-  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
-
-  const handleTabKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      const idx = tabs.indexOf(activeTab);
-      let next = idx;
-      if (e.key === "ArrowRight") next = (idx + 1) % tabs.length;
-      else if (e.key === "ArrowLeft") next = (idx - 1 + tabs.length) % tabs.length;
-      else if (e.key === "Home") next = 0;
-      else if (e.key === "End") next = tabs.length - 1;
-      else return;
-      e.preventDefault();
-      setActiveTab(tabs[next]);
-      tabRefs.current[next]?.focus();
-    },
-    [activeTab, tabs],
-  );
-
   return (
-    <div className={styles.visualContainer}>
-      <div className={styles.tabBar} role="tablist" aria-label="ScrollSpy interaction patterns" onKeyDown={handleTabKeyDown}>
-        {tabs.map((tab, i) => (
-          <button
-            key={tab}
-            ref={(el) => { tabRefs.current[i] = el; }}
-            role="tab"
-            id={`interaction-tab-${tab}`}
-            aria-selected={activeTab === tab}
-            aria-controls={`interaction-panel-${tab}`}
-            tabIndex={activeTab === tab ? 0 : -1}
-            className={`${styles.tab} ${activeTab === tab ? styles.tabActive : ""}`}
-            onClick={() => setActiveTab(tab)}
-          >
+    <Tabs defaultValue="deadZone" className={styles.visualContainer}>
+      <TabsList className={styles.tabList}>
+        {(Object.keys(TAB_LABELS) as Tab[]).map((tab) => (
+          <TabsTrigger key={tab} value={tab}>
             {TAB_LABELS[tab]}
-          </button>
+          </TabsTrigger>
         ))}
-      </div>
+      </TabsList>
 
-      <div className={styles.visualBody} role="tabpanel" id={`interaction-panel-${activeTab}`} aria-labelledby={`interaction-tab-${activeTab}`}>
-        {activeTab === "deadZone" && <DeadZoneDiagram />}
-        {activeTab === "closestElement" && <ClosestElementDiagram />}
-        {activeTab === "transformConflict" && <TransformConflictDiagram />}
-        {activeTab === "pairedChannels" && <PairedChannelsDiagram />}
-      </div>
-    </div>
+      <TabsContent value="deadZone" className={styles.visualBody}>
+        <DeadZoneDiagram />
+      </TabsContent>
+      <TabsContent value="closestElement" className={styles.visualBody}>
+        <ClosestElementDiagram />
+      </TabsContent>
+      <TabsContent value="transformConflict" className={styles.visualBody}>
+        <TransformConflictDiagram />
+      </TabsContent>
+      <TabsContent value="pairedChannels" className={styles.visualBody}>
+        <PairedChannelsDiagram />
+      </TabsContent>
+    </Tabs>
   );
 }

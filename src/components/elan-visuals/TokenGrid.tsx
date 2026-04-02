@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback, useEffect } from "react";
 import { createPortal } from "react-dom";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/Tabs";
 import styles from "./elan-visuals.module.scss";
 
 /* ── Palette data ───────────────────────────────────────────────────────── */
@@ -186,8 +187,6 @@ function composedReads(prop: string, role: string, emphasis: string): string {
 /* ── Component ──────────────────────────────────────────────────────────── */
 
 export default function TokenGrid() {
-  const [activeTab, setActiveTab] = useState<Tab>("builder");
-
   const [selectedFamily, setSelectedFamily] = useState<string | null>(null);
   const [selectedStep, setSelectedStep] = useState<number | string | null>(null);
   const [selectedHex, setSelectedHex] = useState<string | null>(null);
@@ -199,8 +198,6 @@ export default function TokenGrid() {
 
   const triggerRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
-  const tabs = Object.keys(TAB_LABELS) as Tab[];
-  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   const derivedRole = selectedFamily ? ROLE_MAP[selectedFamily] ?? null : null;
   const validProps = derivedRole ? VALID_COMBINATIONS[derivedRole] : null;
@@ -265,22 +262,6 @@ export default function TokenGrid() {
     setSelEmphasis((v) => (v === value ? null : value));
   };
 
-  const handleTabKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      const idx = tabs.indexOf(activeTab);
-      let next = idx;
-      if (e.key === "ArrowRight") next = (idx + 1) % tabs.length;
-      else if (e.key === "ArrowLeft") next = (idx - 1 + tabs.length) % tabs.length;
-      else if (e.key === "Home") next = 0;
-      else if (e.key === "End") next = tabs.length - 1;
-      else return;
-      e.preventDefault();
-      setActiveTab(tabs[next]);
-      tabRefs.current[next]?.focus();
-    },
-    [activeTab, tabs],
-  );
-
   const dropdownPanel = dropdownOpen
     ? createPortal(
         <div
@@ -322,27 +303,17 @@ export default function TokenGrid() {
     : null;
 
   return (
-    <div className={styles.visualContainer}>
-      <div className={styles.tabBar} role="tablist" aria-label="Color token system" onKeyDown={handleTabKeyDown}>
-        {tabs.map((tab, i) => (
-          <button
-            key={tab}
-            ref={(el) => { tabRefs.current[i] = el; }}
-            role="tab"
-            id={`tokenGrid-tab-${tab}`}
-            aria-selected={activeTab === tab}
-            aria-controls={`tokenGrid-panel-${tab}`}
-            tabIndex={activeTab === tab ? 0 : -1}
-            className={`${styles.tab} ${activeTab === tab ? styles.tabActive : ""}`}
-            onClick={() => setActiveTab(tab)}
-          >
+    <Tabs defaultValue="builder" className={styles.visualContainer}>
+      <TabsList className={styles.tabList}>
+        {(Object.keys(TAB_LABELS) as Tab[]).map((tab) => (
+          <TabsTrigger key={tab} value={tab}>
             {TAB_LABELS[tab]}
-          </button>
+          </TabsTrigger>
         ))}
-      </div>
+      </TabsList>
 
-      <div className={styles.visualBody} role="tabpanel" id={`tokenGrid-panel-${activeTab}`} aria-labelledby={`tokenGrid-tab-${activeTab}`}>
-        {activeTab === "builder" && (
+      <TabsContent value="builder" className={styles.visualBody}>
+        {(
           <div className={styles.namingColumn}>
             {/* ── Interactive Token Builder ── */}
             <div className={styles.namingSection}>
@@ -481,47 +452,45 @@ export default function TokenGrid() {
             </div>
           </div>
         )}
+      </TabsContent>
 
-        {activeTab === "lumen" && (
-          <>
-            <div className={styles.namingRationale}>
-              <p className={styles.rationaleText}>
-                Lumen is a custom blue-violet (<span className={styles.rationaleCode}>#3336FF</span>) in the same territory as
-                ultramarine — the pigment Renaissance painters ground from lapis lazuli. Precise enough for an engineering
-                interface, rooted in something older.
-              </p>
-              <p className={styles.rationaleText}>
-                Shifting from IBM Carbon&rsquo;s pure blue broke the original luminance scale. I rebuilt it as a hybrid:
-                grades 10–50 match Carbon&rsquo;s absolute luminance values, 70–100 preserve inter-step ratios for
-                perceptual uniformity. Grade 60 is the key — the brand color itself.
-              </p>
+      <TabsContent value="lumen" className={styles.visualBody}>
+        <div className={styles.namingRationale}>
+          <p className={styles.rationaleText}>
+            Lumen is a custom blue-violet (<span className={styles.rationaleCode}>#3336FF</span>) in the same territory as
+            ultramarine — the pigment Renaissance painters ground from lapis lazuli. Precise enough for an engineering
+            interface, rooted in something older.
+          </p>
+          <p className={styles.rationaleText}>
+            Shifting from IBM Carbon&rsquo;s pure blue broke the original luminance scale. I rebuilt it as a hybrid:
+            grades 10–50 match Carbon&rsquo;s absolute luminance values, 70–100 preserve inter-step ratios for
+            perceptual uniformity. Grade 60 is the key — the brand color itself.
+          </p>
+        </div>
+        <div className={styles.colorRow}>
+          {ACCENT_SCALE.map((c) => (
+            <div key={c.step} className={`${styles.colorCell} ${c.scaling === "key" ? styles.colorCellKey : ""}`}>
+              <div className={styles.colorSwatch} style={{ backgroundColor: c.hex }} />
+              <span className={styles.colorLabel}>{c.step}</span>
+              <span className={styles.colorHex}>{c.hex}</span>
             </div>
-            <div className={styles.colorRow}>
-              {ACCENT_SCALE.map((c) => (
-                <div key={c.step} className={`${styles.colorCell} ${c.scaling === "key" ? styles.colorCellKey : ""}`}>
-                  <div className={styles.colorSwatch} style={{ backgroundColor: c.hex }} />
-                  <span className={styles.colorLabel}>{c.step}</span>
-                  <span className={styles.colorHex}>{c.hex}</span>
-                </div>
-              ))}
-            </div>
-            <div className={styles.scalingLegend}>
-              <div className={styles.scalingLegendItem}>
-                <span className={styles.scalingDot} style={{ background: "rgba(51, 54, 255, 0.15)" }} />
-                <span className={styles.scalingLegendText}>10–50: absolute luminance (matches Carbon)</span>
-              </div>
-              <div className={styles.scalingLegendItem}>
-                <span className={`${styles.scalingDot} ${styles.scalingDotKey}`} />
-                <span className={styles.scalingLegendText}>60: key brand color #3336FF</span>
-              </div>
-              <div className={styles.scalingLegendItem}>
-                <span className={styles.scalingDot} style={{ background: "rgba(0, 4, 226, 0.3)" }} />
-                <span className={styles.scalingLegendText}>70–100: inter-step ratios (perceptual uniformity)</span>
-              </div>
-            </div>
-          </>
-        )}
-      </div>
-    </div>
+          ))}
+        </div>
+        <div className={styles.scalingLegend}>
+          <div className={styles.scalingLegendItem}>
+            <span className={styles.scalingDot} style={{ background: "rgba(51, 54, 255, 0.15)" }} />
+            <span className={styles.scalingLegendText}>10–50: absolute luminance (matches Carbon)</span>
+          </div>
+          <div className={styles.scalingLegendItem}>
+            <span className={`${styles.scalingDot} ${styles.scalingDotKey}`} />
+            <span className={styles.scalingLegendText}>60: key brand color #3336FF</span>
+          </div>
+          <div className={styles.scalingLegendItem}>
+            <span className={styles.scalingDot} style={{ background: "rgba(0, 4, 226, 0.3)" }} />
+            <span className={styles.scalingLegendText}>70–100: inter-step ratios (perceptual uniformity)</span>
+          </div>
+        </div>
+      </TabsContent>
+    </Tabs>
   );
 }

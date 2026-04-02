@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Badge } from "@/components/ui/Badge";
 import styles from "./elan-visuals.module.scss";
 
 type Category = {
@@ -94,7 +95,7 @@ export default function IncidentDensityMap() {
                 </div>
                 <span className={styles.densityCount}>{cat.total}</span>
                 {cat.guardrailed > 0 && (
-                  <span className={styles.densityBadge}>guardrailed</span>
+                  <Badge appearance="highlight" emphasis="subtle" size="xxs" mono>guardrailed</Badge>
                 )}
               </div>
               {isExpanded && (
