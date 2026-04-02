@@ -29,6 +29,12 @@ description: >-
 
 ---
 
+## Phase 0: Pre-Flight
+
+Before starting, scan `docs/release-log.md` (first 30 lines) for recent
+pitfalls. Known recurring issues are cataloged in the Known Pitfalls section
+at the bottom of this file — they inform classification and error recovery.
+
 ## Phase 1: Analyze
 
 Understand the scope of changes since the last release.
@@ -60,10 +66,17 @@ Files that don't fit cleanly: `src/app/globals.scss` goes with Layer 2
 (tokens consumer). `archive/registry.json` goes with Layer 5 (component
 registry). `src/components/ui/index.ts` goes with Layer 5 (barrel exports).
 
+**Component family rule (REL-AP-003):** When a `src/components/ui/*/`
+directory contains *any* new files, ALL files in that directory (new and
+modified) go into Layer 5 together. Do not split a component family across
+Layer 5 and Layer 6 — they are semantically one unit.
+
 After classification, note:
 - Total file count per layer
 - Whether any layer is empty (skip it)
 - Whether any layer has > 50 files (consider splitting)
+- Whether Layer 9 (Playground) contains new pages — flag for build gate
+  scrutiny (see REL-AP-002)
 
 ## Phase 2: Clean
 
@@ -87,7 +100,7 @@ For each populated layer, create one commit entry:
 | 0 | `docs:` | `update agent guardrails and project configuration` |
 | 1 | `docs:` | `(describe the specific doc changes)` |
 | 2 | `feat:` | `expand design tokens — (list new token files)` |
-| 3 | `chore:` | `add (dependency name) dependency` |
+| 3 | `chore:` | `add/remove (dependency name) dependency` |
 | 4 | `refactor:` | `remove legacy component wrappers` |
 | 5 | `feat:` | `add (ComponentName) components, remove (ComponentName)` |
 | 6 | `refactor:` | `update UI component SCSS modules and APIs` |
@@ -191,3 +204,107 @@ Present the recommendation with reasoning. The user makes the final call.
 | `ascii-studio.json` | Phase 1 (current version) | Phase 5 (via checkpoint) |
 | `CHANGELOG.md` | Phase 3 (last entry reference) | Phase 5 (via checkpoint) |
 | `.gitignore` | Phase 2 (check patterns) | Phase 2 (add missing patterns) |
+| `docs/release-log.md` | Phase 0 (recent pitfalls) | Phase 6 (post-release audit) |
+
+---
+
+## Phase 6: Post-Release Audit
+
+**This phase is mandatory after every ship-it run.** It runs after the
+checkpoint skill completes (deploy verified) and before responding to the
+user with the final summary.
+
+1. **Append to `docs/release-log.md`** (newest first):
+   - Version released, date, file count, commit count
+   - Semver level and reasoning
+   - Any incidents during the release (build gate failures, classification
+     issues, checkpoint problems) with references to Known Pitfall IDs
+   - Resolution for each incident
+   - Layer classification notes (anything non-obvious)
+
+2. **Check Known Pitfalls:** If any incident occurred during the release,
+   check if it matches an existing Known Pitfall below. If not, add a new
+   `REL-AP-NNN` entry.
+
+3. **Escalation check:** If a Known Pitfall has been triggered 3+ times
+   (count occurrences in the release log), promote it:
+   - If it's a procedure gap → modify the Phase it affects
+   - If it's a cross-cutting concern → propose a Hard Guardrail in `AGENTS.md`
+
+4. **Cap:** If `docs/release-log.md` exceeds 15 entries, archive the oldest.
+
+---
+
+## Known Pitfalls
+
+> Accumulated lessons from past ship-it runs. Scan before each release.
+> Escalation: 3+ occurrences → promote to procedure change or guardrail.
+> Last updated: 2026-04-02 (4 pitfalls from REL-001)
+
+### REL-AP-001: Version sync targets left uncommitted before branch switch
+
+**Occurrences:** 1 (REL-001)
+
+**Trigger:** `npm run version:release` auto-syncs files listed in the
+checkpoint skill's Registered Apps table (`playground/src/lib/elan.ts`,
+`ascii-tool/src/lib/version.ts`), but the checkpoint procedure's
+`git add` command only includes manifest files.
+
+**Failure:** `git checkout main` refuses — "local changes would be
+overwritten by checkout."
+
+**Fix:** The release commit must include all sync targets:
+```bash
+git add elan.json ascii-studio.json playground/src/lib/elan.ts ascii-tool/src/lib/version.ts
+```
+
+### REL-AP-002: New playground pages with wrong component preview APIs
+
+**Occurrences:** 1 (REL-001 — 2 type errors in same page)
+
+**Trigger:** New playground pages use wrong prop shapes for shared preview
+components (`SubsectionHeading` expects `children`, `SourcePath` expects
+`path` prop). These components have no TypeScript autocomplete hints during
+authoring because playground pages are often generated in bulk.
+
+**Failure:** Build gate catches TypeScript errors after the release commit
+is already created, requiring fix commits before merge.
+
+**Fix:** Phase 1 should flag new playground pages. Before the build gate,
+verify that new playground pages use the correct APIs:
+- `<SubsectionHeading>Title text</SubsectionHeading>` (children, not props)
+- `<SourcePath path="src/components/ui/..." />` (path prop, not children)
+- `<PropsTable props={[...]} />` (array of prop objects)
+
+### REL-AP-003: Layer classification splits component families
+
+**Occurrences:** 1 (REL-001)
+
+**Trigger:** A new sub-component file (e.g., `NavItemChildren.tsx`) and
+modified parent files (e.g., `NavItem.tsx`, `index.ts`) in the same
+`src/components/ui/*/` directory get classified into different layers
+(Layer 5 for new, Layer 6 for modified).
+
+**Failure:** Semantically related changes are split across commits, making
+the git history harder to follow and potentially causing intermediate
+build states where the parent references a sub-component that hasn't been
+committed yet.
+
+**Fix:** Layer 5 absorbs ALL files in a `src/components/ui/ComponentName/`
+directory when that directory contains any new files. This is now documented
+in the Phase 1 classification rules.
+
+### REL-AP-004: Commit message templates don't cover removals
+
+**Occurrences:** 1 (REL-001)
+
+**Trigger:** Layer 3 template says "add (dependency name) dependency" but
+the actual change was removing `tailwind-merge`.
+
+**Failure:** No functional failure — the template was silently adapted.
+But rigid templates slow down Phase 3 when changes don't match the
+expected pattern.
+
+**Fix:** Templates now use `add/remove` for Layer 3. All templates are
+starting points — adapt verb and description to match actual change
+semantics.

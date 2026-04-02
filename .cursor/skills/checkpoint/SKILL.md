@@ -48,7 +48,8 @@ npm run version:auto
 npm run version:release
 npm run ascii-tool:version:release  # skip if no changes
 
-git add elan.json ascii-studio.json
+# IMPORTANT: release scripts auto-sync version files — commit ALL of them
+git add elan.json ascii-studio.json playground/src/lib/elan.ts ascii-tool/src/lib/version.ts
 git commit -m "release: Élan $(node -p \"require('./elan.json').release.version\"), ASCII Art Studio $(node -p \"require('./ascii-studio.json').release.version\")"
 
 # 3. BUILD GATE — verify all apps build before merging (mandatory)
@@ -76,7 +77,8 @@ vercel ls --prod                    # Check latest deployment status
 npm run version:patch
 npm run ascii-tool:version:patch
 
-git add elan.json ascii-studio.json
+# Include sync targets (version scripts auto-update them)
+git add elan.json ascii-studio.json playground/src/lib/elan.ts ascii-tool/src/lib/version.ts
 git commit -m "chore: begin Élan $(node -p \"require('./elan.json').version\"), ASCII Art Studio $(node -p \"require('./ascii-studio.json').version\")"
 git push origin dev
 ```
