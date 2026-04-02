@@ -4,12 +4,42 @@ import {
   type ButtonHTMLAttributes,
   type ReactNode,
 } from "react";
+import { Badge, type BadgeSize } from "../Badge/Badge";
 import styles from "./NavItem.module.scss";
+
+export type NavItemSize = "sm" | "md" | "lg";
+
+const BADGE_SIZE: Record<NavItemSize, { expanded: BadgeSize; overlay: BadgeSize }> = {
+  sm: { expanded: "xxs", overlay: "xxs" },
+  md: { expanded: "xs",  overlay: "xxs" },
+  lg: { expanded: "sm",  overlay: "xs" },
+};
+
+interface RenderBadgeOpts {
+  size: BadgeSize;
+  overlay?: boolean;
+  active?: boolean;
+}
+
+function renderBadge(badge: ReactNode, opts: RenderBadgeOpts): ReactNode {
+  if (typeof badge === "number" || typeof badge === "string") {
+    const appearance = opts.overlay && opts.active ? "highlight" : "neutral";
+    const emphasis = opts.overlay ? "bold" : "subtle";
+    return (
+      <Badge size={opts.size} appearance={appearance} emphasis={emphasis}>
+        {badge}
+      </Badge>
+    );
+  }
+  return badge;
+}
 
 export interface NavItemBaseProps {
   icon: ReactNode;
+  size?: NavItemSize;
   active?: boolean;
   collapsed?: boolean;
+  badge?: ReactNode;
   trailing?: ReactNode;
   disabled?: boolean;
 }
@@ -39,8 +69,10 @@ export const NavItem = forwardRef<
   (
     {
       icon,
+      size = "md",
       active = false,
       collapsed = false,
+      badge,
       trailing,
       disabled = false,
       className,
@@ -51,6 +83,7 @@ export const NavItem = forwardRef<
   ) => {
     const cls = [
       styles.navItem,
+      styles[size],
       active && styles.active,
       collapsed && styles.collapsed,
       disabled && styles.disabled,
@@ -58,6 +91,8 @@ export const NavItem = forwardRef<
     ]
       .filter(Boolean)
       .join(" ");
+
+    const hasBadge = badge != null;
 
     const inner = (
       <>
@@ -67,8 +102,18 @@ export const NavItem = forwardRef<
         {!collapsed && children && (
           <span className={styles.label}>{children}</span>
         )}
+        {!collapsed && hasBadge && (
+          <span className={styles.badge}>
+            {renderBadge(badge, { size: BADGE_SIZE[size].expanded })}
+          </span>
+        )}
         {!collapsed && trailing && (
           <span className={styles.trailing}>{trailing}</span>
+        )}
+        {collapsed && hasBadge && (
+          <span className={styles.badgeOverlay}>
+            {renderBadge(badge, { size: BADGE_SIZE[size].overlay, overlay: true, active })}
+          </span>
         )}
       </>
     );

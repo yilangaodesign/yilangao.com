@@ -1,16 +1,20 @@
 @use '../../../styles' as *;
 
+// Component tokens
+$_dialog-max-width: 520px;
+$_dialog-close-size: 28px;
+
 .overlay {
   position: fixed;
   inset: 0;
-  z-index: $portfolio-z-modal;
-  background-color: $portfolio-surface-overlay;
+  z-index: var(--portfolio-z-modal);
+  background-color: var(--portfolio-surface-overlay);
 
   &[data-state='open'] {
-    animation: fadeIn $portfolio-duration-moderate $portfolio-easing-entrance;
+    animation: fadeIn var(--portfolio-duration-moderate) var(--portfolio-easing-entrance);
   }
   &[data-state='closed'] {
-    animation: fadeOut $portfolio-duration-fast $portfolio-easing-exit;
+    animation: fadeOut var(--portfolio-duration-fast) var(--portfolio-easing-exit);
   }
 }
 
@@ -18,72 +22,72 @@
   position: fixed;
   top: 50%;
   left: 50%;
-  z-index: $portfolio-z-modal;
+  z-index: var(--portfolio-z-modal);
   transform: translate(-50%, -50%);
   width: 90vw;
-  max-width: 520px;
+  max-width: $_dialog-max-width;
   max-height: 85vh;
   overflow-y: auto;
-  background-color: $portfolio-surface-primary;
-  border: 1px solid $portfolio-border-subtle;
-  border-radius: $portfolio-radius-sm;
-  box-shadow: $portfolio-shadow-overlay;
-  padding: $portfolio-spacer-4x;
+  background-color: var(--portfolio-surface-primary);
+  border: 1px solid var(--portfolio-border-subtle);
+  border-radius: var(--portfolio-radius-sm);
+  box-shadow: var(--portfolio-shadow-overlay);
+  padding: var(--portfolio-spacer-4x);
 
   &:focus {
     outline: none;
   }
 
   &[data-state='open'] {
-    animation: dialogIn $portfolio-duration-moderate $portfolio-easing-entrance;
+    animation: dialogIn var(--portfolio-duration-moderate) var(--portfolio-easing-entrance);
   }
   &[data-state='closed'] {
-    animation: dialogOut $portfolio-duration-fast $portfolio-easing-exit;
+    animation: dialogOut var(--portfolio-duration-fast) var(--portfolio-easing-exit);
   }
 }
 
 .title {
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-lg;
-  font-weight: $portfolio-weight-semibold;
-  line-height: $portfolio-leading-snug;
-  color: $portfolio-text-primary;
-  margin-bottom: $portfolio-spacer-1x;
+  font-family: var(--portfolio-font-sans);
+  font-size: var(--portfolio-type-lg);
+  font-weight: var(--portfolio-weight-semibold);
+  line-height: var(--portfolio-leading-snug);
+  color: var(--portfolio-text-primary);
+  margin-bottom: var(--portfolio-spacer-1x);
 }
 
 .description {
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-sm;
-  line-height: $portfolio-leading-normal;
-  color: $portfolio-text-secondary;
-  margin-bottom: $portfolio-spacer-3x;
+  font-family: var(--portfolio-font-sans);
+  font-size: var(--portfolio-type-sm);
+  line-height: var(--portfolio-leading-normal);
+  color: var(--portfolio-text-secondary);
+  margin-bottom: var(--portfolio-spacer-3x);
 }
 
 .close {
   @include button-reset;
   position: absolute;
-  top: $portfolio-spacer-2x;
-  right: $portfolio-spacer-2x;
-  width: 28px;
-  height: 28px;
+  top: var(--portfolio-spacer-2x);
+  right: var(--portfolio-spacer-2x);
+  width: $_dialog-close-size;
+  height: $_dialog-close-size;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: $portfolio-radius-sm;
-  color: $portfolio-text-helper;
+  border-radius: var(--portfolio-radius-sm);
+  color: var(--portfolio-text-helper);
   @include transition-fast;
 
   &:hover {
-    background-color: $portfolio-surface-tertiary;
-    color: $portfolio-text-primary;
+    background-color: var(--portfolio-surface-tertiary);
+    color: var(--portfolio-text-primary);
   }
 }
 
 .footer {
   display: flex;
   justify-content: flex-end;
-  gap: $portfolio-spacer-1x;
-  margin-top: $portfolio-spacer-3x;
+  gap: var(--portfolio-spacer-1x);
+  margin-top: var(--portfolio-spacer-3x);
 }
 
 // ---------------------------------------------------------------------------

@@ -1,74 +1,76 @@
 @use '../../../styles' as *;
 
+$_dropdown-min-w: 180px;
+
 .content {
-  z-index: $portfolio-z-dropdown;
-  min-width: 180px;
+  z-index: var(--portfolio-z-dropdown);
+  min-width: $_dropdown-min-w;
   overflow: hidden;
-  background-color: $portfolio-surface-primary;
-  border: 1px solid $portfolio-border-subtle;
-  border-radius: $portfolio-radius-sm;
-  box-shadow: $portfolio-shadow-lg;
-  padding: $portfolio-spacer-0-5x;
+  background-color: var(--portfolio-surface-primary);
+  border: 1px solid var(--portfolio-border-subtle);
+  border-radius: var(--portfolio-radius-sm);
+  box-shadow: var(--portfolio-shadow-lg);
+  padding: var(--portfolio-spacer-0-5x);
 
   &[data-state='open'] {
-    animation: slideDown $portfolio-duration-fast $portfolio-easing-entrance;
+    animation: slideDown var(--portfolio-duration-fast) var(--portfolio-easing-entrance);
   }
 }
 
 .item {
   display: flex;
   align-items: center;
-  gap: $portfolio-spacer-1x;
-  padding: $portfolio-spacer-1x $portfolio-spacer-1-5x;
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-sm;
-  line-height: $portfolio-leading-normal;
-  color: $portfolio-text-primary;
+  gap: var(--portfolio-spacer-1x);
+  padding: var(--portfolio-spacer-1x) var(--portfolio-spacer-1-5x);
+  font-family: var(--portfolio-font-sans);
+  font-size: var(--portfolio-type-sm);
+  line-height: var(--portfolio-leading-normal);
+  color: var(--portfolio-text-primary);
   border-radius: 2px;
   cursor: pointer;
   user-select: none;
   outline: none;
 
   &[data-highlighted] {
-    background-color: $portfolio-surface-tertiary;
+    background-color: var(--portfolio-surface-tertiary);
   }
 
   &[data-disabled] {
-    color: $portfolio-text-disabled;
+    color: var(--portfolio-text-disabled);
     pointer-events: none;
   }
 }
 
 .destructive {
-  color: $portfolio-support-error;
+  color: var(--portfolio-text-error);
 
   &[data-highlighted] {
-    background-color: $portfolio-red-10;
+    background-color: var(--portfolio-surface-negative-subtle);
   }
 }
 
 .separator {
   height: 1px;
-  background-color: $portfolio-border-subtle;
-  margin: $portfolio-spacer-0-5x (-$portfolio-spacer-0-5x);
+  background-color: var(--portfolio-border-subtle);
+  margin: var(--portfolio-spacer-0-5x) calc(-1 * var(--portfolio-spacer-0-5x));
 }
 
 .label {
-  padding: $portfolio-spacer-1x $portfolio-spacer-1-5x;
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-xs;
-  font-weight: $portfolio-weight-medium;
-  color: $portfolio-text-helper;
+  padding: var(--portfolio-spacer-1x) var(--portfolio-spacer-1-5x);
+  font-family: var(--portfolio-font-sans);
+  font-size: var(--portfolio-type-xs);
+  font-weight: var(--portfolio-weight-medium);
+  color: var(--portfolio-text-helper);
   text-transform: uppercase;
-  letter-spacing: $portfolio-tracking-wider;
+  letter-spacing: var(--portfolio-tracking-wider);
 }
 
 .shortcut {
   margin-left: auto;
-  font-family: $portfolio-font-mono;
+  font-family: var(--portfolio-font-mono);
   font-size: 0.6875rem;
-  color: $portfolio-text-helper;
-  letter-spacing: $portfolio-tracking-wide;
+  color: var(--portfolio-text-helper);
+  letter-spacing: var(--portfolio-tracking-wide);
 }
 
 @keyframes slideDown {

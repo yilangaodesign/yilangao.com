@@ -40,9 +40,9 @@ export function Marquee({
         className={styles.track}
         data-pause={pauseOnHover ? "" : undefined}
         style={{
-          animationDuration: `${duration}s`,
-          animationPlayState: reducedMotion ? "paused" : undefined,
-        }}
+          "--marquee-duration": `${duration}s`,
+          "--marquee-play": reducedMotion ? "paused" : "running",
+        } as React.CSSProperties}
       >
         {children}
         {children}

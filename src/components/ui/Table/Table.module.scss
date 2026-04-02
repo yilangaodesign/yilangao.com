@@ -2,15 +2,15 @@
 
 .wrapper {
   overflow-x: auto;
-  border: 1px solid $portfolio-border-subtle;
-  border-radius: $portfolio-radius-sm;
+  border: 1px solid var(--portfolio-border-subtle);
+  border-radius: var(--portfolio-radius-sm);
 }
 
 .table {
   width: 100%;
   border-collapse: collapse;
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-sm;
+  font-family: var(--portfolio-font-sans);
+  font-size: var(--portfolio-type-sm);
 }
 
 // ---------------------------------------------------------------------------
@@ -18,17 +18,17 @@
 // ---------------------------------------------------------------------------
 
 .header {
-  background-color: $portfolio-surface-neutral-subtle;
+  background-color: var(--portfolio-surface-secondary);
 }
 
 .head {
-  padding: $portfolio-spacer-1x $portfolio-spacer-2x;
-  font-size: $portfolio-type-xs;
-  font-weight: $portfolio-weight-medium;
+  padding: var(--portfolio-spacer-1x) var(--portfolio-spacer-2x);
+  font-size: var(--portfolio-type-xs);
+  font-weight: var(--portfolio-weight-medium);
   text-align: left;
-  color: $portfolio-text-secondary;
+  color: var(--portfolio-text-secondary);
   white-space: nowrap;
-  border-bottom: 1px solid $portfolio-border-subtle;
+  border-bottom: 1px solid var(--portfolio-border-subtle);
 }
 
 // ---------------------------------------------------------------------------
@@ -39,13 +39,13 @@
 
 .row {
   &:not(:last-child) {
-    border-bottom: 1px solid $portfolio-border-subtle;
+    border-bottom: 1px solid var(--portfolio-border-subtle);
   }
 }
 
 .cell {
-  padding: $portfolio-spacer-1x $portfolio-spacer-2x;
-  color: $portfolio-text-primary;
+  padding: var(--portfolio-spacer-1x) var(--portfolio-spacer-2x);
+  color: var(--portfolio-text-primary);
   vertical-align: top;
 }
 
@@ -54,10 +54,10 @@
 // ---------------------------------------------------------------------------
 
 .mono {
-  font-family: $portfolio-font-mono;
-  font-size: $portfolio-type-xs;
+  font-family: var(--portfolio-font-mono);
+  font-size: var(--portfolio-type-xs);
 }
 
 .accent {
-  color: $portfolio-text-brand-bold;
+  color: var(--portfolio-text-link);
 }

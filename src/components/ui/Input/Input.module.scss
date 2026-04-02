@@ -1,73 +1,76 @@
 @use '../../../styles' as *;
 
+// Component tokens
+$_input-height: var(--portfolio-spacer-5x); // 40px
+
 .wrapper {
   display: flex;
   flex-direction: column;
-  gap: $portfolio-spacer-0-5x;
+  gap: var(--portfolio-spacer-0-5x);
 }
 
 .label {
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-sm;
-  font-weight: $portfolio-weight-medium;
-  line-height: $portfolio-leading-normal;
-  color: $portfolio-text-primary;
+  font-family: var(--portfolio-font-sans);
+  font-size: var(--portfolio-type-sm);
+  font-weight: var(--portfolio-weight-medium);
+  line-height: var(--portfolio-leading-normal);
+  color: var(--portfolio-text-primary);
 }
 
 .input {
   width: 100%;
-  height: 40px;
-  padding: 0 $portfolio-spacer-1-5x;
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-sm;
-  line-height: $portfolio-leading-normal;
-  color: $portfolio-text-primary;
-  background-color: $portfolio-surface-primary;
-  border: 1px solid $portfolio-border-subtle;
-  border-radius: $portfolio-radius-sm;
+  height: $_input-height;
+  padding: 0 var(--portfolio-spacer-1-5x);
+  font-family: var(--portfolio-font-sans);
+  font-size: var(--portfolio-type-sm);
+  line-height: var(--portfolio-leading-normal);
+  color: var(--portfolio-text-primary);
+  background-color: var(--portfolio-surface-primary);
+  border: 1px solid var(--portfolio-border-subtle);
+  border-radius: var(--portfolio-radius-sm);
   @include transition-fast;
 
   &::placeholder {
-    color: $portfolio-text-placeholder;
+    color: var(--portfolio-text-placeholder);
   }
 
   &:hover:not(:disabled) {
-    border-color: $portfolio-border-strong;
+    border-color: var(--portfolio-border-strong);
   }
 
   &:focus {
     outline: none;
-    border-color: $portfolio-focus;
-    box-shadow: 0 0 0 1px $portfolio-focus;
+    border-color: var(--portfolio-focus);
+    box-shadow: 0 0 0 1px var(--portfolio-focus);
   }
 
   &:disabled {
-    background-color: $portfolio-surface-tertiary;
-    border-color: $portfolio-border-disabled;
-    color: $portfolio-text-disabled;
+    background-color: var(--portfolio-surface-tertiary);
+    border-color: var(--portfolio-border-disabled);
+    color: var(--portfolio-text-disabled);
     cursor: not-allowed;
   }
 }
 
 .error .input {
-  border-color: $portfolio-support-error;
+  border-color: var(--portfolio-border-negative);
 
   &:focus {
-    border-color: $portfolio-support-error;
-    box-shadow: 0 0 0 1px $portfolio-support-error;
+    border-color: var(--portfolio-border-negative);
+    box-shadow: 0 0 0 1px var(--portfolio-border-negative);
   }
 }
 
 .helperText {
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-xs;
-  line-height: $portfolio-leading-normal;
-  color: $portfolio-text-helper;
+  font-family: var(--portfolio-font-sans);
+  font-size: var(--portfolio-type-xs);
+  line-height: var(--portfolio-leading-normal);
+  color: var(--portfolio-text-helper);
 }
 
 .errorText {
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-xs;
-  line-height: $portfolio-leading-normal;
-  color: $portfolio-text-error;
+  font-family: var(--portfolio-font-sans);
+  font-size: var(--portfolio-type-xs);
+  line-height: var(--portfolio-leading-normal);
+  color: var(--portfolio-text-error);
 }

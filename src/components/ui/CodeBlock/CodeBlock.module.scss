@@ -1,50 +1,52 @@
 @use '../../../styles' as *;
 
+$_codeblock-header-h: 36px;
+
 .wrapper {
-  border: 1px solid $portfolio-border-subtle;
-  border-radius: $portfolio-radius-sm;
+  border: 1px solid var(--portfolio-border-subtle);
+  border-radius: var(--portfolio-radius-sm);
   overflow: hidden;
-  background-color: $portfolio-neutral-05;
+  background-color: var(--portfolio-surface-secondary);
 }
 
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: $portfolio-spacer-0-5x $portfolio-spacer-1-5x;
-  border-bottom: 1px solid $portfolio-border-subtle;
-  background-color: $portfolio-neutral-10;
-  min-height: 36px;
+  padding: var(--portfolio-spacer-0-5x) var(--portfolio-spacer-1-5x);
+  border-bottom: 1px solid var(--portfolio-border-subtle);
+  background-color: var(--portfolio-surface-secondary);
+  min-height: $_codeblock-header-h;
 }
 
 .filename {
-  font-family: $portfolio-font-mono;
-  font-size: $portfolio-type-xs;
-  line-height: $portfolio-leading-normal;
-  color: $portfolio-text-secondary;
+  font-family: var(--portfolio-font-mono);
+  font-size: var(--portfolio-type-xs);
+  line-height: var(--portfolio-leading-normal);
+  color: var(--portfolio-text-secondary);
 }
 
 .actions {
   display: flex;
   align-items: center;
-  gap: $portfolio-spacer-0-5x;
+  gap: var(--portfolio-spacer-0-5x);
   margin-left: auto;
 }
 
 .actionBtn {
   @include button-reset;
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-xs;
-  font-weight: $portfolio-weight-medium;
-  line-height: $portfolio-leading-normal;
-  color: $portfolio-text-secondary;
-  padding: $portfolio-spacer-0-25x $portfolio-spacer-0-5x;
-  border-radius: $portfolio-radius-sm;
+  font-family: var(--portfolio-font-sans);
+  font-size: var(--portfolio-type-xs);
+  font-weight: var(--portfolio-weight-medium);
+  line-height: var(--portfolio-leading-normal);
+  color: var(--portfolio-text-secondary);
+  padding: var(--portfolio-spacer-0-25x) var(--portfolio-spacer-0-5x);
+  border-radius: var(--portfolio-radius-sm);
   @include transition-fast;
 
   &:hover {
-    color: $portfolio-text-primary;
-    background-color: $portfolio-neutral-20;
+    color: var(--portfolio-text-primary);
+    background-color: var(--portfolio-surface-tertiary);
   }
 }
 
@@ -54,14 +56,14 @@
 
 .pre {
   margin: 0;
-  padding: $portfolio-spacer-1-5x;
+  padding: var(--portfolio-spacer-1-5x);
 }
 
 .code {
-  font-family: $portfolio-font-mono;
-  font-size: $portfolio-type-sm;
-  line-height: $portfolio-leading-relaxed;
-  color: $portfolio-text-primary;
+  font-family: var(--portfolio-font-mono);
+  font-size: var(--portfolio-type-sm);
+  line-height: var(--portfolio-leading-relaxed);
+  color: var(--portfolio-text-primary);
   white-space: pre;
   tab-size: 2;
 }

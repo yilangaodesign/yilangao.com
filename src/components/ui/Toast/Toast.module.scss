@@ -1,15 +1,19 @@
 @use '../../../styles' as *;
 
+// Component tokens
+$_toast-width: 360px;
+$_toast-close-size: var(--portfolio-spacer-3x); // 24px
+
 .viewport {
   position: fixed;
-  bottom: $portfolio-spacer-4x;
-  right: $portfolio-spacer-4x;
-  z-index: $portfolio-z-toast;
+  bottom: var(--portfolio-spacer-4x);
+  right: var(--portfolio-spacer-4x);
+  z-index: var(--portfolio-z-toast);
   display: flex;
   flex-direction: column;
-  gap: $portfolio-spacer-1x;
-  width: 360px;
-  max-width: calc(100vw - #{$portfolio-spacer-4x} * 2);
+  gap: var(--portfolio-spacer-1x);
+  width: $_toast-width;
+  max-width: calc(100vw - var(--portfolio-spacer-4x) * 2);
   list-style: none;
   padding: 0;
   margin: 0;
@@ -19,18 +23,18 @@
 .root {
   display: flex;
   align-items: flex-start;
-  gap: $portfolio-spacer-1-5x;
-  padding: $portfolio-spacer-2x;
-  background-color: $portfolio-surface-primary;
-  border: 1px solid $portfolio-border-subtle;
-  border-radius: $portfolio-radius-sm;
-  box-shadow: $portfolio-shadow-lg;
+  gap: var(--portfolio-spacer-1-5x);
+  padding: var(--portfolio-spacer-2x);
+  background-color: var(--portfolio-surface-primary);
+  border: 1px solid var(--portfolio-border-subtle);
+  border-radius: var(--portfolio-radius-sm);
+  box-shadow: var(--portfolio-shadow-lg);
 
   &[data-state='open'] {
-    animation: slideIn $portfolio-duration-moderate $portfolio-easing-entrance;
+    animation: slideIn var(--portfolio-duration-moderate) var(--portfolio-easing-entrance);
   }
   &[data-state='closed'] {
-    animation: slideOut $portfolio-duration-fast $portfolio-easing-exit;
+    animation: slideOut var(--portfolio-duration-fast) var(--portfolio-easing-exit);
   }
 
   &[data-swipe='move'] {
@@ -38,57 +42,57 @@
   }
   &[data-swipe='cancel'] {
     transform: translateX(0);
-    transition: transform $portfolio-duration-fast $portfolio-easing-standard;
+    transition: transform var(--portfolio-duration-fast) var(--portfolio-easing-standard);
   }
   &[data-swipe='end'] {
-    animation: swipeOut $portfolio-duration-fast $portfolio-easing-exit;
+    animation: swipeOut var(--portfolio-duration-fast) var(--portfolio-easing-exit);
   }
 
   &.success {
-    border-left: 3px solid $portfolio-surface-positive-bold;
+    border-left: 3px solid var(--portfolio-surface-positive-bold);
 
     .title {
-      color: $portfolio-text-positive;
+      color: var(--portfolio-text-positive);
     }
 
     .description {
-      color: $portfolio-text-positive;
+      color: var(--portfolio-text-positive);
     }
   }
 
   &.error {
-    border-left: 3px solid $portfolio-surface-negative-bold;
+    border-left: 3px solid var(--portfolio-surface-negative-bold);
 
     .title {
-      color: $portfolio-text-negative;
+      color: var(--portfolio-text-negative);
     }
 
     .description {
-      color: $portfolio-text-negative;
+      color: var(--portfolio-text-negative);
     }
   }
 
   &.warning {
-    border-left: 3px solid $portfolio-surface-warning-bold;
+    border-left: 3px solid var(--portfolio-surface-warning-bold);
 
     .title {
-      color: $portfolio-text-warning;
+      color: var(--portfolio-text-warning);
     }
 
     .description {
-      color: $portfolio-text-warning;
+      color: var(--portfolio-text-warning);
     }
   }
 
   &.info {
-    border-left: 3px solid $portfolio-accent-60;
+    border-left: 3px solid var(--portfolio-accent-60);
 
     .title {
-      color: $portfolio-text-brand-bold;
+      color: var(--portfolio-text-brand-bold);
     }
 
     .description {
-      color: $portfolio-text-brand-bold;
+      color: var(--portfolio-text-brand-bold);
     }
   }
 }
@@ -99,50 +103,50 @@
 }
 
 .title {
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-sm;
-  font-weight: $portfolio-weight-medium;
-  line-height: $portfolio-leading-normal;
-  color: $portfolio-text-primary;
+  font-family: var(--portfolio-font-sans);
+  font-size: var(--portfolio-type-sm);
+  font-weight: var(--portfolio-weight-medium);
+  line-height: var(--portfolio-leading-normal);
+  color: var(--portfolio-text-primary);
 }
 
 .description {
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-xs;
-  line-height: $portfolio-leading-normal;
-  color: $portfolio-text-secondary;
-  margin-top: $portfolio-spacer-0-25x;
+  font-family: var(--portfolio-font-sans);
+  font-size: var(--portfolio-type-xs);
+  line-height: var(--portfolio-leading-normal);
+  color: var(--portfolio-text-secondary);
+  margin-top: var(--portfolio-spacer-0-25x);
 }
 
 .close {
   @include button-reset;
   flex-shrink: 0;
-  width: 24px;
-  height: 24px;
+  width: $_toast-close-size;
+  height: $_toast-close-size;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: $portfolio-radius-sm;
-  color: $portfolio-text-helper;
+  border-radius: var(--portfolio-radius-sm);
+  color: var(--portfolio-text-helper);
   @include transition-fast;
 
   &:hover {
-    background-color: $portfolio-surface-tertiary;
-    color: $portfolio-text-primary;
+    background-color: var(--portfolio-surface-tertiary);
+    color: var(--portfolio-text-primary);
   }
 }
 
 .action {
   @include button-reset;
-  margin-top: $portfolio-spacer-1x;
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-xs;
-  font-weight: $portfolio-weight-medium;
-  color: $portfolio-accent-60;
+  margin-top: var(--portfolio-spacer-1x);
+  font-family: var(--portfolio-font-sans);
+  font-size: var(--portfolio-type-xs);
+  font-weight: var(--portfolio-weight-medium);
+  color: var(--portfolio-accent-60);
   @include transition-fast;
 
   &:hover {
-    color: $portfolio-accent-70;
+    color: var(--portfolio-accent-70);
   }
 }
 

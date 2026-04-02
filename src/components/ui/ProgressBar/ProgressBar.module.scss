@@ -1,53 +1,56 @@
 @use '../../../styles' as *;
 
+$_bar-sm: 4px;
+$_bar-md: var(--portfolio-spacer-1x); // 8px
+
 .wrapper {
   display: flex;
   flex-direction: column;
-  gap: $portfolio-spacer-0-5x;
+  gap: var(--portfolio-spacer-0-5x);
 }
 
 .header {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  gap: $portfolio-spacer-1x;
+  gap: var(--portfolio-spacer-1x);
 }
 
 .label {
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-sm;
-  font-weight: $portfolio-weight-medium;
-  line-height: $portfolio-leading-normal;
-  color: $portfolio-text-primary;
+  font-family: var(--portfolio-font-sans);
+  font-size: var(--portfolio-type-sm);
+  font-weight: var(--portfolio-weight-medium);
+  line-height: var(--portfolio-leading-normal);
+  color: var(--portfolio-text-primary);
 }
 
 .value {
-  font-family: $portfolio-font-mono;
-  font-size: $portfolio-type-xs;
-  line-height: $portfolio-leading-normal;
-  color: $portfolio-text-secondary;
+  font-family: var(--portfolio-font-mono);
+  font-size: var(--portfolio-type-xs);
+  line-height: var(--portfolio-leading-normal);
+  color: var(--portfolio-text-secondary);
 }
 
 .track {
   width: 100%;
-  border-radius: $portfolio-radius-full;
-  background-color: $portfolio-neutral-20;
+  border-radius: var(--portfolio-radius-full);
+  background-color: var(--portfolio-surface-tertiary);
   overflow: hidden;
 }
 
 .sm {
-  height: 4px;
+  height: $_bar-sm;
 }
 
 .md {
-  height: 8px;
+  height: $_bar-md;
 }
 
 .fill {
   height: 100%;
-  border-radius: $portfolio-radius-full;
-  background-color: $portfolio-accent-60;
-  transition: width $portfolio-duration-fast $portfolio-easing-standard;
+  border-radius: var(--portfolio-radius-full);
+  background-color: var(--portfolio-action-brand-bold);
+  transition: width var(--portfolio-duration-fast) var(--portfolio-easing-standard);
 }
 
 .indeterminate {

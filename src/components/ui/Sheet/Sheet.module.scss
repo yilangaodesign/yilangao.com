@@ -1,5 +1,8 @@
 @use '../../../styles' as *;
 
+// Component tokens
+$_sheet-max-width: 480px;
+
 // ---------------------------------------------------------------------------
 // Overlay
 // ---------------------------------------------------------------------------
@@ -7,12 +10,12 @@
 .overlay {
   position: fixed;
   inset: 0;
-  z-index: 50;
-  background-color: $portfolio-overlay-black-40;
-  animation: sheet-overlay-in 200ms ease-out;
+  z-index: var(--portfolio-z-overlay);
+  background-color: var(--portfolio-overlay-black-40);
+  animation: sheet-overlay-in var(--portfolio-duration-moderate) var(--portfolio-easing-entrance);
 
   &[data-state='closed'] {
-    animation: sheet-overlay-out 150ms ease-in;
+    animation: sheet-overlay-out var(--portfolio-duration-fast) var(--portfolio-easing-exit);
   }
 }
 
@@ -32,12 +35,12 @@
 
 .content {
   position: fixed;
-  z-index: 50;
+  z-index: var(--portfolio-z-overlay);
   display: flex;
   flex-direction: column;
-  background-color: $portfolio-surface-primary;
-  border: 1px solid $portfolio-border-subtle;
-  box-shadow: $portfolio-shadow-lg;
+  background-color: var(--portfolio-surface-primary);
+  border: 1px solid var(--portfolio-border-subtle);
+  box-shadow: var(--portfolio-shadow-lg);
   overflow: hidden;
   outline: none;
 
@@ -52,11 +55,11 @@
   right: 0;
   bottom: 0;
   width: 100%;
-  max-width: 480px;
-  animation: sheet-slide-in-right 250ms ease-out;
+  max-width: $_sheet-max-width;
+  animation: sheet-slide-in-right var(--portfolio-duration-moderate) var(--portfolio-easing-entrance);
 
   &[data-state='closed'] {
-    animation: sheet-slide-out-right 200ms ease-in;
+    animation: sheet-slide-out-right var(--portfolio-duration-moderate) var(--portfolio-easing-exit);
   }
 }
 
@@ -65,11 +68,11 @@
   left: 0;
   bottom: 0;
   width: 100%;
-  max-width: 480px;
-  animation: sheet-slide-in-left 250ms ease-out;
+  max-width: $_sheet-max-width;
+  animation: sheet-slide-in-left var(--portfolio-duration-moderate) var(--portfolio-easing-entrance);
 
   &[data-state='closed'] {
-    animation: sheet-slide-out-left 200ms ease-in;
+    animation: sheet-slide-out-left var(--portfolio-duration-moderate) var(--portfolio-easing-exit);
   }
 }
 
@@ -79,10 +82,10 @@
   right: 0;
   height: auto;
   max-height: 50vh;
-  animation: sheet-slide-in-top 250ms ease-out;
+  animation: sheet-slide-in-top var(--portfolio-duration-moderate) var(--portfolio-easing-entrance);
 
   &[data-state='closed'] {
-    animation: sheet-slide-out-top 200ms ease-in;
+    animation: sheet-slide-out-top var(--portfolio-duration-moderate) var(--portfolio-easing-exit);
   }
 }
 
@@ -92,10 +95,10 @@
   right: 0;
   height: auto;
   max-height: 50vh;
-  animation: sheet-slide-in-bottom 250ms ease-out;
+  animation: sheet-slide-in-bottom var(--portfolio-duration-moderate) var(--portfolio-easing-entrance);
 
   &[data-state='closed'] {
-    animation: sheet-slide-out-bottom 200ms ease-in;
+    animation: sheet-slide-out-bottom var(--portfolio-duration-moderate) var(--portfolio-easing-exit);
   }
 }
 
@@ -147,31 +150,31 @@
 .header {
   position: sticky;
   top: 0;
-  z-index: 1;
+  z-index: var(--portfolio-z-raised);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: $portfolio-spacer-2x;
-  padding: $portfolio-spacer-2x $portfolio-spacer-3x;
-  border-bottom: 1px solid $portfolio-border-subtle;
-  background-color: $portfolio-surface-primary;
+  gap: var(--portfolio-spacer-2x);
+  padding: var(--portfolio-spacer-2x) var(--portfolio-spacer-3x);
+  border-bottom: 1px solid var(--portfolio-border-subtle);
+  background-color: var(--portfolio-surface-primary);
   backdrop-filter: blur(8px);
   flex-shrink: 0;
 }
 
 .title {
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-base;
-  font-weight: $portfolio-weight-semibold;
-  line-height: $portfolio-leading-tight;
-  color: $portfolio-text-primary;
+  font-family: var(--portfolio-font-sans);
+  font-size: var(--portfolio-type-base);
+  font-weight: var(--portfolio-weight-semibold);
+  line-height: var(--portfolio-leading-tight);
+  color: var(--portfolio-text-primary);
   margin: 0;
 }
 
 .description {
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-sm;
-  color: $portfolio-text-secondary;
+  font-family: var(--portfolio-font-sans);
+  font-size: var(--portfolio-type-sm);
+  color: var(--portfolio-text-secondary);
   margin: 0;
 }
 
@@ -182,7 +185,7 @@
 .body {
   flex: 1;
   overflow-y: auto;
-  padding: $portfolio-spacer-3x;
+  padding: var(--portfolio-spacer-3x);
 }
 
 // ---------------------------------------------------------------------------
@@ -192,8 +195,8 @@
 .footer {
   display: flex;
   align-items: center;
-  gap: $portfolio-spacer-1x;
-  padding: $portfolio-spacer-2x $portfolio-spacer-3x;
-  border-top: 1px solid $portfolio-border-subtle;
+  gap: var(--portfolio-spacer-1x);
+  padding: var(--portfolio-spacer-2x) var(--portfolio-spacer-3x);
+  border-top: 1px solid var(--portfolio-border-subtle);
   flex-shrink: 0;
 }

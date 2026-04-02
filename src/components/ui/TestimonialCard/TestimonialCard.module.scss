@@ -1,5 +1,11 @@
 @use '../../../styles' as *;
 
+$_testimonial-avatar: var(--portfolio-spacer-4x); // 32px
+$_testimonial-linkedin-btn: 28px;
+$_testimonial-spinner: 12px;
+$_testimonial-editor-w: 260px;
+$_testimonial-admin-gap: 4px;
+
 // ── TESTIMONIAL CARD ────────────────────────────────────────────────────────
 // Sits in the homepage masonry grid alongside project cards.
 // Visually distinct: no hero image, text-driven, subtle background.
@@ -8,11 +14,11 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: $portfolio-spacer-1-5x;
-  padding: $portfolio-spacer-2x;
-  background-color: $portfolio-surface-secondary;
-  border: 1px solid $portfolio-border-subtle;
-  border-radius: $portfolio-radius-sm;
+  gap: var(--portfolio-spacer-1-5x);
+  padding: var(--portfolio-spacer-2x);
+  background-color: var(--portfolio-surface-secondary);
+  border: 1px solid var(--portfolio-border-subtle);
+  border-radius: var(--portfolio-radius-sm);
   text-decoration: none;
   color: inherit;
 
@@ -35,33 +41,33 @@
 .quoteBlock {
   display: flex;
   flex-direction: column;
-  gap: $portfolio-spacer-0-5x;
+  gap: var(--portfolio-spacer-0-5x);
 }
 
 .quoteMark {
-  font-family: $portfolio-font-pixel-square;
-  font-size: $portfolio-type-6xl;
+  font-family: var(--portfolio-font-pixel-square);
+  font-size: var(--portfolio-type-6xl);
   line-height: 0.6;
-  color: $portfolio-text-placeholder;
+  color: var(--portfolio-text-placeholder);
   user-select: none;
 }
 
 .quoteMarkEditable {
   cursor: pointer;
-  transition: color $portfolio-duration-fast $portfolio-easing-standard;
+  transition: color var(--portfolio-duration-fast) var(--portfolio-easing-standard);
 
   &:hover {
-    color: $portfolio-accent-60;
+    color: var(--portfolio-accent-60);
   }
 }
 
 .quoteText {
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-sm;
-  font-weight: $portfolio-weight-regular;
+  font-family: var(--portfolio-font-sans);
+  font-size: var(--portfolio-type-sm);
+  font-weight: var(--portfolio-weight-regular);
   font-style: italic;
-  line-height: $portfolio-leading-relaxed;
-  color: $portfolio-text-secondary;
+  line-height: var(--portfolio-leading-relaxed);
+  color: var(--portfolio-text-secondary);
 }
 
 // ── ATTRIBUTION ─────────────────────────────────────────────────────────────
@@ -69,17 +75,17 @@
 .attribution {
   display: flex;
   align-items: center;
-  gap: $portfolio-spacer-1x;
+  gap: var(--portfolio-spacer-1x);
   margin-top: auto;
 }
 
 .avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: $portfolio-radius-full;
+  width: $_testimonial-avatar;
+  height: $_testimonial-avatar;
+  border-radius: var(--portfolio-radius-full);
   overflow: hidden;
   flex-shrink: 0;
-  background-color: $portfolio-surface-tertiary;
+  background-color: var(--portfolio-surface-tertiary);
 }
 
 .avatarImage {
@@ -94,10 +100,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-xs;
-  font-weight: $portfolio-weight-semibold;
-  color: $portfolio-text-placeholder;
+  font-family: var(--portfolio-font-sans);
+  font-size: var(--portfolio-type-xs);
+  font-weight: var(--portfolio-weight-semibold);
+  color: var(--portfolio-text-placeholder);
   text-transform: uppercase;
 }
 
@@ -110,19 +116,19 @@
 }
 
 .name {
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-sm;
-  font-weight: $portfolio-weight-medium;
-  color: $portfolio-text-primary;
-  line-height: $portfolio-leading-snug;
+  font-family: var(--portfolio-font-sans);
+  font-size: var(--portfolio-type-sm);
+  font-weight: var(--portfolio-weight-medium);
+  color: var(--portfolio-text-primary);
+  line-height: var(--portfolio-leading-snug);
 }
 
 .role {
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-xs;
-  font-weight: $portfolio-weight-regular;
-  color: $portfolio-text-placeholder;
-  line-height: $portfolio-leading-snug;
+  font-family: var(--portfolio-font-sans);
+  font-size: var(--portfolio-type-xs);
+  font-weight: var(--portfolio-weight-regular);
+  color: var(--portfolio-text-placeholder);
+  line-height: var(--portfolio-leading-snug);
 }
 
 // ── ADMIN OVERLAY ───────────────────────────────────────────────────────────
@@ -130,14 +136,14 @@
 
 .adminOverlay {
   position: absolute;
-  top: $portfolio-spacer-1x;
-  right: $portfolio-spacer-1x;
+  top: var(--portfolio-spacer-1x);
+  right: var(--portfolio-spacer-1x);
   display: flex;
-  gap: 4px;
-  z-index: 10;
+  gap: $_testimonial-admin-gap;
+  z-index: var(--portfolio-z-control);
   opacity: 0;
   pointer-events: none;
-  transition: opacity $portfolio-duration-fast $portfolio-easing-standard;
+  transition: opacity var(--portfolio-duration-fast) var(--portfolio-easing-standard);
 }
 
 // ── AVATAR UPLOAD ───────────────────────────────────────────────────────────
@@ -147,7 +153,7 @@
   position: relative;
   width: 100%;
   height: 100%;
-  border-radius: $portfolio-radius-full;
+  border-radius: var(--portfolio-radius-full);
   overflow: hidden;
   cursor: pointer;
 
@@ -162,20 +168,20 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.5);
-  color: #fff;
+  background: var(--portfolio-surface-overlay);
+  color: var(--portfolio-neutral-00);
   opacity: 0;
-  transition: opacity $portfolio-duration-fast $portfolio-easing-standard;
+  transition: opacity var(--portfolio-duration-fast) var(--portfolio-easing-standard);
   pointer-events: none;
 }
 
 .avatarUploadSpinner {
-  width: 12px;
-  height: 12px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top-color: #fff;
+  width: $_testimonial-spinner;
+  height: $_testimonial-spinner;
+  border: 2px solid var(--portfolio-overlay-white-25);
+  border-top-color: var(--portfolio-neutral-00);
   border-radius: 50%;
-  animation: avatarSpin 600ms linear infinite;
+  animation: avatarSpin var(--portfolio-duration-slower) linear infinite;
 }
 
 @keyframes avatarSpin {
@@ -199,26 +205,26 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
+  width: $_testimonial-linkedin-btn;
+  height: $_testimonial-linkedin-btn;
   flex-shrink: 0;
-  border-radius: $portfolio-radius-sm;
-  color: $portfolio-text-placeholder;
+  border-radius: var(--portfolio-radius-sm);
+  color: var(--portfolio-text-placeholder);
   transition:
-    color $portfolio-duration-fast $portfolio-easing-standard,
-    background-color $portfolio-duration-fast $portfolio-easing-standard;
+    color var(--portfolio-duration-fast) var(--portfolio-easing-standard),
+    background-color var(--portfolio-duration-fast) var(--portfolio-easing-standard);
 
   &:hover {
-    color: $portfolio-text-primary;
-    background-color: $portfolio-surface-tertiary;
+    color: var(--portfolio-text-primary);
+    background-color: var(--portfolio-surface-tertiary);
   }
 }
 
 .linkedinBtnLinked {
-  color: $portfolio-accent-60;
+  color: var(--portfolio-accent-60);
 
   &:hover {
-    color: $portfolio-accent-50;
+    color: var(--portfolio-accent-50);
   }
 }
 
@@ -229,73 +235,73 @@
   position: absolute;
   bottom: 100%;
   right: 0;
-  margin-bottom: $portfolio-spacer-0-5x;
-  width: 260px;
-  padding: $portfolio-spacer-1x;
-  background: $portfolio-surface-primary;
-  border: 1px solid $portfolio-border-subtle;
-  border-radius: $portfolio-radius-sm;
-  box-shadow: $portfolio-shadow-lg;
-  z-index: 100;
+  margin-bottom: var(--portfolio-spacer-0-5x);
+  width: $_testimonial-editor-w;
+  padding: var(--portfolio-spacer-1x);
+  background: var(--portfolio-surface-primary);
+  border: 1px solid var(--portfolio-border-subtle);
+  border-radius: var(--portfolio-radius-sm);
+  box-shadow: var(--portfolio-shadow-lg);
+  z-index: var(--portfolio-z-dropdown);
   display: flex;
   flex-direction: column;
-  gap: $portfolio-spacer-0-5x;
+  gap: var(--portfolio-spacer-0-5x);
 }
 
 .linkedinEditorLabel {
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-xs;
-  font-weight: $portfolio-weight-medium;
-  color: $portfolio-text-secondary;
+  font-family: var(--portfolio-font-sans);
+  font-size: var(--portfolio-type-xs);
+  font-weight: var(--portfolio-weight-medium);
+  color: var(--portfolio-text-secondary);
   text-transform: uppercase;
-  letter-spacing: $portfolio-tracking-wider;
+  letter-spacing: var(--portfolio-tracking-wider);
 }
 
 .linkedinEditorInput {
   width: 100%;
-  padding: $portfolio-spacer-0-5x $portfolio-spacer-1x;
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-sm;
-  line-height: $portfolio-leading-normal;
-  border: 1px solid $portfolio-border-subtle;
-  border-radius: $portfolio-radius-sm;
-  background: $portfolio-surface-primary;
-  color: $portfolio-text-primary;
+  padding: var(--portfolio-spacer-0-5x) var(--portfolio-spacer-1x);
+  font-family: var(--portfolio-font-sans);
+  font-size: var(--portfolio-type-sm);
+  line-height: var(--portfolio-leading-normal);
+  border: 1px solid var(--portfolio-border-subtle);
+  border-radius: var(--portfolio-radius-sm);
+  background: var(--portfolio-surface-primary);
+  color: var(--portfolio-text-primary);
   outline: none;
 
   &:focus {
-    border-color: $portfolio-accent-60;
+    border-color: var(--portfolio-accent-60);
   }
 
   &::placeholder {
-    color: $portfolio-text-placeholder;
+    color: var(--portfolio-text-placeholder);
   }
 }
 
 .linkedinEditorError {
-  font-size: $portfolio-type-xs;
-  color: $portfolio-support-error;
+  font-size: var(--portfolio-type-xs);
+  color: var(--portfolio-support-error);
 }
 
 .linkedinEditorActions {
   display: flex;
   justify-content: flex-end;
-  gap: $portfolio-spacer-0-5x;
+  gap: var(--portfolio-spacer-0-5x);
 }
 
 .linkedinEditorCancel {
   @include button-reset;
-  padding: $portfolio-spacer-0-25x $portfolio-spacer-1x;
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-xs;
-  font-weight: $portfolio-weight-medium;
-  color: $portfolio-text-secondary;
-  border: 1px solid $portfolio-border-subtle;
-  border-radius: $portfolio-radius-sm;
+  padding: var(--portfolio-spacer-0-25x) var(--portfolio-spacer-1x);
+  font-family: var(--portfolio-font-sans);
+  font-size: var(--portfolio-type-xs);
+  font-weight: var(--portfolio-weight-medium);
+  color: var(--portfolio-text-secondary);
+  border: 1px solid var(--portfolio-border-subtle);
+  border-radius: var(--portfolio-radius-sm);
   cursor: pointer;
 
   &:hover {
-    background: $portfolio-surface-secondary;
+    background: var(--portfolio-surface-secondary);
   }
 
   &:disabled {
@@ -306,17 +312,17 @@
 
 .linkedinEditorSave {
   @include button-reset;
-  padding: $portfolio-spacer-0-25x $portfolio-spacer-1x;
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-xs;
-  font-weight: $portfolio-weight-semibold;
-  color: #fff;
-  background: $portfolio-accent-60;
-  border-radius: $portfolio-radius-sm;
+  padding: var(--portfolio-spacer-0-25x) var(--portfolio-spacer-1x);
+  font-family: var(--portfolio-font-sans);
+  font-size: var(--portfolio-type-xs);
+  font-weight: var(--portfolio-weight-semibold);
+  color: var(--portfolio-neutral-00);
+  background: var(--portfolio-accent-60);
+  border-radius: var(--portfolio-radius-sm);
   cursor: pointer;
 
   &:hover {
-    background: $portfolio-accent-50;
+    background: var(--portfolio-accent-50);
   }
 
   &:disabled {

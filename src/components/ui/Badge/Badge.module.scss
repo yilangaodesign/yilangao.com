@@ -1,14 +1,35 @@
 @use '../../../styles' as *;
 
+// =============================================================================
+// Badge — Two-Axis Model (Appearance × Emphasis)
+// =============================================================================
+// Appearance: color/intent (neutral, highlight, positive, negative, warning,
+//             inverse, always-dark, always-light)
+// Emphasis:   visual weight (bold, regular, subtle, minimal)
+//
+// Key distinctions (from One GS reference):
+//   Bold    → solid colored fill, contrast text
+//   Regular → shared neutral border, white fill, colored text
+//             (inverse / always-* get their own surface + border)
+//   Minimal → neutral gray fill (same for ALL appearances), colored text
+//   Subtle  → color-TINTED fill (per appearance), colored text
+//
+// Unsupported: always-dark / always-light / inverse + subtle / minimal
+//              → fall back to Regular emphasis visually
+// =============================================================================
+
 .badge {
   display: inline-flex;
   align-items: center;
-  gap: $portfolio-spacer-0-5x;
-  font-family: $portfolio-font-sans;
-  font-weight: $portfolio-weight-medium;
-  line-height: $portfolio-leading-tight;
+  justify-content: center;
+  gap: var(--portfolio-spacer-0-5x);
+  font-family: var(--portfolio-font-sans);
+  font-weight: var(--portfolio-weight-medium);
+  line-height: 1;
   white-space: nowrap;
   user-select: none;
+  border: 1px solid transparent;
+  @include transition-fast;
 }
 
 // ---------------------------------------------------------------------------
@@ -16,11 +37,11 @@
 // ---------------------------------------------------------------------------
 
 .pill {
-  border-radius: $portfolio-radius-full;
+  border-radius: var(--portfolio-radius-full);
 }
 
 .squared {
-  border-radius: $portfolio-radius-sm;
+  border-radius: var(--portfolio-radius-sm);
 }
 
 // ---------------------------------------------------------------------------
@@ -28,63 +49,274 @@
 // ---------------------------------------------------------------------------
 
 .mono {
-  font-family: $portfolio-font-mono;
+  font-family: var(--portfolio-font-mono);
   text-transform: uppercase;
   letter-spacing: 0.1em;
 }
 
-// ---------------------------------------------------------------------------
-// Sizes
-// ---------------------------------------------------------------------------
+// =============================================================================
+// SIZES
+// =============================================================================
+// Font-size uses the type-token scale wherever possible. xs/sm/md share type-xs
+// (12 px) — height and padding provide visual differentiation, mirroring how
+// Button shares type-base across md/lg. Only xxs (10 px) is below the scale.
+//
+// Heights reuse the same spacer tokens as Button at matching physical sizes:
+//   Badge md (24 px) = Button xs · Badge lg (32 px) = Button sm · Badge xl (40 px) = Button md
+//
+// Horizontal padding scales progressively (4 → 4 → 8 → 8 → 12 → 16 px) so
+// larger badges stay proportionally balanced (~0.30–0.40 padding-to-height).
+// =============================================================================
+
+.xxs {
+  height: var(--portfolio-spacer-1-5x);
+  padding: 0 var(--portfolio-spacer-0-5x);
+  font-size: 0.625rem; // 10 px — below token scale; indicator / counter use
+}
 
 .xs {
-  height: 16px;
-  padding: 0 $portfolio-spacer-0-5x;
-  font-size: 0.5625rem; // 9px
+  height: var(--portfolio-spacer-2x);
+  padding: 0 var(--portfolio-spacer-0-5x);
+  font-size: var(--portfolio-type-xs);
 }
 
 .sm {
-  height: 20px;
-  padding: 0 $portfolio-spacer-1x;
-  font-size: 0.6875rem; // 11px
+  height: var(--portfolio-spacer-2-5x);
+  padding: 0 var(--portfolio-spacer-1x);
+  font-size: var(--portfolio-type-xs);
 }
 
 .md {
-  height: 24px;
-  padding: 0 $portfolio-spacer-1x;
-  font-size: $portfolio-type-xs;
+  height: var(--portfolio-spacer-3x);
+  padding: 0 var(--portfolio-spacer-1x);
+  font-size: var(--portfolio-type-xs);
+}
+
+.lg {
+  height: var(--portfolio-spacer-4x);
+  padding: 0 var(--portfolio-spacer-1-5x);
+  font-size: var(--portfolio-type-sm);
+}
+
+.xl {
+  height: var(--portfolio-spacer-5x);
+  padding: 0 var(--portfolio-spacer-2x);
+  font-size: var(--portfolio-type-base);
+}
+
+// =============================================================================
+// APPEARANCE × EMPHASIS
+// =============================================================================
+//
+// Regular emphasis (shared): Most appearances share a neutral border + white bg.
+// Only inverse / always-dark / always-light get their own surface + border.
+//
+// Minimal emphasis (shared): ALL appearances use the same neutral gray surface.
+// Only text color varies.
+
+// ---------------------------------------------------------------------------
+// Neutral
+// ---------------------------------------------------------------------------
+
+.neutral {
+  &.bold {
+    background-color: var(--portfolio-surface-inverse-bold);
+    color: var(--portfolio-text-inverse-bold);
+  }
+
+  &.regular {
+    background-color: var(--portfolio-surface-neutral-minimal);
+    border-color: var(--portfolio-border-neutral-subtle);
+    color: var(--portfolio-text-neutral-bold);
+  }
+
+  &.minimal {
+    background-color: var(--portfolio-surface-neutral-subtle);
+    color: var(--portfolio-text-neutral-bold);
+  }
+
+  &.subtle {
+    background-color: var(--portfolio-surface-neutral-subtle);
+    color: var(--portfolio-text-neutral-bold);
+  }
 }
 
 // ---------------------------------------------------------------------------
-// Variants
+// Highlight (brand accent)
 // ---------------------------------------------------------------------------
 
-.default {
-  background-color: $portfolio-surface-tertiary;
-  color: $portfolio-text-secondary;
+.highlight {
+  &.bold {
+    background-color: var(--portfolio-surface-brand-bold);
+    color: var(--portfolio-text-inverse-bold);
+  }
+
+  &.regular {
+    background-color: var(--portfolio-surface-neutral-minimal);
+    border-color: var(--portfolio-border-neutral-subtle);
+    color: var(--portfolio-text-brand-bold);
+  }
+
+  &.minimal {
+    background-color: var(--portfolio-surface-neutral-subtle);
+    color: var(--portfolio-text-brand-bold);
+  }
+
+  &.subtle {
+    background-color: var(--portfolio-surface-brand-subtle);
+    color: var(--portfolio-text-brand-bold);
+  }
 }
 
-.muted {
-  background-color: $portfolio-surface-neutral-subtle;
-  color: $portfolio-text-tertiary;
+// ---------------------------------------------------------------------------
+// Positive (success)
+// ---------------------------------------------------------------------------
+
+.positive {
+  &.bold {
+    background-color: var(--portfolio-surface-positive-bold);
+    color: var(--portfolio-text-inverse-bold);
+  }
+
+  &.regular {
+    background-color: var(--portfolio-surface-neutral-minimal);
+    border-color: var(--portfolio-border-neutral-subtle);
+    color: var(--portfolio-text-positive);
+  }
+
+  &.minimal {
+    background-color: var(--portfolio-surface-neutral-subtle);
+    color: var(--portfolio-text-positive);
+  }
+
+  &.subtle {
+    background-color: var(--portfolio-surface-positive-subtle);
+    color: var(--portfolio-text-positive);
+  }
 }
 
-.success {
-  background-color: $portfolio-green-10;
-  color: $portfolio-green-70;
+// ---------------------------------------------------------------------------
+// Negative (error)
+// ---------------------------------------------------------------------------
+
+.negative {
+  &.bold {
+    background-color: var(--portfolio-surface-negative-bold);
+    color: var(--portfolio-text-inverse-bold);
+  }
+
+  &.regular {
+    background-color: var(--portfolio-surface-neutral-minimal);
+    border-color: var(--portfolio-border-neutral-subtle);
+    color: var(--portfolio-text-negative);
+  }
+
+  &.minimal {
+    background-color: var(--portfolio-surface-neutral-subtle);
+    color: var(--portfolio-text-negative);
+  }
+
+  &.subtle {
+    background-color: var(--portfolio-surface-negative-subtle);
+    color: var(--portfolio-text-negative);
+  }
 }
+
+// ---------------------------------------------------------------------------
+// Warning
+// ---------------------------------------------------------------------------
 
 .warning {
-  background-color: $portfolio-yellow-10;
-  color: $portfolio-yellow-70;
+  &.bold {
+    background-color: var(--portfolio-surface-warning-bold);
+    color: var(--portfolio-text-always-dark-bold);
+  }
+
+  &.regular {
+    background-color: var(--portfolio-surface-neutral-minimal);
+    border-color: var(--portfolio-border-neutral-subtle);
+    color: var(--portfolio-text-warning);
+  }
+
+  &.minimal {
+    background-color: var(--portfolio-surface-neutral-subtle);
+    color: var(--portfolio-text-warning);
+  }
+
+  &.subtle {
+    background-color: var(--portfolio-surface-warning-subtle);
+    color: var(--portfolio-text-warning);
+  }
 }
 
-.error {
-  background-color: $portfolio-red-10;
-  color: $portfolio-red-70;
+// ---------------------------------------------------------------------------
+// Inverse — Bold + Regular only (subtle/minimal fall back to regular)
+// ---------------------------------------------------------------------------
+
+.inverse {
+  &.bold {
+    background-color: var(--portfolio-action-inverse-bold);
+    color: var(--portfolio-text-neutral-bold);
+  }
+
+  &.regular {
+    background-color: var(--portfolio-surface-inverse-bold);
+    border-color: var(--portfolio-border-inverse-bold);
+    color: var(--portfolio-text-inverse-bold);
+  }
+
+  &.minimal,
+  &.subtle {
+    background-color: var(--portfolio-surface-inverse-bold);
+    border-color: var(--portfolio-border-inverse-bold);
+    color: var(--portfolio-text-inverse-bold);
+  }
 }
 
-.info {
-  background-color: $portfolio-blue-10;
-  color: $portfolio-blue-70;
+// ---------------------------------------------------------------------------
+// Always Dark — Bold + Regular only (subtle/minimal fall back to regular)
+// ---------------------------------------------------------------------------
+
+.always-dark {
+  &.bold {
+    background-color: var(--portfolio-surface-always-dark);
+    color: var(--portfolio-text-always-light-bold);
+  }
+
+  &.regular {
+    background-color: var(--portfolio-surface-always-light);
+    border-color: var(--portfolio-border-always-dark);
+    color: var(--portfolio-text-always-dark-bold);
+  }
+
+  &.minimal,
+  &.subtle {
+    background-color: var(--portfolio-surface-always-light);
+    border-color: var(--portfolio-border-always-dark);
+    color: var(--portfolio-text-always-dark-bold);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Always Light — Bold + Regular only (subtle/minimal fall back to regular)
+// ---------------------------------------------------------------------------
+
+.always-light {
+  &.bold {
+    background-color: var(--portfolio-surface-always-light);
+    color: var(--portfolio-text-always-dark-bold);
+  }
+
+  &.regular {
+    background-color: var(--portfolio-surface-always-dark);
+    border-color: var(--portfolio-border-always-light);
+    color: var(--portfolio-text-always-light-bold);
+  }
+
+  &.minimal,
+  &.subtle {
+    background-color: var(--portfolio-surface-always-dark);
+    border-color: var(--portfolio-border-always-light);
+    color: var(--portfolio-text-always-light-bold);
+  }
 }

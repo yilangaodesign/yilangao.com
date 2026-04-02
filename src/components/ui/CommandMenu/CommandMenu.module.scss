@@ -1,5 +1,10 @@
 @use '../../../styles' as *;
 
+// Component tokens
+$_cmd-max-width: 480px;
+$_cmd-list-max-height: 300px;
+$_cmd-icon-size: 16px;
+
 // ---------------------------------------------------------------------------
 // Overlay
 // ---------------------------------------------------------------------------
@@ -7,12 +12,12 @@
 .overlay {
   position: fixed;
   inset: 0;
-  z-index: 50;
-  background-color: $portfolio-overlay-black-40;
-  animation: cmd-overlay-in 150ms ease-out;
+  z-index: var(--portfolio-z-overlay);
+  background-color: var(--portfolio-overlay-black-40);
+  animation: cmd-overlay-in var(--portfolio-duration-fast) var(--portfolio-easing-entrance);
 
   &[data-state='closed'] {
-    animation: cmd-overlay-out 100ms ease-in;
+    animation: cmd-overlay-out var(--portfolio-duration-fast) var(--portfolio-easing-exit);
   }
 }
 
@@ -32,22 +37,22 @@
 
 .dialog {
   position: fixed;
-  z-index: 50;
+  z-index: var(--portfolio-z-overlay);
   top: 20%;
   left: 50%;
   transform: translateX(-50%);
   width: 90%;
-  max-width: 480px;
-  border: 1px solid $portfolio-border-subtle;
-  border-radius: $portfolio-radius-md;
-  background-color: $portfolio-surface-primary;
-  box-shadow: $portfolio-shadow-lg;
+  max-width: $_cmd-max-width;
+  border: 1px solid var(--portfolio-border-subtle);
+  border-radius: var(--portfolio-radius-md);
+  background-color: var(--portfolio-surface-primary);
+  box-shadow: var(--portfolio-shadow-lg);
   overflow: hidden;
   outline: none;
-  animation: cmd-dialog-in 150ms ease-out;
+  animation: cmd-dialog-in var(--portfolio-duration-fast) var(--portfolio-easing-entrance);
 
   &[data-state='closed'] {
-    animation: cmd-dialog-out 100ms ease-in;
+    animation: cmd-dialog-out var(--portfolio-duration-fast) var(--portfolio-easing-exit);
   }
 }
 
@@ -89,14 +94,14 @@
 .inputWrapper {
   display: flex;
   align-items: center;
-  gap: $portfolio-spacer-1x;
-  padding: $portfolio-spacer-1-5x $portfolio-spacer-2x;
-  border-bottom: 1px solid $portfolio-border-subtle;
+  gap: var(--portfolio-spacer-1x);
+  padding: var(--portfolio-spacer-1-5x) var(--portfolio-spacer-2x);
+  border-bottom: 1px solid var(--portfolio-border-subtle);
 }
 
 .searchIcon {
   flex-shrink: 0;
-  color: $portfolio-text-tertiary;
+  color: var(--portfolio-text-tertiary);
 }
 
 .input {
@@ -104,12 +109,12 @@
   background: transparent;
   border: none;
   outline: none;
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-sm;
-  color: $portfolio-text-primary;
+  font-family: var(--portfolio-font-sans);
+  font-size: var(--portfolio-type-sm);
+  color: var(--portfolio-text-primary);
 
   &::placeholder {
-    color: $portfolio-text-tertiary;
+    color: var(--portfolio-text-tertiary);
   }
 }
 
@@ -118,9 +123,9 @@
 // ---------------------------------------------------------------------------
 
 .list {
-  max-height: 300px;
+  max-height: $_cmd-list-max-height;
   overflow-y: auto;
-  padding: $portfolio-spacer-0-5x;
+  padding: var(--portfolio-spacer-0-5x);
 }
 
 // ---------------------------------------------------------------------------
@@ -128,11 +133,11 @@
 // ---------------------------------------------------------------------------
 
 .empty {
-  padding: $portfolio-spacer-3x $portfolio-spacer-2x;
+  padding: var(--portfolio-spacer-3x) var(--portfolio-spacer-2x);
   text-align: center;
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-sm;
-  color: $portfolio-text-tertiary;
+  font-family: var(--portfolio-font-sans);
+  font-size: var(--portfolio-type-sm);
+  color: var(--portfolio-text-tertiary);
 }
 
 // ---------------------------------------------------------------------------
@@ -141,11 +146,11 @@
 
 .group {
   [cmdk-group-heading] {
-    padding: $portfolio-spacer-0-5x $portfolio-spacer-1x;
-    font-family: $portfolio-font-sans;
-    font-size: $portfolio-type-xs;
-    font-weight: $portfolio-weight-medium;
-    color: $portfolio-text-tertiary;
+    padding: var(--portfolio-spacer-0-5x) var(--portfolio-spacer-1x);
+    font-family: var(--portfolio-font-sans);
+    font-size: var(--portfolio-type-xs);
+    font-weight: var(--portfolio-weight-medium);
+    color: var(--portfolio-text-tertiary);
     text-transform: uppercase;
     letter-spacing: 0.05em;
   }
@@ -158,18 +163,18 @@
 .item {
   display: flex;
   align-items: center;
-  gap: $portfolio-spacer-1x;
-  padding: $portfolio-spacer-1x $portfolio-spacer-1x;
-  border-radius: $portfolio-radius-sm;
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-sm;
-  color: $portfolio-text-primary;
+  gap: var(--portfolio-spacer-1x);
+  padding: var(--portfolio-spacer-1x) var(--portfolio-spacer-1x);
+  border-radius: var(--portfolio-radius-sm);
+  font-family: var(--portfolio-font-sans);
+  font-size: var(--portfolio-type-sm);
+  color: var(--portfolio-text-primary);
   cursor: pointer;
   user-select: none;
   @include transition-fast;
 
   &[data-selected='true'] {
-    background-color: $portfolio-surface-neutral-subtle;
+    background-color: var(--portfolio-surface-neutral-subtle);
   }
 
   &[aria-disabled='true'] {
@@ -183,9 +188,9 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  width: 16px;
-  height: 16px;
-  color: $portfolio-text-secondary;
+  width: $_cmd-icon-size;
+  height: $_cmd-icon-size;
+  color: var(--portfolio-text-secondary);
 
   svg {
     width: 100%;
@@ -207,8 +212,8 @@
 
 .separator {
   height: 1px;
-  margin: $portfolio-spacer-0-5x 0;
-  background-color: $portfolio-border-subtle;
+  margin: var(--portfolio-spacer-0-5x) 0;
+  background-color: var(--portfolio-border-subtle);
 }
 
 // ---------------------------------------------------------------------------
@@ -217,7 +222,7 @@
 
 .shortcut {
   margin-inline-start: auto;
-  font-family: $portfolio-font-mono;
+  font-family: var(--portfolio-font-mono);
   font-size: 10px;
-  color: $portfolio-text-tertiary;
+  color: var(--portfolio-text-tertiary);
 }

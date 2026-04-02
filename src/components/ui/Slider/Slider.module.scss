@@ -1,31 +1,35 @@
 @use '../../../styles' as *;
 
+// Component tokens
+$_slider-track-h: 4px;
+$_slider-thumb-size: 14px;
+
 .wrapper {
   display: flex;
   flex-direction: column;
-  gap: $portfolio-spacer-0-5x;
+  gap: var(--portfolio-spacer-0-5x);
 }
 
 .header {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  gap: $portfolio-spacer-1x;
+  gap: var(--portfolio-spacer-1x);
 }
 
 .label {
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-sm;
-  font-weight: $portfolio-weight-medium;
-  line-height: $portfolio-leading-normal;
-  color: $portfolio-text-primary;
+  font-family: var(--portfolio-font-sans);
+  font-size: var(--portfolio-type-sm);
+  font-weight: var(--portfolio-weight-medium);
+  line-height: var(--portfolio-leading-normal);
+  color: var(--portfolio-text-primary);
 }
 
 .value {
-  font-family: $portfolio-font-mono;
-  font-size: $portfolio-type-xs;
-  line-height: $portfolio-leading-normal;
-  color: $portfolio-text-secondary;
+  font-family: var(--portfolio-font-mono);
+  font-size: var(--portfolio-type-xs);
+  line-height: var(--portfolio-leading-normal);
+  color: var(--portfolio-text-secondary);
   flex-shrink: 0;
 }
 
@@ -34,30 +38,30 @@
   -webkit-appearance: none;
   appearance: none;
   width: 100%;
-  height: 4px;
-  border-radius: $portfolio-radius-full;
+  height: $_slider-track-h;
+  border-radius: var(--portfolio-radius-full);
   background: transparent;
   outline: none;
   @include transition-fast;
   cursor: pointer;
 
   &::-webkit-slider-runnable-track {
-    height: 4px;
-    border-radius: $portfolio-radius-full;
+    height: $_slider-track-h;
+    border-radius: var(--portfolio-radius-full);
     background: linear-gradient(
       to right,
-      $portfolio-accent-60 var(--slider-progress, 0%),
-      $portfolio-neutral-20 var(--slider-progress, 0%)
+      var(--portfolio-accent-60) var(--slider-progress, 0%),
+      var(--portfolio-neutral-20) var(--slider-progress, 0%)
     );
   }
 
   &::-moz-range-track {
-    height: 4px;
-    border-radius: $portfolio-radius-full;
+    height: $_slider-track-h;
+    border-radius: var(--portfolio-radius-full);
     background: linear-gradient(
       to right,
-      $portfolio-accent-60 var(--slider-progress, 0%),
-      $portfolio-neutral-20 var(--slider-progress, 0%)
+      var(--portfolio-accent-60) var(--slider-progress, 0%),
+      var(--portfolio-neutral-20) var(--slider-progress, 0%)
     );
     border: none;
   }
@@ -69,23 +73,23 @@
   &::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 14px;
-    height: 14px;
-    border-radius: $portfolio-radius-full;
-    background-color: $portfolio-accent-60;
-    border: 2px solid $portfolio-neutral-00;
-    box-shadow: $portfolio-shadow-sm;
+    width: $_slider-thumb-size;
+    height: $_slider-thumb-size;
+    border-radius: var(--portfolio-radius-full);
+    background-color: var(--portfolio-accent-60);
+    border: 2px solid var(--portfolio-neutral-00);
+    box-shadow: var(--portfolio-shadow-sm);
     cursor: pointer;
     @include transition-fast;
   }
 
   &::-moz-range-thumb {
-    width: 14px;
-    height: 14px;
-    border-radius: $portfolio-radius-full;
-    background-color: $portfolio-accent-60;
-    border: 2px solid $portfolio-neutral-00;
-    box-shadow: $portfolio-shadow-sm;
+    width: $_slider-thumb-size;
+    height: $_slider-thumb-size;
+    border-radius: var(--portfolio-radius-full);
+    background-color: var(--portfolio-accent-60);
+    border: 2px solid var(--portfolio-neutral-00);
+    box-shadow: var(--portfolio-shadow-sm);
     cursor: pointer;
   }
 
@@ -102,11 +106,11 @@
   }
 
   &:focus-visible::-webkit-slider-thumb {
-    box-shadow: 0 0 0 2px $portfolio-focus;
+    box-shadow: 0 0 0 2px var(--portfolio-focus);
   }
 
   &:focus-visible::-moz-range-thumb {
-    box-shadow: 0 0 0 2px $portfolio-focus;
+    box-shadow: 0 0 0 2px var(--portfolio-focus);
   }
 
   &:disabled {

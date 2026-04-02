@@ -1,45 +1,45 @@
 @use '../../../styles' as *;
 
 .footer {
-  border-top: 1px solid $portfolio-border-subtle;
+  border-top: 1px solid var(--portfolio-border-subtle);
 }
 
 .footerInner {
   max-width: $elan-container-wide;
   margin: 0 auto;
-  padding: $portfolio-spacer-4x $portfolio-spacer-2x;
+  padding: var(--portfolio-spacer-4x) var(--portfolio-spacer-2x);
   display: flex;
   align-items: center;
   justify-content: space-between;
 
   @media #{$elan-mq-sm} {
-    padding: $portfolio-spacer-4x;
+    padding: var(--portfolio-spacer-4x);
   }
 }
 
 .copyright {
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-xs;
-  color: $portfolio-text-placeholder;
+  font-family: var(--portfolio-font-sans);
+  font-size: var(--portfolio-type-xs);
+  color: var(--portfolio-text-placeholder);
 }
 
 .footerLinks {
   display: flex;
-  gap: $portfolio-spacer-2x;
+  gap: var(--portfolio-spacer-2x);
 }
 
 .footerLink {
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-xs;
-  color: $portfolio-text-secondary;
+  font-family: var(--portfolio-font-sans);
+  font-size: var(--portfolio-type-xs);
+  color: var(--portfolio-text-secondary);
   text-decoration: none;
   display: inline-flex;
   align-items: center;
-  gap: $portfolio-spacer-0-25x;
+  gap: var(--portfolio-spacer-0-25x);
   @include transition-fast;
 
   &:hover {
-    color: $portfolio-text-primary;
+    color: var(--portfolio-text-primary);
   }
 }
 

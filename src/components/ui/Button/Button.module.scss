@@ -1,10 +1,18 @@
 @use '../../../styles' as *;
 
+// Component tokens
+$_btn-icon-xs: 16px;
+$_btn-icon-sm: 18px;
+$_btn-icon-md: 20px;
+$_btn-icon-lg: 22px;
+$_btn-icon-xl: var(--portfolio-spacer-3x); // 24px
+
 // =============================================================================
 // Button — Two-Axis Model (Appearance × Emphasis)
 // =============================================================================
-// Appearance: color/intent (neutral, highlight, positive, negative, inverse, always-dark, always-light)
+// Appearance: color/intent (neutral, highlight, positive, negative, warning, inverse, always-dark, always-light)
 // Emphasis:   visual weight (bold, regular, subtle, minimal)
+//             Note: inverse supports Bold + Regular only (One GS). Subtle/Minimal → use always-light.
 // Sizing:     One GS reference — icon = label line-height, padding-derived height,
 //             flex gap for icon-label spacing, py < px at all sizes.
 // =============================================================================
@@ -14,9 +22,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-family: $portfolio-font-sans;
-  font-weight: $portfolio-weight-medium;
-  border-radius: $portfolio-radius-sm;
+  font-family: var(--portfolio-font-sans);
+  font-weight: var(--portfolio-weight-medium);
+  border-radius: var(--portfolio-radius-sm);
   border: 1px solid transparent;
   white-space: nowrap;
   user-select: none;
@@ -59,7 +67,7 @@
 .trailingSlot {
   display: inline-flex;
   align-items: center;
-  margin-inline-start: $portfolio-spacer-0-25x;
+  margin-inline-start: var(--portfolio-spacer-0-25x);
 }
 
 // =============================================================================
@@ -72,36 +80,48 @@
 
 .neutral {
   &.bold {
-    background-color: $portfolio-surface-inverse-bold;
-    color: $portfolio-text-inverse-bold;
+    background-color: var(--portfolio-surface-inverse-bold);
+    color: var(--portfolio-text-inverse-bold);
 
     &:hover:not(:disabled) { background-color: $portfolio-neutral-90; }
     &:active:not(:disabled) { background-color: $portfolio-neutral-80; }
+
+    :global([data-theme="dark"]) &,
+    :global(.dark) & {
+      &:hover:not(:disabled) { background-color: $portfolio-neutral-20; }
+      &:active:not(:disabled) { background-color: $portfolio-neutral-30; }
+    }
   }
 
   &.regular {
     background-color: transparent;
-    border-color: $portfolio-border-neutral-bold;
-    color: $portfolio-text-neutral-bold;
+    border-color: var(--portfolio-border-neutral-bold);
+    color: var(--portfolio-text-neutral-bold);
 
-    &:hover:not(:disabled) { background-color: $portfolio-surface-neutral-subtle; }
-    &:active:not(:disabled) { background-color: $portfolio-surface-neutral-regular; }
+    &:hover:not(:disabled) { background-color: var(--portfolio-surface-neutral-subtle); }
+    &:active:not(:disabled) { background-color: var(--portfolio-surface-neutral-regular); }
   }
 
   &.subtle {
-    background-color: $portfolio-surface-neutral-regular;
-    color: $portfolio-text-neutral-bold;
+    background-color: var(--portfolio-surface-neutral-regular);
+    color: var(--portfolio-text-neutral-bold);
 
     &:hover:not(:disabled) { background-color: $portfolio-neutral-20; }
     &:active:not(:disabled) { background-color: $portfolio-neutral-30; }
+
+    :global([data-theme="dark"]) &,
+    :global(.dark) & {
+      &:hover:not(:disabled) { background-color: $portfolio-neutral-70; }
+      &:active:not(:disabled) { background-color: $portfolio-neutral-60; }
+    }
   }
 
   &.minimal {
     background-color: transparent;
-    color: $portfolio-text-neutral-bold;
+    color: var(--portfolio-text-neutral-bold);
 
-    &:hover:not(:disabled) { background-color: $portfolio-surface-neutral-subtle; }
-    &:active:not(:disabled) { background-color: $portfolio-surface-neutral-regular; }
+    &:hover:not(:disabled) { background-color: var(--portfolio-surface-neutral-subtle); }
+    &:active:not(:disabled) { background-color: var(--portfolio-surface-neutral-regular); }
   }
 }
 
@@ -111,8 +131,15 @@
 
 .highlight {
   &.bold {
-    background-color: $portfolio-action-brand-bold;
-    color: $portfolio-text-always-light-bold;
+    background-color: var(--portfolio-action-brand-bold);
+    color: var(--portfolio-text-always-light-bold);
+
+    // Dark-mode WCAG fix: accent-50 (#7182FD) + white = 3.33:1 (fails AA).
+    // Deepen to accent-60 for buttons; non-button brand uses keep accent-50 to pop.
+    :global([data-theme="dark"]) &,
+    :global(.dark) & {
+      background-color: $portfolio-accent-60;
+    }
 
     &:hover:not(:disabled) { background-color: $portfolio-accent-70; }
     &:active:not(:disabled) { background-color: $portfolio-accent-80; }
@@ -120,27 +147,43 @@
 
   &.regular {
     background-color: transparent;
-    border-color: $portfolio-border-brand-bold;
-    color: $portfolio-text-brand-bold;
+    border-color: var(--portfolio-border-brand-bold);
+    color: var(--portfolio-text-brand-bold);
 
-    &:hover:not(:disabled) { background-color: $portfolio-surface-brand-subtle; }
+    &:hover:not(:disabled) { background-color: var(--portfolio-surface-brand-subtle); }
     &:active:not(:disabled) { background-color: $portfolio-accent-20; }
+
+    :global([data-theme="dark"]) &,
+    :global(.dark) & {
+      &:active:not(:disabled) { background-color: $portfolio-accent-90; }
+    }
   }
 
   &.subtle {
-    background-color: $portfolio-surface-brand-subtle;
-    color: $portfolio-text-brand-bold;
+    background-color: var(--portfolio-surface-brand-subtle);
+    color: var(--portfolio-text-brand-bold);
 
     &:hover:not(:disabled) { background-color: $portfolio-accent-20; }
     &:active:not(:disabled) { background-color: $portfolio-accent-30; }
+
+    :global([data-theme="dark"]) &,
+    :global(.dark) & {
+      &:hover:not(:disabled) { background-color: $portfolio-accent-90; }
+      &:active:not(:disabled) { background-color: $portfolio-accent-80; }
+    }
   }
 
   &.minimal {
     background-color: transparent;
-    color: $portfolio-text-brand-bold;
+    color: var(--portfolio-text-brand-bold);
 
-    &:hover:not(:disabled) { background-color: $portfolio-surface-brand-subtle; }
+    &:hover:not(:disabled) { background-color: var(--portfolio-surface-brand-subtle); }
     &:active:not(:disabled) { background-color: $portfolio-accent-20; }
+
+    :global([data-theme="dark"]) &,
+    :global(.dark) & {
+      &:active:not(:disabled) { background-color: $portfolio-accent-90; }
+    }
   }
 }
 
@@ -150,36 +193,58 @@
 
 .positive {
   &.bold {
-    background-color: $portfolio-surface-positive-bold;
-    color: $portfolio-text-always-light-bold;
+    background-color: var(--portfolio-surface-positive-bold);
+    color: var(--portfolio-text-always-light-bold);
 
     &:hover:not(:disabled) { background-color: $portfolio-green-70; }
     &:active:not(:disabled) { background-color: $portfolio-green-80; }
+
+    :global([data-theme="dark"]) &,
+    :global(.dark) & {
+      &:hover:not(:disabled) { background-color: $portfolio-green-80; }
+      &:active:not(:disabled) { background-color: $portfolio-green-90; }
+    }
   }
 
   &.regular {
     background-color: transparent;
-    border-color: $portfolio-border-positive;
-    color: $portfolio-text-positive;
+    border-color: var(--portfolio-border-positive);
+    color: var(--portfolio-text-positive);
 
-    &:hover:not(:disabled) { background-color: $portfolio-surface-positive-subtle; }
+    &:hover:not(:disabled) { background-color: var(--portfolio-surface-positive-subtle); }
     &:active:not(:disabled) { background-color: $portfolio-green-20; }
+
+    :global([data-theme="dark"]) &,
+    :global(.dark) & {
+      &:active:not(:disabled) { background-color: $portfolio-green-90; }
+    }
   }
 
   &.subtle {
-    background-color: $portfolio-surface-positive-subtle;
-    color: $portfolio-text-positive;
+    background-color: var(--portfolio-surface-positive-subtle);
+    color: var(--portfolio-text-positive);
 
     &:hover:not(:disabled) { background-color: $portfolio-green-20; }
     &:active:not(:disabled) { background-color: $portfolio-green-30; }
+
+    :global([data-theme="dark"]) &,
+    :global(.dark) & {
+      &:hover:not(:disabled) { background-color: $portfolio-green-90; }
+      &:active:not(:disabled) { background-color: $portfolio-green-80; }
+    }
   }
 
   &.minimal {
     background-color: transparent;
-    color: $portfolio-text-positive;
+    color: var(--portfolio-text-positive);
 
-    &:hover:not(:disabled) { background-color: $portfolio-surface-positive-subtle; }
+    &:hover:not(:disabled) { background-color: var(--portfolio-surface-positive-subtle); }
     &:active:not(:disabled) { background-color: $portfolio-green-20; }
+
+    :global([data-theme="dark"]) &,
+    :global(.dark) & {
+      &:active:not(:disabled) { background-color: $portfolio-green-90; }
+    }
   }
 }
 
@@ -189,35 +254,52 @@
 
 .negative {
   &.bold {
-    background-color: $portfolio-surface-negative-bold;
-    color: $portfolio-text-always-light-bold;
+    background-color: var(--portfolio-surface-negative-bold);
+    color: var(--portfolio-text-always-light-bold);
 
     &:hover:not(:disabled) { background-color: $portfolio-red-70; }
     &:active:not(:disabled) { background-color: $portfolio-red-80; }
+
+    :global([data-theme="dark"]) &,
+    :global(.dark) & {
+      &:hover:not(:disabled) { background-color: $portfolio-red-80; }
+      &:active:not(:disabled) { background-color: $portfolio-red-90; }
+    }
   }
 
   &.regular {
     background-color: transparent;
-    border-color: $portfolio-border-negative;
-    color: $portfolio-text-negative;
+    border-color: var(--portfolio-border-negative);
+    color: var(--portfolio-text-negative);
 
-    &:hover:not(:disabled) { background-color: $portfolio-surface-negative-subtle; }
+    &:hover:not(:disabled) { background-color: var(--portfolio-surface-negative-subtle); }
     &:active:not(:disabled) { background-color: $portfolio-red-20; }
+
+    :global([data-theme="dark"]) &,
+    :global(.dark) & {
+      &:active:not(:disabled) { background-color: $portfolio-red-90; }
+    }
   }
 
   &.subtle {
-    background-color: $portfolio-surface-negative-subtle;
-    color: $portfolio-text-negative;
+    background-color: var(--portfolio-surface-negative-subtle);
+    color: var(--portfolio-text-negative);
 
     &:hover:not(:disabled) { background-color: $portfolio-red-20; }
     &:active:not(:disabled) { background-color: $portfolio-red-30; }
+
+    :global([data-theme="dark"]) &,
+    :global(.dark) & {
+      &:hover:not(:disabled) { background-color: $portfolio-red-90; }
+      &:active:not(:disabled) { background-color: $portfolio-red-80; }
+    }
   }
 
   &.minimal {
     background-color: transparent;
-    color: $portfolio-text-negative;
+    color: var(--portfolio-text-negative);
 
-    &:hover:not(:disabled) { background-color: $portfolio-surface-negative-subtle; }
+    &:hover:not(:disabled) { background-color: var(--portfolio-surface-negative-subtle); }
     &:active:not(:disabled) { background-color: $portfolio-red-20; }
   }
 }
@@ -228,7 +310,7 @@
 
 .warning {
   &.bold {
-    background-color: $portfolio-surface-warning-bold;
+    background-color: var(--portfolio-surface-warning-bold);
     color: $portfolio-yellow-100;
 
     &:hover:not(:disabled) { background-color: $portfolio-yellow-40; }
@@ -237,77 +319,84 @@
 
   &.regular {
     background-color: transparent;
-    border-color: $portfolio-border-warning;
-    color: $portfolio-text-warning;
+    border-color: var(--portfolio-border-warning);
+    color: var(--portfolio-text-warning);
 
-    &:hover:not(:disabled) { background-color: $portfolio-surface-warning-subtle; }
+    &:hover:not(:disabled) { background-color: var(--portfolio-surface-warning-subtle); }
     &:active:not(:disabled) { background-color: $portfolio-yellow-20; }
+
+    :global([data-theme="dark"]) &,
+    :global(.dark) & {
+      &:active:not(:disabled) { background-color: $portfolio-yellow-90; }
+    }
   }
 
   &.subtle {
-    background-color: $portfolio-surface-warning-subtle;
-    color: $portfolio-text-warning;
+    background-color: var(--portfolio-surface-warning-subtle);
+    color: var(--portfolio-text-warning);
 
     &:hover:not(:disabled) { background-color: $portfolio-yellow-20; }
     &:active:not(:disabled) { background-color: $portfolio-yellow-30; }
+
+    :global([data-theme="dark"]) &,
+    :global(.dark) & {
+      &:hover:not(:disabled) { background-color: $portfolio-yellow-90; }
+      &:active:not(:disabled) { background-color: $portfolio-yellow-80; }
+    }
   }
 
   &.minimal {
     background-color: transparent;
-    color: $portfolio-text-warning;
+    color: var(--portfolio-text-warning);
 
-    &:hover:not(:disabled) { background-color: $portfolio-surface-warning-subtle; }
+    &:hover:not(:disabled) { background-color: var(--portfolio-surface-warning-subtle); }
     &:active:not(:disabled) { background-color: $portfolio-yellow-20; }
+
+    :global([data-theme="dark"]) &,
+    :global(.dark) & {
+      &:active:not(:disabled) { background-color: $portfolio-yellow-90; }
+    }
   }
 }
 
 // ---------------------------------------------------------------------------
-// Inverse (for use on dark backgrounds)
+// Inverse (theme-responsive — flips with mode; Bold + Regular only per One GS)
+// Use on surface-inverse-bold. Subtle/Minimal are covered by always-light.
 // ---------------------------------------------------------------------------
 
 .inverse {
   &.bold {
-    background-color: $portfolio-action-inverse-bold;
-    color: $portfolio-text-neutral-bold;
+    background-color: var(--portfolio-action-inverse-bold);
+    color: var(--portfolio-text-neutral-bold);
 
     &:hover:not(:disabled) { background-color: $portfolio-neutral-10; }
     &:active:not(:disabled) { background-color: $portfolio-neutral-20; }
+
+    :global([data-theme="dark"]) &,
+    :global(.dark) & {
+      &:hover:not(:disabled) { background-color: $portfolio-neutral-90; }
+      &:active:not(:disabled) { background-color: $portfolio-neutral-80; }
+    }
   }
 
   &.regular {
     background-color: transparent;
-    border-color: $portfolio-neutral-00;
-    color: $portfolio-text-inverse-bold;
+    border-color: var(--portfolio-text-inverse-bold);
+    color: var(--portfolio-text-inverse-bold);
 
-    &:hover:not(:disabled) { background-color: $portfolio-overlay-white-08; }
-    &:active:not(:disabled) { background-color: $portfolio-overlay-white-16; }
-  }
-
-  &.subtle {
-    background-color: $portfolio-overlay-white-08;
-    color: $portfolio-text-inverse-bold;
-
-    &:hover:not(:disabled) { background-color: $portfolio-overlay-white-12; }
-    &:active:not(:disabled) { background-color: $portfolio-overlay-white-16; }
-  }
-
-  &.minimal {
-    background-color: transparent;
-    color: $portfolio-text-inverse-bold;
-
-    &:hover:not(:disabled) { background-color: $portfolio-overlay-white-08; }
-    &:active:not(:disabled) { background-color: $portfolio-overlay-white-12; }
+    &:hover:not(:disabled) { background-color: var(--portfolio-overlay-white-08); }
+    &:active:not(:disabled) { background-color: var(--portfolio-overlay-white-16); }
   }
 }
 
 // ---------------------------------------------------------------------------
-// Always Dark (forced dark regardless of theme)
+// Always Dark (locked dark regardless of theme — use on light/brand surfaces)
 // ---------------------------------------------------------------------------
 
 .always-dark {
   &.bold {
-    background-color: $portfolio-neutral-100;
-    color: $portfolio-neutral-10;
+    background-color: var(--portfolio-action-always-dark);
+    color: var(--portfolio-text-always-light-bold);
 
     &:hover:not(:disabled) { background-color: $portfolio-neutral-90; }
     &:active:not(:disabled) { background-color: $portfolio-neutral-80; }
@@ -315,24 +404,24 @@
 
   &.regular {
     background-color: transparent;
-    border-color: $portfolio-neutral-100;
-    color: $portfolio-neutral-100;
+    border-color: var(--portfolio-border-always-dark);
+    color: var(--portfolio-text-always-dark-bold);
 
     &:hover:not(:disabled) { background-color: $portfolio-overlay-black-04; }
     &:active:not(:disabled) { background-color: $portfolio-overlay-black-08; }
   }
 
   &.subtle {
-    background-color: $portfolio-overlay-black-06;
-    color: $portfolio-neutral-100;
+    background-color: $portfolio-overlay-black-10;
+    color: var(--portfolio-text-always-dark-bold);
 
-    &:hover:not(:disabled) { background-color: $portfolio-overlay-black-10; }
-    &:active:not(:disabled) { background-color: $portfolio-overlay-black-14; }
+    &:hover:not(:disabled) { background-color: $portfolio-overlay-black-14; }
+    &:active:not(:disabled) { background-color: $portfolio-overlay-black-20; }
   }
 
   &.minimal {
     background-color: transparent;
-    color: $portfolio-neutral-100;
+    color: var(--portfolio-text-always-dark-bold);
 
     &:hover:not(:disabled) { background-color: $portfolio-overlay-black-04; }
     &:active:not(:disabled) { background-color: $portfolio-overlay-black-08; }
@@ -340,13 +429,13 @@
 }
 
 // ---------------------------------------------------------------------------
-// Always Light (forced light regardless of theme)
+// Always Light (locked light regardless of theme — use on surface-always-dark)
 // ---------------------------------------------------------------------------
 
 .always-light {
   &.bold {
-    background-color: $portfolio-neutral-10;
-    color: $portfolio-neutral-100;
+    background-color: var(--portfolio-action-always-light);
+    color: var(--portfolio-text-always-dark-bold);
 
     &:hover:not(:disabled) { background-color: $portfolio-neutral-20; }
     &:active:not(:disabled) { background-color: $portfolio-neutral-30; }
@@ -354,27 +443,27 @@
 
   &.regular {
     background-color: transparent;
-    border-color: $portfolio-neutral-10;
-    color: $portfolio-neutral-10;
+    border-color: var(--portfolio-border-always-light);
+    color: var(--portfolio-text-always-light-bold);
 
     &:hover:not(:disabled) { background-color: $portfolio-overlay-white-08; }
     &:active:not(:disabled) { background-color: $portfolio-overlay-white-12; }
   }
 
   &.subtle {
-    background-color: $portfolio-overlay-white-08;
-    color: $portfolio-neutral-10;
+    background-color: $portfolio-overlay-white-10;
+    color: var(--portfolio-text-always-light-bold);
 
-    &:hover:not(:disabled) { background-color: $portfolio-overlay-white-12; }
-    &:active:not(:disabled) { background-color: $portfolio-overlay-white-16; }
+    &:hover:not(:disabled) { background-color: $portfolio-overlay-white-14; }
+    &:active:not(:disabled) { background-color: $portfolio-overlay-white-20; }
   }
 
   &.minimal {
     background-color: transparent;
-    color: $portfolio-neutral-10;
+    color: var(--portfolio-text-always-light-bold);
 
-    &:hover:not(:disabled) { background-color: $portfolio-overlay-white-08; }
-    &:active:not(:disabled) { background-color: $portfolio-overlay-white-12; }
+    &:hover:not(:disabled) { background-color: $portfolio-overlay-white-10; }
+    &:active:not(:disabled) { background-color: $portfolio-overlay-white-14; }
   }
 }
 
@@ -385,54 +474,67 @@
 // py < px at every size. Gap for icon-label spacing (no bounding-box padding).
 
 .xs {
-  min-height: $portfolio-spacer-3x;
+  min-height: var(--portfolio-spacer-3x);
   padding: $portfolio-spacer-utility-0-5x $portfolio-spacer-utility-0-75x;
-  font-size: $portfolio-type-xs;
-  line-height: 16px;
+  font-size: var(--portfolio-type-xs);
+  line-height: $_btn-icon-xs;
   gap: $portfolio-spacer-utility-0-5x;
 
   .iconWrap {
-    width: 16px;
-    height: 16px;
+    width: $_btn-icon-xs;
+    height: $_btn-icon-xs;
   }
 }
 
 .sm {
-  min-height: $portfolio-spacer-4x;
+  min-height: var(--portfolio-spacer-4x);
   padding: $portfolio-spacer-utility-0-875x $portfolio-spacer-utility-1x;
-  font-size: $portfolio-type-sm;
-  line-height: 18px;
+  font-size: var(--portfolio-type-sm);
+  line-height: $_btn-icon-sm;
   gap: $portfolio-spacer-utility-0-75x;
 
   .iconWrap {
-    width: 18px;
-    height: 18px;
+    width: $_btn-icon-sm;
+    height: $_btn-icon-sm;
+  }
+}
+
+.md {
+  min-height: var(--portfolio-spacer-5x);
+  padding: $portfolio-spacer-utility-1-25x $portfolio-spacer-utility-1-5x;
+  font-size: var(--portfolio-type-base);
+  line-height: $_btn-icon-md;
+  gap: $portfolio-spacer-utility-1x;
+
+  .iconWrap {
+    width: $_btn-icon-md;
+    height: $_btn-icon-md;
   }
 }
 
 .lg {
-  min-height: $portfolio-spacer-6x;
+  min-height: var(--portfolio-spacer-6x);
   padding: $portfolio-spacer-utility-1-625x $portfolio-spacer-utility-2x;
-  font-size: $portfolio-type-base;
-  line-height: 20px;
-  gap: $portfolio-spacer-utility-1-25x;
+  font-size: var(--portfolio-type-lg);
+  line-height: $_btn-icon-lg;
+  gap: $portfolio-spacer-utility-1-5x;
 
   .iconWrap {
-    width: 20px;
-    height: 20px;
+    width: $_btn-icon-lg;
+    height: $_btn-icon-lg;
   }
 }
 
 .xl {
-  min-height: $portfolio-spacer-7x;
-  padding: $portfolio-spacer-utility-2x $portfolio-spacer-utility-2-5x;
-  font-size: $portfolio-type-lg;
-  line-height: 24px;
-  gap: $portfolio-spacer-utility-1-5x;
+  min-height: var(--portfolio-spacer-7x);
+  padding: $portfolio-spacer-utility-2x $portfolio-spacer-utility-3x;
+  font-size: var(--portfolio-type-lg);
+  line-height: $_btn-icon-xl;
+  gap: $portfolio-spacer-utility-2x;
 
   .iconWrap {
-    width: 24px;
-    height: 24px;
+    width: $_btn-icon-xl;
+    height: $_btn-icon-xl;
   }
 }
 
@@ -443,10 +545,11 @@
 .iconOnly {
   padding: 0;
 
-  &.xs { width: $portfolio-spacer-3x;  height: $portfolio-spacer-3x; }
-  &.sm { width: $portfolio-spacer-4x;  height: $portfolio-spacer-4x; }
-  &.lg { width: $portfolio-spacer-6x;  height: $portfolio-spacer-6x; }
-  &.xl { width: $portfolio-spacer-7x;  height: $portfolio-spacer-7x; }
+  &.xs { width: var(--portfolio-spacer-3x);  height: var(--portfolio-spacer-3x); }
+  &.sm { width: var(--portfolio-spacer-4x);  height: var(--portfolio-spacer-4x); }
+  &.md { width: var(--portfolio-spacer-5x);  height: var(--portfolio-spacer-5x); }
+  &.lg { width: var(--portfolio-spacer-6x);  height: var(--portfolio-spacer-6x); }
+  &.xl { width: var(--portfolio-spacer-7x);  height: var(--portfolio-spacer-7x); }
 }
 
 .fullWidth {

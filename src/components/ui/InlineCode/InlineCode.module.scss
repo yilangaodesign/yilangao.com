@@ -2,12 +2,12 @@
 
 .inlineCode {
   display: inline;
-  font-family: $portfolio-font-mono;
-  font-size: $portfolio-type-xs;
-  line-height: $portfolio-leading-normal;
-  background-color: $portfolio-surface-neutral-subtle;
-  color: $portfolio-text-primary;
-  padding: 2px $portfolio-spacer-0-5x;
-  border-radius: $portfolio-radius-xs;
+  font-family: var(--portfolio-font-mono);
+  font-size: var(--portfolio-type-xs);
+  line-height: var(--portfolio-leading-normal);
+  background-color: var(--portfolio-surface-neutral-subtle);
+  color: var(--portfolio-text-primary);
+  padding: 2px var(--portfolio-spacer-0-5x);
+  border-radius: var(--portfolio-radius-xs);
   white-space: nowrap;
 }

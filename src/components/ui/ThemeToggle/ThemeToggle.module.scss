@@ -2,16 +2,16 @@
 
 .toggle {
   @include button-reset;
-  border: 1px solid $portfolio-border-subtle;
-  border-radius: $portfolio-radius-sm;
+  border: 1px solid var(--portfolio-border-subtle);
+  border-radius: var(--portfolio-radius-sm);
   padding: $portfolio-spacer-utility-0-5x $portfolio-spacer-utility-0-75x;
   cursor: pointer;
-  color: $portfolio-text-primary;
+  color: var(--portfolio-text-primary);
   @include body-sm;
   @include transition-fast;
 
   &:hover {
-    background-color: $portfolio-surface-secondary;
-    border-color: $portfolio-border-strong;
+    background-color: var(--portfolio-surface-secondary);
+    border-color: var(--portfolio-border-strong);
   }
 }

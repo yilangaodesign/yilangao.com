@@ -1,12 +1,25 @@
 import { forwardRef, type HTMLAttributes } from "react";
 import styles from "./Badge.module.scss";
 
-export type BadgeVariant = "default" | "success" | "warning" | "error" | "info" | "muted";
-export type BadgeSize = "xs" | "sm" | "md";
+export type BadgeAppearance =
+  | "neutral"
+  | "highlight"
+  | "positive"
+  | "negative"
+  | "warning"
+  | "inverse"
+  | "always-dark"
+  | "always-light";
+
+export type BadgeEmphasis = "bold" | "regular" | "subtle" | "minimal";
+
+export type BadgeSize = "xxs" | "xs" | "sm" | "md" | "lg" | "xl";
+
 export type BadgeShape = "pill" | "squared";
 
 export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
-  variant?: BadgeVariant;
+  appearance?: BadgeAppearance;
+  emphasis?: BadgeEmphasis;
   size?: BadgeSize;
   shape?: BadgeShape;
   mono?: boolean;
@@ -15,7 +28,8 @@ export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
 export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(
   (
     {
-      variant = "default",
+      appearance = "neutral",
+      emphasis = "subtle",
       size = "md",
       shape = "pill",
       mono = false,
@@ -27,7 +41,8 @@ export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(
   ) => {
     const cls = [
       styles.badge,
-      styles[variant],
+      styles[appearance],
+      styles[emphasis],
       styles[size],
       styles[shape],
       mono && styles.mono,

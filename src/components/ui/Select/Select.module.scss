@@ -1,17 +1,21 @@
 @use '../../../styles' as *;
 
+// Component tokens
+$_select-height: var(--portfolio-spacer-5x); // 40px
+$_select-indicator-size: 16px;
+
 .wrapper {
   display: flex;
   flex-direction: column;
-  gap: $portfolio-spacer-0-5x;
+  gap: var(--portfolio-spacer-0-5x);
 }
 
 .label {
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-sm;
-  font-weight: $portfolio-weight-medium;
-  line-height: $portfolio-leading-normal;
-  color: $portfolio-text-primary;
+  font-family: var(--portfolio-font-sans);
+  font-size: var(--portfolio-type-sm);
+  font-weight: var(--portfolio-weight-medium);
+  line-height: var(--portfolio-leading-normal);
+  color: var(--portfolio-text-primary);
 }
 
 .trigger {
@@ -20,40 +24,40 @@
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  height: 40px;
-  padding: 0 $portfolio-spacer-1-5x;
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-sm;
-  line-height: $portfolio-leading-normal;
-  color: $portfolio-text-primary;
-  background-color: $portfolio-surface-primary;
-  border: 1px solid $portfolio-border-subtle;
-  border-radius: $portfolio-radius-sm;
+  height: $_select-height;
+  padding: 0 var(--portfolio-spacer-1-5x);
+  font-family: var(--portfolio-font-sans);
+  font-size: var(--portfolio-type-sm);
+  line-height: var(--portfolio-leading-normal);
+  color: var(--portfolio-text-primary);
+  background-color: var(--portfolio-surface-primary);
+  border: 1px solid var(--portfolio-border-subtle);
+  border-radius: var(--portfolio-radius-sm);
   @include transition-fast;
 
   &:hover {
-    border-color: $portfolio-border-strong;
+    border-color: var(--portfolio-border-strong);
   }
 
   &[data-state='open'] {
-    border-color: $portfolio-focus;
-    box-shadow: 0 0 0 1px $portfolio-focus;
+    border-color: var(--portfolio-focus);
+    box-shadow: 0 0 0 1px var(--portfolio-focus);
   }
 
   &[data-disabled] {
-    background-color: $portfolio-surface-tertiary;
-    border-color: $portfolio-border-disabled;
-    color: $portfolio-text-disabled;
+    background-color: var(--portfolio-surface-tertiary);
+    border-color: var(--portfolio-border-disabled);
+    color: var(--portfolio-text-disabled);
     cursor: not-allowed;
   }
 }
 
 .placeholder {
-  color: $portfolio-text-placeholder;
+  color: var(--portfolio-text-placeholder);
 }
 
 .icon {
-  color: $portfolio-text-helper;
+  color: var(--portfolio-text-helper);
   flex-shrink: 0;
 }
 
@@ -63,68 +67,68 @@
 
 .content {
   overflow: hidden;
-  background-color: $portfolio-surface-primary;
-  border: 1px solid $portfolio-border-subtle;
-  border-radius: $portfolio-radius-sm;
-  box-shadow: $portfolio-shadow-lg;
-  z-index: $portfolio-z-dropdown;
+  background-color: var(--portfolio-surface-primary);
+  border: 1px solid var(--portfolio-border-subtle);
+  border-radius: var(--portfolio-radius-sm);
+  box-shadow: var(--portfolio-shadow-lg);
+  z-index: var(--portfolio-z-dropdown);
   min-width: var(--radix-select-trigger-width);
 
   &[data-state='open'] {
-    animation: slideDown $portfolio-duration-fast $portfolio-easing-entrance;
+    animation: slideDown var(--portfolio-duration-fast) var(--portfolio-easing-entrance);
   }
 }
 
 .viewport {
-  padding: $portfolio-spacer-0-5x;
+  padding: var(--portfolio-spacer-0-5x);
 }
 
 .item {
   display: flex;
   align-items: center;
-  gap: $portfolio-spacer-1x;
-  padding: $portfolio-spacer-1x $portfolio-spacer-1-5x;
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-sm;
-  line-height: $portfolio-leading-normal;
-  color: $portfolio-text-primary;
+  gap: var(--portfolio-spacer-1x);
+  padding: var(--portfolio-spacer-1x) var(--portfolio-spacer-1-5x);
+  font-family: var(--portfolio-font-sans);
+  font-size: var(--portfolio-type-sm);
+  line-height: var(--portfolio-leading-normal);
+  color: var(--portfolio-text-primary);
   border-radius: 2px;
   cursor: pointer;
   user-select: none;
   outline: none;
 
   &[data-highlighted] {
-    background-color: $portfolio-surface-tertiary;
+    background-color: var(--portfolio-surface-tertiary);
   }
 
   &[data-disabled] {
-    color: $portfolio-text-disabled;
+    color: var(--portfolio-text-disabled);
     pointer-events: none;
   }
 }
 
 .itemIndicator {
-  width: 16px;
+  width: $_select-indicator-size;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: $portfolio-accent-60;
+  color: var(--portfolio-action-brand-bold);
 }
 
 .separator {
   height: 1px;
-  background-color: $portfolio-border-subtle;
-  margin: $portfolio-spacer-0-5x 0;
+  background-color: var(--portfolio-border-subtle);
+  margin: var(--portfolio-spacer-0-5x) 0;
 }
 
 .groupLabel {
-  padding: $portfolio-spacer-1x $portfolio-spacer-1-5x;
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-xs;
-  font-weight: $portfolio-weight-medium;
-  color: $portfolio-text-helper;
+  padding: var(--portfolio-spacer-1x) var(--portfolio-spacer-1-5x);
+  font-family: var(--portfolio-font-sans);
+  font-size: var(--portfolio-type-xs);
+  font-weight: var(--portfolio-weight-medium);
+  color: var(--portfolio-text-helper);
   text-transform: uppercase;
-  letter-spacing: $portfolio-tracking-wider;
+  letter-spacing: var(--portfolio-tracking-wider);
 }
 
 // ---------------------------------------------------------------------------
@@ -132,25 +136,25 @@
 // ---------------------------------------------------------------------------
 
 .helperText {
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-xs;
-  line-height: $portfolio-leading-normal;
-  color: $portfolio-text-helper;
+  font-family: var(--portfolio-font-sans);
+  font-size: var(--portfolio-type-xs);
+  line-height: var(--portfolio-leading-normal);
+  color: var(--portfolio-text-helper);
 }
 
 .errorText {
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-xs;
-  line-height: $portfolio-leading-normal;
-  color: $portfolio-text-error;
+  font-family: var(--portfolio-font-sans);
+  font-size: var(--portfolio-type-xs);
+  line-height: var(--portfolio-leading-normal);
+  color: var(--portfolio-text-error);
 }
 
 .error .trigger {
-  border-color: $portfolio-support-error;
+  border-color: var(--portfolio-border-negative);
 
   &[data-state='open'] {
-    border-color: $portfolio-support-error;
-    box-shadow: 0 0 0 1px $portfolio-support-error;
+    border-color: var(--portfolio-border-negative);
+    box-shadow: 0 0 0 1px var(--portfolio-border-negative);
   }
 }
 

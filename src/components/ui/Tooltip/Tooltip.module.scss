@@ -1,19 +1,19 @@
 @use '../../../styles' as *;
 
 .content {
-  z-index: $portfolio-z-toast;
-  padding: $portfolio-spacer-0-5x $portfolio-spacer-1x;
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-xs;
-  line-height: $portfolio-leading-normal;
-  color: $portfolio-text-inverse;
-  background-color: $portfolio-surface-inverse;
-  border-radius: $portfolio-radius-sm;
-  box-shadow: $portfolio-shadow-md;
+  z-index: var(--portfolio-z-tooltip);
+  padding: var(--portfolio-spacer-0-5x) var(--portfolio-spacer-1x);
+  font-family: var(--portfolio-font-sans);
+  font-size: var(--portfolio-type-xs);
+  line-height: var(--portfolio-leading-normal);
+  color: var(--portfolio-text-inverse);
+  background-color: var(--portfolio-surface-inverse);
+  border-radius: var(--portfolio-radius-sm);
+  box-shadow: var(--portfolio-shadow-md);
   user-select: none;
 
-  animation-duration: $portfolio-duration-fast;
-  animation-timing-function: $portfolio-easing-entrance;
+  animation-duration: var(--portfolio-duration-fast);
+  animation-timing-function: var(--portfolio-easing-entrance);
 
   &[data-state='delayed-open'][data-side='top'] {
     animation-name: slideUp;
@@ -30,7 +30,7 @@
 }
 
 .arrow {
-  fill: $portfolio-surface-inverse;
+  fill: var(--portfolio-surface-inverse);
 }
 
 @keyframes slideUp {

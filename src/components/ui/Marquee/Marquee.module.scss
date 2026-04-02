@@ -1,4 +1,4 @@
-@use "@yilangaodesign/design-system/scss" as *;
+@use "../../../styles" as *;
 
 @keyframes marquee {
   0% { transform: translateX(0); }
@@ -14,7 +14,8 @@
 .track {
   display: flex;
   width: max-content;
-  animation: marquee 25s linear infinite;
+  animation: marquee var(--marquee-duration, 25s) linear infinite;
+  animation-play-state: var(--marquee-play, running);
 
   &[data-pause]:hover {
     animation-play-state: paused;

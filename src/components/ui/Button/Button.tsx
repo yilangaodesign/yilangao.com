@@ -13,7 +13,7 @@ export type ButtonAppearance =
 
 export type ButtonEmphasis = "bold" | "regular" | "subtle" | "minimal";
 
-export type ButtonSize = "xs" | "sm" | "lg" | "xl";
+export type ButtonSize = "xs" | "sm" | "md" | "lg" | "xl";
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   appearance?: ButtonAppearance;

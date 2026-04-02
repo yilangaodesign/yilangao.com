@@ -1,9 +1,9 @@
 @use '../../../styles' as *;
 
 .card {
-  background-color: $portfolio-surface-primary;
-  border: 1px solid $portfolio-border-subtle;
-  border-radius: $portfolio-radius-sm;
+  background-color: var(--portfolio-surface-primary);
+  border: 1px solid var(--portfolio-border-subtle);
+  border-radius: var(--portfolio-radius-sm);
   overflow: hidden;
 }
 
@@ -11,17 +11,17 @@
   @include transition-fast;
 
   &:hover {
-    box-shadow: $portfolio-shadow-md;
-    border-color: $portfolio-border-strong;
+    box-shadow: var(--portfolio-shadow-md);
+    border-color: var(--portfolio-border-strong);
   }
 }
 
 .elevated {
-  box-shadow: $portfolio-shadow-sm;
+  box-shadow: var(--portfolio-shadow-sm);
 }
 
 .muted {
-  background-color: $portfolio-surface-neutral-subtle;
+  background-color: var(--portfolio-surface-neutral-subtle);
 }
 
 // ---------------------------------------------------------------------------
@@ -29,15 +29,15 @@
 // ---------------------------------------------------------------------------
 
 .header {
-  padding: $portfolio-spacer-2x $portfolio-spacer-3x;
-  border-bottom: 1px solid $portfolio-border-subtle;
+  padding: var(--portfolio-spacer-2x) var(--portfolio-spacer-3x);
+  border-bottom: 1px solid var(--portfolio-border-subtle);
 }
 
 .body {
-  padding: $portfolio-spacer-3x;
+  padding: var(--portfolio-spacer-3x);
 }
 
 .footer {
-  padding: $portfolio-spacer-2x $portfolio-spacer-3x;
-  border-top: 1px solid $portfolio-border-subtle;
+  padding: var(--portfolio-spacer-2x) var(--portfolio-spacer-3x);
+  border-top: 1px solid var(--portfolio-border-subtle);
 }

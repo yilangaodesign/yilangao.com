@@ -1,32 +1,34 @@
 @use '../../../styles' as *;
 
+$_dropzone-min-h: 160px;
+
 .wrapper {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 160px;
-  padding: $portfolio-spacer-3x;
-  border: 2px dashed $portfolio-border-subtle;
-  border-radius: $portfolio-radius-sm;
-  background-color: $portfolio-surface-primary;
+  min-height: $_dropzone-min-h;
+  padding: var(--portfolio-spacer-3x);
+  border: 2px dashed var(--portfolio-border-subtle);
+  border-radius: var(--portfolio-radius-sm);
+  background-color: var(--portfolio-surface-primary);
   cursor: pointer;
   @include transition-fast;
   text-align: center;
 
   &:hover:not(.disabled) {
-    border-color: $portfolio-border-strong;
-    background-color: $portfolio-neutral-05;
+    border-color: var(--portfolio-border-strong);
+    background-color: var(--portfolio-surface-secondary);
   }
 
   &:focus-visible {
     outline: none;
-    border-color: $portfolio-focus;
-    box-shadow: 0 0 0 1px $portfolio-focus;
+    border-color: var(--portfolio-focus);
+    box-shadow: 0 0 0 1px var(--portfolio-focus);
   }
 }
 
 .dragging {
-  border-color: $portfolio-accent-60;
+  border-color: var(--portfolio-border-brand-bold);
   background-color: rgba($portfolio-accent-60, 0.04);
   border-style: solid;
 }
@@ -44,16 +46,16 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: $portfolio-spacer-1x;
+  gap: var(--portfolio-spacer-1x);
 }
 
 .icon {
-  color: $portfolio-text-secondary;
+  color: var(--portfolio-text-secondary);
 }
 
 .prompt {
   @include body-sm-medium;
-  color: $portfolio-text-primary;
+  color: var(--portfolio-text-primary);
 }
 
 .hint {

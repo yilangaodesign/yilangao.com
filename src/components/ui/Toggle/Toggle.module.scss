@@ -1,23 +1,28 @@
 @use '../../../styles' as *;
 
+// Component tokens
+$_toggle-track-w: 36px;
+$_toggle-track-h: 20px;
+$_toggle-knob-size: 16px;
+
 .wrapper {
   display: flex;
   align-items: center;
-  gap: $portfolio-spacer-1x;
+  gap: var(--portfolio-spacer-1x);
 }
 
 .switch {
   @include button-reset;
   position: relative;
-  width: 36px;
-  height: 20px;
-  background-color: $portfolio-neutral-30;
-  border-radius: $portfolio-radius-full;
+  width: $_toggle-track-w;
+  height: $_toggle-track-h;
+  background-color: var(--portfolio-neutral-30);
+  border-radius: var(--portfolio-radius-full);
   flex-shrink: 0;
   @include transition-fast;
 
   &[data-state='checked'] {
-    background-color: $portfolio-accent-60;
+    background-color: var(--portfolio-accent-60);
   }
 
   &[data-disabled] {
@@ -28,12 +33,12 @@
 
 .thumb {
   display: block;
-  width: 16px;
-  height: 16px;
-  background-color: $portfolio-neutral-00;
-  border-radius: $portfolio-radius-full;
-  box-shadow: $portfolio-shadow-sm;
-  transition: transform $portfolio-duration-fast $portfolio-easing-standard;
+  width: $_toggle-knob-size;
+  height: $_toggle-knob-size;
+  background-color: var(--portfolio-neutral-00);
+  border-radius: var(--portfolio-radius-full);
+  box-shadow: var(--portfolio-shadow-sm);
+  transition: transform var(--portfolio-duration-fast) var(--portfolio-easing-standard);
   transform: translateX(2px);
 
   &[data-state='checked'] {
@@ -42,15 +47,15 @@
 }
 
 .label {
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-sm;
-  line-height: $portfolio-leading-normal;
-  color: $portfolio-text-primary;
+  font-family: var(--portfolio-font-sans);
+  font-size: var(--portfolio-type-sm);
+  line-height: var(--portfolio-leading-normal);
+  color: var(--portfolio-text-primary);
   cursor: pointer;
   user-select: none;
 
   &[data-disabled] {
-    color: $portfolio-text-disabled;
+    color: var(--portfolio-text-disabled);
     cursor: not-allowed;
   }
 }

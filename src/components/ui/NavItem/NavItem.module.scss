@@ -1,29 +1,40 @@
 @use '../../../styles' as *;
 
-$_nav-item-height: 28px;
-$_nav-item-icon: 14px;
+// =============================================================================
+// NavItem — 3-Size Model (sm / md / lg)
+// =============================================================================
+// NavItem's size range maps to the lower half of Button's scale.
+// Icon-to-height ratio is 0.5 at every size (nav icons are wayfinding cues,
+// not primary affordances — the label dominates).
+// Trailing icon is 2px smaller than leading icon at each size.
+// =============================================================================
+
+// Component tokens — icon dimensions per size
+$_nav-icon-sm: 12px;
+$_nav-icon-md: 16px;
+$_nav-icon-lg: 20px;
+$_nav-trailing-sm: 10px;
+$_nav-trailing-md: 14px;
+$_nav-trailing-lg: 18px;
 
 .navItem {
   @include button-reset;
+  position: relative;
   display: inline-flex;
   align-items: center;
-  gap: $portfolio-spacer-1x;
   width: 100%;
-  height: $_nav-item-height;
-  padding: 0 $portfolio-spacer-1x;
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-sm;
+  font-family: var(--portfolio-font-sans);
   line-height: 1;
-  color: $portfolio-text-secondary;
-  border-radius: $portfolio-radius-sm;
+  color: var(--portfolio-text-secondary);
+  border-radius: var(--portfolio-radius-sm);
   cursor: pointer;
   user-select: none;
   text-decoration: none;
   @include transition-fast;
 
   &:hover:not(.disabled) {
-    background-color: $portfolio-surface-neutral-subtle;
-    color: $portfolio-text-primary;
+    background-color: var(--portfolio-surface-neutral-subtle);
+    color: var(--portfolio-text-primary);
   }
 
   &:focus-visible {
@@ -32,19 +43,13 @@ $_nav-item-icon: 14px;
 }
 
 .active {
-  background-color: $portfolio-surface-neutral-regular;
-  color: $portfolio-text-primary;
-  font-weight: $portfolio-weight-medium;
+  background-color: var(--portfolio-surface-neutral-regular);
+  color: var(--portfolio-text-primary);
+  font-weight: var(--portfolio-weight-medium);
 
   &:hover:not(.disabled) {
-    background-color: $portfolio-surface-neutral-regular;
+    background-color: var(--portfolio-surface-neutral-regular);
   }
-}
-
-.collapsed {
-  justify-content: center;
-  padding: 0;
-  width: $_nav-item-height;
 }
 
 .disabled {
@@ -58,8 +63,6 @@ $_nav-item-icon: 14px;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  width: $_nav-item-icon;
-  height: $_nav-item-icon;
 
   svg {
     width: 100%;
@@ -75,15 +78,80 @@ $_nav-item-icon: 14px;
   white-space: nowrap;
 }
 
-.trailing {
+.badge {
   display: inline-flex;
   align-items: center;
   flex-shrink: 0;
   margin-inline-start: auto;
-  color: $portfolio-text-tertiary;
+}
 
-  svg {
-    width: 12px;
-    height: 12px;
+.badgeOverlay {
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translate(25%, -25%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.trailing {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  color: var(--portfolio-text-tertiary);
+}
+
+// =============================================================================
+// SIZES
+// =============================================================================
+
+.sm {
+  min-height: var(--portfolio-spacer-3x);
+  padding: 0 $portfolio-spacer-utility-0-75x;
+  font-size: var(--portfolio-type-xs);
+  gap: $portfolio-spacer-utility-0-75x;
+
+  .icon { width: $_nav-icon-sm; height: $_nav-icon-sm; }
+  .trailing svg { width: $_nav-trailing-sm; height: $_nav-trailing-sm; }
+
+  &.collapsed {
+    width: var(--portfolio-spacer-3x);
   }
+}
+
+.md {
+  min-height: var(--portfolio-spacer-4x);
+  padding: 0 var(--portfolio-spacer-1x);
+  font-size: var(--portfolio-type-sm);
+  gap: var(--portfolio-spacer-1x);
+
+  .icon { width: $_nav-icon-md; height: $_nav-icon-md; }
+  .trailing svg { width: $_nav-trailing-md; height: $_nav-trailing-md; }
+
+  &.collapsed {
+    width: var(--portfolio-spacer-4x);
+  }
+}
+
+.lg {
+  min-height: var(--portfolio-spacer-5x);
+  padding: 0 $portfolio-spacer-utility-1-5x;
+  font-size: var(--portfolio-type-base);
+  gap: $portfolio-spacer-utility-1-25x;
+
+  .icon { width: $_nav-icon-lg; height: $_nav-icon-lg; }
+  .trailing svg { width: $_nav-trailing-lg; height: $_nav-trailing-lg; }
+
+  &.collapsed {
+    width: var(--portfolio-spacer-5x);
+  }
+}
+
+// =============================================================================
+// MODIFIERS
+// =============================================================================
+
+.collapsed {
+  justify-content: center;
+  padding: 0;
 }

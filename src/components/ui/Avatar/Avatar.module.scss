@@ -1,35 +1,40 @@
 @use '../../../styles' as *;
 
+// Component tokens
+$_avatar-sm: 28px;
+$_avatar-md: 36px;
+$_avatar-lg: var(--portfolio-spacer-6x); // 48px
+
 .avatar {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: $portfolio-radius-full;
+  border-radius: var(--portfolio-radius-full);
   overflow: hidden;
   background-color: $portfolio-accent-10;
   color: $portfolio-accent-70;
-  font-family: $portfolio-font-sans;
-  font-weight: $portfolio-weight-medium;
+  font-family: var(--portfolio-font-sans);
+  font-weight: var(--portfolio-weight-medium);
   user-select: none;
   flex-shrink: 0;
 }
 
 .sm {
-  width: 28px;
-  height: 28px;
+  width: $_avatar-sm;
+  height: $_avatar-sm;
   font-size: 0.6875rem;
 }
 
 .md {
-  width: 36px;
-  height: 36px;
-  font-size: $portfolio-type-xs;
+  width: $_avatar-md;
+  height: $_avatar-md;
+  font-size: var(--portfolio-type-xs);
 }
 
 .lg {
-  width: 48px;
-  height: 48px;
-  font-size: $portfolio-type-sm;
+  width: $_avatar-lg;
+  height: $_avatar-lg;
+  font-size: var(--portfolio-type-sm);
 }
 
 .image {

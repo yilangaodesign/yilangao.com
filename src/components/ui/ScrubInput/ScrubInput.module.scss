@@ -1,44 +1,48 @@
 @use '../../../styles' as *;
 
+$_scrub-height: var(--portfolio-spacer-4x); // 32px
+$_scrub-stepper-w: var(--portfolio-spacer-3x); // 24px
+$_scrub-display-min-w: var(--portfolio-spacer-4x); // 32px
+
 .wrapper {
   display: flex;
   flex-direction: column;
-  gap: $portfolio-spacer-0-5x;
+  gap: var(--portfolio-spacer-0-5x);
 }
 
 .label {
-  font-family: $portfolio-font-sans;
-  font-size: $portfolio-type-sm;
-  font-weight: $portfolio-weight-medium;
-  line-height: $portfolio-leading-normal;
-  color: $portfolio-text-primary;
+  font-family: var(--portfolio-font-sans);
+  font-size: var(--portfolio-type-sm);
+  font-weight: var(--portfolio-weight-medium);
+  line-height: var(--portfolio-leading-normal);
+  color: var(--portfolio-text-primary);
 }
 
 .control {
   display: inline-flex;
   align-items: center;
-  height: 32px;
-  border: 1px solid $portfolio-border-subtle;
-  border-radius: $portfolio-radius-sm;
-  background-color: $portfolio-surface-primary;
+  height: $_scrub-height;
+  border: 1px solid var(--portfolio-border-subtle);
+  border-radius: var(--portfolio-radius-sm);
+  background-color: var(--portfolio-surface-primary);
   cursor: ew-resize;
   user-select: none;
   @include transition-fast;
 
   &:hover {
-    border-color: $portfolio-border-strong;
+    border-color: var(--portfolio-border-strong);
   }
 
   &:focus-visible {
     outline: none;
-    border-color: $portfolio-focus;
-    box-shadow: 0 0 0 1px $portfolio-focus;
+    border-color: var(--portfolio-focus);
+    box-shadow: 0 0 0 1px var(--portfolio-focus);
   }
 }
 
 .dragging {
-  border-color: $portfolio-accent-60;
-  box-shadow: 0 0 0 1px $portfolio-accent-60;
+  border-color: var(--portfolio-focus);
+  box-shadow: 0 0 0 1px var(--portfolio-focus);
   cursor: ew-resize;
 }
 
@@ -47,15 +51,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
+  width: $_scrub-stepper-w;
   height: 100%;
-  color: $portfolio-text-secondary;
+  color: var(--portfolio-text-secondary);
   flex-shrink: 0;
   @include transition-fast;
 
   &:hover:not(:disabled) {
-    color: $portfolio-text-primary;
-    background-color: $portfolio-neutral-10;
+    color: var(--portfolio-text-primary);
+    background-color: var(--portfolio-surface-secondary);
   }
 
   &:disabled {
@@ -67,32 +71,32 @@
 .display {
   flex: 1;
   text-align: center;
-  font-family: $portfolio-font-mono;
-  font-size: $portfolio-type-sm;
-  line-height: $portfolio-leading-normal;
-  color: $portfolio-text-primary;
-  min-width: 32px;
-  padding: 0 $portfolio-spacer-0-25x;
+  font-family: var(--portfolio-font-mono);
+  font-size: var(--portfolio-type-sm);
+  line-height: var(--portfolio-leading-normal);
+  color: var(--portfolio-text-primary);
+  min-width: $_scrub-display-min-w;
+  padding: 0 var(--portfolio-spacer-0-25x);
 }
 
 .suffix {
-  font-size: $portfolio-type-xs;
-  color: $portfolio-text-secondary;
+  font-size: var(--portfolio-type-xs);
+  color: var(--portfolio-text-secondary);
   margin-left: 1px;
 }
 
 .editInput {
   flex: 1;
   width: 100%;
-  min-width: 32px;
+  min-width: $_scrub-display-min-w;
   height: 100%;
   border: none;
   background: transparent;
-  font-family: $portfolio-font-mono;
-  font-size: $portfolio-type-sm;
-  line-height: $portfolio-leading-normal;
-  color: $portfolio-text-primary;
+  font-family: var(--portfolio-font-mono);
+  font-size: var(--portfolio-type-sm);
+  line-height: var(--portfolio-leading-normal);
+  color: var(--portfolio-text-primary);
   text-align: center;
   outline: none;
-  padding: 0 $portfolio-spacer-0-25x;
+  padding: 0 var(--portfolio-spacer-0-25x);
 }
