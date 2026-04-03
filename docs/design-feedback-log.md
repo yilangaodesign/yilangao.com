@@ -1434,6 +1434,24 @@ This applies to Menu, NavItem, sidebar items, command palettes, and any future l
 
 ---
 
+#### FB-097: "Dark half of Lumen scale has uneven perceptual stepping — 60→70 too tight, 90→100 too wide"
+
+**UX Intent:** The user noticed a perceived gap in the accent scale between steps 10 and 20. Audit revealed the 10→20 gap was actually 97% of average (correct), but exposed genuine unevenness in the dark half (steps 60–100): the 60→70 transition was only 79% of average (too tight), while 90→100 was 116% of average (too wide). Max/min perceptual distance ratio was 1.48x.
+
+**Root Cause:** The chroma arc (sine bell peaking at step 60) didn't descend symmetrically — the peak-to-valley slope was steeper on the dark side because there are only 4 steps below the anchor vs. 5 above it. The light half had more room to ramp up gradually; the dark half shed chroma too quickly, compressing 60→70 (ΔC = 0.018) while inflating 90→100 (ΔC = 0.092).
+
+**Resolution:** Gradient-descent optimization of chroma values for steps 70–100, targeting the light-half average distance as the ideal. Lightness values unchanged (ΔL ≈ 0.081 within dark segment). Changes:
+- Step 70: `#2715D8` → `#261BD5` (C: 0.262 → 0.257)
+- Step 80: `#1A0EA1` → `#1A169C` (C: 0.210 → 0.200)
+- Step 90: `#0F1461` → `#0F1560` (C: 0.132 → 0.129)
+- Step 100: `#0A0F22` → `#070D29` (C: 0.040 → 0.058)
+
+Max/min perceptual distance ratio improved from **1.48x → 1.33x**. Range narrowed from 79%–116% to 81%–108% of average. All WCAG contrast thresholds still pass. Updated: `_colors.scss`, `tokens.ts`, `TokenGrid.tsx`, `colors/page.tsx` docs table, `color.md`.
+
+**Design rule:** When optimizing a color scale for perceptual uniformity, chroma redistribution is a more effective lever than lightness adjustment when the lightness ramp is already even. The asymmetry in chroma descent rate (fewer dark steps than light steps relative to the anchor) is an inherent artifact of non-centered anchors — it must be explicitly compensated rather than assumed symmetric.
+
+---
+
 #### FB-096: "Light/dark columns and ScrollSpy should appear at medium widths, not just largest"
 
 **UX Intent:** On the playground colors page, the light/dark theme strip columns (side-by-side arrangement) and the ScrollSpy navigation only activated at `$elan-mq-lg` (1440px). At medium viewport widths (1056px–1439px) the sidebar is in hamburger mode, so the content area has the full viewport width — plenty of horizontal space for both features. The user wanted them to activate earlier so that medium-width viewports aren't stuck with stacked panels and no page navigation.

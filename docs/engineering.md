@@ -4,7 +4,7 @@
 >
 > **Who reads this:** AI agents routed here by `AGENTS.md` Pre-Flight. Read the Section Index first, then follow the link to the spoke file matching your task.
 > **Who writes this:** AI agents after processing engineering feedback via the `engineering-iteration` skill.
-> **Last updated:** 2026-04-03 (ENG-102: Label component created without playground page — playground drift frequency 3→4)
+> **Last updated:** 2026-04-03 (ENG-105: Rich text paragraph breaks lost after save — CMS UX/inline editing frequency 27→28)
 
 ---
 
@@ -119,7 +119,7 @@ Recurring incidents should be escalated up this hierarchy until they stop recurr
 | Node.js version / CLI tool compat | 1 | High — Node 25 breaks Payload CLI (ENG-015); use Node 22 LTS if CLI needed |
 | Git branching / session safety | 1 | Critical |
 | URL namespace / multi-app architecture | 1 | High — documented as ADR, revisit if a third concern lands on port 4000 |
-| CMS UX / inline editing | 27 | **Critical — ESCALATED. ENG-027→039, ENG-042→046, ENG-049→051, ENG-054→058, ENG-062→063, ENG-066→068. ENG-068: ProjectEditModal missing min-height (AP-027 violated 3rd time). Modal dimension template now documented.** |
+| CMS UX / inline editing | 28 | **Critical — ESCALATED. ENG-027→039, ENG-042→046, ENG-049→051, ENG-054→058, ENG-062→063, ENG-066→068, ENG-105. ENG-105: Rich text paragraph breaks lost after save — missing `htmlContent` prop on `EditableText`. See EAP-065.** |
 | Hydration mismatch (SSR/CSR divergence) | 10 | **Critical — ESCALATED. ENG-017/18/19/20, ENG-045, ENG-055, ENG-067, ENG-081, ENG-086, ENG-087. Three root cause families: (1) Turbopack bundle divergence — barrel import resolution (EAP-056), SCSS @use compilation (EAP-038), stale cache (EAP-035); (2) typeof window branching (EAP-014); (3) invalid HTML nesting. Barrel imports from lucide-react now banned via Hard Guardrail #15. See EAP-056.** |
 | Documentation procedure skips | 7 | **Critical — ESCALATED AGAIN. ENG-008/012 (EAP-010), ENG-044/045/046 (EAP-027), ENG-053 (EAP-032). 7th occurrence. Architectural changes trigger same skip pattern as bug fixes — "get it working" urgency overrides documentation even for non-urgent infrastructure work.** |
 | Design system migration / upstream-first workflow | 1 | High — ENG-040. ScrollSpy promoted to DS; required `transpilePackages` + export path. |

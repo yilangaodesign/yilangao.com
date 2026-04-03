@@ -25,7 +25,7 @@ Lumen is a custom blue-violet accent scale built in OKLCH — a perceptual color
 
 **Construction parameters (OKLCH):**
 - **Lightness:** Two-segment even ramp — deltaL ~0.093 (steps 10-60), deltaL ~0.081 (steps 60-100)
-- **Chroma:** Sine bell peaking at step 60 (C = 0.281), tapering toward both extremes
+- **Chroma:** Sine bell peaking at step 60 (C = 0.281), tapering toward both extremes. Dark half (70-100) chroma optimized for even perceptual distance (max/min ratio 1.33x)
 - **Hue:** Constant 269.7deg across all steps (no hue discontinuity)
 
 | Aspect | yilangao.com | IBM Carbon |
@@ -43,10 +43,10 @@ Lumen is a custom blue-violet accent scale built in OKLCH — a perceptual color
 | 40 | #7392FF | 0.69, 0.164, 269.7 | 2.9:1 | 6.3:1 | Dark mode text/icon brand, hover (dark), playground accent (dark) |
 | 50 | #4E6CFF | 0.59, 0.220, 269.7 | 4.3:1 | 4.2:1 | Dark mode border/action/focus brand |
 | 60 | **#3336FF** | **0.50, 0.281, 269.7** | **6.7:1** | 2.7:1 | **Brand anchor.** Links, focus, interactive borders, brand surfaces (light mode). |
-| 70 | #2715D8 | 0.42, 0.262, 269.7 | 9.6:1 | 1.9:1 | action-brand-bold-hover (light) |
-| 80 | #1A0EA1 | 0.34, 0.210, 269.7 | 13.0:1 | 1.4:1 | action-brand-bold-pressed (light) |
-| 90 | #0F1461 | 0.26, 0.132, 269.7 | 16.3:1 | 1.1:1 | Dark mode highlight, action-brand-subtle (dark) |
-| 100 | #0A0F22 | 0.17, 0.040, 269.7 | 19.0:1 | 1.1:1 | surface-brand-subtle (dark) |
+| 70 | #261BD5 | 0.42, 0.257, 269.7 | 9.6:1 | 1.9:1 | action-brand-bold-hover (light) |
+| 80 | #1A169C | 0.34, 0.200, 269.8 | 12.8:1 | 1.4:1 | action-brand-bold-pressed (light) |
+| 90 | #0F1560 | 0.26, 0.129, 269.8 | 16.2:1 | 1.1:1 | Dark mode highlight, action-brand-subtle (dark) |
+| 100 | #070D29 | 0.17, 0.058, 269.8 | 19.1:1 | 1.1:1 | surface-brand-subtle (dark) |
 
 The Lumen accent IS the brand. It must never be replaced with Carbon's blue for interactive elements.
 
@@ -240,7 +240,7 @@ The following color families are defined in `_colors.scss` but have no current U
 
 | Issue | Status | Notes |
 |-------|--------|-------|
-| **Accent scale perceptual uniformity** | **Resolved (2026-04-03)** | Rebuilt entire scale in OKLCH with grade 60 as anchor. Even lightness ramp (deltaL ~0.09), sine chroma arc, constant hue 269.7deg. The old scale had a 60% lightness cliff at step 50-to-60; the new scale has <2% asymmetry across the critical 40-60 zone. |
+| **Accent scale perceptual uniformity** | **Resolved (2026-04-03)** | Rebuilt entire scale in OKLCH with grade 60 as anchor. Even lightness ramp (deltaL ~0.09), sine chroma arc, constant hue 269.7deg. The old scale had a 60% lightness cliff at step 50-to-60; the new scale has <2% asymmetry across the critical 40-60 zone. Dark-half chroma subsequently optimized to reduce max/min perceptual distance ratio from 1.48x to 1.33x (steps 70-100 redistributed). |
 | **Carbon Blue vs. Accent hue collision** | **Resolved (2026-04-03)** | Blue family removed. Blue-60 (#0F62FE, hue ~219deg) was only ~20deg from accent-60 (#3336FF, hue ~270deg). `$portfolio-support-info` remapped to `$portfolio-cyan-70`. |
 | **Carbon Purple vs. Accent overlap** | **Resolved (2026-04-03)** | Kept. Purple-60 (#8A3FFC, hue ~268deg) has ~29deg separation from the accent and leans red-violet vs the accent's blue-violet. Perceptually distinct. |
 | **Dark mode semantic tokens** | Mostly resolved | Text/icon (step-60/step-40) and border/action (step-60/step-50) tokens for all four functional roles now have canonical dark-mode overrides (§9.12). Surface tokens remain: `surface-warning-bold` uses yellow-30 in both modes intentionally (bright attention-grabbing background). |

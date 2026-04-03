@@ -1030,6 +1030,23 @@ Since dev and production share the same Supabase database, one push covers both 
 
 ---
 
+## EAP-065: `EditableText isRichText` Without `htmlContent` Prop
+
+**Trigger:** Adding `isRichText` and `multiline` to an `EditableText` instance but only passing `extractLexicalText()` as `children`, without computing and passing `lexicalToHtml()` as `htmlContent`.
+
+**Why it's wrong:** `extractLexicalText()` returns plain text with `\n` between paragraphs. HTML renders `\n` as whitespace, so multi-paragraph content collapses into a single block after save + `router.refresh()`. The `htmlContent` prop is what enables `EditableText` to render formatting (including paragraph breaks) via `dangerouslySetInnerHTML` in both admin and non-admin modes.
+
+**Correct alternative:** For every `EditableText` with `isRichText`, the server component must:
+1. Compute `const html = lexicalToHtml(field)`
+2. Pass `htmlContent={html !== plainText ? html : undefined}` to the component
+3. Follow the testimonials pattern (see `page.tsx` testimonials mapping)
+
+Also update the non-admin rendering fallback to use `dangerouslySetInnerHTML` when HTML content is available.
+
+**Incident:** ENG-105 (2026-04-03) — Description, section bodies, and bio all lost paragraph breaks after save.
+
+---
+
 ## EAP-NNN: [Short Name]
 
 **Trigger:** [What action or pattern triggers this]

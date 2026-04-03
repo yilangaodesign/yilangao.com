@@ -13,6 +13,20 @@
 
 ## Session: 2026-04-03 — Checkbox height fluctuation on toggle
 
+### ENG-105: Paragraph breaks lost in inline edit after save
+
+**Date:** 2026-04-03
+
+**Issue:** Rich text fields (description, section bodies, bio) lost paragraph separation after saving in admin inline edit mode. While editing, line breaks were visible, but after save + router refresh they collapsed into a single block of text.
+
+**Root Cause:** Server components used `extractLexicalText()` (which returns plain text with `\n` newlines) to pass data to `EditableText`, but never passed `lexicalToHtml()` as the `htmlContent` prop. After save, `router.refresh()` re-fetched server data, and `\n` characters in plain text are invisible in HTML rendering. The testimonial fields already handled this correctly — the pattern existed but wasn't applied consistently.
+
+**Resolution:** Added `lexicalToHtml()` computation on the server for all rich text fields (project description, section bodies, bio) and passed the result as `htmlContent` to `EditableText`. Updated non-admin rendering paths to use `dangerouslySetInnerHTML` when HTML content is available. Also cleaned up debug logging blocks left from a prior investigation session.
+
+**Lesson:** Every `EditableText` with `isRichText` must also receive `htmlContent` from the server. Plain text (`extractLexicalText`) is only for fallback display and dirty-checking — the HTML representation is required for preserving formatting across save cycles. See EAP-065.
+
+---
+
 ### ENG-104: Checkbox visually fluctuates in height when toggling checked state
 
 **Date:** 2026-04-03
