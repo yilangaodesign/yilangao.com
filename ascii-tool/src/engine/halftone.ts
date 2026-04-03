@@ -2,6 +2,8 @@
  * Apply a halftone dot overlay on top of the current canvas content.
  * Reads the canvas pixels, then redraws dots whose radius varies with luminance.
  */
+import { luminance } from './ascii-map';
+
 export function applyHalftoneOverlay(
   ctx: CanvasRenderingContext2D,
   w: number,
@@ -31,11 +33,11 @@ export function applyHalftoneOverlay(
       const g = data[idx + 1];
       const b = data[idx + 2];
 
-      const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+      const lum = luminance(r, g, b) / 255;
 
-      if (luminance < 0.02) continue;
+      if (lum < 0.02) continue;
 
-      const radius = luminance * maxRadius;
+      const radius = lum * maxRadius;
       if (radius < 0.3) continue;
 
       ctx.fillStyle = `rgb(${r},${g},${b})`;

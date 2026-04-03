@@ -3,6 +3,8 @@
  * Places flowing text into areas where brightness is below threshold.
  */
 
+import { sampleBrightness } from './ascii-map';
+
 export interface WordFillChar {
   char: string;
   x: number;
@@ -22,32 +24,24 @@ export function generateWordFill(
   cellW: number,
   cellH: number,
   brightnessThreshold: number,
-  baseFontSize: number
+  baseFontSize: number,
+  invert: boolean = false,
 ): WordFillChar[] {
   const chars: WordFillChar[] = [];
   if (!text || text.length === 0) return chars;
 
   const cols = Math.floor(canvasWidth / cellW);
   const rows = Math.floor(canvasHeight / cellH);
-  const imgW = imageData.width;
-  const imgH = imageData.height;
-  const data = imageData.data;
 
   let charIdx = 0;
 
   for (let row = 0; row < rows; row++) {
     for (let col = 0; col < cols; col++) {
-      const srcX = Math.floor((col / cols) * imgW);
-      const srcY = Math.floor((row / rows) * imgH);
-      const pixIdx = (srcY * imgW + srcX) * 4;
+      const brightness = sampleBrightness(imageData, col * cellW, row * cellH, cellW, cellH);
+      const effective = invert ? 255 - brightness : brightness;
 
-      const r = data[pixIdx];
-      const g = data[pixIdx + 1];
-      const b = data[pixIdx + 2];
-      const brightness = 0.299 * r + 0.587 * g + 0.114 * b;
-
-      if (brightness < brightnessThreshold) {
-        const darkness = 1 - brightness / brightnessThreshold;
+      if (effective < brightnessThreshold) {
+        const darkness = 1 - effective / brightnessThreshold;
         const fontSize = Math.max(
           baseFontSize * 0.5,
           baseFontSize * (0.5 + darkness * 0.5)

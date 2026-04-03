@@ -5,7 +5,6 @@ import {
   useCallback,
   useRef,
   useEffect,
-  useMemo,
 } from "react";
 import { AsciiCanvas, type AsciiCanvasHandle } from "@/components/ascii-canvas";
 import { ControlPanel } from "@/components/control-panel";
@@ -17,12 +16,11 @@ import { MediaDropzone } from "@/components/media-dropzone";
 import { PresetGallery } from "@/components/preset-gallery";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useProjects, type Project } from "@/hooks/use-projects";
-import { defaultSettings, type AsciiSettings } from "@/hooks/use-ascii-renderer";
+import { defaultSettings, type AsciiSettings, type BlendMode } from "@/hooks/use-ascii-renderer";
 import { useVideoTransform } from "@/hooks/use-video-transform";
 import { useHistory } from "@/hooks/use-history";
 import { useFFmpeg } from "@/hooks/use-ffmpeg";
 import { loadMonoFonts } from "@/lib/fonts";
-import { cn } from "@/lib/utils";
 import { X } from "lucide-react";
 
 const IMAGE_ACCEPT_TYPES = ["image/jpeg", "image/png", "image/svg+xml"];
@@ -37,6 +35,57 @@ const ASPECT_PRESETS: Record<string, number | undefined> = {
 
 type MediaType = "video" | "image" | null;
 
+const RANDOM_CHARSETS = [
+  " .:-=+*#%@",
+  " .:*#@",
+  " .,;:!?-~=+*#%@",
+  " .:-+*#",
+  " ·•○●",
+  "01",
+  " /\\|_-",
+  " ░▒▓█",
+];
+
+const RANDOM_BLEND_MODES: BlendMode[] = [
+  "multiply", "screen", "overlay", "soft-light", "hard-light", "color-dodge", "color-burn",
+];
+
+function randomHexColor(): string {
+  return '#' + Math.floor(Math.random() * 0xffffff).toString(16).padStart(6, '0');
+}
+
+function randomInt(min: number, max: number): number {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function generateRandomSettings(): Partial<AsciiSettings> {
+  const modes: AsciiSettings['mode'][] = ['charGrid', 'wordFill', 'dotGrid'];
+  const mode = modes[randomInt(0, modes.length - 1)];
+  return {
+    mode,
+    charSet: RANDOM_CHARSETS[randomInt(0, RANDOM_CHARSETS.length - 1)],
+    textColor: randomHexColor(),
+    bgColor: randomHexColor(),
+    fontSize: randomInt(6, 18),
+    gridDensity: randomInt(4, 16),
+    brightness: randomInt(-40, 40),
+    contrast: randomInt(-30, 50),
+    edgeEnhancement: randomInt(0, 80),
+    invertMapping: Math.random() > 0.6,
+    coverage: randomInt(40, 100),
+    charOpacity: randomInt(40, 100),
+    bgBlur: Math.random() > 0.5 ? randomInt(4, 25) : 0,
+    bgBlurOpacity: randomInt(40, 100),
+    overlayColor: randomHexColor(),
+    overlayOpacity: Math.random() > 0.5 ? randomInt(10, 40) : 0,
+    overlayBlendMode: RANDOM_BLEND_MODES[randomInt(0, RANDOM_BLEND_MODES.length - 1)],
+    halftoneOverlay: Math.random() > 0.7,
+    halftoneDotSize: randomInt(3, 10),
+    halftoneDotSpacing: randomInt(4, 14),
+    animate: false,
+  };
+}
+
 export default function AsciiToolPage() {
   const [settings, setSettings] = useState<AsciiSettings>({ ...defaultSettings });
   const [isPlaying, setIsPlaying] = useState(false);
@@ -48,7 +97,6 @@ export default function AsciiToolPage() {
   const [showUploader, setShowUploader] = useState(false);
   const [canvasWidth, setCanvasWidth] = useState(800);
   const [canvasHeight, setCanvasHeight] = useState(450);
-  const [renderScale, setRenderScale] = useState(1);
   const [aspectPreset, setAspectPreset] = useState("16:9");
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
@@ -117,7 +165,10 @@ export default function AsciiToolPage() {
   const handleLoadProject = useCallback(
     async (project: Project) => {
       setActiveProject(project);
-      if (project.settings) setSettings(project.settings);
+      if (project.settings) {
+        const merged = { ...defaultSettings, ...project.settings };
+        setSettings(merged);
+      }
       const url = await getMediaUrl(project.id, project.mimeType);
       setMediaUrl(url);
       setMediaType(project.mediaType);
@@ -160,6 +211,12 @@ export default function AsciiToolPage() {
     },
     [settings, handleSettingsChange],
   );
+
+  const handleRandomize = useCallback(() => {
+    const randomized = generateRandomSettings();
+    const merged = { ...settings, ...randomized };
+    handleSettingsChange(merged);
+  }, [settings, handleSettingsChange]);
 
   const handleUndo = useCallback(() => {
     const snapshot = history.undo();
@@ -313,6 +370,7 @@ export default function AsciiToolPage() {
           onCanvasHeightChange={handleCanvasHeightInput}
           hasMedia={hasMedia}
           onResetLayer={() => videoTransform.fitToCanvas(canvasWidth, canvasHeight)}
+          onRandomize={handleRandomize}
         />
 
         <div
@@ -348,7 +406,7 @@ export default function AsciiToolPage() {
                 width={canvasWidth}
                 height={canvasHeight}
                 videoTransform={videoTransform}
-                renderScale={renderScale}
+                renderScale={1}
                 onMediaLoaded={handleMediaLoaded}
               />
             </div>

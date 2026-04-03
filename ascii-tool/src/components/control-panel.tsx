@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect } from "react";
 import { cn } from "@/lib/utils";
-import type { AsciiSettings } from "@/hooks/use-ascii-renderer";
+import type { AsciiSettings, BlendMode } from "@/hooks/use-ascii-renderer";
 import { ButtonSelect, ButtonSelectItem } from "@/components/ui/button-select";
 import { ColorPicker } from "@/components/ui/color-picker";
 import { Slider } from "@/components/ui/slider";
@@ -18,6 +18,17 @@ interface ControlPanelProps {
 const MODE_OPTIONS = [
   { value: "charGrid", label: "Characters" },
   { value: "wordFill", label: "Word Fill" },
+  { value: "dotGrid", label: "Dot Grid" },
+];
+
+const BLEND_MODE_OPTIONS: { value: BlendMode; label: string }[] = [
+  { value: "multiply", label: "Multiply" },
+  { value: "screen", label: "Screen" },
+  { value: "overlay", label: "Overlay" },
+  { value: "soft-light", label: "Soft Light" },
+  { value: "hard-light", label: "Hard Light" },
+  { value: "color-dodge", label: "Color Dodge" },
+  { value: "color-burn", label: "Color Burn" },
 ];
 
 export function ControlPanel({ settings, onSettingsChange, className }: ControlPanelProps) {
@@ -42,6 +53,8 @@ export function ControlPanel({ settings, onSettingsChange, className }: ControlP
     [settings],
   );
 
+  const showTextSettings = settings.mode !== "dotGrid";
+
   return (
     <div className={cn("flex flex-col gap-0 overflow-y-auto h-full", className)}>
       <div className="px-4 py-3 border-b border-panel-border">
@@ -64,25 +77,60 @@ export function ControlPanel({ settings, onSettingsChange, className }: ControlP
         </ButtonSelect>
       </Section>
 
-      {/* Text Settings */}
-      <Section label={settings.mode === "charGrid" ? "Character Set" : "Filler Text"}>
-        {settings.mode === "charGrid" ? (
-          <input
-            type="text"
-            value={settings.charSet}
-            onChange={(e) => update("charSet", e.target.value)}
-            placeholder="Characters dark → light"
-            className="w-full h-8 px-3 text-sm font-mono text-foreground bg-surface border border-border rounded-sm transition-colors hover:border-muted-foreground focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent"
+      {/* Text Settings (hidden for dotGrid) */}
+      {showTextSettings && (
+        <Section label={settings.mode === "charGrid" ? "Character Set" : "Filler Text"}>
+          {settings.mode === "charGrid" ? (
+            <input
+              type="text"
+              value={settings.charSet}
+              onChange={(e) => update("charSet", e.target.value)}
+              placeholder="Characters dark → light"
+              className="w-full h-8 px-3 text-sm font-mono text-foreground bg-surface border border-border rounded-sm transition-colors hover:border-muted-foreground focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent"
+            />
+          ) : (
+            <textarea
+              value={settings.fillerText}
+              onChange={(e) => update("fillerText", e.target.value)}
+              placeholder="Enter text to fill..."
+              rows={3}
+              className="w-full px-3 py-2 text-sm font-mono text-foreground bg-surface border border-border rounded-sm resize-none transition-colors hover:border-muted-foreground focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent"
+            />
+          )}
+        </Section>
+      )}
+
+      {/* Image Adjustments */}
+      <Section label="Image Adjustments">
+        <div className="flex flex-col gap-3">
+          <Slider
+            label="Brightness"
+            value={settings.brightness}
+            onChange={(v) => update("brightness", v)}
+            min={-100}
+            max={100}
+            step={1}
+            showValue
           />
-        ) : (
-          <textarea
-            value={settings.fillerText}
-            onChange={(e) => update("fillerText", e.target.value)}
-            placeholder="Enter text to fill..."
-            rows={3}
-            className="w-full px-3 py-2 text-sm font-mono text-foreground bg-surface border border-border rounded-sm resize-none transition-colors hover:border-muted-foreground focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent"
+          <Slider
+            label="Contrast"
+            value={settings.contrast}
+            onChange={(v) => update("contrast", v)}
+            min={-100}
+            max={100}
+            step={1}
+            showValue
           />
-        )}
+          <Slider
+            label="Edge Enhancement"
+            value={settings.edgeEnhancement}
+            onChange={(v) => update("edgeEnhancement", v)}
+            min={0}
+            max={100}
+            step={1}
+            showValue
+          />
+        </div>
       </Section>
 
       {/* Colors */}
@@ -104,65 +152,75 @@ export function ControlPanel({ settings, onSettingsChange, className }: ControlP
         </label>
       </Section>
 
-      {/* Background */}
-      <Section label="Background">
-        <label className="flex items-center gap-2 cursor-pointer">
-          <input
-            type="checkbox"
-            checked={settings.solidBackground ?? false}
-            onChange={(e) => update("solidBackground", e.target.checked)}
-            className="w-4 h-4 rounded-sm border-border accent-accent"
-          />
-          <span className="text-sm text-foreground">Solid background</span>
-        </label>
-        {settings.solidBackground && (
-          <p className="text-xs text-muted-foreground mt-1">
-            Bright areas are left as the solid background color.
-          </p>
-        )}
-      </Section>
-
-      {/* Brightness Threshold */}
-      {(settings.solidBackground || settings.mode === "wordFill") && (
-        <Section label="Brightness Threshold">
+      {/* Rendering */}
+      <Section label="Rendering">
+        <div className="flex flex-col gap-3">
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={settings.invertMapping}
+              onChange={(e) => update("invertMapping", e.target.checked)}
+              className="w-4 h-4 rounded-sm border-border accent-accent"
+            />
+            <span className="text-sm text-foreground">Invert Mapping</span>
+          </label>
           <Slider
-            value={settings.brightnessThreshold}
-            onChange={(v) => update("brightnessThreshold", v)}
+            label="Coverage"
+            value={settings.coverage}
+            onChange={(v) => update("coverage", v)}
             min={0}
-            max={255}
+            max={100}
             step={1}
             showValue
+            suffix="%"
           />
-        </Section>
-      )}
-
-      {/* Font */}
-      <Section label="Font">
-        <select
-          value={settings.fontFamily}
-          onChange={handleFontChange}
-          className="w-full h-8 px-3 text-sm text-foreground bg-surface border border-border rounded-sm cursor-pointer transition-colors hover:border-muted-foreground focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent"
-        >
-          {FONT_OPTIONS.map((f) => (
-            <option key={f.value} value={f.value}>
-              {f.label}
-            </option>
-          ))}
-        </select>
+          <Slider
+            label="Character Opacity"
+            value={settings.charOpacity}
+            onChange={(v) => update("charOpacity", v)}
+            min={0}
+            max={100}
+            step={1}
+            showValue
+            suffix="%"
+          />
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={settings.solidBackground ?? false}
+              onChange={(e) => update("solidBackground", e.target.checked)}
+              className="w-4 h-4 rounded-sm border-border accent-accent"
+            />
+            <span className="text-sm text-foreground">Solid background</span>
+          </label>
+          {(settings.solidBackground || settings.mode === "wordFill") && (
+            <Slider
+              label="Brightness Threshold"
+              value={settings.brightnessThreshold}
+              onChange={(v) => update("brightnessThreshold", v)}
+              min={0}
+              max={255}
+              step={1}
+              showValue
+            />
+          )}
+        </div>
       </Section>
 
-      {/* Font Size + Grid */}
+      {/* Size & Density */}
       <Section label="Size & Density">
         <div className="flex gap-3">
-          <ScrubInput
-            label="Size"
-            value={settings.fontSize}
-            onChange={(v) => update("fontSize", v)}
-            min={4}
-            max={32}
-            step={1}
-            suffix="px"
-          />
+          {showTextSettings && (
+            <ScrubInput
+              label="Size"
+              value={settings.fontSize}
+              onChange={(v) => update("fontSize", v)}
+              min={4}
+              max={32}
+              step={1}
+              suffix="px"
+            />
+          )}
           <ScrubInput
             label="Grid"
             value={settings.gridDensity}
@@ -172,6 +230,51 @@ export function ControlPanel({ settings, onSettingsChange, className }: ControlP
             step={1}
             suffix="px"
           />
+        </div>
+      </Section>
+
+      {/* Font (hidden for dotGrid) */}
+      {showTextSettings && (
+        <Section label="Font">
+          <select
+            value={settings.fontFamily}
+            onChange={handleFontChange}
+            className="w-full h-8 px-3 text-sm text-foreground bg-surface border border-border rounded-sm cursor-pointer transition-colors hover:border-muted-foreground focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent"
+          >
+            {FONT_OPTIONS.map((f) => (
+              <option key={f.value} value={f.value}>
+                {f.label}
+              </option>
+            ))}
+          </select>
+        </Section>
+      )}
+
+      {/* Background Layer */}
+      <Section label="Background Layer">
+        <div className="flex flex-col gap-3">
+          <Slider
+            label="Blur"
+            value={settings.bgBlur}
+            onChange={(v) => update("bgBlur", v)}
+            min={0}
+            max={40}
+            step={1}
+            showValue
+            suffix="px"
+          />
+          {settings.bgBlur > 0 && (
+            <Slider
+              label="Blur Opacity"
+              value={settings.bgBlurOpacity}
+              onChange={(v) => update("bgBlurOpacity", v)}
+              min={0}
+              max={100}
+              step={1}
+              showValue
+              suffix="%"
+            />
+          )}
         </div>
       </Section>
 
@@ -207,6 +310,70 @@ export function ControlPanel({ settings, onSettingsChange, className }: ControlP
               step={1}
               showValue
               suffix="px"
+            />
+          </div>
+        )}
+      </Section>
+
+      {/* Color Overlay */}
+      <Section label="Color Overlay">
+        <div className="flex flex-col gap-3">
+          <Slider
+            label="Opacity"
+            value={settings.overlayOpacity}
+            onChange={(v) => update("overlayOpacity", v)}
+            min={0}
+            max={100}
+            step={1}
+            showValue
+            suffix="%"
+          />
+          {settings.overlayOpacity > 0 && (
+            <>
+              <div className="flex items-center gap-3">
+                <ColorPicker label="Color" value={settings.overlayColor} onChange={(c) => update("overlayColor", c)} />
+              </div>
+              <div>
+                <label className="text-xs text-muted-foreground mb-1 block">Blend Mode</label>
+                <select
+                  value={settings.overlayBlendMode}
+                  onChange={(e) => update("overlayBlendMode", e.target.value as BlendMode)}
+                  className="w-full h-8 px-3 text-sm text-foreground bg-surface border border-border rounded-sm cursor-pointer transition-colors hover:border-muted-foreground focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent"
+                >
+                  {BLEND_MODE_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </>
+          )}
+        </div>
+      </Section>
+
+      {/* Animation */}
+      <Section label="Animation">
+        <label className="flex items-center gap-2 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={settings.animate}
+            onChange={(e) => update("animate", e.target.checked)}
+            className="w-4 h-4 rounded-sm border-border accent-accent"
+          />
+          <span className="text-sm text-foreground">Animate</span>
+        </label>
+        {settings.animate && (
+          <div className="mt-3">
+            <Slider
+              label="Intensity"
+              value={settings.animationIntensity}
+              onChange={(v) => update("animationIntensity", v)}
+              min={0}
+              max={100}
+              step={1}
+              showValue
+              suffix="%"
             />
           </div>
         )}

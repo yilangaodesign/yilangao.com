@@ -1,6 +1,6 @@
 "use client";
 import { cn } from "@/lib/utils";
-import { Undo2, Redo2, RotateCcw } from "lucide-react";
+import { Undo2, Redo2, RotateCcw, Shuffle } from "lucide-react";
 import { ButtonSelect, ButtonSelectItem } from "@/components/ui/button-select";
 
 const ASPECT_PRESETS = [
@@ -24,6 +24,7 @@ interface ToolbarProps {
   onCanvasHeightChange: (h: number) => void;
   hasMedia: boolean;
   onResetLayer: () => void;
+  onRandomize?: () => void;
   className?: string;
 }
 
@@ -40,6 +41,7 @@ export function Toolbar({
   onCanvasHeightChange,
   hasMedia,
   onResetLayer,
+  onRandomize,
   className,
 }: ToolbarProps) {
   return (
@@ -108,16 +110,29 @@ export function Toolbar({
         </label>
       </div>
 
-      {hasMedia && (
-        <button
-          type="button"
-          onClick={onResetLayer}
-          className="flex items-center gap-1.5 ml-auto h-7 px-3 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-sm transition-colors"
-        >
-          <RotateCcw className="w-3 h-3" />
-          Reset
-        </button>
-      )}
+      <div className="flex items-center gap-1 ml-auto">
+        {onRandomize && (
+          <button
+            type="button"
+            onClick={onRandomize}
+            className="flex items-center gap-1.5 h-7 px-3 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-sm transition-colors"
+            title="Randomize parameters"
+          >
+            <Shuffle className="w-3 h-3" />
+            Randomize
+          </button>
+        )}
+        {hasMedia && (
+          <button
+            type="button"
+            onClick={onResetLayer}
+            className="flex items-center gap-1.5 h-7 px-3 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-sm transition-colors"
+          >
+            <RotateCcw className="w-3 h-3" />
+            Reset
+          </button>
+        )}
+      </div>
     </div>
   );
 }
