@@ -34,9 +34,9 @@ const COLOR_TOKENS = [
   { token: '$portfolio-text-disabled', name: 'text-disabled', hex: '#c6c6c6' },
   { token: '$portfolio-text-inverse', name: 'text-inverse', hex: '#ffffff' },
   { token: '$portfolio-text-on-color', name: 'text-on-color', hex: '#ffffff' },
-  { token: '$portfolio-accent-50', name: 'accent-50', hex: '#6b5ce7' },
-  { token: '$portfolio-accent-60', name: 'accent-60', hex: '#4a3adb' },
-  { token: '$portfolio-text-link', name: 'text-link', hex: '#4a3adb' },
+  { token: '$portfolio-accent-50', name: 'accent-50', hex: '#4E6CFF' },
+  { token: '$portfolio-accent-60', name: 'accent-60', hex: '#3336FF' },
+  { token: '$portfolio-text-link', name: 'text-link', hex: '#3336FF' },
   { token: '$portfolio-text-error', name: 'text-error', hex: '#da1e28' },
 ] as const
 

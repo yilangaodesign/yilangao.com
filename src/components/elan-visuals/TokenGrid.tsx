@@ -9,16 +9,16 @@ import styles from "./elan-visuals.module.scss";
 /* ── Palette data ───────────────────────────────────────────────────────── */
 
 const ACCENT_SCALE = [
-  { step: 10, hex: "#F0F5FD", scaling: "absolute" as const },
-  { step: 20, hex: "#D5E0FC", scaling: "absolute" as const },
-  { step: 30, hex: "#B3C5FC", scaling: "absolute" as const },
-  { step: 40, hex: "#8DA3FC", scaling: "absolute" as const },
-  { step: 50, hex: "#7182FD", scaling: "absolute" as const },
+  { step: 10, hex: "#EFF3FF", scaling: "ramp" as const },
+  { step: 20, hex: "#C5D4FF", scaling: "ramp" as const },
+  { step: 30, hex: "#9BB4FF", scaling: "ramp" as const },
+  { step: 40, hex: "#7392FF", scaling: "ramp" as const },
+  { step: 50, hex: "#4E6CFF", scaling: "ramp" as const },
   { step: 60, hex: "#3336FF", scaling: "key" as const },
-  { step: 70, hex: "#0004E2", scaling: "ratio" as const },
-  { step: 80, hex: "#0003A7", scaling: "ratio" as const },
-  { step: 90, hex: "#000273", scaling: "ratio" as const },
-  { step: 100, hex: "#05063E", scaling: "ratio" as const },
+  { step: 70, hex: "#2715D8", scaling: "ramp" as const },
+  { step: 80, hex: "#1A0EA1", scaling: "ramp" as const },
+  { step: 90, hex: "#0F1461", scaling: "ramp" as const },
+  { step: 100, hex: "#0A0F22", scaling: "ramp" as const },
 ];
 
 const NEUTRAL_SCALE: { step: number | string; hex: string }[] = [
@@ -463,9 +463,9 @@ export default function TokenGrid() {
             interface, rooted in something older.
           </p>
           <p className={styles.rationaleText}>
-            Shifting from IBM Carbon&rsquo;s pure blue broke the original luminance scale. I rebuilt it as a hybrid:
-            grades 10–50 match Carbon&rsquo;s absolute luminance values, 70–100 preserve inter-step ratios for
-            perceptual uniformity. Grade 60 is the key — the brand color itself.
+            The scale is built in OKLCH — a perceptual color space where equal numeric deltas produce equal
+            visual difference. Grade 60 is the anchor; all other steps are derived via an even lightness ramp
+            and a sine chroma arc at constant hue 270°.
           </p>
         </div>
         <div className={styles.colorRow}>
@@ -480,15 +480,15 @@ export default function TokenGrid() {
         <div className={styles.scalingLegend}>
           <div className={styles.scalingLegendItem}>
             <span className={styles.scalingDot} style={{ background: "rgba(51, 54, 255, 0.15)" }} />
-            <span className={styles.scalingLegendText}>10–50: absolute luminance (matches Carbon)</span>
+            <span className={styles.scalingLegendText}>10–50: OKLCH lightness ramp toward anchor</span>
           </div>
           <div className={styles.scalingLegendItem}>
             <span className={`${styles.scalingDot} ${styles.scalingDotKey}`} />
-            <span className={styles.scalingLegendText}>60: key brand color #3336FF</span>
+            <span className={styles.scalingLegendText}>60: brand anchor #3336FF</span>
           </div>
           <div className={styles.scalingLegendItem}>
-            <span className={styles.scalingDot} style={{ background: "rgba(0, 4, 226, 0.3)" }} />
-            <span className={styles.scalingLegendText}>70–100: inter-step ratios (perceptual uniformity)</span>
+            <span className={styles.scalingDot} style={{ background: "rgba(39, 21, 216, 0.3)" }} />
+            <span className={styles.scalingLegendText}>70–100: OKLCH lightness ramp from anchor</span>
           </div>
         </div>
       </TabsContent>

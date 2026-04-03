@@ -1,0 +1,126 @@
+@use "@yilangaodesign/design-system/scss" as *;
+
+.rail {
+  position: fixed;
+  right: $portfolio-spacing-05;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 40;
+  display: none;
+  pointer-events: none;
+
+  @media #{$portfolio-mq-lg} {
+    display: flex;
+  }
+}
+
+.track {
+  display: flex;
+  flex-direction: column;
+  gap: $portfolio-spacing-03;
+  align-items: flex-end;
+  touch-action: none;
+  user-select: none;
+  cursor: pointer;
+  pointer-events: auto;
+  padding: $portfolio-spacing-04;
+  margin: -$portfolio-spacing-04;
+
+  &[data-dragging] {
+    cursor: grabbing;
+  }
+}
+
+.notch {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: 28px;
+  height: $portfolio-spacing-05;
+}
+
+.label {
+  position: absolute;
+  right: calc(100% + #{$portfolio-spacing-03});
+  top: 0;
+  height: $portfolio-spacing-05;
+  display: flex;
+  align-items: center;
+  font-family: $portfolio-font-mono;
+  font-size: $portfolio-type-xs;
+  line-height: 1;
+  color: $portfolio-text-placeholder;
+  font-weight: 400;
+  white-space: nowrap;
+  pointer-events: none;
+  transition: color $portfolio-duration-moderate $portfolio-easing-standard;
+
+  .notch[data-active] & {
+    color: $portfolio-text-primary;
+    font-weight: 500;
+  }
+
+  .notch[data-depth="1"] & {
+    color: $portfolio-text-placeholder;
+    font-weight: 400;
+  }
+
+  .notch[data-depth="1"][data-active] & {
+    color: $portfolio-text-secondary;
+    font-weight: 400;
+  }
+}
+
+.tick {
+  @include button-reset;
+  width: 16px;
+  height: 2px;
+  line-height: 0;
+  min-height: 0;
+  background: $portfolio-border-subtle;
+  border-radius: 1px;
+  transition:
+    width $portfolio-duration-moderate $portfolio-easing-standard,
+    background-color $portfolio-duration-moderate $portfolio-easing-standard,
+    opacity $portfolio-duration-moderate $portfolio-easing-standard;
+  flex-shrink: 0;
+
+  &[data-active] {
+    width: 28px;
+    background: $portfolio-text-primary;
+  }
+
+  &[data-drag-target] {
+    width: 28px;
+    background: $portfolio-text-primary;
+  }
+
+  .track[data-hovered] &:not([data-active]):not([data-drag-target]) {
+    width: 20px;
+    background: $portfolio-text-placeholder;
+  }
+
+  &[data-depth="1"] {
+    width: 10px;
+    opacity: 0.6;
+  }
+
+  &[data-depth="1"][data-active] {
+    width: 22px;
+    background: $portfolio-text-primary;
+    opacity: 1;
+  }
+
+  &[data-depth="1"][data-drag-target] {
+    width: 22px;
+    background: $portfolio-text-primary;
+    opacity: 1;
+  }
+
+  .track[data-hovered] &[data-depth="1"]:not([data-active]):not([data-drag-target]) {
+    width: 14px;
+    background: $portfolio-text-placeholder;
+    opacity: 0.6;
+  }
+}
