@@ -356,15 +356,9 @@ export async function saveFields(
       let value: unknown = field.currentValue
       if (field.isRichText) {
         const str = String(value)
-        // #region agent log
-        fetch('http://127.0.0.1:7531/ingest/d75fbc74-5683-4bca-8930-5a05041b716d',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'e6568c'},body:JSON.stringify({sessionId:'e6568c',location:'api.ts:saveFields',message:'converting richText to lexical',data:{fieldPath:field.fieldPath,htmlSnippet:str.substring(0,200),hasHtmlTags:str.includes('<')},timestamp:Date.now(),hypothesisId:'PARA'})}).catch(()=>{});
-        // #endregion
         value = str.includes('<')
           ? htmlToLexicalDocument(str)
           : makeLexicalParagraph(str)
-        // #region agent log
-        fetch('http://127.0.0.1:7531/ingest/d75fbc74-5683-4bca-8930-5a05041b716d',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'e6568c'},body:JSON.stringify({sessionId:'e6568c',location:'api.ts:saveFields',message:'lexical output',data:{fieldPath:field.fieldPath,paragraphCount:(value as {root?:{children?:unknown[]}})?.root?.children?.length,lexicalSnippet:JSON.stringify(value).substring(0,300)},timestamp:Date.now(),hypothesisId:'PARA'})}).catch(()=>{});
-        // #endregion
       }
       setNested(body, field.fieldPath, value)
     }

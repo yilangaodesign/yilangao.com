@@ -15,10 +15,10 @@ const ACCENT_SCALE = [
   { step: 40, hex: "#7392FF", scaling: "ramp" as const },
   { step: 50, hex: "#4E6CFF", scaling: "ramp" as const },
   { step: 60, hex: "#3336FF", scaling: "key" as const },
-  { step: 70, hex: "#2715D8", scaling: "ramp" as const },
-  { step: 80, hex: "#1A0EA1", scaling: "ramp" as const },
-  { step: 90, hex: "#0F1461", scaling: "ramp" as const },
-  { step: 100, hex: "#0A0F22", scaling: "ramp" as const },
+  { step: 70, hex: "#261BD5", scaling: "ramp" as const },
+  { step: 80, hex: "#1A169C", scaling: "ramp" as const },
+  { step: 90, hex: "#0F1560", scaling: "ramp" as const },
+  { step: 100, hex: "#070D29", scaling: "ramp" as const },
 ];
 
 const NEUTRAL_SCALE: { step: number | string; hex: string }[] = [
@@ -487,7 +487,7 @@ export default function TokenGrid() {
             <span className={styles.scalingLegendText}>60: brand anchor #3336FF</span>
           </div>
           <div className={styles.scalingLegendItem}>
-            <span className={styles.scalingDot} style={{ background: "rgba(39, 21, 216, 0.3)" }} />
+            <span className={styles.scalingDot} style={{ background: "rgba(38, 27, 213, 0.3)" }} />
             <span className={styles.scalingLegendText}>70–100: OKLCH lightness ramp from anchor</span>
           </div>
         </div>
