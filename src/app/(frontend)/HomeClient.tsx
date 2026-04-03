@@ -36,6 +36,7 @@ import {
   AddItemCard,
 } from "@/components/inline-edit";
 import type { ApiTarget, FieldDefinition } from "@/components/inline-edit";
+import { Eyebrow } from "@/components/ui/Eyebrow";
 import styles from "./page.module.scss";
 
 type Project = {
@@ -485,16 +486,16 @@ export default function HomeClient({
 
             <FadeIn delay={0.1}>
               <section className={styles.about}>
-                <EditableText
-                  fieldId="sc:aboutLabel"
-                  target={SITE_CONFIG_TARGET}
-                  fieldPath="aboutLabel"
-                  as="h2"
-                  className={styles.sectionLabel}
-                  label="Section Label"
-                >
-                  {siteConfig.aboutLabel}
-                </EditableText>
+                <Eyebrow as="h2" className={styles.sectionLabel}>
+                  <EditableText
+                    fieldId="sc:aboutLabel"
+                    target={SITE_CONFIG_TARGET}
+                    fieldPath="aboutLabel"
+                    label="Section Label"
+                  >
+                    {siteConfig.aboutLabel}
+                  </EditableText>
+                </Eyebrow>
                 <EditableText
                   fieldId="sc:bio"
                   target={SITE_CONFIG_TARGET}
@@ -513,16 +514,16 @@ export default function HomeClient({
             <FadeIn delay={0.2}>
               <div className={styles.teamsAndLinks}>
                 <section className={styles.teams}>
-                  <EditableText
-                    fieldId="sc:teamsLabel"
-                    target={SITE_CONFIG_TARGET}
-                    fieldPath="teamsLabel"
-                    as="h2"
-                    className={styles.sectionLabel}
-                    label="Section Label"
-                  >
-                    {siteConfig.teamsLabel}
-                  </EditableText>
+                  <Eyebrow as="h2" className={styles.sectionLabel}>
+                    <EditableText
+                      fieldId="sc:teamsLabel"
+                      target={SITE_CONFIG_TARGET}
+                      fieldPath="teamsLabel"
+                      label="Section Label"
+                    >
+                      {siteConfig.teamsLabel}
+                    </EditableText>
+                  </Eyebrow>
                   <EditableArray<Team>
                     fieldId="sc:teams"
                     target={SITE_CONFIG_TARGET}
@@ -548,16 +549,16 @@ export default function HomeClient({
                 </section>
 
                 <section className={styles.links}>
-                  <EditableText
-                    fieldId="sc:linksLabel"
-                    target={SITE_CONFIG_TARGET}
-                    fieldPath="linksLabel"
-                    as="h2"
-                    className={styles.sectionLabel}
-                    label="Section Label"
-                  >
-                    {siteConfig.linksLabel}
-                  </EditableText>
+                  <Eyebrow as="h2" className={styles.sectionLabel}>
+                    <EditableText
+                      fieldId="sc:linksLabel"
+                      target={SITE_CONFIG_TARGET}
+                      fieldPath="linksLabel"
+                      label="Section Label"
+                    >
+                      {siteConfig.linksLabel}
+                    </EditableText>
+                  </Eyebrow>
                   <EditableArray<SocialLink>
                     fieldId="sc:socialLinks"
                     target={SITE_CONFIG_TARGET}

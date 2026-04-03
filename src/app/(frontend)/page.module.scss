@@ -89,7 +89,6 @@
 
 .sectionLabel {
   display: block;
-  @include label;
   color: $portfolio-text-placeholder;
   margin-bottom: $portfolio-spacer-1x;
 

@@ -12,6 +12,7 @@ import {
 } from "@/components/inline-edit";
 import type { ApiTarget } from "@/components/inline-edit";
 import { Badge } from "@/components/ui/Badge";
+import { Eyebrow } from "@/components/ui/Eyebrow";
 import styles from "./page.module.scss";
 
 export interface Experiment {
@@ -171,7 +172,7 @@ export default function ExperimentsClient({ experiments, isAdmin }: { experiment
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: [0.2, 0, 0.38, 0.9] }}
         >
-          <span className={styles.label}>Experiments &amp; Side Projects</span>
+          <Eyebrow className={styles.label}>Experiments &amp; Side Projects</Eyebrow>
           <h1 className={styles.heading}>
             Coding Experiments<br />
             <span className={styles.headingItalic}>&amp; Thought Pieces</span>

@@ -21,6 +21,7 @@ import {
   IncidentDensityMap,
 } from "@/components/elan-visuals";
 import { Badge } from "@/components/ui/Badge";
+import { Eyebrow } from "@/components/ui/Eyebrow";
 import elanStyles from "@/components/elan-visuals/elan-visuals.module.scss";
 import styles from "./page.module.scss";
 
@@ -257,7 +258,7 @@ export default function ProjectClient({
             <FadeIn delay={0.15}>
               <div className={styles.meta}>
                 <div className={styles.metaGroup}>
-                  <span className={styles.metaLabel}>Role</span>
+                  <Eyebrow className={styles.metaLabel}>Role</Eyebrow>
                   {projectTarget ? (
                     <EditableText
                       fieldId={`proj:${p.id}:role`}
@@ -274,7 +275,7 @@ export default function ProjectClient({
                   )}
                 </div>
                 <div className={styles.metaGroup}>
-                  <span className={styles.metaLabel}>Collaborators</span>
+                  <Eyebrow className={styles.metaLabel}>Collaborators</Eyebrow>
                   {projectTarget ? (
                     <EditableArray<Collaborator>
                       fieldId={`proj:${p.id}:collaborators`}
@@ -297,7 +298,7 @@ export default function ProjectClient({
                   )}
                 </div>
                 <div className={styles.metaGroup}>
-                  <span className={styles.metaLabel}>Duration</span>
+                  <Eyebrow className={styles.metaLabel}>Duration</Eyebrow>
                   {projectTarget ? (
                     <EditableText
                       fieldId={`proj:${p.id}:duration`}
@@ -314,7 +315,7 @@ export default function ProjectClient({
                   )}
                 </div>
                 <div className={styles.metaGroup}>
-                  <span className={styles.metaLabel}>Tools</span>
+                  <Eyebrow className={styles.metaLabel}>Tools</Eyebrow>
                   {projectTarget ? (
                     <EditableArray<Tool>
                       fieldId={`proj:${p.id}:tools`}
@@ -410,9 +411,9 @@ export default function ProjectClient({
           {companyNote && (
             <FadeIn>
               <aside className={styles.companyCallout}>
-                <span className={styles.companyCalloutLabel}>
+                <Eyebrow className={styles.companyCalloutLabel}>
                   Why this matters to {companyNote.companyName}
-                </span>
+                </Eyebrow>
                 <p className={styles.companyCalloutText}>
                   {companyNote.note}
                 </p>
@@ -522,7 +523,7 @@ export default function ProjectClient({
                   <Link href={`/work/${prevProject.slug}`} className={styles.projectNavLink}>
                     <ArrowLeft />
                     <div className={styles.projectNavText}>
-                      <span className={styles.projectNavLabel}>Previous</span>
+                      <Eyebrow className={styles.projectNavLabel}>Previous</Eyebrow>
                       <span className={styles.projectNavTitle}>{prevProject.title}</span>
                     </div>
                   </Link>
@@ -532,7 +533,7 @@ export default function ProjectClient({
                 {nextProject ? (
                   <Link href={`/work/${nextProject.slug}`} className={`${styles.projectNavLink} ${styles.projectNavLinkNext}`}>
                     <div className={styles.projectNavText}>
-                      <span className={styles.projectNavLabel}>Next</span>
+                      <Eyebrow className={styles.projectNavLabel}>Next</Eyebrow>
                       <span className={styles.projectNavTitle}>{nextProject.title}</span>
                     </div>
                     <ArrowRight />

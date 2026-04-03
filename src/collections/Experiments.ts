@@ -6,7 +6,7 @@ export const Experiments: CollectionConfig = {
     useAsTitle: 'title',
     defaultColumns: ['title', 'num', 'date', 'order'],
     description: 'Creative coding experiments and side projects.',
-    group: 'Experiments',
+    group: 'Content',
   },
   access: {
     read: () => true,

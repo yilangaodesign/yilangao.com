@@ -5,7 +5,7 @@ export const Projects: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'category', 'featured', 'order'],
-    group: 'Work',
+    group: 'Content',
   },
   access: {
     read: () => true,

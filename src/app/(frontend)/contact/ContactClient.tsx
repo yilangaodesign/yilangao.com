@@ -13,6 +13,7 @@ import {
   AddItemCard,
 } from "@/components/inline-edit";
 import type { ApiTarget, FieldDefinition } from "@/components/inline-edit";
+import { Eyebrow } from "@/components/ui/Eyebrow";
 import styles from "./page.module.scss";
 
 interface Testimonial {
@@ -294,7 +295,7 @@ export default function ContactClient({ testimonials, clients, isAdmin }: Contac
 
         {clients.length > 0 && (
           <div className={styles.trustRow}>
-            <span className={styles.trustLabel}>Trusted by</span>
+            <Eyebrow className={styles.trustLabel}>Trusted by</Eyebrow>
             <div className={styles.marqueeViewport}>
               <EditableArray<ClientEntry>
                 fieldId="sc:clients"

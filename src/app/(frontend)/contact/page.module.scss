@@ -252,7 +252,6 @@ $card-margin: $portfolio-spacer-2x;
 }
 
 .trustLabel {
-  @include label;
   color: $portfolio-overlay-white-30;
   white-space: nowrap;
   flex-shrink: 0;

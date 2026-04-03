@@ -5,7 +5,7 @@ export const Books: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'author', 'order'],
-    group: 'Reading',
+    group: 'Content',
   },
   access: {
     read: () => true,

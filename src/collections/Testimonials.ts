@@ -6,7 +6,7 @@ export const Testimonials: CollectionConfig = {
     useAsTitle: 'name',
     defaultColumns: ['name', 'role', 'showOnHome', 'order'],
     description: 'Client/colleague testimonials shown on the contact page and homepage grid.',
-    group: 'Contact',
+    group: 'Content',
   },
   access: {
     read: () => true,

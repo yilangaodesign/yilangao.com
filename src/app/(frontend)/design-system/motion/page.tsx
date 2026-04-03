@@ -14,6 +14,7 @@ import {
   STAGGER_INTERVAL,
   ENTRANCE_Y,
 } from "@/lib/motion";
+import { Eyebrow } from "@/components/ui/Eyebrow";
 import styles from "./page.module.scss";
 
 // ── Token data for tables ────────────────────────────────────────────────────
@@ -146,7 +147,7 @@ export default function MotionPlaygroundPage() {
 
           {/* Durations */}
           <div className={styles.demo}>
-            <div className={styles.demoLabel}>Durations</div>
+            <Eyebrow as="div" className={styles.demoLabel}>Durations</Eyebrow>
             <table className={styles.tokenTable}>
               <thead>
                 <tr>
@@ -173,7 +174,7 @@ export default function MotionPlaygroundPage() {
 
           {/* Easings */}
           <div className={styles.demo}>
-            <div className={styles.demoLabel}>Easing Curves — click to preview</div>
+            <Eyebrow as="div" className={styles.demoLabel}>Easing Curves — click to preview</Eyebrow>
             <div className={styles.easingGrid}>
               {EASINGS.map((e) => (
                 <EasingDemo key={e.name} name={e.name} value={e.value} desc={e.desc} />
@@ -193,7 +194,7 @@ export default function MotionPlaygroundPage() {
 
           {/* MountEntrance */}
           <div className={styles.demo}>
-            <div className={styles.demoLabel}>Component</div>
+            <Eyebrow as="div" className={styles.demoLabel}>Component</Eyebrow>
             <div className={styles.demoTitle}>MountEntrance</div>
             <div className={styles.demoMeta}>
               src/components/MountEntrance.tsx · duration: {DURATION.slower}s · ease: entrance · y: {ENTRANCE_Y}px
@@ -215,7 +216,7 @@ export default function MotionPlaygroundPage() {
 
           {/* FadeIn */}
           <div className={styles.demo}>
-            <div className={styles.demoLabel}>Component</div>
+            <Eyebrow as="div" className={styles.demoLabel}>Component</Eyebrow>
             <div className={styles.demoTitle}>FadeIn</div>
             <div className={styles.demoMeta}>
               src/components/FadeIn.tsx · duration: {DURATION.slower}s · ease: entrance · y: {ENTRANCE_Y}px · scroll-triggered
@@ -237,7 +238,7 @@ export default function MotionPlaygroundPage() {
 
           {/* StaggerChildren */}
           <div className={styles.demo}>
-            <div className={styles.demoLabel}>Component</div>
+            <Eyebrow as="div" className={styles.demoLabel}>Component</Eyebrow>
             <div className={styles.demoTitle}>StaggerChildren + StaggerItem</div>
             <div className={styles.demoMeta}>
               src/components/StaggerChildren.tsx · stagger: {STAGGER_INTERVAL}s · item duration: {DURATION.slow}s
@@ -270,7 +271,7 @@ export default function MotionPlaygroundPage() {
 
           {/* Link color */}
           <div className={styles.demo}>
-            <div className={styles.demoLabel}>Mixin</div>
+            <Eyebrow as="div" className={styles.demoLabel}>Mixin</Eyebrow>
             <div className={styles.demoTitle}>link-color + link-underline</div>
             <div className={styles.demoMeta}>@include link-color · @include link-underline · duration: fast</div>
             <div className={styles.demoArea}>
@@ -287,7 +288,7 @@ export default function MotionPlaygroundPage() {
 
           {/* Hover-lift */}
           <div className={styles.demo}>
-            <div className={styles.demoLabel}>Mixin</div>
+            <Eyebrow as="div" className={styles.demoLabel}>Mixin</Eyebrow>
             <div className={styles.demoTitle}>hover-lift</div>
             <div className={styles.demoMeta}>@include hover-lift · translateY(-4px) + shadow-lg · duration: moderate</div>
             <div className={styles.demoArea}>
@@ -303,7 +304,7 @@ export default function MotionPlaygroundPage() {
 
           {/* Micro-lift */}
           <div className={styles.demo}>
-            <div className={styles.demoLabel}>Mixin</div>
+            <Eyebrow as="div" className={styles.demoLabel}>Mixin</Eyebrow>
             <div className={styles.demoTitle}>hover-micro-lift</div>
             <div className={styles.demoMeta}>@include hover-micro-lift · translateY(-1px) + opacity · duration: fast</div>
             <div className={styles.demoArea}>
@@ -319,7 +320,7 @@ export default function MotionPlaygroundPage() {
 
           {/* Hover-scale */}
           <div className={styles.demo}>
-            <div className={styles.demoLabel}>Mixin</div>
+            <Eyebrow as="div" className={styles.demoLabel}>Mixin</Eyebrow>
             <div className={styles.demoTitle}>hover-scale</div>
             <div className={styles.demoMeta}>@include hover-scale($scale: 1.02) · duration: slow</div>
             <div className={styles.demoArea}>
@@ -331,7 +332,7 @@ export default function MotionPlaygroundPage() {
 
           {/* Compound card hover */}
           <div className={styles.demo}>
-            <div className={styles.demoLabel}>Mixin</div>
+            <Eyebrow as="div" className={styles.demoLabel}>Mixin</Eyebrow>
             <div className={styles.demoTitle}>compound-card-hover</div>
             <div className={styles.demoMeta}>
               @include compound-card-hover(&apos;.image&apos;, &apos;.title&apos;) · parent hover → child image scales + title recolors
@@ -349,7 +350,7 @@ export default function MotionPlaygroundPage() {
 
           {/* Arrow reveal */}
           <div className={styles.demo}>
-            <div className={styles.demoLabel}>Component</div>
+            <Eyebrow as="div" className={styles.demoLabel}>Component</Eyebrow>
             <div className={styles.demoTitle}>ArrowReveal</div>
             <div className={styles.demoMeta}>
               src/components/ArrowReveal.tsx · xShift: 4px · duration: moderate
@@ -378,7 +379,7 @@ export default function MotionPlaygroundPage() {
 
           {/* Form focus */}
           <div className={styles.demo}>
-            <div className={styles.demoLabel}>Mixin</div>
+            <Eyebrow as="div" className={styles.demoLabel}>Mixin</Eyebrow>
             <div className={styles.demoTitle}>form-field-focus</div>
             <div className={styles.demoMeta}>@include form-field-focus · border-color + box-shadow · duration: fast</div>
             <div className={styles.demoArea}>
@@ -397,7 +398,7 @@ export default function MotionPlaygroundPage() {
 
           {/* ExpandCollapse */}
           <div className={styles.demo}>
-            <div className={styles.demoLabel}>Component</div>
+            <Eyebrow as="div" className={styles.demoLabel}>Component</Eyebrow>
             <div className={styles.demoTitle}>ExpandCollapse</div>
             <div className={styles.demoMeta}>
               src/components/ExpandCollapse.tsx · AnimatePresence + height: auto · duration: slow
@@ -419,7 +420,7 @@ export default function MotionPlaygroundPage() {
 
           {/* Marquee */}
           <div className={styles.demo}>
-            <div className={styles.demoLabel}>Component</div>
+            <Eyebrow as="div" className={styles.demoLabel}>Component</Eyebrow>
             <div className={styles.demoTitle}>Marquee</div>
             <div className={styles.demoMeta}>
               src/components/Marquee.tsx · CSS @keyframes · default: 25s linear infinite · pause on hover
@@ -438,7 +439,7 @@ export default function MotionPlaygroundPage() {
 
           {/* Scroll-driven nav */}
           <div className={styles.demo}>
-            <div className={styles.demoLabel}>Pattern</div>
+            <Eyebrow as="div" className={styles.demoLabel}>Pattern</Eyebrow>
             <div className={styles.demoTitle}>Scroll-Driven Nav Chrome</div>
             <div className={styles.demoMeta}>
               React state (scrollY {">"} threshold) + CSS transition · duration: moderate
@@ -458,7 +459,7 @@ export default function MotionPlaygroundPage() {
           <h2 className={styles.sectionTitle}>5. Global Behaviors</h2>
 
           <div className={styles.demo}>
-            <div className={styles.demoLabel}>Global CSS</div>
+            <Eyebrow as="div" className={styles.demoLabel}>Global CSS</Eyebrow>
             <div className={styles.demoTitle}>scroll-behavior: smooth</div>
             <div className={styles.demoMeta}>src/app/globals.scss · applied to html element</div>
             <div className={styles.demoArea}>
@@ -470,7 +471,7 @@ export default function MotionPlaygroundPage() {
           </div>
 
           <div className={styles.demo}>
-            <div className={styles.demoLabel}>Mixin</div>
+            <Eyebrow as="div" className={styles.demoLabel}>Mixin</Eyebrow>
             <div className={styles.demoTitle}>prefers-reduced-motion</div>
             <div className={styles.demoMeta}>@include reduced-motion · _interactive.scss</div>
             <div className={styles.demoArea}>

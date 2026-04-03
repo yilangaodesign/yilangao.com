@@ -112,7 +112,6 @@
 }
 
 .label {
-  @include label;
   color: $portfolio-accent-40;
   display: block;
   margin-bottom: $portfolio-spacer-2x;

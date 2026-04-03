@@ -11,6 +11,7 @@ import {
   InlineEditBar,
 } from "@/components/inline-edit";
 import type { ApiTarget, FieldDefinition } from "@/components/inline-edit";
+import { Eyebrow } from "@/components/ui/Eyebrow";
 import styles from "./page.module.scss";
 
 type ExperienceEntry = { role: string; company: string; period: string };
@@ -79,7 +80,7 @@ export default function AboutClient({
 
         <FadeIn delay={0.15}>
           <section id="experience" className={styles.section}>
-            <h2 className={styles.sectionLabel}>Experience</h2>
+            <Eyebrow as="h2" className={styles.sectionLabel}>Experience</Eyebrow>
             <EditableArray<ExperienceEntry>
               fieldId="sc:experience"
               target={SITE_CONFIG_TARGET}
@@ -103,7 +104,7 @@ export default function AboutClient({
 
         <FadeIn delay={0.2}>
           <section id="education" className={styles.section}>
-            <h2 className={styles.sectionLabel}>Education</h2>
+            <Eyebrow as="h2" className={styles.sectionLabel}>Education</Eyebrow>
             <EditableArray<EducationEntry>
               fieldId="sc:education"
               target={SITE_CONFIG_TARGET}
