@@ -1,19 +1,96 @@
 @use '../../../styles' as *;
 
+// =============================================================================
+// Kbd — Keyboard Shortcut Chip (Size × Bordered)
+// =============================================================================
+// Size:    xs / sm / md / lg / xl — one type step below the host component's
+//          content font at each size, so Kbd fits inside Input/Button as a
+//          trailing shortcut hint.
+// Bordered: adds a visible border, radius, and reduced opacity.
+//
+// Total bordered height (content + 2*py + 2*1px border) stays at or below
+// the host Input's content line-height at each size.
+// =============================================================================
+
+// ── Component-local line-height tokens ──────────────────────────────────────
+$_kbd-lh-xs: 12px;
+$_kbd-lh-sm: 14px;
+$_kbd-lh-md: 16px;
+$_kbd-lh-lg: 18px;
+$_kbd-lh-xl: 20px;
+
+// =============================================================================
+// BASE — shared properties across all sizes
+// =============================================================================
+
 .kbd {
   display: inline-flex;
   align-items: center;
   font-family: var(--portfolio-font-mono);
-  font-size: $portfolio-type-2xs;
   font-weight: var(--portfolio-weight-medium);
-  line-height: 1;
   color: var(--portfolio-text-secondary);
-  padding: 2px var(--portfolio-spacer-0-5x);
   white-space: nowrap;
 }
 
+// =============================================================================
+// BORDERED — border + reduced opacity
+// =============================================================================
+
 .bordered {
   border: 1px solid var(--portfolio-border-subtle);
-  border-radius: var(--portfolio-radius-xs);
   opacity: 0.6;
+}
+
+// =============================================================================
+// SIZE — xs / sm / md / lg / xl
+// =============================================================================
+
+.xs {
+  font-size: $portfolio-type-2xs;
+  line-height: $_kbd-lh-xs;
+  padding: 1px $portfolio-spacer-0-25x;
+
+  &.bordered {
+    border-radius: var(--portfolio-radius-xs);
+  }
+}
+
+.sm {
+  font-size: $portfolio-type-2xs;
+  line-height: $_kbd-lh-sm;
+  padding: 2px $portfolio-spacer-0-5x;
+
+  &.bordered {
+    border-radius: var(--portfolio-radius-xs);
+  }
+}
+
+.md {
+  font-size: $portfolio-type-xs;
+  line-height: $_kbd-lh-md;
+  padding: 2px $portfolio-spacer-0-5x;
+
+  &.bordered {
+    border-radius: var(--portfolio-radius-sm);
+  }
+}
+
+.lg {
+  font-size: $portfolio-type-sm;
+  line-height: $_kbd-lh-lg;
+  padding: 2px $portfolio-spacer-utility-0-75x;
+
+  &.bordered {
+    border-radius: var(--portfolio-radius-sm);
+  }
+}
+
+.xl {
+  font-size: $portfolio-type-sm;
+  line-height: $_kbd-lh-xl;
+  padding: 2px $portfolio-spacer-utility-0-75x;
+
+  &.bordered {
+    border-radius: var(--portfolio-radius-sm);
+  }
 }

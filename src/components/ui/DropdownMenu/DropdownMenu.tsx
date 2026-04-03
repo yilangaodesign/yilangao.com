@@ -2,6 +2,8 @@
 
 import { forwardRef, type ReactNode } from "react";
 import * as DropdownPrimitive from "@radix-ui/react-dropdown-menu";
+import type { MenuSize, MenuAppearance } from "../Menu/Menu";
+import menuStyles from "../Menu/Menu.module.scss";
 import styles from "./DropdownMenu.module.scss";
 
 export const DropdownMenu = DropdownPrimitive.Root;
@@ -11,7 +13,7 @@ export const DropdownMenuSub = DropdownPrimitive.Sub;
 export const DropdownMenuRadioGroup = DropdownPrimitive.RadioGroup;
 
 // ---------------------------------------------------------------------------
-// Content
+// Content — composes Menu container styles with Radix portal + animation
 // ---------------------------------------------------------------------------
 
 export interface DropdownMenuContentProps {
@@ -19,16 +21,37 @@ export interface DropdownMenuContentProps {
   className?: string;
   align?: "start" | "center" | "end";
   sideOffset?: number;
+  size?: MenuSize;
+  appearance?: MenuAppearance;
 }
 
 export const DropdownMenuContent = forwardRef<HTMLDivElement, DropdownMenuContentProps>(
-  ({ className, align = "end", sideOffset = 4, ...props }, ref) => (
+  (
+    {
+      className,
+      align = "end",
+      sideOffset = 4,
+      size = "sm",
+      appearance = "neutral",
+      ...props
+    },
+    ref,
+  ) => (
     <DropdownPrimitive.Portal>
       <DropdownPrimitive.Content
         ref={ref}
-        className={[styles.content, className].filter(Boolean).join(" ")}
+        className={[
+          menuStyles.menu,
+          menuStyles[size],
+          menuStyles[appearance],
+          styles.animated,
+          className,
+        ]
+          .filter(Boolean)
+          .join(" ")}
         align={align}
         sideOffset={sideOffset}
+        role="menu"
         {...props}
       />
     </DropdownPrimitive.Portal>
@@ -38,7 +61,7 @@ export const DropdownMenuContent = forwardRef<HTMLDivElement, DropdownMenuConten
 DropdownMenuContent.displayName = "DropdownMenuContent";
 
 // ---------------------------------------------------------------------------
-// Item
+// Item — composes Menu item styles with Radix item behavior
 // ---------------------------------------------------------------------------
 
 export interface DropdownMenuItemProps {
@@ -47,18 +70,44 @@ export interface DropdownMenuItemProps {
   destructive?: boolean;
   disabled?: boolean;
   onSelect?: () => void;
+  leading?: ReactNode;
+  trailing?: ReactNode;
 }
 
 export const DropdownMenuItem = forwardRef<HTMLDivElement, DropdownMenuItemProps>(
-  ({ destructive, className, ...props }, ref) => (
-    <DropdownPrimitive.Item
-      ref={ref}
-      className={[styles.item, destructive && styles.destructive, className]
-        .filter(Boolean)
-        .join(" ")}
-      {...props}
-    />
-  ),
+  ({ destructive, leading, trailing, className, children, ...props }, ref) => {
+    const hasSlots = leading != null || trailing != null;
+
+    return (
+      <DropdownPrimitive.Item
+        ref={ref}
+        className={[
+          menuStyles.item,
+          destructive && menuStyles.destructive,
+          className,
+        ]
+          .filter(Boolean)
+          .join(" ")}
+        {...props}
+      >
+        {hasSlots ? (
+          <>
+            {leading && (
+              <span className={menuStyles.leadingSlot} aria-hidden="true">
+                {leading}
+              </span>
+            )}
+            <span className={menuStyles.itemLabel}>{children}</span>
+            {trailing && (
+              <span className={menuStyles.trailingSlot}>{trailing}</span>
+            )}
+          </>
+        ) : (
+          children
+        )}
+      </DropdownPrimitive.Item>
+    );
+  },
 );
 
 DropdownMenuItem.displayName = "DropdownMenuItem";
@@ -73,7 +122,7 @@ export const DropdownMenuLabel = forwardRef<
 >(({ className, ...props }, ref) => (
   <DropdownPrimitive.Label
     ref={ref}
-    className={[styles.label, className].filter(Boolean).join(" ")}
+    className={[menuStyles.label, className].filter(Boolean).join(" ")}
     {...props}
   />
 ));
@@ -81,7 +130,7 @@ export const DropdownMenuLabel = forwardRef<
 DropdownMenuLabel.displayName = "DropdownMenuLabel";
 
 export const DropdownMenuSeparator = () => (
-  <DropdownPrimitive.Separator className={styles.separator} />
+  <DropdownPrimitive.Separator className={menuStyles.separator} />
 );
 
 export function DropdownMenuShortcut({ children }: { children: ReactNode }) {

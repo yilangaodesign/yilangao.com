@@ -1,64 +1,18 @@
 @use '../../../styles' as *;
 
-$_dropdown-min-w: 180px;
+// =============================================================================
+// DropdownMenu — Radix behavioral layer (animation + extras)
+// =============================================================================
+// Structural/visual styles (container, item, label, separator) live in
+// Menu.module.scss. This file only handles portal animation and DropdownMenu-
+// specific extras (shortcut text).
 
-.content {
+.animated {
   z-index: var(--portfolio-z-dropdown);
-  min-width: $_dropdown-min-w;
-  overflow: hidden;
-  background-color: var(--portfolio-surface-primary);
-  border: 1px solid var(--portfolio-border-subtle);
-  border-radius: var(--portfolio-radius-sm);
-  box-shadow: var(--portfolio-shadow-lg);
-  padding: var(--portfolio-spacer-0-5x);
 
   &[data-state='open'] {
-    animation: slideDown var(--portfolio-duration-fast) var(--portfolio-easing-entrance);
+    animation: slideDown $portfolio-duration-fast $portfolio-easing-entrance;
   }
-}
-
-.item {
-  display: flex;
-  align-items: center;
-  gap: var(--portfolio-spacer-1x);
-  padding: var(--portfolio-spacer-1x) var(--portfolio-spacer-1-5x);
-  font-family: var(--portfolio-font-sans);
-  font-size: var(--portfolio-type-sm);
-  line-height: var(--portfolio-leading-normal);
-  color: var(--portfolio-text-primary);
-  border-radius: 2px;
-  cursor: pointer;
-  user-select: none;
-  outline: none;
-
-  &[data-highlighted] {
-    background-color: var(--portfolio-surface-tertiary);
-  }
-
-  &[data-disabled] {
-    color: var(--portfolio-text-disabled);
-    pointer-events: none;
-  }
-}
-
-.destructive {
-  color: var(--portfolio-text-error);
-
-  &[data-highlighted] {
-    background-color: var(--portfolio-surface-negative-subtle);
-  }
-}
-
-.separator {
-  height: 1px;
-  background-color: var(--portfolio-border-subtle);
-  margin: var(--portfolio-spacer-0-5x) calc(-1 * var(--portfolio-spacer-0-5x));
-}
-
-.label {
-  @include label;
-  padding: var(--portfolio-spacer-1x) var(--portfolio-spacer-1-5x);
-  color: var(--portfolio-text-helper);
 }
 
 .shortcut {

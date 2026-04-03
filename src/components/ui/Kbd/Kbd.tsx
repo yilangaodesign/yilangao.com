@@ -1,13 +1,21 @@
 import { forwardRef, type HTMLAttributes } from "react";
 import styles from "./Kbd.module.scss";
 
+export type KbdSize = "xs" | "sm" | "md" | "lg" | "xl";
+
 export interface KbdProps extends HTMLAttributes<HTMLElement> {
+  size?: KbdSize;
   bordered?: boolean;
 }
 
 export const Kbd = forwardRef<HTMLElement, KbdProps>(
-  ({ bordered = false, className, ...props }, ref) => {
-    const cls = [styles.kbd, bordered && styles.bordered, className]
+  ({ size = "xs", bordered = false, className, ...props }, ref) => {
+    const cls = [
+      styles.kbd,
+      styles[size],
+      bordered && styles.bordered,
+      className,
+    ]
       .filter(Boolean)
       .join(" ");
 

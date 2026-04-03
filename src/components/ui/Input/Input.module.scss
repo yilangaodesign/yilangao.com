@@ -1,76 +1,652 @@
 @use '../../../styles' as *;
 
-// Component tokens
-$_input-height: var(--portfolio-spacer-5x); // 40px
+// =============================================================================
+// Input Text — Two-Axis Model (Emphasis × Size)
+// =============================================================================
+// Emphasis: visual border model (regular = full box, minimal = bottom-border)
+// Size:     xs / sm / md / lg / xl — aligned with Button sizing (One GS ref)
+// Status:   none / loading / success / error / warning — border + feedback color
+// State:    enabled, hover, focus-within, disabled, readOnly (pseudo-selectors)
+// =============================================================================
+
+// ── Component icon tokens (icon = label line-height per size) ────────────────
+$_input-icon-xs: 14px;
+$_input-icon-sm: 18px;
+$_input-icon-md: 20px;
+$_input-icon-lg: 22px;
+$_input-icon-xl: var(--portfolio-spacer-3x); // 24px
+
+// =============================================================================
+// WRAPPER — outermost vertical stack (label → input → helper/feedback)
+// =============================================================================
 
 .wrapper {
   display: flex;
   flex-direction: column;
-  gap: var(--portfolio-spacer-0-5x);
+  width: 100%;
 }
+
+// =============================================================================
+// LABEL
+// =============================================================================
 
 .label {
   font-family: var(--portfolio-font-sans);
-  font-size: var(--portfolio-type-sm);
   font-weight: var(--portfolio-weight-medium);
-  line-height: var(--portfolio-leading-normal);
-  color: var(--portfolio-text-primary);
+  color: var(--portfolio-text-neutral-bold);
+}
+
+// =============================================================================
+// INPUT CONTAINER — the bordered/underlined box holding all inner slots
+// =============================================================================
+
+.inputContainer {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  transition:
+    border-color $portfolio-duration-fast $portfolio-easing-standard,
+    background-color $portfolio-duration-fast $portfolio-easing-standard;
+  --_border-offset: 0px;
+}
+
+// =============================================================================
+// NATIVE INPUT
+// =============================================================================
+
+.inputArea {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .input {
   width: 100%;
-  height: $_input-height;
-  padding: 0 var(--portfolio-spacer-1-5x);
-  font-family: var(--portfolio-font-sans);
-  font-size: var(--portfolio-type-sm);
-  line-height: var(--portfolio-leading-normal);
-  color: var(--portfolio-text-primary);
-  background-color: var(--portfolio-surface-primary);
-  border: 1px solid var(--portfolio-border-subtle);
-  border-radius: var(--portfolio-radius-sm);
-  @include transition-fast;
+  background: transparent;
+  border: none;
+  outline: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: var(--portfolio-text-neutral-bold);
 
   &::placeholder {
-    color: var(--portfolio-text-placeholder);
-  }
-
-  &:hover:not(:disabled) {
-    border-color: var(--portfolio-border-strong);
-  }
-
-  &:focus {
-    outline: none;
-    border-color: var(--portfolio-focus);
-    box-shadow: 0 0 0 1px var(--portfolio-focus);
+    color: var(--portfolio-text-neutral-minimal);
   }
 
   &:disabled {
-    background-color: var(--portfolio-surface-tertiary);
-    border-color: var(--portfolio-border-disabled);
-    color: var(--portfolio-text-disabled);
     cursor: not-allowed;
   }
 }
 
-.error .input {
-  border-color: var(--portfolio-border-negative);
+// =============================================================================
+// DESCRIPTION — secondary text below the value, inside the input container
+// =============================================================================
 
-  &:focus {
-    border-color: var(--portfolio-border-negative);
-    box-shadow: 0 0 0 1px var(--portfolio-border-negative);
+.description {
+  font-family: var(--portfolio-font-sans);
+  color: var(--portfolio-text-neutral-subtle);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// =============================================================================
+// ICON WRAP — direct sizing (icon = label line-height)
+// =============================================================================
+
+.iconWrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--portfolio-icon-neutral-bold);
+
+  svg {
+    width: 100%;
+    height: 100%;
   }
 }
 
-.helperText {
+// =============================================================================
+// AFFIX — prefix/suffix text
+// =============================================================================
+
+.affix {
   font-family: var(--portfolio-font-sans);
-  font-size: var(--portfolio-type-xs);
-  line-height: var(--portfolio-leading-normal);
-  color: var(--portfolio-text-helper);
+  color: var(--portfolio-text-neutral-regular);
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
-.errorText {
+// =============================================================================
+// TRAILING SLOT — generic container for arbitrary trailing content (Kbd, badges)
+// =============================================================================
+// Unlike .iconWrap (which forces icon dimensions), this slot lets children
+// determine their own size. Vertical centering via the parent's align-items.
+
+.trailingSlot {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  pointer-events: auto;
+}
+
+// =============================================================================
+// CLEAR BUTTON
+// =============================================================================
+
+.clearButton {
+  @include button-reset;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--portfolio-icon-neutral-bold);
+  border-radius: var(--portfolio-radius-full);
+  @include transition-fast;
+
+  &:hover {
+    color: var(--portfolio-text-neutral-bold);
+    background-color: var(--portfolio-overlay-black-06);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+
+  svg {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+// =============================================================================
+// STATUS ICON — auto-injected based on status prop
+// =============================================================================
+
+.statusIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.statusIcon-error {
+  color: var(--portfolio-icon-negative);
+}
+
+.statusIcon-success {
+  color: var(--portfolio-icon-positive);
+}
+
+.statusIcon-warning {
+  color: var(--portfolio-icon-warning);
+}
+
+.statusIcon-loading {
+  border: 2px solid var(--portfolio-border-neutral-subtle);
+  border-top-color: var(--portfolio-icon-neutral-bold);
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+// =============================================================================
+// HELPER TEXT & FEEDBACK TEXT
+// =============================================================================
+
+.helperText {
   font-family: var(--portfolio-font-sans);
-  font-size: var(--portfolio-type-xs);
-  line-height: var(--portfolio-leading-normal);
-  color: var(--portfolio-text-error);
+  color: var(--portfolio-text-neutral-subtle);
+}
+
+.feedbackText {
+  font-family: var(--portfolio-font-sans);
+}
+
+// =============================================================================
+// EMPHASIS: REGULAR (bordered box)
+// =============================================================================
+
+.regular {
+  .inputContainer {
+    background-color: var(--portfolio-surface-neutral-minimal);
+    border: 1px solid var(--portfolio-border-neutral-subtle);
+    border-radius: var(--portfolio-radius-sm);
+
+    &:hover:not(.disabled):not(.readOnly) {
+      border-color: var(--portfolio-border-neutral-bold);
+    }
+
+    &:focus-within:not(.disabled) {
+      border-width: 2px;
+      border-color: var(--portfolio-border-neutral-bold);
+      --_border-offset: 1px;
+    }
+  }
+
+  .inputContainer.disabled {
+    background-color: var(--portfolio-surface-neutral-regular);
+    border-color: var(--portfolio-border-neutral-disabled);
+    color: var(--portfolio-text-neutral-disabled);
+
+    .input {
+      color: var(--portfolio-text-neutral-disabled);
+
+      &::placeholder {
+        color: var(--portfolio-text-neutral-disabled);
+      }
+    }
+
+    .affix,
+    .iconWrap {
+      color: var(--portfolio-icon-neutral-disabled);
+    }
+  }
+
+  .inputContainer.readOnly {
+    background-color: var(--portfolio-surface-neutral-subtle);
+    border-color: transparent;
+  }
+}
+
+// =============================================================================
+// EMPHASIS: MINIMAL (bottom-border underline)
+// =============================================================================
+
+.minimal {
+  .inputContainer {
+    background-color: transparent;
+    border: none;
+    border-bottom: 1px solid var(--portfolio-border-neutral-subtle);
+    border-radius: 0;
+
+    &:hover:not(.disabled):not(.readOnly) {
+      border-bottom-color: var(--portfolio-border-neutral-bold);
+    }
+
+    &:focus-within:not(.disabled) {
+      border-bottom-width: 2px;
+      border-bottom-color: var(--portfolio-border-neutral-bold);
+      padding-bottom: calc(var(--_ic-py) - 1px);
+    }
+  }
+
+  .inputContainer.disabled {
+    border-bottom-color: var(--portfolio-border-neutral-disabled);
+    color: var(--portfolio-text-neutral-disabled);
+
+    .input {
+      color: var(--portfolio-text-neutral-disabled);
+
+      &::placeholder {
+        color: var(--portfolio-text-neutral-disabled);
+      }
+    }
+
+    .affix,
+    .iconWrap {
+      color: var(--portfolio-icon-neutral-disabled);
+    }
+  }
+
+  .inputContainer.readOnly {
+    border-bottom-color: transparent;
+  }
+}
+
+// =============================================================================
+// SIZE — xs / sm / md / lg / xl
+// =============================================================================
+// Follows Button sizing principles: icon = line-height, padding-derived height,
+// gap-based icon-label spacing, py < px.
+// =============================================================================
+
+.xs {
+  .label {
+    font-size: var(--portfolio-type-xs);
+    line-height: $_input-icon-xs;
+    margin-bottom: $portfolio-spacer-utility-0-5x;
+  }
+
+  .inputContainer {
+    --_ic-py: #{$portfolio-spacer-utility-0-5x};
+    --_ic-px: #{$portfolio-spacer-utility-1x};
+    padding: calc(var(--_ic-py) - var(--_border-offset)) calc(var(--_ic-px) - var(--_border-offset));
+    font-size: var(--portfolio-type-xs);
+    line-height: $_input-icon-xs;
+    gap: $portfolio-spacer-utility-0-5x;
+  }
+
+  .iconWrap,
+  .clearButton {
+    width: $_input-icon-xs;
+    height: $_input-icon-xs;
+  }
+
+  .statusIcon {
+    width: $_input-icon-xs;
+    height: $_input-icon-xs;
+  }
+
+  .description {
+    font-size: var(--portfolio-type-2xs);
+    line-height: 14px;
+  }
+
+  .helperText,
+  .feedbackText {
+    font-size: var(--portfolio-type-2xs);
+    line-height: 14px;
+    margin-top: $portfolio-spacer-utility-0-5x;
+  }
+
+  &.minimal .inputContainer {
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
+
+.sm {
+  .label {
+    font-size: var(--portfolio-type-xs);
+    line-height: $_input-icon-sm;
+    margin-bottom: $portfolio-spacer-utility-0-5x;
+  }
+
+  .inputContainer {
+    --_ic-py: #{$portfolio-spacer-utility-0-875x};
+    --_ic-px: #{$portfolio-spacer-utility-1-25x};
+    padding: calc(var(--_ic-py) - var(--_border-offset)) calc(var(--_ic-px) - var(--_border-offset));
+    font-size: var(--portfolio-type-sm);
+    line-height: $_input-icon-sm;
+    gap: $portfolio-spacer-utility-0-75x;
+  }
+
+  .iconWrap,
+  .clearButton {
+    width: $_input-icon-sm;
+    height: $_input-icon-sm;
+  }
+
+  .statusIcon {
+    width: $_input-icon-sm;
+    height: $_input-icon-sm;
+  }
+
+  .description {
+    font-size: var(--portfolio-type-xs);
+    line-height: $_input-icon-xs;
+  }
+
+  .helperText,
+  .feedbackText {
+    font-size: var(--portfolio-type-xs);
+    line-height: $_input-icon-xs;
+    margin-top: $portfolio-spacer-utility-0-5x;
+  }
+
+  &.minimal .inputContainer {
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
+
+.md {
+  .label {
+    font-size: var(--portfolio-type-sm);
+    line-height: $_input-icon-md;
+    margin-bottom: $portfolio-spacer-utility-0-5x;
+  }
+
+  .inputContainer {
+    --_ic-py: #{$portfolio-spacer-utility-1-25x};
+    --_ic-px: #{$portfolio-spacer-utility-1-5x};
+    padding: calc(var(--_ic-py) - var(--_border-offset)) calc(var(--_ic-px) - var(--_border-offset));
+    font-size: var(--portfolio-type-base);
+    line-height: $_input-icon-md;
+    gap: $portfolio-spacer-utility-1x;
+  }
+
+  .iconWrap,
+  .clearButton {
+    width: $_input-icon-md;
+    height: $_input-icon-md;
+  }
+
+  .statusIcon {
+    width: $_input-icon-md;
+    height: $_input-icon-md;
+  }
+
+  .description {
+    font-size: var(--portfolio-type-xs);
+    line-height: $_input-icon-xs;
+  }
+
+  .helperText,
+  .feedbackText {
+    font-size: var(--portfolio-type-xs);
+    line-height: $_input-icon-xs;
+    margin-top: $portfolio-spacer-utility-0-5x;
+  }
+
+  &.minimal .inputContainer {
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
+
+.lg {
+  .label {
+    font-size: var(--portfolio-type-sm);
+    line-height: $_input-icon-lg;
+    margin-bottom: $portfolio-spacer-utility-1x;
+  }
+
+  .inputContainer {
+    --_ic-py: #{$portfolio-spacer-utility-1-5x};
+    --_ic-px: #{$portfolio-spacer-utility-2x};
+    padding: calc(var(--_ic-py) - var(--_border-offset)) calc(var(--_ic-px) - var(--_border-offset));
+    font-size: var(--portfolio-type-lg);
+    line-height: $_input-icon-lg;
+    gap: $portfolio-spacer-utility-1-5x;
+  }
+
+  .iconWrap,
+  .clearButton {
+    width: $_input-icon-lg;
+    height: $_input-icon-lg;
+  }
+
+  .statusIcon {
+    width: $_input-icon-lg;
+    height: $_input-icon-lg;
+  }
+
+  .description {
+    font-size: var(--portfolio-type-sm);
+    line-height: $_input-icon-sm;
+  }
+
+  .helperText,
+  .feedbackText {
+    font-size: var(--portfolio-type-sm);
+    line-height: $_input-icon-sm;
+    margin-top: $portfolio-spacer-utility-1x;
+  }
+
+  &.minimal .inputContainer {
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
+
+.xl {
+  .label {
+    font-size: var(--portfolio-type-base);
+    line-height: $_input-icon-xl;
+    margin-bottom: $portfolio-spacer-utility-1x;
+  }
+
+  .inputContainer {
+    --_ic-py: #{$portfolio-spacer-utility-2x};
+    --_ic-px: #{$portfolio-spacer-utility-2-5x};
+    padding: calc(var(--_ic-py) - var(--_border-offset)) calc(var(--_ic-px) - var(--_border-offset));
+    font-size: var(--portfolio-type-lg);
+    line-height: $_input-icon-xl;
+    gap: $portfolio-spacer-utility-2x;
+  }
+
+  .iconWrap,
+  .clearButton {
+    width: $_input-icon-xl;
+    height: $_input-icon-xl;
+  }
+
+  .statusIcon {
+    width: $_input-icon-xl;
+    height: $_input-icon-xl;
+  }
+
+  .description {
+    font-size: var(--portfolio-type-sm);
+    line-height: $_input-icon-sm;
+  }
+
+  .helperText,
+  .feedbackText {
+    font-size: var(--portfolio-type-base);
+    line-height: $_input-icon-md;
+    margin-top: $portfolio-spacer-utility-1x;
+  }
+
+  &.minimal .inputContainer {
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
+
+// =============================================================================
+// STATUS — border + feedback color overrides
+// =============================================================================
+
+.error {
+  &.regular .inputContainer {
+    border-color: var(--portfolio-border-negative);
+
+    &:focus-within {
+      border-color: var(--portfolio-border-negative);
+    }
+  }
+
+  &.minimal .inputContainer {
+    border-bottom-color: var(--portfolio-border-negative);
+
+    &:focus-within {
+      border-bottom-color: var(--portfolio-border-negative);
+    }
+  }
+
+  .feedbackText {
+    color: var(--portfolio-text-negative);
+  }
+}
+
+.success {
+  &.regular .inputContainer {
+    border-color: var(--portfolio-border-positive);
+
+    &:focus-within {
+      border-color: var(--portfolio-border-positive);
+    }
+  }
+
+  &.minimal .inputContainer {
+    border-bottom-color: var(--portfolio-border-positive);
+
+    &:focus-within {
+      border-bottom-color: var(--portfolio-border-positive);
+    }
+  }
+
+  .feedbackText {
+    color: var(--portfolio-text-positive);
+  }
+}
+
+.warning {
+  &.regular .inputContainer {
+    border-color: var(--portfolio-border-warning);
+
+    &:focus-within {
+      border-color: var(--portfolio-border-warning);
+    }
+  }
+
+  &.minimal .inputContainer {
+    border-bottom-color: var(--portfolio-border-warning);
+
+    &:focus-within {
+      border-bottom-color: var(--portfolio-border-warning);
+    }
+  }
+
+  .feedbackText {
+    color: var(--portfolio-text-warning);
+  }
+}
+
+.brand {
+  &.regular .inputContainer {
+    border-color: var(--portfolio-border-brand-bold);
+
+    &:focus-within {
+      border-color: var(--portfolio-border-brand-bold);
+    }
+  }
+
+  &.minimal .inputContainer {
+    border-bottom-color: var(--portfolio-border-brand-bold);
+
+    &:focus-within {
+      border-bottom-color: var(--portfolio-border-brand-bold);
+    }
+  }
+
+  .feedbackText {
+    color: var(--portfolio-text-brand-bold);
+  }
+}
+
+.loading {
+  &.regular .inputContainer {
+    border-color: var(--portfolio-border-neutral-subtle);
+  }
+
+  &.minimal .inputContainer {
+    border-bottom-color: var(--portfolio-border-neutral-subtle);
+  }
+
+  .feedbackText {
+    color: var(--portfolio-text-neutral-subtle);
+  }
+}
+
+// =============================================================================
+// DARK MODE
+// =============================================================================
+
+:global([data-theme="dark"]),
+:global(.dark) {
+  .statusIcon-loading {
+    border-color: var(--portfolio-border-neutral-subtle);
+    border-top-color: var(--portfolio-icon-neutral-bold);
+  }
 }

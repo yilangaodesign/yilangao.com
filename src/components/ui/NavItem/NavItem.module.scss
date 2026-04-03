@@ -35,7 +35,11 @@ $_nav-height-touch: 44px;
 
   &:hover:not(.disabled) {
     background-color: var(--portfolio-surface-neutral-subtle);
-    color: var(--portfolio-text-primary);
+    color: var(--portfolio-text-neutral-max);
+
+    .icon {
+      color: var(--portfolio-icon-neutral-max);
+    }
   }
 
   &:focus-visible {
@@ -45,8 +49,12 @@ $_nav-height-touch: 44px;
 
 .active {
   background-color: var(--portfolio-surface-neutral-regular);
-  color: var(--portfolio-text-primary);
+  color: var(--portfolio-text-neutral-max);
   font-weight: var(--portfolio-weight-medium);
+
+  .icon {
+    color: var(--portfolio-icon-neutral-max);
+  }
 
   &:hover:not(.disabled) {
     background-color: var(--portfolio-surface-neutral-regular);
@@ -63,8 +71,12 @@ $_nav-height-touch: 44px;
 }
 
 .expanded {
-  color: var(--portfolio-text-primary);
+  color: var(--portfolio-text-neutral-max);
   font-weight: var(--portfolio-weight-medium);
+
+  .icon {
+    color: var(--portfolio-icon-neutral-max);
+  }
 }
 
 .disabled {
