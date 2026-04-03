@@ -4,6 +4,22 @@ All notable changes to the Élan design system are documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.4.1] — 2026-04-03
+
+Patch release: accent dark-half chroma optimization, rich text paragraph break fix, debug logging cleanup.
+
+### Fixed
+
+- **Accent tokens**: optimized chroma values for steps 70–100 to improve perceptual uniformity (max/min distance ratio 1.48x → 1.33x)
+- **Inline edit**: rich text paragraph breaks now preserved across save cycles via `htmlContent` prop (ENG-105)
+- **Inline edit**: removed 6 debug `fetch()` logging blocks left from investigation session
+
+### Documentation
+
+- FB-097: accent scale dark-half uniformity analysis and resolution
+- ENG-105: paragraph breaks lost in inline edit after save
+- EAP-065: new anti-pattern — `EditableText isRichText` without `htmlContent` prop
+
 ## [2.4.0] — 2026-04-03
 
 Minor release: new site-level components, SCSS module migration for playground, expanded color tokens, and UI component refinements.
