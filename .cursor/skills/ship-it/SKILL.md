@@ -244,7 +244,7 @@ user with the final summary.
 
 > Accumulated lessons from past ship-it runs. Scan before each release.
 > Escalation: 3+ occurrences → promote to procedure change or guardrail.
-> Last updated: 2026-04-02 (4 pitfalls from REL-001)
+> Last updated: 2026-04-03 (5 pitfalls from REL-001, REL-004)
 
 ### REL-AP-001: Version sync targets left uncommitted before branch switch
 
@@ -313,3 +313,21 @@ expected pattern.
 **Fix:** Templates now use `add/remove` for Layer 3. All templates are
 starting points — adapt verb and description to match actual change
 semantics.
+
+### REL-AP-005: Dead utility file with missing dependency passes classification
+
+**Occurrences:** 1 (REL-004)
+
+**Trigger:** `src/lib/utils.ts` (standard shadcn `cn` utility) was added
+as a new file importing `tailwind-merge`, which was never installed and
+never imported by any other file. Phase 1 classified it as Layer 5 and
+committed it without verifying imports or dependencies.
+
+**Failure:** Main site build gate failed with `Cannot find module
+'tailwind-merge'`. Required a fix commit to remove the dead file before
+merge.
+
+**Fix:** During Phase 1, for any new `src/lib/*.ts` file, verify:
+1. It is imported by at least one other file (`grep -r` for the export)
+2. All its imports resolve (check `package.json` for third-party deps)
+If either check fails, flag the file as dead code and exclude from commit.

@@ -4,7 +4,29 @@
 >
 > **Who reads this:** AI agents when the `ship-it` skill is activated — scan recent entries for recurring pitfalls before starting a new release.
 > **Who writes this:** AI agents after each ship-it run via the Post-Release Audit protocol in `ship-it/SKILL.md`.
-> **Last updated:** 2026-04-03 (REL-003: Élan 2.3.0, ASCII Art Studio 0.3.0)
+> **Last updated:** 2026-04-03 (REL-004: Élan 2.4.0, ASCII Art Studio 0.4.0)
+
+---
+
+## REL-004 — Élan 2.4.0, ASCII Art Studio 0.4.0 (2026-04-03)
+
+**Scope:** 55 files across 7 layer commits + release commit + 1 fix commit
+**Semver:** Minor — new site-level components (Footer, Navigation, Marquee, animations, theme), expanded color tokens, playground SCSS module migration
+**Previous release:** Élan 2.3.0, ASCII Art Studio 0.3.0
+
+**Incidents during release:**
+
+1. **Build gate caught missing dependency** (new pitfall → REL-AP-005)
+   `src/lib/utils.ts` (standard shadcn `cn` utility) imported `tailwind-merge` which was not installed. The file was also not imported by any other file (dead code). Removed the file; main site build passed on retry.
+
+2. **Git push timeout** (transient, not a pitfall)
+   First two `git push` attempts failed with `mmap failed: Operation timed out`. Fixed by increasing `http.postBuffer` and `pack.windowMemory` git config. Third attempt succeeded.
+
+**Layer classification notes:**
+- `src/lib/utils.ts` was classified as Layer 5 (new lib) and grouped with Layer 7 (site components). It turned out to be dead code — future classification should verify imports for new utility files before including them.
+- All 17 macOS duplicate junk files (`* 2.*` pattern + `src/styles 2/` directory) cleaned in Phase 2.
+
+**Outcome:** All 3 builds passed after fix commit. Fast-forward merge to main. Playground deployed Ready in 55s. Main site responding 200 at `https://new.yilangao.com`.
 
 ---
 
