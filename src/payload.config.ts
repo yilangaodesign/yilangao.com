@@ -12,6 +12,7 @@ import { Projects } from './collections/Projects.ts'
 import { Books } from './collections/Books.ts'
 import { Testimonials } from './collections/Testimonials.ts'
 import { Experiments } from './collections/Experiments.ts'
+import { Companies } from './collections/Companies.ts'
 import { SiteConfig } from './globals/SiteConfig.ts'
 
 const filename = fileURLToPath(import.meta.url)
@@ -35,7 +36,12 @@ export default buildConfig({
       beforeLogin: ['@/components/admin/EnableAutocomplete'],
       beforeDashboard: ['@/components/admin/DashboardPages'],
       beforeNavLinks: ['@/components/admin/NavPages'],
-      afterNavLinks: ['@/components/admin/ViewSiteLink'],
+      views: {
+        companiesDashboard: {
+          Component: '@/components/admin/CompanyDashboard',
+          path: '/companies-dashboard',
+        },
+      },
     },
     importMap: {
       baseDir: path.resolve(dirname),
@@ -69,7 +75,7 @@ export default buildConfig({
     },
   },
   editor: lexicalEditor(),
-  collections: [Users, Media, Projects, Books, Testimonials, Experiments],
+  collections: [Users, Media, Projects, Books, Testimonials, Experiments, Companies],
   globals: [SiteConfig],
   secret: process.env.PAYLOAD_SECRET || 'CHANGE-ME-IN-PRODUCTION',
   db: postgresAdapter({

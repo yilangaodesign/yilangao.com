@@ -6,16 +6,7 @@ import {
   createSignedValue,
   getSessionCookieConfig,
 } from "@/lib/company-session";
-import companiesData from "@/config/companies.json";
-
-type CompanyConfig = {
-  name: string;
-  password: string;
-  theme: { accent: string; greeting: string };
-  caseStudyNotes: Record<string, string>;
-};
-
-const companies = companiesData as Record<string, CompanyConfig>;
+import { getCompanyBySlug, incrementLoginAnalytics } from "@/lib/company-data";
 
 const SITE_PASSWORD = process.env.SITE_PASSWORD || "preview-2026";
 
@@ -23,7 +14,11 @@ export async function validatePassword(
   company: string,
   password: string,
 ): Promise<{ success: boolean; error?: string }> {
-  const config = companies[company];
+  const config = await getCompanyBySlug(company);
+
+  if (config && !config.active) {
+    return { success: false, error: "Access is no longer available" };
+  }
 
   const storedPassword = config?.password ?? SITE_PASSWORD;
   const isValid = comparePasswords(password, storedPassword);
@@ -38,6 +33,10 @@ export async function validatePassword(
 
   const cookieStore = await cookies();
   cookieStore.set(cookieConfig);
+
+  if (config) {
+    await incrementLoginAnalytics(config.id);
+  }
 
   return { success: true };
 }
