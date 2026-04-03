@@ -4,6 +4,58 @@ All notable changes to the Élan design system are documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.0] — 2026-04-03
+
+Minor release: new UI components, company password gate, expanded design tokens, ASCII Art Studio engines, and playground pages.
+
+### Added
+
+- **Eyebrow component**: typographic label for section headers and metadata
+- **Menu component**: dropdown navigation with SCSS module styling
+- **TextRow component**: key-value display row for structured content
+- **Company password gate**: CMS collection, admin dashboard, seed script, and `/for/[company]` route updates
+- **Color tokens**: expanded palette and updated custom properties
+- **ASCII Art Studio**: dot-grid engine, image-filter engine, expanded control panel and preset gallery
+- **Playground pages**: Eyebrow, Menu, TextRow component pages; updated Input, Kbd, Button, and color token pages
+- **Boot-up skill**: new agent skill for dev server management
+
+### Changed
+
+- **Input component**: major SCSS and API expansion (+650 SCSS lines, +150 TSX lines)
+- **DropdownMenu**: updated styles and component logic
+- **Kbd component**: expanded styles and API
+- **NavItem**: updated SCSS module
+- **Admin navigation**: refactored NavPages, updated DashboardPages, added CompanyDashboard
+- **Elan-visuals**: updated ComponentShowcase, InteractionShowcase, TokenGrid styles
+- **Frontend pages**: updated HomeClient, motion page, project pages; consolidated CMS admin groups to "Content"
+- **Playground**: refactored sidebar, tokens lib, updated existing component pages
+- **ASCII Art Studio**: refactored use-ascii-renderer hook, updated halftone and word-fill engines
+- **Sync pipeline**: expanded sync-tokens script
+- **Agent guardrails**: updated password gate skill, AGENTS.md configuration
+- **Documentation**: expanded design/engineering feedback logs, anti-patterns, architecture, and design docs
+
+### Removed
+
+- **ViewSiteLink**: removed admin component (replaced by updated NavPages)
+
+---
+
+## ASCII Art Studio [0.3.0] — 2026-04-03
+
+### Added
+
+- **Dot-grid engine**: new rendering mode for dot-matrix style output
+- **Image-filter engine**: pre-processing filters for input images
+- **Expanded preset gallery**: more presets and improved UI
+
+### Changed
+
+- **Control panel**: major UI expansion with new rendering options
+- **ASCII map engine**: updated character mapping
+- **Renderer hook**: refactored core rendering pipeline
+
+---
+
 ## [2.1.0] — 2026-04-02
 
 Minor release: new components, expanded token system, legacy cleanup, and playground improvements.
