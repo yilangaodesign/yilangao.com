@@ -9,6 +9,7 @@
     "lint": "eslint",
     "sync-tokens": "node scripts/sync-tokens.mjs",
     "seed": "PAYLOAD_CONFIG_PATH=src/payload.config.ts npx tsx src/scripts/seed.ts",
+    "seed:companies": "PAYLOAD_CONFIG_PATH=src/payload.config.ts npx tsx src/scripts/seed-companies.ts",
     "playground": "npm run dev --prefix playground",
     "ascii-tool": "npm run dev --prefix ascii-tool",
     "audit-docs": "node scripts/audit-docs.mjs",
