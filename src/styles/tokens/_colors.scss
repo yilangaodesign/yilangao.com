@@ -27,6 +27,7 @@
 // Construction: OKLCH(L, C, 269.7°)
 //   Lightness — two-segment even ramp: ΔL ≈ 0.093 (10–60), ΔL ≈ 0.081 (60–100)
 //   Chroma — sine bell peaking at step 60 (C = 0.281), tapering to extremes
+//           Dark half (70–100) optimized for even perceptual distance (max/min 1.33x)
 //   Hue — constant 269.7° across all steps (no hue discontinuity)
 //
 // Carbon uses Blue 60 (#0F62FE) as its primary interactive color; we
@@ -38,10 +39,10 @@ $portfolio-accent-30: #9BB4FF;   // oklch(0.78, 0.111, 269.7)
 $portfolio-accent-40: #7392FF;   // oklch(0.69, 0.164, 269.7)
 $portfolio-accent-50: #4E6CFF;   // oklch(0.59, 0.220, 269.7)
 $portfolio-accent-60: #3336FF;   // oklch(0.50, 0.281, 269.7) — brand anchor
-$portfolio-accent-70: #2715D8;   // oklch(0.42, 0.262, 269.7)
-$portfolio-accent-80: #1A0EA1;   // oklch(0.34, 0.210, 269.7)
-$portfolio-accent-90: #0F1461;   // oklch(0.26, 0.132, 269.7)
-$portfolio-accent-100: #0A0F22;  // oklch(0.17, 0.040, 269.7)
+$portfolio-accent-70: #261BD5;   // oklch(0.42, 0.257, 269.7)
+$portfolio-accent-80: #1A169C;   // oklch(0.34, 0.200, 269.7)
+$portfolio-accent-90: #0F1560;   // oklch(0.26, 0.129, 269.7)
+$portfolio-accent-100: #070D29;  // oklch(0.17, 0.058, 269.7)
 
 
 // -----------------------------------------------------------------------------
