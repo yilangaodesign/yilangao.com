@@ -243,9 +243,7 @@
   }
 }
 
-.namingSectionTitle {
-  @include label-sm;
-}
+.namingSectionTitle {}
 
 .namingSectionDesc {
   font-family: var(--portfolio-font-sans);
@@ -349,9 +347,7 @@
   gap: var(--portfolio-spacer-0-5x);
 }
 
-.namingDimensionTitle {
-  @include label-sm;
-}
+.namingDimensionTitle {}
 
 .namingDimensionDesc {
   font-family: var(--portfolio-font-sans);
@@ -688,7 +684,6 @@
 }
 
 .componentCategory {
-  @include label-sm;
   color: var(--portfolio-text-brand-bold);
 }
 
@@ -1298,7 +1293,6 @@
 }
 
 .beforeAfterLabel {
-  @include label;
   padding-bottom: var(--portfolio-spacer-1x);
   border-bottom: 1px solid var(--portfolio-border-subtle);
 }

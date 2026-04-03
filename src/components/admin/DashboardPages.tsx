@@ -6,7 +6,14 @@ import styles from './DashboardPages.module.scss'
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:4000'
 
-const PAGES = [
+type PageEntry = {
+  label: string
+  description: string
+  liveUrl: string | null
+  adminUrl: string
+}
+
+const PAGES: PageEntry[] = [
   {
     label: 'Home',
     description: 'Sidebar identity, bio, experience, links',
@@ -15,7 +22,7 @@ const PAGES = [
   },
   {
     label: 'Work',
-    description: 'Case study cards and project list',
+    description: 'Case studies and project cards',
     liveUrl: `${SITE_URL}/`,
     adminUrl: '/admin/collections/projects',
   },
@@ -43,6 +50,12 @@ const PAGES = [
     liveUrl: `${SITE_URL}/contact`,
     adminUrl: '/admin/collections/testimonials',
   },
+  {
+    label: 'Company Access',
+    description: 'Manage password-gated company logins',
+    liveUrl: null,
+    adminUrl: '/admin/companies-dashboard',
+  },
 ]
 
 export default function DashboardPages() {
@@ -61,11 +74,21 @@ export default function DashboardPages() {
             className={styles.card}
             role="button"
             tabIndex={0}
-            onClick={() => window.open(page.liveUrl, '_blank', 'noopener')}
+            onClick={() => {
+              if (page.liveUrl) {
+                window.open(page.liveUrl, '_blank', 'noopener')
+              } else {
+                window.location.href = page.adminUrl
+              }
+            }}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault()
-                window.open(page.liveUrl, '_blank', 'noopener')
+                if (page.liveUrl) {
+                  window.open(page.liveUrl, '_blank', 'noopener')
+                } else {
+                  window.location.href = page.adminUrl
+                }
               }
             }}
           >

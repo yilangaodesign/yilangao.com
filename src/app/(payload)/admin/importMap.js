@@ -21,11 +21,11 @@ import { StrikethroughFeatureClient as StrikethroughFeatureClient_e70f5e05f09f93
 import { UnderlineFeatureClient as UnderlineFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { BoldFeatureClient as BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
-import { default as default_4825072285f9364e3016113bb30951e2 } from '@/components/admin/ViewSiteLink'
 import { default as default_30e87e494fdc7fd19a05d61829f365ca } from '@/components/admin/DashboardPages'
 import { default as default_15b6366422bdfee72c8edab9dc53bbcb } from '@/components/admin/EnableAutocomplete'
 import { default as default_8c7af6c4d56e92f49d4e3acf0b4def92 } from '@/components/admin/NavPages'
 import { S3ClientUploadHandler as S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24 } from '@payloadcms/storage-s3/client'
+import { default as default_90866ca6b23e7c3b3e928cee15690698 } from '@/components/admin/CompanyDashboard'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
 export const importMap = {
@@ -52,10 +52,10 @@ export const importMap = {
   "@payloadcms/richtext-lexical/client#UnderlineFeatureClient": UnderlineFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#BoldFeatureClient": BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#ItalicFeatureClient": ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
-  "@/components/admin/ViewSiteLink#default": default_4825072285f9364e3016113bb30951e2,
   "@/components/admin/DashboardPages#default": default_30e87e494fdc7fd19a05d61829f365ca,
   "@/components/admin/EnableAutocomplete#default": default_15b6366422bdfee72c8edab9dc53bbcb,
   "@/components/admin/NavPages#default": default_8c7af6c4d56e92f49d4e3acf0b4def92,
   "@payloadcms/storage-s3/client#S3ClientUploadHandler": S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24,
+  "@/components/admin/CompanyDashboard#default": default_90866ca6b23e7c3b3e928cee15690698,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
 }

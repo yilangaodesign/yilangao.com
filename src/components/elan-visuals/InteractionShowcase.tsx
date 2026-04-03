@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/Tabs";
+import { Eyebrow } from "@/components/ui/Eyebrow";
 import styles from "./elan-visuals.module.scss";
 
 type Tab = "deadZone" | "closestElement" | "transformConflict" | "pairedChannels";
@@ -115,7 +116,7 @@ function DeadZoneDiagram() {
   return (
     <div className={styles.beforeAfterGrid}>
       <div className={styles.beforeAfterCard}>
-        <div className={styles.beforeAfterLabel}>Before</div>
+        <Eyebrow as="div" className={styles.beforeAfterLabel}>Before</Eyebrow>
         <div
           ref={beforeAreaRef}
           className={styles.deadZoneContent}
@@ -151,7 +152,7 @@ function DeadZoneDiagram() {
       </div>
 
       <div className={styles.beforeAfterCard}>
-        <div className={styles.beforeAfterLabel}>After</div>
+        <Eyebrow as="div" className={styles.beforeAfterLabel}>After</Eyebrow>
         <div className={styles.deadZoneContent}>
           <div
             ref={afterRailRef}
@@ -234,7 +235,7 @@ function ClosestElementDiagram() {
   return (
     <div className={styles.beforeAfterGrid}>
       <div className={styles.beforeAfterCard}>
-        <div className={styles.beforeAfterLabel}>Before</div>
+        <Eyebrow as="div" className={styles.beforeAfterLabel}>Before</Eyebrow>
         <div ref={linearRef} className={styles.closestElementArea} onMouseMove={handleLinearMove}>
           <div className={styles.closestPointerLine} style={{ top: `${pointerY}%` }} />
           {itemPositions.map((pos, i) => (
@@ -257,7 +258,7 @@ function ClosestElementDiagram() {
       </div>
 
       <div className={styles.beforeAfterCard}>
-        <div className={styles.beforeAfterLabel}>After</div>
+        <Eyebrow as="div" className={styles.beforeAfterLabel}>After</Eyebrow>
         <div ref={closestRef} className={styles.closestElementArea} onMouseMove={handleClosestMove}>
           <div className={styles.closestPointerLine} style={{ top: `${pointerY}%` }} />
           {itemPositions.map((pos, i) => (
@@ -288,7 +289,7 @@ function TransformConflictDiagram() {
   return (
     <div className={styles.beforeAfterGrid}>
       <div className={styles.beforeAfterCard}>
-        <div className={styles.beforeAfterLabel}>Before</div>
+        <Eyebrow as="div" className={styles.beforeAfterLabel}>Before</Eyebrow>
         <div className={styles.transformDemo}>
           <div className={styles.transformTick} />
           <div
@@ -308,7 +309,7 @@ function TransformConflictDiagram() {
       </div>
 
       <div className={styles.beforeAfterCard}>
-        <div className={styles.beforeAfterLabel}>After</div>
+        <Eyebrow as="div" className={styles.beforeAfterLabel}>After</Eyebrow>
         <div className={styles.transformDemo}>
           <div className={styles.transformTick} />
           <div className={styles.transformLabelFlex}>Section</div>
@@ -343,7 +344,7 @@ function PairedChannelsDiagram() {
   return (
     <div className={styles.beforeAfterGrid}>
       <div className={styles.beforeAfterCard}>
-        <div className={styles.beforeAfterLabel}>Before</div>
+        <Eyebrow as="div" className={styles.beforeAfterLabel}>Before</Eyebrow>
         <div className={styles.pairedRail}>
           {sections.map((s, i) => (
             <div key={i} className={styles.pairedRow} onMouseEnter={() => setActiveIndex(i)}>
@@ -359,7 +360,7 @@ function PairedChannelsDiagram() {
       </div>
 
       <div className={styles.beforeAfterCard}>
-        <div className={styles.beforeAfterLabel}>After</div>
+        <Eyebrow as="div" className={styles.beforeAfterLabel}>After</Eyebrow>
         <div className={styles.pairedRail}>
           {sections.map((s, i) => (
             <div

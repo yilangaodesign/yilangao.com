@@ -3,6 +3,7 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/Tabs";
+import { Eyebrow } from "@/components/ui/Eyebrow";
 import styles from "./elan-visuals.module.scss";
 
 /* ── Palette data ───────────────────────────────────────────────────────── */
@@ -317,7 +318,7 @@ export default function TokenGrid() {
           <div className={styles.namingColumn}>
             {/* ── Interactive Token Builder ── */}
             <div className={styles.namingSection}>
-              <span className={styles.namingSectionTitle}>Naming Formula</span>
+              <Eyebrow size="sm" className={styles.namingSectionTitle}>Naming Formula</Eyebrow>
               <p className={styles.namingSectionDesc}>
                 Pick a color swatch to begin — the role auto-fills and available dimensions filter to valid combinations.
               </p>
@@ -394,7 +395,7 @@ export default function TokenGrid() {
 
               <div className={styles.namingDimensions}>
                 <div className={styles.namingDimension}>
-                  <span className={styles.namingDimensionTitle}>Property</span>
+                  <Eyebrow size="sm" className={styles.namingDimensionTitle}>Property</Eyebrow>
                   <p className={styles.namingDimensionDesc}>What element type the color applies to</p>
                   <div className={styles.namingPills}>
                     {DIMENSIONS.properties.map((p) => {
@@ -414,7 +415,7 @@ export default function TokenGrid() {
                   </div>
                 </div>
                 <div className={styles.namingDimension}>
-                  <span className={styles.namingDimensionTitle}>Emphasis</span>
+                  <Eyebrow size="sm" className={styles.namingDimensionTitle}>Emphasis</Eyebrow>
                   <p className={styles.namingDimensionDesc}>Prominence level within its group</p>
                   <div className={styles.namingPills}>
                     {DIMENSIONS.emphases.map((e) => {
@@ -438,7 +439,7 @@ export default function TokenGrid() {
 
             {/* ── Rationale ── */}
             <div className={styles.namingSection}>
-              <span className={styles.namingSectionTitle}>Why Semantic Naming</span>
+              <Eyebrow size="sm" className={styles.namingSectionTitle}>Why Semantic Naming</Eyebrow>
               <div className={styles.rationaleComparisons}>
                 {RATIONALE.comparisons.map((c) => (
                   <div key={c.system} className={styles.rationaleComparison}>

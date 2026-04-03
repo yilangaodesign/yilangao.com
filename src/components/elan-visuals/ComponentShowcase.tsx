@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { FadeIn } from "@/components/ui/FadeIn";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/Tabs";
+import { Eyebrow } from "@/components/ui/Eyebrow";
 import styles from "./elan-visuals.module.scss";
 
 const COMPONENTS = [
@@ -43,7 +44,7 @@ export default function ComponentShowcase() {
             <div className={styles.componentCard}>
               <div className={styles.componentCardHeader}>
                 <span className={styles.componentName}>{comp.name}</span>
-                <span className={styles.componentCategory}>{comp.category}</span>
+                <Eyebrow size="sm" className={styles.componentCategory}>{comp.category}</Eyebrow>
               </div>
               <span className={styles.componentDesc}>{comp.desc}</span>
             </div>
