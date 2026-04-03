@@ -1,0 +1,251 @@
+@use '../../../styles' as *;
+
+// =============================================================================
+// TextRow — Composed Inline Text Primitive (Size × Emphasis)
+// =============================================================================
+// A horizontal row of text parts with optional slots. Use for standalone
+// metadata annotations, key-value pairs, card metadata, and composed text
+// lines outside interactive or form components.
+//
+// Size:     xxs / xs / sm / md / lg / xl — maps 1:1 to the shared type scale
+// Emphasis: subtle (regular/400) / bold (medium/500)
+//
+// Slot layout:
+//   [leadingContent] [primaryText] [infoTooltip] [secondaryText] … [trailingSecondaryText] [trailingContent]
+//   └────────────── hStack (flex: 1, gap: 0.5x) ──────────────┘   └──── outer (gap: 1x) ────────────────┘
+//
+// NOT a replacement for:
+//   - Eyebrow / section headings (uppercase, tracked — use <Eyebrow> component)
+//   - Form field labels (coupled to Input/Checkbox/Select size systems)
+//   - Nav/menu item text (state-dependent color/weight transitions)
+// =============================================================================
+
+// ── Component-local icon tokens (icon = primary line-height per size) ────────
+$_icon-xxs: 12px;
+$_icon-xs: 16px;
+$_icon-sm: 18px;
+$_icon-md: 20px;
+$_icon-lg: 22px;
+$_icon-xl: 24px;
+
+// =============================================================================
+// BASE — outer flex row
+// =============================================================================
+
+.textRow {
+  display: inline-flex;
+  align-items: center;
+  gap: $portfolio-spacer-utility-1x;
+  font-family: var(--portfolio-font-sans);
+  color: var(--portfolio-text-neutral-bold);
+}
+
+// =============================================================================
+// HSTACK — inner flex group (leading + primary + info + secondary)
+// =============================================================================
+
+.hStack {
+  display: inline-flex;
+  align-items: center;
+  gap: $portfolio-spacer-utility-0-5x;
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+// =============================================================================
+// PRIMARY TEXT
+// =============================================================================
+
+.primaryText {
+  white-space: nowrap;
+}
+
+// =============================================================================
+// SECONDARY TEXT — one step smaller, subtle color
+// =============================================================================
+
+.secondaryText {
+  color: var(--portfolio-text-neutral-subtle);
+  white-space: nowrap;
+}
+
+// =============================================================================
+// TRAILING SECONDARY TEXT
+// =============================================================================
+
+.trailingSecondaryText {
+  color: var(--portfolio-text-neutral-subtle);
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+// =============================================================================
+// SLOT — leading/trailing content wrappers
+// =============================================================================
+
+.slot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--portfolio-icon-neutral-bold);
+
+  svg {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+// =============================================================================
+// INFO SLOT — inline tooltip icon wrapper
+// =============================================================================
+
+.infoSlot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--portfolio-icon-neutral-bold);
+}
+
+// =============================================================================
+// SIZE — xxs / xs / sm / md / lg / xl
+// =============================================================================
+
+.xxs {
+  font-size: var(--portfolio-type-2xs);
+  line-height: $_icon-xxs;
+
+  .secondaryText,
+  .trailingSecondaryText {
+    font-size: var(--portfolio-type-2xs);
+    line-height: $_icon-xxs;
+  }
+
+  .slot {
+    width: $_icon-xxs;
+    height: $_icon-xxs;
+  }
+
+  .infoSlot {
+    width: $_icon-xxs;
+    height: $_icon-xxs;
+  }
+}
+
+.xs {
+  font-size: var(--portfolio-type-xs);
+  line-height: $_icon-xs;
+
+  .secondaryText,
+  .trailingSecondaryText {
+    font-size: var(--portfolio-type-2xs);
+    line-height: $_icon-xxs;
+  }
+
+  .slot {
+    width: $_icon-xs;
+    height: $_icon-xs;
+  }
+
+  .infoSlot {
+    width: $_icon-xs;
+    height: $_icon-xs;
+  }
+}
+
+.sm {
+  font-size: var(--portfolio-type-sm);
+  line-height: $_icon-sm;
+
+  .secondaryText,
+  .trailingSecondaryText {
+    font-size: var(--portfolio-type-2xs);
+    line-height: $_icon-xxs;
+  }
+
+  .slot {
+    width: $_icon-sm;
+    height: $_icon-sm;
+  }
+
+  .infoSlot {
+    width: $_icon-sm;
+    height: $_icon-sm;
+  }
+}
+
+.md {
+  font-size: var(--portfolio-type-base);
+  line-height: $_icon-md;
+
+  .secondaryText,
+  .trailingSecondaryText {
+    font-size: var(--portfolio-type-xs);
+    line-height: $_icon-xs;
+  }
+
+  .slot {
+    width: $_icon-md;
+    height: $_icon-md;
+  }
+
+  .infoSlot {
+    width: $_icon-md;
+    height: $_icon-md;
+  }
+}
+
+.lg {
+  font-size: var(--portfolio-type-lg);
+  line-height: $_icon-lg;
+
+  .secondaryText,
+  .trailingSecondaryText {
+    font-size: var(--portfolio-type-xs);
+    line-height: $_icon-xs;
+  }
+
+  .slot {
+    width: $_icon-lg;
+    height: $_icon-lg;
+  }
+
+  .infoSlot {
+    width: $_icon-lg;
+    height: $_icon-lg;
+  }
+}
+
+.xl {
+  font-size: var(--portfolio-type-xl);
+  line-height: $_icon-xl;
+
+  .secondaryText,
+  .trailingSecondaryText {
+    font-size: var(--portfolio-type-xs);
+    line-height: $_icon-xs;
+  }
+
+  .slot {
+    width: $_icon-xl;
+    height: $_icon-xl;
+  }
+
+  .infoSlot {
+    width: $_icon-xl;
+    height: $_icon-xl;
+  }
+}
+
+// =============================================================================
+// EMPHASIS — subtle (regular weight) / bold (medium weight)
+// =============================================================================
+
+.subtle {
+  font-weight: var(--portfolio-weight-regular);
+}
+
+.bold {
+  font-weight: var(--portfolio-weight-medium);
+}

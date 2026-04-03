@@ -1,0 +1,415 @@
+@use '../../../styles' as *;
+
+// =============================================================================
+// Menu — Standalone Visual Primitive (Zero Radix Dependency)
+// =============================================================================
+// Container + item styles for actionable item lists. Composed by DropdownMenu
+// (Radix behavioral layer) and usable standalone (sidebar lists, selection panels).
+//
+// Axes:
+//   Size:       xs | sm | md | lg | xl  (aligned with Button spatial scale)
+//   Appearance: neutral | inverse | always-dark | always-light
+//
+// Icon sizes mirror Button's $_btn-icon-* at each step.
+// =============================================================================
+
+// ── Component tokens ─────────────────────────────────────────────────────────
+
+$_icon-xs: 16px;
+$_icon-sm: 18px;
+$_icon-md: 20px;
+$_icon-lg: 22px;
+$_icon-xl: 24px;
+
+// =============================================================================
+// MENU CONTAINER
+// =============================================================================
+
+.menu {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: var(--portfolio-surface-primary);
+  border: $portfolio-border-width-thin solid var(--portfolio-border-subtle);
+  border-radius: var(--portfolio-radius-sm);
+  box-shadow: var(--portfolio-shadow-lg);
+  padding-block: $portfolio-spacer-utility-0-5x;
+  padding-inline: $portfolio-spacer-utility-0-5x;
+}
+
+// =============================================================================
+// SIZES — container-level padding + font-size context
+// =============================================================================
+// Size classes set CSS custom properties consumed by .item and .slot children.
+
+.xs {
+  --_menu-icon: #{$_icon-xs};
+  --_menu-gap: #{$portfolio-spacer-utility-0-5x};
+
+  .item {
+    min-height: var(--portfolio-spacer-3x);
+    padding: $portfolio-spacer-utility-0-5x $portfolio-spacer-utility-0-75x;
+    font-size: var(--portfolio-type-xs);
+    line-height: $_icon-xs;
+    gap: $portfolio-spacer-utility-0-5x;
+  }
+
+  .label {
+    padding: $portfolio-spacer-utility-0-5x $portfolio-spacer-utility-0-75x;
+  }
+
+  .header,
+  .footer {
+    padding-block: $portfolio-spacer-utility-0-5x;
+  }
+}
+
+.sm {
+  --_menu-icon: #{$_icon-sm};
+  --_menu-gap: #{$portfolio-spacer-utility-0-75x};
+
+  .item {
+    min-height: var(--portfolio-spacer-4x);
+    padding: $portfolio-spacer-utility-0-875x $portfolio-spacer-utility-1x;
+    font-size: var(--portfolio-type-sm);
+    line-height: $_icon-sm;
+    gap: $portfolio-spacer-utility-0-75x;
+  }
+
+  .label {
+    padding: $portfolio-spacer-utility-0-875x $portfolio-spacer-utility-1x;
+  }
+
+  .header,
+  .footer {
+    padding-block: $portfolio-spacer-utility-0-5x;
+  }
+}
+
+.md {
+  --_menu-icon: #{$_icon-md};
+  --_menu-gap: #{$portfolio-spacer-utility-1x};
+
+  .item {
+    min-height: var(--portfolio-spacer-5x);
+    padding: $portfolio-spacer-utility-1-25x $portfolio-spacer-utility-1-5x;
+    font-size: var(--portfolio-type-base);
+    line-height: $_icon-md;
+    gap: $portfolio-spacer-utility-1x;
+  }
+
+  .label {
+    padding: $portfolio-spacer-utility-1-25x $portfolio-spacer-utility-1-5x;
+  }
+
+  .header,
+  .footer {
+    padding-block: $portfolio-spacer-utility-0-5x;
+  }
+}
+
+.lg {
+  --_menu-icon: #{$_icon-lg};
+  --_menu-gap: #{$portfolio-spacer-utility-1-25x};
+
+  .item {
+    min-height: var(--portfolio-spacer-6x);
+    padding: $portfolio-spacer-utility-1-625x $portfolio-spacer-utility-2x;
+    font-size: var(--portfolio-type-lg);
+    line-height: $_icon-lg;
+    gap: $portfolio-spacer-utility-1-25x;
+  }
+
+  .label {
+    padding: $portfolio-spacer-utility-1-625x $portfolio-spacer-utility-2x;
+  }
+
+  .header,
+  .footer {
+    padding-block: $portfolio-spacer-utility-0-75x;
+  }
+}
+
+.xl {
+  --_menu-icon: #{$_icon-xl};
+  --_menu-gap: #{$portfolio-spacer-utility-1-25x};
+
+  .item {
+    min-height: var(--portfolio-spacer-7x);
+    padding: $portfolio-spacer-utility-2x $portfolio-spacer-utility-2-5x;
+    font-size: var(--portfolio-type-lg);
+    line-height: $_icon-xl;
+    gap: $portfolio-spacer-utility-1-25x;
+  }
+
+  .label {
+    padding: $portfolio-spacer-utility-2x $portfolio-spacer-utility-2-5x;
+  }
+
+  .header,
+  .footer {
+    padding-block: $portfolio-spacer-utility-1x;
+  }
+}
+
+// =============================================================================
+// APPEARANCE — container surface + text color
+// =============================================================================
+
+.neutral {
+  background-color: var(--portfolio-surface-primary);
+  border-color: var(--portfolio-border-subtle);
+  color: var(--portfolio-text-primary);
+
+  .item {
+    color: var(--portfolio-text-primary);
+
+    &:hover:not([disabled]):not([aria-disabled='true']),
+    &[data-highlighted] {
+      background-color: var(--portfolio-surface-neutral-subtle);
+      color: var(--portfolio-text-neutral-max);
+
+      .leadingSlot {
+        color: var(--portfolio-icon-neutral-max);
+      }
+    }
+
+    &:active:not([disabled]):not([aria-disabled='true']) {
+      background-color: var(--portfolio-surface-neutral-regular);
+      color: var(--portfolio-text-neutral-max);
+
+      .leadingSlot {
+        color: var(--portfolio-icon-neutral-max);
+      }
+    }
+  }
+
+  .label {
+    color: var(--portfolio-text-helper);
+  }
+
+  .separator {
+    background-color: var(--portfolio-border-subtle);
+  }
+}
+
+.inverse {
+  background-color: var(--portfolio-surface-inverse-bold);
+  border-color: var(--portfolio-border-inverse);
+  color: var(--portfolio-text-inverse-bold);
+
+  .item {
+    color: var(--portfolio-text-inverse-bold);
+
+    &:hover:not([disabled]):not([aria-disabled='true']),
+    &[data-highlighted] {
+      background-color: $portfolio-overlay-white-08;
+    }
+
+    &:active:not([disabled]):not([aria-disabled='true']) {
+      background-color: $portfolio-overlay-white-16;
+    }
+  }
+
+  .label {
+    color: var(--portfolio-text-inverse-subtle);
+  }
+
+  .separator {
+    background-color: var(--portfolio-border-inverse);
+  }
+}
+
+.always-dark {
+  background-color: var(--portfolio-action-always-dark);
+  border-color: var(--portfolio-border-always-dark);
+  color: var(--portfolio-text-always-light-bold);
+
+  .item {
+    color: var(--portfolio-text-always-light-bold);
+
+    &:hover:not([disabled]):not([aria-disabled='true']),
+    &[data-highlighted] {
+      background-color: $portfolio-overlay-white-08;
+    }
+
+    &:active:not([disabled]):not([aria-disabled='true']) {
+      background-color: $portfolio-overlay-white-14;
+    }
+  }
+
+  .label {
+    color: var(--portfolio-text-always-light-subtle);
+  }
+
+  .separator {
+    background-color: $portfolio-overlay-white-12;
+  }
+}
+
+.always-light {
+  background-color: var(--portfolio-action-always-light);
+  border-color: var(--portfolio-border-always-light);
+  color: var(--portfolio-text-always-dark-bold);
+
+  .item {
+    color: var(--portfolio-text-always-dark-bold);
+
+    &:hover:not([disabled]):not([aria-disabled='true']),
+    &[data-highlighted] {
+      background-color: $portfolio-overlay-black-04;
+      color: #000000;
+
+      .leadingSlot {
+        color: #000000;
+      }
+    }
+
+    &:active:not([disabled]):not([aria-disabled='true']) {
+      background-color: $portfolio-overlay-black-08;
+      color: #000000;
+
+      .leadingSlot {
+        color: #000000;
+      }
+    }
+  }
+
+  .label {
+    color: var(--portfolio-text-always-dark-subtle);
+  }
+
+  .separator {
+    background-color: $portfolio-overlay-black-10;
+  }
+}
+
+// =============================================================================
+// MENU ITEM — actionable row (button or link)
+// =============================================================================
+
+.item {
+  @include button-reset;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  font-family: var(--portfolio-font-sans);
+  font-weight: var(--portfolio-weight-regular);
+  text-decoration: none;
+  user-select: none;
+  cursor: pointer;
+  border-radius: $portfolio-radius-xs;
+  outline: none;
+  @include transition-fast;
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+
+  &[disabled],
+  &[aria-disabled='true'] {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+}
+
+.active {
+  background-color: var(--portfolio-surface-neutral-regular);
+  font-weight: var(--portfolio-weight-medium);
+
+  &:hover:not([disabled]):not([aria-disabled='true']) {
+    background-color: var(--portfolio-surface-neutral-regular);
+  }
+}
+
+.destructive {
+  color: var(--portfolio-text-negative);
+
+  &:hover:not([disabled]):not([aria-disabled='true']),
+  &[data-highlighted] {
+    background-color: var(--portfolio-surface-negative-subtle);
+  }
+
+  &:active:not([disabled]):not([aria-disabled='true']) {
+    background-color: $portfolio-red-20;
+  }
+}
+
+// =============================================================================
+// LEADING / TRAILING SLOTS
+// =============================================================================
+
+.leadingSlot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: var(--_menu-icon, $_icon-md);
+  height: var(--_menu-icon, $_icon-md);
+
+  svg {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.trailingSlot {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  margin-inline-start: auto;
+  color: var(--portfolio-text-tertiary);
+}
+
+.itemLabel {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// =============================================================================
+// MENU LABEL — non-interactive group heading
+// =============================================================================
+
+.label {
+  @include label;
+  user-select: none;
+}
+
+// =============================================================================
+// MENU SEPARATOR — visual divider
+// =============================================================================
+
+.separator {
+  height: 1px;
+  margin-block: $portfolio-spacer-utility-0-5x;
+  margin-inline: calc(-1 * $portfolio-spacer-utility-0-5x);
+}
+
+// =============================================================================
+// MENU HEADER / FOOTER — sticky slot areas
+// =============================================================================
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--_menu-gap, $portfolio-spacer-utility-1x);
+  border-bottom: $portfolio-border-width-thin solid var(--portfolio-border-subtle);
+  margin-bottom: $portfolio-spacer-utility-0-5x;
+  margin-inline: calc(-1 * $portfolio-spacer-utility-0-5x);
+  padding-inline: $portfolio-spacer-utility-0-5x;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  gap: var(--_menu-gap, $portfolio-spacer-utility-1x);
+  border-top: $portfolio-border-width-thin solid var(--portfolio-border-subtle);
+  margin-top: $portfolio-spacer-utility-0-5x;
+  margin-inline: calc(-1 * $portfolio-spacer-utility-0-5x);
+  padding-inline: $portfolio-spacer-utility-0-5x;
+}

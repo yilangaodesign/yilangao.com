@@ -1,0 +1,62 @@
+@use '../../../styles' as *;
+
+// =============================================================================
+// Eyebrow — Uppercase Tracked Text Primitive (Size × Emphasis × Font)
+// =============================================================================
+// Small uppercase text for section headings, group labels, and metric
+// annotations. Codifies the @include label / label-sm mixin pattern.
+//
+// Size:     sm (10px / 2xs) / md (12px / xs)
+// Emphasis: subtle (regular/400, wider tracking) / bold (medium/500, wide tracking)
+// Font:     sans (default) / mono via `metric` prop (opt-in for stat/data labels)
+//
+// Color defaults to --portfolio-text-secondary. Parent components override
+// via className when needed (e.g. Menu uses --portfolio-text-helper).
+// =============================================================================
+
+// =============================================================================
+// BASE
+// =============================================================================
+
+.eyebrow {
+  display: inline-block;
+  font-family: var(--portfolio-font-sans);
+  text-transform: uppercase;
+  color: var(--portfolio-text-secondary);
+}
+
+// =============================================================================
+// SIZE — sm / md
+// =============================================================================
+
+.sm {
+  font-size: $portfolio-type-2xs;
+  line-height: $portfolio-leading-compact;
+}
+
+.md {
+  font-size: $portfolio-type-xs;
+  line-height: $portfolio-leading-normal;
+}
+
+// =============================================================================
+// EMPHASIS — subtle (regular, wider tracking) / bold (medium, wide tracking)
+// =============================================================================
+
+.subtle {
+  font-weight: $portfolio-weight-regular;
+  letter-spacing: $portfolio-tracking-wider;
+}
+
+.bold {
+  font-weight: $portfolio-weight-medium;
+  letter-spacing: $portfolio-tracking-wide;
+}
+
+// =============================================================================
+// CONTEXT — metric (labels above stats/KPIs use monospace for scanability)
+// =============================================================================
+
+.metric {
+  font-family: var(--portfolio-font-mono);
+}

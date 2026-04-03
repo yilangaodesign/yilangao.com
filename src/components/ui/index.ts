@@ -30,6 +30,22 @@ export type {
   BadgeOverlayPlacement,
 } from "./BadgeOverlay";
 
+export { TextRow } from "./TextRow";
+export type {
+  TextRowProps,
+  TextRowSize,
+  TextRowEmphasis,
+  TextRowElement,
+} from "./TextRow";
+
+export { Eyebrow } from "./Eyebrow";
+export type {
+  EyebrowProps,
+  EyebrowSize,
+  EyebrowEmphasis,
+  EyebrowElement,
+} from "./Eyebrow";
+
 export { Divider } from "./Divider";
 export type { DividerProps, DividerOrientation } from "./Divider";
 
@@ -57,6 +73,24 @@ export type {
 
 export { Toggle } from "./Toggle";
 export type { ToggleProps } from "./Toggle";
+
+export {
+  Menu,
+  MenuItem,
+  MenuLabel,
+  MenuSeparator,
+  MenuHeader,
+  MenuFooter,
+} from "./Menu";
+export type {
+  MenuSize,
+  MenuAppearance,
+  MenuProps,
+  MenuItemProps,
+  MenuLabelProps,
+  MenuHeaderProps,
+  MenuFooterProps,
+} from "./Menu";
 
 // Tier 3 — Overlay & Disclosure
 export { Tooltip } from "./Tooltip";
@@ -171,7 +205,7 @@ export {
 export type { CommandMenuProps, CommandInputProps, CommandGroupProps, CommandItemProps } from "./CommandMenu";
 
 export { Kbd } from "./Kbd";
-export type { KbdProps } from "./Kbd";
+export type { KbdProps, KbdSize } from "./Kbd";
 
 export { DescriptionList, DescriptionItem } from "./DescriptionList";
 export type { DescriptionListProps, DescriptionItemProps } from "./DescriptionList";

@@ -1155,6 +1155,57 @@
       "origin": { "type": "custom" },
       "tags": ["ui", "navigation", "sidebar", "vertical-nav", "collapsible", "compound"],
       "hasPreview": true
+    },
+    {
+      "id": "shared-ui-text-row",
+      "name": "TextRow",
+      "type": "Component",
+      "experiment": "shared",
+      "status": "active",
+      "description": "Composed inline text primitive — a horizontal row of text parts with optional leading/trailing slots, secondary text, and tooltip triggers. Use for standalone metadata annotations, key-value pairs, and card metadata. Not a replacement for eyebrow/section headings, form field labels, or nav/menu item text. Polymorphic rendering via `as` prop. Inspired by One GS Label.",
+      "sourcePath": "src/components/ui/TextRow/TextRow.tsx",
+      "createdAt": "2026-04-03T00:00:00Z",
+      "createdBy": "cursor",
+      "origin": {
+        "type": "hybrid",
+        "library": "One GS Design System",
+        "url": "https://www.figma.com/design/MoZ2aLe1MQK88V57lnMxUf/-One-GS--Components?node-id=6-167872"
+      },
+      "tags": ["ui", "text-row", "text", "metadata", "polymorphic", "primitive"],
+      "hasPreview": true
+    },
+    {
+      "id": "shared-ui-eyebrow",
+      "name": "Eyebrow",
+      "type": "Component",
+      "experiment": "shared",
+      "status": "active",
+      "description": "Uppercase tracked text primitive for section headings, group labels, and metric annotations. Codifies the @include label / label-sm mixin pattern. Two sizes (sm/md), two emphases (subtle/bold). Not for form labels, nav item text, or body annotations. Polymorphic via `as` prop.",
+      "sourcePath": "src/components/ui/Eyebrow/Eyebrow.tsx",
+      "createdAt": "2026-04-03T00:00:00Z",
+      "createdBy": "cursor",
+      "origin": {
+        "type": "custom",
+        "library": "Internal — codifies existing @include label mixin"
+      },
+      "tags": ["ui", "eyebrow", "text", "uppercase", "section-heading", "primitive"],
+      "hasPreview": true
+    },
+    {
+      "id": "shared-ui-menu",
+      "name": "Menu",
+      "type": "Component",
+      "experiment": "shared",
+      "status": "active",
+      "description": "Standalone visual primitive for actionable item lists. Provides Menu container (size × appearance), MenuItem (button/link with leading/trailing slots), MenuLabel, MenuSeparator, MenuHeader, and MenuFooter. Zero Radix dependency — composable with DropdownMenu for popup behavior or usable standalone. Inspired by One GS Menu, adapted to Élan tokens.",
+      "sourcePath": "src/components/ui/Menu/Menu.tsx",
+      "createdAt": "2026-04-02T12:00:00Z",
+      "createdBy": "cursor",
+      "origin": {
+        "type": "custom"
+      },
+      "tags": ["ui", "menu", "list", "action-list", "navigation", "selection"],
+      "hasPreview": true
     }
   ]
 }
