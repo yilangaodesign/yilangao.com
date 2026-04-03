@@ -28,7 +28,7 @@ const scale = (prefix: string, values: Record<string, string>): ColorStep[] =>
 
 export const colors = {
   accent: scale("accent", {
-    "10": "#EFF3FF", "20": "#C5D4FF", "30": "#9BB4FF", "40": "#7392FF", "50": "#4E6CFF", "60": "#3336FF", "70": "#2715D8", "80": "#1A0EA1", "90": "#0F1461", "100": "#0A0F22",
+    "10": "#EFF3FF", "20": "#C5D4FF", "30": "#9BB4FF", "40": "#7392FF", "50": "#4E6CFF", "60": "#3336FF", "70": "#261BD5", "80": "#1A169C", "90": "#0F1560", "100": "#070D29",
   }),
   neutral: scale("neutral", {
     "00": "#FFFFFF", "05": "#F9F9F9", "10": "#F4F4F4", "20": "#E0E0E0", "30": "#C6C6C6", "40": "#A8A8A8", "50": "#8D8D8D", "60": "#6F6F6F", "70": "#525252", "80": "#393939", "90": "#262626", "100": "#161616",
@@ -106,7 +106,7 @@ export const colors = {
           role: "brand",
           tokens: [
             { emphasis: "bold", value: "#3336FF", token: "$portfolio-surface-brand-bold", ref: "$portfolio-accent-60", darkValue: "#4E6CFF" },
-            { emphasis: "subtle", value: "#EFF3FF", token: "$portfolio-surface-brand-subtle", ref: "$portfolio-accent-10", darkValue: "#0A0F22" },
+            { emphasis: "subtle", value: "#EFF3FF", token: "$portfolio-surface-brand-subtle", ref: "$portfolio-accent-10", darkValue: "#070D29" },
           ],
         },
         {
@@ -334,10 +334,10 @@ export const colors = {
           role: "brand",
           tokens: [
             { emphasis: "bold", value: "#3336FF", token: "$portfolio-action-brand-bold", ref: "$portfolio-accent-60", darkValue: "#4E6CFF" },
-            { emphasis: "subtle", value: "#C5D4FF", token: "$portfolio-action-brand-subtle", ref: "$portfolio-accent-20", darkValue: "#0F1461" },
-            { emphasis: "bold-hover", value: "#2715D8", token: "$portfolio-action-brand-bold-hover", ref: "$portfolio-accent-70", darkValue: "#7392FF" },
-            { emphasis: "bold-pressed", value: "#1A0EA1", token: "$portfolio-action-brand-bold-pressed", ref: "$portfolio-accent-80", darkValue: "#9BB4FF" },
-            { emphasis: "bold-disabled", value: "#9BB4FF", token: "$portfolio-action-brand-bold-disabled", ref: "$portfolio-accent-30", darkValue: "#1A0EA1" },
+            { emphasis: "subtle", value: "#C5D4FF", token: "$portfolio-action-brand-subtle", ref: "$portfolio-accent-20", darkValue: "#0F1560" },
+            { emphasis: "bold-hover", value: "#261BD5", token: "$portfolio-action-brand-bold-hover", ref: "$portfolio-accent-70", darkValue: "#7392FF" },
+            { emphasis: "bold-pressed", value: "#1A169C", token: "$portfolio-action-brand-bold-pressed", ref: "$portfolio-accent-80", darkValue: "#9BB4FF" },
+            { emphasis: "bold-disabled", value: "#9BB4FF", token: "$portfolio-action-brand-bold-disabled", ref: "$portfolio-accent-30", darkValue: "#1A169C" },
           ],
         },
         {
@@ -391,7 +391,7 @@ export const colors = {
   interaction: [
     { name: "Focus", value: "#3336FF", token: "$portfolio-focus", ref: "$portfolio-accent-60", darkValue: "#4E6CFF" },
     { name: "Focus Inset", value: "#FFFFFF", token: "$portfolio-focus-inset", ref: "$portfolio-neutral-00", darkValue: "#161616" },
-    { name: "Highlight", value: "#C5D4FF", token: "$portfolio-highlight", ref: "$portfolio-accent-20", darkValue: "#0F1461" },
+    { name: "Highlight", value: "#C5D4FF", token: "$portfolio-highlight", ref: "$portfolio-accent-20", darkValue: "#0F1560" },
   ] as SemanticToken[],
 };
 // @sync-tokens:end
