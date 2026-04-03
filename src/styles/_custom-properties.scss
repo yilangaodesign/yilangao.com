@@ -65,6 +65,7 @@
   --portfolio-overlay-black-40: #{$portfolio-overlay-black-40};
 
   // ── Text ─────────────────────────────────────────────────────────────────
+  --portfolio-text-neutral-max: #{$portfolio-text-neutral-max};
   --portfolio-text-neutral-bold: #{$portfolio-text-neutral-bold};
   --portfolio-text-neutral-regular: #{$portfolio-text-neutral-regular};
   --portfolio-text-neutral-subtle: #{$portfolio-text-neutral-subtle};
@@ -79,6 +80,7 @@
   --portfolio-text-warning: #{$portfolio-text-warning};
 
   // ── Icon ─────────────────────────────────────────────────────────────────
+  --portfolio-icon-neutral-max: #{$portfolio-icon-neutral-max};
   --portfolio-icon-neutral-bold: #{$portfolio-icon-neutral-bold};
   --portfolio-icon-neutral-regular: #{$portfolio-icon-neutral-regular};
   --portfolio-icon-neutral-subtle: #{$portfolio-icon-neutral-subtle};
@@ -94,7 +96,9 @@
 
   // ── Border ───────────────────────────────────────────────────────────────
   --portfolio-border-neutral-bold: #{$portfolio-border-neutral-bold};
+  --portfolio-border-neutral-regular: #{$portfolio-border-neutral-regular};
   --portfolio-border-neutral-subtle: #{$portfolio-border-neutral-subtle};
+  --portfolio-border-neutral-minimal: #{$portfolio-border-neutral-minimal};
   --portfolio-border-neutral-disabled: #{$portfolio-border-neutral-disabled};
   --portfolio-border-brand-bold: #{$portfolio-border-brand-bold};
   --portfolio-border-inverse-bold: #{$portfolio-border-inverse-bold};
@@ -357,6 +361,7 @@
   --portfolio-overlay-black-40: #{$portfolio-overlay-black-40};
 
   // ── Text ─────────────────────────────────────────────────────────────────
+  --portfolio-text-neutral-max: #FFFFFF;
   --portfolio-text-neutral-bold: #{$portfolio-neutral-00};
   --portfolio-text-neutral-regular: #{$portfolio-neutral-30};
   --portfolio-text-neutral-subtle: #{$portfolio-neutral-40};
@@ -369,6 +374,7 @@
   --portfolio-text-warning: #{$portfolio-yellow-40};
 
   // ── Icon ─────────────────────────────────────────────────────────────────
+  --portfolio-icon-neutral-max: #FFFFFF;
   --portfolio-icon-neutral-bold: #{$portfolio-neutral-00};
   --portfolio-icon-neutral-regular: #{$portfolio-neutral-30};
   --portfolio-icon-neutral-subtle: #{$portfolio-neutral-40};
@@ -381,8 +387,10 @@
   --portfolio-icon-warning: #{$portfolio-yellow-40};
 
   // ── Border ───────────────────────────────────────────────────────────────
-  --portfolio-border-neutral-bold: #{$portfolio-neutral-60};
-  --portfolio-border-neutral-subtle: #{$portfolio-neutral-80};
+  --portfolio-border-neutral-bold: #{$portfolio-neutral-10};
+  --portfolio-border-neutral-regular: #{$portfolio-neutral-60};
+  --portfolio-border-neutral-subtle: #{$portfolio-neutral-70};
+  --portfolio-border-neutral-minimal: #{$portfolio-neutral-80};
   --portfolio-border-neutral-disabled: #{$portfolio-neutral-70};
   --portfolio-border-brand-bold: #{$portfolio-accent-50};
   --portfolio-border-inverse-bold: #{$portfolio-neutral-00};

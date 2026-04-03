@@ -24,6 +24,7 @@ import { fileURLToPath } from "node:url";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
 const SCSS_PATH = resolve(ROOT, "src/styles/tokens/_colors.scss");
+const CUSTOM_PROPS_PATH = resolve(ROOT, "src/styles/_custom-properties.scss");
 const TOKENS_PATH = resolve(ROOT, "playground/src/lib/tokens.ts");
 
 const BEGIN_MARKER = "// @sync-tokens:begin";
@@ -68,6 +69,40 @@ function resolveValue(raw) {
   if (raw.startsWith("$")) return lookup.get(raw) || raw;
   return raw;
 }
+
+// ---------------------------------------------------------------------------
+// 1b. Parse dark mode overrides from _custom-properties.scss
+// ---------------------------------------------------------------------------
+
+function parseDarkOverrides(filePath, lookupMap) {
+  const src = readFileSync(filePath, "utf-8");
+  const darkMap = new Map();
+  const darkMarker = '[data-theme="dark"]';
+  const darkStart = src.indexOf(darkMarker);
+  if (darkStart === -1) return darkMap;
+  const darkSection = src.slice(darkStart);
+
+  for (const line of darkSection.split("\n")) {
+    const m = line.match(
+      /--portfolio-([\w-]+):\s*#\{(\$portfolio-[\w-]+)\}\s*;/
+    );
+    if (m) {
+      const [, propName, ref] = m;
+      const resolved = lookupMap.get(ref) || ref;
+      darkMap.set(`$portfolio-${propName}`, resolved);
+    }
+    const mRgba = line.match(
+      /--portfolio-([\w-]+):\s*(rgba\([^)]+\))\s*;/
+    );
+    if (mRgba) {
+      const [, propName, val] = mRgba;
+      darkMap.set(`$portfolio-${propName}`, val);
+    }
+  }
+  return darkMap;
+}
+
+const darkOverrides = parseDarkOverrides(CUSTOM_PROPS_PATH, lookup);
 
 // ---------------------------------------------------------------------------
 // 2. Parse SCSS — Structured Semantic Tokens
@@ -166,14 +201,16 @@ function parseStructuredSemantics(src) {
       fullName.startsWith("focus") ||
       fullName.startsWith("highlight")
     ) {
+      const interToken = `$portfolio-${fullName}`;
       interaction.push({
         name: fullName
           .split("-")
           .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
           .join(" "),
-        token: `$portfolio-${fullName}`,
+        token: interToken,
         value: resolveValue(raw),
         ref: raw.startsWith("$") ? raw : undefined,
+        darkValue: darkOverrides.get(interToken),
       });
     }
   }
@@ -198,12 +235,14 @@ for (const token of structured) {
     roleMap.set(token.role, []);
   }
   const legacy = legacyMap.get(token.token);
+  const darkValue = darkOverrides.get(token.token);
   roleMap.get(token.role).push({
     emphasis: token.emphasis || "",
     value: token.value,
     token: token.token,
     ref: token.ref,
     legacy,
+    darkValue,
   });
 }
 
@@ -247,7 +286,7 @@ const neutralSteps = palette.get("neutral") || [];
 let generated = `${BEGIN_MARKER}
 export type ColorStep = { step: string; value: string; token: string };
 export type ColorFamily = { name: string; prefix: string; steps: ColorStep[] };
-export type SemanticToken = { name: string; value: string; token: string; ref?: string };
+export type SemanticToken = { name: string; value: string; token: string; ref?: string; darkValue?: string };
 
 export type EmphasisToken = {
   emphasis: string;
@@ -255,6 +294,7 @@ export type EmphasisToken = {
   token: string;
   ref?: string;
   legacy?: string;
+  darkValue?: string;
 };
 
 export type RoleGroup = {
@@ -300,7 +340,8 @@ for (const prop of KNOWN_PROPERTIES) {
     for (const t of tokens) {
       const ref = t.ref ? `, ref: "${t.ref}"` : "";
       const legacy = t.legacy ? `, legacy: "${t.legacy}"` : "";
-      generated += `            { emphasis: "${t.emphasis}", value: "${t.value}", token: "${t.token}"${ref}${legacy} },\n`;
+      const dark = t.darkValue ? `, darkValue: "${t.darkValue}"` : "";
+      generated += `            { emphasis: "${t.emphasis}", value: "${t.value}", token: "${t.token}"${ref}${legacy}${dark} },\n`;
     }
     generated += `          ],\n        },\n`;
   }
@@ -314,7 +355,8 @@ generated += `  ] as PropertySection[],
 
 for (const t of interaction) {
   const ref = t.ref ? `, ref: "${t.ref}"` : "";
-  generated += `    { name: "${t.name}", value: "${t.value}", token: "${t.token}"${ref} },\n`;
+  const dark = t.darkValue ? `, darkValue: "${t.darkValue}"` : "";
+  generated += `    { name: "${t.name}", value: "${t.value}", token: "${t.token}"${ref}${dark} },\n`;
 }
 
 generated += `  ] as SemanticToken[],

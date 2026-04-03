@@ -241,6 +241,7 @@ $portfolio-overlay-black-30: rgba(0, 0, 0, 0.30);
 $portfolio-overlay-black-40: rgba(0, 0, 0, 0.40);
 
 // — Text ··································································
+$portfolio-text-neutral-max: #000000;
 $portfolio-text-neutral-bold: $portfolio-neutral-100;
 $portfolio-text-neutral-regular: $portfolio-neutral-70;
 $portfolio-text-neutral-subtle: $portfolio-neutral-60;
@@ -255,6 +256,7 @@ $portfolio-text-positive: $portfolio-green-60;
 $portfolio-text-warning: $portfolio-yellow-60;
 
 // — Icon ··································································
+$portfolio-icon-neutral-max: #000000;
 $portfolio-icon-neutral-bold: $portfolio-neutral-100;
 $portfolio-icon-neutral-regular: $portfolio-neutral-70;
 $portfolio-icon-neutral-subtle: $portfolio-neutral-60;
@@ -269,8 +271,10 @@ $portfolio-icon-positive: $portfolio-green-60;
 $portfolio-icon-warning: $portfolio-yellow-60;
 
 // — Border ································································
-$portfolio-border-neutral-bold: $portfolio-neutral-50;
-$portfolio-border-neutral-subtle: $portfolio-neutral-20;
+$portfolio-border-neutral-bold: $portfolio-neutral-100;
+$portfolio-border-neutral-regular: $portfolio-neutral-50;
+$portfolio-border-neutral-subtle: $portfolio-neutral-30;
+$portfolio-border-neutral-minimal: $portfolio-neutral-20;
 $portfolio-border-neutral-disabled: $portfolio-neutral-30;
 $portfolio-border-brand-bold: $portfolio-accent-60;
 $portfolio-border-inverse-bold: $portfolio-neutral-100;
