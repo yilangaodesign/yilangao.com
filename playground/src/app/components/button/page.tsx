@@ -8,6 +8,7 @@ import { ComponentPreview, PropsTable, SourcePath, SubsectionHeading} from "@/co
 import ScrollSpy from "@/components/scroll-spy";
 import { Button } from "@ds/Button";
 import type { ButtonAppearance, ButtonEmphasis, ButtonSize } from "@ds/Button";
+import { Kbd } from "@ds/Kbd";
 import surfaces from "./surfaces.module.css";
 
 const SIZE_TOKEN_DOCS: Record<ButtonSize, { height: string; px: string; py: string; font: string; icon: string; gap: string }> = {
@@ -229,7 +230,7 @@ export default function ButtonPage() {
 <Button leadingIcon={<Plus />}>Leading icon</Button>
 <Button trailingIcon={<ChevronRight />}>Trailing icon</Button>
 <Button leadingIcon={<Plus />} trailingIcon={<ArrowRight />}>Both</Button>
-<Button trailingSlot={<kbd>⌘K</kbd>}>With shortcut</Button>`}
+<Button trailingSlot={<Kbd bordered size="lg">⌘K</Kbd>}>With shortcut</Button>`}
             >
               <div className="flex flex-wrap items-center justify-center gap-3 w-full">
                 <Button appearance="highlight">Label only</Button>
@@ -252,11 +253,7 @@ export default function ButtonPage() {
                 <Button
                   appearance="highlight"
                   emphasis="regular"
-                  trailingSlot={
-                    <kbd className="inline-flex items-center rounded-sm border border-current/20 px-1 py-0.5 text-[10px] font-mono opacity-60">
-                      ⌘K
-                    </kbd>
-                  }
+                  trailingSlot={<Kbd bordered size="lg">⌘K</Kbd>}
                 >
                   Search
                 </Button>

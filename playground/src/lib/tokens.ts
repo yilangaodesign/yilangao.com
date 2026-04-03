@@ -1,7 +1,7 @@
 // @sync-tokens:begin
 export type ColorStep = { step: string; value: string; token: string };
 export type ColorFamily = { name: string; prefix: string; steps: ColorStep[] };
-export type SemanticToken = { name: string; value: string; token: string; ref?: string };
+export type SemanticToken = { name: string; value: string; token: string; ref?: string; darkValue?: string };
 
 export type EmphasisToken = {
   emphasis: string;
@@ -9,6 +9,7 @@ export type EmphasisToken = {
   token: string;
   ref?: string;
   legacy?: string;
+  darkValue?: string;
 };
 
 export type RoleGroup = {
@@ -96,61 +97,61 @@ export const colors = {
         {
           role: "neutral",
           tokens: [
-            { emphasis: "minimal", value: "#FFFFFF", token: "$portfolio-surface-neutral-minimal", ref: "$portfolio-neutral-00", legacy: "$portfolio-surface-primary" },
-            { emphasis: "subtle", value: "#F9F9F9", token: "$portfolio-surface-neutral-subtle", ref: "$portfolio-neutral-05", legacy: "$portfolio-surface-secondary" },
-            { emphasis: "regular", value: "#F4F4F4", token: "$portfolio-surface-neutral-regular", ref: "$portfolio-neutral-10", legacy: "$portfolio-surface-tertiary" },
+            { emphasis: "minimal", value: "#FFFFFF", token: "$portfolio-surface-neutral-minimal", ref: "$portfolio-neutral-00", legacy: "$portfolio-surface-primary", darkValue: "#161616" },
+            { emphasis: "subtle", value: "#F9F9F9", token: "$portfolio-surface-neutral-subtle", ref: "$portfolio-neutral-05", legacy: "$portfolio-surface-secondary", darkValue: "#262626" },
+            { emphasis: "regular", value: "#F4F4F4", token: "$portfolio-surface-neutral-regular", ref: "$portfolio-neutral-10", legacy: "$portfolio-surface-tertiary", darkValue: "#393939" },
           ],
         },
         {
           role: "inverse",
           tokens: [
-            { emphasis: "bold", value: "#161616", token: "$portfolio-surface-inverse-bold", ref: "$portfolio-neutral-100", legacy: "$portfolio-surface-inverse" },
+            { emphasis: "bold", value: "#161616", token: "$portfolio-surface-inverse-bold", ref: "$portfolio-neutral-100", legacy: "$portfolio-surface-inverse", darkValue: "#FFFFFF" },
           ],
         },
         {
           role: "brand",
           tokens: [
-            { emphasis: "bold", value: "#3336FF", token: "$portfolio-surface-brand-bold", ref: "$portfolio-accent-60" },
-            { emphasis: "subtle", value: "#F0F5FD", token: "$portfolio-surface-brand-subtle", ref: "$portfolio-accent-10" },
+            { emphasis: "bold", value: "#3336FF", token: "$portfolio-surface-brand-bold", ref: "$portfolio-accent-60", darkValue: "#7182FD" },
+            { emphasis: "subtle", value: "#F0F5FD", token: "$portfolio-surface-brand-subtle", ref: "$portfolio-accent-10", darkValue: "#05063E" },
           ],
         },
         {
           role: "negative",
           tokens: [
-            { emphasis: "bold", value: "#DA1E28", token: "$portfolio-surface-negative-bold", ref: "$portfolio-red-60" },
-            { emphasis: "subtle", value: "#FFF1F1", token: "$portfolio-surface-negative-subtle", ref: "$portfolio-red-10" },
+            { emphasis: "bold", value: "#DA1E28", token: "$portfolio-surface-negative-bold", ref: "$portfolio-red-60", darkValue: "#A2191F" },
+            { emphasis: "subtle", value: "#FFF1F1", token: "$portfolio-surface-negative-subtle", ref: "$portfolio-red-10", darkValue: "#2D0709" },
           ],
         },
         {
           role: "positive",
           tokens: [
-            { emphasis: "bold", value: "#198038", token: "$portfolio-surface-positive-bold", ref: "$portfolio-green-60" },
-            { emphasis: "subtle", value: "#DEFBE6", token: "$portfolio-surface-positive-subtle", ref: "$portfolio-green-10" },
+            { emphasis: "bold", value: "#198038", token: "$portfolio-surface-positive-bold", ref: "$portfolio-green-60", darkValue: "#0E6027" },
+            { emphasis: "subtle", value: "#DEFBE6", token: "$portfolio-surface-positive-subtle", ref: "$portfolio-green-10", darkValue: "#071908" },
           ],
         },
         {
           role: "warning",
           tokens: [
-            { emphasis: "bold", value: "#F1C21B", token: "$portfolio-surface-warning-bold", ref: "$portfolio-yellow-30" },
-            { emphasis: "subtle", value: "#FCF4D6", token: "$portfolio-surface-warning-subtle", ref: "$portfolio-yellow-10" },
+            { emphasis: "bold", value: "#F1C21B", token: "$portfolio-surface-warning-bold", ref: "$portfolio-yellow-30", darkValue: "#F1C21B" },
+            { emphasis: "subtle", value: "#FCF4D6", token: "$portfolio-surface-warning-subtle", ref: "$portfolio-yellow-10", darkValue: "#1C1500" },
           ],
         },
         {
           role: "overlay",
           tokens: [
-            { emphasis: "", value: "rgba(0, 0, 0, 0.5)", token: "$portfolio-surface-overlay" },
+            { emphasis: "", value: "rgba(0, 0, 0, 0.5)", token: "$portfolio-surface-overlay", darkValue: "rgba(0, 0, 0, 0.7)" },
           ],
         },
         {
           role: "always-dark",
           tokens: [
-            { emphasis: "", value: "#161616", token: "$portfolio-surface-always-dark", ref: "$portfolio-neutral-100" },
+            { emphasis: "", value: "#161616", token: "$portfolio-surface-always-dark", ref: "$portfolio-neutral-100", darkValue: "$portfolio-surface-always-dark" },
           ],
         },
         {
           role: "always-light",
           tokens: [
-            { emphasis: "", value: "#FFFFFF", token: "$portfolio-surface-always-light", ref: "$portfolio-neutral-00" },
+            { emphasis: "", value: "#FFFFFF", token: "$portfolio-surface-always-light", ref: "$portfolio-neutral-00", darkValue: "$portfolio-surface-always-light" },
           ],
         },
       ],
@@ -162,53 +163,53 @@ export const colors = {
         {
           role: "neutral",
           tokens: [
-            { emphasis: "bold", value: "#161616", token: "$portfolio-text-neutral-bold", ref: "$portfolio-neutral-100", legacy: "$portfolio-text-primary" },
-            { emphasis: "regular", value: "#525252", token: "$portfolio-text-neutral-regular", ref: "$portfolio-neutral-70", legacy: "$portfolio-text-secondary" },
-            { emphasis: "subtle", value: "#6F6F6F", token: "$portfolio-text-neutral-subtle", ref: "$portfolio-neutral-60", legacy: "$portfolio-text-tertiary" },
-            { emphasis: "minimal", value: "#A8A8A8", token: "$portfolio-text-neutral-minimal", ref: "$portfolio-neutral-40", legacy: "$portfolio-text-placeholder" },
-            { emphasis: "disabled", value: "#C6C6C6", token: "$portfolio-text-neutral-disabled", ref: "$portfolio-neutral-30", legacy: "$portfolio-text-disabled" },
+            { emphasis: "bold", value: "#161616", token: "$portfolio-text-neutral-bold", ref: "$portfolio-neutral-100", legacy: "$portfolio-text-primary", darkValue: "#FFFFFF" },
+            { emphasis: "regular", value: "#525252", token: "$portfolio-text-neutral-regular", ref: "$portfolio-neutral-70", legacy: "$portfolio-text-secondary", darkValue: "#C6C6C6" },
+            { emphasis: "subtle", value: "#6F6F6F", token: "$portfolio-text-neutral-subtle", ref: "$portfolio-neutral-60", legacy: "$portfolio-text-tertiary", darkValue: "#A8A8A8" },
+            { emphasis: "minimal", value: "#A8A8A8", token: "$portfolio-text-neutral-minimal", ref: "$portfolio-neutral-40", legacy: "$portfolio-text-placeholder", darkValue: "#6F6F6F" },
+            { emphasis: "disabled", value: "#C6C6C6", token: "$portfolio-text-neutral-disabled", ref: "$portfolio-neutral-30", legacy: "$portfolio-text-disabled", darkValue: "#525252" },
           ],
         },
         {
           role: "brand",
           tokens: [
-            { emphasis: "bold", value: "#3336FF", token: "$portfolio-text-brand-bold", ref: "$portfolio-accent-60", legacy: "$portfolio-text-link" },
+            { emphasis: "bold", value: "#3336FF", token: "$portfolio-text-brand-bold", ref: "$portfolio-accent-60", legacy: "$portfolio-text-link", darkValue: "#8DA3FC" },
           ],
         },
         {
           role: "inverse",
           tokens: [
-            { emphasis: "bold", value: "#FFFFFF", token: "$portfolio-text-inverse-bold", ref: "$portfolio-neutral-00", legacy: "$portfolio-text-inverse" },
+            { emphasis: "bold", value: "#FFFFFF", token: "$portfolio-text-inverse-bold", ref: "$portfolio-neutral-00", legacy: "$portfolio-text-inverse", darkValue: "#161616" },
           ],
         },
         {
           role: "always-light",
           tokens: [
-            { emphasis: "bold", value: "#FFFFFF", token: "$portfolio-text-always-light-bold", ref: "$portfolio-neutral-00", legacy: "$portfolio-text-on-color" },
+            { emphasis: "bold", value: "#FFFFFF", token: "$portfolio-text-always-light-bold", ref: "$portfolio-neutral-00", legacy: "$portfolio-text-on-color", darkValue: "$portfolio-text-always-light-bold" },
           ],
         },
         {
           role: "always-dark",
           tokens: [
-            { emphasis: "bold", value: "#161616", token: "$portfolio-text-always-dark-bold", ref: "$portfolio-neutral-100" },
+            { emphasis: "bold", value: "#161616", token: "$portfolio-text-always-dark-bold", ref: "$portfolio-neutral-100", darkValue: "$portfolio-text-always-dark-bold" },
           ],
         },
         {
           role: "negative",
           tokens: [
-            { emphasis: "", value: "#DA1E28", token: "$portfolio-text-negative", ref: "$portfolio-red-60", legacy: "$portfolio-text-error" },
+            { emphasis: "", value: "#DA1E28", token: "$portfolio-text-negative", ref: "$portfolio-red-60", legacy: "$portfolio-text-error", darkValue: "#FF8389" },
           ],
         },
         {
           role: "positive",
           tokens: [
-            { emphasis: "", value: "#198038", token: "$portfolio-text-positive", ref: "$portfolio-green-60" },
+            { emphasis: "", value: "#198038", token: "$portfolio-text-positive", ref: "$portfolio-green-60", darkValue: "#42BE65" },
           ],
         },
         {
           role: "warning",
           tokens: [
-            { emphasis: "", value: "#8E6A00", token: "$portfolio-text-warning", ref: "$portfolio-yellow-60" },
+            { emphasis: "", value: "#8E6A00", token: "$portfolio-text-warning", ref: "$portfolio-yellow-60", darkValue: "#D2A106" },
           ],
         },
       ],
@@ -220,53 +221,53 @@ export const colors = {
         {
           role: "neutral",
           tokens: [
-            { emphasis: "bold", value: "#161616", token: "$portfolio-icon-neutral-bold", ref: "$portfolio-neutral-100" },
-            { emphasis: "regular", value: "#525252", token: "$portfolio-icon-neutral-regular", ref: "$portfolio-neutral-70" },
-            { emphasis: "subtle", value: "#6F6F6F", token: "$portfolio-icon-neutral-subtle", ref: "$portfolio-neutral-60" },
-            { emphasis: "minimal", value: "#A8A8A8", token: "$portfolio-icon-neutral-minimal", ref: "$portfolio-neutral-40" },
-            { emphasis: "disabled", value: "#C6C6C6", token: "$portfolio-icon-neutral-disabled", ref: "$portfolio-neutral-30" },
+            { emphasis: "bold", value: "#161616", token: "$portfolio-icon-neutral-bold", ref: "$portfolio-neutral-100", darkValue: "#FFFFFF" },
+            { emphasis: "regular", value: "#525252", token: "$portfolio-icon-neutral-regular", ref: "$portfolio-neutral-70", darkValue: "#C6C6C6" },
+            { emphasis: "subtle", value: "#6F6F6F", token: "$portfolio-icon-neutral-subtle", ref: "$portfolio-neutral-60", darkValue: "#A8A8A8" },
+            { emphasis: "minimal", value: "#A8A8A8", token: "$portfolio-icon-neutral-minimal", ref: "$portfolio-neutral-40", darkValue: "#6F6F6F" },
+            { emphasis: "disabled", value: "#C6C6C6", token: "$portfolio-icon-neutral-disabled", ref: "$portfolio-neutral-30", darkValue: "#525252" },
           ],
         },
         {
           role: "brand",
           tokens: [
-            { emphasis: "bold", value: "#3336FF", token: "$portfolio-icon-brand-bold", ref: "$portfolio-accent-60" },
+            { emphasis: "bold", value: "#3336FF", token: "$portfolio-icon-brand-bold", ref: "$portfolio-accent-60", darkValue: "#8DA3FC" },
           ],
         },
         {
           role: "inverse",
           tokens: [
-            { emphasis: "bold", value: "#FFFFFF", token: "$portfolio-icon-inverse-bold", ref: "$portfolio-neutral-00" },
+            { emphasis: "bold", value: "#FFFFFF", token: "$portfolio-icon-inverse-bold", ref: "$portfolio-neutral-00", darkValue: "#161616" },
           ],
         },
         {
           role: "always-light",
           tokens: [
-            { emphasis: "bold", value: "#FFFFFF", token: "$portfolio-icon-always-light-bold", ref: "$portfolio-neutral-00" },
+            { emphasis: "bold", value: "#FFFFFF", token: "$portfolio-icon-always-light-bold", ref: "$portfolio-neutral-00", darkValue: "$portfolio-icon-always-light-bold" },
           ],
         },
         {
           role: "always-dark",
           tokens: [
-            { emphasis: "bold", value: "#161616", token: "$portfolio-icon-always-dark-bold", ref: "$portfolio-neutral-100" },
+            { emphasis: "bold", value: "#161616", token: "$portfolio-icon-always-dark-bold", ref: "$portfolio-neutral-100", darkValue: "$portfolio-icon-always-dark-bold" },
           ],
         },
         {
           role: "negative",
           tokens: [
-            { emphasis: "", value: "#DA1E28", token: "$portfolio-icon-negative", ref: "$portfolio-red-60" },
+            { emphasis: "", value: "#DA1E28", token: "$portfolio-icon-negative", ref: "$portfolio-red-60", darkValue: "#FF8389" },
           ],
         },
         {
           role: "positive",
           tokens: [
-            { emphasis: "", value: "#198038", token: "$portfolio-icon-positive", ref: "$portfolio-green-60" },
+            { emphasis: "", value: "#198038", token: "$portfolio-icon-positive", ref: "$portfolio-green-60", darkValue: "#42BE65" },
           ],
         },
         {
           role: "warning",
           tokens: [
-            { emphasis: "", value: "#8E6A00", token: "$portfolio-icon-warning", ref: "$portfolio-yellow-60" },
+            { emphasis: "", value: "#8E6A00", token: "$portfolio-icon-warning", ref: "$portfolio-yellow-60", darkValue: "#D2A106" },
           ],
         },
       ],
@@ -278,51 +279,53 @@ export const colors = {
         {
           role: "neutral",
           tokens: [
-            { emphasis: "bold", value: "#8D8D8D", token: "$portfolio-border-neutral-bold", ref: "$portfolio-neutral-50", legacy: "$portfolio-border-strong" },
-            { emphasis: "subtle", value: "#E0E0E0", token: "$portfolio-border-neutral-subtle", ref: "$portfolio-neutral-20", legacy: "$portfolio-border-subtle" },
-            { emphasis: "disabled", value: "#C6C6C6", token: "$portfolio-border-neutral-disabled", ref: "$portfolio-neutral-30", legacy: "$portfolio-border-disabled" },
+            { emphasis: "bold", value: "#161616", token: "$portfolio-border-neutral-bold", ref: "$portfolio-neutral-100", legacy: "$portfolio-border-strong", darkValue: "#F4F4F4" },
+            { emphasis: "regular", value: "#8D8D8D", token: "$portfolio-border-neutral-regular", ref: "$portfolio-neutral-50", darkValue: "#6F6F6F" },
+            { emphasis: "subtle", value: "#C6C6C6", token: "$portfolio-border-neutral-subtle", ref: "$portfolio-neutral-30", legacy: "$portfolio-border-subtle", darkValue: "#525252" },
+            { emphasis: "minimal", value: "#E0E0E0", token: "$portfolio-border-neutral-minimal", ref: "$portfolio-neutral-20", darkValue: "#393939" },
+            { emphasis: "disabled", value: "#C6C6C6", token: "$portfolio-border-neutral-disabled", ref: "$portfolio-neutral-30", legacy: "$portfolio-border-disabled", darkValue: "#525252" },
           ],
         },
         {
           role: "brand",
           tokens: [
-            { emphasis: "bold", value: "#3336FF", token: "$portfolio-border-brand-bold", ref: "$portfolio-accent-60", legacy: "$portfolio-border-interactive" },
+            { emphasis: "bold", value: "#3336FF", token: "$portfolio-border-brand-bold", ref: "$portfolio-accent-60", legacy: "$portfolio-border-interactive", darkValue: "#7182FD" },
           ],
         },
         {
           role: "inverse",
           tokens: [
-            { emphasis: "bold", value: "#161616", token: "$portfolio-border-inverse-bold", ref: "$portfolio-neutral-100", legacy: "$portfolio-border-inverse" },
+            { emphasis: "bold", value: "#161616", token: "$portfolio-border-inverse-bold", ref: "$portfolio-neutral-100", legacy: "$portfolio-border-inverse", darkValue: "#FFFFFF" },
           ],
         },
         {
           role: "always-light",
           tokens: [
-            { emphasis: "", value: "#FFFFFF", token: "$portfolio-border-always-light", ref: "$portfolio-neutral-00" },
+            { emphasis: "", value: "#FFFFFF", token: "$portfolio-border-always-light", ref: "$portfolio-neutral-00", darkValue: "$portfolio-border-always-light" },
           ],
         },
         {
           role: "always-dark",
           tokens: [
-            { emphasis: "", value: "#161616", token: "$portfolio-border-always-dark", ref: "$portfolio-neutral-100" },
+            { emphasis: "", value: "#161616", token: "$portfolio-border-always-dark", ref: "$portfolio-neutral-100", darkValue: "$portfolio-border-always-dark" },
           ],
         },
         {
           role: "negative",
           tokens: [
-            { emphasis: "", value: "#DA1E28", token: "$portfolio-border-negative", ref: "$portfolio-red-60" },
+            { emphasis: "", value: "#DA1E28", token: "$portfolio-border-negative", ref: "$portfolio-red-60", darkValue: "#FA4D56" },
           ],
         },
         {
           role: "positive",
           tokens: [
-            { emphasis: "", value: "#198038", token: "$portfolio-border-positive", ref: "$portfolio-green-60" },
+            { emphasis: "", value: "#198038", token: "$portfolio-border-positive", ref: "$portfolio-green-60", darkValue: "#24A148" },
           ],
         },
         {
           role: "warning",
           tokens: [
-            { emphasis: "", value: "#8E6A00", token: "$portfolio-border-warning", ref: "$portfolio-yellow-60" },
+            { emphasis: "", value: "#8E6A00", token: "$portfolio-border-warning", ref: "$portfolio-yellow-60", darkValue: "#B28600" },
           ],
         },
       ],
@@ -334,65 +337,65 @@ export const colors = {
         {
           role: "brand",
           tokens: [
-            { emphasis: "bold", value: "#3336FF", token: "$portfolio-action-brand-bold", ref: "$portfolio-accent-60" },
-            { emphasis: "subtle", value: "#D5E0FC", token: "$portfolio-action-brand-subtle", ref: "$portfolio-accent-20" },
-            { emphasis: "bold-hover", value: "#0004E2", token: "$portfolio-action-brand-bold-hover", ref: "$portfolio-accent-70" },
-            { emphasis: "bold-pressed", value: "#0003A7", token: "$portfolio-action-brand-bold-pressed", ref: "$portfolio-accent-80" },
-            { emphasis: "bold-disabled", value: "#B3C5FC", token: "$portfolio-action-brand-bold-disabled", ref: "$portfolio-accent-30" },
+            { emphasis: "bold", value: "#3336FF", token: "$portfolio-action-brand-bold", ref: "$portfolio-accent-60", darkValue: "#7182FD" },
+            { emphasis: "subtle", value: "#D5E0FC", token: "$portfolio-action-brand-subtle", ref: "$portfolio-accent-20", darkValue: "#000273" },
+            { emphasis: "bold-hover", value: "#0004E2", token: "$portfolio-action-brand-bold-hover", ref: "$portfolio-accent-70", darkValue: "#8DA3FC" },
+            { emphasis: "bold-pressed", value: "#0003A7", token: "$portfolio-action-brand-bold-pressed", ref: "$portfolio-accent-80", darkValue: "#B3C5FC" },
+            { emphasis: "bold-disabled", value: "#B3C5FC", token: "$portfolio-action-brand-bold-disabled", ref: "$portfolio-accent-30", darkValue: "#0003A7" },
           ],
         },
         {
           role: "neutral",
           tokens: [
-            { emphasis: "bold", value: "#161616", token: "$portfolio-action-neutral-bold", ref: "$portfolio-neutral-100" },
-            { emphasis: "regular", value: "#F4F4F4", token: "$portfolio-action-neutral-regular", ref: "$portfolio-neutral-10" },
-            { emphasis: "bold-hover", value: "#393939", token: "$portfolio-action-neutral-bold-hover", ref: "$portfolio-neutral-80" },
-            { emphasis: "bold-disabled", value: "#C6C6C6", token: "$portfolio-action-neutral-bold-disabled", ref: "$portfolio-neutral-30" },
+            { emphasis: "bold", value: "#161616", token: "$portfolio-action-neutral-bold", ref: "$portfolio-neutral-100", darkValue: "#FFFFFF" },
+            { emphasis: "regular", value: "#F4F4F4", token: "$portfolio-action-neutral-regular", ref: "$portfolio-neutral-10", darkValue: "#262626" },
+            { emphasis: "bold-hover", value: "#393939", token: "$portfolio-action-neutral-bold-hover", ref: "$portfolio-neutral-80", darkValue: "#E0E0E0" },
+            { emphasis: "bold-disabled", value: "#C6C6C6", token: "$portfolio-action-neutral-bold-disabled", ref: "$portfolio-neutral-30", darkValue: "#525252" },
           ],
         },
         {
           role: "inverse",
           tokens: [
-            { emphasis: "bold", value: "#FFFFFF", token: "$portfolio-action-inverse-bold", ref: "$portfolio-neutral-00" },
+            { emphasis: "bold", value: "#FFFFFF", token: "$portfolio-action-inverse-bold", ref: "$portfolio-neutral-00", darkValue: "#161616" },
           ],
         },
         {
           role: "always-dark",
           tokens: [
-            { emphasis: "", value: "#161616", token: "$portfolio-action-always-dark", ref: "$portfolio-neutral-100" },
+            { emphasis: "", value: "#161616", token: "$portfolio-action-always-dark", ref: "$portfolio-neutral-100", darkValue: "$portfolio-action-always-dark" },
           ],
         },
         {
           role: "always-light",
           tokens: [
-            { emphasis: "", value: "#FFFFFF", token: "$portfolio-action-always-light", ref: "$portfolio-neutral-00" },
+            { emphasis: "", value: "#FFFFFF", token: "$portfolio-action-always-light", ref: "$portfolio-neutral-00", darkValue: "$portfolio-action-always-light" },
           ],
         },
         {
           role: "negative",
           tokens: [
-            { emphasis: "", value: "#DA1E28", token: "$portfolio-action-negative", ref: "$portfolio-red-60" },
+            { emphasis: "", value: "#DA1E28", token: "$portfolio-action-negative", ref: "$portfolio-red-60", darkValue: "#FA4D56" },
           ],
         },
         {
           role: "positive",
           tokens: [
-            { emphasis: "", value: "#198038", token: "$portfolio-action-positive", ref: "$portfolio-green-60" },
+            { emphasis: "", value: "#198038", token: "$portfolio-action-positive", ref: "$portfolio-green-60", darkValue: "#24A148" },
           ],
         },
         {
           role: "warning",
           tokens: [
-            { emphasis: "", value: "#8E6A00", token: "$portfolio-action-warning", ref: "$portfolio-yellow-60" },
+            { emphasis: "", value: "#8E6A00", token: "$portfolio-action-warning", ref: "$portfolio-yellow-60", darkValue: "#B28600" },
           ],
         },
       ],
     },
   ] as PropertySection[],
   interaction: [
-    { name: "Focus", value: "#3336FF", token: "$portfolio-focus", ref: "$portfolio-accent-60" },
-    { name: "Focus Inset", value: "#FFFFFF", token: "$portfolio-focus-inset", ref: "$portfolio-neutral-00" },
-    { name: "Highlight", value: "#D5E0FC", token: "$portfolio-highlight", ref: "$portfolio-accent-20" },
+    { name: "Focus", value: "#3336FF", token: "$portfolio-focus", ref: "$portfolio-accent-60", darkValue: "#7182FD" },
+    { name: "Focus Inset", value: "#FFFFFF", token: "$portfolio-focus-inset", ref: "$portfolio-neutral-00", darkValue: "#161616" },
+    { name: "Highlight", value: "#D5E0FC", token: "$portfolio-highlight", ref: "$portfolio-accent-20", darkValue: "#000273" },
   ] as SemanticToken[],
 };
 // @sync-tokens:end

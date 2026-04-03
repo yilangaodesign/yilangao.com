@@ -31,10 +31,12 @@ import GripVertical from "lucide-react/dist/esm/icons/grip-vertical";
 import RectangleHorizontal from "lucide-react/dist/esm/icons/rectangle-horizontal";
 import Square from "lucide-react/dist/esm/icons/square";
 import Tag from "lucide-react/dist/esm/icons/tag";
+import Tags from "lucide-react/dist/esm/icons/tags";
 import SeparatorHorizontal from "lucide-react/dist/esm/icons/separator-horizontal";
 import CircleUser from "lucide-react/dist/esm/icons/circle-user";
 import FormInput from "lucide-react/dist/esm/icons/form-input";
 import AlignLeft from "lucide-react/dist/esm/icons/align-left";
+import List from "lucide-react/dist/esm/icons/list";
 import ListFilter from "lucide-react/dist/esm/icons/list-filter";
 import CheckSquare from "lucide-react/dist/esm/icons/check-square";
 import ToggleRight from "lucide-react/dist/esm/icons/toggle-right";
@@ -53,6 +55,7 @@ import Upload from "lucide-react/dist/esm/icons/upload";
 import Loader from "lucide-react/dist/esm/icons/loader";
 import Columns from "lucide-react/dist/esm/icons/columns";
 import Code2 from "lucide-react/dist/esm/icons/code-2";
+import Heading from "lucide-react/dist/esm/icons/heading";
 import { cn } from "@/lib/utils";
 import { elan } from "@/lib/elan";
 import styles from "./sidebar.module.css";
@@ -69,7 +72,7 @@ import {
 import { createPortal } from "react-dom";
 import Fuse from "fuse.js";
 import { useSafeTriangle } from "@/hooks/use-safe-triangle";
-import { Button, Kbd } from "@ds/index";
+import { Button, Input, Kbd } from "@ds/index";
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
@@ -160,7 +163,9 @@ const componentCategories: NavCategory[] = [
       { href: "/components/card", label: "Card", icon: RectangleHorizontal, group: "Display" },
       { href: "/components/divider", label: "Divider", icon: SeparatorHorizontal, group: "Display" },
       { href: "/components/inline-code", label: "InlineCode", icon: Code2, group: "Inline" },
+      { href: "/components/eyebrow", label: "Eyebrow", icon: Heading, group: "Inline" },
       { href: "/components/kbd", label: "Kbd", icon: Square, group: "Inline" },
+      { href: "/components/text-row", label: "TextRow", icon: Tags, group: "Inline" },
     ],
   },
   {
@@ -216,6 +221,7 @@ const componentCategories: NavCategory[] = [
       { href: "/components/command-menu", label: "CommandMenu", icon: Search, group: "Overlays" },
       { href: "/components/dialog", label: "Dialog", icon: PanelTopOpen, group: "Overlays" },
       { href: "/components/dropdown-menu", label: "DropdownMenu", icon: ListFilter, group: "Overlays" },
+      { href: "/components/menu", label: "Menu", icon: List, group: "Overlays" },
       { href: "/components/sheet", label: "Sheet", icon: PanelLeftOpen, group: "Overlays" },
       { href: "/components/progress-bar", label: "ProgressBar", icon: Loader, group: "Feedback" },
       { href: "/components/toast", label: "Toast", icon: BellRing, group: "Feedback" },
@@ -317,10 +323,10 @@ function SidebarSearch({
   }, [collapsed]);
 
   useEffect(() => {
-    if (open) {
+    if (open && collapsed) {
       requestAnimationFrame(() => inputRef.current?.focus());
     }
-  }, [open]);
+  }, [open, collapsed]);
 
   useEffect(() => {
     if (!open) return;
@@ -340,6 +346,7 @@ function SidebarSearch({
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
         e.preventDefault();
         setOpen(true);
+        requestAnimationFrame(() => inputRef.current?.focus());
       }
     }
     document.addEventListener("keydown", handleKey);
@@ -351,6 +358,7 @@ function SidebarSearch({
       e.preventDefault();
       setOpen(false);
       setQuery("");
+      inputRef.current?.blur();
       return;
     }
     if (results.length === 0) return;
@@ -424,16 +432,15 @@ function SidebarSearch({
               ref={flyoutRef}
               className="fixed top-[56px] left-[41px] z-50 w-[200px] bg-sidebar border border-sidebar-border rounded-sm shadow-2xl overflow-hidden"
             >
-              <div className="relative p-1.5">
-                <Search className="absolute left-[14px] top-1/2 -translate-y-1/2 w-3 h-3 text-sidebar-muted-foreground pointer-events-none" />
-                <input
+              <div className="p-1.5">
+                <Input
                   ref={inputRef}
-                  type="text"
+                  size="xs"
+                  leadingIcon={<Search />}
                   placeholder="Search…"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  className="w-full h-7 pl-6 pr-2 text-xs bg-sidebar-muted/50 rounded-sm border border-accent/50 text-sidebar-foreground placeholder:text-sidebar-muted-foreground/50 focus:outline-none transition-colors"
                 />
               </div>
               {resultsDropdown}
@@ -446,63 +453,48 @@ function SidebarSearch({
 
   return (
     <div ref={containerRef} onMouseEnter={onMouseEnter} className="shrink-0 pt-2 relative px-1.5">
-      {!open ? (
-        <button
-          onClick={() => setOpen(true)}
-          title="Search (⌘K)"
-          className="flex items-center gap-2 w-full h-7 px-2 rounded-sm text-xs bg-sidebar-muted/50 border border-sidebar-border/50 text-sidebar-muted-foreground/50 hover:border-accent/50 hover:text-sidebar-muted-foreground transition-colors"
-        >
-          <Search className="w-3 h-3 shrink-0" />
-          <span className="flex-1 text-left">Search…</span>
-          <Kbd>⌘K</Kbd>
-        </button>
-      ) : (
-        <>
-          <div className="relative">
-            <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-sidebar-muted-foreground pointer-events-none" />
-            <input
-              ref={inputRef}
-              type="text"
-              placeholder="Search…"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              onKeyDown={handleKeyDown}
-              className="w-full h-7 pl-6 pr-2 text-xs bg-sidebar-muted/50 rounded-sm border border-accent/50 text-sidebar-foreground placeholder:text-sidebar-muted-foreground/50 focus:outline-none transition-colors"
-            />
-          </div>
-          {showResults && (
-            <div className="absolute left-1.5 right-1.5 top-[calc(100%-2px)] z-50 bg-sidebar border border-sidebar-border rounded-sm shadow-lg overflow-hidden">
-              {results.length === 0 ? (
-                <div className="px-3 py-4 text-center text-xs text-sidebar-muted-foreground/50">
-                  No results for &ldquo;{query}&rdquo;
-                </div>
-              ) : (
-                results.map((r, idx) => {
-                  const Icon = r.item.icon;
-                  return (
-                    <button
-                      key={r.item.href}
-                      className={cn(
-                        "flex items-center gap-2 w-full px-2 h-7 text-xs transition-colors text-left",
-                        idx === selectedIndex
-                          ? "bg-foreground/7 text-black dark:text-white"
-                          : "text-sidebar-foreground hover:bg-foreground/7"
-                      )}
-                      onMouseEnter={() => setSelectedIndex(idx)}
-                      onClick={() => navigateTo(r.item.href)}
-                    >
-                      <Icon className="w-3 h-3 shrink-0 text-sidebar-muted-foreground" />
-                      <span className="truncate flex-1">{r.item.label}</span>
-                      <span className="text-xs text-sidebar-muted-foreground/50 shrink-0">
-                        {r.item.section}
-                      </span>
-                    </button>
-                  );
-                })
-              )}
+      <Input
+        ref={inputRef}
+        size="xs"
+        leadingIcon={<Search />}
+        trailing={!open ? <Kbd>⌘K</Kbd> : undefined}
+        placeholder="Search…"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        onFocus={() => setOpen(true)}
+        onKeyDown={handleKeyDown}
+      />
+      {open && showResults && (
+        <div className="absolute left-1.5 right-1.5 top-[calc(100%-2px)] z-50 bg-sidebar border border-sidebar-border rounded-sm shadow-lg overflow-hidden">
+          {results.length === 0 ? (
+            <div className="px-3 py-4 text-center text-xs text-sidebar-muted-foreground/50">
+              No results for &ldquo;{query}&rdquo;
             </div>
+          ) : (
+            results.map((r, idx) => {
+              const Icon = r.item.icon;
+              return (
+                <button
+                  key={r.item.href}
+                  className={cn(
+                    "flex items-center gap-2 w-full px-2 h-7 text-xs transition-colors text-left",
+                    idx === selectedIndex
+                      ? "bg-foreground/7 text-black dark:text-white"
+                      : "text-sidebar-foreground hover:bg-foreground/7"
+                  )}
+                  onMouseEnter={() => setSelectedIndex(idx)}
+                  onClick={() => navigateTo(r.item.href)}
+                >
+                  <Icon className="w-3 h-3 shrink-0 text-sidebar-muted-foreground" />
+                  <span className="truncate flex-1">{r.item.label}</span>
+                  <span className="text-xs text-sidebar-muted-foreground/50 shrink-0">
+                    {r.item.section}
+                  </span>
+                </button>
+              );
+            })
           )}
-        </>
+        </div>
       )}
     </div>
   );
