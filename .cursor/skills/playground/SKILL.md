@@ -74,6 +74,153 @@ context, bridge/stub files must exist for each dependency:
 - `playground/src/components/inline-edit/` — stubs for CMS inline-edit (TestimonialCard)
 - `playground/src/components/EditButton.tsx` — stub for admin EditButton
 
+## Styling Policy
+
+The playground documentation infrastructure uses **SCSS modules with Élan DS tokens** — never Tailwind utility classes. This ensures the playground dogfoods the same design system it documents, and token changes propagate automatically.
+
+### Mandatory for new doc infrastructure
+
+All new playground shell/doc components MUST use:
+
+- **SCSS modules** (co-located `*.module.scss`) for all styling
+- **`var(--portfolio-*)` CSS custom properties** for colors, typography, spacing, borders, elevation, motion, z-index
+- **`@include` mixins** from `src/styles/mixins/` for typography (`body-sm`, `code-sm`, `label`, `heading-3`, etc.), interactive states (`button-reset`, `transition-fast`, `focus-ring`), and layout (`flex-center`)
+- **`$elan-mq-*` breakpoint variables** from `src/styles/tokens/_breakpoints.scss` for responsive media queries
+
+**Tailwind is NOT permitted** for new doc infrastructure code (`token-grid.tsx`, `component-preview.tsx`, `scroll-spy.tsx`, token/component page files).
+
+### Acceptable inline styles
+
+Dynamic values from data are the one acceptable use of inline `style={{}}`:
+
+```tsx
+<div style={{ backgroundColor: tokenColor }}>  {/* ✅ data-driven */}
+```
+
+Static visual properties must always go in the SCSS module — never `style={{}}`.
+
+### Gradual migration plan
+
+The following files still use Tailwind and will be migrated incrementally in future phases:
+
+- `playground/src/components/shell.tsx`
+- `playground/src/components/sidebar.tsx`
+- Individual component page files (`playground/src/app/components/*/page.tsx`)
+
+The `@theme` block in `playground/src/app/globals.css` remains as a bridge for these existing Tailwind pages. It will be removed when the full playground migration is complete.
+
+### SCSS module conventions
+
+```
+playground/src/components/
+  token-grid.tsx              (React component)
+  token-grid.module.scss      (styles via DS tokens)
+  component-preview.tsx
+  component-preview.module.scss
+  scroll-spy.tsx
+  scroll-spy.module.scss
+
+playground/src/app/tokens/colors/
+  page.tsx
+  colors.module.scss
+```
+
+Import pattern: `import s from "./component-name.module.scss"`, then use `className={s.className}`.
+
+SCSS modules `@use` DS sources via the `sassOptions.loadPaths` in `playground/next.config.ts`:
+
+```scss
+@use 'mixins/typography' as *;
+@use 'mixins/interactive' as *;
+@use 'tokens/breakpoints' as *;
+```
+
+## Page Typography Hierarchy
+
+Every playground page (both token pages and component pages) must use a consistent heading system. These shared components live in `playground/src/components/token-grid.tsx` and are styled via `token-grid.module.scss` using DS tokens.
+
+| Level | Component | HTML tag | DS tokens used | Usage |
+|-------|-----------|----------|----------------|-------|
+| Page hero | `SectionHeading` | `h2` | `type-2xl`, `weight-bold`, `tracking-tight` | One per page. Title + optional description. |
+| Major section | `SectionTitle` | `h3` | `type-lg`, `weight-semibold`, `tracking-tight` | Content sections within a page. Sentence/title case. |
+| Subsection | `SubsectionTitle` (via `SubSection` wrapper) | `h4` | `type-sm`, `weight-medium`, `text-secondary`, `tracking-wider`, uppercase | Eyebrow-style subsection labels. Always uppercase. |
+| Section intro | `SectionDescription` | `p` | `@include body-sm` | Description text after any heading. Always `type-sm`, never `type-xs`. |
+| Zone divider | `ZoneDivider` | `div` | `border-subtle`, `spacer-8x` / `spacer-6x` / `spacer-4x` | Separates major IA zones. Optional label. |
+
+### Rules
+
+- **One `SectionHeading` (h2) per page.** It is the page title in the content area.
+- **Shell `h1` is the sticky header.** Do not try to make it match the hero.
+- **`h3` is reserved for `SectionTitle` and `ComponentPreview` titles.** Do not use `h3` for eyebrow labels.
+- **All section descriptions use `type-sm`.** Never `type-xs` for intro paragraphs. `type-xs` is for captions, sublabels, and metadata only.
+- **No inline `style={{}}` for text colors.** Use DS token classes from SCSS modules.
+- **Component pages** use `ComponentPreview` (which has its own `h3` inside a Card) for demos, and `SubsectionHeading` for sections like "Props".
+
+## Token Page Template
+
+Every foundational styles page (`playground/src/app/tokens/*/page.tsx`) must follow this standard IA structure:
+
+```
+SectionHeading (h2): Page Title + description
+
+SectionTitle (h3): Token Architecture        ← MANDATORY first section
+  Explains the naming formula, tiers, or convention for this token category.
+
+SectionTitle (h3): [Content Section 1]
+SectionTitle (h3): [Content Section 2]
+...
+
+ZoneDivider (if page has raw primitives / reference material)
+
+SectionTitle (h3): [Reference Section]
+  SubsectionTitle (h4): [Sub-sections]
+```
+
+### Rules
+
+- **Token Architecture is always the first `SectionTitle`** (h3) on every styles page. It explains how this page's tokens are named and structured — the naming formula.
+- It belongs to the application/semantic zone, not at a global level above all content. It answers "how are these tokens named?" not "what is the design system?".
+- **ZoneDivider** only appears when there's a conceptual split between semantic/application tokens and raw primitives (e.g., colors page: semantic tokens above, palette reference below).
+- **ScrollSpy** is mandatory per the policy below (4+ sections threshold). The `token-architecture` id should be the first entry in the `scrollSpySections` array.
+
+### Gold-standard reference
+
+The **colors page** (`playground/src/app/tokens/colors/page.tsx`) is the canonical example of this template, with Token Architecture as the first SectionTitle, property sections, a ZoneDivider, and a Palette Reference zone.
+
+## ScrollSpy Usage Policy
+
+`ScrollSpy` provides a fixed right-rail section navigator on large screens. It is imported from `@/components/scroll-spy` (which in turn imports the production component via `@site/ScrollSpy`).
+
+### When to include ScrollSpy
+
+A page SHOULD include ScrollSpy when it meets **any** of these criteria:
+
+- The page has **4+ major sections** (`SectionTitle`-level headings)
+- The page content exceeds **~3 viewport heights** (~2400px) of rendered content
+- The page has a **two-zone IA** (e.g., semantic tokens + palette reference) where the user needs to orient between zones
+
+A page SHOULD NOT include ScrollSpy when:
+
+- The page has 3 or fewer sections (the content is short enough to scan)
+- The page is a single-component demo with only Preview + Props (most component pages)
+
+### ScrollSpy sections array
+
+The `sections` prop accepts an array of `{ id, label, group? }` objects. For pages with grouped sections (e.g., semantic tokens zone vs. reference zone), use the `group` field to insert a visual divider in the nav before that section:
+
+```tsx
+const sections = [
+  { id: "architecture", label: "Architecture", group: "Tokens" },
+  { id: "surface", label: "Surface" },
+  // ...
+  { id: "palette-reference", label: "Palette Reference", group: "Reference" },
+];
+```
+
+### Scroll target IDs
+
+Every section that appears in ScrollSpy MUST have a matching `id` attribute on its container element plus `scroll-mt-24` for sticky-header offset. `SectionTitle` accepts an `id` prop that handles both.
+
 ## Reference Implementation
 
 **`playground/src/app/components/button/page.tsx`** is the gold-standard template.
@@ -83,8 +230,9 @@ Key patterns to follow:
 ```tsx
 // 1. Import harness primitives from playground's own components
 import { Shell } from "@/components/shell";
-import { SectionHeading } from "@/components/token-grid";
+import { SectionHeading, SectionTitle, SectionDescription, SubSection } from "@/components/token-grid";
 import { ComponentPreview, PropsTable } from "@/components/component-preview";
+// ScrollSpy — include on pages with 4+ sections or 3+ viewport heights of content
 import ScrollSpy from "@/components/scroll-spy";
 
 // 2. Import the REAL component from the design system — never re-implement it
@@ -130,32 +278,37 @@ Before writing any code for a new playground component page:
 
 1. **Import the production component** via `@ds/*` or direct path — the page renders the real component
 2. **Use harness primitives** for structure: `Shell`, `SectionHeading`, `ComponentPreview`, `PropsTable`, `ScrollSpy`
-3. **Provide a `code` prop** on every `ComponentPreview` showing the import path and usage
-4. **Include a source path footer** at the bottom (e.g., `src/components/ui/Button/Button.tsx`)
-5. **Use `@ds/Button`** for any trigger/action buttons in the demo (e.g., dialog triggers, toast triggers)
-6. **Add a sidebar entry** in `playground/src/components/sidebar.tsx` in the appropriate category
+3. **Use the standard typography hierarchy** for all headings and descriptions. Import `SectionTitle`, `SubSection`, `SectionDescription` from `@/components/token-grid`. Do not create ad-hoc heading elements. See "Page Typography Hierarchy" above.
+4. **Provide a `code` prop** on every `ComponentPreview` showing the import path and usage
+5. **Include a source path footer** at the bottom (e.g., `src/components/ui/Button/Button.tsx`)
+6. **Use `@ds/Button`** for any trigger/action buttons in the demo (e.g., dialog triggers, toast triggers)
+7. **Add a sidebar entry** in `playground/src/components/sidebar.tsx` in the appropriate category
+8. **Every foundational styles page** (`playground/src/app/tokens/*/page.tsx`) must include a Token Architecture section as its first `SectionTitle` (h3). See "Token Page Template" above.
 
 ### MUST NOT
 
 1. **Never declare component markup** — no `<button>`, `<input>`, `<div>` styled to look like a component when the real component exists
 2. **Never use raw `<button>` for demo triggers** — import `Button` from `@ds/Button`
 3. **Never use SVG for text, labels, or component UI** — SVG is only for icons (Lucide), logos, and decorative illustrations
-4. **Never use inline `style={{}}`** — use Tailwind classes or CSS custom properties
-5. **Never use Tailwind's default palette** (`emerald-600`, `red-500`) as component colors — use token CSS custom properties from `globals.css`
+4. **Never use inline `style={{}}`** for static visual properties — use SCSS module classes with DS tokens. Dynamic data-driven values (e.g., `style={{ backgroundColor: tokenColor }}`) are the one exception.
+5. **Never use Tailwind's default palette** (`emerald-600`, `red-500`) as component colors — use `var(--portfolio-*)` token custom properties
+6. **Never use Tailwind utility classes in doc infrastructure files** (`token-grid.tsx`, `component-preview.tsx`, `scroll-spy.tsx`, token page files) — use SCSS modules with DS tokens. See "Styling Policy" above.
 6. **Never re-implement component logic** (state machines, event handlers, Radix primitive wrappers) — import the production version that already has this
 7. **Never use arbitrary Tailwind values with raw pixels** (`w-[48px]`, `h-[200px]`) or raw hex (`bg-[#161616]`, `text-[#525252]`) when a design token CSS custom property exists in `playground/src/app/globals.css`. Use `var(--token-name)` references instead.
+8. **Never use `h3` for eyebrow-style labels** — use `SubSection` (`h4`). `h3` is reserved for `SectionTitle` and `ComponentPreview` titles.
+9. **Never use `text-xs` for section intro paragraphs** — use `SectionDescription` (`text-sm`). `text-xs` is for metadata, sublabels, and captions only.
 
 ### Acceptable Harness Code
 
 The following are expected in a demo page and are NOT violations:
 
-- Layout `div`s with Tailwind for arranging demos (flex, grid, spacing)
+- Layout `div`s with SCSS module classes (or Tailwind in not-yet-migrated pages) for arranging demos
 - Demo state hooks (`useState`, `useEffect`) for controlling component props interactively
 - Data arrays (e.g., `const SIZES: ButtonSize[] = [...]`) for iterating over variants
 - Lucide icons as slot content for icon props
 - `<table>`, `<thead>`, `<tbody>` for comparison matrices
 - Custom label text (`<span>`, `<p>`) for annotations and descriptions
-- `cn()` utility for conditional Tailwind class composition on layout elements
+- `cn()` utility for conditional class composition on layout elements (not-yet-migrated pages only)
 
 ### Allowlisted Exceptions
 
@@ -171,10 +324,11 @@ These specific patterns are explicitly permitted despite normally being violatio
 - [ ] No component re-implementations in the page (search for Radix imports, styled `<button>`, etc.)
 - [ ] Sidebar entry exists in `playground/src/components/sidebar.tsx`
 - [ ] Registry entry exists in `archive/registry.json` (for new components)
-- [ ] No arbitrary hex values in Tailwind classes (search for `#` in className props)
+- [ ] No arbitrary hex values in className props (search for `#` in className strings)
 - [ ] No arbitrary pixel values when a token CSS var exists (search for `[Npx]` patterns)
-- [ ] All colors use `var(--...)` references or Tailwind token classes, not default palette or raw hex
-- [ ] All spacing uses token vars or standard Tailwind spacing, not arbitrary `[Npx]` when tokens cover the value
+- [ ] All colors use `var(--portfolio-*)` token references, not raw hex or default palette colors
+- [ ] All spacing uses `var(--portfolio-spacer-*)` tokens, not arbitrary pixel values when tokens cover the value
+- [ ] Doc infrastructure files use SCSS modules — no Tailwind utility classes in `token-grid.tsx`, `component-preview.tsx`, `scroll-spy.tsx`, or token page files
 
 ## Evaluation Gate (Mandatory Post-Implementation Check)
 
@@ -242,8 +396,9 @@ After building or modifying a playground page, run the Cross-App Parity Checklis
 |------|---------|-----------|------------|
 | `playground/src/app/components/button/page.tsx` | Reference implementation | Before building any new page | Documentation / page structure changes only (props table, code examples, section text) — never for component visual changes |
 | `playground/src/components/sidebar.tsx` | Sidebar navigation categories | When adding a page | When adding a page |
+| `playground/src/components/token-grid.tsx` | Doc primitives: `SectionHeading`, `SectionTitle`, `SectionDescription`, `SubSection`, `SubsectionTitle`, `ZoneDivider`, `TokenRow`, `ColorSwatch` | Before building any new page | When adding new doc-level primitives |
 | `playground/src/components/shell.tsx` | Page shell wrapper | When understanding harness structure | Rarely |
-| `playground/src/components/component-preview.tsx` | Preview + code tab wrapper | When understanding harness structure | Rarely |
+| `playground/src/components/component-preview.tsx` | Preview + code tab wrapper, `SubsectionHeading`, `PropsTable` | When understanding harness structure | Rarely |
 | `archive/registry.json` | Component registry | When adding a new component | When adding a new component |
 | `playground/tsconfig.json` | `@ds/*` alias definition | When debugging imports | When adding new aliases |
 | `playground/next.config.ts` | Turbopack root + SCSS paths | When debugging build issues | When changing build config |
