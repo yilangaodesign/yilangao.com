@@ -4,10 +4,91 @@
 >
 > **Who reads this:** AI agents at session start (scan recent entries for context), and during feedback processing (check for recurring patterns).
 > **Who writes this:** AI agents after each feedback cycle via the `design-iteration` skill.
-> **Last updated:** 2026-04-03 (FB-092: Input xs icon size too large for text scale)
+> **Last updated:** 2026-04-03 (FB-096: Accent scale OKLCH redesign + Blue removal)
 >
 > **For agent skills:** Read only the first 30 lines of this file (most recent entries) for pattern detection.
 > **Older entries:** Synthesized in `docs/design-feedback-synthesis.md`. Raw archive in `docs/design-feedback-log-archive.md`.
+
+---
+
+## Session: 2026-04-03 — Accent scale audit + extended palette blue removal
+
+### FB-096: Lumen accent scale perceptually uneven; extended Blue too close to brand
+
+**User feedback:** "There are certain steps that don't really make sense. They're a little bit too close, especially for step 50 (#7182FD). It seriously is not enough of a distinction from 40, and it's too far from 60." Also: "Remove the blue color from the extended palette — it's too close to the brand accent, clashing."
+
+**Root cause:** The old accent scale had uneven OKLCH lightness deltas — the 40-to-50 gap was 0.10 while 50-to-60 was 0.16 (a 60% asymmetry). Combined with a chroma cliff (pastels → maximum saturation in one step), steps 40/50 looked nearly identical while 60 felt disconnected. The extended Blue family (hue ~219deg) was only ~20deg from the accent (hue ~270deg), creating semantic confusion.
+
+**Resolution:**
+1. **Accent scale rebuilt in OKLCH** with grade 60 (#3336FF) as immovable anchor. Even lightness ramp (deltaL ~0.093 above, ~0.081 below) with sine chroma arc peaking at the anchor. Constant hue 269.7deg. The critical 40-60 zone now has <2% asymmetry vs the old 60%.
+2. **Blue family removed** from `_colors.scss` and all downstream consumers. `$portfolio-support-info` remapped from `$portfolio-blue-70` to `$portfolio-cyan-70` (#00539A).
+3. **Purple kept** — 29deg hue separation is sufficient, and it leans red-violet vs the accent's blue-violet.
+4. **Playground documentation added** — "How This Scale Is Built" section in the Palette Reference with OKLCH construction parameters, Lumen origin narrative, and full hex/contrast audit table.
+5. **Case study updated** — TokenGrid.tsx methodology text changed from "hybrid Carbon luminance" to OKLCH construction.
+
+**Files changed:** `src/styles/tokens/_colors.scss`, `playground/src/lib/tokens.ts`, `playground/src/app/globals.css`, `playground/src/app/tokens/colors/page.tsx`, `playground/src/app/tokens/colors/colors.module.scss`, `src/components/elan-visuals/TokenGrid.tsx`, `src/components/inline-edit/token-map.ts`, `docs/design/color.md`
+
+**Pattern note:** This is the second time the accent scale's perceptual uniformity has been flagged (first: pre-Lumen hue jump at step 50). The root cause both times was hand-picked hex values without systematic perceptual validation. The OKLCH approach makes the scale auditable by construction.
+
+---
+
+## Session: 2026-04-03 — Checkbox height fluctuation on toggle
+
+### FB-095: Checkbox visually fluctuates in height when toggling checked state
+
+**User feedback:** "When I tick the checkbox, it kind of just fluctuates in height or something. It really bothers me."
+
+**Root cause:** Two compounding factors. (1) The Radix `CheckboxPrimitive.Indicator` was mounted/unmounted from the DOM on every state change (no `forceMount`), triggering a brief layout recalculation inside the fixed-size checkbox button. (2) The `.checkbox` element used `transition: all 110ms` (via `transition-fast` mixin), which animated even momentary layout-related property changes during the DOM churn — making the recalculation visible as a size fluctuation.
+
+**Resolution (two iterations):** First attempt used `forceMount` on the Radix Indicator — eliminated DOM mount/unmount but Presence's ResizeObserver/animation machinery still caused sub-frame jitter. Final fix: bypassed `CheckboxPrimitive.Indicator` entirely. Icons are now direct children of the Root button, absolutely positioned with `opacity: 0/1` toggling via CSS `data-state` selectors. Replaced `transition: all` with targeted transitions on `background-color`, `border-color`, `box-shadow`. Added `position: relative` + `overflow: hidden` on the checkbox.
+
+**Design rule — Transition specificity:** Never use `transition: all` on interactive controls with conditional children — always enumerate the specific visual properties (`background-color`, `border-color`, `box-shadow`, `color`, `opacity`). `transition: all` makes layout recalculations visible as glitches.
+
+**Design rule — Radix Indicator bypass:** When entrance/exit animations are not needed, skip the Radix Indicator and render icons directly as children of the Root, using CSS `data-state` selectors for visibility. This eliminates the Presence/ResizeObserver/animation machinery entirely.
+
+**Cross-category note:** Also documented as ENG-104 (engineering) — Radix Indicator bypass for stable layout.
+
+---
+
+## Session: 2026-04-03 — Playground doc primitives: Tailwind to Élan DS migration
+
+### FB-094: Playground documentation infrastructure migrated from Tailwind to Élan DS tokens + SCSS modules
+
+**User feedback:** "Why tf is Tailwind still here? Everything should be built using the actual Élan design system code. Use anything that we can use in the design system as a token instead of hardcoding things that mirror the design system."
+
+**Root cause:** Previous implementation used Tailwind utility classes for all styling in the doc infrastructure files (token-grid.tsx, component-preview.tsx, scroll-spy.tsx, colors/page.tsx). The playground already had `sassOptions.loadPaths` configured to resolve DS sources, but the convenience of Tailwind led to bypassing the DS token system entirely.
+
+**Resolution:**
+- Created 4 co-located SCSS modules (`token-grid.module.scss`, `component-preview.module.scss`, `scroll-spy.module.scss`, `colors.module.scss`) using `var(--portfolio-*)` custom properties and `@include` mixins from the DS
+- Migrated all 4 TSX files from `className="tailwind-classes"` to `className={s.scssClass}` references
+- Eliminated all `cn()` and `@/lib/utils` imports from the migrated files
+- Dynamic data-driven inline styles (`style={{ backgroundColor: tokenColor }}`) retained as the one acceptable exception
+- Added comprehensive "Styling Policy" section to `SKILL.md` documenting the no-Tailwind mandate, gradual migration plan, and SCSS module conventions
+- Updated Composition Rules, Validation Checklist, and typography hierarchy table to reflect DS tokens instead of Tailwind class descriptions
+
+**Cross-category note:** Also documented as an engineering concern — the SCSS module pattern, `sassOptions.loadPaths` configuration, and Turbopack cache flush requirements are engineering infrastructure. See SKILL.md Styling Policy for the canonical reference.
+
+---
+
+## Session: 2026-04-03 — Colors page IA, typography hierarchy, and layout restructure
+
+### FB-093: Playground documentation typography hierarchy standardized; colors page restructured
+
+**User feedback:** The colors page had three problems: (1) information architecture was flat — palette reference (raw primitives) appeared in the same list as semantic token sections with no visual separation; (2) `h3` meant three different things across the playground (uppercase eyebrow, large semibold section title, and ComponentPreview demo title); (3) light/dark theme panels stacked vertically, wasting horizontal space on wide screens.
+
+**Root cause:** The playground grew organically without a codified heading hierarchy. `SubSection` (token-grid.tsx) and `SubsectionHeading` (component-preview.tsx) both used `h3` for what was semantically an `h4`-level eyebrow. The colors page used ad-hoc `h3` tags at `text-lg font-semibold` for property sections — a completely different visual level than the shared components. Section description text alternated between `text-xs` and `text-sm` with no standard.
+
+**Resolution:**
+- Defined a standard typography hierarchy: `SectionHeading` (h2), `SectionTitle` (h3, new), `SubsectionTitle` (h4, fixed from h3), `SectionDescription` (p, text-sm), `ZoneDivider` (new). All in `playground/src/components/token-grid.tsx`.
+- Changed `SubsectionHeading` in `component-preview.tsx` from h3 to h4 (same visual, correct semantics). Auto-fixes ~40 component pages.
+- Refactored the colors page to use shared heading components. Added `ZoneDivider` between semantic tokens and palette reference. Added responsive side-by-side light/dark layout (`lg:flex-row`).
+- Standardized section description text from `text-xs` to `text-sm` on spacing and breakpoints pages.
+- Added ScrollSpy group divider support for IA zone separation.
+- Updated `.cursor/skills/playground/SKILL.md` with "Page Typography Hierarchy" and "ScrollSpy Usage Policy" sections.
+
+**Principle established:** Documentation surfaces must codify their heading hierarchy as shared components, not as ad-hoc inline elements. When the same HTML tag carries multiple visual meanings, the system is already broken — fix the semantic tags and extract shared components before building more pages. This is the same principle as design tokens: naming things forces consistency.
+
+**Files changed:** `playground/src/components/token-grid.tsx`, `playground/src/components/component-preview.tsx`, `playground/src/components/scroll-spy.tsx`, `playground/src/app/tokens/colors/page.tsx`, `playground/src/app/tokens/spacing/page.tsx`, `playground/src/app/tokens/breakpoints/page.tsx`, `.cursor/skills/playground/SKILL.md`
 
 ---
 
@@ -1329,4 +1410,39 @@ The same two-tier logic applies in dark mode: default text is `neutral-bold` (wh
 This applies to Menu, NavItem, sidebar items, command palettes, and any future list-based interactive component. Never use `neutral-max` as a resting-state text color — it's reserved for interactive states where background context changes.
 
 **Cross-category note:** This pattern was previously identified in NavItem work (FB-078) and Button dark mode audit (FB-072/073 in design-feedback-log) but was never formalized as a reusable token or applied consistently. This entry establishes the token (`neutral-max`) and the two-tier contrast principle as system-wide standards.
+
+---
+
+#### FB-095: "Token Architecture should belong to the application section"
+
+**UX Intent:** Standardize the information architecture across all 6 foundational styles pages in the playground. The "Token Architecture" section on the colors page was positioned at the global level (as a SubsectionTitle h4), but its content explains how semantic token *names* are constructed — an application/use-case concern. The user wanted it scoped inside the semantic zone as a proper SectionTitle (h3), and wanted every foundational styles page to have its own Token Architecture section explaining the naming convention for that token category.
+
+**Root Cause:** The colors page was the only page with a Token Architecture explanation, and it was at the wrong heading level (h4 SubsectionTitle instead of h3 SectionTitle). The other 5 pages (typography, spacing, motion, elevation, breakpoints) had no Token Architecture section at all. Additionally, 3 pages (spacing, elevation, breakpoints) lacked ScrollSpy despite meeting the 4+ sections threshold.
+
+**Resolution:**
+1. **Colors page:** Promoted Token Architecture from `SubsectionTitle` (h4) to `SectionTitle` (h3) with `id="token-architecture"`. Added `SectionDescription` explaining the four-part naming formula. Removed redundant `scroll-margin-top` from SCSS (now handled by SectionTitle's own class).
+2. **Typography page:** Added Token Architecture as first SectionTitle explaining two-tier naming (semantic mixins vs. primitive tokens). Updated ScrollSpy.
+3. **Spacing page:** Added Token Architecture explaining three-tier naming (primitives, layout, utility). Added ScrollSpy with 5 sections. Added `id` attributes to existing SubSections.
+4. **Motion page:** Added Token Architecture explaining intent-based naming (duration speed names, easing intent names, choreography presets, interactive mixins). Updated ScrollSpy.
+5. **Elevation page:** Added Token Architecture explaining size-scale naming (shadow-sm/md/lg, radius-sm/md/lg). Added ScrollSpy with 4 sections. Added `id` attributes to existing SubSections.
+6. **Breakpoints page:** Added Token Architecture explaining SCSS variable naming ($elan-bp-* vs $elan-mq-*). Added ScrollSpy with 6 sections. Added `id` attributes to existing SubSections.
+7. **SKILL.md:** Added "Token Page Template" section codifying the standard IA for foundational styles pages. Added MUST DO #8 requiring Token Architecture as the first SectionTitle on every styles page.
+
+**Design rule — Token Page IA Template:** Every foundational styles page must follow: SectionHeading (h2) → Token Architecture as first SectionTitle (h3) → content sections → optional ZoneDivider → reference sections. Token Architecture explains the naming formula and belongs to the application/semantic zone. The colors page is the gold-standard reference. This template is now codified in `.cursor/skills/playground/SKILL.md`.
+
+**Cross-category note:** Also documented as CF-011 (content) — the placement of Token Architecture is both an IA design decision and a content strategy decision about how naming conventions are communicated.
+
+---
+
+#### FB-096: "Light/dark columns and ScrollSpy should appear at medium widths, not just largest"
+
+**UX Intent:** On the playground colors page, the light/dark theme strip columns (side-by-side arrangement) and the ScrollSpy navigation only activated at `$elan-mq-lg` (1440px). At medium viewport widths (1056px–1439px) the sidebar is in hamburger mode, so the content area has the full viewport width — plenty of horizontal space for both features. The user wanted them to activate earlier so that medium-width viewports aren't stuck with stacked panels and no page navigation.
+
+**Root Cause:** Both features used `$elan-mq-lg` (1440px) as their breakpoint. This was likely set conservatively to account for the sidebar at wide widths, but at `md` (1056px) the sidebar is hidden, so the full width is available. The design system ScrollSpy (`src/components/ui/ScrollSpy/`) already used `$elan-mq-md` (1056px) — the playground version was misaligned.
+
+**Resolution:**
+1. **ScrollSpy:** Changed `.nav` breakpoint from `$elan-mq-lg` to `$elan-mq-md` in `playground/src/components/scroll-spy.module.scss` — now matches the production design system ScrollSpy.
+2. **Colors page:** Changed four media queries from `$elan-mq-lg` to `$elan-mq-md` in `playground/src/app/tokens/colors/colors.module.scss`: `.themeStripContainer`, `.themeStripLight`, `.themeStripDark`, `.interactionStrips`.
+
+**Design rule — Playground responsive breakpoint alignment:** When the playground sidebar is in hamburger/overlay mode (below `lg`), the content area has full viewport width. Features that need horizontal space (side-by-side panels, ScrollSpy) should activate at `$elan-mq-md` (1056px), not `$elan-mq-lg` (1440px). Reserve `lg` breakpoints for features that must coexist with the expanded sidebar.
 

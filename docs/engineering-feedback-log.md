@@ -4,10 +4,31 @@
 >
 > **Who reads this:** AI agents at session start (scan recent entries for context), and during incident response (check for recurring patterns).
 > **Who writes this:** AI agents after each incident resolution via the `engineering-iteration` skill.
-> **Last updated:** 2026-04-03 (ENG-103: sync-tokens script enhanced for dark mode)
+> **Last updated:** 2026-04-03 (ENG-104: Checkbox forceMount + transition fix)
 >
 > **For agent skills:** Read only the first 30 lines of this file (most recent entries) for pattern detection.
 > **Older entries:** Synthesized in `docs/engineering-feedback-synthesis.md`. Raw archive in `docs/engineering-feedback-log-archive.md`.
+
+---
+
+## Session: 2026-04-03 — Checkbox height fluctuation on toggle
+
+### ENG-104: Checkbox visually fluctuates in height when toggling checked state
+
+**Date:** 2026-04-03
+
+**Issue:** Checkbox component exhibited a visible height/size fluctuation when toggling between unchecked and checked states.
+
+**Root cause:** Radix `CheckboxPrimitive.Indicator` without `forceMount` removes/adds the indicator span from the DOM on every state change. Combined with `transition: all` on the parent button, the DOM mount/unmount triggered a brief animated layout recalculation visible as a size glitch.
+
+**Resolution (two iterations):**
+First attempt: added `forceMount` to `CheckboxPrimitive.Indicator`, narrowed `transition: all` to specific properties, added `overflow: hidden`. This eliminated the DOM mount/unmount but the Presence component's `ResizeObserver`, animation event listeners, and internal state machine still caused sub-frame layout jitter.
+
+Final fix: bypassed `CheckboxPrimitive.Indicator` entirely. Icons are now direct children of `CheckboxPrimitive.Root` (the button), absolutely positioned with `opacity: 0/1` toggling via CSS `data-state` selectors on the button itself. Added `position: relative` to `.checkbox` to contain the absolute icons. Zero Radix animation/presence machinery involved — the only thing that changes on toggle is `data-state`, `background-color`, `border-color`, and icon `opacity`.
+
+**Lesson:** Radix's `Indicator`/`Presence` pattern is designed for entrance/exit animations. If you don't need animations and want rock-solid layout stability, skip the Indicator and render icons directly as children of the Root, using CSS `data-state` selectors for visibility. The Presence component's `ResizeObserver` + animation state machine + event listeners add overhead that can cause sub-frame jitter even with `forceMount`.
+
+**Cross-category note:** Also documented as FB-095 (design) — transition specificity rule.
 
 ---
 

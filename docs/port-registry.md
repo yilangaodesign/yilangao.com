@@ -24,7 +24,7 @@
 | Service | Default Port | Current Port | Status | PID | Notes |
 |---|---|---|---|---|---|
 | Main site (`yilangao.com`) | 4000 | 4000 | running | 70330 | `npm run dev` |
-| Playground | 4001 | 4001 | running | 31775 | `npm run playground` |
+| Playground | 4001 | 4001 | running | 63663 | `npm run playground` |
 | ASCII Art Studio | 4002 | 4002 | running | 19736 | `npm run ascii-tool` |
 
 ## Change Log
@@ -52,3 +52,6 @@
 | 2026-04-01 | Playground | restarted | 4001 | Cleared .next + restarted — Turbopack HMR failed to push button page edit to browser (ENG-085) |
 | 2026-04-01 | Playground | restarted | 4001 | Cleared .next + restarted — ThemeProvider hydration fix (ENG-086) |
 | 2026-04-01 | Playground | restarted | 4001 | Cleared .next + restarted — stale HMR after adding md button size + updating Lg/Xl gaps/padding |
+| 2026-04-03 | Playground | restarted | 4001 | Cleared .next + restarted — typography hierarchy + colors page IA/layout restructure |
+| 2026-04-03 | Playground | restarted | 4001 | Cleared .next + restarted — Checkbox forceMount + transition fix |
+| 2026-04-03 | Playground | restarted | 4001 | Cleared .next + restarted — Checkbox bypass Radix Indicator, icons direct in Root with opacity toggle |

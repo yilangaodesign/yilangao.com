@@ -538,6 +538,28 @@ This session was not a single piece of feedback — it was the foundational anal
 
 ---
 
+#### CF-011: "Token Architecture should belong to the application section, not global"
+
+**Intent:** Enforce consistent content strategy across all 6 foundational styles pages in the playground documentation. Every token category has a naming convention that designers and developers need to understand — this should be systematically documented in the same position on every page, not ad-hoc on one page and missing from the rest.
+
+**Root Cause:** Only the colors page had a Token Architecture section, and it was positioned at the global level (above semantic tokens) rather than scoped as part of the application/semantic narrative. The other 5 pages (typography, spacing, motion, elevation, breakpoints) each have distinct naming conventions that were undocumented. This inconsistency meant users visiting different token pages got different levels of documentation depth.
+
+**Resolution:**
+1. Established a standard content template: Token Architecture is always the first major section on every foundational styles page, explaining the naming formula for that token category.
+2. Wrote Token Architecture content for each page:
+   - **Typography**: two-tier naming (semantic mixins vs. primitive tokens)
+   - **Spacing**: three-tier naming (primitives, layout, utility)
+   - **Motion**: intent-based naming (duration speed, easing intent, choreography presets, interactive mixins)
+   - **Elevation**: size-scale naming (shadow-sm/md/lg, radius-sm/md/lg)
+   - **Breakpoints**: SCSS variable naming ($elan-bp-* vs $elan-mq-*)
+3. Codified the template in SKILL.md for future page creation enforcement.
+
+**Pattern extracted → SKILL.md "Token Page Template" section:** Every foundational styles page must have Token Architecture as its first SectionTitle, explaining the naming formula. This is a content strategy requirement — naming conventions are essential reference content for both human and agent consumers.
+
+**Cross-category note:** Also documented as FB-095 (design) — the IA placement and heading hierarchy are design decisions that intersect with this content strategy decision.
+
+---
+
 ## Entry Template
 
 ```markdown

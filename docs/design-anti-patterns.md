@@ -4,7 +4,7 @@
 >
 > **Who reads this:** AI agents before making UI changes — scan for relevant anti-patterns.
 > **Who writes this:** AI agents when a feedback cycle reveals a new anti-pattern.
-> **Last updated:** 2026-04-02 (AP-052: Typography mixin color clobbering on-color text)
+> **Last updated:** 2026-04-03 (AP-055: Hand-picked hex values for color scales)
 
 ---
 
@@ -18,10 +18,10 @@
 | Theming & Dark Mode | AP-042, AP-043, AP-044, AP-047 | 4 | 4 |
 | Interaction & Pointer Behavior | AP-011, AP-012, AP-022, AP-025, AP-035 | 5 | 5 |
 | Navigation & Menus | AP-014, AP-015, AP-016, AP-029, AP-046, AP-049 | 6 | 6 |
-| Visual Hierarchy & Affordances | AP-010, AP-017, AP-019, AP-026, AP-030, AP-032, AP-039, AP-040, AP-041, AP-048‡, AP-050, AP-051, AP-052 | 13 | 13 |
+| Visual Hierarchy & Affordances | AP-010, AP-017, AP-019, AP-026, AP-030, AP-032, AP-039, AP-040, AP-041, AP-048‡, AP-050, AP-051, AP-052, AP-054 | 14 | 14 |
 | Form & Input UX | AP-023, AP-024, AP-028, AP-036 | 4 | 4 |
 | Admin UI Patterns | AP-034, AP-037 | 2 | 2 |
-| **Total** | | **53** | **53** |
+| **Total** | | **54** | **54** |
 
 > **†** AP-048 "Independent Padding Decisions Across Adjacent Panels" (spacing entry)
 > **‡** AP-048 "Incremental State-by-State Implementation Without a Holistic Model" (state modeling entry)
@@ -847,6 +847,20 @@ Use `var(--ds-*, #{$scss-fallback})`. The CSS custom property adapts at runtime;
 
 ---
 
+## AP-054: Ad-Hoc Heading Elements in Playground Documentation
+
+**Status: ACTIVE**
+
+**Trigger:** Using raw `<h3>`, `<h4>`, or `<p>` tags with ad-hoc className strings for section headings and descriptions in playground pages, instead of using the shared heading components from `playground/src/components/token-grid.tsx`.
+
+**Why it's wrong:** Each page that invents its own heading styles creates a maintenance fork. The same HTML tag (`h3`) ends up meaning three different things: uppercase muted eyebrow, large semibold section title, and demo block title. Section description text randomly alternates between `text-xs` and `text-sm`. The heading hierarchy breaks — screen readers see a flat outline instead of a meaningful document structure. When the system-wide heading style needs to change, every page that used ad-hoc tags must be found and updated individually.
+
+**Correct alternative:** Use the standardized heading components: `SectionHeading` (h2 hero), `SectionTitle` (h3 major section), `SubSection`/`SubsectionTitle` (h4 eyebrow), `SectionDescription` (p, always text-sm). These are exported from `playground/src/components/token-grid.tsx`. See the "Page Typography Hierarchy" section in `.cursor/skills/playground/SKILL.md`.
+
+**Frustration caused:** 1 round (FB-093). Colors page had two conflicting h3 patterns on the same page; typography/spacing/breakpoints/motion all had inconsistent description text sizes.
+
+---
+
 ## AP-054: Changing border-width Without Padding Compensation
 
 **Trigger:** Writing CSS that changes `border-width` (or `border-bottom-width`) on `:focus`, `:focus-within`, `:hover`, or `:active` without simultaneously reducing padding by the same amount.
@@ -931,6 +945,18 @@ Use `var(--ds-*, #{$scss-fallback})`. The CSS custom property adapts at runtime;
 
 ---
 
+## AP-063: Tailwind Utility Classes in Playground Doc Infrastructure
+
+**Trigger:** Using Tailwind className strings (`"text-sm text-muted-foreground"`, `cn("bg-white", ...)`) in playground documentation infrastructure files (`token-grid.tsx`, `component-preview.tsx`, `scroll-spy.tsx`, token page files) when the Élan DS provides equivalent `var(--portfolio-*)` custom properties and SCSS mixins.
+
+**Why it's wrong:** The playground's purpose is to document and dogfood the design system. Styling it with Tailwind instead of DS tokens creates a disconnect: the playground says "use our token system" while itself ignoring it. Changes to DS tokens don't propagate to playground styling, and the playground can't serve as a reference for how to consume the DS. This was flagged multiple times by the user as a violation of the project's no-Tailwind policy for documentation infrastructure.
+
+**Correct alternative:** Create co-located SCSS modules (`*.module.scss`) that `@use` DS mixins and reference `var(--portfolio-*)` custom properties. Import as `import s from "./component.module.scss"` and use `className={s.className}`. Dynamic data-driven values (e.g., `style={{ backgroundColor: tokenColor }}`) are the one acceptable inline style. See SKILL.md "Styling Policy" section.
+
+**Frustration caused:** 3+ rounds — user repeatedly flagged Tailwind in playground across multiple sessions.
+
+---
+
 ## Entry Template
 
 ```markdown
@@ -944,3 +970,15 @@ Use `var(--ds-*, #{$scss-fallback})`. The CSS custom property adapts at runtime;
 
 **Frustration caused:** [Optional — how many rounds of user frustration this created]
 ```
+
+---
+
+### AP-055: Hand-picked hex values for color scales
+
+**Trigger:** Building a color scale by selecting individual hex values by eye, without verifying perceptual uniformity in a color space like OKLCH.
+
+**Why it's wrong:** Human color perception is nonlinear. Two colors that look "evenly spaced" in hex (or even HSL) can have wildly different perceptual distances. This creates scales where adjacent steps are indistinguishable (40 vs 50) while non-adjacent steps have jarring cliffs (50 vs 60). The Lumen accent scale was flagged for this twice — first a hue discontinuity, then a lightness/chroma cliff. Both issues were invisible in hex but obvious in OKLCH.
+
+**Correct alternative:** Define color scales in OKLCH with explicit lightness, chroma, and hue curves. Anchor the key brand step, then derive all other steps mathematically. Document the OKLCH coordinates alongside hex values so the scale is auditable. This is the approach used by Material 3, Radix Colors, and the rebuilt Lumen scale.
+
+**Frustration caused:** 2 rounds — original hue discontinuity (pre-Lumen) and this lightness cliff (steps 40–60).

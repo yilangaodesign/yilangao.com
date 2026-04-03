@@ -21,10 +21,14 @@ Labels in ScrollSpy tooltips should be shorter than section headings. The sectio
 ### 13.3 Scroll Offset — Context-Preserving Navigation
 
 **Source:** Session 2026-03-30, "I don't want it to be up against the upper border of the browser screen"
+**Updated:** Session 2026-04-03, component-level offset replaces reliance on per-page `scroll-margin-top`
 
-Any section targeted by `scrollIntoView({ block: "start" })` or anchor navigation must have `scroll-margin-top` that provides **contextual breathing room**, not just header clearance. When a user jumps to a section, they need to see a sliver of the preceding content to maintain spatial context — "where did I come from?" Without it, the section heading slams against the viewport top edge, losing all sense of position within the page.
+**ScrollSpy component-level offset (primary mechanism):** The ScrollSpy component now handles scroll offset internally. When a user clicks or drags to a section, ScrollSpy positions the target at **20% from the viewport top** using `window.scrollTo` instead of `scrollIntoView`. This:
+- Aligns with the IntersectionObserver `rootMargin: "-20% 0px -60% 0px"` detection zone, so the scroll target and the active-section detection use the same viewport region
+- Provides breathing room without depending on CSS on the target elements
+- Eliminates the failure mode where pages forget to add `scroll-margin-top` to their section elements
 
-**Values:**
+**CSS `scroll-margin-top` (secondary, for non-ScrollSpy navigation):** Anchor links, direct URL hash navigation, and other non-ScrollSpy scroll mechanisms still rely on `scroll-margin-top` on target elements. Keep these values for those cases:
 
 | Context | Property | Value | Rationale |
 |---------|----------|-------|-----------|

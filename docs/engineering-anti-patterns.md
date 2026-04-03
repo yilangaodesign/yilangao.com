@@ -1018,6 +1018,18 @@ Since dev and production share the same Supabase database, one push covers both 
 
 ---
 
+## EAP-064: `transition: all` on Interactive Controls with Conditional DOM Children
+
+**Trigger:** Using `transition: all` (or a mixin that expands to it) on an element whose children are conditionally mounted/unmounted by a headless UI library (Radix, Headless UI, etc.).
+
+**Why it's wrong:** When a child element mounts or unmounts, the browser briefly recalculates layout on the parent. `transition: all` animates even momentary layout-related property changes during this DOM churn, making the recalculation visible as a size glitch or flicker. Fixed `width`/`height` on the parent does NOT fully prevent this — the transition can still animate intermediate states.
+
+**Correct alternative:** Enumerate only the visual properties that should transition: `transition: background-color Xms ease, border-color Xms ease, box-shadow Xms ease`. If the child must mount/unmount, also consider `forceMount` (Radix) or `static` (Headless UI) to keep the element always in the DOM and control visibility via CSS `data-state` or `data-headlessui-state` selectors.
+
+**Incident:** ENG-104 (2026-04-03) — Checkbox height fluctuated on toggle due to Radix Indicator mount/unmount + `transition: all`.
+
+---
+
 ## EAP-NNN: [Short Name]
 
 **Trigger:** [What action or pattern triggers this]

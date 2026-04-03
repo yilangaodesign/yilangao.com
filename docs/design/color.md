@@ -15,11 +15,18 @@ When an agent is prompted to use a color from the extended palette, it should:
 
 ### 9.2 Neutral-Dominant UI
 
-The interface should remain **predominantly neutral with minimal, intentional hits of color.** The neutral gray family and the brand accent (purple-indigo) carry the visual identity. Extended palette colors (blue, red, green, yellow, etc.) appear only where they have a specific functional role.
+The interface should remain **predominantly neutral with minimal, intentional hits of color.** The neutral gray family and the brand accent (blue-violet) carry the visual identity. Extended palette colors (red, green, yellow, cyan, etc.) appear only where they have a specific functional role.
 
 ### 9.3 Brand Accent: Lumen Blue-Violet
 
-**Adopted 2026-03-29.** Lumen is a custom blue-violet accent scale designed for this system. It is a perceptually uniform ramp with no hue discontinuity — the previous accent had a visible hue jump at step 50 where desaturated blue-gray shifted abruptly to warm indigo.
+**Adopted 2026-03-29. Redesigned 2026-04-03 (OKLCH).**
+
+Lumen is a custom blue-violet accent scale built in OKLCH — a perceptual color space where equal numeric deltas produce equal visual difference. Grade 60 (`#3336FF`) is the immovable brand anchor; all other steps are derived via an even lightness ramp and a sine chroma arc at constant hue ~270deg.
+
+**Construction parameters (OKLCH):**
+- **Lightness:** Two-segment even ramp — deltaL ~0.093 (steps 10-60), deltaL ~0.081 (steps 60-100)
+- **Chroma:** Sine bell peaking at step 60 (C = 0.281), tapering toward both extremes
+- **Hue:** Constant 269.7deg across all steps (no hue discontinuity)
 
 | Aspect | yilangao.com | IBM Carbon |
 |--------|-------------|------------|
@@ -28,26 +35,30 @@ The interface should remain **predominantly neutral with minimal, intentional hi
 | Focus indicators | `accent-60` | Blue 60 |
 | Interactive borders | `accent-60` | Blue 60 |
 
-| Step | Hex | Usage |
-|------|-----|-------|
-| 10 | #F0F5FD | Highlight backgrounds, sidebar accent (light mode) |
-| 20 | #D5E0FC | Selection highlight, action-brand-subtle |
-| 30 | #B3C5FC | — |
-| 40 | #8DA3FC | Playground accent + ring (dark mode, 7.56:1 on #161616) |
-| 50 | #7182FD | ~~Playground accent (light mode)~~ — **Removed:** 3.33:1 on white fails WCAG AA. |
-| 60 | **#3336FF** | **Key brand color.** Playground accent + ring (light mode, 6.75:1 on white). Links, focus, interactive borders, brand surfaces. |
-| 70 | #0004E2 | — |
-| 80 | #0003A7 | — |
-| 90 | #000273 | Selection text color |
-| 100 | #05063E | — |
+| Step | Hex | OKLCH (L, C, H) | vs White | vs #161616 | Usage |
+|------|-----|-----------------|----------|------------|-------|
+| 10 | #EFF3FF | 0.96, 0.016, 269.7 | 1.1:1 | 16.3:1 | Highlight backgrounds, sidebar accent (light mode) |
+| 20 | #C5D4FF | 0.87, 0.062, 269.7 | 1.5:1 | 12.2:1 | Selection highlight, action-brand-subtle |
+| 30 | #9BB4FF | 0.78, 0.111, 269.7 | 2.0:1 | 8.9:1 | action-brand-bold-disabled (light), pressed (dark) |
+| 40 | #7392FF | 0.69, 0.164, 269.7 | 2.9:1 | 6.3:1 | Dark mode text/icon brand, hover (dark), playground accent (dark) |
+| 50 | #4E6CFF | 0.59, 0.220, 269.7 | 4.3:1 | 4.2:1 | Dark mode border/action/focus brand |
+| 60 | **#3336FF** | **0.50, 0.281, 269.7** | **6.7:1** | 2.7:1 | **Brand anchor.** Links, focus, interactive borders, brand surfaces (light mode). |
+| 70 | #2715D8 | 0.42, 0.262, 269.7 | 9.6:1 | 1.9:1 | action-brand-bold-hover (light) |
+| 80 | #1A0EA1 | 0.34, 0.210, 269.7 | 13.0:1 | 1.4:1 | action-brand-bold-pressed (light) |
+| 90 | #0F1461 | 0.26, 0.132, 269.7 | 16.3:1 | 1.1:1 | Dark mode highlight, action-brand-subtle (dark) |
+| 100 | #0A0F22 | 0.17, 0.040, 269.7 | 19.0:1 | 1.1:1 | surface-brand-subtle (dark) |
 
-The Lumen accent IS the brand. It must never be replaced with Carbon's blue for interactive elements. Carbon's blue family is available in the palette for *informational* use cases (info states, data visualization) where blue is semantically expected.
+The Lumen accent IS the brand. It must never be replaced with Carbon's blue for interactive elements.
 
 ### 9.4 Carbon Color Provenance
 
-The extended palette (`$portfolio-blue-*`, `$portfolio-red-*`, etc.) is sourced directly from `@carbon/colors` v11. These are the exact hex values from the IBM Design Language — they are not approximations. The neutral gray family (`$portfolio-neutral-*`) was already identical to Carbon's gray palette before this expansion.
+The extended palette (`$portfolio-red-*`, `$portfolio-green-*`, etc.) is sourced directly from `@carbon/colors` v11. These are the exact hex values from the IBM Design Language — they are not approximations. The neutral gray family (`$portfolio-neutral-*`) was already identical to Carbon's gray palette before this expansion.
 
-The only non-Carbon value in the palette is `$portfolio-neutral-05` (#F9F9F9), which is a yilangao.com addition for a subtle secondary surface.
+**Removals:**
+- **Blue family** — Removed 2026-04-03. Blue-60 (#0F62FE, hue ~219deg) was only ~20deg from the brand accent (#3336FF, hue ~270deg), creating semantic confusion between "brand" and "informational" contexts. Cyan and Teal cover cool-informational use cases. `$portfolio-support-info` remapped from `$portfolio-blue-70` to `$portfolio-cyan-70` (#00539A).
+
+**Additions:**
+- `$portfolio-neutral-05` (#F9F9F9) — yilangao.com addition for a subtle secondary surface.
 
 ### 9.5 Token Architecture: Property · Role · Emphasis
 
@@ -102,8 +113,8 @@ Not all tokens carry an emphasis modifier. Functional roles (positive, warning, 
 | `$portfolio-text-neutral-regular` | Regular neutral text | neutral-70 (#525252) |
 | `$portfolio-surface-neutral-minimal` | Minimal neutral surface | neutral-00 (#FFFFFF) |
 | `$portfolio-surface-negative-subtle` | Subtle negative surface | red-10 (#FFF1F1) |
-| `$portfolio-icon-brand-bold` | Bold brand icon | accent-60 (#4A3ADB) |
-| `$portfolio-action-brand-subtle` | Subtle brand action fill | accent-20 (#D9D9FF) |
+| `$portfolio-icon-brand-bold` | Bold brand icon | accent-60 (#3336FF) |
+| `$portfolio-action-brand-subtle` | Subtle brand action fill | accent-20 (#C5D4FF) |
 | `$portfolio-border-neutral-bold` | Bold neutral border | neutral-100 (#161616) |
 | `$portfolio-text-negative` | Negative text (no emphasis) | red-60 (#DA1E28) |
 
@@ -142,11 +153,10 @@ The `support-*` tokens (`support-error`, `support-success`, `support-warning`, `
 
 ### 9.8 Accent Color Accessibility Policy
 
-**Severity: High** — Discovered 2026-03-29 during self-audit. Accent-50 (#7182FD) was used as `--color-accent` in the playground light mode, appearing as `text-accent` on meaningful content (prop types, token values, active navigation). At **3.33:1** on white, it fails WCAG AA for normal text (4.5:1 required).
-
 **Rule: Any accent step used as foreground text on a neutral surface must achieve 4.5:1 contrast.** This means:
-- **Light mode text on white:** Only accent-60 (#3336FF, 6.75:1) or darker may be used. Accent-50 and lighter steps **must not** be used for text.
-- **Dark mode text on #161616:** Accent-40 (#8DA3FC, 7.56:1) or lighter may be used. Accent-50 (5.44:1) also passes.
+- **Light mode text on white:** Only accent-60 (#3336FF, 6.7:1) or darker may be used. Accent-50 and lighter steps **must not** be used for text.
+- **Dark mode text on #161616:** Accent-40 (#7392FF, 6.3:1) passes WCAG AA. Accent-30 and lighter also pass.
+- **Border/action/focus in dark mode:** Accent-50 (#4E6CFF, 4.2:1) passes the 3:1 threshold for UI components.
 - **Disabled states** are exempt from the 4.5:1 requirement per WCAG (SC 1.4.3 exception).
 - **Decorative elements** (borders, backgrounds, focus rings) follow the 3:1 threshold for UI components.
 
@@ -154,9 +164,9 @@ The `support-*` tokens (`support-error`, `support-success`, `support-warning`, `
 
 | Variable | Light mode | Contrast on bg | Dark mode | Contrast on bg |
 |----------|-----------|----------------|-----------|----------------|
-| `--color-accent` | accent-60 (#3336FF) | 6.75:1 on white ✓ | accent-40 (#8DA3FC) | 7.56:1 on #161616 ✓ |
-| `--color-ring` | accent-60 (#3336FF) | 6.75:1 ✓ | accent-40 (#8DA3FC) | 7.56:1 ✓ |
-| `--color-sidebar-accent` | accent-10 (#F0F5FD) | bg only | #262626 | bg only |
+| `--color-accent` | accent-60 (#3336FF) | 6.7:1 on white ✓ | accent-40 (#7392FF) | 6.3:1 on #161616 ✓ |
+| `--color-ring` | accent-60 (#3336FF) | 6.7:1 ✓ | accent-40 (#7392FF) | 6.3:1 ✓ |
+| `--color-sidebar-accent` | accent-10 (#EFF3FF) | bg only | #262626 | bg only |
 
 ### 9.9 Accessibility Contrast Reference (IBM)
 
@@ -183,14 +193,13 @@ The following color families are defined in `_colors.scss` but have no current U
 
 | Family | Potential Use Cases | Notes |
 |--------|-------------------|-------|
-| **Blue** (non-info steps) | Data visualization, link states in non-brand contexts, code syntax | Carbon's primary — use carefully to avoid looking like an IBM product |
 | **Red** (non-error steps) | Destructive action gradients, error state backgrounds (red-10 for error banners) | Light steps (10–30) useful for background tints on error states |
 | **Green** (non-success steps) | Success banners (green-10 background), progress indicators | Light steps for background tints |
 | **Yellow** (non-warning steps) | Star ratings, highlight markers, pending states | Be cautious — yellow has poor contrast on white |
 | **Orange** | Caution states, urgency indicators, notifications | Sits between yellow (warning) and red (error) in severity |
 | **Teal** | Secondary accent, tags, categories, data series | Cool complement to the purple-indigo brand |
-| **Cyan** | Links in specific contexts, informational badges, data series | Close to blue — differentiate carefully |
-| **Purple** (Carbon's) | Visited links, special states, data series | Different hue from our accent — our accent is purple-indigo, Carbon's purple is more violet |
+| **Cyan** | Info states (`support-info` remapped here), informational badges, data series | Hue-distinct from brand accent (~45deg separation) |
+| **Purple** (Carbon's) | Visited links, special states, data series | Different hue from our accent — our accent is blue-violet (~270deg), Carbon purple is more red-violet (~268deg). ~29deg separation is sufficient. |
 | **Magenta** | Tags, decorative elements, data series | Warm accent — use very sparingly in B2B context |
 
 ### 9.12 Text Color Brightness Inversion Rule
@@ -210,7 +219,7 @@ The following color families are defined in `_colors.scss` but have no current U
 
 | Role | Light mode (`:root`) | Dark mode (`[data-theme="dark"]`) | Light contrast on white | Dark contrast on #161616 |
 |------|---------------------|----------------------------------|------------------------|-------------------------|
-| Brand | accent-60 (#3336FF) | accent-40 (#8DA3FC) | 6.75:1 | 7.56:1 |
+| Brand | accent-60 (#3336FF) | accent-40 (#7392FF) | 6.75:1 | 6.26:1 |
 | Negative | red-60 (#DA1E28) | red-40 (#FF8389) | 5.00:1 | 7.63:1 |
 | Positive | green-60 (#198038) | green-40 (#42BE65) | 5.02:1 | 7.57:1 |
 | Warning | yellow-60 (#8E6A00) | yellow-40 (#D2A106) | 4.99:1 | 7.62:1 |
@@ -231,7 +240,8 @@ The following color families are defined in `_colors.scss` but have no current U
 
 | Issue | Status | Notes |
 |-------|--------|-------|
-| **Accent scale perceptual jump at step 50** | **Resolved** | Replaced with Lumen scale from Cadence Design System. Lumen is perceptually uniform blue-violet with no hue discontinuity. |
-| **Carbon Purple vs. Accent overlap** | Flagged | Two purple families exist (brand accent + Carbon purple). Consider dropping Carbon purple or adding clear gating rules. |
+| **Accent scale perceptual uniformity** | **Resolved (2026-04-03)** | Rebuilt entire scale in OKLCH with grade 60 as anchor. Even lightness ramp (deltaL ~0.09), sine chroma arc, constant hue 269.7deg. The old scale had a 60% lightness cliff at step 50-to-60; the new scale has <2% asymmetry across the critical 40-60 zone. |
+| **Carbon Blue vs. Accent hue collision** | **Resolved (2026-04-03)** | Blue family removed. Blue-60 (#0F62FE, hue ~219deg) was only ~20deg from accent-60 (#3336FF, hue ~270deg). `$portfolio-support-info` remapped to `$portfolio-cyan-70`. |
+| **Carbon Purple vs. Accent overlap** | **Resolved (2026-04-03)** | Kept. Purple-60 (#8A3FFC, hue ~268deg) has ~29deg separation from the accent and leans red-violet vs the accent's blue-violet. Perceptually distinct. |
 | **Dark mode semantic tokens** | Mostly resolved | Text/icon (step-60/step-40) and border/action (step-60/step-50) tokens for all four functional roles now have canonical dark-mode overrides (§9.12). Surface tokens remain: `surface-warning-bold` uses yellow-30 in both modes intentionally (bright attention-grabbing background). |
-| **`support-info` and `support-caution-major` migration** | Pending | These legacy tokens have no direct equivalent in the new architecture. `info` may warrant its own role; `caution-major` (orange-40) remains legacy-only. |
+| **`support-info` and `support-caution-major` migration** | Partially resolved | `support-info` remapped from `$portfolio-blue-70` to `$portfolio-cyan-70` (#00539A) as part of blue removal. `info` may still warrant its own role. `caution-major` (orange-40) remains legacy-only. |
