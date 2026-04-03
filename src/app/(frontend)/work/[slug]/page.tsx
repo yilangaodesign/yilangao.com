@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { getPayloadClient } from "@/lib/payload";
-import { extractLexicalText } from "@/lib/lexical";
+import { extractLexicalText, lexicalToHtml } from "@/lib/lexical";
 import { isAdminAuthenticated } from "@/lib/admin-auth";
 import { getCompanyFromSession } from "@/lib/company-session";
 import { getCompanyBySlug } from "@/lib/company-data";
@@ -111,6 +111,7 @@ const FALLBACK_PROJECT = {
   title: "Project Title",
   category: "Digital toolmaking",
   description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+  descriptionHtml: undefined as string | undefined,
   heroMetric: undefined as { value: string; label: string } | undefined,
   inlineLinks: {} as Record<string, string>,
   role: "Product Designer",
@@ -122,10 +123,10 @@ const FALLBACK_PROJECT = {
     { label: "Twitter", href: "#" },
   ],
   sections: [
-    { heading: "Section Heading One", body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.", imageCount: 2, imagePlaceholders: [] as string[], caption: "Caption describing the images above." },
-    { heading: "Section Heading Two", body: "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore.", imageCount: 1, imagePlaceholders: [] as string[], caption: null },
-    { heading: "Section Heading Three", body: "Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit.", imageCount: 3, imagePlaceholders: [] as string[], caption: "Additional context about the three images." },
-    { heading: "Section Heading Four", body: "At vero eos et accusamus et iusto odio dignissimos ducimus.", imageCount: 2, imagePlaceholders: [] as string[], caption: null },
+    { heading: "Section Heading One", body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.", bodyHtml: undefined as string | undefined, imageCount: 2, imagePlaceholders: [] as string[], caption: "Caption describing the images above." },
+    { heading: "Section Heading Two", body: "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore.", bodyHtml: undefined as string | undefined, imageCount: 1, imagePlaceholders: [] as string[], caption: null },
+    { heading: "Section Heading Three", body: "Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit.", bodyHtml: undefined as string | undefined, imageCount: 3, imagePlaceholders: [] as string[], caption: "Additional context about the three images." },
+    { heading: "Section Heading Four", body: "At vero eos et accusamus et iusto odio dignissimos ducimus.", bodyHtml: undefined as string | undefined, imageCount: 2, imagePlaceholders: [] as string[], caption: null },
   ],
 };
 
@@ -153,11 +154,15 @@ export default async function ProjectPage({ params }: Props) {
 
     if (res.docs.length > 0) {
       const doc = res.docs[0];
+      const descPlain = extractLexicalText(doc.description) || "Project description.";
+      const descHtml = lexicalToHtml(doc.description);
+
       project = {
         id: doc.id,
         title: doc.title,
         category: doc.category,
-        description: extractLexicalText(doc.description) || "Project description.",
+        description: descPlain,
+        descriptionHtml: descHtml !== descPlain ? descHtml : undefined,
         heroMetric: HERO_METRICS[doc.slug] ?? undefined,
         inlineLinks: INLINE_LINKS[doc.slug] ?? {},
         role: doc.role ?? "Designer",
@@ -170,9 +175,12 @@ export default async function ProjectPage({ params }: Props) {
         })) ?? [],
         sections: doc.sections?.map((s: { heading: string; body?: unknown; images?: { image: unknown }[]; caption?: string | null }) => {
           const realImageCount = s.images?.length ?? 0;
+          const bodyPlain = extractLexicalText(s.body) || "Section content.";
+          const bodyHtml = lexicalToHtml(s.body);
           return {
             heading: s.heading,
-            body: extractLexicalText(s.body) || "Section content.",
+            body: bodyPlain,
+            bodyHtml: bodyHtml !== bodyPlain ? bodyHtml : undefined,
             imageCount: realImageCount,
             imagePlaceholders: realImageCount === 0 ? (IMAGE_PLACEHOLDERS[s.heading] ?? []) : [],
             caption: s.caption ?? null,

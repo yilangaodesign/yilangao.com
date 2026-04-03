@@ -28,6 +28,7 @@ import styles from "./page.module.scss";
 type ProjectSection = {
   heading: string;
   body: string;
+  bodyHtml?: string;
   imageCount: number;
   imagePlaceholders: string[];
   caption: string | null;
@@ -42,6 +43,7 @@ type ProjectData = {
   title: string;
   category: string;
   description: string;
+  descriptionHtml?: string;
   heroMetric?: { value: string; label: string };
   inlineLinks?: Record<string, string>;
   role: string;
@@ -396,10 +398,13 @@ export default function ProjectClient({
                   className={styles.descriptionText}
                   multiline
                   isRichText
+                  htmlContent={p.descriptionHtml}
                   label="Description"
                 >
                   {p.description}
                 </EditableText>
+              ) : p.descriptionHtml ? (
+                <p className={styles.descriptionText} dangerouslySetInnerHTML={{ __html: p.descriptionHtml }} />
               ) : (
                 <p className={styles.descriptionText}>
                   {renderTextWithLinks(p.description, p.inlineLinks ?? {})}
@@ -444,6 +449,7 @@ export default function ProjectClient({
                       className={styles.sectionBody}
                       multiline
                       isRichText
+                      htmlContent={section.bodyHtml}
                       label={`Section ${i + 1} Body`}
                     >
                       {section.body}
@@ -452,7 +458,11 @@ export default function ProjectClient({
                 ) : (
                   <>
                     <h2 className={styles.sectionHeading}>{section.heading}</h2>
-                    <p className={styles.sectionBody}>{section.body}</p>
+                    {section.bodyHtml ? (
+                      <p className={styles.sectionBody} dangerouslySetInnerHTML={{ __html: section.bodyHtml }} />
+                    ) : (
+                      <p className={styles.sectionBody}>{section.body}</p>
+                    )}
                   </>
                 )}
               </FadeIn>

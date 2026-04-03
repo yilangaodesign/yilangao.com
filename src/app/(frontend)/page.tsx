@@ -57,6 +57,7 @@ export default async function Home() {
   let links = FALLBACK_LINKS;
   let siteConfig = {
     name: "Yilan Gao", role: "UX Designer", location: "City, ST", email: "hello@example.com", bio: "",
+    bioHtml: undefined as string | undefined,
     aboutLabel: "ABOUT", teamsLabel: "EXPERIENCE", linksLabel: "LINKS", footerCta: "Let's build something together.",
   };
   let gridOrder: { type: string; id: number }[] | null = null;
@@ -112,12 +113,15 @@ export default async function Home() {
     const config = await payload.findGlobal({ slug: "site-config" });
     if (config) {
       const cfg = config as Record<string, unknown>;
+      const bioPlain = extractLexicalText(config.bio) || "";
+      const bioHtml = lexicalToHtml(config.bio);
       siteConfig = {
         name: config.name ?? siteConfig.name,
         role: config.role ?? siteConfig.role,
         location: config.location ?? siteConfig.location,
         email: config.email ?? siteConfig.email,
-        bio: extractLexicalText(config.bio) || "",
+        bio: bioPlain,
+        bioHtml: bioHtml !== bioPlain ? bioHtml : undefined,
         aboutLabel: (cfg.aboutLabel as string) ?? siteConfig.aboutLabel,
         teamsLabel: (cfg.teamsLabel as string) ?? siteConfig.teamsLabel,
         linksLabel: (cfg.linksLabel as string) ?? siteConfig.linksLabel,

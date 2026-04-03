@@ -53,6 +53,7 @@ type Team = { name: string; url: string; period: string };
 type SocialLink = { label: string; href: string; external: boolean };
 type SiteIdentity = {
   name: string; role: string; location: string; email: string; bio: string;
+  bioHtml?: string;
   aboutLabel: string; teamsLabel: string; linksLabel: string; footerCta: string;
 };
 
@@ -504,6 +505,7 @@ export default function HomeClient({
                   className={styles.aboutText}
                   multiline
                   isRichText
+                  htmlContent={siteConfig.bioHtml}
                   label="Bio"
                 >
                   {siteConfig.bio || "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. At the moment, interested in how tools connect with each other, how they act on our behalf, and how we interact with them across different modes."}
