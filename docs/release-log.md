@@ -4,7 +4,26 @@
 >
 > **Who reads this:** AI agents when the `ship-it` skill is activated — scan recent entries for recurring pitfalls before starting a new release.
 > **Who writes this:** AI agents after each ship-it run via the Post-Release Audit protocol in `ship-it/SKILL.md`.
-> **Last updated:** 2026-04-02 (REL-002: Main site deployed to new.yilangao.com)
+> **Last updated:** 2026-04-03 (REL-003: Élan 2.3.0, ASCII Art Studio 0.3.0)
+
+---
+
+## REL-003 — Élan 2.3.0, ASCII Art Studio 0.3.0 (2026-04-03)
+
+**Scope:** 92 files across 12 layer commits + release commit
+**Semver:** Minor — new UI components (Eyebrow, Menu, TextRow), company password gate feature, new ASCII engines (dot-grid, image-filters), expanded Input/DropdownMenu/Kbd components
+**Previous release:** Élan 2.2.0, ASCII Art Studio 0.2.1
+
+**Incidents during release:**
+
+1. **Branch switch blocked by uncommitted sync target** (→ REL-AP-001, occurrence #2)
+   Playground build's `prebuild` step ran `sync-tokens.mjs`, which regenerated `playground/src/lib/tokens.ts` with 2 new lines. This file wasn't staged in the release commit. `git checkout main` failed. Fixed by amending the release commit to include the sync output.
+
+**Layer classification notes:**
+- Company password gate files (9 files spanning collections, lib, scripts, admin components, and frontend pages) were grouped as a single feature commit (Layer 7a) rather than splitting across Layers 5/7/8 — cohesive feature commits are easier to review.
+- CMS collection admin group changes (Books, Experiments, Projects, Testimonials all changing `group` to "Content") were grouped with frontend pages in Layer 8 since they're trivial label changes.
+
+**Outcome:** All 3 builds passed on first attempt. Fast-forward merge to main. Playground deployed Ready in 55s. Main site responding 200 at `https://new.yilangao.com`.
 
 ---
 
