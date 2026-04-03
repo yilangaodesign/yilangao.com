@@ -1,19 +1,37 @@
 "use client";
 
 import { Shell } from "@/components/shell";
-import { SectionHeading, SubSection, TokenRow } from "@/components/token-grid";
+import { SectionHeading, SectionTitle, SectionDescription, SubSection, TokenRow } from "@/components/token-grid";
+import ScrollSpy from "@/components/scroll-spy";
 import { elevation } from "@/lib/tokens";
+
+const scrollSpySections = [
+  { id: "token-architecture", label: "Architecture" },
+  { id: "shadows", label: "Shadows" },
+  { id: "border-radius", label: "Border Radius" },
+  { id: "combined-demo", label: "Combined Demo" },
+];
 
 export default function ElevationPage() {
   return (
     <Shell title="Elevation">
+      <ScrollSpy sections={scrollSpySections} />
       <div className="max-w-5xl">
         <SectionHeading
           title="Elevation"
           description="Shadow depth levels and border-radius tokens for consistent visual hierarchy and shape language."
         />
 
-        <SubSection title="Shadows">
+        <SectionTitle id="token-architecture">Token Architecture</SectionTitle>
+        <SectionDescription>
+          Elevation tokens use a size-scale naming convention. Shadows follow
+          shadow-sm / shadow-md / shadow-lg / shadow-xl / shadow-overlay,
+          indicating increasing visual depth. Border radii mirror the same
+          scale pattern with radius-sm / radius-md / radius-lg / radius-full
+          for shape consistency. Both scales progress from subtle to prominent.
+        </SectionDescription>
+
+        <SubSection id="shadows" title="Shadows">
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
             {elevation.shadows.map((s) => (
               <div key={s.name} className="text-center">
@@ -30,7 +48,7 @@ export default function ElevationPage() {
           </div>
         </SubSection>
 
-        <SubSection title="Border Radius">
+        <SubSection id="border-radius" title="Border Radius">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             {elevation.radii.map((r) => (
               <div key={r.name} className="text-center">
@@ -48,7 +66,7 @@ export default function ElevationPage() {
           </div>
         </SubSection>
 
-        <SubSection title="Combined Demo">
+        <SubSection id="combined-demo" title="Combined Demo">
           <div className="flex flex-wrap gap-6 p-8 rounded-sm bg-muted/30 border border-border">
             {elevation.shadows.slice(1).map((s, i) => (
               <div

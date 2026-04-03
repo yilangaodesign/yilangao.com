@@ -22,7 +22,7 @@
   --color-sidebar: #f9f9f9;
   --color-sidebar-foreground: #161616;
   --color-sidebar-border: #e0e0e0;
-  --color-sidebar-accent: #F0F5FD;
+  --color-sidebar-accent: #EFF3FF;
   --color-sidebar-accent-foreground: #161616;
   --color-sidebar-muted: #f4f4f4;
   --color-sidebar-muted-foreground: #525252;
@@ -109,12 +109,12 @@
   --color-card-foreground: #f4f4f4;
   --color-border: #393939;
   --color-input: #393939;
-  --color-ring: #8DA3FC;
+  --color-ring: #7392FF;
   --color-primary: #f4f4f4;
   --color-primary-foreground: #161616;
   --color-secondary: #262626;
   --color-secondary-foreground: #f4f4f4;
-  --color-accent: #8DA3FC;
+  --color-accent: #7392FF;
   --color-accent-foreground: #161616;
   --color-sidebar: #1a1a1a;
   --color-sidebar-foreground: #f4f4f4;

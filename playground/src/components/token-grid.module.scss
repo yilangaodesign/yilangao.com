@@ -1,0 +1,229 @@
+@use 'mixins/typography' as *;
+@use 'mixins/interactive' as *;
+@use 'tokens/breakpoints' as *;
+
+// ── ColorSwatch ──────────────────────────────────────────────────────────────
+
+.swatchButton {
+  @include button-reset;
+  text-align: left;
+  width: 52px;
+  padding: var(--portfolio-spacer-0-25x);
+  border-radius: var(--portfolio-radius-sm);
+}
+
+.swatchChip {
+  height: var(--portfolio-spacer-6x);
+  width: var(--portfolio-spacer-6x);
+  border-radius: var(--portfolio-radius-sm);
+  border: var(--portfolio-border-width-thin) solid var(--portfolio-border-subtle);
+  border-color: color-mix(in srgb, var(--portfolio-border-subtle) 50%, transparent);
+  position: relative;
+  overflow: hidden;
+  transition: transform var(--portfolio-duration-fast) var(--portfolio-easing-standard);
+
+  .swatchButton:hover & {
+    transform: scale(1.05);
+  }
+}
+
+.swatchOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  background-color: var(--portfolio-overlay-black-20);
+  transition: opacity var(--portfolio-duration-fast) var(--portfolio-easing-standard);
+
+  .swatchButton:hover & {
+    opacity: 1;
+  }
+}
+
+.swatchIcon {
+  color: var(--portfolio-text-always-light-bold);
+}
+
+.swatchIconSm {
+  composes: swatchIcon;
+  width: 12px;
+  height: 12px;
+}
+
+.swatchIconMd {
+  composes: swatchIcon;
+  width: 14px;
+  height: 14px;
+}
+
+.swatchLabel {
+  margin-top: var(--portfolio-spacer-0-125x);
+  font-size: var(--portfolio-type-3xs);
+  font-weight: var(--portfolio-weight-medium);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.swatchSublabel {
+  font-size: var(--portfolio-type-4xs);
+  font-family: var(--portfolio-font-mono);
+  color: var(--portfolio-text-tertiary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// ── TokenRow ─────────────────────────────────────────────────────────────────
+
+.tokenRow {
+  @include button-reset;
+  display: flex;
+  align-items: center;
+  gap: var(--portfolio-spacer-2x);
+  width: 100%;
+  padding: var(--portfolio-spacer-1-5x) var(--portfolio-spacer-2x);
+  text-align: left;
+  border-radius: var(--portfolio-radius-sm);
+  border: var(--portfolio-border-width-thin) solid transparent;
+  @include transition-fast;
+
+  &:hover {
+    background-color: var(--portfolio-overlay-black-04);
+    border-color: var(--portfolio-border-subtle);
+  }
+}
+
+.tokenRowPreview {
+  flex-shrink: 0;
+  display: none;
+
+  @media #{$elan-mq-sm} {
+    display: block;
+  }
+}
+
+.tokenRowText {
+  flex: 1 1 0%;
+  min-width: 0;
+}
+
+.tokenRowLabel {
+  @include body-sm-medium;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tokenRowToken {
+  @include code-sm;
+  color: var(--portfolio-text-tertiary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-top: 2px;
+}
+
+.tokenRowValue {
+  @include code-sm;
+  color: var(--portfolio-text-tertiary);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+.tokenRowIconCol {
+  width: 20px;
+  flex-shrink: 0;
+}
+
+.tokenRowIconSuccess {
+  width: 14px;
+  height: 14px;
+  color: var(--portfolio-text-positive);
+}
+
+.tokenRowIconCopy {
+  width: 14px;
+  height: 14px;
+  color: var(--portfolio-text-tertiary);
+  opacity: 0;
+  transition: opacity var(--portfolio-duration-fast) var(--portfolio-easing-standard);
+
+  .tokenRow:hover & {
+    opacity: 1;
+  }
+}
+
+// ── SectionHeading ───────────────────────────────────────────────────────────
+
+.sectionHeading {
+  margin-bottom: var(--portfolio-spacer-4x);
+}
+
+.sectionHeadingTitle {
+  font-size: var(--portfolio-type-2xl);
+  font-weight: var(--portfolio-weight-bold);
+  letter-spacing: var(--portfolio-tracking-tight);
+  color: var(--portfolio-text-primary);
+}
+
+.sectionHeadingDescription {
+  margin-top: var(--portfolio-spacer-1x);
+  color: var(--portfolio-text-secondary);
+  line-height: var(--portfolio-leading-relaxed);
+}
+
+// ── SectionTitle ─────────────────────────────────────────────────────────────
+
+.sectionTitle {
+  font-size: var(--portfolio-type-lg);
+  font-weight: var(--portfolio-weight-semibold);
+  letter-spacing: var(--portfolio-tracking-tight);
+  color: var(--portfolio-text-primary);
+  margin-bottom: var(--portfolio-spacer-0-5x);
+  scroll-margin-top: var(--portfolio-spacer-12x);
+}
+
+// ── SectionDescription ───────────────────────────────────────────────────────
+
+.sectionDescription {
+  @include body-sm;
+  margin-bottom: var(--portfolio-spacer-3x);
+}
+
+// ── SubsectionTitle ──────────────────────────────────────────────────────────
+
+.subsectionTitle {
+  font-size: var(--portfolio-type-sm);
+  font-weight: var(--portfolio-weight-medium);
+  color: var(--portfolio-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: var(--portfolio-tracking-wider);
+  margin-bottom: var(--portfolio-spacer-2x);
+}
+
+// ── SubSection ───────────────────────────────────────────────────────────────
+
+.subSection {
+  margin-bottom: var(--portfolio-spacer-6x);
+  scroll-margin-top: var(--portfolio-spacer-12x);
+}
+
+// ── ZoneDivider ──────────────────────────────────────────────────────────────
+
+.zoneDivider {
+  border-top: var(--portfolio-border-width-thin) solid var(--portfolio-border-subtle);
+  margin-top: var(--portfolio-spacer-8x);
+  margin-bottom: var(--portfolio-spacer-6x);
+  padding-top: var(--portfolio-spacer-4x);
+}
+
+.zoneDividerLabel {
+  font-size: var(--portfolio-type-xs);
+  font-weight: var(--portfolio-weight-medium);
+  color: var(--portfolio-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: var(--portfolio-tracking-wider);
+}

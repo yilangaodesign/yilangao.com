@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import { Shell } from "@/components/shell";
-import { SectionHeading, SubSection, TokenRow } from "@/components/token-grid";
+import { SectionHeading, SectionTitle, SectionDescription, SubSection, TokenRow } from "@/components/token-grid";
 import ScrollSpy from "@/components/scroll-spy";
 import { motion as motionTokens } from "@/lib/tokens";
 
 const scrollSpySections = [
+  { id: "token-architecture", label: "Architecture" },
   { id: "easing-curves", label: "Easing Curves" },
   { id: "durations", label: "Durations" },
   { id: "choreography-presets", label: "Choreography" },
@@ -627,6 +628,18 @@ export default function MotionPage() {
           title="Motion & Interaction"
           description="Duration, easing, and choreography tokens for consistent animation. Follows Carbon's productive motion methodology. Available in SCSS via _motion.scss and in TS via src/lib/motion.ts."
         />
+
+        <SectionTitle id="token-architecture">Token Architecture</SectionTitle>
+        <SectionDescription>
+          Motion tokens use intent-based naming across four categories. Durations
+          follow speed names (duration-instant, duration-fast, duration-moderate,
+          duration-slow). Easings follow intent names (easing-standard,
+          easing-entrance, easing-exit, easing-expressive). Choreography presets
+          are TypeScript constants that compose duration + easing into
+          ready-to-spread Framer Motion objects. Interactive SCSS mixins
+          (@include hover-lift, @include transition-base) compose multiple tokens
+          into reusable interaction patterns.
+        </SectionDescription>
 
         {/* Easing Curves */}
         <SubSection id="easing-curves" title="Easing Curves">

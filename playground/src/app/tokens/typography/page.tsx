@@ -1,11 +1,12 @@
 "use client";
 
 import { Shell } from "@/components/shell";
-import { SectionHeading, SubSection, TokenRow } from "@/components/token-grid";
+import { SectionHeading, SectionTitle, SectionDescription, SubSection, TokenRow } from "@/components/token-grid";
 import ScrollSpy from "@/components/scroll-spy";
 import { typography } from "@/lib/tokens";
 
 const scrollSpySections = [
+  { id: "token-architecture", label: "Architecture" },
   { id: "semantic-mixins", label: "Semantic Mixins" },
   { id: "type-scale", label: "Type Scale" },
   { id: "font-stacks", label: "Font Stacks" },
@@ -30,6 +31,17 @@ export default function TypographyPage() {
           title="Typography"
           description="28 semantic mixins across 9 categories, built on a 13-step type scale. Primary face: Geist Sans. Serif (Georgia) restricted to quotes. Mono (Geist Mono) restricted to code. Informed by OneGS and IBM Carbon."
         />
+
+        <SectionTitle id="token-architecture">Token Architecture</SectionTitle>
+        <SectionDescription>
+          Typography tokens follow a two-tier naming system. Semantic mixins
+          (@include heading-display, @include body-sm) compose font-size, weight,
+          line-height, and letter-spacing into ready-to-use type styles. Primitive
+          tokens (--portfolio-type-2xl, --portfolio-weight-bold,
+          --portfolio-leading-relaxed) expose individual properties for custom
+          compositions. Mixins are the preferred API; primitives are for edge cases
+          where no mixin fits.
+        </SectionDescription>
 
         <SubSection id="semantic-mixins" title="Semantic Mixins">
           <div className="space-y-8">

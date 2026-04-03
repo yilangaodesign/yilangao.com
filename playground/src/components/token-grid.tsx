@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Check from "lucide-react/dist/esm/icons/check";
 import Copy from "lucide-react/dist/esm/icons/copy";
+import s from "./token-grid.module.scss";
 
 export function ColorSwatch({
   color,
@@ -22,26 +23,18 @@ export function ColorSwatch({
   };
 
   return (
-    <button
-      onClick={copy}
-      className="group text-left w-[52px] p-0.5 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
-    >
-      <div
-        className="h-12 w-12 rounded-sm border border-border/50 relative overflow-hidden transition-transform group-hover:scale-105"
-        style={{ backgroundColor: color }}
-      >
-        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20">
+    <button onClick={copy} className={s.swatchButton}>
+      <div className={s.swatchChip} style={{ backgroundColor: color }}>
+        <div className={s.swatchOverlay}>
           {copied ? (
-            <Check className="w-3.5 h-3.5 text-white" />
+            <Check className={s.swatchIconMd} />
           ) : (
-            <Copy className="w-3 h-3 text-white" />
+            <Copy className={s.swatchIconSm} />
           )}
         </div>
       </div>
-      <p className="mt-1 text-[10px] font-medium truncate">{label}</p>
-      {sublabel && (
-        <p className="text-[9px] text-muted-foreground font-mono truncate">{sublabel}</p>
-      )}
+      <p className={s.swatchLabel}>{label}</p>
+      {sublabel && <p className={s.swatchSublabel}>{sublabel}</p>}
     </button>
   );
 }
@@ -66,21 +59,18 @@ export function TokenRow({
   };
 
   return (
-    <button
-      onClick={copy}
-      className="group flex items-center gap-4 w-full px-4 py-3 text-left rounded-sm hover:bg-muted/50 transition-colors border border-transparent hover:border-border"
-    >
-      {preview && <div className="shrink-0 hidden sm:block">{preview}</div>}
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium truncate">{label}</p>
-        <p className="text-xs text-muted-foreground font-mono truncate mt-0.5">{token}</p>
+    <button onClick={copy} className={s.tokenRow}>
+      {preview && <div className={s.tokenRowPreview}>{preview}</div>}
+      <div className={s.tokenRowText}>
+        <p className={s.tokenRowLabel}>{label}</p>
+        <p className={s.tokenRowToken}>{token}</p>
       </div>
-      <div className="text-xs font-mono text-muted-foreground tabular-nums shrink-0">{value}</div>
-      <div className="w-5 shrink-0">
+      <div className={s.tokenRowValue}>{value}</div>
+      <div className={s.tokenRowIconCol}>
         {copied ? (
-          <Check className="w-3.5 h-3.5 text-green-600 dark:text-green-400" />
+          <Check className={s.tokenRowIconSuccess} />
         ) : (
-          <Copy className="w-3.5 h-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+          <Copy className={s.tokenRowIconCopy} />
         )}
       </div>
     </button>
@@ -95,13 +85,43 @@ export function SectionHeading({
   description?: string;
 }) {
   return (
-    <div className="mb-8">
-      <h2 className="text-2xl font-bold tracking-tight">{title}</h2>
+    <div className={s.sectionHeading}>
+      <h2 className={s.sectionHeadingTitle}>{title}</h2>
       {description && (
-        <p className="mt-2 text-muted-foreground leading-relaxed">{description}</p>
+        <p className={s.sectionHeadingDescription}>{description}</p>
       )}
     </div>
   );
+}
+
+export function SectionTitle({
+  id,
+  children,
+}: {
+  id?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <h3 id={id} className={s.sectionTitle}>
+      {children}
+    </h3>
+  );
+}
+
+export function SectionDescription({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return <p className={s.sectionDescription}>{children}</p>;
+}
+
+export function SubsectionTitle({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return <h4 className={s.subsectionTitle}>{children}</h4>;
 }
 
 export function SubSection({
@@ -114,11 +134,17 @@ export function SubSection({
   children: React.ReactNode;
 }) {
   return (
-    <div id={id} className="mb-12 scroll-mt-24">
-      <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-4">
-        {title}
-      </h3>
+    <div id={id} className={s.subSection}>
+      <SubsectionTitle>{title}</SubsectionTitle>
       {children}
+    </div>
+  );
+}
+
+export function ZoneDivider({ label }: { label?: string }) {
+  return (
+    <div className={s.zoneDivider}>
+      {label && <p className={s.zoneDividerLabel}>{label}</p>}
     </div>
   );
 }

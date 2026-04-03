@@ -1,8 +1,18 @@
 "use client";
 
 import { Shell } from "@/components/shell";
-import { SectionHeading, SubSection, TokenRow } from "@/components/token-grid";
+import { SectionHeading, SectionTitle, SectionDescription, SubSection, TokenRow } from "@/components/token-grid";
+import ScrollSpy from "@/components/scroll-spy";
 import { breakpoints, densityModes, spacing } from "@/lib/tokens";
+
+const scrollSpySections = [
+  { id: "token-architecture", label: "Architecture" },
+  { id: "breakpoint-scale", label: "Scale" },
+  { id: "breakpoint-details", label: "Details" },
+  { id: "density-modes", label: "Density" },
+  { id: "container-widths", label: "Containers" },
+  { id: "migration-reference", label: "Migration" },
+];
 
 function BreakpointVisual({ value, max }: { value: number; max: number }) {
   const pct = Math.min((value / max) * 100, 100);
@@ -21,13 +31,24 @@ export default function BreakpointsPage() {
 
   return (
     <Shell title="Breakpoints">
+      <ScrollSpy sections={scrollSpySections} />
       <div className="max-w-5xl">
         <SectionHeading
           title="Breakpoints"
           description="6-tier enterprise breakpoint scale for B2B SaaS. Values selected from comparative audit of IBM Carbon, OneGS, and Tailwind v4. Column logic: doubles at major layout shifts (4→8→16). Above md, column count holds at 16."
         />
 
-        <SubSection title="Breakpoint Scale">
+        <SectionTitle id="token-architecture">Token Architecture</SectionTitle>
+        <SectionDescription>
+          Breakpoint tokens use SCSS variables in two forms: $elan-bp-* for raw
+          pixel values (e.g. $elan-bp-md = 1056px) and $elan-mq-* for
+          ready-to-use media query strings (e.g. $elan-mq-md = &quot;(min-width:
+          1056px)&quot;). CSS custom properties are not used for breakpoints because
+          media queries cannot reference custom properties. Use $elan-mq-* in
+          @media rules and $elan-bp-* when the raw value is needed in calculations.
+        </SectionDescription>
+
+        <SubSection id="breakpoint-scale" title="Breakpoint Scale">
           <div className="space-y-1">
             {breakpoints.map((bp) => (
               <TokenRow
@@ -48,7 +69,7 @@ export default function BreakpointsPage() {
           </div>
         </SubSection>
 
-        <SubSection title="Breakpoint Details">
+        <SubSection id="breakpoint-details" title="Breakpoint Details">
           <div className="space-y-3">
             {breakpoints.map((bp) => {
               const px = parseInt(bp.value);
@@ -83,8 +104,8 @@ export default function BreakpointsPage() {
           </div>
         </SubSection>
 
-        <SubSection title="Density Modes">
-          <p className="text-xs text-muted-foreground mb-3">
+        <SubSection id="density-modes" title="Density Modes">
+          <p className="text-sm text-muted-foreground mb-3">
             Information density is orthogonal to viewport size. Breakpoints
             control layout; density modes control spacing within that layout.
             Adopted from IBM Carbon&apos;s gutter system.
@@ -115,8 +136,8 @@ export default function BreakpointsPage() {
           </div>
         </SubSection>
 
-        <SubSection title="Container Widths">
-          <p className="text-xs text-muted-foreground mb-3">
+        <SubSection id="container-widths" title="Container Widths">
+          <p className="text-sm text-muted-foreground mb-3">
             Semantic container names avoid collision with breakpoint tier names.
           </p>
           <div className="space-y-3">
@@ -144,8 +165,8 @@ export default function BreakpointsPage() {
           </div>
         </SubSection>
 
-        <SubSection title="Migration Reference">
-          <p className="text-xs text-muted-foreground mb-3">
+        <SubSection id="migration-reference" title="Migration Reference">
+          <p className="text-sm text-muted-foreground mb-3">
             Legacy token mapping for incremental migration from the Carbon-derived scale.
           </p>
           <div className="overflow-x-auto">

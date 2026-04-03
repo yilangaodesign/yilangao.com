@@ -7,35 +7,39 @@ import ScrollSpy from "@ds/ScrollSpy/ScrollSpy";
 import type { ScrollSpySection } from "@ds/ScrollSpy/ScrollSpy";
 
 const demoSections: ScrollSpySection[] = [
-  { id: "demo-overview", label: "Overview" },
-  { id: "demo-features", label: "Features" },
-  { id: "demo-api", label: "API" },
-  { id: "demo-examples", label: "Examples" },
-  { id: "demo-notes", label: "Notes" },
+  { id: "demo-overview", label: "Overview", group: "Basics" },
+  { id: "demo-tracking", label: "Tracking", depth: 1 },
+  { id: "demo-interaction", label: "Interaction", depth: 1 },
+  { id: "demo-api", label: "API", group: "Reference" },
+  { id: "demo-hierarchy", label: "Hierarchy", depth: 1 },
+  { id: "demo-notes", label: "Notes", depth: 1 },
 ];
 
 const sectionContent = [
-  "This is the overview section. Scroll down to see the active indicator change on the right rail.",
-  "Features section — the scroll spy tracks which section is in view using IntersectionObserver and highlights the corresponding tick.",
-  "API section — the component accepts a sections array with id and label. Each section in the page needs a matching id attribute.",
-  "Examples section — click any tick on the right to scroll to that section. Click and drag to snap between sections.",
-  "Notes section — the component is hidden on mobile. On desktop, it appears fixed on the right edge of the viewport.",
+  "This is the overview section. Scroll down to see the active indicator change on the right rail. Notice how section ticks (wider) differ from subsection ticks (narrower).",
+  "Tracking — the scroll spy tracks which section is in view using IntersectionObserver and highlights the corresponding tick. Subsection ticks use a shorter active width (22px vs 28px).",
+  "Interaction — click any tick on the right to scroll to that section. Click and drag to snap between sections. Both section and subsection ticks are interactive.",
+  "API section — the component accepts a sections array with id, label, and optional depth and group fields. A gap appears between the two groups above.",
+  "Hierarchy — use depth: 1 to mark subsections. Subsection ticks are narrower and use dimmer colors to communicate subordination.",
+  "Notes — the component is hidden on mobile. On desktop, it appears fixed on the right edge of the viewport. The group prop creates whitespace-based grouping between sections.",
 ];
 
 const scrollSpyCode = `import ScrollSpy from "@/components/ui/ScrollSpy";
 import type { ScrollSpySection } from "@/components/ui/ScrollSpy";
 
 const sections: ScrollSpySection[] = [
-  { id: "intro", label: "Introduction" },
-  { id: "features", label: "Features" },
-  { id: "api", label: "API Reference" },
+  { id: "overview", label: "Overview", group: "Basics" },
+  { id: "tracking", label: "Tracking", depth: 1 },
+  { id: "interaction", label: "Interaction", depth: 1 },
+  { id: "api", label: "API", group: "Reference" },
+  { id: "examples", label: "Examples", depth: 1 },
 ];
 
 <main>
   <ScrollSpy sections={sections} />
-  <section id="intro">...</section>
-  <section id="features">...</section>
-  <section id="api">...</section>
+  <section id="overview">...</section>
+  <section id="tracking">...</section>
+  ...
 </main>`;
 
 export default function ScrollSpyPage() {
@@ -77,7 +81,7 @@ export default function ScrollSpyPage() {
               {
                 name: "sections",
                 type: "ScrollSpySection[]",
-                description: "Array of { id, label } objects. Each id must match a DOM element's id attribute.",
+                description: "Array of { id, label, depth?, group? } objects. Each id must match a DOM element's id attribute.",
               },
             ]}
           />
@@ -97,6 +101,16 @@ export default function ScrollSpyPage() {
                 type: "string",
                 description: "Display label shown on hover and during drag.",
               },
+              {
+                name: "depth",
+                type: "0 | 1",
+                description: "Hierarchy level. 0 (default) = section tick (16px). 1 = subsection tick (10px, dimmer, shorter active width).",
+              },
+              {
+                name: "group",
+                type: "string",
+                description: "Grouping key. When a section's group differs from the previous section's group, extra whitespace is inserted to visually separate groups.",
+              },
             ]}
           />
         </div>
@@ -106,7 +120,7 @@ export default function ScrollSpyPage() {
           <ul className="space-y-2 text-sm text-muted-foreground">
             <li className="flex gap-2">
               <span className="text-accent shrink-0">&bull;</span>
-              <span><strong>Idle:</strong> Ticks at default width. Active section tick is wider and uses primary color.</span>
+              <span><strong>Idle:</strong> Section ticks at 16px, subsection ticks at 10px (dimmer). Active tick widens: 28px for sections, 22px for subsections.</span>
             </li>
             <li className="flex gap-2">
               <span className="text-accent shrink-0">&bull;</span>

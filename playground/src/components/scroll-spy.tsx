@@ -2,10 +2,13 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import s from "./scroll-spy.module.scss";
 
 export type ScrollSpySection = {
   id: string;
   label: string;
+  depth?: 0 | 1;
+  group?: string;
 };
 
 export default function ScrollSpy({
@@ -23,7 +26,7 @@ export default function ScrollSpy({
 
   useEffect(() => {
     const elements = sections
-      .map((s) => document.getElementById(s.id))
+      .map((sec) => document.getElementById(sec.id))
       .filter(Boolean) as HTMLElement[];
 
     if (elements.length === 0) return;
@@ -59,7 +62,8 @@ export default function ScrollSpy({
     (index: number, behavior: ScrollBehavior = "smooth") => {
       const el = document.getElementById(sections[index]?.id);
       if (el) {
-        el.scrollIntoView({ behavior, block: "start" });
+        const top = el.getBoundingClientRect().top + window.scrollY - window.innerHeight * 0.2;
+        window.scrollTo({ top: Math.max(0, top), behavior });
         setActiveIndex(index);
       }
     },
@@ -129,13 +133,10 @@ export default function ScrollSpy({
   const isDragging = dragIndex !== null;
 
   return (
-    <nav
-      className="fixed right-5 top-1/2 -translate-y-1/2 z-40 hidden lg:flex pointer-events-none"
-      aria-label="Page sections"
-    >
+    <nav className={s.nav} aria-label="Page sections">
       <div
         ref={trackRef}
-        className={`flex flex-col gap-3 items-end touch-none select-none pointer-events-auto p-4 -m-4 ${isDragging ? "cursor-grabbing" : "cursor-pointer"}`}
+        className={isDragging ? s.trackDragging : s.track}
         onPointerEnter={() => setIsHovered(true)}
         onPointerLeave={() => setIsHovered(false)}
         onPointerDown={onPointerDown}
@@ -147,18 +148,38 @@ export default function ScrollSpy({
           const isActive = i === activeIndex;
           const isDragTarget = isDragging && i === dragIndex;
           const showLabel = isDragging ? isDragTarget : isHovered;
+          const depth = section.depth ?? 0;
+          const isSub = depth === 1;
+
+          const labelClass = isSub
+            ? isActive
+              ? s.labelActiveSub
+              : s.labelDefaultSub
+            : isActive
+              ? s.labelActive
+              : s.labelDefault;
+
+          const tickClass = (() => {
+            if (isActive || isDragTarget) {
+              return isSub ? s.notchActiveSub : s.notchActive;
+            }
+            if (isHovered && !isDragging) {
+              return isSub ? s.notchHoveredSub : s.notchHovered;
+            }
+            return isSub ? s.notchSub : s.notch;
+          })();
 
           return (
             <div
               key={section.id}
               data-notch-index={i}
               data-active={isActive || undefined}
-              className="relative flex items-center justify-end h-4"
+              className={s.notchRow}
             >
               <AnimatePresence>
                 {showLabel && (
                   <motion.span
-                    className={`absolute right-[calc(100%+8px)] top-0 h-4 flex items-center text-[11px] font-mono whitespace-nowrap pointer-events-none ${isActive ? "text-foreground font-medium" : "text-muted-foreground/60"}`}
+                    className={labelClass}
                     initial={{ opacity: 0, x: 4 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: 4 }}
@@ -173,13 +194,7 @@ export default function ScrollSpy({
               </AnimatePresence>
 
               <button
-                className={`h-[2px] rounded-sm transition-all duration-200 ${
-                  isActive || isDragTarget
-                    ? "w-7 bg-foreground"
-                    : isHovered && !isDragging
-                      ? "w-5 bg-muted-foreground/60"
-                      : "w-4 bg-border"
-                }`}
+                className={tickClass}
                 onClick={() => scrollTo(i)}
                 aria-label={`Jump to ${section.label}`}
                 aria-current={isActive ? "true" : undefined}

@@ -1,0 +1,128 @@
+@use 'mixins/typography' as *;
+@use 'mixins/interactive' as *;
+
+// ── ComponentPreview ─────────────────────────────────────────────────────────
+
+.header {
+  padding: var(--portfolio-spacer-2-5x) var(--portfolio-spacer-3x) var(--portfolio-spacer-1-5x);
+}
+
+.title {
+  font-size: var(--portfolio-type-base);
+  font-weight: var(--portfolio-weight-semibold);
+  color: var(--portfolio-text-primary);
+}
+
+.description {
+  @include body-sm;
+  margin-top: var(--portfolio-spacer-0-5x);
+}
+
+// ── Tab bar ──────────────────────────────────────────────────────────────────
+
+.tabBar {
+  display: flex;
+  align-items: center;
+  gap: var(--portfolio-spacer-0-5x);
+  padding: var(--portfolio-spacer-1-5x) var(--portfolio-spacer-2-5x);
+  border-bottom: var(--portfolio-border-width-thin) solid var(--portfolio-border-subtle);
+  background-color: var(--portfolio-overlay-black-04);
+}
+
+.tabButton {
+  @include button-reset;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: var(--portfolio-spacer-1x) var(--portfolio-spacer-1-5x);
+  font-size: var(--portfolio-type-xs);
+  font-weight: var(--portfolio-weight-medium);
+  border-radius: var(--portfolio-radius-sm);
+  color: var(--portfolio-text-secondary);
+  @include transition-fast;
+
+  &:hover {
+    color: var(--portfolio-text-primary);
+  }
+}
+
+.tabButtonActive {
+  composes: tabButton;
+  background-color: var(--portfolio-surface-neutral-minimal);
+  color: var(--portfolio-text-primary);
+  box-shadow: var(--portfolio-shadow-sm);
+}
+
+.tabIcon {
+  width: 14px;
+  height: 14px;
+}
+
+// ── Preview / Code panes ─────────────────────────────────────────────────────
+
+.previewPane {
+  padding: var(--portfolio-spacer-4x);
+  background-color: var(--preview-bg, var(--portfolio-surface-neutral-minimal));
+  min-height: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.codePane {
+  overflow-x: auto;
+  background-color: var(--code-bg, var(--portfolio-surface-inverse-bold));
+}
+
+.codePre {
+  padding: var(--portfolio-spacer-3x);
+  font-size: var(--portfolio-type-sm);
+  line-height: var(--portfolio-leading-relaxed);
+  font-family: var(--portfolio-font-mono);
+  color: var(--code-foreground, var(--portfolio-text-inverse-bold));
+}
+
+// ── SourcePath ───────────────────────────────────────────────────────────────
+
+.sourcePath {
+  @include code-sm;
+  color: var(--portfolio-text-tertiary);
+  padding: var(--portfolio-spacer-1-5x);
+  border-radius: var(--portfolio-radius-sm);
+  background-color: var(--portfolio-overlay-black-04);
+}
+
+// ── SubsectionHeading ────────────────────────────────────────────────────────
+
+.subsectionHeading {
+  font-size: var(--portfolio-type-sm);
+  font-weight: var(--portfolio-weight-medium);
+  color: var(--portfolio-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: var(--portfolio-tracking-wider);
+  margin-bottom: var(--portfolio-spacer-1-5x);
+}
+
+// ── NotesList / NotesItem ────────────────────────────────────────────────────
+
+.notesList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.notesItem {
+  @include body-sm;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--portfolio-spacer-1x);
+}
+
+.notesBullet {
+  margin-top: 6px;
+  height: 6px;
+  width: 6px;
+  border-radius: var(--portfolio-radius-full);
+  background-color: var(--portfolio-surface-brand-bold);
+  flex-shrink: 0;
+}

@@ -1,0 +1,429 @@
+@use 'mixins/typography' as *;
+@use 'mixins/interactive' as *;
+@use 'tokens/breakpoints' as *;
+
+// ── Page wrapper ─────────────────────────────────────────────────────────────
+
+.content {
+  max-width: 1024px;
+}
+
+// ── Swatch (forced-context variant of ColorSwatch) ───────────────────────────
+
+.swatchButton {
+  @include button-reset;
+  text-align: left;
+  width: 52px;
+  padding: var(--portfolio-spacer-0-25x);
+  border-radius: var(--portfolio-radius-sm);
+}
+
+.swatchChip {
+  height: var(--portfolio-spacer-6x);
+  width: var(--portfolio-spacer-6x);
+  border-radius: var(--portfolio-radius-sm);
+  position: relative;
+  overflow: hidden;
+  transition: transform var(--portfolio-duration-fast) var(--portfolio-easing-standard);
+
+  .swatchButton:hover & {
+    transform: scale(1.05);
+  }
+}
+
+.swatchChipLight {
+  composes: swatchChip;
+  border: var(--portfolio-border-width-thin) solid var(--portfolio-overlay-black-14);
+}
+
+.swatchChipDark {
+  composes: swatchChip;
+  border: var(--portfolio-border-width-thin) solid var(--portfolio-overlay-white-12);
+}
+
+.swatchOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  background-color: var(--portfolio-overlay-black-20);
+  transition: opacity var(--portfolio-duration-fast) var(--portfolio-easing-standard);
+
+  .swatchButton:hover & {
+    opacity: 1;
+  }
+}
+
+.swatchIcon {
+  color: var(--portfolio-text-always-light-bold);
+}
+
+.swatchIconSm {
+  composes: swatchIcon;
+  width: 12px;
+  height: 12px;
+}
+
+.swatchIconMd {
+  composes: swatchIcon;
+  width: 14px;
+  height: 14px;
+}
+
+.swatchLabelLight {
+  margin-top: var(--portfolio-spacer-0-5x);
+  font-size: var(--portfolio-type-3xs);
+  font-weight: var(--portfolio-weight-medium);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--portfolio-text-always-dark-bold);
+}
+
+.swatchLabelDark {
+  margin-top: var(--portfolio-spacer-0-5x);
+  font-size: var(--portfolio-type-3xs);
+  font-weight: var(--portfolio-weight-medium);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--portfolio-text-always-light-bold);
+}
+
+.swatchSublabelLight {
+  font-size: var(--portfolio-type-4xs);
+  font-family: var(--portfolio-font-mono);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--portfolio-text-always-dark-bold);
+  opacity: 0.55;
+}
+
+.swatchSublabelDark {
+  font-size: var(--portfolio-type-4xs);
+  font-family: var(--portfolio-font-mono);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--portfolio-text-always-light-bold);
+  opacity: 0.55;
+}
+
+.swatchGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+// ── Token Architecture ───────────────────────────────────────────────────────
+
+.architectureSection {
+  margin-bottom: var(--portfolio-spacer-8x);
+}
+
+.formulaBox {
+  border-radius: var(--portfolio-radius-sm);
+  border: var(--portfolio-border-width-thin) solid var(--portfolio-border-subtle);
+  background-color: var(--portfolio-overlay-black-04);
+  padding: var(--portfolio-spacer-3x);
+  margin-bottom: var(--portfolio-spacer-2x);
+}
+
+.formulaRow {
+  display: flex;
+  align-items: center;
+  gap: var(--portfolio-spacer-1x);
+  font-family: var(--portfolio-font-mono);
+  font-size: var(--portfolio-type-sm);
+  flex-wrap: wrap;
+}
+
+.formulaPillInverted {
+  background-color: var(--portfolio-surface-inverse-bold);
+  color: var(--portfolio-text-inverse-bold);
+  padding: 6px var(--portfolio-spacer-1-5x);
+  border-radius: var(--portfolio-radius-sm);
+}
+
+.formulaPill {
+  background-color: var(--portfolio-surface-neutral-regular);
+  padding: 6px var(--portfolio-spacer-1-5x);
+  border-radius: var(--portfolio-radius-sm);
+}
+
+.formulaDot {
+  color: var(--portfolio-text-secondary);
+}
+
+.explainerGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--portfolio-spacer-2x);
+  font-size: var(--portfolio-type-sm);
+
+  @media #{$elan-mq-sm} {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.explainerCol {
+  display: flex;
+  flex-direction: column;
+  gap: var(--portfolio-spacer-0-5x);
+}
+
+.explainerTitle {
+  font-weight: var(--portfolio-weight-medium);
+  color: var(--portfolio-text-primary);
+}
+
+.explainerDesc {
+  color: var(--portfolio-text-secondary);
+}
+
+.tagRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--portfolio-spacer-0-5x);
+  padding-top: var(--portfolio-spacer-0-5x);
+}
+
+.tag {
+  @include code-sm;
+  padding: var(--portfolio-spacer-0-25x) var(--portfolio-spacer-1x);
+  background-color: var(--portfolio-surface-neutral-regular);
+  border-radius: var(--portfolio-radius-full);
+}
+
+// ── Property / Role sections ─────────────────────────────────────────────────
+
+.propertySection {
+  margin-bottom: var(--portfolio-spacer-8x);
+}
+
+.roleStack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--portfolio-spacer-3x);
+}
+
+.roleRow {
+  display: flex;
+  gap: var(--portfolio-spacer-2x);
+  align-items: flex-start;
+}
+
+.roleLabel {
+  width: var(--portfolio-spacer-10x);
+  flex-shrink: 0;
+  padding-top: var(--portfolio-spacer-0-5x);
+}
+
+.roleLabelText {
+  font-size: var(--portfolio-type-xs);
+  font-weight: var(--portfolio-weight-medium);
+  color: var(--portfolio-text-primary);
+}
+
+// ── Themed strips (light/dark panels) ────────────────────────────────────────
+
+.themeStripContainer {
+  flex: 1 1 0%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--portfolio-spacer-1-5x);
+
+  @media #{$elan-mq-md} {
+    flex-direction: row;
+    gap: var(--portfolio-spacer-2x);
+  }
+}
+
+.themeStripLight {
+  border-radius: var(--portfolio-radius-md);
+  padding: var(--portfolio-spacer-1-5x);
+  border: var(--portfolio-border-width-thin) solid var(--portfolio-overlay-black-08);
+  background-color: var(--portfolio-surface-always-light);
+
+  @media #{$elan-mq-md} {
+    flex: 1 1 0%;
+  }
+}
+
+.themeStripDark {
+  border-radius: var(--portfolio-radius-md);
+  padding: var(--portfolio-spacer-1-5x);
+  border: var(--portfolio-border-width-thin) solid var(--portfolio-overlay-white-08);
+  background-color: var(--portfolio-surface-always-dark);
+
+  @media #{$elan-mq-md} {
+    flex: 1 1 0%;
+  }
+}
+
+.themeStripTitle {
+  @include label-sm;
+  margin-bottom: var(--portfolio-spacer-1x);
+  color: var(--portfolio-text-always-dark-bold);
+  opacity: 0.55;
+}
+
+.themeStripTitleDark {
+  @include label-sm;
+  margin-bottom: var(--portfolio-spacer-1x);
+  color: var(--portfolio-text-always-light-bold);
+  opacity: 0.55;
+}
+
+// ── Interaction section (same structure as role rows) ─────────────────────────
+
+.interactionSection {
+  margin-bottom: var(--portfolio-spacer-8x);
+}
+
+.interactionStrips {
+  display: flex;
+  flex-direction: column;
+  gap: var(--portfolio-spacer-1-5x);
+
+  @media #{$elan-mq-md} {
+    flex-direction: row;
+    gap: var(--portfolio-spacer-2x);
+  }
+}
+
+// ── Palette Reference ────────────────────────────────────────────────────────
+
+.paletteSection {
+  margin-bottom: var(--portfolio-spacer-8x);
+}
+
+.paletteGroup {
+  margin-bottom: var(--portfolio-spacer-6x);
+}
+
+.familyBlock {
+  margin-bottom: var(--portfolio-spacer-3x);
+}
+
+.familyName {
+  @include caption;
+  font-weight: var(--portfolio-weight-medium);
+  margin-bottom: var(--portfolio-spacer-1x);
+}
+
+// ── Lumen scale documentation ────────────────────────────────────────────────
+
+.lumenSection {
+  margin-bottom: var(--portfolio-spacer-6x);
+  scroll-margin-top: var(--portfolio-spacer-12x);
+}
+
+.lumenNarrative {
+  font-size: var(--portfolio-type-sm);
+  color: var(--portfolio-text-secondary);
+  line-height: var(--portfolio-leading-relaxed);
+  max-width: 640px;
+  margin-bottom: var(--portfolio-spacer-3x);
+}
+
+.lumenCode {
+  font-family: var(--portfolio-font-mono);
+  font-size: var(--portfolio-type-xs);
+  background-color: var(--portfolio-surface-neutral-regular);
+  padding: 2px var(--portfolio-spacer-0-5x);
+  border-radius: var(--portfolio-radius-sm);
+}
+
+.lumenCodeMuted {
+  composes: lumenCode;
+  opacity: 0.7;
+}
+
+.lumenMethodBox {
+  border: var(--portfolio-border-width-thin) solid var(--portfolio-border-subtle);
+  border-radius: var(--portfolio-radius-md);
+  padding: var(--portfolio-spacer-2x) var(--portfolio-spacer-3x);
+  margin-bottom: var(--portfolio-spacer-3x);
+  background-color: var(--portfolio-overlay-black-04);
+}
+
+.lumenMethodTitle {
+  @include label-sm;
+  font-weight: var(--portfolio-weight-semibold);
+  margin-bottom: var(--portfolio-spacer-0-5x);
+}
+
+.lumenMethodDesc {
+  font-size: var(--portfolio-type-sm);
+  color: var(--portfolio-text-secondary);
+  margin-bottom: var(--portfolio-spacer-2x);
+}
+
+.lumenParamGrid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--portfolio-spacer-1x);
+}
+
+.lumenParam {
+  display: flex;
+  gap: var(--portfolio-spacer-2x);
+  align-items: baseline;
+  font-size: var(--portfolio-type-xs);
+}
+
+.lumenParamLabel {
+  font-weight: var(--portfolio-weight-medium);
+  width: 72px;
+  flex-shrink: 0;
+}
+
+.lumenParamValue {
+  color: var(--portfolio-text-secondary);
+  font-family: var(--portfolio-font-mono);
+  font-size: var(--portfolio-type-3xs);
+}
+
+.lumenTable {
+  overflow-x: auto;
+}
+
+.lumenTableEl {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--portfolio-type-xs);
+
+  th,
+  td {
+    text-align: left;
+    padding: var(--portfolio-spacer-0-5x) var(--portfolio-spacer-1-5x);
+    border-bottom: var(--portfolio-border-width-thin) solid var(--portfolio-border-neutral-minimal);
+    white-space: nowrap;
+  }
+
+  th {
+    @include label-sm;
+    color: var(--portfolio-text-secondary);
+    padding-bottom: var(--portfolio-spacer-1x);
+  }
+
+  td {
+    font-family: var(--portfolio-font-mono);
+    font-size: var(--portfolio-type-3xs);
+  }
+
+  td:first-child {
+    font-family: var(--portfolio-font-sans);
+    font-weight: var(--portfolio-weight-medium);
+    font-size: var(--portfolio-type-xs);
+  }
+}
+
+.lumenAnchorRow {
+  background-color: var(--portfolio-overlay-black-04);
+  font-weight: var(--portfolio-weight-semibold);
+}

@@ -1,0 +1,128 @@
+@use 'mixins/interactive' as *;
+@use 'tokens/breakpoints' as *;
+
+// ── Nav container ────────────────────────────────────────────────────────────
+
+.nav {
+  position: fixed;
+  right: var(--portfolio-spacer-2-5x);
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: var(--portfolio-z-scrollspy);
+  display: none;
+  pointer-events: none;
+
+  @media #{$elan-mq-md} {
+    display: flex;
+  }
+}
+
+// ── Track ────────────────────────────────────────────────────────────────────
+
+.track {
+  display: flex;
+  flex-direction: column;
+  gap: var(--portfolio-spacer-1-5x);
+  align-items: flex-end;
+  touch-action: none;
+  user-select: none;
+  pointer-events: auto;
+  padding: var(--portfolio-spacer-2x);
+  margin: calc(-1 * var(--portfolio-spacer-2x));
+  cursor: pointer;
+}
+
+.trackDragging {
+  composes: track;
+  cursor: grabbing;
+}
+
+// ── Notch row ────────────────────────────────────────────────────────────────
+
+.notchRow {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  height: var(--portfolio-spacer-2x);
+}
+
+// ── Floating label ───────────────────────────────────────────────────────────
+
+.floatingLabel {
+  position: absolute;
+  right: calc(100% + 8px);
+  top: 0;
+  height: var(--portfolio-spacer-2x);
+  display: flex;
+  align-items: center;
+  font-size: 11px;
+  font-family: var(--portfolio-font-mono);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.labelDefault {
+  composes: floatingLabel;
+  color: color-mix(in srgb, var(--portfolio-text-secondary) 60%, transparent);
+}
+
+.labelActive {
+  composes: floatingLabel;
+  color: var(--portfolio-text-primary);
+  font-weight: var(--portfolio-weight-medium);
+}
+
+.labelDefaultSub {
+  composes: floatingLabel;
+  color: color-mix(in srgb, var(--portfolio-text-secondary) 50%, transparent);
+}
+
+.labelActiveSub {
+  composes: floatingLabel;
+  color: var(--portfolio-text-secondary);
+}
+
+// ── Notch tick ───────────────────────────────────────────────────────────────
+
+%notchBase {
+  height: 2px;
+  border-radius: var(--portfolio-radius-sm);
+  @include transition-base;
+}
+
+.notch {
+  @extend %notchBase;
+  width: var(--portfolio-spacer-2x);
+  background-color: var(--portfolio-border-subtle);
+}
+
+.notchSub {
+  @extend %notchBase;
+  width: 10px;
+  background-color: color-mix(in srgb, var(--portfolio-border-subtle) 60%, transparent);
+}
+
+.notchHovered {
+  @extend %notchBase;
+  width: var(--portfolio-spacer-2-5x);
+  background-color: color-mix(in srgb, var(--portfolio-text-secondary) 60%, transparent);
+}
+
+.notchHoveredSub {
+  @extend %notchBase;
+  width: 14px;
+  background-color: color-mix(in srgb, var(--portfolio-text-secondary) 40%, transparent);
+}
+
+.notchActive {
+  @extend %notchBase;
+  width: 28px;
+  background-color: var(--portfolio-text-primary);
+}
+
+.notchActiveSub {
+  @extend %notchBase;
+  width: 22px;
+  background-color: var(--portfolio-text-primary);
+}
