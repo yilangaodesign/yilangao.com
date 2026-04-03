@@ -8,6 +8,8 @@ import styles from "./ScrollSpy.module.scss";
 export type ScrollSpySection = {
   id: string;
   label: string;
+  depth?: 0 | 1;
+  group?: string;
 };
 
 type ScrollSpyProps = {
@@ -61,7 +63,8 @@ export default function ScrollSpy({ sections }: ScrollSpyProps) {
     (index: number, behavior: ScrollBehavior = "smooth") => {
       const el = document.getElementById(sections[index]?.id);
       if (el) {
-        el.scrollIntoView({ behavior, block: "start" });
+        const top = el.getBoundingClientRect().top + window.scrollY - window.innerHeight * 0.2;
+        window.scrollTo({ top: Math.max(0, top), behavior });
         setActiveIndex(index);
       }
     },
@@ -148,9 +151,16 @@ export default function ScrollSpy({ sections }: ScrollSpyProps) {
           const isActive = i === activeIndex;
           const isDragTarget = isDragging && i === dragIndex;
           const showLabel = isDragging ? isDragTarget : isHovered;
+          const depth = section.depth ?? 0;
 
           return (
-            <div key={section.id} className={styles.notch} data-notch-index={i} data-active={isActive || undefined}>
+            <div
+              key={section.id}
+              className={styles.notch}
+              data-notch-index={i}
+              data-active={isActive || undefined}
+              data-depth={depth || undefined}
+            >
               <AnimatePresence>
                 {showLabel && (
                   <motion.span
@@ -172,6 +182,7 @@ export default function ScrollSpy({ sections }: ScrollSpyProps) {
                 className={styles.tick}
                 data-active={isActive || undefined}
                 data-drag-target={isDragTarget || undefined}
+                data-depth={depth || undefined}
                 onClick={() => scrollTo(i)}
                 aria-label={`Jump to ${section.label}`}
                 aria-current={isActive ? "true" : undefined}

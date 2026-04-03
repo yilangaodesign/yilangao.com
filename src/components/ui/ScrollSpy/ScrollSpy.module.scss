@@ -5,6 +5,10 @@ $_spy-dot-w: var(--portfolio-spacer-2x); // 16px
 $_spy-progress-h: 2px;
 $_spy-dot-active-w: var(--portfolio-spacer-2-5x); // 20px
 
+$_spy-sub-dot-w: 10px;
+$_spy-sub-active-w: 22px;
+$_spy-sub-hover-w: 14px;
+
 .rail {
   position: fixed;
   right: var(--portfolio-spacer-2x);
@@ -65,6 +69,16 @@ $_spy-dot-active-w: var(--portfolio-spacer-2-5x); // 20px
     color: var(--portfolio-text-primary);
     font-weight: 500;
   }
+
+  .notch[data-depth="1"] & {
+    color: var(--portfolio-text-placeholder);
+    font-weight: 400;
+  }
+
+  .notch[data-depth="1"][data-active] & {
+    color: var(--portfolio-text-secondary);
+    font-weight: 400;
+  }
 }
 
 .tick {
@@ -77,7 +91,8 @@ $_spy-dot-active-w: var(--portfolio-spacer-2-5x); // 20px
   border-radius: 1px;
   transition:
     width var(--portfolio-duration-moderate) var(--portfolio-easing-standard),
-    background-color var(--portfolio-duration-moderate) var(--portfolio-easing-standard);
+    background-color var(--portfolio-duration-moderate) var(--portfolio-easing-standard),
+    opacity var(--portfolio-duration-moderate) var(--portfolio-easing-standard);
   flex-shrink: 0;
 
   &[data-active] {
@@ -93,5 +108,28 @@ $_spy-dot-active-w: var(--portfolio-spacer-2-5x); // 20px
   .track[data-hovered] &:not([data-active]):not([data-drag-target]) {
     width: $_spy-dot-active-w;
     background: var(--portfolio-text-placeholder);
+  }
+
+  &[data-depth="1"] {
+    width: $_spy-sub-dot-w;
+    opacity: 0.6;
+  }
+
+  &[data-depth="1"][data-active] {
+    width: $_spy-sub-active-w;
+    background: var(--portfolio-text-primary);
+    opacity: 1;
+  }
+
+  &[data-depth="1"][data-drag-target] {
+    width: $_spy-sub-active-w;
+    background: var(--portfolio-text-primary);
+    opacity: 1;
+  }
+
+  .track[data-hovered] &[data-depth="1"]:not([data-active]):not([data-drag-target]) {
+    width: $_spy-sub-hover-w;
+    background: var(--portfolio-text-placeholder);
+    opacity: 0.6;
   }
 }

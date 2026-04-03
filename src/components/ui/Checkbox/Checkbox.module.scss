@@ -44,14 +44,18 @@ $_box-xl: 24px;  $_icon-xl: 16px;
 
 .checkbox {
   @include button-reset;
+  position: relative;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
   background-color: var(--portfolio-surface-neutral-minimal);
   border: $portfolio-border-width-thin solid var(--portfolio-border-neutral-bold);
   border-radius: $portfolio-radius-xs;
-  @include transition-fast;
+  transition: background-color $portfolio-duration-fast $portfolio-easing-standard,
+              border-color $portfolio-duration-fast $portfolio-easing-standard,
+              box-shadow $portfolio-duration-fast $portfolio-easing-standard;
 
   &:focus-visible {
     @include focus-ring;
@@ -172,28 +176,26 @@ $_box-xl: 24px;  $_icon-xl: 16px;
 }
 
 // =============================================================================
-// INDICATOR — icon visibility logic (Radix data-state driven)
+// ICONS — visibility driven by data-state on the checkbox button itself
 // =============================================================================
+// No Radix Indicator/Presence wrapper — icons live directly inside the Root
+// button, absolutely positioned with opacity toggling. Zero layout changes.
 
-.indicator {
+.iconChecked,
+.iconIndeterminate {
+  position: absolute;
   display: flex;
   align-items: center;
   justify-content: center;
+  opacity: 0;
+}
 
-  .iconChecked,
-  .iconIndeterminate {
-    display: none;
-    align-items: center;
-    justify-content: center;
-  }
+.checkbox[data-state='checked'] > .iconChecked {
+  opacity: 1;
+}
 
-  &[data-state='checked'] .iconChecked {
-    display: flex;
-  }
-
-  &[data-state='indeterminate'] .iconIndeterminate {
-    display: flex;
-  }
+.checkbox[data-state='indeterminate'] > .iconIndeterminate {
+  opacity: 1;
 }
 
 .iconWrap {

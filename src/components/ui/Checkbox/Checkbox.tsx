@@ -88,18 +88,16 @@ export const Checkbox = forwardRef<HTMLButtonElement, CheckboxProps>(
           name={name}
           value={value}
         >
-          <CheckboxPrimitive.Indicator className={styles.indicator}>
-            <span className={styles.iconChecked} aria-hidden="true">
-              <span className={styles.iconWrap}>
-                <CheckIcon />
-              </span>
+          <span className={styles.iconChecked} aria-hidden="true">
+            <span className={styles.iconWrap}>
+              <CheckIcon />
             </span>
-            <span className={styles.iconIndeterminate} aria-hidden="true">
-              <span className={styles.iconWrap}>
-                <MinusIcon />
-              </span>
+          </span>
+          <span className={styles.iconIndeterminate} aria-hidden="true">
+            <span className={styles.iconWrap}>
+              <MinusIcon />
             </span>
-          </CheckboxPrimitive.Indicator>
+          </span>
         </CheckboxPrimitive.Root>
         {hasContent && (
           <div className={styles.content}>

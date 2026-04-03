@@ -134,8 +134,8 @@ $_btn-icon-xl: var(--portfolio-spacer-3x); // 24px
     background-color: var(--portfolio-action-brand-bold);
     color: var(--portfolio-text-always-light-bold);
 
-    // Dark-mode WCAG fix: accent-50 (#7182FD) + white = 3.33:1 (fails AA).
-    // Deepen to accent-60 for buttons; non-button brand uses keep accent-50 to pop.
+    // Dark-mode WCAG fix: accent-50 (#4E6CFF) + white = 4.3:1 (below AA for text).
+    // Deepen to accent-60 for buttons; non-button brand uses keep accent-50 for UI.
     :global([data-theme="dark"]) &,
     :global(.dark) & {
       background-color: $portfolio-accent-60;
