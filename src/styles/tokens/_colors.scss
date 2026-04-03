@@ -20,22 +20,28 @@
 // -----------------------------------------------------------------------------
 // 1. Brand Accent (Lumen Blue-Violet) — NOT from Carbon
 // -----------------------------------------------------------------------------
-// Ported from the Cadence Design System's "Lumen" scale (IBM Carbon project).
-// Lumen was designed as a perceptually uniform blue-violet ramp with no hue
-// discontinuity. Carbon uses Blue 60 (#0f62fe) as its primary interactive
-// color; we deliberately diverge to maintain visual identity distinct from
-// IBM products. The key brand color sits at step 60.
+// Lumen is a custom blue-violet scale built in OKLCH for perceptual uniformity.
+// Grade 60 (#3336FF) is the immovable brand anchor — all other steps are derived
+// from it via even lightness ramp + sine chroma arc at constant hue ~270°.
+//
+// Construction: OKLCH(L, C, 269.7°)
+//   Lightness — two-segment even ramp: ΔL ≈ 0.093 (10–60), ΔL ≈ 0.081 (60–100)
+//   Chroma — sine bell peaking at step 60 (C = 0.281), tapering to extremes
+//   Hue — constant 269.7° across all steps (no hue discontinuity)
+//
+// Carbon uses Blue 60 (#0F62FE) as its primary interactive color; we
+// deliberately diverge to maintain visual identity distinct from IBM products.
 
-$portfolio-accent-10: #F0F5FD;
-$portfolio-accent-20: #D5E0FC;
-$portfolio-accent-30: #B3C5FC;
-$portfolio-accent-40: #8DA3FC;
-$portfolio-accent-50: #7182FD;
-$portfolio-accent-60: #3336FF;
-$portfolio-accent-70: #0004E2;
-$portfolio-accent-80: #0003A7;
-$portfolio-accent-90: #000273;
-$portfolio-accent-100: #05063E;
+$portfolio-accent-10: #EFF3FF;   // oklch(0.96, 0.016, 269.7)
+$portfolio-accent-20: #C5D4FF;   // oklch(0.87, 0.062, 269.7)
+$portfolio-accent-30: #9BB4FF;   // oklch(0.78, 0.111, 269.7)
+$portfolio-accent-40: #7392FF;   // oklch(0.69, 0.164, 269.7)
+$portfolio-accent-50: #4E6CFF;   // oklch(0.59, 0.220, 269.7)
+$portfolio-accent-60: #3336FF;   // oklch(0.50, 0.281, 269.7) — brand anchor
+$portfolio-accent-70: #2715D8;   // oklch(0.42, 0.262, 269.7)
+$portfolio-accent-80: #1A0EA1;   // oklch(0.34, 0.210, 269.7)
+$portfolio-accent-90: #0F1461;   // oklch(0.26, 0.132, 269.7)
+$portfolio-accent-100: #0A0F22;  // oklch(0.17, 0.040, 269.7)
 
 
 // -----------------------------------------------------------------------------
@@ -67,17 +73,10 @@ $portfolio-neutral-100: #161616;
 // They are NOT currently used in the UI. When adopting a color, document the
 // rationale in docs/design.md §9.
 
-// — Blue (Carbon's primary action color; we use it for info states, not brand)
-$portfolio-blue-10: #EDF5FF;
-$portfolio-blue-20: #D0E2FF;
-$portfolio-blue-30: #A6C8FF;
-$portfolio-blue-40: #78A9FF;
-$portfolio-blue-50: #4589FF;
-$portfolio-blue-60: #0F62FE;
-$portfolio-blue-70: #0043CE;
-$portfolio-blue-80: #002D9C;
-$portfolio-blue-90: #001D6C;
-$portfolio-blue-100: #001141;
+// — Blue — REMOVED (2026-04-03)
+// Blue-60 (#0F62FE, hue ~219°) was only ~20° from the brand accent (#3336FF,
+// hue ~270°), causing semantic confusion. Cyan and Teal cover "cool info" needs.
+// $portfolio-support-info remapped to $portfolio-cyan-70.
 
 // — Red
 $portfolio-red-10: #FFF1F1;
@@ -340,6 +339,6 @@ $portfolio-border-disabled: $portfolio-border-neutral-disabled;
 $portfolio-support-error: $portfolio-red-60;
 $portfolio-support-success: $portfolio-green-60;
 $portfolio-support-warning: $portfolio-yellow-30;
-$portfolio-support-info: $portfolio-blue-70;
+$portfolio-support-info: $portfolio-cyan-70;
 $portfolio-support-caution-minor: $portfolio-yellow-30;
 $portfolio-support-caution-major: $portfolio-orange-40;
