@@ -22,6 +22,7 @@ dispatched by the orchestrator. Follow these rules:
 5. **NEVER** skip dark mode verification when touching colors or backgrounds
 6. **ALWAYS** use flex layout with in-flow spacers for fixed sidebars — never rely on padding-left offsets
 7. **NEVER** use SVG to render text, labels, or component UI — SVG is permitted only for icons, logos, and decorative illustrations. Text in SVG bypasses the typography token system, breaks copy/paste, and is invisible to screen readers.
+8. **ALWAYS** name component props, CSS classes, and design tokens by **semantic intent** (when/why to use), never by **visual implementation** (what CSS changes). An agent must be able to decide whether to use a prop from its name alone, in one reasoning step, without knowing the underlying CSS. Bad: `mono` (implementation — "use monospace font"). Good: `metric` (intent — "this labels a statistic"). Bad: `rounded` (implementation). Good: `pill` (intent — "tag/badge shape"). This applies to every new prop, variant, token, and CSS class. See §7.7 in `docs/design.md`.
 
 **Content:**
 1. **NEVER** write case study text that exceeds 4 consecutive sentences without a visual break — the target is 80-85% visual, 15-20% text
@@ -51,7 +52,7 @@ dispatched by the orchestrator. Follow these rules:
 16. **ALWAYS** run the Cross-App Parity Checklist after creating or modifying anything in `src/`
 17. **NEVER** merge to `main` without first running `npm run version:release` for each app with unreleased changes — every checkpoint is a versioned release. Check all manifests (`elan.json`, `ascii-studio.json`, etc.) to see if `version` differs from `release.version`.
 18. **ALWAYS** run the CMS-Frontend Parity Checklist after adding, removing, or renaming any CMS field or frontend data field. A field that exists in one layer but not all three (schema, data fetch, UI) is a bug. See EAP-019.
-19. **ALWAYS** restart the Payload dev server after modifying any global or collection schema — Payload syncs the database schema only on startup. A schema change without a server restart means the field silently does not exist.
+19. **ALWAYS** run `src/scripts/push-schema.ts` (or equivalent SQL) after adding a new Payload collection — Payload 3's auto-push does NOT work on this project. The admin will 500 with "column does not exist" until the table + `payload_locked_documents_rels` column are created manually. After pushing, restart the dev server. See EAP-062.
 20. **NEVER** create a component that renders CMS data without inline edit support — every text field from a Payload collection or global MUST be wrapped in `EditableText` (with `fieldId`, `target`, `fieldPath`) when `isAdmin`. The component MUST accept `id` and `isAdmin` props, and include an `EditButton`. A component that renders CMS text as plain elements is incomplete. See EAP-029.
 21. **NEVER** create or modify a playground component page (`playground/src/app/components/*/page.tsx`) without first reading `.cursor/skills/playground/SKILL.md`. Playground pages are thin harnesses that import and render production components — they must never re-implement components in Tailwind, raw HTML, or SVG. See EAP-037.
 22. **NEVER** edit a playground component page (`playground/src/app/components/*/page.tsx`) to fix how a component **looks or behaves** — visual/behavioral changes go to the design system source (`src/components/ui/` or `src/components/`). The playground auto-updates via `@ds/*` imports. Before editing any playground file, classify the task:
@@ -60,7 +61,7 @@ dispatched by the orchestrator. Follow these rules:
     - **Shell** (sidebar layout, ComponentPreview rendering, playground-wide IA, theme behavior) → Edit `playground/src/components/` or `playground/src/app/layout.tsx`
     - **Ambiguous** → Ask the user before proceeding
     This classification is a **central guardrail** — it applies regardless of which skill or route activated the task (design-iteration, engineering-iteration, or direct playground work). When the user explicitly overrides this gate, document the exception reason and scope before proceeding.
-23. **NEVER** modify `src/proxy.ts`, `src/config/companies.json`, or `src/lib/company-session.ts` without first reading `.cursor/skills/password-gate/SKILL.md`. These files form the visitor access boundary — incorrect changes can expose the site publicly or lock out all visitors.
+23. **NEVER** modify `src/proxy.ts`, `src/collections/Companies.ts`, `src/lib/company-session.ts`, or `src/lib/company-data.ts` without first reading `.cursor/skills/password-gate/SKILL.md`. These files form the visitor access boundary — incorrect changes can expose the site publicly or lock out all visitors.
 
 # Pre-Flight: Conditional Reading
 
@@ -149,6 +150,11 @@ skill assignment, and gate identification internally.
     (triggers: "ship it", "publish", "release everything", "push it live", "deploy everything", "go live")
     → Activate `ship-it` skill at `.cursor/skills/ship-it/SKILL.md`.
     → This skill handles diff analysis, commit batching, and hands off to `checkpoint` for the release pipeline.
+
+14. **Am I starting / booting dev servers?**
+    (triggers: "boot up", "start servers", "spin up", "fire up", or "I can't see X on localhost")
+    → Activate `boot-up` skill at `.cursor/skills/boot-up/SKILL.md`.
+    → Probes ports, starts what's missing, waits for HTTP 200, updates the port registry.
 
 Do NOT read docs that don't match your task. Do NOT read full doc files when only one section is relevant. The Section Index exists so you can target-read.
 

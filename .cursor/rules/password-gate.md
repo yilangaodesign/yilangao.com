@@ -1,9 +1,11 @@
 ---
 globs:
   - src/proxy.ts
-  - src/config/companies.json
+  - src/collections/Companies.ts
   - src/lib/company-session.ts
+  - src/lib/company-data.ts
   - src/app/(frontend)/for/**
+  - src/components/admin/CompanyDashboard.tsx
 ---
 
 STOP — read `.cursor/skills/password-gate/SKILL.md` before making any changes.
