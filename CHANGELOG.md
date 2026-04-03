@@ -4,6 +4,36 @@ All notable changes to the Élan design system are documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.4.0] — 2026-04-03
+
+Minor release: new site-level components, SCSS module migration for playground, expanded color tokens, and UI component refinements.
+
+### Added
+
+- **Site components**: Footer, Navigation, Marquee, TestimonialCard, ThemeProvider, ThemeToggle, ViewSiteLink
+- **Animation utilities**: ArrowReveal, ExpandCollapse, FadeIn, MountEntrance, StaggerChildren
+- **ScrollSpy** (site-level): full-featured scroll spy wrapper with SCSS module
+- **Utility library**: `src/lib/utils.ts` with shared helpers
+- **Color tokens**: expanded palette in `_colors.scss`
+- **Playground SCSS modules**: component-preview, scroll-spy, token-grid, and colors page modules
+
+### Changed
+
+- **Button**: updated SCSS module styles
+- **Checkbox**: updated SCSS module and component API
+- **ScrollSpy (UI)**: expanded SCSS module and component logic
+- **TokenGrid**: updated elan-visuals and inline-edit token map
+- **Playground**: migrated shared components to SCSS modules, updated all token pages (breakpoints, colors, elevation, motion, spacing, typography)
+- **ASCII Art Studio**: synced globals.css with token updates
+
+### Documentation
+
+- Updated design feedback log, engineering feedback log, content feedback log
+- Expanded design anti-patterns and engineering anti-patterns
+- Updated color design doc and content navigation doc
+- Updated playground skill guardrails
+- Updated port registry
+
 ## [2.3.0] — 2026-04-03
 
 Minor release: new UI components, company password gate, expanded design tokens, ASCII Art Studio engines, and playground pages.
