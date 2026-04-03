@@ -4,10 +4,153 @@
 >
 > **Who reads this:** AI agents at session start (scan recent entries for context), and during feedback processing (check for recurring patterns).
 > **Who writes this:** AI agents after each feedback cycle via the `design-iteration` skill.
-> **Last updated:** 2026-04-02 (FB-085: NavItemTrigger missing parent active state in playground demo)
+> **Last updated:** 2026-04-03 (FB-092: Input xs icon size too large for text scale)
 >
 > **For agent skills:** Read only the first 30 lines of this file (most recent entries) for pattern detection.
 > **Older entries:** Synthesized in `docs/design-feedback-synthesis.md`. Raw archive in `docs/design-feedback-log-archive.md`.
+
+---
+
+## Session: 2026-04-03 — Input xs icon disproportionate to text
+
+#### FB-092: "The icon size for xs is just a hair too big — doesn't match the placeholder typography size"
+
+**User feedback:** At the `xs` size, the input icon (16px) looks disproportionately large next to the 12px font-size placeholder text. It takes up too much space and feels visually unbalanced.
+
+**Root cause:** The `$_input-icon-xs` token was 16px — a 1.33:1 ratio to the 12px text. The other sizes maintain a tighter ~1.1–1.17:1 ratio (e.g., `sm`: 18px icon / 14px text = 1.28, `md`: 20px icon / 16px text = 1.25). The xs size was the outlier.
+
+**Resolution:** Reduced `$_input-icon-xs` from 16px to 14px (1.17:1 ratio to 12px text). This single token change propagates to `iconWrap`, `clearButton`, `statusIcon`, and the loading spinner at the xs size.
+
+**Principle established:** When building components with multiple content types (text, icons, badges), always verify **visual size consistency** across all content slots. Icon size should be proportional to the text scale at every size variant — if the font size drops, the icon must drop with it. The eye tests this as "do these feel like the same weight?" not just "are they technically aligned?"
+
+**Files changed:** `src/components/ui/Input/Input.module.scss` (`$_input-icon-xs: 16px` → `14px`)
+
+---
+
+## Session: 2026-04-03 — Eyebrow component created to canonicalize uppercase text pattern
+
+### FB-091: Eyebrow component built — canonical uppercase tracked text primitive for section headings, group labels, and metric annotations
+
+**Date:** 2026-04-03
+
+**Intent:** User requested building an Eyebrow component based on the text primitive taxonomy established in FB-090. The design system had three divergent implementations of the same visual pattern (uppercase, tracked, small text): the `@include label` mixin (5 consumers), the `@include label-sm` mixin (7 consumers), and VerticalNav's hand-rolled variant (different weight and tracking). No React component existed — every consumer re-implemented the mixin or hand-wrote the styles.
+
+**Diagnosis:** Audit found the VerticalNav variant had drifted from the canonical mixin: weight 500 vs 400, tracking 0.02em vs 0.05em. This drift was actually typographically intentional — heavier strokes at medium weight (500) create more visual air between characters, so tighter tracking (0.02em) compensates. The component needed to formalize both variants as a 2×2 matrix: size (sm/md) × emphasis (subtle/bold).
+
+**Resolution:** Created `src/components/ui/Eyebrow/` with:
+- Two sizes: `sm` (10px, compact leading) and `md` (12px, normal leading)
+- Two emphases: `subtle` (regular/400, wider tracking 0.05em) and `bold` (medium/500, tighter tracking 0.02em)
+- Polymorphic `as` prop supporting span, p, div, dt, legend, h2, h3, h4
+- No slots — Eyebrow is pure text; compose with TextRow or flex containers for adjacent content
+- Color defaults to `--portfolio-text-secondary`; parent components override via className
+- Added to barrel exports, registry, playground with demo page, sidebar navigation
+
+**Principle extracted:** When a visual pattern has drifted across multiple implementations, the component should formalize ALL observed variants (not just the canonical one). The drift often encodes real typographic logic — in this case, weight-tracking compensation. Rejecting the drift and forcing a single recipe would regress the VerticalNav's intentional refinement.
+
+**Cross-category note:** Also documented as FB-090 (taxonomy decision). Existing `@include label` consumers were NOT migrated — that is a separate, higher-risk effort.
+
+---
+
+## Session: 2026-04-03 — Label renamed to TextRow to resolve naming collision
+
+### FB-090: "Label" component renamed to "TextRow" after audit revealed naming collision with 4 distinct label patterns
+
+**Date:** 2026-04-03
+
+**Intent:** User noticed the newly built Label component's name was ambiguous — the design system already uses "label" in four different contexts: (1) the `@include label` mixin (uppercase section headings), (2) `.label` classes in 9 form components, (3) HTML `<label>` element semantics, (4) `.label` / `.itemLabel` in Menu/NavItem for interactive text. The component needed a distinct name.
+
+**Diagnosis:** Full audit of all 45 components under `src/components/ui/` identified three distinct text patterns that should NOT be conflated: **Eyebrow** (uppercase, tracked, section headings), **Form field labels** (coupled to parent control's size system), and **Composed text rows** (standalone inline text with slots). The new component is Pattern 3 only.
+
+**Resolution:** Renamed `Label` → `TextRow` across all surfaces:
+- `src/components/ui/Label/` → `src/components/ui/TextRow/` (component, SCSS, barrel)
+- Type exports: `LabelProps` → `TextRowProps`, `LabelSize` → `TextRowSize`, etc.
+- SCSS root class: `.label` → `.textRow`
+- Playground page: `/components/label` → `/components/text-row`
+- Sidebar entry: updated href + display name
+- Registry: `shared-ui-label` → `shared-ui-text-row`
+- Updated all code comments and descriptions to clarify scope: "Use for standalone metadata annotations, key-value pairs, and card metadata. NOT a replacement for eyebrow/section headings, form field labels, or nav/menu item text."
+
+**Principle extracted:** When a design system term is overloaded (used for 3+ distinct visual/semantic patterns), the newer component should yield the name to the established usage. Name by structure (TextRow = "what it IS") rather than role (Label = "what it DOES") when the component serves multiple roles.
+
+**Cross-category note:** Also an engineering rename touching 8 files. No engineering feedback log entry needed — this is a clean rename with no incident or breakage.
+
+---
+
+## Session: 2026-04-03 — Brand status variant for Input
+
+#### FB-089: "Add a brand version for the input field — active state border in the brand color"
+
+**User feedback:** The Input component has neutral, success, error, and warning statuses, but no brand/accent variant. The playground's sidebar search bar already uses the accent color for its active border — the Input component should support this as a first-class status.
+
+**Resolution:** Added `"brand"` to `InputStatus` type. Created `.brand` status block in SCSS following the identical pattern as error/success/warning — sets `border-color` to `--portfolio-border-brand-bold` (accent-60 in light, accent-50 in dark) for both resting and focused states, across both regular and minimal emphasis. No status icon for brand (it signals intent, not validation). Feedback text uses `--portfolio-text-brand-bold`. Playground updated with a brand demo (search input with leading icon).
+
+**Design decision:** Brand follows Option A (colored border at rest, matching other statuses) rather than Option B (neutral at rest, brand on focus only). This is consistent with the existing status pattern and makes the field always visually distinct as a branded/primary element.
+
+**Files changed:** `src/components/ui/Input/Input.tsx`, `src/components/ui/Input/Input.module.scss`, `playground/src/app/components/input/page.tsx`
+
+---
+
+## Session: 2026-04-03 — Input focus border layout shift
+
+#### FB-088: "Clicking the input makes everything jump — placeholder, icons, all content shifts"
+
+**User feedback:** When clicking/focusing the Input component, all content (placeholder text, icons, prefix/suffix) visibly shifts position. The component's geometry changes between resting and active states.
+
+**Root cause:** The resting border was `border: 1px solid` and focus changed it to `border-width: 2px`. The extra 1px on each side (top, right, bottom, left) pushed all internal content inward by 1px, causing a visible jump. This affected both `regular` (all four sides) and `minimal` (bottom border only) emphasis variants, plus all status variant focus overrides (error, success, warning).
+
+**Resolution:** Padding compensation via CSS custom properties. Each size variant now stores its base padding in `--_ic-py` and `--_ic-px`. The container always computes `padding: calc(var(--_ic-py) - var(--_border-offset)) calc(var(--_ic-px) - var(--_border-offset))`. The `--_border-offset` defaults to `0px` and flips to `1px` on `:focus-within` when the border grows from 1px to 2px. This keeps the content in exactly the same position across all states. Three distinct visual states preserved: resting (1px gray), hover (1px black), focus (2px black). For minimal emphasis, only `padding-bottom` compensates since only `border-bottom-width` changes.
+
+**Files changed:** `src/components/ui/Input/Input.module.scss`
+
+**Principle reinforced:** When a design requires border-width changes on state transitions (e.g., thicker focus ring), compensate with padding reduction so content stays fixed. Use CSS custom properties for the base padding values and `calc()` with a `--_border-offset` variable — this scales across all size variants without per-size focus overrides.
+
+---
+
+## Session: 2026-04-02 — Colors page: dual-theme display and token audit
+
+#### FB-087: "Playground colors page doesn't show dark theme values; needs full audit"
+
+**User feedback:** The playground colors page only documented light mode token values. Dark theme border colors (and all other dark mode overrides) were invisible. Color swatches should stay true to their hex values regardless of the playground theme. The page needs to show both light and dark resolved values explicitly.
+
+**Root cause:** The `sync-tokens.mjs` script only parsed `_colors.scss` (light mode SCSS variables). It never read `_custom-properties.scss` where dark mode overrides are defined. The `tokens.ts` data had no concept of `darkValue`. The colors page rendered one set of swatches that showed only light mode hex values, with no way to see what those tokens resolve to in dark mode.
+
+**Resolution:**
+1. Enhanced `sync-tokens.mjs` to also parse `_custom-properties.scss` dark mode section (`[data-theme="dark"]`). Added `parseDarkOverrides()` that extracts CSS custom property overrides and resolves them to hex via the palette lookup. Every semantic token and interaction token now carries an optional `darkValue`.
+2. Updated `EmphasisToken` and `SemanticToken` types in `tokens.ts` to include `darkValue?: string`.
+3. Rewrote the colors page (`playground/src/app/tokens/colors/page.tsx`): each role row now shows a **Light strip** (white background, light mode swatches) and a **Dark strip** (dark background, dark mode swatches). All swatch fills use inline `style={{ backgroundColor }}` with hardcoded hex — they never change with the playground theme toggle.
+4. Palette reference section (raw scales) kept as-is — these are theme-invariant primitives.
+
+**Files changed:** `scripts/sync-tokens.mjs`, `playground/src/lib/tokens.ts` (auto-generated), `playground/src/app/tokens/colors/page.tsx`
+
+**Cross-category note:** Also documented as ENG-102 (engineering) — sync-tokens script enhancement.
+
+**Principle reinforced:** Token documentation pages are primitives — they must show the **resolved values**, not just names. For any token that changes between themes, both resolved values must be visible simultaneously. Never rely on theme toggle to reveal dark mode values; that conflates "viewing documentation" with "testing the theme."
+
+---
+
+## Session: 2026-04-02 — Input focus state visual fix
+
+#### FB-086: "Focus state has double-layer border; default focus should be black, not gray"
+
+**User feedback:** Two issues with the Input component's focus state: (1) the active/focused state shows a double-layer border effect, and (2) the default focus border color appears gray instead of black.
+
+**Root cause:** Three compounding issues: (1) The focus-within styles used a `box-shadow` technique (1px white gap + 2px outer ring) that created a visible double-layer border effect. (2) The border token scale was fundamentally miscalibrated — `$portfolio-border-neutral-bold` was mapped to `$portfolio-neutral-50` (#8D8D8D, mid-gray), which is equivalent to One GS's "Regular" level, not "Bold". The entire scale was shifted one level too light. (3) The scale was incomplete — only 2 levels (bold, subtle) existed instead of the 4-level hierarchy (bold, regular, subtle, minimal) that the One GS foundation specifies.
+
+**Resolution:** Three-part fix:
+1. Removed all `box-shadow` from focus-within states — focus now uses `border-width: 2px` for visual weight without gap artifacts.
+2. Rebuilt the border neutral token scale to match the One GS 4-level hierarchy:
+   - `bold`: neutral-50 (#8D8D8D) → **neutral-100 (#161616)** — near-black
+   - `regular`: **(NEW)** neutral-50 (#8D8D8D) — mid-gray
+   - `subtle`: neutral-20 (#E0E0E0) → **neutral-30 (#C6C6C6)** — medium-light
+   - `minimal`: **(NEW)** neutral-20 (#E0E0E0) — light gray
+3. Dark mode overrides updated proportionally: bold→neutral-10, regular→neutral-50, subtle→neutral-70, minimal→neutral-80.
+4. Reverted the Input focus border from workaround `--portfolio-border-inverse-bold` back to `--portfolio-border-neutral-bold` — the token itself is now correct.
+
+**Files changed:** `src/styles/tokens/_colors.scss`, `src/styles/_custom-properties.scss`, `src/components/ui/Input/Input.module.scss`
+
+**Cross-category note:** This is primarily a design-system token calibration issue. The fix is global — all 40+ components referencing `border-neutral-bold` or `border-neutral-subtle` will shift. The new `regular` and `minimal` levels are available for future granularity.
+
+**Principle reinforced:** (1) Token values should be validated against the reference design system early, not assumed correct from names. A token named "bold" that maps to mid-gray breaks the mental model of every consumer. (2) Border token scales should have at least 4 levels (bold/regular/subtle/minimal) — a 2-level scale forces components to choose between "too strong" and "too weak" with nothing in between. (3) Use `border-width` for thicker focus borders, not `box-shadow` stacking — box-shadow rings create a visible gap between the element border and the outer ring.
 
 ---
 
@@ -986,4 +1129,204 @@ From Tailwind — **Partially adapt:** as implementation mechanism (`@theme` ove
 These remain custom because they are purpose-built visualization primitives with no clean DS component mapping, but they all use DS tokens (colors, spacing, typography, radii) as their foundation.
 
 **Principles reinforced:** When a DS component exists for a pattern (Button, Tabs, Badge), use the component — even in bespoke visualizations. Custom CSS that reimplements DS component behavior is maintenance debt. Visualization-specific elements that don't map to any DS component are acceptable when they use DS tokens.
+
+---
+
+#### FB-063: "Menu item spacing audit vs. IBM Carbon, MUI, Ant Design"
+
+**UX Intent:** Comparative analysis of Élan Menu item spacing against three industry-standard design systems (IBM Carbon v11, MUI v6, Ant Design v5). Goal: identify discrepancies in inline padding, vertical padding, font-size scaling, icon sizing, and icon-to-text gap.
+
+**Key Finding:** The Menu component intentionally mirrors the Button spatial scale 1:1 — every dimension (height, padding-block, padding-inline, font-size, icon-size, gap) is identical between Button and Menu. The "discrepancies" against industry systems are deliberate design decisions from the One GS reference model, not Menu-specific issues.
+
+**Industry divergences (deliberate, consistent with Button):**
+- **Inline padding**: Élan uses progressive scaling (6→8→12→16→24px); Carbon/MUI/Ant all use constant 16px. Élan only reaches 16px at lg.
+- **Font size**: Élan uses 4-step progression (12→14→16→18px); Carbon uses constant 14px. Élan's "size = different weight class" vs. Carbon's "size = same content, different density."
+- **Icon size**: Élan scales 16→18→20→22→24px; Carbon uses constant 16px.
+- **Icon-to-text gap**: Élan scales 4→6→8→12→16px; Carbon uses ~8px constant, Ant uses 10px.
+- **Vertical padding**: Élan uses explicit block padding (padding-derived height model); Carbon/Ant use min-height + flex centering.
+
+**Resolution:**
+1. Added `padding-inline: 4px` to `.menu` container — supplements item-level inline padding without changing the Button spatial scale. At xs, effective inset from menu border is now 10px (4px container + 6px item) instead of 6px. Matches Ant Design's `itemMarginInline: 4px` pattern.
+2. Separator/header/footer negative margins already compensate, so dividing lines still span full width.
+3. All other dimensions left unchanged — they are consistent with Button and the One GS reference.
+
+**Design review flag:** If the 4px icon-to-text gap at xs or 6px item inline padding at xs/sm ever feels too tight in a menu context, the fix would be a design-system-wide spatial scale change affecting Button + Menu + all future components on the same scale. This is not a Menu-only decision.
+
+**Principles reinforced:** Menu items are contained elements (inside a bordered panel), unlike buttons which are standalone. Container-level padding is a valid menu-specific concern that doesn't violate Button spatial parity. When comparing against industry systems, distinguish between deliberate architectural decisions (progressive vs. constant scaling) and actual gaps (missing container inset).
+
+---
+
+#### FB-064: "Menu header demo should use real use case, not generic placeholder"
+
+**UX Intent:** The MenuHeader playground demo used a "Select all" button — a plausible but uncommon use case. The user pointed out that high-fidelity demos create strong mental models, and showing the wrong content misleads viewers about the component's purpose even if they're "smart enough" to know it's a demo.
+
+**Root Cause:** The AI agent extrapolated MenuHeader/MenuFooter from the One GS design and chose generic demo content ("Select all" / "Cancel") without considering what the most representative real-world usage would be. The canonical pattern for menu headers is a search/filter input (VS Code command palette, Notion's page picker, Slack's channel switcher).
+
+**Resolution:**
+1. Replaced MenuHeader demo content: "Select all" button → `Input` with `leadingIcon={<Search />}` and `placeholder="Filter actions..."`. This is the single most common real-world use case for a fixed menu header.
+2. Updated MenuFooter demo content: "Cancel" → "Manage actions..." — a more realistic secondary action pattern.
+3. Updated demo description text to explain the header slot's purpose in terms of the real use case.
+4. Added design principle 7.6 ("Playground Demos Must Show the Real Use Case") to `docs/design.md`.
+
+**Principles reinforced:** Demo content is not throwaway — it teaches usage patterns. The human brain pattern-matches against demo content rather than reading API descriptions. Always ask "what is the single most common real-world use case?" before writing a playground demo. Generic labels like "Header slot" or "Content here" signal that the author didn't think through actual usage.
+
+---
+
+#### FB-065: "Line-on-line visual collision — Input minimal inside Menu with separators"
+
+**UX Intent:** The user observed that using `Input emphasis="minimal"` (bottom-border underline style) inside a `MenuHeader` creates visual ambiguity because the menu already uses horizontal lines for `MenuSeparator` dividers and `MenuHeader`/`MenuFooter` border lines. Two different semantic elements — "type here" vs. "group boundary" — render as visually identical horizontal lines.
+
+**Root Cause:** When choosing the Input emphasis for the menu header demo, the agent selected "minimal" (underline) without auditing the parent container's existing visual vocabulary. The menu container already owns the "horizontal line" visual language for separators and section boundaries. Nesting another line-based element inside it creates ambiguity.
+
+**Resolution:**
+1. Changed `Input emphasis="minimal"` to `emphasis="regular"` (box/bordered style) in the MenuHeader demo. The box style is visually distinct from divider lines — it reads as a contained interactive field.
+2. Updated demo description to note the emphasis choice rationale.
+3. Added anti-pattern AP-058 ("Overlapping Visual Language — Line-on-Line Ambiguity") to `docs/design-anti-patterns.md`.
+
+**Principles reinforced:** Before choosing a child component's visual variant, audit the parent container's visual vocabulary. If the parent already uses a visual treatment (lines, fills, borders) for a specific semantic purpose, the child must use a different treatment to remain visually distinct. Distinct semantics require distinct visual treatments. See AP-058.
+
+---
+
+#### FB-066: "Header/footer padding stacks with nested component padding; Input size must match Menu size"
+
+**UX Intent:** Two issues in the MenuHeader demo: (1) the header had the same padding as menu items (e.g., 10px/12px at md), but since it wraps an Input that has its own internal padding, the total whitespace was visually doubled compared to regular items; (2) the Input was hardcoded to `size="xs"` regardless of the Menu's size, causing a 16px search icon next to 20px menu item icons at the default md size.
+
+**Root Cause — padding:** Header/footer were treated as content rows (same padding as `.item`) rather than structural slots. A slot wraps content that brings its own sizing — it should only add minimal breathing room from the border, not full item-level padding.
+
+**Root Cause — size mismatch:** The demo chose `size="xs"` for compactness without considering that Menu and Input share the same spatial scale (identical icon sizes at each step: 16/18/20/22/24). Mismatched sizes create a visible icon-size discrepancy that breaks visual consistency within the menu.
+
+**Resolution:**
+1. Changed header/footer padding from copying full item padding to a fixed minimal `padding-block` only (4px at xs–md, 6px at lg, 8px at xl). Inline padding is handled by the base header/footer styles. The nested component (Input, Button) brings its own height and internal padding.
+2. Changed the demo's `Input size="xs"` to `size="md"` and `Button size="xs"` to `size="md"` to match the Menu's default size. This aligns the search icon (20px) with menu item icons (20px).
+3. Updated demo description to note: "Match nested component sizes to the Menu size so icons align visually."
+
+**Design rule — Slot vs. Row:** Structural slots (header, footer) wrap content that owns its own sizing. They should use minimal padding (breathing room from borders only). Content rows (items, labels) are the content itself — they use the full spatial scale padding. Never copy item padding to a slot — it doubles the whitespace. See AP-059.
+
+**Design rule — Size Parity for Nested Components:** When a component is nested inside a container that defines a size scale, the nested component's size must match the container's size so that proportional elements (icons, font, padding) remain visually consistent. Input, Button, and Menu all share the same spatial scale — use the same size keyword across all of them.
+
+---
+
+#### FB-070: "Eyebrow mono font looks bad as section headers — revert to sans, keep mono as option for metrics"
+
+**UX Intent:** The Eyebrow component was switched to mono font (Geist Mono) globally, but mono doesn't work well for section header / nav divider use cases — it looks too technical and clashes with the surrounding sans-serif UI. However, mono is desirable for metric/data annotations where tabular alignment aids scanability.
+
+**Root Cause:** Applying a single font family globally to a component that serves two distinct visual contexts (structural headings vs. data labels) forces one context to compromise. Section headers need the same font family as their surrounding UI to feel integrated; metric labels benefit from mono's uniform character widths.
+
+**Resolution:**
+1. Reverted Eyebrow base font from `var(--portfolio-font-mono)` to `var(--portfolio-font-sans)` in `Eyebrow.module.scss`.
+2. Added a `.metric` class and corresponding `metric?: boolean` prop (default: `false`) that opts into `var(--portfolio-font-mono)`. Originally named `mono` — renamed in FB-071 to follow semantic intent naming.
+3. Updated playground metric annotations demo to use `metric` prop. Updated PropsTable and code snippet.
+
+**Design rule — Font as Context Signal:** When a component serves multiple visual contexts, font family should be a per-instance option, not a global default. Default to the font that integrates with the majority use case (sans for structural UI), and provide an opt-in for the minority use case (mono for data display).
+
+---
+
+#### FB-071: "Prop names must communicate intent, not implementation — rename `mono` to `metric`"
+
+**UX Intent:** The `mono` prop on Eyebrow describes what CSS changes (switches to monospace font) but not when to use it. An agent encountering `mono` has to reason through a two-step chain: "Is this a data context? → If so, use mono." The prop name should collapse that to one step so agents can make the right decision from the name alone.
+
+**Root Cause:** The original naming (`mono`) followed the implementation-detail pattern common in utility-first CSS (`font-mono`, `rounded-full`, `bg-gray`). This pattern works for low-level utilities where the consumer is always a human developer making an aesthetic choice. It fails for component props where the consumer is an AI agent making a contextual decision — the agent needs to know *when*, not *what*.
+
+**Resolution:**
+1. Renamed `mono` → `metric` in `EyebrowProps`, SCSS module class (`.mono` → `.metric`), and all playground references.
+2. Established **Design guardrail #8** in `AGENTS.md`: "ALWAYS name component props, CSS classes, and design tokens by semantic intent, never by visual implementation."
+3. Established **Process Principle §7.7** in `docs/design.md`: "Name by Semantic Intent, Not Visual Implementation" — includes the one-step test, protocol, and example table.
+4. Added frequency map entry: "Semantic intent naming" at Critical priority.
+
+**Design rule — Semantic Intent Naming:** Every prop, variant, CSS class, and token in the design system must be named by its use-case context (when/why), not its CSS effect (what). The test: can an agent decide whether to use this prop from its name alone, without inspecting the source? If the name requires a second reasoning step to map from implementation to context, it fails. This is a first-class design system principle — it applies to every new API surface.
+
+---
+
+#### FB-072: "Eyebrow adoption audit — migrate ~44 hand-rolled label instances to `<Eyebrow>`"
+
+**UX Intent:** Consolidate all hand-rolled uppercase+tracked text (via `@include label` / `label-sm` SCSS mixins) into the canonical `<Eyebrow>` component across all public-facing pages and elan-visuals, ensuring a single source of truth for this text pattern.
+
+**Root Cause:** When the Eyebrow component was created (FB-091), it unified three divergent implementations but didn't retroactively migrate existing call sites. Across 9 files and ~44 JSX instances, raw `<span>`, `<div>`, and `<h2>` elements still used `@include label` / `label-sm` mixins directly, duplicating the typography Eyebrow now owns.
+
+**Resolution:**
+1. **Tier 1 (public-facing, 6 page pairs, ~30 instances):**
+   - HomeClient.tsx: 3 sectionLabel instances — wrapped `<Eyebrow as="h2">` around existing `<EditableText>` (inner `as` changed to `"span"` removed, relies on Eyebrow for typography inheritance).
+   - AboutClient.tsx: 2 sectionLabel instances — `<h2>` → `<Eyebrow as="h2">`.
+   - ProjectClient.tsx: 4 metaLabel + 1 companyCalloutLabel + 2 projectNavLabel — `<span>` → `<Eyebrow>`.
+   - ExperimentsClient.tsx: 1 label instance — `<span>` → `<Eyebrow>`.
+   - ContactClient.tsx: 1 trustLabel instance — `<span>` → `<Eyebrow>`.
+   - Motion page: 17 demoLabel instances — `<div>` → `<Eyebrow as="div">`.
+2. **Tier 2 (elan-visuals, 3 components, ~13 instances):**
+   - ComponentShowcase: 1 componentCategory — `<span>` → `<Eyebrow size="sm">`.
+   - TokenGrid: 2 namingSectionTitle + 2 namingDimensionTitle — `<span>` → `<Eyebrow size="sm">`.
+   - InteractionShowcase: 8 beforeAfterLabel — `<div>` → `<Eyebrow as="div">`.
+3. **SCSS cleanup:** Removed `@include label` / `@include label-sm` from all 9 SCSS files, preserving non-typography properties (color, display, margin, padding, border).
+4. **No TextRow migrations** — candidates were in tightly-coupled visualization components where the risk/reward ratio was unfavorable.
+
+**Design rule — Component Adoption Audit Pattern:** When creating a new primitive that replaces hand-rolled patterns, schedule a follow-up audit to retroactively migrate existing call sites. The audit should: (a) search for the SCSS mixin the component replaces, (b) classify each hit as definite/borderline/excluded with reasons, (c) batch migrations by risk tier (public-facing first, internal second), (d) preserve non-typography residual styles in the original SCSS class.
+
+---
+
+#### FB-073: "Input trailing slot — generic content slot for Kbd, badges, and chips"
+
+**UX Intent:** Expand the Input component's API to support a generic `trailing` slot for arbitrary content (Kbd shortcut hints, status badges, action chips) positioned after clear/status but before `trailingIcon`. The Kbd component was already designed with sizes calibrated to fit inside Input, but the Input never had a slot to accept it.
+
+**Root Cause:** The existing `suffix` prop served double duty — both as a value-context affix ("USD", ".com") and as a container for non-affix content like Kbd. This conflated two different semantic roles: `suffix` wraps content in `.affix` styles (font-family, color, whitespace) that are appropriate for text units but interfere with self-styled components like Kbd that own their own typography. A dedicated slot was missing.
+
+**Resolution:**
+1. Added `trailing?: ReactNode` to `InputProps` in `src/components/ui/Input/Input.tsx`.
+2. Rendered the slot inside a `<span className={styles.trailingSlot}>` positioned after `statusIcon` but before `trailingIcon` — the rightmost non-icon position.
+3. Added `.trailingSlot` to `Input.module.scss` — `display: inline-flex; align-items: center; flex-shrink: 0; pointer-events: auto` — a neutral container that lets children determine their own dimensions and styles.
+4. Updated Input playground to use `trailing={<Kbd bordered>⌘K</Kbd>}` instead of `suffix={<Kbd>⌘K</Kbd>}`.
+5. Updated Menu playground's header demo to show `trailing={<Kbd bordered size="md">⌘F</Kbd>}` inside the search Input.
+6. Updated the Input Props table: added `trailing` entry; refined `suffix` description to clarify it's for value affixes.
+
+**Design rule — Slot Semantic Separation:** Input's addon slots have distinct roles: `prefix`/`suffix` are value affixes (contextual to what the user types), `leadingIcon`/`trailingIcon` are icon slots (forced to icon dimensions), and `trailing` is a generic content slot (neutral container, no imposed styles). When a component needs to appear inside Input but isn't a value affix or an icon, use `trailing`.
+
+---
+
+#### FB-074: "Menu lg/xl icon-to-text gap too wide, content not left-aligned at xl"
+
+**UX Intent:** The gap between leading icon and text label in Menu items at lg and xl sizes felt disproportionately spacious compared to xs/sm/md. The xl size's content also appeared insufficiently left-aligned due to excessive inline padding.
+
+**Root Cause:** Menu's gap and inline padding were lifted 1:1 from the Button spatial scale. While Button is an isolated interactive element where generous spacing aids tap target clarity, Menu items are dense stacked list items where the same spacing feels excessive in aggregate. The gap-to-icon ratio jumped from a smooth +8% per step (xs→sm→md) to +15% at lg and +12% at xl, breaking the visual curve. Similarly, xl inline padding jumped by 8px (md→lg was +4px, but lg→xl was +8px), pushing content away from the left edge.
+
+**Resolution:**
+1. **lg gap**: reduced from 12px (1.5x) to 10px (1.25x) — ratio becomes 45% (smooth step from md's 40%).
+2. **xl gap**: reduced from 16px (2x) to 10px (1.25x) — matches lg, per user directive to use lg's gap for xl.
+3. **xl inline padding**: reduced from 24px (3x) to 20px (2.5x) — restores the consistent +4px delta (md 12 → lg 16 → xl 20).
+4. Updated `--_menu-gap` CSS custom property and `.label` padding for both sizes.
+
+**Corrected progression:**
+| Size | Icon | Gap | Gap/Icon | px | px delta |
+|------|------|-----|----------|-----|----------|
+| xs | 16px | 4px | 25% | 6px | — |
+| sm | 18px | 6px | 33% | 8px | +2 |
+| md | 20px | 8px | 40% | 12px | +4 |
+| lg | 22px | 10px | 45% | 16px | +4 |
+| xl | 24px | 10px | 42% | 20px | +4 |
+
+**Design rule — Menu-Specific Gap Ceiling:** Menu items are stacked list rows, not standalone buttons. While Menu shares Button's icon sizes, font sizes, and vertical padding, the icon-to-text gap should scale more conservatively — capped at 10px (1.25x) for lg and xl — because dense vertical repetition amplifies perceived spacing. This is a deliberate departure from Button's gap scale for Menu only.
+
+---
+
+#### FB-075: "Menu item hover state must boost text and icon to max contrast"
+
+**UX Intent:** When a menu item's hover background shifts from white to light gray, the text and icon must compensate by increasing to maximum contrast (pure black in light mode, pure white in dark mode). Without this, hover *decreases* the contrast between content and background — the opposite of what a hover state should do. This is a universal interactive-state principle, not Menu-specific.
+
+**Root Cause:** Menu items in the `neutral` appearance used `var(--portfolio-text-primary)` (maps to `#161616` / neutral-100) for both default and hover states. When hover shifted the background from `#FFFFFF` to `#F9F9F9`, the text-to-background contrast dropped from ~19.5:1 to ~18:1. While technically above WCAG AA, the perceptual effect is that hover makes the text *less* readable rather than *more* prominent. The design system lacked a "max contrast" tier — the darkest text token was `neutral-bold` (`#161616`), with no pure black (`#000000`) option. This was previously identified in NavItem sidebar work (FB-078) but never formalized as a system-wide token or applied to other components.
+
+**Resolution:**
+1. Added `$portfolio-text-neutral-max: #000000` and `$portfolio-icon-neutral-max: #000000` to `src/styles/tokens/_colors.scss`.
+2. Added `--portfolio-text-neutral-max` and `--portfolio-icon-neutral-max` CSS custom properties to `src/styles/_custom-properties.scss`:
+   - Light mode: `#000000`
+   - Dark mode: `#FFFFFF`
+3. Applied to Menu's `neutral` appearance: hover and active states now set `color: var(--portfolio-text-neutral-max)` on the `.item` and `color: var(--portfolio-icon-neutral-max)` on `.leadingSlot`.
+4. Applied to Menu's `always-light` appearance: same treatment with static `#000000` (always-light is theme-invariant).
+5. `inverse` and `always-dark` appearances already use max-white text by default — no change needed.
+
+**Design rule — Two-Tier Contrast Model (system-wide):** Text and icon color in interactive components uses a deliberate two-tier system:
+- **Default state** → `neutral-bold` (`#161616`, dark gray). This is intentionally *not* pure black. Pure black (#000) on pure white (#FFF) creates a contrast ratio so high it causes visual fatigue during sustained reading. The slightly softened dark gray provides comfortable readability while still far exceeding WCAG AA.
+- **Hover/active state** → `neutral-max` (`#000000`, pure black). When the background shifts from white to gray on hover, the contrast gap shrinks. The text must compensate by stepping up to max contrast. This is a *reactive* boost — it fires only when background conditions change, not as a resting state.
+
+The same two-tier logic applies in dark mode: default text is `neutral-bold` (white, `#FFFFFF` / neutral-00), and hover uses `neutral-max` (`#FFFFFF`). In dark mode the two happen to be the same value, so no visual change occurs — which is correct, because the dark-mode hover background is an additive white overlay that already *increases* text-to-background contrast.
+
+This applies to Menu, NavItem, sidebar items, command palettes, and any future list-based interactive component. Never use `neutral-max` as a resting-state text color — it's reserved for interactive states where background context changes.
+
+**Cross-category note:** This pattern was previously identified in NavItem work (FB-078) and Button dark mode audit (FB-072/073 in design-feedback-log) but was never formalized as a reusable token or applied consistently. This entry establishes the token (`neutral-max`) and the two-tier contrast principle as system-wide standards.
 

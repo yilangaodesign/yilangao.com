@@ -4,10 +4,86 @@
 >
 > **Who reads this:** AI agents at session start (scan recent entries for context), and during incident response (check for recurring patterns).
 > **Who writes this:** AI agents after each incident resolution via the `engineering-iteration` skill.
-> **Last updated:** 2026-04-02 (ENG-097: Playground proxy collision — turbopack.root causes Next.js 16 to detect main site's proxy.ts)
+> **Last updated:** 2026-04-03 (ENG-103: sync-tokens script enhanced for dark mode)
 >
 > **For agent skills:** Read only the first 30 lines of this file (most recent entries) for pattern detection.
 > **Older entries:** Synthesized in `docs/engineering-feedback-synthesis.md`. Raw archive in `docs/engineering-feedback-log-archive.md`.
+
+---
+
+## Session: 2026-04-03 — sync-tokens script enhanced for dark mode
+
+#### ENG-103: sync-tokens.mjs only parsed light mode; dark mode token values missing from playground
+
+**Issue:** The `sync-tokens.mjs` script generated `tokens.ts` with only light mode hex values. Dark mode overrides from `_custom-properties.scss` were never read or output. This meant the playground colors page couldn't document dark theme token values.
+
+**Root cause:** The script was scoped to `_colors.scss` only (SCSS variable definitions). Dark mode values live in `_custom-properties.scss` under the `[data-theme="dark"]` block as CSS custom property overrides. The script had no awareness of this second file.
+
+**Resolution:** Added `parseDarkOverrides()` to `sync-tokens.mjs` that reads `_custom-properties.scss`, extracts all `--portfolio-*` overrides from the dark theme block, resolves `#{$portfolio-*}` references to hex via the palette lookup, and maps them back to token names. Every `EmphasisToken` and `SemanticToken` now carries an optional `darkValue` field. The sync script is now the single source of truth for both light and dark token values.
+
+**Cross-category note:** Also documented as FB-087 (design) — playground colors page restructure.
+
+---
+
+## Session: 2026-04-03 — Label component created without playground page or sidebar entry
+
+### ENG-102: "I don't see the label component being there in the playground shell"
+
+**Date:** 2026-04-03
+
+**Issue:** Created the `Label` component (`src/components/ui/Label/`) with full implementation (6 sizes, 2 emphasis levels, polymorphic `as` prop, 5 slot types) and added it to the main site's UI barrel export. Did not create a playground page, did not add it to the sidebar navigation, and did not add it to `archive/registry.json`. The component was invisible in the playground.
+
+**Root Cause:** Same as ENG-101 — process failure. The component creation was treated as complete after TypeScript compilation + linter checks, without running the Cross-App Parity Checklist. This is the 3rd occurrence of EAP-007 in this project (ENG-004: ScrollSpy, ENG-101: Input rebuild, ENG-102: Label creation). The pattern is consistent: the agent considers the component "done" after it compiles and exports, without checking the playground surface.
+
+**Resolution:** Created `playground/src/app/components/label/page.tsx` with 7 demo sections (Size x Emphasis matrix, Leading Content, Secondary Text, Trailing Content, Info Tooltip Slot, Polymorphic Rendering, Full Composition) plus a complete PropsTable documenting all 11 props. Added sidebar entry in the "Base > Inline" group. Added registry entry in `archive/registry.json`. Ran the mandatory flush-and-restart protocol (EAP-042): killed server, deleted `.next`, restarted, verified HTTP 200 and confirmed all section headings + SCSS module classes present in the HTML response.
+
+**Principle extracted -> EAP-007 (3rd violation): The three occurrences share a common behavioral gap — the "definition of done" for component work stops at compilation, not at visibility. EAP-007 already documents this but the agent continues to skip the playground step. The Cross-App Parity Checklist exists in AGENTS.md but is not being run at end-of-task.**
+
+**Cross-category note:** None — this is purely an engineering process issue.
+
+---
+
+## Session: 2026-04-03 — Input component rebuilt without playground page update
+
+### ENG-101: "Where is it? I don't see it in the playground shell."
+
+**Date:** 2026-04-03
+
+**Issue:** Rebuilt the Input component with a dramatically expanded API (emphasis axis, 5 sizes, 5 statuses, leading/trailing icons, prefix/suffix, clearable, description) but did not update the playground documentation page. The playground still showed only the old minimal demos (default, label+helper, error, disabled) with no visibility into the new features.
+
+**Root Cause:** Process failure — the component rebuild in `src/components/ui/Input/` was treated as complete after TypeScript compilation + SCSS compilation + linter checks, without running the Cross-App Parity Checklist or updating the playground page. The playground imports the real component via `@ds/Input` so the component itself auto-updated, but the demos, code examples, and props table remained stale, making the new features invisible.
+
+**Resolution:** Updated `playground/src/app/components/input/page.tsx` with comprehensive demos covering all new axes: emphasis variants, size scale, all 5 status states, addon slots (leading/trailing icons, prefix/suffix, clearable), and description. Updated the PropsTable to document all new props. Ran flush-and-restart protocol per EAP-042.
+
+**Principle extracted -> `engineering-anti-patterns.md` EAP-007, EAP-042: Playground is the documentation surface. A component change is not done until the playground reflects it.**
+
+**Cross-category note:** None — this is purely an engineering process issue.
+
+---
+
+## Session: 2026-04-02 — Payload schema push failure for new collection
+
+#### ENG-099: "Admin returns 500 — `column payload_locked_documents__rels.companies_id does not exist`"
+
+**Issue:** After adding the `companies` collection to `payload.config.ts`, the admin panel returned 500. Payload generated SQL referencing `companies_id` in `payload_locked_documents_rels`, but that column didn't exist in the database.
+
+**Root Cause:** Payload 3.80 with `@payloadcms/db-postgres` does not auto-push schema changes to the database on dev server startup, even with `push: true` in the adapter config. The "Pulling schema from database..." step only introspects — it doesn't push. The Payload CLI (`npx payload migrate:create`) also fails on this project due to Node.js 25 ESM compatibility issues (`ERR_REQUIRE_ASYNC_MODULE`). There is no working path from "add collection to config" to "database has the tables" without manual intervention.
+
+**Resolution:** Created `src/scripts/push-schema.ts` — a standalone script that connects directly to Postgres via `pg` and runs DDL statements to create the `companies` table, `companies_case_study_notes` array table, indexes, and the `companies_id` column on `payload_locked_documents_rels`. Run via `npx tsx src/scripts/push-schema.ts`. Since dev and production share the same Supabase database, this one-time push serves both environments.
+
+**Principle extracted → EAP-062: When adding a new Payload collection, the database schema must be manually updated. Payload 3's `push` option and CLI migrations do not work reliably on this project. Use `src/scripts/push-schema.ts` as a template — create the collection table, any array subtables, indexes, and add the `{collection}_id` column to `payload_locked_documents_rels`. Restart the dev server after pushing.**
+
+---
+
+## Session: 2026-04-02 — Company management dashboard
+
+#### ENG-098: "Migrated password gate data from static JSON to Payload CMS collection + built management dashboard"
+
+**Issue:** Company passwords, themes, and case study notes were stored in a static `src/config/companies.json` file. No UI to manage them — required code changes to add/edit companies. No analytics on login usage.
+
+**Root Cause:** Initial implementation used static JSON for simplicity during the password gate build. The user now needs dynamic management of company access.
+
+**Resolution:** Created `companies` Payload collection with all fields (slug, name, password, active, theme group, caseStudyNotes array, analytics group). Registered in payload.config.ts under "Access Control" admin group. Built a custom Payload admin view (`CompanyDashboard.tsx`) at `/admin/companies-dashboard` with full CRUD, activate/deactivate toggle, password auto-generation, copy URL+password, and analytics display. Migrated all consuming code (`actions.ts`, login `page.tsx`, work `page.tsx`) from JSON imports to Payload DB queries via new `src/lib/company-data.ts` helper. Added `incrementLoginAnalytics()` to track logins. Created seed script (`seed-companies.ts`) for one-time migration. Proxy remains cookie-only validation (no DB dependency). Updated password-gate skill, architecture docs, AGENTS.md guardrail, and file-scoped rule.
 
 ---
 
@@ -737,5 +813,48 @@ This is an instance of EAP-016 (conditional rendering hiding inline-editable emp
 **Resolution:** Created a no-op `playground/src/proxy.ts` that simply returns `NextResponse.next()`. This shadows the parent proxy and prevents the collision. The playground has no authentication gate — it's a design system documentation tool.
 
 **Lesson:** When a monorepo app sets `turbopack.root` to a parent directory, ALL file conventions detected by Next.js 16 (proxy.ts, layout.tsx, etc.) may be resolved from that parent root, not just module imports. Adding a new file convention to any app in the monorepo requires checking whether sibling apps with `turbopack.root` overrides will accidentally pick it up. See EAP-061.
+
+---
+
+### ENG-098: Password gate migrated from static JSON to Payload CMS Companies collection
+
+**Date:** 2026-04-02
+
+**Issue:** Company password configurations were stored in a static `src/config/companies.json` file with no UI for management. Adding/editing companies required code changes and redeployment.
+
+**Resolution:** Created a Payload CMS `Companies` collection with full CRUD, custom admin dashboard (`CompanyDashboard.tsx`), and analytics tracking (login count, last login). Updated proxy, login pages, and case study pages to read from Payload instead of JSON.
+
+**Lesson:** Payload custom admin views (`admin.components.views`) are effective for building tool UIs that need Payload's auth but aren't standard collection CRUD. The REST API (`/api/companies`) provides a clean data layer for client-side dashboards.
+
+---
+
+### ENG-099: Payload 3 schema push doesn't auto-execute for new collections
+
+**Date:** 2026-04-02
+
+**Issue:** After adding the `Companies` collection, the dev server failed with "column payload_locked_documents__rels.companies_id does not exist". Payload's `db-postgres` adapter did not automatically create the required tables/columns.
+
+**Resolution:** Created `src/scripts/push-schema.ts` — a standalone script that connects directly to PostgreSQL and executes the DDL statements to create tables, indexes, and alter `payload_locked_documents_rels`. Must be run once after adding any new collection. See EAP-062.
+
+**Lesson:** Payload 3.80's auto-push for new collections is unreliable. Always run the manual schema push script after adding collections. The Payload CLI (`npx payload migrate:create`) fails under Node.js 25 ESM due to `ERR_REQUIRE_ASYNC_MODULE`.
+
+---
+
+### ENG-100: Payload admin IA restructured — consolidated groups, simplified navigation
+
+**Date:** 2026-04-02
+
+**Issue:** The admin panel had 7 sidebar groups (one per collection), three overlapping navigation systems (DashboardPages cards, NavPages sidebar links, Payload's default collection nav), and a Company Dashboard with no breadcrumb/back navigation. ViewSiteLink was redundant with NavPages.
+
+**Resolution:**
+1. Consolidated sidebar groups from 7 to 3: Content (Projects, Books, Testimonials, Experiments), Settings (Site Config, Companies), System (Users, Media).
+2. Simplified NavPages to "Quick Links" with only 2 items: Company Access and Open Live Site (absorbed ViewSiteLink).
+3. Deleted ViewSiteLink component and removed from `payload.config.ts` `afterNavLinks`.
+4. Added breadcrumb navigation to CompanyDashboard ("Dashboard / Company Access").
+5. Added Company Access card to DashboardPages for complete dashboard coverage.
+6. Added `layoutVariant` select control to CompanyDashboard form.
+7. Manually updated Payload's generated `importMap.js` to remove the deleted ViewSiteLink reference.
+
+**Lesson:** Payload's `importMap.js` is auto-generated but doesn't always regenerate when components are removed from config. After deleting an admin component, always check and manually clean the import map, then restart with a cleared `.next` cache. Without this, the admin panel returns 500 with a "Module not found" error.
 
 ---

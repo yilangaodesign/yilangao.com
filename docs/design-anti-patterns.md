@@ -847,6 +847,90 @@ Use `var(--ds-*, #{$scss-fallback})`. The CSS custom property adapts at runtime;
 
 ---
 
+## AP-054: Changing border-width Without Padding Compensation
+
+**Trigger:** Writing CSS that changes `border-width` (or `border-bottom-width`) on `:focus`, `:focus-within`, `:hover`, or `:active` without simultaneously reducing padding by the same amount.
+
+**Why it's wrong:** Changing `border-width` without compensating padding causes layout reflow. The extra pixels push all internal content (text, icons, placeholders) inward, producing a visible jump/flicker every time the state changes. This is especially noticeable on form inputs where focus toggles rapidly.
+
+**Correct alternative:** Use CSS custom properties for base padding (`--_ic-py`, `--_ic-px`) and a `--_border-offset` variable (default `0px`, set to the border increase on focus). Compute padding as `calc(var(--_ic-py) - var(--_border-offset))`. When border goes from 1px to 2px, set `--_border-offset: 1px` — content stays fixed while the border visually thickens. This preserves distinct state affordances (thin→thick) without layout shift.
+
+**Frustration caused:** 1 round — user noticed "everything jumps" on input click.
+
+---
+
+## AP-058: Overlapping Visual Language — Line-on-Line Ambiguity
+
+**Trigger:** Nesting a component that uses a line-based visual treatment (e.g., `Input emphasis="minimal"` with its bottom-border underline) inside a container that already uses lines for a different semantic purpose (e.g., `MenuSeparator` divider lines, `MenuHeader`/`MenuFooter` border lines).
+
+**Why it's wrong:** When two different elements in the same visual context both render as horizontal lines, the viewer cannot distinguish their purposes at a glance. The input underline and the menu separator become visually identical — one means "type here" and the other means "group boundary," but they look the same. This violates the principle that distinct semantics require distinct visual treatments.
+
+**Correct alternative:** When embedding a component inside a container that already owns the "line" visual language, switch the nested component to its box/bordered variant (e.g., `Input emphasis="regular"`). The box style is visually distinct from divider lines — it reads as a contained interactive field, not a separator. More generally: audit the parent container's visual vocabulary before choosing a child component's emphasis/variant.
+
+**Frustration caused:** 1 round — user identified the visual collision immediately.
+
+---
+
+## AP-059: Treating Structural Slots Like Content Rows
+
+**Trigger:** Giving a structural slot (header, footer, toolbar area) the same padding as a content row (menu item, list item) when the slot wraps a child component that already has its own internal padding/sizing.
+
+**Why it's wrong:** Structural slots and content rows serve different purposes. A content row IS the content — its padding defines the click target and reading margin. A structural slot WRAPS content — it provides a mounting point with border separation. When a slot copies item padding, and the child inside it (Input, Button, etc.) also has its own padding, the total whitespace doubles. The slot visually appears bloated compared to sibling items.
+
+**Correct alternative:** Structural slots should use minimal `padding-block` only (breathing room from borders) and let the child component handle its own sizing. The slot's inline alignment comes from the container's padding, not its own. When the child component shares the same spatial scale as the container (e.g., Input at md inside Menu at md), the child's internal dimensions will naturally harmonize with sibling items.
+
+**Frustration caused:** 1 round — user noticed the header was visually heavier than items.
+
+---
+
+## AP-060: Mismatched Size Keywords Across Shared-Scale Components
+
+**Trigger:** Using `size="xs"` on a component (Input, Button) nested inside a container that defaults to `size="md"` (Menu, DropdownMenu), when both components share the same spatial scale (identical icon/font/padding values at each size step).
+
+**Why it's wrong:** Components built on the same spatial scale (Button, Input, Menu, NavItem) use identical icon sizes at each step (16/18/20/22/24px). When a nested component uses a different size keyword than its parent, proportional elements (icons, font size, gap) visually clash — e.g., a 16px search icon next to 20px menu item icons. The inconsistency is immediately perceptible and signals a broken visual system.
+
+**Correct alternative:** Match the nested component's size keyword to the parent container's size. If `Menu size="md"`, use `Input size="md"` and `Button size="md"` inside it. This ensures all icons, font sizes, and gaps are optically consistent. Document the size-matching expectation in the component's playground demo.
+
+**Frustration caused:** 1 round — user spotted the icon size mismatch immediately.
+
+---
+
+## AP-062: Same Text Color for Default and Hover on Light Surfaces
+
+**Trigger:** Setting a component's hover state to change only the background color without also boosting the text and icon color to maximum contrast.
+
+**Why it's wrong:** On a light surface (white or near-white), the default text color is `neutral-bold` (`#161616`). When hover adds a gray background (`#F9F9F9` or similar), the contrast between text and background *decreases*. A hover state that reduces contrast undermines the purpose of hover feedback — the user perceives the text as less readable, not more prominent. This is a perceptual accessibility issue even when the raw WCAG ratio stays above 4.5:1, because the directional change is wrong (hover should make content more prominent, never less).
+
+**Correct alternative:** Use the two-tier contrast model: default state uses `neutral-bold` (`#161616`) for comfortable reading — pure black is too sharp for sustained use. On hover/active, boost to `var(--portfolio-text-neutral-max)` (`#000000`) for text and `var(--portfolio-icon-neutral-max)` for icons — this compensates for the background contrast reduction. Never use `neutral-max` as a resting color; it's a reactive boost reserved for interactive states where the background context has changed.
+
+**Frustration caused:** 2+ rounds — first caught on NavItem sidebar hover (FB-078), then on Menu items (FB-075). The pattern was identified but never formalized as a system-wide token until FB-075.
+
+---
+
+## AP-061: Lifting Button Spacing 1:1 Into Dense List Components
+
+**Trigger:** Creating a list-based component (Menu, Sidebar, CommandPalette) and copying the Button's gap/padding scale verbatim for all five sizes.
+
+**Why it's wrong:** Buttons are isolated interactive elements where generous spacing improves tap target clarity and visual weight. Menu items (and similar dense list rows) stack vertically, so the same spacing is amplified by repetition — 12px gap × 8 items = 96px of total dead space in a column, which reads as "too airy" and breaks the visual density expected from a list. The gap-to-icon ratio diverges sharply at lg/xl (55–67% vs the 25–40% at xs–md), making the two tiers feel like different components.
+
+**Correct alternative:** Share Button's icon sizes, font sizes, and vertical padding (these set the row height), but apply a gap ceiling for dense-list components — 10px (1.25x) at lg and xl. Inline padding at xl should follow the existing +4px delta pattern, not jump +8px. This preserves the spatial family while respecting the density context.
+
+**Frustration caused:** 1 round — FB-074.
+
+---
+
+## AP-055: Disproportionate Icon Size Relative to Text Scale
+
+**Trigger:** Setting icon dimensions (width/height) without checking the corresponding font-size at the same size variant — especially at small sizes where 2px differences are perceptually significant.
+
+**Why it's wrong:** When an icon is visually heavier than the text next to it, the component feels unbalanced. At small sizes (xs, sm), even a 2px overshoot makes the icon dominate the row, drawing the eye away from the content and making the text feel undersized. The user reads this as "the icon is too big" even when the text is correctly sized.
+
+**Correct alternative:** Always verify visual size consistency across all content slots (text, icons, badges, affixes) at every size variant. Icon dimensions should maintain a proportional ratio to the font-size — roughly 1.1–1.25:1. When the font drops (e.g., 12px at xs), the icon must drop with it. Validate by asking: "do these feel like the same visual weight?"
+
+**Frustration caused:** 1 round — FB-092.
+
+---
+
 ## Entry Template
 
 ```markdown

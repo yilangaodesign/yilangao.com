@@ -312,30 +312,64 @@ proxy.ts (runs before every request)
     └── Missing or invalid   → Redirect to /for/unknown
 ```
 
+**Company data storage:** Company passwords, themes, and case study notes are stored
+in the Payload CMS `companies` collection (Supabase Postgres). Managed via a custom
+admin dashboard at `/admin/companies-dashboard` with CRUD, activate/deactivate toggle,
+password auto-generation, copy URL+password, and login analytics.
+
 **Company-personalized login:** Each URL like `/for/google` shows a themed login
 page with the company's accent color and greeting. Passwords are unique per company,
-stored in `src/config/companies.json` (server-side only, never sent to client).
+fetched from the DB at render time (server-side only, never sent to client).
 
 **Session cookie:** `portfolio_session` — HMAC-signed with `SESSION_SECRET`, HTTP-only,
 Secure, SameSite=Lax, 30-day expiry. Contains the company slug as payload.
 
+**Proxy ↔ DB boundary:** The proxy uses cookie-only validation (no DB queries). It
+verifies the HMAC signature only. Deactivating a company prevents new logins but
+existing sessions expire naturally (30 days).
+
+**Login analytics:** Each successful login increments `loginCount` and updates
+`lastLoginAt` on the company record. Visible in the dashboard.
+
 **Case study personalization:** When a visitor with a company session views a case study,
-a "Why this matters to [Company]" callout is rendered if the company config has a
-matching `caseStudyNotes[slug]` entry.
+the server fetches the company record from the DB and looks up `caseStudyNotes` for
+a matching `projectSlug`. If found, a "Why this matters to [Company]" callout is rendered.
 
 **Files involved:**
 - `src/proxy.ts` — the server-side gate
-- `src/config/companies.json` — company passwords, themes, case study notes
+- `src/collections/Companies.ts` — Payload collection definition
 - `src/lib/company-session.ts` — cookie sign/verify/read utilities
+- `src/lib/company-data.ts` — Payload queries (getCompanyBySlug, incrementLoginAnalytics)
 - `src/app/(frontend)/for/[company]/` — login page (server + client + actions)
-- `src/app/(frontend)/work/[slug]/page.tsx` — reads company session for callout
+- `src/app/(frontend)/work/[slug]/page.tsx` — reads company session + DB for callout
 - `src/app/(frontend)/work/[slug]/ProjectClient.tsx` — renders the callout
+- `src/components/admin/CompanyDashboard.tsx` — management dashboard (Payload custom view)
 
 **What's exempt:** Payload CMS admin (`/admin`), API routes (`/api`), and static
 assets are not gated. Payload has its own authentication.
 
-**Future extension:** An `aiNotes` flag per company can trigger live AI generation
-of case study notes instead of using static text from the config.
+**Future extension:** Layout variants (split, fullbleed) for login pages, and an
+`aiNotes` flag per company to trigger live AI generation of case study notes.
+
+### 4.2 Payload Admin Information Architecture
+
+The admin panel organizes content into **3 sidebar groups**:
+
+| Group        | Collections/Globals                         |
+|--------------|---------------------------------------------|
+| **Content**  | Projects, Books, Testimonials, Experiments  |
+| **Settings** | Site Config (global), Companies             |
+| **System**   | Users, Media                                |
+
+**Navigation components:**
+- `DashboardPages` (beforeDashboard) — 7 page cards on the admin homepage: Home, Work, About, Reading, Experiments, Contact, Company Access. Clicking a card with a live URL opens the site; clicking Company Access navigates to the custom dashboard.
+- `NavPages` (beforeNavLinks) — "Quick Links" section with 2 items: Company Access (custom view) and Open Live Site (external). Only shows items unreachable via Payload's default collection nav.
+- `CompanyDashboard` (custom view at `/admin/companies-dashboard`) — full CRUD for password-gated companies, with breadcrumb navigation back to the dashboard.
+
+**Design decisions:**
+- Sidebar collections are grouped by purpose, not 1:1 with page names, reducing 7 groups to 3.
+- `ViewSiteLink` was removed — its functionality is absorbed into NavPages.
+- The `importMap.js` (Payload-generated) must be manually updated when adding/removing admin components. Restart the dev server after changes.
 
 ---
 
@@ -386,15 +420,19 @@ yilangao.com/
 │   │   ├── about/ work/ blog/ contact/ reading/ experiments/
 │   │   ├── for/[company]/        # Password gate login page (themed per company)
 │   │   └── api/                  # Payload CMS API routes
+│   ├── collections/              # Payload CMS collection definitions
+│   │   └── Companies.ts          # Company access control (passwords, themes, analytics)
 │   ├── components/               # Site components
-│   │   └── ui/                   # Foundational UI primitives (Button, Card, etc.)
-│   ├── config/                   # Static config files
-│   │   └── companies.json        # Company passwords, themes, case study notes
+│   │   ├── ui/                   # Foundational UI primitives (Button, Card, etc.)
+│   │   └── admin/                # Payload admin customizations + CompanyDashboard
 │   ├── styles/                   # Site-specific SCSS (overrides + local tokens)
 │   │   ├── tokens/               # Local token files
 │   │   └── mixins/               # Local mixins
 │   ├── lib/                      # Utilities
-│   │   └── company-session.ts    # Password gate session cookie utilities
+│   │   ├── company-session.ts    # Password gate session cookie utilities
+│   │   └── company-data.ts       # Company Payload queries (getCompanyBySlug, analytics)
+│   ├── scripts/                  # One-time scripts
+│   │   └── seed-companies.ts     # Migrate companies.json → Payload collection
 │   └── proxy.ts                  # Server-side password gate (Next.js 16 proxy)
 ├── playground/                   # Design system docs UI (separate Next.js app)
 │   ├── src/

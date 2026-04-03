@@ -4,7 +4,7 @@
 >
 > **Who reads this:** AI agents routed here by `AGENTS.md` Pre-Flight. Read the Section Index first, then follow the link to the spoke file matching your task.
 > **Who writes this:** AI agents after processing engineering feedback via the `engineering-iteration` skill.
-> **Last updated:** 2026-04-02 (ENG-095: Playground flush-and-restart protocol escalation — guardrail #11 rewritten, EAP-042 escalated)
+> **Last updated:** 2026-04-03 (ENG-102: Label component created without playground page — playground drift frequency 3→4)
 
 ---
 
@@ -123,12 +123,12 @@ Recurring incidents should be escalated up this hierarchy until they stop recurr
 | Hydration mismatch (SSR/CSR divergence) | 10 | **Critical — ESCALATED. ENG-017/18/19/20, ENG-045, ENG-055, ENG-067, ENG-081, ENG-086, ENG-087. Three root cause families: (1) Turbopack bundle divergence — barrel import resolution (EAP-056), SCSS @use compilation (EAP-038), stale cache (EAP-035); (2) typeof window branching (EAP-014); (3) invalid HTML nesting. Barrel imports from lucide-react now banned via Hard Guardrail #15. See EAP-056.** |
 | Documentation procedure skips | 7 | **Critical — ESCALATED AGAIN. ENG-008/012 (EAP-010), ENG-044/045/046 (EAP-027), ENG-053 (EAP-032). 7th occurrence. Architectural changes trigger same skip pattern as bug fixes — "get it working" urgency overrides documentation even for non-urgent infrastructure work.** |
 | Design system migration / upstream-first workflow | 1 | High — ENG-040. ScrollSpy promoted to DS; required `transpilePackages` + export path. |
-| Admin IA / discoverability | 3 | **High — ENG-042/043/046. Sidebar nav insufficient; dashboard is the only reliable entry point. Auto-login cookie gap masked the whole inline editing system.** |
+| Admin IA / discoverability | 4 | **High — ENG-042/043/046/100. ENG-100: Full IA restructure — 7 groups → 3, NavPages trimmed to Quick Links (Company Access + Open Live Site), ViewSiteLink absorbed, breadcrumb added to CompanyDashboard. See architecture.md §4.2.** |
 | Infrastructure / storage architecture | 3 | High — ENG-053. Supabase Storage added for cloud file persistence. ENG-055: Added `uploadMedia` API helper for inline file uploads via S3. ENG-060: Filename sanitization for S3-incompatible chars. |
 | Version control / release automation | 4 | **Critical — ENG-069/078/079/080. ENG-080: Vercel build failed after checkpoint — monorepo @ds/* imports couldn't resolve node_modules on Vercel (Turbopack resolves relative to file location). Fixed via dual install command + build gate. Build gate now mandatory pre-merge step.** |
 | Radix primitive internal state vs mirrored props | 1 | Medium — ENG-071. Checkbox indeterminate icon branched on React `checked` while uncontrolled `defaultChecked="indeterminate"` leaves prop undefined; UI must follow `CheckboxIndicator` `data-state` (or context), not props alone. |
 | Scroll hijack on embedded canvas | 1 | High — ENG-072. onWheel handler on embedded DAG canvas intercepted page scroll. Embedded canvases must never capture wheel events; pan via drag only. See EAP-036. |
-| Playground ↔ production drift (one-way experiment) | 2 | **Critical — ENG-073, ENG-074. Drift from non-propagation AND from rebuilding demos with hardcoded values instead of token references. See EAP-030, EAP-055.** |
+| Playground ↔ production drift (one-way experiment) | 4 | **Critical — ENG-073, ENG-074, ENG-101, ENG-102. Drift from non-propagation AND from rebuilding demos with hardcoded values instead of token references. ENG-101: Input rebuilt without updating playground. ENG-102: Label created without any playground page/sidebar entry. See EAP-007, EAP-030, EAP-055.** |
 | Playground component re-implementation drift | 3 | **Resolved — ENG-073/075/076. Three-stage enforcement pipeline: (1) Central Intent Gate in AGENTS.md #18 blocks component visual edits to playground, (2) ESLint inline plugin catches forbidden patterns in playground pages, (3) Evaluation Gate with correction loop in playground skill. See EAP-037.** |
 | SCSS token theme adaptability | 2 | **Resolved — ENG-082/083. Full CSS custom property output layer (`_custom-properties.scss`) now generates `:root` (light) and `[data-theme="dark"]` blocks. ~40 SCSS modules migrated from `$portfolio-*` to `var(--portfolio-*)`. 43 component-level `$_` tokens introduced for hardcoded px values. Remaining 202 SCSS refs are documented exceptions (rgba(), always-dark surfaces, interaction state tints).** |
 | Playground demo placeholder links | 3 | **High — ENG-088/089/090. ENG-088: `href="#"` scrolls to top. ENG-089: removing `href` broke NavItem layout because SCSS doesn't reset `<button>` UA defaults. ENG-090: resolved with `onClick={prevent}` + `"use client"` — keeps `<a>` rendering for correct SCSS while suppressing navigation. See EAP-057.** |
@@ -138,6 +138,9 @@ Recurring incidents should be escalated up this hierarchy until they stop recurr
 | Component API prop pass-through gap | 1 | Medium — ENG-094. NavItemTrigger lacked `badge` prop pass-through to NavItem. Wrapper components must forward all visual props of the inner primitive they compose. |
 | CSS alignment inconsistency (.badge vs .trailing) | 1 | Medium — ENG-094. `.badge` had `margin-inline-start: auto` but `.trailing` didn't. Both right-aligned slots should use the same CSS mechanism. |
 | Deployment / Vercel build | 2 | **High — ENG-096/097. ENG-096: First deploy failed (gitignored `importMap.js` + missing `resend` dep). ENG-097: Playground proxy collision — `turbopack.root: monorepoRoot` caused Next.js 16 to detect main site's `proxy.ts` in playground build. See EAP-060, EAP-061.** |
+| CMS data migration (JSON → collection) | 1 | Low — ENG-098. Password gate data migrated from static `companies.json` to Payload `companies` collection. Custom admin dashboard built. Seed script for one-time migration. |
+| Payload schema push failure | 1 | **High — ENG-099. Payload 3's `push` option and CLI both non-functional on this project. New collections require manual SQL push via `src/scripts/push-schema.ts`. See EAP-062.** |
+| Payload import map stale after component removal | 1 | **High — ENG-100. Deleting an admin component without cleaning `importMap.js` crashes the admin panel with 500. See EAP-063.** |
 
 ---
 

@@ -104,7 +104,7 @@ Not all tokens carry an emphasis modifier. Functional roles (positive, warning, 
 | `$portfolio-surface-negative-subtle` | Subtle negative surface | red-10 (#FFF1F1) |
 | `$portfolio-icon-brand-bold` | Bold brand icon | accent-60 (#4A3ADB) |
 | `$portfolio-action-brand-subtle` | Subtle brand action fill | accent-20 (#D9D9FF) |
-| `$portfolio-border-neutral-bold` | Bold neutral border | neutral-50 (#8D8D8D) |
+| `$portfolio-border-neutral-bold` | Bold neutral border | neutral-100 (#161616) |
 | `$portfolio-text-negative` | Negative text (no emphasis) | red-60 (#DA1E28) |
 
 ### 9.6 Why Icon Is Separate from Text

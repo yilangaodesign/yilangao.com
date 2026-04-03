@@ -4,7 +4,7 @@
 >
 > **Who reads this:** AI agents before making code changes — scan for relevant anti-patterns.
 > **Who writes this:** AI agents when an incident reveals a new anti-pattern.
-> **Last updated:** 2026-04-02 (EAP-042 ESCALATED: Flush-and-restart is now mandatory default, not fallback — 6+ violations. Previous soft protocol failed repeatedly.)
+> **Last updated:** 2026-04-02 (EAP-062: Adding a Payload collection without manual schema push causes admin 500)
 
 ## Category Index
 
@@ -12,7 +12,7 @@
 |----------|---------|--------|-------|
 | Cross-App Parity & Token Sync | EAP-001, EAP-004, EAP-005, EAP-007, EAP-028, EAP-041 | 6 active | 6 |
 | Playground | EAP-006, EAP-037, EAP-038†, EAP-042, EAP-055 | 5 active | 5 |
-| CMS / Payload Schema | EAP-015, EAP-019, EAP-021, EAP-026, EAP-030, EAP-033, EAP-034 | 6 active · 1 resolved | 7 |
+| CMS / Payload Schema | EAP-015, EAP-019, EAP-021, EAP-026, EAP-030, EAP-033, EAP-034, EAP-062 | 7 active · 1 resolved | 8 |
 | CMS / Inline Edit | EAP-016, EAP-023, EAP-029 | 3 active | 3 |
 | Save Flow / Error Handling | EAP-017, EAP-018, EAP-020, EAP-024 | 4 active | 4 |
 | Hydration / SSR / React State | EAP-013, EAP-014, EAP-022, EAP-054, EAP-056 | 5 active | 5 |
@@ -151,18 +151,19 @@ After modifying any source, run its sync mechanism and verify each consumer.
 
 **Status: ACTIVE**
 
-**Trigger:** Creating a new reusable component in `src/components/` and integrating it into pages, but not creating a corresponding preview page in the playground (`playground/src/app/components/<slug>/page.tsx`) and not adding it to the sidebar navigation.
+**Trigger:** Creating a new reusable component in `src/components/` and integrating it into pages, but not creating a corresponding preview page in the playground (`playground/src/app/components/<slug>/page.tsx`) and not adding it to the sidebar navigation. **Also applies to rebuilding an existing component with a significantly expanded API** — the playground page exists but its demos, code examples, and PropsTable are stale and don't cover the new features.
 
-**Why it's wrong:** The playground is the design system documentation UI — it's where components are discovered, previewed, and understood. A component that exists in the main site but not the playground is invisible to anyone browsing the design system. It won't appear in search, won't have a code example, won't have a props table, and won't be verifiable in isolation. This is the component-level equivalent of EAP-005 (infrastructure parity).
+**Why it's wrong:** The playground is the design system documentation UI — it's where components are discovered, previewed, and understood. A component that exists in the main site but not the playground is invisible to anyone browsing the design system. It won't appear in search, won't have a code example, won't have a props table, and won't be verifiable in isolation. This is the component-level equivalent of EAP-005 (infrastructure parity). When a component is rebuilt with many new props, the playground auto-imports the new code via `@ds/*`, but the demos and PropsTable still show the old minimal API — making the new features invisible.
 
-**Correct alternative:** When creating any new component in `src/components/`:
-1. Create a preview page at `playground/src/app/components/<kebab-name>/page.tsx` using the established pattern: `Shell` → `SectionHeading` → `ComponentPreview` (with interactive demo + code) → `PropsTable` → behavior notes → file path footnote.
-2. Add the component to the appropriate category in `playground/src/components/sidebar.tsx` `componentCategories` array (this also makes it searchable via Fuse.js).
-3. Add an entry to `archive/registry.json`.
+**Correct alternative:** When creating or **significantly rebuilding** any component in `src/components/`:
+1. Create or update the preview page at `playground/src/app/components/<kebab-name>/page.tsx` using the established pattern: `Shell` → `SectionHeading` → `ComponentPreview` (with interactive demo + code) → `PropsTable` → behavior notes → file path footnote.
+2. When rebuilding: update ALL demos to cover new axes/props, update the PropsTable to document new props, update the SectionHeading description.
+3. Add the component to the appropriate category in `playground/src/components/sidebar.tsx` `componentCategories` array (this also makes it searchable via Fuse.js).
+4. Add an entry to `archive/registry.json`.
 
-**Detection:** After creating any component, verify: `ls playground/src/app/components/<name>/page.tsx` — if it doesn't exist, the component is not in the playground.
+**Detection:** After creating or rebuilding any component: (1) verify playground page exists, (2) compare the component's exported props against the PropsTable entries — any prop not in the table is undocumented.
 
-**Incident:** ENG-004 (2026-03-29) — ScrollSpy created in main site but missing from playground.
+**Incident:** ENG-004 (2026-03-29) — ScrollSpy created in main site but missing from playground. ENG-101 (2026-04-03) — Input rebuilt with 15+ new props but playground page left showing old 3-prop API.
 
 ---
 
@@ -977,6 +978,43 @@ Do NOT skip any step. Do NOT try HMR first. Do NOT tell the user to "hard refres
 **Correct alternative:** When adding a file convention to any monorepo app, check if sibling apps have `turbopack.root` overrides. If so, create a no-op version of that file convention in the sibling app to shadow the parent. Example: `playground/src/proxy.ts` returning `NextResponse.next()`.
 
 **Incident:** ENG-097 (2026-04-02) — Main site's `src/proxy.ts` (password gate) was detected by the playground's build via `turbopack.root: monorepoRoot`. Build failed because `@/lib/company-session` doesn't exist in `playground/src/lib/`.
+
+---
+
+## EAP-062: Adding a Payload Collection Without Manual Schema Push
+
+**Trigger:** Adding a new collection to `payload.config.ts` and expecting the database to auto-update on dev server restart.
+
+**Why it's wrong:** Payload 3.80 with `@payloadcms/db-postgres` does not auto-push schema changes to the database on startup. The `push: true` adapter option and the Payload CLI (`npx payload migrate:create`) both fail on this project — the option silently does nothing, and the CLI crashes with `ERR_REQUIRE_ASYNC_MODULE` on Node.js 25. The dev server starts, Payload generates SQL referencing the new collection's columns (e.g., `companies_id` in `payload_locked_documents_rels`), and the query fails with "column does not exist."
+
+**Correct alternative:** After adding a new collection to the Payload config, manually push the schema to the database using `src/scripts/push-schema.ts` as a template. Required DDL for each new collection:
+1. Create the collection table with all fields
+2. Create any array subtables (e.g., `{collection}_case_study_notes`)
+3. Create indexes (unique, foreign key, ordering)
+4. Add `{collection}_id` column to `payload_locked_documents_rels` (Payload's internal document locking system references every collection)
+5. Restart the dev server
+
+Since dev and production share the same Supabase database, one push covers both environments.
+
+**Incident:** ENG-099 (2026-04-02) — Admin returned 500 after adding `companies` collection. `payload_locked_documents__rels.companies_id` did not exist.
+
+---
+
+## EAP-063: Deleting a Payload Admin Component Without Cleaning the Import Map
+
+**Trigger:** Removing a component from `payload.config.ts` admin components (e.g., deleting `afterNavLinks: ['@/components/admin/ViewSiteLink']`) but not updating the generated `importMap.js`.
+
+**Why it's wrong:** Payload generates `src/app/(payload)/admin/importMap.js` based on the config, but the generated file isn't always regenerated when components are removed. The stale import causes a "Module not found" error that crashes the entire admin panel with a 500 response.
+
+**Correct alternative:**
+1. Remove the component from `payload.config.ts`
+2. Delete the component file(s)
+3. Open `src/app/(payload)/admin/importMap.js` and manually remove the `import` line and the corresponding entry in the `importMap` object
+4. Delete `.next/` cache
+5. Restart the dev server
+6. Verify HTTP 200 on `/admin`
+
+**Incident:** ENG-100 (2026-04-02) — Admin returned 500 after removing ViewSiteLink from afterNavLinks. The import map still referenced the deleted component.
 
 ---
 
