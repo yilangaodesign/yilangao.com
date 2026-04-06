@@ -1,0 +1,541 @@
+@use 'mixins/interactive' as *;
+@use 'mixins/typography' as *;
+@use 'tokens/breakpoints' as *;
+@use 'tokens/spacing' as *;
+@use 'tokens/typography' as *;
+@use 'tokens/motion' as *;
+@use 'tokens/elevation' as *;
+@use 'tokens/borders' as *;
+
+// ── Component-scoped layout constants ────────────────────────────────────────
+// Sidebar-specific dimensions that don't map to the global token scale.
+// Pattern follows Input.module.scss ($_input-icon-xs) for component-internal tokens.
+
+$_sidebar-expanded: 200px;
+$_sidebar-collapsed: 41px;
+$_nav-item-height: 28px;
+$_sidebar-footer-height: 44px;
+
+$_z-backdrop: 20;
+$_z-sliver: 29;
+$_z-sidebar: 30;
+
+$_icon-nav: $portfolio-spacer-utility-1-75x;
+$_icon-sm: $portfolio-spacer-utility-1-5x;
+$_icon-logo: var(--portfolio-spacer-3x);
+$_icon-menu: var(--portfolio-spacer-2-5x);
+
+// ── Shared nav-item transitions ──────────────────────────────────────────────
+
+@mixin nav-transition {
+  transition:
+    color $portfolio-duration-fast $portfolio-easing-standard,
+    background-color $portfolio-duration-fast $portfolio-easing-standard;
+}
+
+@mixin sidebar-width-transition {
+  transition: width $portfolio-duration-nav $portfolio-easing-standard;
+}
+
+// ── Hover helpers (mode-aware via color-mix on semantic tokens) ───────────────
+
+@mixin hover-neutral {
+  &:hover {
+    background-color: color-mix(in srgb, var(--portfolio-text-neutral-bold) 7%, transparent);
+    color: var(--portfolio-text-neutral-max);
+  }
+}
+
+@mixin hover-accent {
+  &:hover {
+    background-color: color-mix(in srgb, var(--portfolio-text-brand-bold) 7%, transparent);
+  }
+}
+
+// =============================================================================
+// MOBILE BACKDROP
+// =============================================================================
+
+.mobileBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: $_z-backdrop;
+  background-color: var(--portfolio-overlay-black-40);
+
+  @media #{$elan-mq-lg} {
+    display: none;
+  }
+}
+
+// =============================================================================
+// SPACER — invisible block that reserves sidebar width in the document flow
+// =============================================================================
+
+.spacer {
+  display: none;
+  flex-shrink: 0;
+  @include sidebar-width-transition;
+
+  @media #{$elan-mq-lg} {
+    display: block;
+  }
+}
+
+.spacerExpanded {
+  width: $_sidebar-expanded;
+}
+
+.spacerCollapsed {
+  width: $_sidebar-collapsed;
+}
+
+// =============================================================================
+// SIDEBAR (aside) — fixed left panel
+// =============================================================================
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: $_z-sidebar;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  border-right: $portfolio-border-width-thin solid var(--portfolio-border-neutral-subtle);
+  background-color: var(--portfolio-surface-neutral-subtle);
+  color: var(--portfolio-text-neutral-bold);
+  overflow: hidden;
+  @include sidebar-width-transition;
+}
+
+.sidebarExpanded {
+  width: $_sidebar-expanded;
+}
+
+.sidebarCollapsed {
+  width: $_sidebar-collapsed;
+}
+
+.sidebarHidden {
+  transform: translateX(-100%);
+
+  @media #{$elan-mq-lg} {
+    transform: translateX(0);
+  }
+}
+
+.sidebarVisible {
+  transform: translateX(0);
+}
+
+// =============================================================================
+// HEADER — branding + collapse toggle
+// =============================================================================
+
+.header {
+  display: flex;
+  align-items: center;
+  height: var(--portfolio-spacer-6x);
+  border-bottom: $portfolio-border-width-thin solid var(--portfolio-border-neutral-subtle);
+  flex-shrink: 0;
+  padding: 0 $portfolio-spacer-utility-0-75x;
+}
+
+.headerExpanded {
+  justify-content: space-between;
+}
+
+.headerCollapsed {
+  justify-content: center;
+}
+
+.logoLink {
+  display: flex;
+  align-items: center;
+  gap: $portfolio-spacer-utility-0-75x;
+  min-width: 0;
+  padding: 0 var(--portfolio-spacer-1x);
+}
+
+.logoImage {
+  display: block;
+  width: $_icon-logo;
+  height: $_icon-logo;
+  flex-shrink: 0;
+  background-color: var(--portfolio-text-brand-bold);
+  mask-image: url('/yg-logo.svg');
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
+}
+
+.versionLabel {
+  font-size: $portfolio-type-base;
+  font-weight: $portfolio-weight-regular;
+  line-height: $portfolio-leading-compact;
+  white-space: nowrap;
+}
+
+.versionName {
+  font-weight: $portfolio-weight-medium;
+}
+
+.versionNumber {
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-sm;
+}
+
+.collapseBtn {
+  display: none;
+  flex-shrink: 0;
+  margin-right: var(--portfolio-spacer-1x);
+
+  @media #{$elan-mq-lg} {
+    display: flex;
+  }
+}
+
+// =============================================================================
+// SEARCH — collapsed icon trigger + expanded inline input
+// =============================================================================
+
+.searchSection {
+  flex-shrink: 0;
+  padding: var(--portfolio-spacer-1x) $portfolio-spacer-utility-0-75x 0;
+}
+
+.searchSectionExpanded {
+  composes: searchSection;
+  position: relative;
+  padding-bottom: var(--portfolio-spacer-0-5x);
+}
+
+.searchIconBtn {
+  @include button-reset;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: $_nav-item-height;
+  height: $_nav-item-height;
+  border-radius: $portfolio-radius-sm;
+  color: var(--portfolio-text-neutral-regular);
+  @include nav-transition;
+  @include hover-neutral;
+}
+
+.searchFlyout {
+  position: fixed;
+  top: calc(var(--portfolio-spacer-6x) + var(--portfolio-spacer-1x));
+  left: $_sidebar-collapsed;
+  z-index: $portfolio-z-dropdown;
+  width: $_sidebar-expanded;
+  background-color: var(--portfolio-surface-neutral-subtle);
+  border: $portfolio-border-width-thin solid var(--portfolio-border-neutral-subtle);
+  border-radius: $portfolio-radius-sm;
+  box-shadow: $portfolio-shadow-overlay;
+  overflow: hidden;
+}
+
+.searchFlyoutInner {
+  padding: $portfolio-spacer-utility-0-75x;
+}
+
+.searchDropdown {
+  position: absolute;
+  left: $portfolio-spacer-utility-0-75x;
+  right: $portfolio-spacer-utility-0-75x;
+  top: calc(100% - var(--portfolio-spacer-0-25x));
+  z-index: $portfolio-z-dropdown;
+  background-color: var(--portfolio-surface-neutral-subtle);
+  border: $portfolio-border-width-thin solid var(--portfolio-border-neutral-subtle);
+  border-radius: $portfolio-radius-sm;
+  box-shadow: var(--portfolio-shadow-lg);
+  overflow: hidden;
+}
+
+.searchResults {
+  max-height: 50vh;
+  overflow-y: auto;
+  padding: var(--portfolio-spacer-0-5x);
+}
+
+.searchResultItem {
+  @include button-reset;
+  display: flex;
+  align-items: center;
+  gap: var(--portfolio-spacer-1x);
+  width: 100%;
+  padding: 0 var(--portfolio-spacer-1x);
+  height: $_nav-item-height;
+  border-radius: $portfolio-radius-sm;
+  font-size: $portfolio-type-xs;
+  @include nav-transition;
+  text-align: left;
+  color: var(--portfolio-text-neutral-bold);
+
+  &:hover {
+    background-color: color-mix(in srgb, var(--portfolio-text-neutral-bold) 7%, transparent);
+  }
+}
+
+.searchResultItemActive {
+  background-color: color-mix(in srgb, var(--portfolio-text-neutral-bold) 7%, transparent);
+  color: var(--portfolio-text-neutral-max);
+}
+
+.searchResultIcon {
+  width: $_icon-sm;
+  height: $_icon-sm;
+  flex-shrink: 0;
+  color: var(--portfolio-text-neutral-regular);
+}
+
+.searchResultLabel {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+
+.searchResultSection {
+  font-size: $portfolio-type-xs;
+  color: color-mix(in srgb, var(--portfolio-text-neutral-regular) 50%, transparent);
+  flex-shrink: 0;
+}
+
+.searchEmpty {
+  padding: var(--portfolio-spacer-1x) var(--portfolio-spacer-1-5x) var(--portfolio-spacer-2x);
+  text-align: center;
+  font-size: $portfolio-type-xs;
+  color: color-mix(in srgb, var(--portfolio-text-neutral-regular) 50%, transparent);
+}
+
+// =============================================================================
+// SCROLLABLE NAV AREA
+// =============================================================================
+
+.scrollArea {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0 $portfolio-spacer-utility-0-75x var(--portfolio-spacer-2x);
+}
+
+.navList {
+  display: flex;
+  flex-direction: column;
+  gap: $portfolio-spacer-0-125x;
+}
+
+// =============================================================================
+// SECTION DIVIDERS — "Foundations" / "Components" headings
+// =============================================================================
+
+.sectionDivider {
+  display: flex;
+  align-items: center;
+  height: var(--portfolio-spacer-3x);
+}
+
+.sectionDividerLine {
+  width: 100%;
+  border-top: $portfolio-border-width-thin solid var(--portfolio-border-neutral-subtle);
+}
+
+.sectionLabel {
+  padding: 0 var(--portfolio-spacer-1x);
+  font-size: var(--portfolio-type-2xs);
+  font-weight: $portfolio-weight-medium;
+  line-height: $portfolio-leading-compact;
+  letter-spacing: $portfolio-tracking-wider;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--portfolio-text-neutral-regular) 50%, transparent);
+}
+
+// =============================================================================
+// GROUP LABELS — sub-headers within flyout categories (Action, Display, etc.)
+// =============================================================================
+
+.groupLabelWrap {
+  padding: var(--portfolio-spacer-1x) var(--portfolio-spacer-1x) var(--portfolio-spacer-0-25x);
+}
+
+.groupLabel {
+  font-size: var(--portfolio-type-2xs);
+  font-weight: $portfolio-weight-medium;
+  line-height: $portfolio-leading-compact;
+  letter-spacing: $portfolio-tracking-wider;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--portfolio-text-neutral-regular) 40%, transparent);
+}
+
+// =============================================================================
+// NAV ITEMS — links + category buttons (shared base)
+// =============================================================================
+
+.navItem {
+  display: flex;
+  align-items: center;
+  height: $_nav-item-height;
+  border-radius: $portfolio-radius-sm;
+  @include nav-transition;
+  width: 100%;
+  text-decoration: none;
+}
+
+.navItemExpanded {
+  gap: var(--portfolio-spacer-1x);
+  padding: 0 var(--portfolio-spacer-1x);
+  font-size: $portfolio-type-sm;
+}
+
+.navItemCollapsed {
+  padding-left: $portfolio-spacer-utility-0-875x;
+}
+
+.navItemActive {
+  color: var(--portfolio-text-brand-bold);
+  font-weight: $portfolio-weight-medium;
+  @include hover-accent;
+}
+
+.navItemDefault {
+  color: var(--portfolio-text-neutral-regular);
+  @include hover-neutral;
+}
+
+.navItemOpen {
+  color: var(--portfolio-text-neutral-max);
+  font-weight: $portfolio-weight-medium;
+
+  &:hover {
+    background-color: color-mix(in srgb, var(--portfolio-text-neutral-bold) 7%, transparent);
+  }
+}
+
+.navItemDisabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.iconNav {
+  width: $_icon-nav;
+  height: $_icon-nav;
+  flex-shrink: 0;
+}
+
+.iconSm {
+  width: $_icon-sm;
+  height: $_icon-sm;
+  flex-shrink: 0;
+}
+
+.iconMenu {
+  width: $_icon-menu;
+  height: $_icon-menu;
+}
+
+.navItemLabel {
+  flex: 1;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chevron {
+  width: $_icon-sm;
+  height: $_icon-sm;
+  flex-shrink: 0;
+  transition: transform $portfolio-duration-fast $portfolio-easing-standard;
+}
+
+.chevronOpen {
+  transform: rotate(90deg);
+}
+
+.mobileExpandedLinks {
+  padding-left: var(--portfolio-spacer-2x);
+  display: flex;
+  flex-direction: column;
+  gap: $portfolio-spacer-0-125x;
+}
+
+// =============================================================================
+// CATEGORY SLIVER — desktop flyout panel
+// =============================================================================
+
+.sliver {
+  position: fixed;
+  top: 0;
+  height: 100vh;
+  width: $_sidebar-expanded;
+  z-index: $_z-sliver;
+  background-color: var(--portfolio-surface-neutral-subtle);
+  border-right: $portfolio-border-width-thin solid var(--portfolio-border-neutral-subtle);
+  box-shadow: var(--portfolio-shadow-lg);
+  transition: transform $portfolio-duration-nav $portfolio-easing-nav;
+}
+
+.sliverFromCollapsed {
+  left: $_sidebar-collapsed;
+}
+
+.sliverFromExpanded {
+  left: $_sidebar-expanded;
+}
+
+.sliverVisible {
+  transform: translateX(0);
+}
+
+.sliverHidden {
+  transform: translateX(-100%);
+  pointer-events: none;
+}
+
+.sliverHeader {
+  display: flex;
+  align-items: center;
+  height: var(--portfolio-spacer-6x);
+  padding: 0 var(--portfolio-spacer-1-5x);
+  border-bottom: $portfolio-border-width-thin solid var(--portfolio-border-neutral-subtle);
+}
+
+.sliverHeaderLabel {
+  font-size: $portfolio-type-xs;
+  font-weight: $portfolio-weight-medium;
+  color: var(--portfolio-text-neutral-bold);
+}
+
+.sliverNav {
+  padding: $portfolio-spacer-utility-0-75x;
+  display: flex;
+  flex-direction: column;
+  gap: $portfolio-spacer-0-125x;
+}
+
+// =============================================================================
+// FOOTER — pinned Archive link
+// =============================================================================
+
+.footer {
+  flex-shrink: 0;
+  height: $_sidebar-footer-height;
+  display: flex;
+  align-items: center;
+  border-top: $portfolio-border-width-thin solid var(--portfolio-border-neutral-subtle);
+  padding: 0 $portfolio-spacer-utility-0-75x;
+}
+
+// =============================================================================
+// MOBILE MENU BUTTON
+// =============================================================================
+
+.mobileMenuBtn {
+  margin-left: -#{$portfolio-spacer-utility-0-75x};
+
+  @media #{$elan-mq-lg} {
+    display: none;
+  }
+}

@@ -30,6 +30,8 @@ const scrollSpySections = [
     group: "Reference",
   },
   { id: "lumen-scale", label: "How Lumen Is Built", depth: 1 as const },
+  { id: "terra-scale", label: "Terra Scale (Brand)", depth: 1 as const },
+  { id: "terra-construction", label: "How Terra Is Built", depth: 1 as const },
 ];
 
 function titleCase(str: string) {
@@ -273,6 +275,7 @@ export default function ColorsPage() {
                 {[
                   "neutral",
                   "brand",
+                  "terra",
                   "inverse",
                   "positive",
                   "warning",
@@ -395,6 +398,95 @@ export default function ColorsPage() {
                     { step: 80, hex: "#1A169C", oklch: "0.34, 0.200, 269.8", w: "12.8:1", d: "1.4:1" },
                     { step: 90, hex: "#0F1560", oklch: "0.26, 0.129, 269.8", w: "16.2:1", d: "1.1:1" },
                     { step: 100, hex: "#070D29", oklch: "0.17, 0.058, 269.8", w: "19.1:1", d: "1.1:1" },
+                  ].map((row) => (
+                    <tr key={row.step} className={row.step === 60 ? s.lumenAnchorRow : undefined}>
+                      <td>{row.step}</td>
+                      <td>
+                        <code className={s.lumenCode}>{row.hex}</code>
+                      </td>
+                      <td>
+                        <code className={s.lumenCodeMuted}>{row.oklch}</code>
+                      </td>
+                      <td>{row.w}</td>
+                      <td>{row.d}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div id="terra-scale" className={s.paletteGroup}>
+            <SubsectionTitle>Terra Scale (Brand)</SubsectionTitle>
+            <PaletteSwatchRow items={colors.terra} />
+          </div>
+
+          {/* Terra scale construction documentation */}
+          <div id="terra-construction" className={s.lumenSection}>
+            <SubsectionTitle>How This Scale Is Built</SubsectionTitle>
+            <p className={s.lumenNarrative}>
+              Terra is a warm amber accent seeded from{" "}
+              <code className={s.lumenCode}>#FAF9F6</code>, then hue-tuned to
+              70&deg; for a richer, redder warmth that reads as amber/sienna
+              rather than gold. It follows the same OKLCH construction as Lumen,
+              providing a full-range warm complement to the cool blue-violet brand.
+            </p>
+
+            <div className={s.lumenMethodBox}>
+              <p className={s.lumenMethodTitle}>OKLCH Construction</p>
+              <p className={s.lumenMethodDesc}>
+                Same methodology as Lumen: grade 60 is the brand anchor.
+                Peak chroma scaled to 0.480&times; Lumen&apos;s to match warm
+                earth-tone gamut limits. Hue tuned from seed (91.4&deg;) to
+                70&deg; for redder warmth.
+              </p>
+              <div className={s.lumenParamGrid}>
+                <div className={s.lumenParam}>
+                  <span className={s.lumenParamLabel}>Lightness</span>
+                  <span className={s.lumenParamValue}>
+                    Even ramp: &Delta;L&nbsp;&asymp;&nbsp;0.093 (10&ndash;60),
+                    &Delta;L&nbsp;&asymp;&nbsp;0.081 (60&ndash;100)
+                  </span>
+                </div>
+                <div className={s.lumenParam}>
+                  <span className={s.lumenParamLabel}>Chroma</span>
+                  <span className={s.lumenParamValue}>
+                    Sine arc peaking at grade 60 (C&nbsp;=&nbsp;0.135), tapering
+                    to both extremes
+                  </span>
+                </div>
+                <div className={s.lumenParam}>
+                  <span className={s.lumenParamLabel}>Hue</span>
+                  <span className={s.lumenParamValue}>
+                    Constant 70&deg; across all steps (no hue discontinuity)
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className={s.lumenTable}>
+              <table className={s.lumenTableEl}>
+                <thead>
+                  <tr>
+                    <th>Step</th>
+                    <th>Hex</th>
+                    <th>OKLCH</th>
+                    <th>vs White</th>
+                    <th>vs #161616</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    { step: 10, hex: "#F5F1EC", oklch: "0.96, 0.008, 70", w: "1.1:1", d: "16.1:1" },
+                    { step: 20, hex: "#E0D0BF", oklch: "0.87, 0.030, 70", w: "1.5:1", d: "12.0:1" },
+                    { step: 30, hex: "#CCB091", oklch: "0.77, 0.053, 70", w: "2.1:1", d: "8.8:1" },
+                    { step: 40, hex: "#B89062", oklch: "0.68, 0.079, 70", w: "2.9:1", d: "6.2:1" },
+                    { step: 50, hex: "#A4702C", oklch: "0.59, 0.106, 70", w: "4.3:1", d: "4.3:1" },
+                    { step: 60, hex: "#915000", oklch: "0.50, 0.135, 70", w: "6.3:1", d: "2.9:1" },
+                    { step: 70, hex: "#743B00", oklch: "0.41, 0.123, 70", w: "8.9:1", d: "2.0:1" },
+                    { step: 80, hex: "#542A00", oklch: "0.33, 0.096, 70", w: "12.3:1", d: "1.5:1" },
+                    { step: 90, hex: "#341B00", oklch: "0.25, 0.062, 70", w: "16.1:1", d: "1.1:1" },
+                    { step: 100, hex: "#170D03", oklch: "0.17, 0.028, 70", w: "19.2:1", d: "1.1:1" },
                   ].map((row) => (
                     <tr key={row.step} className={row.step === 60 ? s.lumenAnchorRow : undefined}>
                       <td>{row.step}</td>

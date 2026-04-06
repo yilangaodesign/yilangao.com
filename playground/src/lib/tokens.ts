@@ -30,6 +30,9 @@ export const colors = {
   accent: scale("accent", {
     "10": "#EFF3FF", "20": "#C5D4FF", "30": "#9BB4FF", "40": "#7392FF", "50": "#4E6CFF", "60": "#3336FF", "70": "#261BD5", "80": "#1A169C", "90": "#0F1560", "100": "#070D29",
   }),
+  terra: scale("terra", {
+    "10": "#F5F1EC", "20": "#E0D0BF", "30": "#CCB091", "40": "#B89062", "50": "#A4702C", "60": "#915000", "70": "#743B00", "80": "#542A00", "90": "#341B00", "100": "#170D03",
+  }),
   neutral: scale("neutral", {
     "00": "#FFFFFF", "05": "#F9F9F9", "10": "#F4F4F4", "20": "#E0E0E0", "30": "#C6C6C6", "40": "#A8A8A8", "50": "#8D8D8D", "60": "#6F6F6F", "70": "#525252", "80": "#393939", "90": "#262626", "100": "#161616",
   }),
@@ -131,6 +134,13 @@ export const colors = {
           ],
         },
         {
+          role: "terra",
+          tokens: [
+            { emphasis: "bold", value: "#915000", token: "$portfolio-surface-terra-bold", ref: "$portfolio-terra-60", darkValue: "#393939" },
+            { emphasis: "subtle", value: "#F5F1EC", token: "$portfolio-surface-terra-subtle", ref: "$portfolio-terra-10", darkValue: "#262626" },
+          ],
+        },
+        {
           role: "overlay",
           tokens: [
             { emphasis: "", value: "rgba(0, 0, 0, 0.5)", token: "$portfolio-surface-overlay", darkValue: "rgba(0, 0, 0, 0.7)" },
@@ -205,6 +215,12 @@ export const colors = {
           role: "warning",
           tokens: [
             { emphasis: "", value: "#8E6A00", token: "$portfolio-text-warning", ref: "$portfolio-yellow-60", darkValue: "#D2A106" },
+          ],
+        },
+        {
+          role: "terra",
+          tokens: [
+            { emphasis: "", value: "#915000", token: "$portfolio-text-terra", ref: "$portfolio-terra-60", darkValue: "#B89062" },
           ],
         },
       ],
@@ -322,6 +338,12 @@ export const colors = {
           role: "warning",
           tokens: [
             { emphasis: "", value: "#8E6A00", token: "$portfolio-border-warning", ref: "$portfolio-yellow-60", darkValue: "#B28600" },
+          ],
+        },
+        {
+          role: "terra",
+          tokens: [
+            { emphasis: "", value: "#915000", token: "$portfolio-border-terra", ref: "$portfolio-terra-60", darkValue: "#A4702C" },
           ],
         },
       ],

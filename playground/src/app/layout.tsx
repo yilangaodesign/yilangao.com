@@ -10,6 +10,7 @@ import {
 } from "geist/font/pixel";
 import { ThemeProvider } from "@/components/theme-provider";
 import { SidebarProvider } from "@/components/sidebar";
+import { TooltipProvider } from "@ds/Tooltip";
 import "./ds-tokens.scss";
 import "./globals.css";
 
@@ -37,7 +38,9 @@ export default function RootLayout({
     <html lang="en" className={fontVariables} suppressHydrationWarning>
       <body>
         <ThemeProvider>
-          <SidebarProvider>{children}</SidebarProvider>
+          <TooltipProvider>
+            <SidebarProvider>{children}</SidebarProvider>
+          </TooltipProvider>
         </ThemeProvider>
       </body>
     </html>

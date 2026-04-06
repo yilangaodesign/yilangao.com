@@ -58,7 +58,7 @@ import Code2 from "lucide-react/dist/esm/icons/code-2";
 import Heading from "lucide-react/dist/esm/icons/heading";
 import { cn } from "@/lib/utils";
 import { elan } from "@/lib/elan";
-import styles from "./sidebar.module.css";
+import s from "./sidebar.module.scss";
 import { useDevInfo } from "@/hooks/use-dev-info";
 import {
   createContext,
@@ -73,11 +73,6 @@ import { createPortal } from "react-dom";
 import Fuse from "fuse.js";
 import { useSafeTriangle } from "@/hooks/use-safe-triangle";
 import { Button, Input, Kbd } from "@ds/index";
-
-// ── Constants ────────────────────────────────────────────────────────────────
-
-const W_EXPANDED = "w-[200px]";
-const W_COLLAPSED = "w-[41px]";
 
 // ── Context ──────────────────────────────────────────────────────────────────
 
@@ -384,9 +379,9 @@ function SidebarSearch({
   const showResults = query.trim().length > 0;
 
   const resultsDropdown = showResults && (
-    <div className="max-h-[50vh] overflow-y-auto p-1">
+    <div className={s.searchResults}>
       {results.length === 0 ? (
-        <div className="px-3 py-4 text-center text-xs text-sidebar-muted-foreground/50">
+        <div className={s.searchEmpty}>
           No results for &ldquo;{query}&rdquo;
         </div>
       ) : (
@@ -396,17 +391,15 @@ function SidebarSearch({
             <button
               key={r.item.href}
               className={cn(
-                "flex items-center gap-2 w-full px-2 h-7 rounded-sm text-xs transition-colors text-left",
-                idx === selectedIndex
-                  ? "bg-foreground/7 text-black dark:text-white"
-                  : "text-sidebar-foreground hover:bg-foreground/7"
+                s.searchResultItem,
+                idx === selectedIndex && s.searchResultItemActive
               )}
               onMouseEnter={() => setSelectedIndex(idx)}
               onClick={() => navigateTo(r.item.href)}
             >
-              <Icon className="w-3 h-3 shrink-0 text-sidebar-muted-foreground" />
-              <span className="truncate flex-1">{r.item.label}</span>
-              <span className="text-xs text-sidebar-muted-foreground/50 shrink-0">
+              <Icon className={s.searchResultIcon} />
+              <span className={s.searchResultLabel}>{r.item.label}</span>
+              <span className={s.searchResultSection}>
                 {r.item.section}
               </span>
             </button>
@@ -418,21 +411,18 @@ function SidebarSearch({
 
   if (collapsed) {
     return (
-      <div ref={containerRef} onMouseEnter={onMouseEnter} className="shrink-0 pt-2 px-1.5">
+      <div ref={containerRef} onMouseEnter={onMouseEnter} className={s.searchSection}>
         <button
           onClick={() => setOpen(!open)}
-          className="flex items-center justify-center w-7 h-7 rounded-sm text-sidebar-muted-foreground hover:bg-foreground/7 hover:text-black dark:hover:text-white transition-colors"
+          className={s.searchIconBtn}
           title="Search (⌘K)"
         >
-          <Search className="w-3.5 h-3.5" />
+          <Search className={s.iconNav} />
         </button>
         {open &&
           createPortal(
-            <div
-              ref={flyoutRef}
-              className="fixed top-[56px] left-[41px] z-50 w-[200px] bg-sidebar border border-sidebar-border rounded-sm shadow-2xl overflow-hidden"
-            >
-              <div className="p-1.5">
+            <div ref={flyoutRef} className={s.searchFlyout}>
+              <div className={s.searchFlyoutInner}>
                 <Input
                   ref={inputRef}
                   size="xs"
@@ -452,7 +442,7 @@ function SidebarSearch({
   }
 
   return (
-    <div ref={containerRef} onMouseEnter={onMouseEnter} className="shrink-0 pt-2 relative px-1.5">
+    <div ref={containerRef} onMouseEnter={onMouseEnter} className={s.searchSectionExpanded}>
       <Input
         ref={inputRef}
         size="xs"
@@ -465,9 +455,9 @@ function SidebarSearch({
         onKeyDown={handleKeyDown}
       />
       {open && showResults && (
-        <div className="absolute left-1.5 right-1.5 top-[calc(100%-2px)] z-50 bg-sidebar border border-sidebar-border rounded-sm shadow-lg overflow-hidden">
+        <div className={s.searchDropdown}>
           {results.length === 0 ? (
-            <div className="px-3 py-4 text-center text-xs text-sidebar-muted-foreground/50">
+            <div className={s.searchEmpty}>
               No results for &ldquo;{query}&rdquo;
             </div>
           ) : (
@@ -477,17 +467,15 @@ function SidebarSearch({
                 <button
                   key={r.item.href}
                   className={cn(
-                    "flex items-center gap-2 w-full px-2 h-7 text-xs transition-colors text-left",
-                    idx === selectedIndex
-                      ? "bg-foreground/7 text-black dark:text-white"
-                      : "text-sidebar-foreground hover:bg-foreground/7"
+                    s.searchResultItem,
+                    idx === selectedIndex && s.searchResultItemActive
                   )}
                   onMouseEnter={() => setSelectedIndex(idx)}
                   onClick={() => navigateTo(r.item.href)}
                 >
-                  <Icon className="w-3 h-3 shrink-0 text-sidebar-muted-foreground" />
-                  <span className="truncate flex-1">{r.item.label}</span>
-                  <span className="text-xs text-sidebar-muted-foreground/50 shrink-0">
+                  <Icon className={s.searchResultIcon} />
+                  <span className={s.searchResultLabel}>{r.item.label}</span>
+                  <span className={s.searchResultSection}>
                     {r.item.section}
                   </span>
                 </button>
@@ -518,8 +506,8 @@ function renderLinksWithGroups(
     return (
       <div key={link.href}>
         {showGroupHeader && (
-          <div className="px-2 pt-2 pb-0.5">
-            <span className={styles.groupLabel}>
+          <div className={s.groupLabelWrap}>
+            <span className={s.groupLabel}>
               {link.group}
             </span>
           </div>
@@ -528,13 +516,12 @@ function renderLinksWithGroups(
           href={link.href}
           onClick={onNavigate}
           className={cn(
-            "flex items-center gap-2 h-7 px-2 rounded-sm text-sm transition-colors",
-            isLinkActive
-              ? "text-accent font-medium hover:bg-accent/7"
-              : "text-sidebar-muted-foreground hover:bg-foreground/7 hover:text-black dark:hover:text-white"
+            s.navItem,
+            s.navItemExpanded,
+            isLinkActive ? s.navItemActive : s.navItemDefault
           )}
         >
-          <LinkIcon className="w-3.5 h-3.5 shrink-0" />
+          <LinkIcon className={s.iconNav} />
           {link.label}
         </Link>
       </div>
@@ -576,7 +563,7 @@ function CategoriesSection({
 
   return (
     <div>
-      <nav className="space-y-px">
+      <nav className={s.navList}>
         {componentCategories.map((cat) => {
           const Icon = cat.icon;
           const isCatActive = activeCategory === cat.id;
@@ -593,11 +580,11 @@ function CategoriesSection({
           return (
             <div key={cat.id}>
               {showSectionDivider && (
-                <div className="h-6 flex items-center">
+                <div className={s.sectionDivider}>
                   {collapsed ? (
-                    <div className="w-full border-t border-sidebar-border" />
+                    <div className={s.sectionDividerLine} />
                   ) : (
-                    <span className={cn("px-2", styles.sectionLabel)}>
+                    <span className={s.sectionLabel}>
                       {cat.section}
                     </span>
                   )}
@@ -610,16 +597,14 @@ function CategoriesSection({
                   onMouseEnter={() => !isMobile && onCategoryHover("")}
                   title={collapsed ? cat.label : undefined}
                   className={cn(
-                    "flex items-center h-7 rounded-sm transition-colors w-full",
-                    collapsed ? "pl-[7px]" : "gap-2 px-2 text-sm",
-                    isDirectActive
-                      ? "text-accent font-medium hover:bg-accent/7"
-                      : "text-sidebar-muted-foreground hover:bg-foreground/7 hover:text-black dark:hover:text-white"
+                    s.navItem,
+                    collapsed ? s.navItemCollapsed : s.navItemExpanded,
+                    isDirectActive ? s.navItemActive : s.navItemDefault
                   )}
                 >
-                  <Icon className="w-3.5 h-3.5 shrink-0" />
+                  <Icon className={s.iconNav} />
                   {!collapsed && (
-                    <span className="flex-1 text-left truncate">
+                    <span className={s.navItemLabel}>
                       {cat.label}
                     </span>
                   )}
@@ -633,29 +618,27 @@ function CategoriesSection({
                   title={collapsed ? cat.label : undefined}
                   disabled={isEmpty}
                   className={cn(
-                    "flex items-center h-7 rounded-sm transition-colors w-full",
-                    collapsed
-                      ? "pl-[7px]"
-                      : "gap-2 px-2 text-sm",
-                    isEmpty && "opacity-30 cursor-not-allowed",
+                    s.navItem,
+                    collapsed ? s.navItemCollapsed : s.navItemExpanded,
+                    isEmpty && s.navItemDisabled,
                     isCatActive && !isEmpty
-                      ? "text-accent font-medium hover:bg-accent/7"
+                      ? s.navItemActive
                       : isOpen
-                        ? "text-black dark:text-white font-medium hover:bg-foreground/7"
-                        : "text-sidebar-muted-foreground hover:bg-foreground/7 hover:text-black dark:hover:text-white"
+                        ? s.navItemOpen
+                        : s.navItemDefault
                   )}
                 >
-                  <Icon className="w-3.5 h-3.5 shrink-0" />
+                  <Icon className={s.iconNav} />
                   {!collapsed && (
                     <>
-                      <span className="flex-1 text-left truncate">
+                      <span className={s.navItemLabel}>
                         {cat.label}
                       </span>
                       {!isEmpty && (
                         <ChevronRight
                           className={cn(
-                            "w-3 h-3 shrink-0 transition-transform duration-150",
-                            isMobile && isOpen && "rotate-90"
+                            s.chevron,
+                            isMobile && isOpen && s.chevronOpen
                           )}
                         />
                       )}
@@ -665,7 +648,7 @@ function CategoriesSection({
               )}
 
               {isMobile && isOpen && !isDirectLink && (
-                <div className="pl-4 space-y-px">
+                <div className={s.mobileExpandedLinks}>
                   {renderLinksWithGroups(cat.links, pathname, onNavigate)}
                 </div>
               )}
@@ -708,20 +691,17 @@ const CategorySliver = React.forwardRef<
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       className={cn(
-        "fixed top-0 h-screen w-[200px] z-[29] bg-sidebar border-r border-sidebar-border shadow-lg",
-        "transition-transform duration-200 ease-out",
-        visible
-          ? "translate-x-0"
-          : "-translate-x-full pointer-events-none",
-        sidebarCollapsed ? "left-[41px]" : "left-[200px]",
+        s.sliver,
+        sidebarCollapsed ? s.sliverFromCollapsed : s.sliverFromExpanded,
+        visible ? s.sliverVisible : s.sliverHidden,
       )}
     >
-      <div className="flex items-center h-12 px-3 border-b border-sidebar-border">
-        <span className="text-xs font-medium text-sidebar-foreground">
+      <div className={s.sliverHeader}>
+        <span className={s.sliverHeaderLabel}>
           {category.label}
         </span>
       </div>
-      <nav className="p-1.5 space-y-px">
+      <nav className={s.sliverNav}>
         {renderLinksWithGroups(category.links, pathname, onNavigate)}
       </nav>
     </div>
@@ -738,10 +718,10 @@ export function MobileMenuButton() {
       size="sm"
       emphasis="minimal"
       onClick={() => setMobileOpen(!mobileOpen)}
-      className="lg:hidden -ml-1.5"
+      className={s.mobileMenuBtn}
       aria-label="Toggle sidebar"
     >
-      <Menu className="w-5 h-5" />
+      <Menu className={s.iconMenu} />
     </Button>
   );
 }
@@ -754,8 +734,10 @@ function VersionLabel() {
     ? data?.currentVersion ?? elan.version
     : elan.release.version;
   return (
-    <span className="font-semibold text-sm whitespace-nowrap">
-      {elan.name} {version}
+    <span className={s.versionLabel}>
+      <span className={s.versionName}>{elan.name}</span>
+      {" "}
+      <span className={s.versionNumber}>{version}</span>
     </span>
   );
 }
@@ -825,8 +807,6 @@ export function Sidebar() {
     return () => document.removeEventListener("keydown", handleKey);
   }, [openCategory]);
 
-  const widthClass = isCollapsedDesktop ? W_COLLAPSED : W_EXPANDED;
-
   function handleCategoryClick(catId: string) {
     setOpenCategory((prev) => (prev === catId ? null : catId));
   }
@@ -854,15 +834,15 @@ export function Sidebar() {
     <>
       {mobileOpen && (
         <div
-          className="fixed inset-0 z-20 bg-black/40 lg:hidden"
+          className={s.mobileBackdrop}
           onClick={closeMobile}
         />
       )}
 
       <div
         className={cn(
-          "hidden lg:block shrink-0 transition-[width] duration-200 ease-in-out",
-          widthClass
+          s.spacer,
+          isCollapsedDesktop ? s.spacerCollapsed : s.spacerExpanded
         )}
       />
 
@@ -871,30 +851,28 @@ export function Sidebar() {
         onMouseEnter={cancelClose}
         onMouseLeave={scheduleClose}
         className={cn(
-          "fixed top-0 left-0 z-30 flex flex-col h-screen border-r bg-sidebar text-sidebar-foreground border-sidebar-border transition-[width] duration-200 ease-in-out overflow-hidden",
-          "lg:translate-x-0",
-          mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
-          mobileOpen && collapsed ? W_EXPANDED : widthClass
+          s.sidebar,
+          mobileOpen ? s.sidebarVisible : s.sidebarHidden,
+          (mobileOpen && collapsed) ? s.sidebarExpanded : (isCollapsedDesktop ? s.sidebarCollapsed : s.sidebarExpanded)
         )}
       >
-        {/* Header */}
         <div
           onMouseEnter={() => setOpenCategory(null)}
           className={cn(
-            "flex items-center h-12 border-b border-sidebar-border shrink-0 px-1.5",
-            isCollapsedDesktop ? "justify-center" : "justify-between"
+            s.header,
+            isCollapsedDesktop ? s.headerCollapsed : s.headerExpanded
           )}
         >
           {!isCollapsedDesktop && (
             <Link
               href="/"
-              className="flex items-center gap-2.5 min-w-0 px-2"
+              className={s.logoLink}
               onClick={closeMobile}
             >
-              <img
-                src="/yg-logo.svg"
-                alt="YG"
-                className="w-6 h-6 shrink-0"
+              <span
+                className={s.logoImage}
+                role="img"
+                aria-label="YG"
               />
               <VersionLabel />
             </Link>
@@ -907,7 +885,7 @@ export function Sidebar() {
               onClick={() => setCollapsed(false)}
               aria-label="Expand sidebar"
             >
-              <PanelLeftOpen className="w-3.5 h-3.5" />
+              <PanelLeftOpen className={s.iconNav} />
             </Button>
           )}
           {!isCollapsedDesktop && (
@@ -923,23 +901,21 @@ export function Sidebar() {
                   setOpenCategory(null);
                 }
               }}
-              className="hidden lg:flex shrink-0 mr-2"
+              className={s.collapseBtn}
               aria-label="Collapse sidebar"
             >
-              <PanelLeftClose className="w-3.5 h-3.5" />
+              <PanelLeftClose className={s.iconNav} />
             </Button>
           )}
         </div>
 
-        {/* Search */}
         <SidebarSearch
           collapsed={isCollapsedDesktop}
           onNavigate={closeMobile}
           onMouseEnter={() => setOpenCategory(null)}
         />
 
-        {/* Scrollable nav */}
-        <div className="flex-1 overflow-y-auto overflow-x-hidden pb-4 px-1.5">
+        <div className={s.scrollArea}>
           <CategoriesSection
             pathname={pathname}
             collapsed={isCollapsedDesktop}
@@ -951,24 +927,19 @@ export function Sidebar() {
           />
         </div>
 
-        {/* Bottom — Archive pinned (h-11 matches page footer) */}
-        <div className="shrink-0 h-11 flex items-center border-t border-sidebar-border px-1.5">
+        <div className={s.footer}>
           <Link
             href="/archive"
             onClick={closeMobile}
             onMouseEnter={() => setOpenCategory(null)}
             title={isCollapsedDesktop ? "Archive" : undefined}
             className={cn(
-              "flex items-center h-7 rounded-sm transition-colors",
-              isCollapsedDesktop
-                ? "pl-[7px]"
-                : "gap-2 px-2 text-sm",
-              pathname === "/archive"
-                ? "text-accent font-medium hover:bg-accent/7"
-                : "text-sidebar-muted-foreground hover:bg-foreground/7 hover:text-black dark:hover:text-white"
+              s.navItem,
+              isCollapsedDesktop ? s.navItemCollapsed : s.navItemExpanded,
+              pathname === "/archive" ? s.navItemActive : s.navItemDefault
             )}
           >
-            <Archive className="w-3.5 h-3.5 shrink-0" />
+            <Archive className={s.iconNav} />
             {!isCollapsedDesktop && "Archive"}
           </Link>
         </div>
