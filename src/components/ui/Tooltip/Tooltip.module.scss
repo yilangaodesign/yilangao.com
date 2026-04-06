@@ -1,15 +1,18 @@
 @use '../../../styles' as *;
 
+// ── File-local constants ────────────────────────────────────────────────────
+// Component-specific dimensions with no global token (follows Dialog/Sheet convention).
+$_tooltip-max-width-sm: 176px;
+$_tooltip-max-width-md: 240px;
+$_tooltip-max-width-lg: 320px;
+$_tooltip-slide-distance: $portfolio-spacer-0-5x;
+
+// ── Base container ──────────────────────────────────────────────────────────
+
 .content {
   z-index: var(--portfolio-z-tooltip);
-  padding: var(--portfolio-spacer-0-5x) var(--portfolio-spacer-1x);
-  font-family: var(--portfolio-font-sans);
-  font-size: var(--portfolio-type-xs);
-  line-height: var(--portfolio-leading-normal);
-  color: var(--portfolio-text-inverse);
-  background-color: var(--portfolio-surface-inverse);
   border-radius: var(--portfolio-radius-sm);
-  box-shadow: var(--portfolio-shadow-md);
+  font-family: var(--portfolio-font-sans);
   user-select: none;
 
   animation-duration: var(--portfolio-duration-fast);
@@ -27,28 +30,101 @@
   &[data-state='delayed-open'][data-side='right'] {
     animation-name: slideRight;
   }
+
+  &[data-state='closed'] {
+    animation-name: fadeOut;
+    animation-duration: var(--portfolio-duration-fast);
+    animation-timing-function: var(--portfolio-easing-exit);
+  }
+
+  @include reduced-motion;
 }
 
-.arrow {
-  fill: var(--portfolio-surface-inverse);
+// ── Appearance variants ─────────────────────────────────────────────────────
+
+.inverse {
+  background-color: var(--portfolio-surface-inverse-bold);
+  color: var(--portfolio-text-inverse-bold);
+  box-shadow: var(--portfolio-shadow-md);
 }
+
+.neutral {
+  background-color: var(--portfolio-surface-neutral-regular);
+  color: var(--portfolio-text-neutral-bold);
+  border: $portfolio-spacer-0-125x solid var(--portfolio-border-neutral-subtle);
+  box-shadow: var(--portfolio-shadow-sm);
+}
+
+.brand {
+  background-color: var(--portfolio-surface-brand-bold);
+  color: var(--portfolio-text-always-light-bold);
+  box-shadow: var(--portfolio-shadow-md);
+}
+
+// ── Size variants ───────────────────────────────────────────────────────────
+
+.sm {
+  max-width: $_tooltip-max-width-sm;
+  padding: var(--portfolio-spacer-0-25x) var(--portfolio-spacer-1x);
+  font-size: var(--portfolio-type-xs);
+  line-height: var(--portfolio-leading-normal);
+}
+
+.md {
+  max-width: $_tooltip-max-width-md;
+  padding: var(--portfolio-spacer-0-5x) var(--portfolio-spacer-1-5x);
+  font-size: var(--portfolio-type-xs);
+  line-height: var(--portfolio-leading-normal);
+}
+
+.lg {
+  max-width: $_tooltip-max-width-lg;
+  padding: var(--portfolio-spacer-1x) var(--portfolio-spacer-2x);
+  font-size: var(--portfolio-type-sm);
+  line-height: var(--portfolio-leading-relaxed);
+}
+
+// ── Caret styles ────────────────────────────────────────────────────────────
+
+.caretInverse {
+  fill: var(--portfolio-surface-inverse-bold);
+}
+
+.caretNeutral {
+  fill: var(--portfolio-surface-neutral-regular);
+  stroke: var(--portfolio-border-neutral-subtle);
+  stroke-width: $portfolio-spacer-0-125x;
+}
+
+.caretBrand {
+  fill: var(--portfolio-surface-brand-bold);
+}
+
+// ── Entrance keyframes (direction-aware) ────────────────────────────────────
 
 @keyframes slideUp {
-  from { opacity: 0; transform: translateY(4px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: translateY($_tooltip-slide-distance); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes slideDown {
-  from { opacity: 0; transform: translateY(-4px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: translateY(-$_tooltip-slide-distance); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes slideLeft {
-  from { opacity: 0; transform: translateX(4px); }
-  to { opacity: 1; transform: translateX(0); }
+  from { opacity: 0; transform: translateX($_tooltip-slide-distance); }
+  to   { opacity: 1; transform: translateX(0); }
 }
 
 @keyframes slideRight {
-  from { opacity: 0; transform: translateX(-4px); }
-  to { opacity: 1; transform: translateX(0); }
+  from { opacity: 0; transform: translateX(-$_tooltip-slide-distance); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+// ── Exit keyframe ───────────────────────────────────────────────────────────
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to   { opacity: 0; }
 }

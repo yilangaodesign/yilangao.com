@@ -1,0 +1,25 @@
+@use '../../../styles' as *;
+
+.trigger {
+  @include button-reset;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--portfolio-icon-neutral-regular);
+  transition: color var(--portfolio-duration-fast) var(--portfolio-easing-standard);
+
+  &:hover {
+    color: var(--portfolio-icon-neutral-bold);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+// Icon size classes derived from contextSize → type-scale token mapping.
+.xs { width: var(--portfolio-type-xs); height: var(--portfolio-type-xs); }
+.sm { width: var(--portfolio-type-sm); height: var(--portfolio-type-sm); }
+.md { width: var(--portfolio-type-base); height: var(--portfolio-type-base); }
+.lg { width: var(--portfolio-type-lg); height: var(--portfolio-type-lg); }
+.xl { width: var(--portfolio-type-xl); height: var(--portfolio-type-xl); }

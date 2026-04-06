@@ -93,8 +93,8 @@ export type {
 } from "./Menu";
 
 // Tier 3 — Overlay & Disclosure
-export { Tooltip } from "./Tooltip";
-export type { TooltipProps } from "./Tooltip";
+export { Tooltip, TooltipProvider, InfoTooltip } from "./Tooltip";
+export type { TooltipProps, TooltipSize, TooltipAppearance, InfoTooltipProps, InfoTooltipContextSize } from "./Tooltip";
 
 export {
   Dialog,
