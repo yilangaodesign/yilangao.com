@@ -314,11 +314,10 @@ export default function TestimonialCard({
         while (true) {
           const beside = y < QUOTE_SVG_SIZE && cw > indent;
           const maxWidth = beside ? cw - indent : cw;
-          const range = pretext.layoutNextLineRange(prepared, cursor, maxWidth);
-          if (!range) break;
-          const line = pretext.materializeLineRange(prepared, range);
+          const line = pretext.layoutNextLine(prepared, cursor, maxWidth);
+          if (!line) break;
           result.push({ text: line.text, indented: beside });
-          cursor = range.end;
+          cursor = line.end;
           y += lh;
         }
 
