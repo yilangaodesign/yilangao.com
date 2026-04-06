@@ -333,7 +333,7 @@ export default function ProjectClient({
     () => [
       { id: 'overview', label: 'Overview' },
       ...contentBlocks
-        .filter(({ block }): block is ContentBlock & { blockType: 'heading' } => block.blockType === 'heading')
+        .filter((item): item is { block: ContentBlock & { blockType: 'heading' }; originalIndex: number } => item.block.blockType === 'heading')
         .map(({ block }) => ({
           id: slugify(block.text),
           label: block.text,
