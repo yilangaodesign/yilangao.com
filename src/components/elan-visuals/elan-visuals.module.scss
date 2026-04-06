@@ -1419,12 +1419,12 @@
   font-family: var(--portfolio-font-sans);
   font-size: var(--portfolio-type-xs);
   font-weight: var(--portfolio-weight-medium);
-  color: var(--portfolio-text-link);
+  color: var(--portfolio-text-primary);
   text-decoration: none;
   @include transition-fast;
   margin-top: var(--portfolio-spacer-1x);
 
   &:hover {
-    opacity: 0.7;
+    color: var(--portfolio-text-secondary);
   }
 }

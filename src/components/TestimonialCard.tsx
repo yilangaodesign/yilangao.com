@@ -33,6 +33,33 @@ function testimonialTarget(id: number): ApiTarget {
   return { type: "collection", slug: "testimonials", id };
 }
 
+const QUOTE_SVG_SIZE = 32;
+const QUOTE_WRAP_GAP = 12;
+
+function QuoteMark({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      width="74"
+      height="74"
+      viewBox="0 0 74 74"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M61 59.4614V37L46.0257 37C46.0257 30.5464 47.1093 23.3734 57.3057 23.3734L57.3057 14.5386C46.0257 14.5386 38.5386 20.6644 38.5386 37V59.4614H46.0257H53.5129H61Z"
+        fill="currentColor"
+      />
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M12.3335 49.4614H34.7949V27L19.8207 27C19.8207 20.5464 20.9042 13.3734 31.1007 13.3734L31.1007 4.53861C19.8207 4.53861 12.3335 10.6644 12.3335 27V49.4614Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
 function LinkedInIcon() {
   return (
     <svg
@@ -252,6 +279,63 @@ export default function TestimonialCard({
   const canEdit = mounted && isAdmin && id != null;
   const [showLinkedinEditor, setShowLinkedinEditor] = useState(false);
 
+  const quoteRef = useRef<HTMLDivElement>(null);
+  const [wrappedLines, setWrappedLines] = useState<
+    Array<{ text: string; indented: boolean }> | null
+  >(null);
+
+  useEffect(() => {
+    if (canEdit) return;
+    const el = quoteRef.current;
+    if (!el) return;
+
+    let disposed = false;
+    let ro: ResizeObserver | null = null;
+
+    Promise.all([
+      import("@chenglou/pretext"),
+      document.fonts.ready,
+    ]).then(([pretext]) => {
+      if (disposed) return;
+
+      function relayout() {
+        const cs = getComputedStyle(el!);
+        const font = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+        const lh = parseFloat(cs.lineHeight);
+        const cw = el!.clientWidth;
+        if (cw <= 0 || lh <= 0) return;
+
+        const indent = QUOTE_SVG_SIZE + QUOTE_WRAP_GAP;
+        const prepared = pretext.prepareWithSegments(text, font);
+        let cursor = { segmentIndex: 0, graphemeIndex: 0 };
+        let y = 0;
+        const result: Array<{ text: string; indented: boolean }> = [];
+
+        while (true) {
+          const beside = y < QUOTE_SVG_SIZE && cw > indent;
+          const maxWidth = beside ? cw - indent : cw;
+          const range = pretext.layoutNextLineRange(prepared, cursor, maxWidth);
+          if (!range) break;
+          const line = pretext.materializeLineRange(prepared, range);
+          result.push({ text: line.text, indented: beside });
+          cursor = range.end;
+          y += lh;
+        }
+
+        setWrappedLines(result);
+      }
+
+      relayout();
+      ro = new ResizeObserver(relayout);
+      ro.observe(el!);
+    });
+
+    return () => {
+      disposed = true;
+      ro?.disconnect();
+    };
+  }, [text, canEdit]);
+
   return (
     <div className={styles.card}>
       {canEdit && (
@@ -270,16 +354,21 @@ export default function TestimonialCard({
       )}
 
       <div className={styles.quoteBlock}>
-        <span
-          className={[styles.quoteMark, canEdit ? styles.quoteMarkEditable : ''].filter(Boolean).join(' ')}
-          aria-hidden="true"
-          onClick={canEdit ? (e) => {
-            const editable = (e.currentTarget.parentElement?.querySelector('[data-editable]')) as HTMLElement | null;
-            if (editable) editable.dispatchEvent(new MouseEvent('dblclick', { bubbles: true, cancelable: true }));
-          } : undefined}
-        >
-          &ldquo;
-        </span>
+        {canEdit ? (
+          <button
+            type="button"
+            className={[styles.quoteMark, styles.quoteMarkFloat, styles.quoteMarkEditable].join(' ')}
+            onClick={(e) => {
+              const editable = (e.currentTarget.parentElement?.querySelector('[data-editable]')) as HTMLElement | null;
+              if (editable) editable.dispatchEvent(new MouseEvent('dblclick', { bubbles: true, cancelable: true }));
+            }}
+          >
+            <QuoteMark />
+          </button>
+        ) : (
+          <QuoteMark className={[styles.quoteMark, styles.quoteMarkFloat].join(' ')} />
+        )}
+
         {canEdit ? (
           <EditableText
             fieldId={`testimonials:${id}:text`}
@@ -294,10 +383,25 @@ export default function TestimonialCard({
           >
             {text}
           </EditableText>
-        ) : textHtml ? (
-          <p className={styles.quoteText} dangerouslySetInnerHTML={{ __html: textHtml }} />
         ) : (
-          <p className={styles.quoteText}>{text}</p>
+          <div ref={quoteRef} className={styles.quoteText}>
+            {wrappedLines
+              ? wrappedLines.map((line, i) => (
+                  <span
+                    key={i}
+                    className={
+                      line.indented
+                        ? styles.lineBesideSvg
+                        : styles.lineFullWidth
+                    }
+                  >
+                    {line.text}
+                  </span>
+                ))
+              : textHtml
+                ? <span dangerouslySetInnerHTML={{ __html: textHtml }} />
+                : text}
+          </div>
         )}
       </div>
 

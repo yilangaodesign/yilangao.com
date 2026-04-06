@@ -1,0 +1,79 @@
+'use client'
+
+import { useCallback, useRef } from 'react'
+import type { BlockType } from './useBlockManager'
+
+export interface BlockNavCallbacks {
+  onEnterAtEnd: (blockIndex: number) => void
+  onBackspaceAtStart: (blockIndex: number, isEmpty: boolean) => void
+  onArrowUp: (blockIndex: number) => void
+  onArrowDown: (blockIndex: number) => void
+}
+
+function focusBlock(index: number, position: 'start' | 'end' = 'start') {
+  requestAnimationFrame(() => {
+    const wrapper = document.querySelector(`[data-block-index="${index}"]`)
+    if (!wrapper) return
+
+    const editable =
+      wrapper.querySelector<HTMLElement>('[contenteditable="true"]') ??
+      wrapper.querySelector<HTMLElement>('[tabindex]')
+
+    if (editable) {
+      editable.focus()
+      if (position === 'end' && editable.isContentEditable) {
+        const sel = window.getSelection()
+        if (sel) {
+          sel.selectAllChildren(editable)
+          sel.collapseToEnd()
+        }
+      }
+    }
+  })
+}
+
+export default function useBlockKeyboardNav(
+  addBlock: (type: BlockType, atIndex?: number) => void,
+  deleteBlock: (index: number) => void,
+  blockCount: number,
+): BlockNavCallbacks {
+  const blockCountRef = useRef(blockCount)
+  blockCountRef.current = blockCount
+
+  const onEnterAtEnd = useCallback(
+    (blockIndex: number) => {
+      addBlock('richText', blockIndex + 1)
+      setTimeout(() => focusBlock(blockIndex + 1, 'start'), 300)
+    },
+    [addBlock],
+  )
+
+  const onBackspaceAtStart = useCallback(
+    (blockIndex: number, isEmpty: boolean) => {
+      if (!isEmpty || blockIndex === 0) return
+      deleteBlock(blockIndex)
+      setTimeout(() => focusBlock(blockIndex - 1, 'end'), 300)
+    },
+    [deleteBlock],
+  )
+
+  const onArrowUp = useCallback(
+    (blockIndex: number) => {
+      if (blockIndex > 0) {
+        focusBlock(blockIndex - 1, 'end')
+      }
+    },
+    [],
+  )
+
+  const onArrowDown = useCallback(
+    (blockIndex: number) => {
+      if (blockIndex < blockCountRef.current - 1) {
+        focusBlock(blockIndex + 1, 'start')
+      }
+    },
+    [],
+  )
+
+  return { onEnterAtEnd, onBackspaceAtStart, onArrowUp, onArrowDown }
+}

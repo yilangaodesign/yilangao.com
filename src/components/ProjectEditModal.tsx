@@ -16,6 +16,7 @@ interface MediaDoc {
 export interface ProjectForEdit {
   id: string | number
   title: string
+  introBlurbHeadline?: string
   category: string
   coverImage?: string | null
   heroImageId?: string | number | null
@@ -29,6 +30,7 @@ interface ProjectEditModalProps {
 
 export default function ProjectEditModal({ project, onClose, onSaved }: ProjectEditModalProps) {
   const [title, setTitle] = useState(project.title)
+  const [introBlurbHeadline, setIntroBlurbHeadline] = useState(project.introBlurbHeadline ?? '')
   const [category, setCategory] = useState(project.category)
   const [coverUrl, setCoverUrl] = useState(project.coverImage ?? null)
   const [heroImageId, setHeroImageId] = useState<number | string | null>(project.heroImageId ?? null)
@@ -100,6 +102,7 @@ export default function ProjectEditModal({ project, onClose, onSaved }: ProjectE
     try {
       const body: Record<string, unknown> = {}
       if (title !== project.title) body.title = title
+      if (introBlurbHeadline !== (project.introBlurbHeadline ?? '')) body.introBlurbHeadline = introBlurbHeadline
       if (category !== project.category) body.category = category
       if (heroImageId !== project.heroImageId) body.heroImage = heroImageId
 
@@ -126,7 +129,7 @@ export default function ProjectEditModal({ project, onClose, onSaved }: ProjectE
     } finally {
       setSaving(false)
     }
-  }, [title, category, heroImageId, project, onClose, onSaved])
+  }, [title, introBlurbHeadline, category, heroImageId, project, onClose, onSaved])
 
   const openDashboard = useCallback(() => {
     window.open(`/admin/collections/projects/${project.id}`, '_blank')
@@ -255,14 +258,25 @@ export default function ProjectEditModal({ project, onClose, onSaved }: ProjectE
           {/* Text fields */}
           <div className={styles.section}>
             <div className={styles.fieldGroup}>
-              <label className={styles.fieldLabel} htmlFor="project-title">Title</label>
+              <label className={styles.fieldLabel} htmlFor="project-title">App Name</label>
               <input
                 id="project-title"
                 type="text"
                 className={styles.fieldInput}
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="Project title"
+                placeholder="Application or product name"
+              />
+            </div>
+            <div className={styles.fieldGroup}>
+              <label className={styles.fieldLabel} htmlFor="project-headline">Case Study Title</label>
+              <input
+                id="project-headline"
+                type="text"
+                className={styles.fieldInput}
+                value={introBlurbHeadline}
+                onChange={(e) => setIntroBlurbHeadline(e.target.value)}
+                placeholder="Creative tension headline (6-10 words)"
               />
             </div>
             <div className={styles.fieldGroup}>

@@ -13,7 +13,33 @@ interface LexicalTextNode {
   version: 1
 }
 
-function collectTextNodes(node: Node, format: number): LexicalTextNode[] {
+function extractInlineStyle(el: HTMLElement, parentStyle: string): string {
+  const parts: string[] = []
+  if (parentStyle) parts.push(parentStyle)
+
+  if (el.tagName === 'FONT') {
+    const color = el.getAttribute('color')
+    if (color) parts.push(`color: ${color}`)
+  }
+
+  const inlineStyle = el.getAttribute('style') || ''
+  if (inlineStyle) {
+    const colorMatch = inlineStyle.match(/(?:^|;\s*)color\s*:\s*([^;]+)/i)
+    if (colorMatch) parts.push(`color: ${colorMatch[1].trim()}`)
+
+    const fontMatch = inlineStyle.match(/(?:^|;\s*)font-family\s*:\s*([^;]+)/i)
+    if (fontMatch) parts.push(`font-family: ${fontMatch[1].trim()}`)
+  }
+
+  const unique = new Map<string, string>()
+  for (const p of parts) {
+    const colon = p.indexOf(':')
+    if (colon > 0) unique.set(p.slice(0, colon).trim().toLowerCase(), p.trim())
+  }
+  return Array.from(unique.values()).join('; ')
+}
+
+function collectTextNodes(node: Node, format: number, style = ''): LexicalTextNode[] {
   const nodes: LexicalTextNode[] = []
 
   for (const child of Array.from(node.childNodes)) {
@@ -24,7 +50,7 @@ function collectTextNodes(node: Node, format: number): LexicalTextNode[] {
           mode: 'normal',
           text,
           type: 'text',
-          style: '',
+          style,
           detail: 0,
           format,
           version: 1,
@@ -38,7 +64,8 @@ function collectTextNodes(node: Node, format: number): LexicalTextNode[] {
       if (tag === 'I' || tag === 'EM') f |= 2
       if (tag === 'U') f |= 8
       if (tag === 'S' || tag === 'STRIKE' || tag === 'DEL') f |= 4
-      nodes.push(...collectTextNodes(el, f))
+      const childStyle = extractInlineStyle(el, style)
+      nodes.push(...collectTextNodes(el, f, childStyle))
     }
   }
 
@@ -50,7 +77,7 @@ function mergeAdjacentNodes(nodes: LexicalTextNode[]): LexicalTextNode[] {
   const merged: LexicalTextNode[] = [nodes[0]]
   for (let i = 1; i < nodes.length; i++) {
     const prev = merged[merged.length - 1]
-    if (prev.format === nodes[i].format) {
+    if (prev.format === nodes[i].format && prev.style === nodes[i].style) {
       prev.text += nodes[i].text
     } else {
       merged.push(nodes[i])
@@ -106,7 +133,8 @@ function splitIntoBlocks(container: Node): LexicalTextNode[][] {
       if (tag === 'I' || tag === 'EM') f |= 2
       if (tag === 'U') f |= 8
       if (tag === 'S' || tag === 'STRIKE' || tag === 'DEL') f |= 4
-      inline.push(...collectTextNodes(el, f))
+      const elStyle = extractInlineStyle(el, '')
+      inline.push(...collectTextNodes(el, f, elStyle))
     } else if (child.nodeType === Node.TEXT_NODE) {
       const text = child.textContent || ''
       if (text) {
@@ -293,8 +321,14 @@ export async function uploadMedia(
   alt: string,
 ): Promise<{ id: number | string; url: string }> {
   const formData = new FormData()
-  formData.append('file', file)
-  formData.append('alt', alt)
+
+  const ext = file.name.match(/\.[^.]+$/)?.[0] ?? ''
+  const stem = file.name.replace(/\.[^.]+$/, '')
+  const uniqueName = `${stem}-${Date.now()}${ext}`
+  const renamedFile = new File([file], uniqueName, { type: file.type })
+
+  formData.append('file', renamedFile)
+  formData.append('_payload', JSON.stringify({ alt }))
 
   const response = await fetch('/api/media', {
     method: 'POST',
@@ -355,10 +389,14 @@ export async function saveFields(
     for (const field of fields) {
       let value: unknown = field.currentValue
       if (field.isRichText) {
-        const str = String(value)
-        value = str.includes('<')
-          ? htmlToLexicalDocument(str)
-          : makeLexicalParagraph(str)
+        if (value && typeof value === 'object' && 'root' in (value as Record<string, unknown>)) {
+          // Already a Lexical JSON object — pass through directly
+        } else {
+          const str = String(value)
+          value = str.includes('<')
+            ? htmlToLexicalDocument(str)
+            : makeLexicalParagraph(str)
+        }
       }
       setNested(body, field.fieldPath, value)
     }

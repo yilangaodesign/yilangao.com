@@ -24,6 +24,7 @@ interface EditableTextProps {
   isRichText?: boolean
   htmlContent?: string
   label?: string
+  singleClickEdit?: boolean
   [htmlAttr: string]: unknown
 }
 
@@ -45,6 +46,7 @@ export default function EditableText({
   isRichText = false,
   htmlContent,
   label,
+  singleClickEdit = false,
   ...htmlAttrs
 }: EditableTextProps) {
   const ctx = useInlineEdit()
@@ -117,8 +119,9 @@ export default function EditableText({
       if (isEditing) return
       e.preventDefault()
       e.stopPropagation()
+      if (singleClickEdit) activate()
     },
-    [isAdmin, fieldId, isEditing],
+    [isAdmin, fieldId, isEditing, singleClickEdit, activate],
   )
 
   const handleDoubleClick = useCallback(
@@ -150,12 +153,19 @@ export default function EditableText({
 
         if (hasTextSelection(el)) {
           document.execCommand('bold', false)
-          handleInput()
         } else {
-          const computed = window.getComputedStyle(el)
-          const current = parseInt(computed.fontWeight, 10) || 400
-          el.style.fontWeight = current >= 700 ? '400' : '700'
+          const range = document.createRange()
+          range.selectNodeContents(el)
+          const sel = window.getSelection()
+          sel?.removeAllRanges()
+          sel?.addRange(range)
+          document.execCommand('bold', false)
+          range.collapse(false)
+          sel?.removeAllRanges()
+          sel?.addRange(range)
         }
+        el.style.removeProperty('font-weight')
+        handleInput()
         el.dispatchEvent(new CustomEvent('inlinestyle', { bubbles: true }))
         return
       }
@@ -167,11 +177,19 @@ export default function EditableText({
 
         if (hasTextSelection(el)) {
           document.execCommand('italic', false)
-          handleInput()
         } else {
-          const computed = window.getComputedStyle(el)
-          el.style.fontStyle = computed.fontStyle === 'italic' ? 'normal' : 'italic'
+          const range = document.createRange()
+          range.selectNodeContents(el)
+          const sel = window.getSelection()
+          sel?.removeAllRanges()
+          sel?.addRange(range)
+          document.execCommand('italic', false)
+          range.collapse(false)
+          sel?.removeAllRanges()
+          sel?.addRange(range)
         }
+        el.style.removeProperty('font-style')
+        handleInput()
         el.dispatchEvent(new CustomEvent('inlinestyle', { bubbles: true }))
         return
       }

@@ -26,18 +26,29 @@ export const WEIGHT_SCALE = [
   { token: '$portfolio-weight-bold', name: 'Bold', value: 700 },
 ] as const
 
-const COLOR_TOKENS = [
-  { token: '$portfolio-text-primary', name: 'text-primary', hex: '#161616' },
-  { token: '$portfolio-text-secondary', name: 'text-secondary', hex: '#525252' },
-  { token: '$portfolio-text-helper', name: 'text-helper', hex: '#6f6f6f' },
-  { token: '$portfolio-text-placeholder', name: 'text-placeholder', hex: '#a8a8a8' },
-  { token: '$portfolio-text-disabled', name: 'text-disabled', hex: '#c6c6c6' },
-  { token: '$portfolio-text-inverse', name: 'text-inverse', hex: '#ffffff' },
-  { token: '$portfolio-text-on-color', name: 'text-on-color', hex: '#ffffff' },
-  { token: '$portfolio-accent-50', name: 'accent-50', hex: '#4E6CFF' },
-  { token: '$portfolio-accent-60', name: 'accent-60', hex: '#3336FF' },
-  { token: '$portfolio-text-link', name: 'text-link', hex: '#3336FF' },
-  { token: '$portfolio-text-error', name: 'text-error', hex: '#da1e28' },
+export const FONT_FAMILY_SCALE = [
+  { token: '$portfolio-font-sans', name: 'Geist Sans', css: 'var(--font-geist-sans), system-ui, sans-serif' },
+  { token: '$portfolio-font-mono', name: 'Geist Mono', css: 'var(--font-geist-mono), ui-monospace, monospace' },
+  { token: '$portfolio-font-serif', name: 'Serif', css: 'Georgia, "Times New Roman", serif' },
+  { token: '$portfolio-font-pixel-square', name: 'Pixel Square', css: 'var(--font-geist-pixel-square), monospace' },
+  { token: '$portfolio-font-pixel-grid', name: 'Pixel Grid', css: 'var(--font-geist-pixel-grid), monospace' },
+  { token: '$portfolio-font-pixel-circle', name: 'Pixel Circle', css: 'var(--font-geist-pixel-circle), monospace' },
+  { token: '$portfolio-font-pixel-triangle', name: 'Pixel Triangle', css: 'var(--font-geist-pixel-triangle), monospace' },
+  { token: '$portfolio-font-pixel-line', name: 'Pixel Line', css: 'var(--font-geist-pixel-line), monospace' },
+] as const
+
+export const COLOR_TOKENS = [
+  { token: '$portfolio-text-primary', name: 'Black', hex: '#161616' },
+  { token: '$portfolio-text-secondary', name: 'Dark Gray', hex: '#525252' },
+  { token: '$portfolio-text-helper', name: 'Gray', hex: '#6f6f6f' },
+  { token: '$portfolio-text-placeholder', name: 'Light Gray', hex: '#a8a8a8' },
+  { token: '$portfolio-text-disabled', name: 'Muted', hex: '#c6c6c6' },
+  { token: '$portfolio-text-inverse', name: 'White', hex: '#ffffff' },
+  { token: '$portfolio-text-on-color', name: 'White (on color)', hex: '#ffffff' },
+  { token: '$portfolio-accent-50', name: 'Accent', hex: '#4E6CFF' },
+  { token: '$portfolio-accent-60', name: 'Accent Bold', hex: '#3336FF' },
+  { token: '$portfolio-text-link', name: 'Link Blue', hex: '#3336FF' },
+  { token: '$portfolio-text-error', name: 'Red', hex: '#da1e28' },
 ] as const
 
 export function matchFontSize(computedFontSize: string): TokenMatch {
@@ -89,6 +100,30 @@ function rgbToHex(rgb: string): string {
   const g = parseInt(match[2])
   const b = parseInt(match[3])
   return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`
+}
+
+export function matchFontFamily(computedFamily: string): TokenMatch {
+  const normalized = computedFamily.toLowerCase().replace(/["']/g, '')
+
+  for (const entry of FONT_FAMILY_SCALE) {
+    const entryFirst = entry.css.split(',')[0].trim().replace(/["']/g, '').toLowerCase()
+    if (normalized.includes(entryFirst)) {
+      return {
+        token: entry.token,
+        name: entry.name,
+        value: entry.css,
+        rawValue: computedFamily,
+      }
+    }
+  }
+
+  const displayName = computedFamily.split(',')[0].trim().replace(/["']/g, '')
+  return {
+    token: '(custom)',
+    name: displayName || computedFamily,
+    value: computedFamily,
+    rawValue: computedFamily,
+  }
 }
 
 export function matchColor(computedColor: string): TokenMatch {

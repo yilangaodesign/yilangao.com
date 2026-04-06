@@ -433,7 +433,7 @@ $accent-light: rgba($portfolio-accent-60, 0.06);
   cursor: pointer;
 
   &:hover {
-    background: darken($accent, 6%);
+    background: $portfolio-accent-70;
   }
 
   &:disabled {
@@ -562,7 +562,7 @@ $accent-light: rgba($portfolio-accent-60, 0.06);
   font-family: $portfolio-font-sans;
 
   &:hover {
-    background: darken($accent, 6%);
+    background: $portfolio-accent-70;
   }
 
   &:disabled {
@@ -831,10 +831,16 @@ $accent-light: rgba($portfolio-accent-60, 0.06);
   transition: background 0.15s, border-color 0.15s;
   font-family: inherit;
   white-space: nowrap;
+  outline: none;
 
   &:hover {
     background: var(--portfolio-overlay-white-12);
     border-color: var(--portfolio-overlay-white-20);
+  }
+
+  &:focus-visible {
+    outline: 2px solid $portfolio-accent-50;
+    outline-offset: -1px;
   }
 }
 
@@ -890,10 +896,17 @@ $accent-light: rgba($portfolio-accent-60, 0.06);
   text-align: left;
   font-family: inherit;
   transition: background 0.1s;
+  outline: none;
 
-  &:hover {
+  &:hover,
+  &[data-highlighted] {
     background: var(--portfolio-overlay-white-08);
     color: $portfolio-neutral-00;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $portfolio-accent-50;
+    outline-offset: -2px;
   }
 }
 
@@ -921,14 +934,14 @@ $accent-light: rgba($portfolio-accent-60, 0.06);
 .formatOptionMeta {
   font-family: var(--font-geist-mono, monospace);
   font-size: $portfolio-type-2xs;
-  color: $portfolio-neutral-70;
+  color: $portfolio-neutral-40;
 }
 
 .formatOptionToken {
   margin-left: auto;
   font-family: var(--font-geist-mono, monospace);
   font-size: $portfolio-type-4xs;
-  color: $portfolio-accent-60;
+  color: $portfolio-neutral-40;
 }
 
 .formatDivider {
@@ -952,11 +965,17 @@ $accent-light: rgba($portfolio-accent-60, 0.06);
   cursor: pointer;
   transition: background 0.15s, color 0.15s, border-color 0.15s;
   font-family: inherit;
+  outline: none;
 
   &:hover {
     background: var(--portfolio-overlay-white-08);
     color: $portfolio-neutral-30;
     border-color: var(--portfolio-overlay-white-16);
+  }
+
+  &:focus-visible {
+    outline: 2px solid $portfolio-accent-50;
+    outline-offset: -1px;
   }
 }
 
@@ -1012,4 +1031,723 @@ $accent-light: rgba($portfolio-accent-60, 0.06);
   font-size: $portfolio-type-2xs;
   color: $portfolio-accent-60;
   opacity: 0.8;
+}
+
+.formatColorGrid {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: $portfolio-spacer-0-5x;
+  min-width: 220px;
+  max-height: 320px;
+  overflow-y: auto;
+  background: #1a1a2e;
+  border: 1px solid var(--portfolio-overlay-white-12);
+  border-radius: var(--portfolio-radius-sm);
+  box-shadow: var(--portfolio-shadow-lg);
+  z-index: calc(var(--portfolio-z-admin-modal) + 3);
+  padding: $portfolio-spacer-0-5x;
+}
+
+.formatColorOption {
+  display: flex;
+  align-items: center;
+  gap: $portfolio-spacer-utility-0-75x;
+  width: 100%;
+  padding: $portfolio-spacer-utility-0-75x $portfolio-spacer-utility-1-25x;
+  background: transparent;
+  border: none;
+  border-radius: $portfolio-radius-xs;
+  color: $portfolio-neutral-30;
+  font-size: var(--portfolio-type-xs);
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  transition: background 0.1s;
+
+  &:hover {
+    background: var(--portfolio-overlay-white-08);
+    color: $portfolio-neutral-00;
+  }
+}
+
+.formatColorOptionActive {
+  background: rgba($portfolio-accent-60, 0.2);
+  color: $portfolio-accent-30;
+
+  &:hover {
+    background: rgba($portfolio-accent-60, 0.3);
+  }
+}
+
+.formatColorDot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1px solid var(--portfolio-overlay-white-20);
+  flex-shrink: 0;
+}
+
+.formatColorLabel {
+  font-weight: $portfolio-weight-medium;
+}
+
+/* ── Section Manager (admin-only) ── */
+
+.sectionToolbar {
+  position: absolute;
+  top: -12px;
+  right: 0;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px;
+  background: $portfolio-neutral-90;
+  border: 1px solid $portfolio-neutral-80;
+  border-radius: $portfolio-radius-sm;
+  box-shadow: var(--portfolio-shadow-sm);
+  z-index: var(--portfolio-z-admin);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 150ms ease;
+
+  [data-section-admin]:hover > &,
+  [data-section-admin]:focus-within > & {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+.sectionToolbarBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: transparent;
+  border: none;
+  border-radius: $portfolio-radius-xs;
+  color: $portfolio-neutral-30;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background: var(--portfolio-overlay-white-12);
+    color: $portfolio-neutral-00;
+  }
+
+  &:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+}
+
+.sectionToolbarBtnDanger {
+  &:hover:not(:disabled) {
+    background: rgba($portfolio-red-60, 0.2);
+    color: $portfolio-red-30;
+  }
+}
+
+.sectionToolbarBtnActive {
+  background: var(--portfolio-overlay-white-12);
+  color: $portfolio-neutral-00;
+}
+
+.sectionToolbarSep {
+  width: 1px;
+  height: 16px;
+  background: $portfolio-neutral-70;
+  margin: 0 2px;
+}
+
+.sectionToolbarLayoutWrap {
+  position: relative;
+}
+
+.sectionLayoutMenu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  min-width: 130px;
+  padding: 4px;
+  background: $portfolio-neutral-90;
+  border: 1px solid $portfolio-neutral-80;
+  border-radius: $portfolio-radius-sm;
+  box-shadow: var(--portfolio-shadow-md);
+  z-index: calc(var(--portfolio-z-admin) + 1);
+}
+
+.sectionLayoutOption {
+  display: flex;
+  align-items: center;
+  padding: 6px 10px;
+  font-size: $portfolio-type-xs;
+  font-weight: $portfolio-weight-regular;
+  font-family: $portfolio-font-sans;
+  color: $portfolio-neutral-30;
+  background: transparent;
+  border: none;
+  border-radius: $portfolio-radius-xs;
+  cursor: pointer;
+  text-align: left;
+
+  &:hover:not(:disabled) {
+    background: var(--portfolio-overlay-white-12);
+    color: $portfolio-neutral-00;
+  }
+
+  &:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+}
+
+.sectionLayoutOptionActive {
+  background: rgba($accent, 0.15);
+  color: $accent;
+
+  &:hover:not(:disabled) {
+    background: rgba($accent, 0.2);
+    color: $accent;
+  }
+}
+
+.addSectionBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $portfolio-spacer-utility-0-75x;
+  width: 100%;
+  padding: $portfolio-spacer-1-5x $portfolio-spacer-2x;
+  margin-top: $portfolio-spacer-3x;
+  font-size: $portfolio-type-sm;
+  font-weight: $portfolio-weight-medium;
+  font-family: $portfolio-font-sans;
+  color: $accent;
+  background: transparent;
+  border: 2px dashed rgba($accent, 0.3);
+  border-radius: $portfolio-radius-md;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+
+  &:hover:not(:disabled) {
+    background: rgba($accent, 0.04);
+    border-color: rgba($accent, 0.5);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.sectionAdminWrap {
+  position: relative;
+}
+
+/* ── Image Upload Zone ── */
+
+.uploadZone {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 120px;
+  border: 2px dashed rgba($accent, 0.3);
+  border-radius: $portfolio-radius-md;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  outline: none;
+
+  &:hover,
+  &:focus-visible {
+    background: rgba($accent, 0.04);
+    border-color: rgba($accent, 0.5);
+  }
+}
+
+.uploadZoneDragOver {
+  background: rgba($accent, 0.08);
+  border-color: $accent;
+  border-style: solid;
+}
+
+.uploadZoneUploading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.uploadInput {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  overflow: hidden;
+}
+
+.uploadContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $portfolio-spacer-utility-0-75x;
+  padding: $portfolio-spacer-2x;
+}
+
+.uploadIcon {
+  color: $accent;
+  opacity: 0.6;
+}
+
+.uploadLabel {
+  font-size: $portfolio-type-xs;
+  font-weight: $portfolio-weight-medium;
+  color: $accent;
+  font-family: $portfolio-font-sans;
+}
+
+.uploadError {
+  position: absolute;
+  bottom: $portfolio-spacer-utility-0-75x;
+  font-size: $portfolio-type-2xs;
+  color: var(--portfolio-text-error);
+  font-family: $portfolio-font-sans;
+}
+
+/* ── Image Manager ── */
+
+.imageManager {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $portfolio-spacer-1x;
+  align-items: flex-start;
+  padding: $portfolio-spacer-1x 0;
+}
+
+.imageManagerCard {
+  position: relative;
+  width: 80px;
+  height: 60px;
+  border-radius: $portfolio-radius-sm;
+  overflow: hidden;
+  border: 1px solid rgba($accent, 0.2);
+
+  &:hover .imageManagerOverlay {
+    opacity: 1;
+  }
+}
+
+.imageManagerThumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.imageManagerOverlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.imageManagerBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  border: none;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.15s;
+
+  &:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.3);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+.imageManagerBtnDanger {
+  &:hover:not(:disabled) {
+    background: rgba(239, 68, 68, 0.6);
+  }
+}
+
+.imageManagerAdd {
+  width: 80px;
+  height: 60px;
+  border-radius: $portfolio-radius-sm;
+  border: 2px dashed rgba($accent, 0.3);
+  background: transparent;
+  color: $accent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, border-color 0.15s;
+
+  &:hover:not(:disabled) {
+    background: rgba($accent, 0.04);
+    border-color: rgba($accent, 0.5);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+.imageManagerError {
+  width: 100%;
+  font-size: $portfolio-type-2xs;
+  color: var(--portfolio-text-error);
+  font-family: $portfolio-font-sans;
+}
+
+/* ── Block Editor Chrome ── */
+
+.blockToolbar {
+  display: flex;
+  align-items: center;
+  gap: $portfolio-spacer-utility-0-5x;
+  padding: $portfolio-spacer-utility-0-5x;
+  background: var(--portfolio-surface-secondary);
+  border: 1px solid var(--portfolio-border-subtle);
+  border-radius: $portfolio-radius-sm;
+  position: absolute;
+  top: -#{$portfolio-spacer-2x};
+  left: 0;
+  z-index: var(--portfolio-z-dropdown);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--portfolio-duration-fast) ease;
+}
+
+.blockToolbarSep {
+  width: 1px;
+  height: 16px;
+  background: var(--portfolio-border-subtle);
+  flex-shrink: 0;
+}
+
+.levelLabel {
+  font-size: $portfolio-type-xs;
+  font-weight: $portfolio-weight-bold;
+  line-height: 1;
+  font-family: $portfolio-font-sans;
+}
+
+.blockWrapper {
+  position: relative;
+
+  &:hover .blockToolbar,
+  &:focus-within .blockToolbar {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+.betweenBlockInsert {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  height: 20px;
+  opacity: 0;
+  transition: opacity var(--portfolio-duration-fast) ease;
+
+  &:hover,
+  &:focus-within {
+    opacity: 1;
+  }
+}
+
+.betweenBlockLine {
+  flex: 1;
+  height: 1px;
+  background: $accent;
+}
+
+.betweenBlockBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: $portfolio-radius-full;
+  border: 1px solid $accent;
+  background: var(--portfolio-surface-primary);
+  color: $accent;
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 0;
+  transition: background var(--portfolio-duration-fast) ease;
+
+  &:hover {
+    background: $accent;
+    color: $portfolio-neutral-00;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.blockError {
+  font-size: $portfolio-type-2xs;
+  color: var(--portfolio-text-error);
+  font-family: $portfolio-font-sans;
+  padding: $portfolio-spacer-utility-0-5x 0;
+}
+
+.dropZone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: $portfolio-spacer-1x;
+  min-height: 160px;
+  border: 2px dashed var(--portfolio-border-subtle);
+  border-radius: $portfolio-radius-md;
+  background: var(--portfolio-surface-secondary);
+  color: var(--portfolio-text-secondary);
+  font-size: $portfolio-type-sm;
+  font-family: $portfolio-font-sans;
+  cursor: pointer;
+  transition: border-color var(--portfolio-duration-fast) ease, background var(--portfolio-duration-fast) ease;
+
+  &:hover,
+  &:focus-visible {
+    border-color: $accent;
+    background: rgba($accent, 0.04);
+  }
+}
+
+.imageOverlay {
+  position: absolute;
+  top: $portfolio-spacer-utility-0-5x;
+  right: $portfolio-spacer-utility-0-5x;
+  display: flex;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity var(--portfolio-duration-fast) ease;
+
+  *:hover > &,
+  *:focus-within > & {
+    opacity: 1;
+  }
+}
+
+.imageOverlayBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: $portfolio-radius-sm;
+  background: rgba(0, 0, 0, 0.65);
+  color: $portfolio-neutral-00;
+  font-size: 11px;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.85);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+.imageOverlayBtnDanger {
+  &:hover {
+    background: rgba(200, 40, 40, 0.9);
+  }
+}
+
+.addBlockBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $portfolio-spacer-utility-0-5x;
+  width: 100%;
+  padding: $portfolio-spacer-1x;
+  border: 1px dashed var(--portfolio-border-subtle);
+  border-radius: $portfolio-radius-sm;
+  background: transparent;
+  color: var(--portfolio-text-secondary);
+  font-size: $portfolio-type-xs;
+  font-family: $portfolio-font-sans;
+  cursor: pointer;
+  transition: border-color var(--portfolio-duration-fast) ease, color var(--portfolio-duration-fast) ease;
+
+  &:hover {
+    border-color: $accent;
+    color: $accent;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+/* ── Lexical Block Editor ── */
+
+.lexEditorWrapper {
+  position: relative;
+}
+
+.lexContentEditable {
+  outline: none;
+  min-height: 1.5em;
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-base;
+  line-height: 1.7;
+  color: var(--portfolio-text-primary);
+  cursor: text;
+}
+
+.lexPlaceholder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: var(--portfolio-text-placeholder);
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-base;
+  line-height: 1.7;
+  pointer-events: none;
+  user-select: none;
+}
+
+.lexParagraph {
+  margin: 0 0 $portfolio-spacer-1x;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.lexBold {
+  font-weight: $portfolio-weight-bold;
+}
+
+.lexItalic {
+  font-style: italic;
+}
+
+.lexUnderline {
+  text-decoration: underline;
+}
+
+.lexStrikethrough {
+  text-decoration: line-through;
+}
+
+.lexCode {
+  font-family: $portfolio-font-mono;
+  font-size: 0.9em;
+  padding: 2px 4px;
+  background: var(--portfolio-surface-secondary);
+  border-radius: $portfolio-radius-xs;
+}
+
+/* ── Lexical Toolbar ── */
+
+.lexToolbar {
+  z-index: var(--portfolio-z-dropdown);
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px 6px;
+  background: var(--portfolio-surface-primary);
+  border: 1px solid var(--portfolio-border-subtle);
+  border-radius: $portfolio-radius-sm;
+  box-shadow: var(--portfolio-shadow-lg);
+  white-space: nowrap;
+}
+
+.lexToolbarBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: $portfolio-radius-xs;
+  background: transparent;
+  color: var(--portfolio-text-secondary);
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-xs;
+  cursor: pointer;
+  transition: background var(--portfolio-duration-fast) ease, color var(--portfolio-duration-fast) ease;
+
+  &:hover {
+    background: var(--portfolio-surface-secondary);
+    color: var(--portfolio-text-primary);
+  }
+}
+
+.lexToolbarBtnActive {
+  background: $accent-light;
+  color: $accent;
+}
+
+.lexToolbarSep {
+  display: block;
+  width: 1px;
+  height: 20px;
+  background: var(--portfolio-border-subtle);
+  margin: 0 4px;
+}
+
+.lexColorGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+  padding: 6px;
+}
+
+.lexColorSwatch {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--portfolio-border-subtle);
+  border-radius: $portfolio-radius-xs;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  transition: border-color var(--portfolio-duration-fast) ease;
+
+  &:hover {
+    border-color: $accent;
+  }
+}
+
+.lexColorDot {
+  display: block;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
 }

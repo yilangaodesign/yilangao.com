@@ -31,37 +31,65 @@
 }
 
 // ── QUOTE SECTION ─────────────────────────────────────────────────────────
+// SVG floats left; text wraps around it via CSS float (SSR) + pretext (client).
+// Works identically in admin and visitor modes.
+
+$_quote-svg-size: 32px;
+$_quote-wrap-gap: 12px;
 
 .quoteBlock {
-  display: flex;
-  flex-direction: column;
-  gap: $portfolio-spacing-02;
+  overflow: hidden;
 }
 
 .quoteMark {
-  font-family: $portfolio-font-pixel-square;
-  font-size: $portfolio-type-6xl;
-  line-height: 0.6;
+  width: $_quote-svg-size;
+  height: $_quote-svg-size;
   color: $portfolio-text-placeholder;
-  user-select: none;
+}
+
+.quoteMarkFloat {
+  float: left;
+  margin-right: $_quote-wrap-gap;
+  margin-bottom: $portfolio-spacing-02;
 }
 
 .quoteMarkEditable {
+  @include button-reset;
+  width: $_quote-svg-size;
+  height: $_quote-svg-size;
   cursor: pointer;
   transition: color $portfolio-duration-fast $portfolio-easing-standard;
 
   &:hover {
     color: $portfolio-accent-60;
   }
+
+  svg {
+    width: 100%;
+    height: 100%;
+  }
 }
 
 .quoteText {
+  margin: 0;
+  padding-top: $portfolio-spacing-03;
   font-family: $portfolio-font-sans;
   font-size: $portfolio-type-sm;
   font-weight: $portfolio-weight-regular;
   font-style: italic;
   line-height: $portfolio-leading-relaxed;
   color: $portfolio-text-secondary;
+}
+
+.lineBesideSvg {
+  display: block;
+  white-space: nowrap;
+}
+
+.lineFullWidth {
+  display: block;
+  white-space: nowrap;
+  clear: left;
 }
 
 // ── ATTRIBUTION ─────────────────────────────────────────────────────────────
@@ -79,7 +107,6 @@
   border-radius: $portfolio-radius-full;
   overflow: hidden;
   flex-shrink: 0;
-  background-color: $portfolio-surface-tertiary;
 }
 
 .avatarImage {
@@ -94,11 +121,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: $portfolio-font-sans;
+  font-family: $portfolio-font-pixel-square;
   font-size: $portfolio-type-xs;
-  font-weight: $portfolio-weight-semibold;
+  font-weight: 900;
   color: $portfolio-text-placeholder;
   text-transform: uppercase;
+  background-color: $portfolio-surface-tertiary;
 }
 
 .meta {
