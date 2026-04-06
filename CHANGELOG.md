@@ -4,6 +4,40 @@ All notable changes to the Élan design system are documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.5.0] — 2026-04-06
+
+Minor release: new Tooltip subsystem (InfoTooltip, TooltipProvider), block editor for inline editing, Etro case study API, expanded content framework.
+
+### Added
+
+- **InfoTooltip**: persistent informational tooltip component with configurable placement
+- **TooltipProvider**: context provider for coordinated tooltip behavior
+- **Content helpers**: `src/lib/content-helpers.ts` utility library for case study content processing
+- **Block editor subsystem**: Lexical-based block editor for inline editing (BlockToolbar, LexicalBlockEditor, LexicalToolbar, ImageManager, ImageUploadZone, SectionManager, useBlockKeyboardNav, useBlockManager)
+- **Etro API route**: new `update-etro` CMS update endpoint
+- **Content framework**: case study authoring guide, project dossiers (Elan, Etro, Lacework, Meteor), voice/narrative/personal-voice docs, case study review checklist, portfolio coherence guide, technical framing guide
+- **Agent skills**: case-study-authoring, plan-audit, plan-structure, stress-test
+- **Color tokens**: expanded palette with new custom property mappings
+- **YG logo**: added public SVG logo asset
+
+### Changed
+
+- **Button**: updated component API and SCSS module
+- **TestimonialCard**: updated both UI and site-level component styles
+- **Tooltip**: refactored core component with expanded SCSS module
+- **Inline edit**: expanded TextFormatBar, EditableText, and token-map with block editing support
+- **ProjectClient**: major expansion of case study rendering logic
+- **HomeClient**: updated layout and component integration
+- **Projects collection**: expanded CMS schema with new fields
+- **Playground sidebar**: migrated from CSS to SCSS module
+- **Playground tooltip page**: expanded with InfoTooltip demos
+- **Playground colors page**: expanded token visualization
+
+### Documentation
+
+- 33 doc files updated/added covering content, design, and engineering feedback logs, anti-patterns, and specialized guides
+- Magic words trigger reference added
+
 ## [2.4.1] — 2026-04-03
 
 Patch release: accent dark-half chroma optimization, rich text paragraph break fix, debug logging cleanup.
