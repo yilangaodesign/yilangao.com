@@ -29,6 +29,7 @@ $_btn-icon-xl: var(--portfolio-spacer-3x); // 24px
   white-space: nowrap;
   user-select: none;
   cursor: pointer;
+  text-decoration: none;
   @include transition-fast;
 
   &:focus-visible {

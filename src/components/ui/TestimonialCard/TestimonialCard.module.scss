@@ -16,8 +16,7 @@ $_testimonial-admin-gap: 4px;
   flex-direction: column;
   gap: var(--portfolio-spacer-1-5x);
   padding: var(--portfolio-spacer-2x);
-  background-color: var(--portfolio-surface-secondary);
-  border: 1px solid var(--portfolio-border-subtle);
+  background-color: var(--portfolio-surface-terra-subtle);
   border-radius: var(--portfolio-radius-sm);
   text-decoration: none;
   color: inherit;
@@ -37,37 +36,65 @@ $_testimonial-admin-gap: 4px;
 }
 
 // ── QUOTE SECTION ─────────────────────────────────────────────────────────
+// SVG floats left; text wraps around it via CSS float (SSR) + pretext (client).
+// Works identically in admin and visitor modes.
+
+$_quote-svg-size: 32px;
+$_quote-wrap-gap: 12px;
 
 .quoteBlock {
-  display: flex;
-  flex-direction: column;
-  gap: var(--portfolio-spacer-0-5x);
+  overflow: hidden;
 }
 
 .quoteMark {
-  font-family: var(--portfolio-font-pixel-square);
-  font-size: var(--portfolio-type-6xl);
-  line-height: 0.6;
-  color: var(--portfolio-text-placeholder);
-  user-select: none;
+  width: $_quote-svg-size;
+  height: $_quote-svg-size;
+  color: var(--portfolio-text-terra);
+}
+
+.quoteMarkFloat {
+  float: left;
+  margin-right: $_quote-wrap-gap;
+  margin-bottom: var(--portfolio-spacer-0-5x);
 }
 
 .quoteMarkEditable {
+  @include button-reset;
+  width: $_quote-svg-size;
+  height: $_quote-svg-size;
   cursor: pointer;
   transition: color var(--portfolio-duration-fast) var(--portfolio-easing-standard);
 
   &:hover {
     color: var(--portfolio-accent-60);
   }
+
+  svg {
+    width: 100%;
+    height: 100%;
+  }
 }
 
 .quoteText {
+  margin: 0;
+  padding-top: var(--portfolio-spacer-1x);
   font-family: var(--portfolio-font-sans);
   font-size: var(--portfolio-type-sm);
   font-weight: var(--portfolio-weight-regular);
   font-style: italic;
   line-height: var(--portfolio-leading-relaxed);
   color: var(--portfolio-text-secondary);
+}
+
+.lineBesideSvg {
+  display: block;
+  white-space: nowrap;
+}
+
+.lineFullWidth {
+  display: block;
+  white-space: nowrap;
+  clear: left;
 }
 
 // ── ATTRIBUTION ─────────────────────────────────────────────────────────────
@@ -85,7 +112,6 @@ $_testimonial-admin-gap: 4px;
   border-radius: var(--portfolio-radius-full);
   overflow: hidden;
   flex-shrink: 0;
-  background-color: var(--portfolio-surface-tertiary);
 }
 
 .avatarImage {
@@ -100,11 +126,12 @@ $_testimonial-admin-gap: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: var(--portfolio-font-sans);
+  font-family: var(--portfolio-font-pixel-square);
   font-size: var(--portfolio-type-xs);
-  font-weight: var(--portfolio-weight-semibold);
+  font-weight: 900;
   color: var(--portfolio-text-placeholder);
   text-transform: uppercase;
+  background-color: var(--portfolio-surface-tertiary);
 }
 
 .meta {
