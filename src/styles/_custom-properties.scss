@@ -42,6 +42,8 @@
   --portfolio-surface-positive-subtle: #{$portfolio-surface-positive-subtle};
   --portfolio-surface-warning-bold: #{$portfolio-surface-warning-bold};
   --portfolio-surface-warning-subtle: #{$portfolio-surface-warning-subtle};
+  --portfolio-surface-terra-bold: #{$portfolio-surface-terra-bold};
+  --portfolio-surface-terra-subtle: #{$portfolio-surface-terra-subtle};
   --portfolio-surface-overlay: #{$portfolio-surface-overlay};
   --portfolio-surface-always-dark: #{$portfolio-surface-always-dark};
   --portfolio-surface-always-light: #{$portfolio-surface-always-light};
@@ -78,6 +80,7 @@
   --portfolio-text-negative: #{$portfolio-text-negative};
   --portfolio-text-positive: #{$portfolio-text-positive};
   --portfolio-text-warning: #{$portfolio-text-warning};
+  --portfolio-text-terra: #{$portfolio-text-terra};
 
   // ── Icon ─────────────────────────────────────────────────────────────────
   --portfolio-icon-neutral-max: #{$portfolio-icon-neutral-max};
@@ -93,7 +96,6 @@
   --portfolio-icon-negative: #{$portfolio-icon-negative};
   --portfolio-icon-positive: #{$portfolio-icon-positive};
   --portfolio-icon-warning: #{$portfolio-icon-warning};
-
   // ── Border ───────────────────────────────────────────────────────────────
   --portfolio-border-neutral-bold: #{$portfolio-border-neutral-bold};
   --portfolio-border-neutral-regular: #{$portfolio-border-neutral-regular};
@@ -107,6 +109,7 @@
   --portfolio-border-negative: #{$portfolio-border-negative};
   --portfolio-border-positive: #{$portfolio-border-positive};
   --portfolio-border-warning: #{$portfolio-border-warning};
+  --portfolio-border-terra: #{$portfolio-border-terra};
 
   // ── Action ───────────────────────────────────────────────────────────────
   --portfolio-action-brand-bold: #{$portfolio-action-brand-bold};
@@ -328,6 +331,8 @@
   --portfolio-surface-positive-subtle: #{$portfolio-green-100};
   --portfolio-surface-warning-bold: #{$portfolio-yellow-30};
   --portfolio-surface-warning-subtle: #{$portfolio-yellow-100};
+  --portfolio-surface-terra-bold: #{$portfolio-neutral-80};    // Tier 2 neutral fallback — warmth is light-mode only
+  --portfolio-surface-terra-subtle: #{$portfolio-neutral-90};  // Tier 2 neutral fallback — warmth is light-mode only
   --portfolio-surface-overlay: rgba(0, 0, 0, 0.7);
 
   // ── Overlay interaction states ───────────────────────────────────────────
@@ -372,6 +377,7 @@
   --portfolio-text-negative: #{$portfolio-red-40};
   --portfolio-text-positive: #{$portfolio-green-40};
   --portfolio-text-warning: #{$portfolio-yellow-40};
+  --portfolio-text-terra: #{$portfolio-terra-40};
 
   // ── Icon ─────────────────────────────────────────────────────────────────
   --portfolio-icon-neutral-max: #FFFFFF;
@@ -397,6 +403,7 @@
   --portfolio-border-negative: #{$portfolio-red-50};
   --portfolio-border-positive: #{$portfolio-green-50};
   --portfolio-border-warning: #{$portfolio-yellow-50};
+  --portfolio-border-terra: #{$portfolio-terra-50};
 
   // ── Action ───────────────────────────────────────────────────────────────
   --portfolio-action-brand-bold: #{$portfolio-accent-50};

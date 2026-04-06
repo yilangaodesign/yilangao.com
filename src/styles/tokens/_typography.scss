@@ -4,7 +4,7 @@
 //   ──────────────────────────────   ─────────────────────   ──────────────   ──────────────────────
 //   $portfolio-font-sans           → Geist Sans            | Sans-serif      | Primary UI, headings, body, labels
 //   $portfolio-font-serif          → Georgia               | Serif           | Quotes only — never headings or body
-//   $portfolio-font-mono           → Geist Mono            | Monospace       | Code only — never data numbers
+//   $portfolio-font-mono           → Geist Mono            | Monospace       | Code + hero metrics (tabular data)
 //   $portfolio-font-pixel-*        → Geist Pixel variants  | Display/accent  | Decorative only — never UI elements
 
 $portfolio-font-sans: var(--font-geist-sans), 'Inter', system-ui, -apple-system, sans-serif;

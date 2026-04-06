@@ -252,6 +252,7 @@ for (const token of structured) {
 
 const KNOWN_FAMILIES = [
   "accent",
+  "terra",
   "neutral",
   "blue",
   "red",
@@ -264,8 +265,10 @@ const KNOWN_FAMILIES = [
   "magenta",
 ];
 
+const BRAND_ACCENTS = ["accent", "terra"];
+
 const EXTENDED_FAMILIES = KNOWN_FAMILIES.filter(
-  (f) => f !== "accent" && f !== "neutral"
+  (f) => !BRAND_ACCENTS.includes(f) && f !== "neutral"
 );
 
 function formatScale(prefix, steps) {
@@ -281,6 +284,7 @@ function titleCase(str) {
 }
 
 const accentSteps = palette.get("accent") || [];
+const terraSteps = palette.get("terra") || [];
 const neutralSteps = palette.get("neutral") || [];
 
 let generated = `${BEGIN_MARKER}
@@ -313,6 +317,7 @@ const scale = (prefix: string, values: Record<string, string>): ColorStep[] =>
 
 export const colors = {
   accent: ${formatScale("accent", accentSteps)},
+  terra: ${formatScale("terra", terraSteps)},
   neutral: ${formatScale("neutral", neutralSteps)},
   extended: [
 `;
@@ -395,7 +400,7 @@ const familyCount = EXTENDED_FAMILIES.filter((f) => palette.has(f)).length;
 const propCount = structured.length;
 const interactionCount = interaction.length;
 console.log(
-  `Synced: ${accentSteps.length} accent + ${neutralSteps.length} neutral + ${familyCount} extended families`
+  `Synced: ${accentSteps.length} accent + ${terraSteps.length} terra + ${neutralSteps.length} neutral + ${familyCount} extended families`
 );
 console.log(
   `Structured: ${propCount} property tokens across ${KNOWN_PROPERTIES.length} properties, ${interactionCount} interaction tokens`

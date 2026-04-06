@@ -46,6 +46,40 @@ $portfolio-accent-100: #070D29;  // oklch(0.17, 0.058, 269.7)
 
 
 // -----------------------------------------------------------------------------
+// 1b. Brand Accent (Terra Warm Amber) — NOT from Carbon
+// -----------------------------------------------------------------------------
+// Tier 2 (brand/marketing) accent. Content-layer only — no action or icon
+// tokens. Dark mode surfaces fall back to neutral. See docs/design/color.md §9.3b.
+//
+// Terra is a custom warm-amber scale built in OKLCH for perceptual uniformity,
+// following the same construction methodology as Lumen. The seed color
+// #FAF9F6 established the warm family direction; the hue was then tuned to
+// 70° for a richer, redder warmth that reads as amber/sienna rather than gold.
+//
+// Construction: OKLCH(L, C, 70°)
+//   Lightness — identical two-segment even ramp as Lumen:
+//               ΔL ≈ 0.093 (10–60), ΔL ≈ 0.081 (60–100)
+//   Chroma — sine bell peaking at step 60 (C = 0.135), tapering to extremes
+//            Scaled at 0.480× Lumen's peak to match warm earth-tone gamut
+//   Hue — constant 70° across all steps (no hue discontinuity)
+//
+// The scale progresses from warm cream (#f5f1ec) through caramel/sienna to
+// rich umber (#170d03), providing a full-range warm accent complement to
+// Lumen's cool blue-violet.
+
+$portfolio-terra-10: #f5f1ec;   // oklch(0.96, 0.008, 70)
+$portfolio-terra-20: #e0d0bf;   // oklch(0.87, 0.030, 70)
+$portfolio-terra-30: #ccb091;   // oklch(0.77, 0.053, 70)
+$portfolio-terra-40: #b89062;   // oklch(0.68, 0.079, 70)
+$portfolio-terra-50: #a4702c;   // oklch(0.59, 0.106, 70)
+$portfolio-terra-60: #915000;   // oklch(0.50, 0.135, 70) — brand anchor
+$portfolio-terra-70: #743b00;   // oklch(0.41, 0.123, 70)
+$portfolio-terra-80: #542a00;   // oklch(0.33, 0.096, 70)
+$portfolio-terra-90: #341b00;   // oklch(0.25, 0.062, 70)
+$portfolio-terra-100: #170d03;  // oklch(0.17, 0.028, 70)
+
+
+// -----------------------------------------------------------------------------
 // 2. Neutral Gray — Matches Carbon Gray exactly
 // -----------------------------------------------------------------------------
 // The neutral-05 step (#F9F9F9) is a yilangao.com addition; Carbon jumps
@@ -204,6 +238,8 @@ $portfolio-surface-positive-bold: $portfolio-green-60;
 $portfolio-surface-positive-subtle: $portfolio-green-10;
 $portfolio-surface-warning-bold: $portfolio-yellow-30;
 $portfolio-surface-warning-subtle: $portfolio-yellow-10;
+$portfolio-surface-terra-bold: $portfolio-terra-60;
+$portfolio-surface-terra-subtle: $portfolio-terra-10;
 $portfolio-surface-overlay: rgba(0, 0, 0, 0.5);
 
 // — Always tokens (invariant across color modes — One GS surface/always pattern)
@@ -254,6 +290,7 @@ $portfolio-text-always-dark-bold: $portfolio-neutral-100;
 $portfolio-text-negative: $portfolio-red-60;
 $portfolio-text-positive: $portfolio-green-60;
 $portfolio-text-warning: $portfolio-yellow-60;
+$portfolio-text-terra: $portfolio-terra-60;
 
 // — Icon ··································································
 $portfolio-icon-neutral-max: #000000;
@@ -269,7 +306,6 @@ $portfolio-icon-always-dark-bold: $portfolio-neutral-100;
 $portfolio-icon-negative: $portfolio-red-60;
 $portfolio-icon-positive: $portfolio-green-60;
 $portfolio-icon-warning: $portfolio-yellow-60;
-
 // — Border ································································
 $portfolio-border-neutral-bold: $portfolio-neutral-100;
 $portfolio-border-neutral-regular: $portfolio-neutral-50;
@@ -283,6 +319,7 @@ $portfolio-border-always-dark: $portfolio-neutral-100;
 $portfolio-border-negative: $portfolio-red-60;
 $portfolio-border-positive: $portfolio-green-60;
 $portfolio-border-warning: $portfolio-yellow-60;
+$portfolio-border-terra: $portfolio-terra-60;
 
 // — Action ································································
 $portfolio-action-brand-bold: $portfolio-accent-60;
@@ -295,7 +332,6 @@ $portfolio-action-always-light: $portfolio-neutral-00;
 $portfolio-action-negative: $portfolio-red-60;
 $portfolio-action-positive: $portfolio-green-60;
 $portfolio-action-warning: $portfolio-yellow-60;
-
 // — Action state tokens (hover, pressed, disabled)
 $portfolio-action-brand-bold-hover: $portfolio-accent-70;
 $portfolio-action-brand-bold-pressed: $portfolio-accent-80;
