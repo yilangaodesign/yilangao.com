@@ -4,7 +4,35 @@
 >
 > **Who reads this:** AI agents when the `ship-it` skill is activated — scan recent entries for recurring pitfalls before starting a new release.
 > **Who writes this:** AI agents after each ship-it run via the Post-Release Audit protocol in `ship-it/SKILL.md`.
-> **Last updated:** 2026-04-03 (REL-005: Élan 2.4.1, ASCII Art Studio 0.4.1)
+> **Last updated:** 2026-04-06 (REL-006: Élan 2.5.0, ASCII Art Studio 0.5.0)
+
+---
+
+## REL-006 — Élan 2.5.0, ASCII Art Studio 0.5.0 (2026-04-06)
+
+**Scope:** 104 files across 9 layer commits + release commit + 2 build-gate fix commits + dev patch bump
+**Semver:** Minor — new Tooltip subsystem (InfoTooltip, TooltipProvider), block editor for inline editing, Etro API route, expanded content framework
+**Previous release:** Élan 2.4.1, ASCII Art Studio 0.4.1
+
+**Incidents during release:**
+
+1. **Build gate failure #1 — type predicate on destructured binding** (TypeScript error)
+   `ProjectClient.tsx` used `.filter(({ block }): block is ...` which TypeScript rejects — type predicates cannot reference destructured elements. Fixed by rewriting as `.filter((item): item is ...`.
+
+2. **Build gate failure #2 — wrong pretext API** (TypeScript error)
+   `TestimonialCard.tsx` called `pretext.layoutNextLineRange()` and `pretext.materializeLineRange()`, which don't exist on the main export (`layout.d.ts`). The correct API is `pretext.layoutNextLine()` which returns a `LayoutLine` with `.text` directly. Fixed by consolidating to `layoutNextLine`.
+
+3. **REL-AP-005 triggered — dead `src/lib/utils.ts`** (caught in Phase 1)
+   Same file from REL-004 was re-created — imports `tailwind-merge` (not installed), not imported by anything. Caught during Phase 1 classification per the pitfall check. Deleted before committing.
+
+**Layer classification notes:**
+- Largest release to date: 104 files across 9 layers (no empty layers except 4 and 10).
+- Layer 1 (Docs) had 33 files — the content framework expansion (14 new doc files).
+- Layer 5 applied REL-AP-003 (component family rule) for Tooltip directory.
+- Layer 7 (Site components) had 18 files — the block editor subsystem is the largest single feature.
+- 8 macOS duplicate junk files cleaned in Phase 2 (same `* 2.*` pattern as REL-004).
+
+**Outcome:** All 3 builds passed after 2 fix commits. Fast-forward merge to main. Playground deployed Ready in 53s. Main site responding 200 at `https://new.yilangao.com`.
 
 ---
 
