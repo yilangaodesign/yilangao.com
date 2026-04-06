@@ -19,6 +19,13 @@ Don't just fix the surface-level complaint. Ask:
 - **Why does this matter to a hiring manager?** (conversion, engagement, credibility)
 - **Is this the same category as a previous complaint?** (check feedback log)
 
+**Rebuild redirect (check first):**
+If the feedback is a full rebuild request — not a specific text fix but "redo this
+case study," "rebuild from scratch," "apply the new framework," or general
+dissatisfaction with the entire case study — redirect to the `case-study-authoring`
+skill at `.cursor/skills/case-study-authoring/SKILL.md` (Phase 1b: Rebuild). Do
+not process a full rebuild through the iteration loop.
+
 **Cross-category check (mandatory):**
 > If `[ORCHESTRATED]`: skip this cross-category check. The orchestrator already
 > decomposed the request into category-specific tasks.
@@ -37,6 +44,7 @@ Before making changes:
 5. Read the first 30 lines of `docs/content-feedback-log.md` (most recent entries) for recurring patterns.
 6. If the feedback touches an area covered by archived entries, skim `docs/content-feedback-synthesis.md` (when it exists) for historical context.
 7. If a documented solution exists, **apply it directly** — don't re-derive.
+8. If the feedback touches a specific case study, also read the Portfolio Coherence Manifest (`docs/content/portfolio-coherence.md`) to check if the proposed edit would break portfolio-wide diversity on any of the six dimensions.
 
 ### Step 3: Diagnose Root Cause
 
@@ -47,10 +55,47 @@ If it's a new issue:
 
 ### Step 4: Implement the Fix
 
-- Follow the inverted pyramid — lead with outcome, not context.
+- Follow the inverted pyramid - lead with outcome, not context.
 - Maintain 80-85% visual, 15-20% text ratio.
-- Every word must earn its place — cut generic language.
+- Every word must earn its place - cut generic language.
 - Verify the fix reads correctly at the hiring manager's scan speed (15-60 seconds).
+
+**When feedback targets a section title or blurb headline:** Headlines are a
+different compositional level than body text. Do not apply body-text refinement
+to headline-level problems. Read `personal-voice.md` Techniques 6-10 (headline
+composition) and `case-study.md` §3.4 (title archetypes). Rewrite the title using
+the selection heuristic from the case-study-authoring skill Phase 2 Step 4 and run
+the Standalone Test before presenting the fix.
+
+### Step 4b: Voice Refinement Protocol (when user provides raw draft text)
+
+When the user provides replacement text - not just a complaint but actual
+draft copy - the processing is different from a standard fix.
+
+**Detection:** The user's message contains quotation marks or a block of text
+that reads as draft copy (not instructions). Phrases like "I wrote this," "my
+draft," "here's what I'd say," or raw text with grammatical roughness.
+
+**Processing:**
+
+1. Read the user's draft. Identify the register, rhythm, and devices.
+2. Apply Tier 1 constraints (see `personal-voice.md` Part C): banned words,
+   em dashes, thesis coherence, word counts, no credential performance.
+3. Preserve Tier 2 elements: fragment density, rhetorical questions, cultural
+   references, informal grammar that carries personality, sentence rhythm.
+4. Tighten logic where the draft drifts from the thesis - but tighten the
+   CONNECTION, don't cut the drift. The drift may reveal how the user thinks.
+5. Fix grammar errors: typos, unclear antecedents, subject-verb disagreement.
+   Do NOT fix informalities that carry voice ("Me too." stays as-is).
+6. **Voice-flattening test:** Compare the refined version against the original
+   draft. If the refined version is less vivid, less specific, or less personal,
+   the refinement over-corrected. Restore the original's energy.
+
+**The rule:** When a Tier 2 constraint conflicts with the user's draft, the
+user's draft wins.
+
+See `personal-voice.md` Part C for the full Tier 1/Tier 2 definition and the
+voice-flattening test. See also CAP-023 in `docs/content-anti-patterns.md`.
 
 ### Step 5: Close the Loop — Update Documentation
 
@@ -75,6 +120,22 @@ After resolving the feedback:
 5. **Cross-category documentation (if Step 1 identified other dimensions):**
    - If design dimension exists → also append to `docs/design-feedback-log.md`
    - If engineering dimension exists → also append to `docs/engineering-feedback-log.md`
+
+6. **Update the project dossier** (if the feedback touches a specific case study):
+   - Check if `docs/content/projects/{slug}.md` exists. If it doesn't and this is
+     the 3rd+ feedback entry for this project, create one by synthesizing existing
+     log entries.
+   - **Tiered updates** (not every edit warrants a full dossier entry):
+     - *Always:* Append one line to the Evolution Timeline section.
+     - *On explicit praise:* Add to Positive Signals. Classify as Type A
+       (content-specific — recyclable only if future thesis demands it) or Type B
+       (principle-level — always transferable).
+     - *On explicit frustration/rejection:* Add to Frustration Log with root cause.
+     - *On thesis change or significant structural pivot:* Update Current State;
+       archive old thesis in Evolution Timeline.
+     - *On interactive visual change:* Update Interactive Visual History.
+   - When a style preference pattern emerges (same correction 2+ times for this
+     project), add to Style Preferences.
 
 ## Escalation Triggers
 
@@ -105,3 +166,5 @@ When `[ORCHESTRATED]` appears in your context:
 | `docs/content-feedback-log.md` | Chronological feedback history (30 most recent entries) | Session start, during feedback | After each feedback resolution |
 | `docs/content-anti-patterns.md` | Things to never do | Before writing content | After discovering a new anti-pattern |
 | `docs/content-feedback-synthesis.md` | Distilled lessons from archived entries | When historical context needed | When archiving entries reveals new patterns |
+| `docs/content/personal-voice.md` | Named voice techniques, refinement protocol | When user provides raw draft text (Step 4b) | Never (spoke) |
+| `docs/content/projects/{slug}.md` | Per-project dossier (evolution, signals, frustrations) | When feedback targets a specific case study | After resolving feedback (tiered — see Step 5.6) |

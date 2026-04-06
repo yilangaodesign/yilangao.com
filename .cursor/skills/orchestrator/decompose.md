@@ -41,6 +41,15 @@ a task writes to, identify which gates apply:
 These gates are NOT sent to helpers. The orchestrator runs them in Phase 4
 after all implementation helpers have returned.
 
+## Dispatchable Skills
+
+| Skill | When to dispatch | Notes |
+|-------|-----------------|-------|
+| `content-iteration` | Specific content feedback on existing text | Standard content fixes |
+| `design-iteration` | Visual, spacing, interaction feedback | Standard design fixes |
+| `engineering-iteration` | Data, build, infra issues | Standard engineering fixes |
+| `case-study-authoring` | Full case study creation or rebuild | Dual-entry (1a: raw materials, 1b: rebuild). If the authoring task identifies Tier 3 interactive artifacts (new components to build), the orchestrator must dispatch BOTH a content helper (authoring skill) and an engineering helper (component creation from the interactive component spec). |
+
 ## Output
 
 After decomposition, produce:

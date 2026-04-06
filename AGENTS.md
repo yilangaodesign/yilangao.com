@@ -31,6 +31,7 @@ dispatched by the orchestrator. Follow these rules:
 4. **NEVER** describe an internal tool with paragraphs when screenshots exist — replace every descriptive paragraph with a full-width screenshot + one-line caption
 5. **NEVER** respond to content feedback without FIRST completing all documentation steps — append to `docs/content-feedback-log.md`, check if a new anti-pattern belongs in `docs/content-anti-patterns.md`, update the frequency map in `docs/content.md`. The fix is not done until the documentation is done.
 6. **ALWAYS** include a scope statement (2-4 sentences) at the top of every case study that simultaneously communicates: what the company/product does, what you specifically did, and evidence of scale/impact
+7. **NEVER** use em dashes (U+2014) in any portfolio text. Use a regular dash surrounded by spaces ( - ) or split into separate sentences. Em dashes are an AI voice tell. See `docs/content/voice-style.md` line 73 and CAP-022. Violated 6+ times in a single writing pass (CFB-022).
 
 **Engineering:**
 1. **NEVER** respond to the user after fixing a bug or incident without FIRST completing all documentation steps — append to `docs/engineering-feedback-log.md`, check if a new anti-pattern belongs in `docs/engineering-anti-patterns.md`, update the frequency map in `docs/engineering.md`. The fix is not done until the documentation is done. This applies even when the bug was reported mid-task — pause, document, then respond.
@@ -68,7 +69,7 @@ dispatched by the orchestrator. Follow these rules:
 > If `[ORCHESTRATED]` appears in your context, skip Pre-Flight entirely.
 > Your routing has been done. Proceed directly to your dispatched task.
 
-Before writing code, classify your task. Read ONLY the docs that match — use the Section Index at the top of each doc to target-read, not read everything.
+Before writing code, classify your task. Read ONLY the docs that match — use the Section Index at the top of each doc to target-read, not read everything. For a quick reference of all magic-word triggers, see [`docs/magic-words.md`](docs/magic-words.md). When adding a new trigger phrase, check that file for collisions first.
 
 **CRITICAL — Multi-Category Classification (Step 0):**
 User feedback is rarely one-dimensional. Before routing, ask: **does this feedback touch more than one category?** A single piece of feedback can simultaneously be:
@@ -156,7 +157,48 @@ skill assignment, and gate identification internally.
     → Activate `boot-up` skill at `.cursor/skills/boot-up/SKILL.md`.
     → Probes ports, starts what's missing, waits for HTTP 200, updates the port registry.
 
+15. **Am I writing a new case study from raw materials, or rebuilding an existing one?**
+    (triggers: "write up", "write this up", "draft this", "turn this into a case study",
+    "redo/rebuild/rethink this case study", "apply the new framework to X",
+    "this case study doesn't work", or user provides raw notes/transcripts/project details)
+    → Activate `case-study-authoring` skill at `.cursor/skills/case-study-authoring/SKILL.md`.
+    → The skill's intake protocol detects the scenario and routes to the correct entry point.
+    → If the rebuild involves new interactive components (Tier 3 artifacts), the skill
+      may trigger the orchestrator for cross-category dispatch.
+
 Do NOT read docs that don't match your task. Do NOT read full doc files when only one section is relevant. The Section Index exists so you can target-read.
+
+# Self-Audit Protocol
+
+> These routes activate in ANY mode when the user requests quality evaluation
+> of a plan, proposal, or existing content. They are quality gates on the
+> agent's output, not on the work the output describes.
+>
+> Pre-Flight handles task routing ("what work am I doing?").
+> Self-Audit Protocol handles output evaluation ("is my output sound?").
+> Mid-Flight handles implementation verification ("did the code land?").
+> Post-Flight handles documentation ("what did I learn?").
+>
+> Workflows 1 and 2 are read-only by design and work in any mode.
+> Workflow 3 requires write access; if in a read-only mode, note the
+> requirement and let the user/system handle the transition.
+
+16. **Is the user asking me to adversarially audit a plan or proposal?**
+    (triggers: "pressure test plan")
+    → Activate `plan-audit` skill at `.cursor/skills/plan-audit/SKILL.md`.
+    → Prerequisite: a plan, proposal, or set of proposed changes exists in context.
+    → Mode: any (read-only skill).
+
+17. **Is the user asking me to check a plan's structure and sequencing?**
+    (triggers: "meta audit plan")
+    → Activate `plan-structure` skill at `.cursor/skills/plan-structure/SKILL.md`.
+    → Prerequisite: a plan or proposal exists and its logical content is finalized.
+    → Mode: any (read-only skill).
+
+18. **Is the user asking me to stress-test existing content?**
+    (triggers: "content stress test", "fresh eyes", "recheck portfolio")
+    → Activate `stress-test` skill at `.cursor/skills/stress-test/SKILL.md`.
+    → Mode: requires write access (modifies files, pushes to CMS).
 
 # Mid-Flight: Verification Gate
 

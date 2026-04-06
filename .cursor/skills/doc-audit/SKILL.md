@@ -53,6 +53,7 @@ Hub docs:
 - `docs/content.md`
 - `docs/architecture.md`
 - `docs/port-registry.md`
+- `docs/magic-words.md`
 
 Spoke directories (scan all files in each):
 - `docs/design/*.md`
@@ -87,6 +88,9 @@ All skills:
 - `.cursor/skills/cross-app-parity/SKILL.md`
 - `.cursor/skills/cms-parity/SKILL.md`
 - `.cursor/skills/doc-audit/SKILL.md` (this file — check for self-referential consistency)
+- `.cursor/skills/plan-audit/SKILL.md`
+- `.cursor/skills/plan-structure/SKILL.md`
+- `.cursor/skills/stress-test/SKILL.md`
 
 ### Check A: Semantic Duplicates
 
