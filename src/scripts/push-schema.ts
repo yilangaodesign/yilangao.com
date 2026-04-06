@@ -70,6 +70,45 @@ async function pushSchema() {
     EXCEPTION
       WHEN duplicate_column THEN NULL;
     END $$`,
+
+    // Add layout column to projects_sections
+    `DO $$ BEGIN
+      ALTER TABLE "projects_sections" ADD COLUMN "layout" varchar DEFAULT 'auto';
+    EXCEPTION
+      WHEN duplicate_column THEN NULL;
+    END $$`,
+
+    // Add show_divider column to projects_sections
+    `DO $$ BEGIN
+      ALTER TABLE "projects_sections" ADD COLUMN "show_divider" boolean DEFAULT true;
+    EXCEPTION
+      WHEN duplicate_column THEN NULL;
+    END $$`,
+
+    // Add caption column to projects_sections_images
+    `DO $$ BEGIN
+      ALTER TABLE "projects_sections_images" ADD COLUMN "caption" varchar;
+    EXCEPTION
+      WHEN duplicate_column THEN NULL;
+    END $$`,
+
+    // Fix testimonials.text column type: varchar → jsonb (richText field)
+    // Payload auto-push can't do this cast; without it, payloadInitError crashes the whole site
+    `DO $$ BEGIN
+      ALTER TABLE "testimonials" ALTER COLUMN "text" TYPE jsonb USING text::jsonb;
+    EXCEPTION
+      WHEN others THEN NULL;
+    END $$`,
+
+    // Allow hero blocks without an image (placeholder heroes)
+    `ALTER TABLE "projects_blocks_hero" ALTER COLUMN "image_id" DROP NOT NULL`,
+
+    // Add placeholder_label to hero blocks for skeleton labels
+    `DO $$ BEGIN
+      ALTER TABLE "projects_blocks_hero" ADD COLUMN "placeholder_label" varchar;
+    EXCEPTION
+      WHEN duplicate_column THEN NULL;
+    END $$`,
   ]
 
   for (const sql of statements) {

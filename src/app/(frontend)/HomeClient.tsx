@@ -43,6 +43,7 @@ type Project = {
   id?: string | number;
   slug: string;
   title: string;
+  introBlurbHeadline?: string;
   category: string;
   featured: boolean;
   coverImage?: string | null;
@@ -107,14 +108,14 @@ function ProjectCard({ project, isAdmin, onEdit }: { project: Project; isAdmin?:
       </div>
       <div className={styles.projectInfo}>
         <EditableText
-          fieldId={`projects:${project.id}:title`}
+          fieldId={`projects:${project.id}:introBlurbHeadline`}
           target={projectTarget(project.id!)}
-          fieldPath="title"
+          fieldPath="introBlurbHeadline"
           as="h3"
           className={styles.projectTitle}
-          label="Title"
+          label="Case Study Title"
         >
-          {project.title}
+          {project.introBlurbHeadline || project.title}
         </EditableText>
         <EditableText
           fieldId={`projects:${project.id}:category`}
@@ -321,6 +322,7 @@ export default function HomeClient({
     setEditingProject({
       id: p.id,
       title: p.title,
+      introBlurbHeadline: p.introBlurbHeadline ?? '',
       category: p.category,
       coverImage: p.coverImage ?? null,
       heroImageId: p.heroImageId ?? null,
@@ -400,6 +402,19 @@ export default function HomeClient({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ gridOrder: newGridOrder }),
       });
+
+      const projectItems = orderedItems.filter((it) => it.type === "project");
+      await Promise.all(
+        projectItems.map((item, idx) =>
+          fetch(`/api/projects/${(item.data as Project).id}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({ order: idx + 1 }),
+          }),
+        ),
+      );
+
       setHasPendingSave(true);
       setReorderMode(false);
       router.refresh();
@@ -452,16 +467,24 @@ export default function HomeClient({
           <div className={styles.sidebarInner}>
             <FadeIn>
               <header className={styles.identity}>
-                <EditableText
-                  fieldId="sc:name"
-                  target={SITE_CONFIG_TARGET}
-                  fieldPath="name"
-                  as="h1"
-                  className={styles.name}
-                  label="Name"
-                >
-                  {siteConfig.name}
-                </EditableText>
+                <div className={styles.nameRow}>
+                  <img
+                    src="/images/yg-logo.svg"
+                    alt=""
+                    className={styles.nameLogo}
+                    aria-hidden="true"
+                  />
+                  <EditableText
+                    fieldId="sc:name"
+                    target={SITE_CONFIG_TARGET}
+                    fieldPath="name"
+                    as="h1"
+                    className={styles.name}
+                    label="Name"
+                  >
+                    {siteConfig.name}
+                  </EditableText>
+                </div>
                 <EditableText
                   fieldId="sc:role"
                   target={SITE_CONFIG_TARGET}

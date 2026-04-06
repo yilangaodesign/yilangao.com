@@ -47,6 +47,8 @@ export function lexicalToHtml(value: unknown): string {
     if (fmt & FORMAT_ITALIC) html = `<em>${html}</em>`;
     if (fmt & FORMAT_UNDERLINE) html = `<u>${html}</u>`;
     if (fmt & FORMAT_STRIKETHROUGH) html = `<s>${html}</s>`;
+    const style = typeof node.style === 'string' ? node.style : '';
+    if (style) html = `<span style="${escapeHtml(style)}">${html}</span>`;
     return html;
   }
 

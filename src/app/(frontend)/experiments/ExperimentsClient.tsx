@@ -12,6 +12,7 @@ import {
 } from "@/components/inline-edit";
 import type { ApiTarget } from "@/components/inline-edit";
 import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import styles from "./page.module.scss";
 
@@ -207,7 +208,19 @@ export default function ExperimentsClient({ experiments, isAdmin }: { experiment
           transition={{ duration: 0.6, ease: [0.2, 0, 0.38, 0.9] }}
         >
           <p className={styles.footerCtaText}>More experiments coming soon.</p>
-          <Link href="/" className={styles.backLink}>&larr; Back to Home</Link>
+          <Button
+            href="/"
+            appearance="neutral"
+            emphasis="minimal"
+            size="sm"
+            leadingIcon={
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                <path d="M8.5 3L4.5 7L8.5 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            }
+          >
+            Back to Home
+          </Button>
         </motion.div>
       </section>
 

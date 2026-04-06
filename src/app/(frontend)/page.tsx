@@ -51,7 +51,7 @@ const FALLBACK_TESTIMONIALS = [
 ];
 
 export default async function Home() {
-  let projects: { id?: string | number; slug: string; title: string; category: string; featured: boolean; coverImage?: string | null; heroImageId?: string | number | null }[] = FALLBACK_PROJECTS;
+  let projects: { id?: string | number; slug: string; title: string; introBlurbHeadline?: string; category: string; featured: boolean; coverImage?: string | null; heroImageId?: string | number | null }[] = FALLBACK_PROJECTS;
   let testimonials: { id?: string | number; text: string; textHtml?: string; name: string; role: string; avatarUrl?: string | null; linkedinUrl?: string | null }[] = FALLBACK_TESTIMONIALS;
   let teams = FALLBACK_TEAMS;
   let links = FALLBACK_LINKS;
@@ -80,6 +80,7 @@ export default async function Home() {
           id: p.id,
           slug: p.slug,
           title: p.title,
+          introBlurbHeadline: (p as Record<string, unknown>).introBlurbHeadline as string | undefined,
           category: p.category,
           featured: p.featured ?? false,
           coverImage: hero?.url ?? null,

@@ -66,12 +66,24 @@
   }
 }
 
+.nameRow {
+  display: flex;
+  align-items: center;
+  gap: $portfolio-spacer-0-5x;
+}
+
+.nameLogo {
+  height: calc($portfolio-type-2xl * 1.2);
+  width: auto;
+  flex-shrink: 0;
+}
+
 .name {
   font-family: $portfolio-font-sans;
   font-size: $portfolio-type-2xl;
-  font-weight: $portfolio-weight-medium;
+  font-weight: $portfolio-weight-bold;
   line-height: $portfolio-leading-snug;
-  color: $portfolio-text-primary;
+  color: $portfolio-accent-60;
   letter-spacing: $portfolio-tracking-tight;
 }
 
@@ -146,13 +158,16 @@
 }
 
 .teamLink {
-  @include body-sm-medium;
+  @include body-sm;
   color: $portfolio-text-primary;
   text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: $portfolio-spacer-0-5x;
   transition: color $portfolio-duration-fast $portfolio-easing-standard;
 
   &:hover {
-    color: $portfolio-text-link;
+    color: $portfolio-text-secondary;
   }
 }
 
@@ -173,7 +188,7 @@
 
 .externalLink {
   @include body-sm;
-  color: $portfolio-text-secondary;
+  color: $portfolio-text-primary;
   text-decoration: none;
   display: inline-flex;
   align-items: center;
@@ -181,7 +196,7 @@
   transition: color $portfolio-duration-fast $portfolio-easing-standard;
 
   &:hover {
-    color: $portfolio-text-primary;
+    color: $portfolio-text-secondary;
   }
 }
 

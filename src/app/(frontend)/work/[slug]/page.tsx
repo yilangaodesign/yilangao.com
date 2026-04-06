@@ -1,16 +1,27 @@
 import { notFound } from "next/navigation";
 import { getPayloadClient } from "@/lib/payload";
-import { extractLexicalText, lexicalToHtml } from "@/lib/lexical";
+import { extractLexicalText } from "@/lib/lexical";
+import { convertLexicalToHTML, defaultHTMLConverters } from "@payloadcms/richtext-lexical/html";
+import type { SerializedEditorState } from "lexical";
 import { isAdminAuthenticated } from "@/lib/admin-auth";
 import { getCompanyFromSession } from "@/lib/company-session";
 import { getCompanyBySlug } from "@/lib/company-data";
 import { RefreshRouteOnSave } from "@/components/RefreshRouteOnSave";
 import ProjectClient from "./ProjectClient";
+import type { ContentBlock } from "./ProjectClient";
 
-const HERO_METRICS: Record<string, { value: string; label: string }> = {
-  lacework: { value: "2×", label: "page discoverability" },
-  "elan-design-system": { value: "47+", label: "incidents documented → systemic fixes" },
-  meteor: { value: "95%", label: "noise reduction" },
+const HERO_METRICS: Record<string, { value: string; label: string; tooltip?: string }> = {
+  lacework: {
+    value: "58%",
+    label: "usability improvement",
+    tooltip: "Perceived ease-of-use scores from task-based evaluations with the customer success team. Scores rose from 60 to 95 out of 100.",
+  },
+  "elan-design-system": { value: "54", label: "design corrections the agent will never make twice" },
+  meteor: {
+    value: "95%",
+    label: "noise reduction",
+    tooltip: "A representative basket review went from ~12,000 spreadsheet rows to ~560 exception flags. The remaining rows are auto-validated.",
+  },
 };
 
 const INLINE_LINKS: Record<string, Record<string, string>> = {
@@ -38,81 +49,119 @@ const COVER_IMAGES: Record<string, string> = {
 
 const INTERACTIVE_VISUALS: Record<string, Record<string, { component: string; playgroundUrl: string; playgroundLabel: string }>> = {
   "elan-design-system": {
-    "Agent Harness Architecture": {
-      component: "EscalationTimeline",
-      playgroundUrl: "http://localhost:4001",
-      playgroundLabel: "View the full design system →",
-    },
-    "Agent-Native Semantic Tokens": {
-      component: "TokenGrid",
-      playgroundUrl: "http://localhost:4001/tokens/colors",
-      playgroundLabel: "Explore the full color system in the playground →",
-    },
-    "Systemic Pattern Map": {
+    "How the System Learns": {
       component: "IncidentDensityMap",
-      playgroundUrl: "http://localhost:4001",
+      playgroundUrl: "https://yilangao-design-system.vercel.app",
       playgroundLabel: "Explore the full design system →",
     },
-    "ScrollSpy — A Micro-Interaction Deep Dive": {
+    "Naming as Documentation": {
+      component: "TokenGrid",
+      playgroundUrl: "https://yilangao-design-system.vercel.app/tokens/colors",
+      playgroundLabel: "Explore the color system in the playground →",
+    },
+    "One Component, Seven Corrections": {
       component: "InteractionShowcase",
-      playgroundUrl: "http://localhost:4001/components/scroll-spy",
+      playgroundUrl: "https://yilangao-design-system.vercel.app/components/scroll-spy",
       playgroundLabel: "Try the ScrollSpy in the playground →",
     },
   },
 };
 
-const IMAGE_PLACEHOLDERS: Record<string, string[]> = {
-  "Restructured Navigation": [
-    "Before: Old navigation with License buried 5 layers deep",
-    "After: New Account section at 3rd level with clean grouping",
-    "Full product screenshot showing new navigation in context",
-  ],
-  "Interactive Usage Trends": [
-    "Usage page with interactive trend chart and time selector",
-    "Detail: trend chart at monthly vs. daily granularity",
-    "Usage breakdown table with per-resource deployment counts",
-  ],
-  "At-a-Glance Overage Status": [
-    "Subscription page with speedometer gauge overview",
-    "Speedometer in three states: healthy, approaching, overage",
-    "Subscription history timeline with past changes",
-  ],
-  "In-App Service Discovery": [
-    "Before/after: old static subscription vs. new service tiers",
-    "In-app pricing plan comparison table with feature matrix",
-    "Consumption-based pricing plan card detail",
-  ],
-  "The Trust Problem": [
-    "Before: Daily workflow with multi-loop vendor correction cycle",
-    "After: Streamlined Meteor workflow — auto-generate, flag, review, confirm",
-    "12,000 → 560: Visual noise reduction comparison",
-    "Sanitized screenshot of basket review interface showing flagged vs. unflagged lines",
-  ],
-  "Leverage-Based Scoping": [
-    "ETF Portfolio Management Cycle: Fund Launch → Holdings → Basket → Order",
-    "Coverage matrix: FI/EQ × lifecycle stages with existing tools mapped",
-    "Upstream → Downstream funnel: basket management as the highest-leverage bottleneck",
-  ],
-  "Adoption Sequencing": [
-    "A Tale of Two Teams: EQ vs. FI adoption readiness comparison",
-    "User research insights: side-by-side EQ (desperate for change) vs. FI (entrenched habits)",
-    "Scoping matrix with EQ 1st Priority / FI 2nd Priority annotations",
-  ],
-  "ETRO — Progressive Trust Calibration": [
-    "Explainability: Severity tier reasoning — flagged row with reasoning tag + decision tree",
-    "Traceability: Corporate actions diff view — before state, after state, delta",
-    "Traceability detail: Corner notch indicator showing what changed and by how much",
-    "Reversibility: Pro-rata calculation sandbox with preview before committing",
-    "Observability: Override justification flow — deliberate friction for audit trail",
-  ],
-};
+function safeConvertToHtml(value: unknown): string {
+  if (!value || typeof value !== 'object') return ''
+  try {
+    const data = value as SerializedEditorState
+    if (!data.root) return ''
+    return convertLexicalToHTML({
+      converters: defaultHTMLConverters,
+      data,
+      disableContainer: true,
+    })
+  } catch {
+    return ''
+  }
+}
+
+type RawBlock = {
+  id?: string
+  blockType: string
+  text?: string
+  level?: string
+  body?: unknown
+  layout?: string | null
+  images?: { image: unknown; caption?: string | null }[]
+  caption?: string | null
+  image?: unknown
+  placeholderLabels?: string[]
+  placeholderLabel?: string
+}
+
+function mapContentBlocks(rawBlocks: RawBlock[]): ContentBlock[] {
+  return rawBlocks.map((b) => {
+    const base = { id: b.id ?? '' }
+    switch (b.blockType) {
+      case 'heading':
+        return { ...base, blockType: 'heading' as const, text: b.text ?? '', level: (b.level ?? 'h2') as 'h2' | 'h3' }
+      case 'richText': {
+        const plain = extractLexicalText(b.body) || ''
+        const html = safeConvertToHtml(b.body)
+        const bodyLexical = b.body && typeof b.body === 'object' ? (b.body as Record<string, unknown>) : undefined
+        return { ...base, blockType: 'richText' as const, body: plain, bodyHtml: html !== plain ? html : undefined, bodyLexical }
+      }
+      case 'imageGroup': {
+        const images = (b.images ?? [])
+          .map((img) => {
+            const media = img.image as { url?: string } | null
+            const url = media?.url ?? null
+            if (!url) return null
+            return { url, caption: img.caption ?? undefined }
+          })
+          .filter(Boolean) as { url: string; caption?: string }[]
+        return {
+          ...base,
+          blockType: 'imageGroup' as const,
+          layout: b.layout ?? 'auto',
+          images,
+          caption: b.caption ?? undefined,
+          placeholderLabels: images.length === 0 ? (b.placeholderLabels ?? undefined) : undefined,
+        }
+      }
+      case 'divider':
+        return { ...base, blockType: 'divider' as const }
+      case 'hero': {
+        const heroMedia = b.image as { url?: string } | null
+        return {
+          ...base,
+          blockType: 'hero' as const,
+          imageUrl: heroMedia?.url ?? undefined,
+          caption: b.caption ?? undefined,
+          placeholderLabel: b.placeholderLabel as string | undefined,
+        }
+      }
+      default:
+        return { ...base, blockType: 'divider' as const }
+    }
+  })
+}
+
+const FALLBACK_BLOCKS: ContentBlock[] = [
+  { id: 'fb-0', blockType: 'hero', imageUrl: undefined, caption: undefined },
+  { id: 'fb-1', blockType: 'heading', text: 'Section Heading One', level: 'h2' },
+  { id: 'fb-2', blockType: 'richText', body: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' },
+  { id: 'fb-3', blockType: 'heading', text: 'Section Heading Two', level: 'h2' },
+  { id: 'fb-4', blockType: 'richText', body: 'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore.' },
+]
 
 const FALLBACK_PROJECT = {
   title: "Project Title",
   category: "Digital toolmaking",
-  description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+  introBlurbHeadline: undefined as string | undefined,
+  introBlurbBody: undefined as string | undefined,
+  introBlurbBodyHtml: undefined as string | undefined,
+  description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
   descriptionHtml: undefined as string | undefined,
-  heroMetric: undefined as { value: string; label: string } | undefined,
+  descriptionLexical: undefined as Record<string, unknown> | undefined,
+  heroMetric: undefined as { value: string; label: string; tooltip?: string } | undefined,
   inlineLinks: {} as Record<string, string>,
   role: "Product Designer",
   collaborators: [{ name: "Name Surname" }, { name: "Name Surname" }, { name: "Design Team" }],
@@ -122,12 +171,7 @@ const FALLBACK_PROJECT = {
     { label: "Website", href: "#" },
     { label: "Twitter", href: "#" },
   ],
-  sections: [
-    { heading: "Section Heading One", body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.", bodyHtml: undefined as string | undefined, imageCount: 2, imagePlaceholders: [] as string[], caption: "Caption describing the images above." },
-    { heading: "Section Heading Two", body: "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore.", bodyHtml: undefined as string | undefined, imageCount: 1, imagePlaceholders: [] as string[], caption: null },
-    { heading: "Section Heading Three", body: "Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit.", bodyHtml: undefined as string | undefined, imageCount: 3, imagePlaceholders: [] as string[], caption: "Additional context about the three images." },
-    { heading: "Section Heading Four", body: "At vero eos et accusamus et iusto odio dignissimos ducimus.", bodyHtml: undefined as string | undefined, imageCount: 2, imagePlaceholders: [] as string[], caption: null },
-  ],
+  content: FALLBACK_BLOCKS,
 };
 
 type AdjacentProject = { slug: string; title: string } | null;
@@ -155,14 +199,38 @@ export default async function ProjectPage({ params }: Props) {
     if (res.docs.length > 0) {
       const doc = res.docs[0];
       const descPlain = extractLexicalText(doc.description) || "Project description.";
-      const descHtml = lexicalToHtml(doc.description);
+      const descHtml = safeConvertToHtml(doc.description);
+
+      const introBlurbHeadline = (doc as Record<string, unknown>).introBlurbHeadline as string | undefined;
+      const introBlurbBodyPlain = extractLexicalText((doc as Record<string, unknown>).introBlurbBody) || undefined;
+      const introBlurbBodyHtml = safeConvertToHtml((doc as Record<string, unknown>).introBlurbBody) || undefined;
+
+      const rawBlocks = (doc.content ?? []) as RawBlock[]
+      const contentBlocks = mapContentBlocks(rawBlocks)
+
+      const heroImg = doc.heroImage as { url?: string } | string | null | undefined;
+      const legacyHeroUrl = typeof heroImg === 'object' && heroImg?.url ? heroImg.url : undefined;
+      const coverImageUrl = legacyHeroUrl ?? COVER_IMAGES[doc.slug] ?? undefined;
+
+      const heroBlockIdx = contentBlocks.findIndex((b) => b.blockType === 'hero');
+      if (coverImageUrl) {
+        if (heroBlockIdx === -1) {
+          contentBlocks.unshift({ id: 'legacy-hero', blockType: 'hero', imageUrl: coverImageUrl, caption: undefined })
+        } else if (!(contentBlocks[heroBlockIdx] as { imageUrl?: string }).imageUrl) {
+          contentBlocks[heroBlockIdx] = { ...contentBlocks[heroBlockIdx], imageUrl: coverImageUrl } as ContentBlock
+        }
+      }
 
       project = {
         id: doc.id,
         title: doc.title,
         category: doc.category,
+        introBlurbHeadline: introBlurbHeadline || undefined,
+        introBlurbBody: introBlurbBodyPlain,
+        introBlurbBodyHtml: introBlurbBodyHtml && introBlurbBodyHtml !== introBlurbBodyPlain ? introBlurbBodyHtml : undefined,
         description: descPlain,
         descriptionHtml: descHtml !== descPlain ? descHtml : undefined,
+        descriptionLexical: doc.description && typeof doc.description === 'object' ? (doc.description as Record<string, unknown>) : undefined,
         heroMetric: HERO_METRICS[doc.slug] ?? undefined,
         inlineLinks: INLINE_LINKS[doc.slug] ?? {},
         role: doc.role ?? "Designer",
@@ -173,19 +241,7 @@ export default async function ProjectPage({ params }: Props) {
           label: l.label,
           href: l.href,
         })) ?? [],
-        sections: doc.sections?.map((s: { heading: string; body?: unknown; images?: { image: unknown }[]; caption?: string | null }) => {
-          const realImageCount = s.images?.length ?? 0;
-          const bodyPlain = extractLexicalText(s.body) || "Section content.";
-          const bodyHtml = lexicalToHtml(s.body);
-          return {
-            heading: s.heading,
-            body: bodyPlain,
-            bodyHtml: bodyHtml !== bodyPlain ? bodyHtml : undefined,
-            imageCount: realImageCount,
-            imagePlaceholders: realImageCount === 0 ? (IMAGE_PLACEHOLDERS[s.heading] ?? []) : [],
-            caption: s.caption ?? null,
-          };
-        }) ?? [],
+        content: contentBlocks,
       };
 
       const currentOrder = doc.order ?? 0;
@@ -219,7 +275,6 @@ export default async function ProjectPage({ params }: Props) {
   }
 
   const interactiveVisuals = INTERACTIVE_VISUALS[slug] ?? undefined;
-  const coverImage = COVER_IMAGES[slug] ?? undefined;
 
   let companyNote: { companyName: string; note: string } | undefined;
   const companySess = await getCompanyFromSession();
@@ -242,7 +297,6 @@ export default async function ProjectPage({ params }: Props) {
         nextProject={nextProject}
         isAdmin={isAdmin}
         interactiveVisuals={interactiveVisuals}
-        coverImage={coverImage}
         companyNote={companyNote}
       />
     </>

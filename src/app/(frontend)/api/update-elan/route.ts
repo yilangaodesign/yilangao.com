@@ -1,23 +1,27 @@
 import { NextResponse } from 'next/server'
 import { getPayload } from 'payload'
 import config from '@payload-config'
-import { makeLexicalParagraph } from '@/lib/lexical'
+import { markdownToLexical, createCaseStudyBlocks } from '@/lib/content-helpers'
 
 const ELAN_DATA = {
-  title: 'Élan Design System',
+  title: '\u00c9lan Design System',
   slug: 'elan-design-system',
-  category: 'Design Systems · AI-Native Tooling · Vibe Coding',
+  category: 'Design Systems \u00b7 Design Infrastructure',
   featured: true,
   order: 2,
-  description: makeLexicalParagraph(
-    '\u00c9lan is a design system I built from scratch in 2 days through human-AI co-evolution\u2009—\u2009token architecture, component library, and interactive playground, designed so an AI agent can read, generate, and self-correct without external documentation. The harness constrains the agent; the agent improves the harness.'
+  introBlurbHeadline: 'Teaching Einstein to build a design system - when he\u2019s six',
+  introBlurbBody: markdownToLexical(
+    'Sounds ridiculous? That\u2019s what everyone vibe coding an app is dealing with right now. AI has the knowledge of the world - if you teach it how to use it. I\u2019ve been vibe coding since GPT came out. Every session starts from zero. Spacing rules, color decisions, interaction patterns, gone. Afraid of that default Tailwind blue-violet? Me too. I built \u00c9lan to escape AI design slop and ship components that actually look like a designer made them.'
+  ),
+  description: markdownToLexical(
+    '\u00c9lan is a design system I built from scratch as sole designer and engineer. Token architecture, component library, interactive playground, and 54 documented design patterns the agent reads before writing a single component. Every naming convention is machine-parseable. Every guardrail comes from a real correction, not a style guide prescribed upfront. Published as an npm package, consumed by three apps, continuously evolving.'
   ),
   role: 'Designer & Engineer (sole creator)',
   collaborators: [
     { name: 'AI Coding Agent (Cursor + Claude)' },
-    { name: 'Open-Source Libraries' },
+    { name: 'Open-Source Libraries (Radix UI, Carbon, Geist)' },
   ],
-  duration: '2 days',
+  duration: '2026 \u2013 Present',
   tools: [
     { name: 'Figma' },
     { name: 'Next.js 16' },
@@ -30,43 +34,29 @@ const ELAN_DATA = {
   externalLinks: [
     {
       label: 'Interactive Playground',
-      href: 'https://localhost:4001',
+      href: 'https://yilangao-design-system.vercel.app',
     },
     {
       label: 'GitHub Packages',
       href: 'https://github.com/yilangaodesign/design-system',
     },
   ],
-  sections: [
+  content: createCaseStudyBlocks([
     {
-      heading: 'Agent Harness Architecture',
-      body: makeLexicalParagraph(
-        "The harness that constrains and co-evolves with the AI agent\u2009—\u2009dual evaluation, 3-domain feedback routing, and guardrails that tighten with every repeated failure."
-      ),
-      caption: 'Dual evaluation (AI pre-check + human review) \u00b7 3-domain routing \u00b7 Self-tightening guardrails',
+      heading: 'How the System Learns',
+      bodyMarkdown: 'First time the agent broke dark mode, I wrote it down. Third time, I made it a rule. Now it checks before it touches a single color.',
     },
     {
-      heading: 'Agent-Native Semantic Tokens',
-      body: makeLexicalParagraph(
-        "Using color as the example domain: a token naming convention where every name fully describes its intent\u2009—\u2009so agents can generate and validate tokens without a lookup table."
-      ),
-      caption: 'Goldman Sachs\u2013inspired property \u00b7 role \u00b7 emphasis naming \u00b7 Machine-readable by default',
+      heading: 'Naming as Documentation',
+      bodyMarkdown: 'color.surface.brand.bold - not color-1, not --primary-dark. The name tells the agent exactly what the token does. No lookup table needed.',
     },
     {
-      heading: 'Systemic Pattern Map',
-      body: makeLexicalParagraph(
-        "Patterns invisible to individual incidents become obvious in aggregate. Four categories hit the 3-strike threshold and promoted to hard guardrails."
-      ),
-      caption: '47 incidents \u00b7 6 failure categories \u00b7 Documented \u2192 Audited \u2192 Guardrailed',
+      heading: 'One Component, Seven Corrections',
+      bodyMarkdown: 'ScrollSpy took four tries. Click and drag share the same pointer. Turns out you need a 3px dead zone to tell them apart. The model stays the same. The system around it sharpens.',
     },
-    {
-      heading: 'ScrollSpy \u2014 A Micro-Interaction Deep Dive',
-      body: makeLexicalParagraph(
-        "One component, 7 anti-patterns, 4 iterations. Click and drag share the same pointer\u2009—\u2009a 3px dead zone discriminates intent."
-      ),
-      caption: '7 anti-patterns \u00b7 AP-011 pointer mapping \u00b7 AP-012 dead zone \u00b7 AP-031 Framer Motion transform conflict',
-    },
-  ],
+  ], {
+    heroPlaceholderLabel: 'Hero — Design system component library with token architecture',
+  }),
 }
 
 export async function POST() {

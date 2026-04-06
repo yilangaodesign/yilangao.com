@@ -10,6 +10,7 @@ import {
 } from "geist/font/pixel";
 import "../globals.scss";
 import elan from "../../../elan.json";
+import { TooltipProvider } from "@/components/ui/Tooltip";
 
 export const metadata: Metadata = {
   title: "Yilan Gao — UX Designer",
@@ -34,7 +35,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" data-theme="light" className={fontVariables}>
-      <body>{children}</body>
+      <body>
+          <TooltipProvider>{children}</TooltipProvider>
+        </body>
     </html>
   );
 }
