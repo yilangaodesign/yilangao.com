@@ -4,7 +4,7 @@
 >
 > **Who reads this:** AI agents routed here by `AGENTS.md` Pre-Flight. Read the Section Index first, then open only the spoke file matching your task.
 > **Who writes this:** AI agents after processing user feedback via the `design-iteration` skill.
-> **Last updated:** 2026-04-03 (FB-072: Eyebrow adoption audit — ~44 instances migrated across 9 files)
+> **Last updated:** 2026-04-06 (7.9: Tier 2 colors follow different dark mode rules)
 
 ---
 
@@ -34,6 +34,7 @@
 | §20 | Button Adoption | [`docs/design/admin-ui.md`](design/admin-ui.md) | When to use DS Button |
 | §21 | Undocumented Patterns | [`docs/design/admin-ui.md`](design/admin-ui.md) | DS gap analysis |
 | §22 | Button Sizing | [`docs/design/button-sizing.md`](design/button-sizing.md) | Icon/label proportionality |
+| §23 | Tooltip | [`docs/design/tooltip.md`](design/tooltip.md) | Tooltip component, InfoTooltip, placement, content guardrails |
 | §7 | Process Principles | *(this file)* | Meta — how to diagnose |
 | App. | Frequency Map | *(this file)* | Checking recurring patterns |
 
@@ -136,6 +137,34 @@ Every prop name, CSS class name, variant value, and token name must communicate 
 
 **Applies to:** All component props, SCSS module class names, CSS custom property names, design token names, and variant type values across the design system.
 
+### 7.8 Never Expose Implementation Details to End Users
+
+Admin UIs, inline editors, and any user-facing tool must present information in the user's conceptual model — not the developer's. Design system tokens, CSS variable names, rem/em values, hex codes, component IDs, and internal naming conventions are implementation details that exist for the agent/developer, not the user.
+
+**The test:** For every piece of text, label, or metadata shown in a user-facing control, ask: "Would a designer/content editor who has never seen the codebase understand this and find it useful?" If the answer is no, remove it.
+
+**Why this exists:** The inline edit toolbar's font, size, and weight menus originally displayed design system token names (`$portfolio-font-sans`, `$portfolio-type-sm`, `$portfolio-weight-regular`) and `rem` values alongside human-readable labels. These are critical for the agent to use the correct token when applying changes, but they are noise for the user — equivalent to showing source code behind a button. The token mapping must happen transparently in the background.
+
+**The protocol:**
+1. User-facing menus and controls show only human-readable labels (font name, px size, weight name, color name).
+2. Technical values (token names, CSS variables, rem/em units, hex codes) must never appear in rendered UI — they live only in data structures consumed by code.
+3. When a control applies a design system value, the mapping from user label → token → CSS happens entirely in the code path, invisible to the user.
+4. Tooltips may show secondary contextual info (e.g., keyboard shortcut) but never implementation details.
+
+**Anti-pattern:** Showing `$portfolio-weight-medium` next to "Medium" in a dropdown to "help the user understand which token is being used." The user doesn't care which token is being used — they care about the visual effect.
+
+**Applies to:** All admin UIs, inline editing controls, CMS field descriptions shown to content editors, and any interface where the audience is not a developer.
+
+### 7.9 Tier 2 Colors Follow Different Dark Mode Rules
+
+Tier 2 (brand/marketing) colors may use different dark mode strategies than Tier 1 (functional) colors. Standard step inversion assumes every color serves a functional purpose in both modes. Atmospheric/decorative colors (e.g., Terra warm amber) exist to create mood in light mode; step-inverting them produces muddy, purposeless dark surfaces that serve neither brand nor function.
+
+**The rule:** When a color family is classified as Tier 2 (brand/marketing), its surface tokens fall back to neutral dark surfaces in dark mode instead of inverting to dark steps of the same hue. Foreground tokens (text, border) may still use standard step inversion because they need WCAG contrast guarantees in both modes.
+
+**Why this exists:** Terra surface-subtle inverted to terra-100 (#170d03) in dark mode: a near-black rectangle with no atmospheric quality and no functional purpose. Industry precedent confirms this pattern: Notion drops warm beige to cool dark gray, Anthropic's warm ivory is fundamentally light-mode. No major design system has made "warm cream atmosphere" work in dark mode.
+
+**Applies to:** Any color family classified as Tier 2 in the Color Tier Architecture (currently: Terra). See `docs/design/color.md` 9.3b.
+
 ---
 
 ## Appendix: Feedback Frequency Map
@@ -163,12 +192,12 @@ Every prop name, CSS class name, variant value, and token name must communicate 
 | Content navigation policy (ScrollSpy threshold, scroll offset) | 2 | High |
 | Portfolio grid density / scannability | 1 | High |
 | Homepage IA / nav consistency / mobile density | 1 | High |
-| User-centric information filtering (audience vs. maintainer data) | 1 | High |
+| User-centric information filtering (no implementation details in user UI) | 2 | High — FB-100: Removed token names, rem values from inline edit toolbar menus. Established §7.8. |
 | Playground swatch interaction/shape/size consistency | 3 | High |
 | CMS inline edit panel UX (actions, drag, errors, dimensions, validation) | 6 | Critical |
 | CMS admin form UX (field labels, descriptions, validation feedback) | 1 | High |
 | Upload affordances (contextual upload where content is displayed) | 1 | High |
-| Admin controls displacing component content (overlay separation) | 1 | High |
+| Admin controls displacing component content (overlay separation) | 2 | High — FB-105: drag handle as invisible flex child indented block list 24px. |
 | Interactive visual scoping (content must match section topic) | 1 | High |
 | False affordances (static elements styled as interactive) | 1 | High |
 | Responsive breakpoints / cross-app parity | 1 | High |

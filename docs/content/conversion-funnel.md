@@ -37,7 +37,7 @@ In growth design, a "magic number" is a specific behavior that strongly predicts
 
 If all three signals land within a minute, the probability of deeper engagement rises dramatically. If any one is missing, the visit likely ends. Designing for the magic number means:
 - The homepage must communicate specialization immediately (signal 1)
-- Project titles and thumbnails must convey domain relevance at a glance (signal 2)
+- Project card titles (creative headlines) and thumbnails must hook attention and convey domain relevance at a glance - the headline provides intrigue while the category line and thumbnail provide domain signal (signal 2)
 - The first visible element of each case study must include an outcome, not just a problem statement (signal 3)
 
 ## 1.4 P(Alive) — Consideration Probability
@@ -46,7 +46,7 @@ Every candidate has an implicit P(Alive) in the hiring manager's mind — the pr
 
 - Strong positioning statement → P(Alive) increases
 - Vague or generic hero copy → P(Alive) drops sharply
-- Relevant project titles → P(Alive) holds or increases
+- Intriguing project headlines with relevant category/thumbnail → P(Alive) holds or increases
 - Case study demonstrates clear thinking → P(Alive) climbs toward conversion threshold
 - Process-heavy narrative without insight → P(Alive) decays
 

@@ -230,6 +230,161 @@ For fields with non-obvious formats, add a help line or placeholder with an exam
 
 ---
 
+## CAP-017: AI-Generated Voice Tells
+
+**Status: ACTIVE**
+
+**Trigger:** Case study text that passes a factual review but fails the "read it aloud" test — the writing sounds machine-generated rather than human-authored.
+
+**Why it's wrong:** Hiring managers read dozens of AI-polished portfolios. They have developed instincts for machine voice, even if they can't articulate the rules. Text that triggers these instincts undermines the "I did the thinking" signal the portfolio is built on. If the writing doesn't sound like the designer, the reader doubts the thinking behind it too. The tells are:
+
+- **Passive voice clusters:** "The system was designed to..." instead of "I designed the system to..."
+- **Hedging phrases:** "might," "could potentially," "we felt that," "it seemed like" — conviction killers
+- **Symmetrical structures:** Three parallel clauses of identical length and rhythm — a signature of language model generation
+- **Banned vocabulary:** "landscape," "realm," "multifaceted," "holistic," "innovative," "streamlined" (see `voice-style.md` §13.1)
+- **Balanced emptiness:** Sentences that sound measured and articulate but communicate nothing specific
+- **Telegram staccato:** The opposite extreme — every sentence under 8 words, creating a choppy rhythm that is equally artificial
+
+**Correct alternative:** Mix sentence lengths. Lead with specifics, not abstractions. State choices as judgments ("I chose X because Y") not feelings ("We felt X might work"). Let a sentence breathe when the idea needs room. Read aloud: does it sound like a person with an opinion, or a machine summarizing?
+
+**Reference:** Derived from the AI-sniff test (case-study-review.md, Check 3) and voice-style.md §13.1/§13.2. See also CFB-015 (agent conflated "explain WHY" with "write more").
+
+---
+
+## CAP-018: Blurb That Summarizes Instead of Teasing
+
+**Status: ACTIVE**
+
+**Trigger:** An intro blurb that reveals the solution, process, or specific design decisions — functioning as a project summary rather than a trailer. If the reader can understand how you solved the problem from the blurb alone, the blurb has given away too much.
+
+**Why it's wrong:** The blurb's job is to create an information gap that makes the reader scroll. A summary closes that gap. "I redesigned the review workflow by introducing exception-driven filtering that grouped errors by type" is a summary — the reader now knows the solution and has less reason to keep reading. The blurb should show the stakes and flash the outcome but withhold the mechanism entirely.
+
+**Correct alternative:** Show the situation tension (rhetorical "you," constraints, scale), flash the outcome in the closer ("cut 12,000 lines to 560"), and hide the how. The how is the case study itself. See `case-study.md` §3.7 for full blurb rules.
+
+**Reference:** Check 11 in `case-study-review.md`.
+
+---
+
+## CAP-019: Credential Performance (Editorializing Outcomes)
+
+**Status: ACTIVE**
+
+**Trigger:** Copy that editorializes about the difficulty or impressiveness of the work, or draws conclusions the reader should reach independently. This is NOT about hiding achievements — outcomes, metrics, and credentials must be front-loaded (time-to-value is non-negotiable). The anti-pattern is adding commentary ON TOP of the fact.
+
+**Why it's wrong:** Editorializing outcomes is mass-market positioning. Luxury positioning states the fact and trusts the reader to be impressed. "Review time dropped from 80 minutes to 8" is a powerful credential. Adding "which was a significant achievement" weakens it — the commentary signals that the writer doesn't trust the fact to speak for itself. Credential performance ("I had the unique opportunity to lead this massive initiative") is the written equivalent of nervous laughter after a good joke.
+
+**Correct alternative:** State the outcome as a fact and stop. "Review time dropped from 80 minutes to 8." The reader does the math. The fact itself is the credential; commentary cheapens it. See `case-study.md` §3.8 for the Luxury Positioning Principle.
+
+**Specific tells to watch for:** "which was a significant achievement," "requiring innovative thinking," "I had the unique opportunity to," "demonstrating my ability to drive efficiency," "a massive undertaking," "proving that I could."
+
+**Reference:** Check 12 in `case-study-review.md`.
+
+---
+
+## CAP-020: Buzzword Misapplication
+
+**Status: ACTIVE**
+
+**Trigger:** Using an AI or technical systems term in a case study that does not pass all three gates of the technical vocabulary test (structural match, evidence gate, terminology accuracy) defined in `technical-framing.md` §16.1.
+
+**Why it's wrong:** A hiring manager who knows the term will immediately see the mismatch. Calling a filtered list "AI-powered curation" or a standard search feature "RAG-enabled retrieval" doesn't signal fluency — it signals either ignorance or dishonesty. Both are disqualifying at senior level. This is the technical equivalent of credential performance (CAP-019): the term itself should be the credential, not your commentary about it. A misapplied buzzword is worse than no buzzword — it raises the question of what else in the portfolio is overstated.
+
+**Correct alternative:** Run the three-gate test. If all gates pass, use the term prominently and let it speak for itself. If only gate 1 passes (structural parallel), use the authentic parallel technique: "This exception-driven review system uses the same pattern as human-in-the-loop AI verification." If no gates pass, do not use the term. Silence is luxury; misapplication is mass market.
+
+**Reference:** Check 13 in `case-study-review.md`. Full vocabulary and test in `technical-framing.md` §16.
+
+---
+
+## CAP-021: Claiming AI Agent Work as Designer Expertise
+
+**Status: ACTIVE**
+
+**Trigger:** Writing a case study about an AI-collaborative project that presents engineering fixes (cache invalidation, hydration mismatches, build errors) as designer decisions.
+
+**Why it's wrong:** A designer cannot credibly claim they personally resolved Turbopack cache invalidation or React hydration mismatches — those are the AI agent's execution domain. When a hiring manager reads "I fixed the SSR hydration mismatch," they expect the designer to explain the technical fix. If the designer can't, the credibility of the entire case study suffers. The designer's contribution in AI-collaborative work is the SYSTEM — naming conventions, feedback architecture, escalation paths, documentation structure. That's the design work.
+
+**Correct alternative:** Distinguish between what the designer decided (system architecture, naming conventions, feedback routing, visual rules) and what the AI agent executed (bug fixes, build configuration, infrastructure debugging). Frame engineering improvements as evidence that the designer's system WORKS, not as the designer's direct achievement. "The agent fixed spacing issues 15 times before the system encoded a spacing rule" positions the designer as architect, not debugger.
+
+**Reference:** CFB-021 (2026-04-04) — Élan case study rebuild pivoted from engineering-centric to design-system-centric framing.
+
+---
+
+## CAP-022: Em Dash Usage
+
+**Status: ACTIVE**
+
+**Trigger:** Using the em dash character (U+2014) anywhere in case study text, blurbs, scope statements, section bodies, or captions.
+
+**Why it's wrong:** Em dashes are an AI voice tell. Language models default to em dashes as a stylistic device because they are standard in formal English typography. In this portfolio's voice, em dashes read as machine-generated and break the conversational register. The project voice style (`docs/content/voice-style.md` line 73) explicitly bans them: "Em dashes: never. Use a regular dash - like this. Max one per section."
+
+**Correct alternative:** Use a regular hyphen-minus surrounded by spaces ( - ) for parenthetical asides. Prefer splitting into two sentences or using a comma when possible. Max one dash per section to avoid staccato rhythm.
+
+**Reference:** CFB-022 (2026-04-04). Agent used em dashes across every section of the Élan case study despite the rule existing in voice-style.md. Violated 6+ times in a single writing pass.
+
+---
+
+## CAP-023: Voice Flattening During Refinement
+
+**Status: ACTIVE**
+
+**Trigger:** Taking a user-provided raw draft that is vivid, specific, and personal, and "refining" it into text that is grammatically correct but stripped of the original's energy - fragment rhythm replaced with full sentences, cultural references generalized, rhetorical questions converted to declarative statements.
+
+**Why it's wrong:** The user provides raw draft text precisely because the AI's first draft lacked personality. If the refinement step sands down the personality the user injected, the workflow produces no net improvement - the system oscillates between "too clinical" (AI draft) and "too rough" (user draft) without reaching "vivid and polished." The user's voice IS the value; refinement should preserve it.
+
+**Correct alternative:** Apply the two-tier constraint model from `personal-voice.md` Part C. Enforce Tier 1 constraints (banned words, em dashes, thesis coherence, word counts). Yield to the user's voice on Tier 2 elements (fragment density, rhetorical questions, cultural references, informal grammar). Run the voice-flattening test after refinement.
+
+**Reference:** Elan case study overhaul (2026-04-04) - system acknowledged user's draft was better, then produced a refinement that reintroduced em dashes and flattened the register.
+
+---
+
+## CAP-024: Divider Overuse Between Narrative Sections
+
+**Status: ACTIVE**
+
+**Trigger:** Placing `<hr>` divider blocks between every feature section in a case study, or defaulting `showDivider` to true in `createCaseStudyBlocks` calls.
+
+**Why it's wrong:** Dividers signal structural zone boundaries (intro-to-article, article-to-navigation), not chapter breaks within a continuous narrative. Overuse fragments the reading flow, creates visual stop signs that discourage scrolling, and contradicts the cohesive story structure from `narrative-arc.md`. From a UX and content strategy perspective, sections within a case study are telling one story - the divider line signals "this is a separate thing" and breaks the reader's momentum.
+
+**Correct alternative:** Use whitespace (CSS adjacent-sibling margin on headings, 48px) for inter-section separation. Reserve the divider for the single boundary between the intro blurb (hook) and the article body (scope statement onward), which is rendered by the template itself (not authored as a content block). See `case-study.md` section 3.9.
+
+**Reference:** User feedback (2026-04-04) - identified divider lines as "too much" and "abused," creating friction that stops readers from enjoying the narrative arc.
+
+---
+
+## CAP-025: Floating Metric
+
+**Status: ACTIVE**
+
+**Trigger:** A hero metric that appears in the visual scan zone (blurb headline, hero area, or scope statement) without a derivation or anchor visible within the scope statement or blurb body closer. The metric type determines what "floating" means:
+
+- **Derived metric** (percentage, multiplier, ratio - "58%", "2x"): Floating when the before/after absolutes or measurement basis are not visible in the scan window.
+- **Self-anchoring metric** (absolute before/after - "12,000 lines to 560"): Floating when the measurement domain is ambiguous. The math is self-evident; domain context must not be missing.
+- **Behavioral observation** ("users stopped verifying line by line"): Floating when there is no temporal or observational anchor ("within six weeks", "across N users").
+
+**Why it's wrong:** Impressive numbers without derivation trigger a "how did they calculate this?" reflex in skeptical readers. The number becomes a trust liability instead of a credibility anchor. Even absolute reductions fail if the reader cannot tell what was measured. The scan window (0-60s) is the only window where anchoring matters - if the reader moves past it without verification, the metric was either trusted (anchored) or discounted (floating).
+
+**Correct alternative:** Ground every hero metric within the scan window. For derived metrics, show the before/after absolutes or measurement basis in the scope statement (Zone 2). For self-anchoring metrics, ensure domain clarity. For behavioral observations, add a temporal anchor. The reader's own verification is more convincing than the writer's claim.
+
+**Cross-reference:** `case-study.md` section 3.3 describes the construction pattern for metric derivation anchors. Check 17 in `case-study-review.md` is the compliance test.
+
+---
+
+## CAP-026: Employment Classification Signal
+
+**Status: ACTIVE**
+
+**Trigger:** Portfolio text that reveals or implies an employment type that would undermine seniority positioning - specifically: internship, contract, part-time, junior-level classification.
+
+**What does NOT trigger this pattern:** Employment types that signal scope or ownership are positioning assets, not liabilities. "Founding designer," "sole designer," "first design hire" communicate decision authority - use them prominently. "Personal project" is context-dependent - fine for projects demonstrating ongoing system work, not for framing that reads as "hobby."
+
+**Why it's wrong:** "Intern project" triggers a mental discount regardless of the project's actual complexity. When work demonstrates senior-level thinking, a diminishing employment label contradicts the evidence. Cognitive dissonance resolves against the candidate. The reader won't think "impressive intern" - they'll think "just an intern project."
+
+**Correct alternative:** Functional descriptors: "Product Designer (sole designer)" not "Design Intern." "7 weeks" not "summer internship." Employment context is interview-only disclosure. See the Portfolio Coherence Manifest (`docs/content/portfolio-coherence.md`) for the employment context tracking field.
+
+**Scope:** All portfolio text. Does NOT apply to interview prep notes (`docs/content/projects/{slug}-interview.md`), where honest disclosure is mandatory.
+
+---
+
 ## Entry Template
 
 ```markdown

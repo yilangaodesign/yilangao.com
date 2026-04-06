@@ -4,10 +4,334 @@
 >
 > **Who reads this:** AI agents at session start (scan recent entries for context), and during feedback processing (check for recurring patterns).
 > **Who writes this:** AI agents after each feedback cycle via the `design-iteration` skill.
-> **Last updated:** 2026-04-03 (FB-096: Accent scale OKLCH redesign + Blue removal)
+> **Last updated:** 2026-04-06 (FB-118: Terra scope lockdown, color tier architecture, neutral-fallback dark mode)
 >
 > **For agent skills:** Read only the first 30 lines of this file (most recent entries) for pattern detection.
 > **Older entries:** Synthesized in `docs/design-feedback-synthesis.md`. Raw archive in `docs/design-feedback-log-archive.md`.
+
+---
+
+### FB-118: Terra scope lockdown, color tier architecture, neutral-fallback dark mode
+
+**Date:** 2026-04-06
+
+**User said:** Series of iterative feedback through pressure test and design discussion. Renamed Sand to Terra. Requested definitive scoping to prevent Terra from leaking into functional UI. Decided against opacity-based dark mode after industry research. Adopted neutral-fallback strategy.
+
+**Intent:** Terra is a warm atmospheric accent for portfolio/marketing contexts, not a functional UI color. The design system must structurally prevent misuse while supporting dual-context usage (portfolio site now, B2B desktop tools later).
+
+**What was decided:**
+1. Renamed Sand to Terra across all source files
+2. Introduced two-tier color architecture: Tier 1 (functional, all products) and Tier 2 (brand/marketing, portfolio + brand moments)
+3. Removed `icon-terra` and `action-terra` tokens entirely (structural enforcement of content-layer-only scope)
+4. Dark mode Terra surfaces fall back to neutral (#262626, #393939) instead of step-inverted dark terra steps. Warmth is a light-mode brand expression only. Industry precedent: Notion, Anthropic, Spotify all drop atmospheric warmth in dark mode
+5. Orange kept alongside Terra despite 14.6deg hue proximity. Different tiers, different semantic roles, never coexist in same context
+
+**What was learned:**
+- Atmospheric/decorative brand colors need fundamentally different dark mode strategies than functional colors. Standard step inversion produces muddy, purposeless dark surfaces. Neutral fallback preserves intent
+- Token existence is a stronger enforcement mechanism than documentation. If `action-terra` exists, it will eventually be used regardless of documentation prohibiting it. Token removal is the structural fix
+- Color tier architecture resolves the tension between "marketing warmth" and "functional everything." The tier boundary determines which dark mode strategy applies
+
+**Files changed:** `_colors.scss`, `_custom-properties.scss`, `sync-tokens.mjs`, `tokens.ts` (generated), `playground/.../colors/page.tsx`, `docs/design/color.md`, `TestimonialCard.module.scss`, `page.module.scss` (project slug)
+
+---
+
+### FB-117: TestimonialCard recolored with Terra accent palette
+
+**Date:** 2026-04-06
+
+**User said:** "Update the testimonial component to have no border color and use the light color shades from our brand accent color Terra. Turn the quotation mark into a dark Terra accent."
+
+**Intent:** Testimonial cards should feel warm and distinct from the neutral project cards. The Terra accent family gives them an earthy, warm identity. The quotation mark becomes a rich amber instead of placeholder gray, turning it into a deliberate design element rather than a muted decoration.
+
+**Root Cause:** Testimonial cards used `surface-secondary` (neutral-05) background with `border-subtle` (neutral-30), making them visually bland and indistinct from the grid background. The quotation mark used `text-placeholder` (neutral-40), making it nearly invisible.
+
+**Resolution:** Three changes to `TestimonialCard.module.scss`:
+1. Removed `border: 1px solid var(--portfolio-border-subtle)` from `.card`
+2. Changed `.card` background from `var(--portfolio-surface-secondary)` to `var(--portfolio-surface-terra-subtle)` (terra-10 #f5f1ec light, neutral-90 #262626 dark)
+3. Changed `.quoteMark` color from `var(--portfolio-text-placeholder)` to `var(--portfolio-text-terra)` (terra-60 #915000 light, terra-40 #b89062 dark)
+
+**Note:** Sand palette renamed to Terra. Icon-sand token removed (Tier 2 scope restriction); quotation mark should use text-terra or border-terra instead.
+
+**File changed:** `src/components/ui/TestimonialCard/TestimonialCard.module.scss` (lines 19-20, 52)
+
+---
+
+### FB-116: Hero metric value font changed to Geist Mono, regular weight, no brand color
+
+**Date:** 2026-04-06
+
+**User said:** "Let's change all the hero metrics font to Geist Mono. And remove the brand color. And use regular font weight."
+
+**Intent:** Hero metric values (e.g. "95%", "58%", "54") should use Geist Mono at regular weight with default text color, not a decorative pixel font with brand accent. The metric should read as clean data, not a decorative element.
+
+**Root Cause:** FB-110 had changed `.heroMetricValue` to `$portfolio-font-pixel-grid` (Geist Pixel Grid) at `$portfolio-weight-bold` (700) in `$portfolio-accent-60` (#3336FF). The decorative pixel font and bold brand accent were over-designed for what is fundamentally a data label.
+
+**Resolution:** Changed `.heroMetricValue` to `$portfolio-font-mono` (Geist Mono) at `$portfolio-weight-regular` (400), removed `color` override so it inherits the default text color. Updated the `_typography.scss` token comment to reflect that Geist Mono is now used for hero metrics as well as code. The `stat-sm` mixin is kept as a base for sizing, line-height, and tabular-nums.
+
+**Supersedes:** FB-110 (hero metric pixel font decision). The decorative direction explored in FB-110 was reversed in favor of a cleaner, more understated typographic treatment.
+
+**File changed:** `src/app/(frontend)/work/[slug]/page.module.scss` (lines 105-109), `src/styles/tokens/_typography.scss` (line 7)
+
+---
+
+### FB-115: Hero image container dimension mismatch + missing replace affordance
+
+**Date:** 2026-04-06
+
+**User said:** "The dimension of the image when I upload the image is not the same dimension that was set up before... it just has a blank space at the bottom. You might want to have it auto-fit."
+
+**Intent:** Hero image container should maintain consistent dimensions before and after upload, and admin users need the ability to replace an existing hero image.
+
+**Root Cause:** The `.heroSkeleton` (empty state) had `aspect-ratio: 16/9` but `.heroInner` (image present) had no aspect ratio — the image rendered at natural proportions, causing size jumps and blank space. The upload zone only appeared when no image existed, removing the replace affordance after first upload.
+
+**Resolution:** (1) Moved `aspect-ratio: 16/9` and `overflow: hidden` to `.heroInner` so all states share the same container geometry. Changed `.heroImg` to `object-fit: cover` so images always fill the container. Proportion mismatches now crop visibly, signaling the user to fix their source image. (2) Added a hover overlay (`heroReplaceOverlay`) with drag-and-drop + click-to-browse that appears over existing images in admin mode.
+
+**Principle reinforced:** Image containers should enforce dimensions via the container, not the image. Uploading content should never remove the ability to update it.
+
+**Cross-category note:** Also documented as ENG-125 (engineering) for the upload flow fix.
+
+---
+
+### FB-114: External link visual inconsistency across site
+
+**Date:** 2026-04-06
+
+**Intent:** External links across the site used three different visual treatments: homepage team links (black, medium weight, `↗` char), homepage sidebar links (gray, regular weight, `↗` char), and case study meta links (blue, SVG arrow icon). All should use a single consistent pattern with `$portfolio-text-primary` (black) color.
+
+**Root Cause:** External links were created at different times without a shared visual contract. The homepage sidebar links used `$portfolio-text-secondary` (gray), case study meta/inline links used `$portfolio-text-link` (blue) with a different arrow indicator (SVG vs character), and the elan-visuals playground link also used the link color. No canonical "external link" pattern was established in the design system docs.
+
+**Resolution:** Standardized all external link patterns to: `body-sm`, `$portfolio-text-primary` color, `inline-flex` layout, `↗` character arrow with `caption` size at `0.5` opacity, hover state dims to `$portfolio-text-secondary`. Applied across 4 files: homepage `page.module.scss` (`.teamLink`, `.externalLink`), case study `page.module.scss` (`.metaLink`, `.inlineLink`), `ProjectClient.tsx` (replaced SVG `ExternalIcon` with `↗` character), and `elan-visuals.module.scss` (`.playgroundLink`). Removed the now-unused `ExternalIcon` component.
+
+**Principle established:** All external links site-wide use `$portfolio-text-primary` color (not blue/link color) with the `↗` character indicator. External links are visually distinguished by the arrow glyph, not by color. This keeps the reading surface calm and reserves color-based affordance for interactive controls (buttons, toggles). See AP-060 below.
+
+---
+
+### FB-113: Tooltip caret touching container edge — needs inset
+
+**User said:** "For the chevron, when it's emerging on the side, there should be a mini gap just so that the chevron is not literally touching the edge of the box. Horizontally, there should always be a spacing, a very mini, the minimum spacing, just so that there's breathing room."
+
+**Intent:** The caret (triangular pointer) should never sit flush against the rounded corner of the tooltip container. There must be a minimum inset so the caret has breathing room from the container edge.
+
+**Root cause:** Radix's `arrowPadding` defaults to 0, which allows the arrow SVG to be positioned all the way to the edge of the content box. Combined with `border-radius: radius-sm` (4px), this means the caret can visually overlap or touch the rounded corner.
+
+**Fix:** Set `arrowPadding={CARET_INSET}` where `CARET_INSET = 4` (matches `radius-sm`). This insets the caret by at least the border-radius, guaranteeing it never sits in the rounded-corner zone. Exception: `caret="center"` keeps `arrowPadding={0}` since it forces dead-center placement by design.
+
+**Principle established:** Caret elements on containers with rounded corners must be inset by at least the container's border-radius. This is a geometric constraint — the caret is a sharp triangle, and if it sits in the radius zone, it visually breaks the corner curve. Documented in `docs/design/tooltip.md` and `docs/design/spacing.md` as a general overlay principle.
+
+---
+
+### FB-112: Back button and nav links not using DS Button component
+
+**Date:** 2026-04-06
+
+**Intent:** The "Back" link on case study sidebar and prev/next navigation links were hand-rolled `<Link>` elements with custom CSS instead of using the Elan Design System `Button` component. Same pattern existed on experiments, motion, and typography pages.
+
+**Root Cause:** The `Button` component only supported `<button>` rendering. Navigation links that needed button-like styling had to bypass the DS and use custom CSS. This created a consistency gap - every new page replicated the pattern instead of using the shared component.
+
+**Resolution:** Made `Button` polymorphic: when `href` is provided, it renders as Next.js `<Link>` (internal) or `<a>` (external) while maintaining all DS styling (appearance, emphasis, size, icons). Replaced all 4 back links and 2 prev/next nav links across the site. Since `ProjectClient.tsx` is the shared renderer for all case studies, future case studies automatically get the DS component.
+
+**Cross-category note:** Also documented as ENG-124 (engineering) for the polymorphic component upgrade.
+
+**Decision:** The `Button` now supports three render modes: `<button>` (default, no `href`), `<Link>` (internal `href`), `<a>` (external `href` starting with `http` or `//`). External links automatically get `target="_blank"` and `rel="noopener noreferrer"`.
+
+---
+
+### FB-111: InfoTooltip on hero metrics for metric derivation context
+
+**Date:** 2026-04-06
+
+**Intent:** Add a non-invasive progressive disclosure mechanism to hero metrics so hiring managers can understand how a derived metric was calculated without disrupting the sidebar's visual hierarchy.
+
+**Root Cause:** Derived metrics (percentages calculated from before/after data) naturally prompt "how did you measure that?" from skeptical readers. The derivation anchor existed in the scope statement text but was physically distant from the number itself. Co-locating a brief explanation via tooltip closes that information gap.
+
+**Resolution:**
+- Rendered `InfoTooltip` (`contextSize="sm"`) next to the metric label in a new `.heroMetricLabelRow` flex container.
+- Tooltip inherits the standard `inverse` appearance and `top/start` alignment from InfoTooltip defaults.
+- Applied selectively: only Derived metrics (Lacework 58%, Meteor 95%) get tooltips. Self-anchoring metrics (Elan's count) do not.
+- The info icon sits inline with the label text at the `sm` context size (14px icon matching `body-sm` text).
+
+**Design decision:** The tooltip is a *confident footnote*, not a defensive justification. The hiring manager who notices the info icon and hovers sees methodology rigor. The one who doesn't still gets the clean metric display. Progressive disclosure is itself a portfolio signal - it demonstrates that the designer thinks about trust and information density.
+
+**Cross-category note:** Also documented as CF-020 (content) and ENG-122 (engineering).
+
+---
+
+### FB-110: Hero metric value should use Geist Pixel font with thicker weight
+
+**⚠️ SUPERSEDED by FB-116** — decorative pixel font + brand color reverted to Geist Mono + regular weight + default color.
+
+**Date:** 2026-04-05
+**Trigger:** User pointed at the hero metric value ("58%") in the case study sidebar and requested the font be changed to Geist Pixel with a thicker weight, across all current and future case studies.
+**Category:** Typography
+
+**Root Cause:** The `.heroMetricValue` class used `@include stat-sm`, which sets Geist Sans at weight 500 (Medium). The hero metric is a decorative display number meant to grab attention in the first scan, but using the same sans-serif font as body text reduced its visual distinctiveness.
+
+**Resolution:** Overrode `font-family`, `font-weight`, and `color` on `.heroMetricValue` to use `$portfolio-font-pixel-grid` (Geist Pixel Grid) at `$portfolio-weight-bold` (700) in `$portfolio-accent-60` (#3336FF, brand anchor). Initially used Pixel Square, then revised to Pixel Grid per user preference. The `stat-sm` mixin is kept as a base for sizing, line-height, and tabular-nums. All three current case studies (lacework, elan-design-system, meteor) inherit the change through the shared `page.module.scss` class. Future case studies will also use it since all hero metrics flow through the same `ProjectClient.tsx` template.
+
+**File changed:** `src/app/(frontend)/work/[slug]/page.module.scss` (lines 105-110)
+
+---
+
+### FB-109: "Divider sits under the scope statement instead of above it; not enough space between sections"
+
+**Date:** 2026-04-05
+
+**UX Intent:** The structural divider should mark the boundary between the intro blurb (hook) and the start of the article (scope statement). Within the article body, sections need more whitespace to feel separated without using divider lines.
+
+**Root Cause:** Two issues: (1) The `<hr className={styles.articleSeparator}>` was placed after the legacyDescription (scope statement) and companyCallout in `ProjectClient.tsx`, making it appear below the scope statement instead of above it. The zone model treated scope + callout as part of the intro - but the user's intent is that the scope statement is the article start. (2) The CSS adjacent-sibling selector `.blockItem + .blockItem .sectionHeading` / `.blockWrapper + .blockWrapper .sectionHeading` for inter-section spacing was non-functional because the outer block wrapper `<div>` elements (both visitor and admin) had no class names. The `.blockItem`/`.blockWrapper` classes existed only on inner divs, so the sibling selector never matched. Additionally, the spacing token was `$portfolio-spacer-layout-spacious` (32px), perceived as too tight.
+
+**Resolution:**
+1. Moved `<hr>` in `ProjectClient.tsx` from after legacyDescription/companyCallout to between the introBlurb closing and the legacyDescription block. Rendering order: introBlurb -> `<hr>` -> legacyDescription -> companyCallout -> blocks.
+2. Added `styles.blockItem` to the non-admin outer block wrapper div (visitor mode).
+3. Added `styles.blockWrapper` to SortableBlock's outer div (admin mode).
+4. Bumped inter-section heading margin from `$portfolio-spacer-layout-spacious` (32px) to `$portfolio-spacer-layout-x-spacious` (48px).
+5. Updated zone model: intro zone = blurb only; article begins at scope statement. Updated anatomy diagram, section 3.9, and CAP-024.
+
+**Design principle:** The intro blurb is the hook; the scope statement is the article. The divider signals a register change, not a content grouping. Inter-section spacing (48px) < divider zone (~65px) maintains hierarchy.
+
+**Cross-category note:** Also documented as CF-019 (content).
+
+---
+
+### FB-106: Semantic field split - title becomes app name, introBlurbHeadline becomes case study title
+
+**User feedback:** The sidebar h1 (`page_title`) should display the application name (e.g. "Lacework"), not the case study headline. The intro blurb headline (`page_introBlurbHeadline`) should be promoted to the official case study title and drive the homepage masonry card title. Editing the card title on the homepage or the intro blurb headline on the case study page edits the same `introBlurbHeadline` field.
+
+**Intent:** Establish clearer information hierarchy - app name in sidebar for context, creative headline as the primary case study identity visible from the homepage grid.
+
+**Root Cause:** Both `title` and `introBlurbHeadline` previously competed for "case study title" semantics. The homepage card used `title` (app name), creating a mismatch where the most engaging content (the creative headline) was hidden behind a click.
+
+**Resolution:**
+1. Updated `EditableText` labels: sidebar title label changed from "Title" to "App Name", intro blurb headline label changed from "Intro Blurb Headline" to "Case Study Title".
+2. Homepage card `EditableText` now reads `introBlurbHeadline` (with fallback to `title` if no headline exists).
+3. `ProjectEditModal` updated: "Title" renamed to "App Name", new "Case Study Title" field added for `introBlurbHeadline`.
+4. Reset Lacework `title` from headline text back to "Lacework" (it had been overwritten by inline editing).
+5. Updated 6 knowledge base files to reflect that homepage cards now show creative headlines instead of app names, with `category` providing domain context.
+
+**Cross-category note:** Also documented as CFB-026 (content) and ENG-120 (engineering).
+
+---
+
+### FB-104: Scope statement visibly smaller than section body + different editing UX
+
+**Feedback:** "These two are both body text, but the paragraph starting with 'Lacework (now FortiCNAPP) is visibly smaller and less legible font compared to the other one. Also they're not having the same editing behavior/ux."
+
+**UX Intent:** All body text in a case study should render at the same size for visual consistency. Editing UX should be identical for semantically equivalent fields (both are rich text body content).
+
+**Root Cause:** Two issues: (1) Both `.legacyDescriptionText` (scope statement) and `.sectionBody` used `@include body-sm` (14px), but the Lexical editor's `.lexContentEditable` overrode section body to `$portfolio-type-base` (16px) in admin mode - creating a visible size mismatch. (2) The scope statement used `EditableText` (plain contenteditable) while section bodies used `LexicalBlockEditor` (rich text with toolbar), despite both being Lexical richText fields in the CMS.
+
+**Resolution:** (1) Changed both `.legacyDescriptionText` and `.sectionBody` from `body-sm` (14px) to `body-base` (16px) - matching the Lexical editor's native size. Case studies are "expressive contexts" per §18.4, where `body-base` is the correct choice. (2) Upgraded the scope statement to use `LexicalBlockEditor` when in admin mode (passed `descriptionLexical` through from `page.tsx`), giving it the same rich text editing UX as section bodies.
+
+**Cross-category note:** Also an engineering issue (data flow gap - `descriptionLexical` was never passed to the client component). Documented as ENG-119.
+
+**Pattern extracted → `design.md` §18: Expressive contexts should use body-base minimum, never body-sm**
+
+---
+
+### FB-103: Intro blurb headline needs bigger font and bolder weight for hierarchy
+
+**Feedback:** "This should use a bigger font size and thicker font weight to have it visually further distinguished from the rest of the article (e.g. section header) so there's a better information hierarchy."
+
+**UX Intent:** The intro blurb headline is the editorial hook for the entire case study - it's the highest-leverage text on the page after the project title. It should sit clearly above section headings in the typographic hierarchy, like a columnist's pull-quote headline in editorial layout.
+
+**Root Cause:** `.introBlurbHeadline` used `@include subtitle-1` (20px, Semibold 600) - the exact same mixin as `.sectionHeading`. Two elements at completely different hierarchy levels rendered identically, making the intro blurb read as "just another heading" instead of the article's hook.
+
+**Resolution:** Changed `.introBlurbHeadline` from `subtitle-1` (20px/600) to `heading-2-fluid` (clamp 24-36px responsive, tight tracking) + Bold 700 weight. This creates a clear 1.5-1.8x size jump over section headings while remaining responsive. Increased bottom margin from `$portfolio-spacer-1x` to `$portfolio-spacer-2x` for breathing room proportional to the larger type. The `heading-2-fluid` mixin is the correct pairing per the typography system: it pairs with `body-lg`/`body-base`, and the blurb body already uses `body-lg`.
+
+**Pattern extracted → `design.md` §18: Typography System — editorial headline hierarchy**
+
+---
+
+## Session: 2026-04-04 — Inline edit system enhancements
+
+### FB-102: Links section renders inline instead of vertical list — inconsistent with collaborators
+
+**Feedback:** "Links should not be on the same row in the case study template. It should look like how the collaborators section work - putting them into vertical lists. This should be a consistent pattern."
+
+**Root Cause:** The links `EditableArray` didn't receive a `className` prop, so it used only the default `editableArray` style (no flex-direction). Collaborators passed `className={styles.collaboratorList}` which provides `flex-direction: column`. The links section also lacked the standard `metaGroup` + `Eyebrow` label wrapper that every other sidebar section uses.
+
+**Resolution:** Matched the links section to the collaborators pattern: wrapped in `metaGroup` with `Eyebrow` label, passed `className={styles.metaLinks}` to `EditableArray` (which provides `display: flex; flex-direction: column`), wrapped non-editable fallback in the same layout container.
+
+---
+
+### FB-101: Hero image renders below intro blurb — wrong template rendering order
+
+**Feedback:** "Hero image not sitting above Intro blurb. Please fix this template and enforce this format for all existing case studies and ensure the future ones has this template."
+
+**Root Cause:** The hero image was a block type inside the `content` array, which renders in the block list AFTER the introBlurb, description, and companyNote sections. The template had no concept of "promoted" blocks that should render in a fixed position.
+
+**Cross-category note:** Also documented as ENG-115 (engineering).
+
+**Resolution:** Hero image now renders at the top of the content column, before the intro blurb. The template rendering order is: Hero image → Intro blurb → Description → Company callout → Content blocks → Prev/Next nav. This applies to all existing and future case studies via the shared `ProjectClient` template.
+
+---
+
+### FB-100: Lexical toolbar overlapping content — transparent background from undefined tokens
+
+**Feedback:** "Bad UI, edit modal clashing with content." The floating rich text toolbar renders on top of body text with no visible background, making both unreadable.
+
+**Root Cause:** Three CSS classes in `inline-edit.module.scss` reference non-existent custom properties (`--portfolio-bg-elevated`, `--portfolio-bg-subtle`). These were likely placeholder names from initial implementation that were never updated to the canonical token system (`--portfolio-surface-*`).
+
+**Cross-category note:** Also documented as ENG-114 (engineering).
+
+**Resolution:** Mapped all three broken references to canonical `--portfolio-surface-*` tokens. Toolbar now renders with an opaque background, proper elevation shadow (`--portfolio-shadow-lg`), and correct z-index (`--portfolio-z-dropdown`). The floating format bar is visually distinct from the content beneath it.
+
+---
+
+### FB-099: Inline edit toolbar accessibility, color picker, font family picker, formatting consistency
+
+**User feedback:** "The accessibility for this dropdown is horrible... the contrast is just bad. It's very hard to see the blue text." Also: "I cannot choose the font I want to use" and "I cannot change colors for the text."
+
+**Root Cause:** The `TextFormatBar` dropdowns were custom-built without keyboard navigation, focus management, or ARIA `activedescendant` patterns. Token metadata text used `$portfolio-neutral-70` and `$portfolio-accent-60` on a `#1a1a2e` background — well below WCAG AA contrast for small text. Additionally, no font family or color selection was available.
+
+**Resolution:**
+1. Added keyboard navigation hook (`useListboxKeyboard`) to all dropdown panels — supports arrow keys, Home/End, Enter/Space to select, Escape to close.
+2. Fixed contrast: changed `.formatOptionMeta` and `.formatOptionToken` from `$portfolio-neutral-70`/`$portfolio-accent-60` to `$portfolio-neutral-40` (lighter, higher contrast).
+3. Added `:focus-visible` outlines to all interactive elements (`.formatSelect`, `.formatToggle`, `.formatOption`).
+4. Added font family picker dropdown with 8 DS font stacks (Sans, Mono, Serif, 5 Pixel variants).
+5. Converted read-only color swatch to interactive color picker with 11 DS color tokens.
+6. Both font and color pickers are selection-aware (apply to selected text via `<span>` wrapping, or to all content via select-all fallback).
+
+**Cross-category note:** Also documented as ENG-107 (engineering — Lexical style round-trip, selection formatting fix, section CRUD, image upload).
+
+**Design rule — Inline admin toolbar accessibility baseline:** Every dropdown/menu in the admin overlay must have (a) keyboard navigation (Arrow/Home/End/Enter/Escape), (b) a `data-highlighted` visual state distinct from `aria-selected`, (c) `:focus-visible` outlines, and (d) WCAG AA contrast on all text against the dark admin background. Custom dropdowns are acceptable when Radix portals would break focus management (e.g., contentEditable toolbar), but they must still meet this baseline.
+
+---
+
+## Session: 2026-04-03 — Sidebar shell refactored from Tailwind to Élan DS tokens
+
+### FB-098: Sidebar Tailwind → Élan DS SCSS module migration
+
+**User feedback:** "Rebuild the playground sidebar by refactoring all the Tailwind code into using the full Élan design system code only. No hardcoded inline, no visually matching by hardcoding, but completely using the design system token."
+
+**Root cause:** The sidebar (`playground/src/components/sidebar.tsx`) was the last remaining Tailwind-styled shell component in the playground. All ~50 distinct Tailwind utility classes (layout, spacing, typography, colors, borders, transitions, z-index, responsiveness) were inline in the TSX, making the sidebar impossible to audit against the Élan DS token system.
+
+**Resolution:** Complete rewrite from `sidebar.module.css` (2 classes) → `sidebar.module.scss` (~50 classes). Every property now references Élan DS tokens:
+- **Colors:** `var(--portfolio-text-neutral-bold)`, `var(--portfolio-text-brand-bold)`, `var(--portfolio-surface-neutral-subtle)`, `var(--portfolio-border-neutral-subtle)`, etc. Mode-aware hover overlays use `color-mix(in srgb, var(--portfolio-text-neutral-bold) 7%, transparent)`.
+- **Spacing:** `var(--portfolio-spacer-*)` (Tier 1), `$portfolio-spacer-utility-*` (Tier 3 SCSS).
+- **Typography:** `$portfolio-type-sm/xs`, `$portfolio-weight-medium/semibold`.
+- **Motion:** `$portfolio-duration-fast/nav`, `$portfolio-easing-standard/nav`.
+- **Borders:** `$portfolio-border-width-thin`, `$portfolio-radius-sm`.
+- **Elevation:** `$portfolio-shadow-lg/overlay`.
+- **Breakpoints:** `@media #{$elan-mq-lg}` (replaces Tailwind `lg:` prefix).
+- **Component-scoped constants** (sidebar width 200px/41px, nav item height 28px, footer height 44px, z-indices) as local `$_` SCSS variables.
+- **Interactive patterns** use `@include button-reset`, custom `nav-transition`, `hover-neutral`, `hover-accent` mixins.
+
+**Design rule — Playground shell styling policy update:** `sidebar.tsx` is no longer in the Tailwind migration backlog. Remaining: `shell.tsx`.
+
+---
+
+## Session: 2026-04-03 — Playground sidebar collapse/expand spacing jitter
+
+### FB-097: Content below search jitters when toggling sidebar collapsed/expanded
+
+**User feedback:** "The content below the search jitter when I go from making the navigation bar from expanded to collapsed or from collapsed to expanded, because there's not enough spacing between the search bar and the section header."
+
+**Root cause:** The collapsed search section (8px top padding + 28px icon button = 36px) and expanded search section (8px top padding + 24px Input xs = 32px) had a 4px height discrepancy. The Input xs height is 24px (4px padding + 14px line-height + 4px padding + 2px border), while the collapsed icon button is h-7 (28px). This 4px difference caused the content below to jump vertically during state transition.
+
+**Resolution:** Added `pb-1` (4px) bottom padding to the expanded search container only, equalizing both states at 36px total height. The collapsed state was left unchanged since the user confirmed its spacing was correct.
+
+**Design rule — Collapse/expand height parity:** When a sidebar (or any togglable container) has sections that render different components in collapsed vs expanded states, their container must produce the same total height in both states. Use padding compensation on the shorter state to match the taller one. This prevents content jitter during transitions.
 
 ---
 
@@ -1463,4 +1787,298 @@ Max/min perceptual distance ratio improved from **1.48x → 1.33x**. Range narro
 2. **Colors page:** Changed four media queries from `$elan-mq-lg` to `$elan-mq-md` in `playground/src/app/tokens/colors/colors.module.scss`: `.themeStripContainer`, `.themeStripLight`, `.themeStripDark`, `.interactionStrips`.
 
 **Design rule — Playground responsive breakpoint alignment:** When the playground sidebar is in hamburger/overlay mode (below `lg`), the content area has full viewport width. Features that need horizontal space (side-by-side panels, ScrollSpy) should activate at `$elan-mq-md` (1056px), not `$elan-mq-lg` (1440px). Reserve `lg` breakpoints for features that must coexist with the expanded sidebar.
+
+---
+
+#### FB-100: Image management controls and section layout presets for case study inline editing
+
+**UX Intent:** The user needed in-context controls for managing images within case study sections — deleting, reordering, replacing, choosing layout styles, adding per-image captions, and toggling section dividers. The existing system only allowed uploading, with layout hardcoded by image count and dividers always rendered.
+
+**Root Cause:** The inline editing system was built with an upload-only model — once images were added, they could only be managed through the Payload admin panel. Layout was determined entirely by image count (1 = full, 2 = grid-2, 3+ = bento), giving no creative control. Section dividers were unconditional.
+
+**Resolution:**
+1. **ImageManager overlay:** Per-image admin toolbar appears on hover with move left/right, replace, and delete buttons. Thumbnail grid with add-image button at the end.
+2. **Layout picker:** 8 preset options (Auto, Full Width, 2-Col Equal, 2-Col Left Heavy, 2-Col Right Heavy, 3-Col Bento, 3-Col Equal, Stacked) in a dropdown from the SectionToolbar. Auto preserves the count-based fallback.
+3. **Divider toggle:** Single icon button in SectionToolbar with pressed/unpressed state.
+4. **Per-image captions:** `EditableText` targeting `sections[i].images[j].caption` renders as `<figcaption>` in `<figure>` semantic markup. Empty captions show "Add caption…" placeholder in admin.
+
+**Design rule:** Admin image management controls should use hover-reveal overlays on thumbnails rather than separate management panels — this keeps the spatial relationship between the control and the image clear. Layout presets should always include an "Auto" option that preserves intelligent defaults while giving users the ability to override.
+
+**Cross-category note:** Also documented as ENG-108 (engineering).
+
+---
+
+#### FB-101: "Token names in toolbar menus are irrelevant to users — remove them"
+
+**UX Intent:** The inline edit toolbar menus (font family, size, weight) showed design system token names (`$portfolio-font-sans`, `$portfolio-type-sm`, `$portfolio-weight-regular`) and rem values alongside human-readable labels. The user pointed out that these are implementation details irrelevant to the editing experience — equivalent to showing code behind a button. The backend must use the correct tokens transparently, but the user should never see them.
+
+**Root Cause:** When the toolbar menus were built, the token names were included to provide a reference for which design system token maps to which visual option. This was developer-centric thinking — useful for the agent implementing styles, but noise for the user consuming the editing UI.
+
+**Resolution:**
+1. **Font family menu:** Removed `formatOptionToken` span (was showing `$portfolio-font-sans`, etc.). Only font name remains.
+2. **Font size menu:** Removed `formatOptionToken` span (was showing `$portfolio-type-sm`, etc.) and `formatOptionValue` span (was showing rem values like `0.875rem`). Only name + px remains.
+3. **Font weight menu:** Removed `formatOptionToken` span (was showing `$portfolio-weight-regular`, etc.). Only weight name + numeric value remains.
+4. **Color picker:** Renamed semantic token names to plain English (`text-primary` → `Black`, `text-secondary` → `Dark Gray`, etc.). Removed hex from tooltip.
+5. **Principle documented:** Added §7.8 "Never Expose Implementation Details to End Users" to `docs/design.md` and AP-056 to `docs/design-anti-patterns.md`.
+
+**Design rule — §7.8:** Admin UIs and inline editors must present information in the user's conceptual model, never the developer's. Token names, CSS variables, rem values, and internal identifiers exist for the code path only — they must never appear in rendered UI. The mapping from user-visible label to design system token happens transparently in the background.
+
+---
+
+#### FB-102: Block editor redesign — from rigid sections to flexible content blocks
+
+**UX Intent:** The user identified a holistic structural problem with the inline editing experience. Every complaint — can't add standalone text, can't reorder within sections, can't move content above the hero, forced dividers, non-functional layout selector on empty image slots — traced to the same root cause: the section model was a fixed tuple, not a composable block system.
+
+**Root Cause:** The CMS schema defined sections as rigid `(heading + body + images + caption)` tuples. This architectural choice prevented the user from exercising compositional freedom that modern content editors (Notion, WordPress Gutenberg, Payload's own block model) provide natively.
+
+**Resolution:**
+1. **Block-based content model:** Replaced sections with 5 block types (heading, richText, imageGroup, divider, hero) using Payload's `blocks` field. Each block is independently orderable, deletable, and insertable at any position.
+2. **Block editor chrome:** Floating toolbar per block (appears on hover/focus) with move up/down, delete, insert-above, and type-specific controls (layout selector for imageGroup, level toggle for heading). Between-block "+" insert affordances (Notion-style horizontal line with centered button).
+3. **Image group UX:** Empty imageGroup shows a prominent drop zone with upload icon and "Drop images or click to browse" label. Existing images show per-image overlay controls (move left/right, delete). "Add image" button below existing images.
+4. **Accessibility:** Full keyboard navigation (Alt+Arrow reorder, Tab between blocks), ARIA roles (`role="list"`, `role="toolbar"`), live region announcements for block operations, all icon-only buttons have `aria-label`.
+
+**Design decisions:**
+- Block handles appear on hover/focus, not always-visible — keeps reading experience clean while edit controls remain discoverable.
+- DS components throughout: `Button` (size="xs", emphasis="minimal", iconOnly), `DropdownMenu` for insert menus and layout selector, `Tooltip` on all icon buttons.
+- No drag-and-drop yet (Elan DS has no sortable DnD utility) — uses arrow-key/button reordering as a solid keyboard-first baseline. DnD is a progressive enhancement candidate.
+
+**Cross-category note:** Also documented as ENG-110 (engineering).
+
+**Design rule:** When 3+ user complaints about a content editing system all trace to structural rigidity rather than visual issues, the intervention is architectural (schema redesign to a block model), not cosmetic (patching individual affordances).
+
+---
+
+#### FB-103: Playground sidebar logo invisible in dark mode
+
+**UX Intent:** The YG logo in the playground sidebar header blended into the dark background, failing accessibility contrast requirements.
+
+**Root Cause:** The SVG logo was rendered via `<img>` with a hardcoded `fill="#3336FF"` (brand blue). This color has insufficient contrast against the dark mode sidebar background (`--portfolio-surface-neutral-subtle`). The `<img>` tag doesn't inherit CSS color context, so the logo couldn't adapt to the active theme.
+
+**Resolution:** Replaced the `<img>` element with a `<span role="img" aria-label="YG">` using the CSS `mask-image` technique. The SVG is now used as a mask shape, filled by `background-color: var(--portfolio-text-brand-bold)`. This token resolves to `#3336ff` in light mode and `#7392ff` in dark mode, ensuring the logo adapts to the theme with proper contrast in both.
+
+**Design decision:** Brand logos are typically static, but the user explicitly opted for theme-adaptive coloring. The `mask-image` approach keeps the SVG file unchanged while making the color purely CSS-driven — a clean separation of shape (SVG) and color (token).
+
+---
+
+### Block Editor Enhancement — Rich Text UX Overhaul
+
+**Date:** 2026-04-04
+
+**UX Intent:** Replace the lossy, unreliable `contentEditable` + `document.execCommand` editing experience in case study richText blocks with a proper rich text editor. Provide cross-block keyboard flow, direct image dropping, and drag-to-reorder — moving the inline editing UX from "frustrating CMS" toward "seamless WYSIWYG" while staying within the design system.
+
+**Root Cause:** The previous editing layer used deprecated browser APIs that caused formatting loss, whole-block formatting instead of selection-level, no undo/redo, and no smooth navigation between blocks. The *structure* was right (blocks), but the *editing surface* was wrong (raw contentEditable).
+
+**Resolution:**
+1. **Per-block Lexical editor** — Each richText block mounts its own `LexicalComposer`. The floating `LexicalToolbar` is composed entirely of DS components (`ButtonSelect`, `DropdownMenu`, `Tooltip`, `Kbd`), ensuring visual parity with the rest of the editing chrome.
+2. **Cross-block keyboard navigation** — Enter at end creates a new richText block, Backspace in empty block removes it, ArrowUp/ArrowDown at block boundaries moves focus. This gives Notion-like flow without merging blocks into a single document.
+3. **Direct image dropping** — Native drag events on content area detect insertion position between blocks via element geometry. A drop indicator line appears at the target position. Dropping creates an `imageGroup` block at that position. Existing imageGroup grids accept additional drops.
+4. **Block drag-to-reorder** — `@dnd-kit/sortable` wraps the block list. A drag handle (grip icon) fades in on hover. This provides visual, accessible reordering alongside the existing Alt+ArrowUp/Down keyboard reorder.
+5. **Single-click edit for headings** — Headings now enter edit mode on single click (via `singleClickEdit` prop) instead of double-click, reducing friction.
+6. **Server rendering upgrade** — Visitor-facing HTML now uses Payload's own `convertLexicalToHTML` (full-fidelity) instead of a custom lossy converter.
+
+**Design decisions:**
+- Lexical toolbar uses the same visual patterns as `TextFormatBar` (token names hidden per FB-098 principle) but composes DS components directly instead of raw `<button>` elements
+- Drag handles positioned to the left of content, invisible until hover — matches Notion's "zero-chrome until needed" pattern
+- Drop indicator is a 3px accent-colored line with pulse animation — visible enough to guide, subtle enough not to distract
+- Block boundaries not visible by default — only revealed during drag operations via outline dashing
+
+**Cross-category note:** Also documented in engineering feedback log (Phase 0-6 implementation details).
+
+---
+
+#### FB-104: "Intro blurb should match description styling; remove description as template concept"
+
+**UX Intent:** The intro blurb body text (`body-lg`, `text-secondary`, normal weight) looked visually weaker than the description section below it (`body-lg`, `text-primary`, medium weight). The user wanted the intro blurb to be the single prominent entry text, eliminating the description as a distinct template element.
+
+**Root Cause:** Two separate typography tiers for similar-purpose text created visual hierarchy confusion. The description looked more important than the intro blurb despite being lower in the page. Having both "intro blurb body" and "description" as distinct sections was redundant - the intro blurb should serve as the sole prominent entry text.
+
+**Resolution:**
+1. Promoted `.introBlurbBody` to use `font-weight: medium` and `color: text-primary` (matching the former description styling).
+2. Renamed `.description` / `.descriptionText` to `.legacyDescription` / `.legacyDescriptionText` and downgraded to `body-sm`, `text-secondary` (regular body text).
+3. Made legacy description conditional - only renders if `p.description` exists (backward compatibility for existing case studies).
+4. Updated `docs/content/case-study.md` to document the template change: no separate description section, all prominent text goes in the intro blurb.
+
+**Cross-category note:** Also documented as CF-016 (content template policy change).
+
+---
+
+#### FB-105: Block list content indented ~24px vs intro blurb in admin mode
+
+**Date:** 2026-04-04
+
+**UX Intent:** All body content in a case study (intro blurb headline, scope statement, section headings, section bodies) should share the same left edge. In admin mode, the block list content was visibly pushed to the right compared to the intro blurb and scope statement above it.
+
+**Root Cause:** The drag handle (`button.dragHandle`) inside `SortableBlock > .sortableInner` was a flex item occupying 20px width + 4px `margin-right` = 24px of horizontal space in the document flow. Even though the handle was invisible (`opacity: 0`) until hover, it still consumed layout space as a flex child. The intro blurb and scope statement are not wrapped in `SortableBlock`, so they had no drag handle and no offset.
+
+**Resolution:**
+1. Changed `.dragHandle` from in-flow flex item to `position: absolute; left: -28px; top: 2px`. This places the handle in the left gutter (between sidebar and content on desktop) without consuming any layout space. The content inside `.sortableContent` now fills the full width and aligns with the intro blurb above.
+2. Added a mobile breakpoint guard: `display: none` below `md`, `display: flex` at `md`+. On mobile (single-column layout), page padding is only 12-16px, insufficient for a -28px gutter offset. Mobile drag-to-reorder is poor UX regardless; `BlockToolbar` (move-up/move-down buttons) remains available for reordering on mobile.
+3. Removed `margin-right`, `margin-top`, and `flex-shrink: 0` (not meaningful for absolutely positioned elements).
+
+**Design decision:** The drag handle is a hover affordance, not a persistent UI element. It should never occupy layout space. Absolute positioning matches the existing pattern used by `BlockToolbar` (also `position: absolute; top: -24px; left: 0`).
+
+**Anti-pattern reference:** AP-034 (Admin Controls in Component Document Flow). The drag handle was a textbook instance - an admin-only control placed as an in-flow flex child, causing layout divergence between admin and visitor views.
+
+---
+
+#### FB-106: "Hero image taking up too much space vertically, no breathing room top/bottom"
+
+**UX Intent:** The full-width hero splash should have symmetric breathing room on all four sides, not just horizontal padding. If the hero is not a full-bleed takeover, directional asymmetry (horizontal padding but no vertical) creates a visual imbalance where the image feels pressed against the top/bottom edges. Additionally, uploading images with non-16:9 dimensions should not result in cropping.
+
+**Root Cause:** Two issues in `.heroSection` / `.heroInner`:
+1. `.heroSection` had horizontal padding at tablet+ breakpoints (0/16px/32px) but zero vertical padding. The hero sat flush against the top edge.
+2. `.heroInner` enforced `aspect-ratio: 16/9` with `overflow: hidden` on all states, including when an image was present. Any non-16:9 image was silently cropped.
+
+**Resolution:**
+1. Added vertical padding to `.heroSection` matching horizontal at each breakpoint: 24px top/bottom on mobile, 24px/16px at tablet, 32px all sides at desktop. Removed standalone `margin-bottom`.
+2. Split `.heroInner` into a base wrapper (no `aspect-ratio`, no `overflow: hidden`) and a `.heroSkeleton` modifier class (retains `aspect-ratio: 16/9` and gradient background). The skeleton class is applied conditionally via JSX only when no image is present. When an image loads, the container adapts to the image's natural proportions.
+3. Added spacing principle to `docs/design/spacing.md` §1.5: "Full-Width Splash Inset Symmetry."
+
+**Design decision:** The hero container should never dictate image proportions. The 16:9 skeleton is a placeholder shape for discoverability, not an enforced constraint. The designer controls hero proportions by choosing image dimensions.
+
+**Cross-category note:** Also documented as CF-017 (content - adaptive image dimensions in case study template).
+
+---
+
+#### FB-107: "No separation between intro blurb and article start; divider lines between sections are too much"
+
+**Date:** 2026-04-05
+
+**UX Intent:** A single structural divider should mark the boundary between the intro zone (blurb + scope statement + company callout) and the article body (content sections). Within the article, sections tell a cohesive story and should not be fragmented by `<hr>` dividers - whitespace alone provides sufficient separation.
+
+**Root Cause:** Two issues: (1) No visual separator existed between the intro zone and the content block list. The intro blurb body flowed directly into the scope statement and then into the first section heading with only margin gaps - no boundary signal. (2) `createCaseStudyBlocks` in `content-helpers.ts` defaulted `showDivider` to `true` (`s.showDivider !== false`), inserting `<hr>` divider blocks between every feature section. The existing anatomy diagram in `case-study.md` showed no inter-section dividers but the code contradicted it.
+
+**Resolution:**
+1. Added `.articleSeparator` class to `page.module.scss` - a 1px `$portfolio-border-subtle` line with `$portfolio-spacer-layout-spacious` margin. Inserted in `ProjectClient.tsx` after all intro content (blurb, description, company callout) and before the block list. Renders conditionally when `introBlurbHeadline` exists.
+2. Flipped `showDivider` default in `createCaseStudyBlocks` from opt-out (`!== false`) to opt-in (`=== true`). Sections no longer get divider blocks unless explicitly requested.
+3. Added adjacent-sibling CSS rule: `.blockItem + .blockItem .sectionHeading` / `.blockWrapper + .blockWrapper .sectionHeading` gets `margin-top: $portfolio-spacer-layout-spacious`. First heading has no extra margin (no preceding sibling).
+4. Removed divider from `FALLBACK_BLOCKS` in `page.tsx`.
+5. Re-ran Lacework and Elan seed routes to regenerate CMS content without stale dividers.
+
+**Design principle:** Dividers are zone boundaries, not chapter breaks. See `case-study.md` §3.9.
+
+**Anti-pattern reference:** CAP-024 (Divider Overuse Between Narrative Sections).
+
+**Cross-category note:** Also documented as CF-018 (content).
+
+---
+
+#### FB-108: "Hero image still too tall at widest breakpoint - needs to fit without scrolling"
+
+**Date:** 2026-04-05
+
+**UX Intent:** At the largest common laptop breakpoint (1440px+), the hero splash should fit entirely within the viewport without scrolling. The user should see the complete hero image and the beginning of the content below in a single glance.
+
+**Root Cause:** `.heroInner` had `max-width: 1600px`. At the `$elan-mq-lg` breakpoint (1440px viewport), the hero rendered at 1376px wide with a 16:9 skeleton height of 774px. Adding 64px of section padding yielded ~838px total - exceeding a typical MacBook's usable viewport height (~800px after browser chrome and admin bar).
+
+**Resolution:** Reduced `max-width` on `.heroInner` from 1600px to 1200px. At 1440px viewport, the hero is now 1200px wide, 675px tall at 16:9, total section ~739px - fits comfortably. Smaller breakpoints (md = 1056px and below) are unaffected because the viewport width already constrains the hero below 1200px. Updated `docs/content/case-study.md` §3.2 to reflect the new max-width value.
+
+**Design decision:** 1200px is wide enough to maintain the "breakout" effect (nearly double the 720px content column) while ensuring the hero fits within the viewport at 1440px. At 1920px+, 1200px centered with generous side breathing room looks intentional rather than overflowing.
+
+**Superseded by FB-109** - the 1200px reduction broke alignment with the layout (hero became narrower than the 1440px layout). Reverted max-width to 1600px; height is now controlled via skeleton aspect ratio instead.
+
+---
+
+#### FB-109: "Hero image and two columns not vertically aligned - should be centered"
+
+**Date:** 2026-04-05
+
+**UX Intent:** The hero splash and the two-column layout below it should share the same visual center and appear aligned when scanning vertically. The hero should remain a "breakout" element (wider than the layout), not match the layout width.
+
+**Root Cause:** FB-108 reduced `.heroInner` max-width from 1600px to 1200px to control skeleton height. This made the hero 240px narrower than `.layout` (max-width: 1440px), creating a visible misalignment where the hero floated as a smaller rectangle above a wider content area. The root cause of the height issue was using max-width as the height control lever - the correct lever is the skeleton's aspect ratio.
+
+**Resolution:**
+1. Restored `.heroInner` max-width from 1200px to 1600px. The hero is once again wider than the layout, re-establishing the breakout effect and centering alignment (both use `margin: 0 auto`).
+2. Changed `.heroSkeleton` aspect-ratio from `16/9` to `21/9` (cinema widescreen). This controls height without narrowing the container. At 1440px viewport: skeleton = 590px tall, total section = 654px. Fits in ~800px viewport.
+3. `.heroSection` padding unchanged on all four sides - spacing principle (§1.5) preserved.
+4. Updated `docs/content/case-study.md` §3.2: max-width, aspect ratio, alignment behavior, and hero image recommendation (21:9 or wider for above-the-fold presence).
+
+**Alignment behavior by viewport:**
+- 1440px: hero inner 1376px, layout 1440px. Left edges aligned at 32px inset. Hero slightly narrower due to padding.
+- 1504px+: hero inner exceeds 1440px. Breakout begins - hero wider than layout on both sides.
+- 1920px: hero inner 1600px, layout 1440px. Full breakout, 80px each side.
+
+**Design decision:** Height should be controlled via aspect ratio, not max-width. Max-width controls horizontal alignment and breakout; aspect ratio controls vertical fit. Conflating the two (FB-108) traded alignment for height, creating a new problem. Separating the concerns resolves both.
+
+**Known trade-off:** Real 16:9 images will exceed viewport at 1440px (774px image + 64px padding = 838px). Accepted per adaptive dimensions policy - the designer controls proportions by choosing image dimensions. The 21:9 skeleton communicates the recommended proportions.
+
+---
+
+#### FB-110: "Hero and two-column layout not sharing the same visual center - layout is left-biased"
+
+**Date:** 2026-04-05
+
+**UX Intent:** The hero splash (symmetric 32px padding at md+) and the two-column layout below it should share the same visual center. The layout appeared left-biased compared to the hero.
+
+**Root Cause:** FB-048 (archived) introduced `padding-right: $portfolio-spacer-8x` (64px) on `.layout` at md+ and `margin-left: $portfolio-spacer-3x` (24px) on `.content` at lg+ to prevent content from overlapping the ScrollSpy (`position: fixed; right: 16px`). This solved the overlap but shifted the entire layout leftward, creating a different visual center than the hero section's symmetric padding. The clearance was applied at the wrong level - the layout container instead of the content column.
+
+**Resolution:**
+1. Removed `padding-right: $portfolio-spacer-8x` from `.layout` at md+. Layout now uses symmetric padding (`$portfolio-spacer-4x` all sides at md+), matching the homepage and hero section.
+2. Removed `margin-left: $portfolio-spacer-3x` from `.content` at lg+. No longer needed since the layout is now symmetric.
+3. Added `margin-right: $portfolio-spacer-6x` (48px) to `.content` at md+. This yields ScrollSpy clearance at the content level without shifting the layout's center.
+4. Added layout principles 2.3 (Cross-Page Alignment Consistency) and 2.4 (Overlay Clearance) to `docs/design/layout.md`.
+
+**Reversal rationale (FB-048):** FB-048's intent (ScrollSpy clearance) was correct but the mechanism (layout-level padding) had a side effect: it shifted the visual center of the entire layout. The new approach applies clearance at the `.content` level via `margin-right`, which only narrows the content column without displacing the layout. At md (1056px), content narrows to 612px - still above the 45-75 character readability minimum. At lg+ (1440px+), `max-width: 720px` kicks in and the margin is redundant.
+
+**Verification math at md (1056px):** Available = 992px. After sidebar (300) + gap (32) + content margin-right (48) = 612px content. Content right edge: 976px. ScrollSpy tick left edge: 1012px. Gap: 36px.
+
+**Addendum (same session):** Symmetric padding alone was insufficient. The content column (`flex: 1; max-width: 720px`) claimed all remaining flex space via flex-grow, but `max-width` prevented it from using it. The 276px of unclaimed space sat on the right as dead space, making the sidebar+content block appear left-biased. Fix: changed `.content` to `flex: 0 1 $elan-container-content` at md+ (don't grow, can shrink, basis = 720px) and added `justify-content: center` to `.layout` at md+. This allows the flex algorithm to distribute the free space equally on both sides, centering the sidebar+content group within the layout container. At md (1056px), content shrinks from 720px to 612px (no free space to distribute, so justify-content has no effect). At lg (1440px), sidebar+content is 1100px in a 1376px container, centered with 138px on each side.
+
+---
+
+#### FB-111: "Hero skeleton too wide - impractical 21:9 ratio, impossible to create matching assets"
+
+**Date:** 2026-04-05
+
+**UX Intent:** The hero skeleton should use a standard image ratio that designers can easily create assets for. The current height (~590px at 1440px) is good but the width is impractical - no standard screenshot or mockup matches 21:9.
+
+**Root Cause:** FB-109 changed the skeleton from 16:9 to 21:9 to control height while keeping `max-width: 1600px`. This solved the height problem but created a new one: the 21:9 (2.33:1) ratio doesn't match any standard image format. Standard screenshots are 16:9 (1920x1080), MacBook captures are 16:10 (2560x1600). Designers cannot create assets that fill the hero without custom ultra-wide crops or large blank margins.
+
+**Resolution:**
+1. Changed `.heroSkeleton` aspect-ratio from `21/9` back to `16/9` (standard screen ratio).
+2. Changed `.heroInner` max-width from `1600px` to `$elan-container-default` (1056px). At 1440px viewport, the hero renders at 1056px x 594px - virtually the same height as before (was 590px) with a practical width.
+3. Updated `docs/content/case-study.md` to reflect the new max-width, ratio, and alignment description.
+
+**Design shift:** The hero is no longer a "breakout" element wider than the layout. It is now a centered inset element, slightly narrower than the sidebar+content block (~1100px). Both share the same visual center. This is a deliberate reversal - asset practicality and visual consistency outweigh the breakout effect.
+
+**Height verification:** 1056 * 9/16 = 594px + 64px section padding = 658px total. Fits comfortably in all common viewports.
+
+**Addendum (same session):** After the hero narrowed to 1056px, the sidebar+content block (~1100px) visually bled past the hero edges on both sides. Fix: changed `.layout` max-width from `$elan-container-wide` (1440px) to `calc($elan-container-default + $portfolio-spacer-4x * 2)` (1120px). This gives the layout an inner content area of 1056px - exactly matching the hero's max-width. At every viewport, the hero and layout share the same visual edges. Content column narrows from 720px to 676px at lg+ (still 95+ characters per line, well within readability range).
+
+#### FB-112: "Case study title should sit above the sidebar, not beside it" — REVERTED
+
+**Date:** 2026-04-05
+
+**UX Intent:** The case study title (introBlurbHeadline) should have clear visual primacy over the sidebar metadata. The hypothesis was that offsetting the sidebar downward so the title occupies its own visual tier above the metadata would strengthen hierarchy.
+
+**Approaches tried (all rejected):**
+
+1. **Separate container above layout (flex):** Extracted the introBlurb into a `.caseStudyIntro` container above the two-column `.layout`. Result: title spanned full container width (~1100px), text was too wide, the page felt like three disconnected zones (hero, title blob, columns). The title lost its spatial relationship to the content column.
+
+2. **CSS Grid with title in right column row 1:** Converted `.layout` to CSS Grid with `grid-template-columns: 300px 1fr` and `grid-template-rows: auto 1fr`. Intro placed at `grid-column: 2; grid-row: 1`, sidebar and content at `grid-row: 2`. Initial implementation had the title land in the wrong column (FadeIn wrapper was the grid child, not `.introBlurb`). After fixing, the empty left column at title height and the row transition still looked unnatural - the visual break between the title zone and the two-column zone was jarring rather than elegant.
+
+3. **Grid with headline-only in row 1, body alongside sidebar:** Split the introBlurb so only the headline occupied row 1 and the body text moved into `.content` (row 2, alongside sidebar). This created the tightest offset but still looked wrong - the separation between headline and its body text felt arbitrary.
+
+**Conclusion:** All three approaches degraded the layout. The original design - sidebar and content top-aligned, both starting at the same height below the hero - is the correct choice for this page. The two-column alignment creates a clean, predictable reading frame. The case study title achieves hierarchy through typography (size, weight) rather than vertical offset. Trying to offset the sidebar disrupts the visual rhythm of the page without a proportional gain in hierarchy clarity.
+
+**Decision:** Keep the original flex layout with top-aligned columns. Do not attempt vertical offset of the sidebar relative to the title. Document this as a deliberately explored and rejected direction.
+
+---
+
+### FB-XXX — Terra Brand Accent Scale (2026-04-05)
+
+**Trigger:** User request to create a new brand accent called "Sand" (later renamed "Terra") in the Elan Design System, based on the color family of #FAF9F6.
+
+**What was decided:**
+- Built a full 10-step OKLCH color scale (terra-10 through terra-100) using the identical construction methodology as the existing Lumen accent: same lightness ramp, same sine chroma bell curve shape, constant hue
+- Hue initially 91.4deg from OKLCH decomposition of #FAF9F6, then tuned to 70deg for redder warmth (amber/sienna vs gold)
+- Peak chroma set to 0.135 at step 60 (0.480x Lumen's peak), appropriate for warm earth-tone gamut
+- Semantic tokens added for surface, text, and border property dimensions. Icon and action tokens deliberately omitted (Tier 2 scope restriction)
+- Dark mode: text/border follow standard step inversion (60/40 and 60/50). Surface tokens use neutral fallback (neutral-90/80) instead of step inversion
+
+**What was learned:**
+- The Lumen construction formula (even lightness ramp + sine chroma arc + constant hue in OKLCH) generalizes cleanly to any hue family. The primary variable is peak chroma, which must be tuned to the gamut limits of the target hue region
+- Terra's hue proximity to Carbon Yellow (~10-15deg) and Orange (~15deg) is not a semantic collision because they serve different roles and different tiers (Tier 2 brand accent vs. Tier 1 warning/caution)
+- Atmospheric/decorative colors warrant different dark mode strategies than functional colors. Neutral fallback preserves intent better than step inversion for warm surfaces
+- culori npm package proved reliable for OKLCH-to-hex batch conversion and contrast computation
 

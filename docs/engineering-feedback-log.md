@@ -4,10 +4,283 @@
 >
 > **Who reads this:** AI agents at session start (scan recent entries for context), and during incident response (check for recurring patterns).
 > **Who writes this:** AI agents after each incident resolution via the `engineering-iteration` skill.
-> **Last updated:** 2026-04-03 (ENG-104: Checkbox forceMount + transition fix)
+> **Last updated:** 2026-04-06 (ENG-125: Hero image re-upload missing + dimension mismatch)
 >
 > **For agent skills:** Read only the first 30 lines of this file (most recent entries) for pattern detection.
 > **Older entries:** Synthesized in `docs/engineering-feedback-synthesis.md`. Raw archive in `docs/engineering-feedback-log-archive.md`.
+
+---
+
+### ENG-125: Hero image re-upload missing + dimension mismatch
+
+**Date:** 2026-04-06
+
+**Issue:** Two hero image problems: (1) After uploading a hero image, there is no way to re-upload/replace it. (2) Uploaded image dimensions don't match the placeholder container, causing blank space or inconsistent sizing.
+
+**Root Cause:** (1) The hero section JSX had a ternary that rendered `<img>` when an image existed and `<ImageUploadZone>` only when no image existed. Once uploaded, the upload affordance disappeared. (2) `.heroSkeleton` had `aspect-ratio: 16/9` but `.heroInner` (which wraps existing images) had no aspect ratio constraint. `.heroImg` used `height: auto` which let the image render at its natural proportions, creating container-size jumps. Related to ENG-123 (hero image upload flow), same area.
+
+**Resolution:**
+1. **Re-upload overlay** (ProjectClient.tsx): When admin + image exists, renders a hover overlay (`heroReplaceOverlay`) on top of the image with a hidden file input. Clicking or dropping uploads a new file, updates both the hero content block's `image` field and the legacy `heroImage` field, then refreshes. Added `heroBlockIndex` tracking, `replaceHeroImage` callback, and `heroFileRef` + `heroUploading` state.
+2. **Dimension auto-fit** (page.module.scss): Moved `aspect-ratio: 16/9` and `overflow: hidden` from `.heroSkeleton` to `.heroInner` so the container always maintains 16:9 regardless of image content. Changed `.heroImg` from `height: auto` to `height: 100%; object-fit: cover`. Images that don't match 16:9 now get cropped, making proportion issues immediately visible.
+
+**Cross-category note:** Also documented as FB-115 (design) for image container consistency and upload affordance.
+
+**Files modified:** `src/app/(frontend)/work/[slug]/ProjectClient.tsx`, `src/app/(frontend)/work/[slug]/page.module.scss`.
+
+---
+
+### ENG-124: Button component polymorphic upgrade for link support
+
+**Date:** 2026-04-06
+
+**Issue:** The DS `Button` component (`src/components/ui/Button/Button.tsx`) only rendered `<button>` elements. Navigation links (back, prev/next) across the site bypassed the DS by using plain `<Link>` with custom CSS, creating a consistency gap.
+
+**Root Cause:** The `ButtonProps` type only extended `ButtonHTMLAttributes<HTMLButtonElement>`. There was no mechanism for the component to render as a link element.
+
+**Resolution:** Made `Button` polymorphic via discriminated union types: `ButtonAsButton` (no `href`, renders `<button>`) and `ButtonAsLink` (`href` required, renders `<Link>` for internal or `<a>` for external URLs). Added `text-decoration: none` to the base `.button` CSS class for link rendering. Replaced 6 instances across 4 files: `ProjectClient.tsx` (back + prev + next), `ExperimentsClient.tsx`, `motion/page.tsx`, `typography/page.tsx`. Removed unused `Link` import from `ProjectClient.tsx`.
+
+**Cross-category note:** Also documented as FB-112 (design) for DS component consistency.
+
+**Files modified:** `src/components/ui/Button/Button.tsx`, `src/components/ui/Button/Button.module.scss`, `src/app/(frontend)/work/[slug]/ProjectClient.tsx`, `src/app/(frontend)/experiments/ExperimentsClient.tsx`, `src/app/(frontend)/design-system/motion/page.tsx`, `src/app/(frontend)/typography/page.tsx`.
+
+---
+
+### ENG-123: Hero image upload — uniqueness error + display disconnect
+
+**Date:** 2026-04-06
+
+**Issue:** Two problems with hero image upload on case study pages: (1) Uploading images via the hero ImageUploadZone fails with "Could not save - A field value must be unique" when the sanitized filename matches an existing media entry. (2) After a successful upload, the image appears in the home page thumbnail (which reads the legacy heroImage field) but not on the actual case study page.
+
+**Root Cause:** (1) `uploadMedia()` used the original filename for the Payload media entry. Payload's media collection enforces unique filenames. Common filenames (e.g., "Screenshot 2026-04-05 at 19.04.17.png") collide after sanitization. (2) The ImageUploadZone writes to the legacy heroImage field. The case study page.tsx reads from the hero content block's image field first, and only falls back to heroImage when NO hero content block exists. Projects with a hero content block (even one with no image) never reach the heroImage fallback path.
+
+**Resolution:**
+1. **Filename dedup** (api.ts): `uploadMedia()` now appends a `Date.now()` timestamp to the stem of every uploaded filename (e.g., hero-1743897600000.png). Prevents collisions without server-side dedup.
+2. **Hero fallback merge** (work/[slug]/page.tsx): When a hero content block exists but has no imageUrl, the server-side mapper now fills it with the legacy heroImage URL. Previously the fallback only fired when no hero block existed at all.
+
+**Pattern:** Data model migration gap - architecture moved from heroImage (top-level upload field) to hero content blocks, but the upload path still wrote to the old field and the read path had a gap in the fallback chain.
+
+**Lesson:** When migrating from legacy fields to new content structures, audit all three legs: (1) the write path, (2) the read/display path, and (3) the fallback path. A gap in any one leg creates a "writes but doesn't display" bug.
+
+---
+
+### ENG-122: InfoTooltip integration on hero metrics
+
+**Issue:** Hero metrics on case study pages display a big number and a label but offer no explanation of how the metric was derived. User requested adding tooltips to provide non-invasive methodology context.
+
+**Root Cause:** The `heroMetric` data structure (`{ value, label }`) had no field for tooltip content, and the rendering code displayed only static text without any interactive element.
+
+**Resolution:**
+1. Extended `HERO_METRICS` map in `page.tsx` with optional `tooltip` field (string).
+2. Added tooltip content for Lacework ("Perceived ease-of-use scores...") and Meteor ("A representative basket review...").
+3. Updated `ProjectClient.tsx` type to include `tooltip?: string`.
+4. Imported `InfoTooltip` from `@/components/ui/Tooltip` and rendered it alongside the metric label in a new `.heroMetricLabelRow` flex wrapper.
+5. Added `.heroMetricLabelRow` SCSS class (`display: flex; align-items: center; gap: spacer-0.5x`).
+6. Elan Design System metric intentionally has no tooltip (self-anchoring count).
+
+**Files changed:** `page.tsx`, `ProjectClient.tsx`, `page.module.scss` (all in `src/app/(frontend)/work/[slug]/`).
+
+**Cross-category note:** Also documented as CF-020 (content - tooltip copy and metric taxonomy) and in design log (tooltip as a UI pattern for metrics).
+
+---
+
+### ENG-121: LexicalBlockEditor save-on-blur silently fails for array-indexed fields
+
+**Issue:** Editing rich text blocks in case study content (LexicalBlockEditor) appeared to save on blur but reverted on page refresh. No error was ever shown to the user.
+
+**Root Cause:** Two compounding bugs: (1) `setNested()` in `api.ts` creates a sparse array when the field path contains an array index (e.g., `content.2.body` produces `[null, null, {body: ...}]`). Payload CMS rejects this with HTTP 500 because the null entries lack required `blockType` fields. (2) The `save()` function in `LexicalBlockEditor.tsx` was fire-and-forget - it called `updateCollectionField()` without `await` or `.catch()`, so the 500 error was silently swallowed.
+
+**Resolution:** Changed `save()` to detect array-indexed field paths via regex (`/^(\w+)\.(\d+)\.(.+)$/`). When detected, it fetches the current document, patches only the specific array element, and sends the full array back - the same pattern `useBlockManager.patchContent` already uses. Also added `.catch()` to the blur and Cmd+S save handlers so future errors are logged to the console instead of silently lost.
+
+**Lesson:** Fire-and-forget async calls that appear to succeed (no visible error) are the hardest bugs to diagnose. Any function that writes to the backend should either `await` its result or attach a `.catch()` that surfaces the error. The `setNested` utility is also fundamentally unsuited for partial array updates - always fetch-modify-save for array fields.
+
+---
+
+### ENG-120: Title semantic split - introBlurbHeadline drives homepage card
+
+**Issue:** The `title` CMS field was used for both the app name and the homepage card title. The creative case study headline (`introBlurbHeadline`) was only visible inside the case study, wasting its hook value.
+
+**Root Cause:** Original data model treated `title` as the universal display name. When `introBlurbHeadline` was added for the case study intro blurb, the homepage card was never updated to use it.
+
+**Resolution:**
+1. `page.tsx` (homepage): added `introBlurbHeadline` to project data mapping, updated project type.
+2. `HomeClient.tsx`: card `EditableText` switched from `fieldPath="title"` to `fieldPath="introBlurbHeadline"`, with fallback display `{project.introBlurbHeadline || project.title}`. Updated `openProjectEditor` to pass `introBlurbHeadline`.
+3. `ProjectClient.tsx`: sidebar title label changed to "App Name", intro blurb headline label changed to "Case Study Title".
+4. `ProjectEditModal.tsx`: added `introBlurbHeadline` to `ProjectForEdit` interface, added state management, added "Case Study Title" form field, included in save body. "Title" label renamed to "App Name".
+5. `Projects.ts`: updated admin descriptions for both fields.
+6. DB fix: PATCH Lacework `title` from "I saved the page..." back to "Lacework".
+
+**Data flow:** Homepage card title now reads `introBlurbHeadline` (falls back to `title`). Editing the card title on the homepage or the intro blurb headline on the case study page both edit the same `introBlurbHeadline` field. The `title` field is the app name, displayed in sidebar h1 and prev/next nav only.
+
+**Cross-category note:** Also documented as FB-106 (design) and CFB-026 (content).
+
+---
+
+### ENG-119: Scope statement Lexical data flow + editing UX parity
+
+**Issue:** The scope statement (description field) used `EditableText` (plain contenteditable) for editing while section bodies used `LexicalBlockEditor`. Both are Lexical richText fields in the CMS, but `descriptionLexical` was never passed from `page.tsx` to `ProjectClient.tsx`.
+
+**Root cause:** Data flow gap. `page.tsx` extracted `descPlain` and `descHtml` from `doc.description` but never passed the raw Lexical JSON needed by `LexicalBlockEditor`.
+
+**Resolution:** Added `descriptionLexical` to the project data flow (`page.tsx` → `ProjectClient.tsx`). Switched scope statement admin rendering from `EditableText` to `LexicalBlockEditor`. Both body text areas now use the same Lexical editing UX.
+
+**Cross-category note:** Also a design issue (font size mismatch between the two areas). Documented as FB-104.
+
+---
+
+### ENG-118: Restore image skeleton system (placeholderLabels)
+
+**Issue:** During the migration from `sections[]` to typed `content` blocks, the image placeholder/skeleton system was dropped entirely. The old `IMAGE_PLACEHOLDERS` map in `page.tsx` (commit `d9bb2d3`) provided labeled placeholder boxes so users knew which images to upload where. The new blocks system had no equivalent. Three compounding causes: CMS schema required real image IDs (`required: true`), the helper API had no placeholder concept, and the authoring skill workflow docs never instructed agents to create placeholder blocks.
+
+**Root cause:** Migration gap. When `sections[]` became `content` blocks, the scaffold layer (labeled image skeletons) was dropped without a replacement. The SCSS styles (`.placeholderGrid`, `.labeledPlaceholder`) survived but went unused. Additionally, `content-helpers.ts` used stale layout shorthand values (`'full'`, `'leftHeavy'`) that didn't match CMS schema or frontend render map values.
+
+**Resolution:**
+- Added `placeholderLabels` (json field) to `imageGroup` block in `Projects.ts` (auto-pushed by Payload)
+- Fixed layout type mismatch in `CaseStudySection` interface to use CMS-native values (`full-width`, `grid-2-equal`, etc.)
+- Added `imagePlaceholders` field to `CaseStudySection`, updated `createCaseStudyBlocks()` to emit one imageGroup per section with `placeholderLabels` when no real images exist
+- Updated `readBlocksAsMarkdown()` to represent placeholders as `> [IMAGE PLACEHOLDER: label]`
+- Updated `mapContentBlocks()` in `page.tsx` to pass `placeholderLabels` through to frontend
+- Updated `ProjectClient.tsx` to render labeled skeleton grid using existing SCSS classes
+- Updated `addImageToBlock` in `useBlockManager.ts` to clear `placeholderLabels` on first real image upload
+- Updated authoring skill workflow (Phase 2 + Phase 3) with image skeleton planning and materialization
+- Added Check 15 (Visual density) to case-study-review.md, removed hardcoded "14 checks" count
+- Updated narrative-arc.md Tier 1 definition and visual-economy.md with generation guidance
+
+**Lesson:** When migrating a data model, audit the full rendering pipeline end-to-end: schema → helper → server-side mapping → client-side render → admin upload flow. The image skeleton system was invisible in the CMS schema diff because it lived in a separate layer (`page.tsx` static map) that wasn't part of the formal migration checklist. Migration checklists should include "scaffold/placeholder/preview" layers alongside data and render layers.
+
+---
+
+### ENG-117: Turbopack routes-manifest.json missing breaks all dynamic routes
+
+**Issue:** User reported "this page isn't working" on `http://localhost:4000/work/lacework` and expected other case study pages to have the same problem. Server returned 500 for all `/work/[slug]` routes while the home page `/` worked fine.
+
+**Root Cause:** Next.js 16.2.1 Turbopack does not generate `.next/dev/routes-manifest.json` during development. The file is required for resolving dynamic routes. Static routes (like `/`) work because they don't need the manifest, but any parameterized route (`/work/[slug]`) fails with `ENOENT: no such file or directory, open '.next/dev/routes-manifest.json'`. This is a known Turbopack regression in 16.2.x (GitHub vercel/next.js#91609, #91864). The `--webpack` bundler generates the manifest correctly.
+
+**Resolution:** Switched the main site dev script from `next dev --port 4000` (Turbopack default) to `next dev --port 4000 --webpack`. All dynamic routes now compile and serve correctly. This is a temporary workaround until the Turbopack bug is fixed in a future Next.js release.
+
+**Principle extracted -> `engineering-anti-patterns.md` EAP-069: Turbopack routes-manifest regression in Next.js 16.2.x**
+
+---
+
+### ENG-116: Zombie Next.js servers accept TCP but hang on HTTP requests
+
+**Issue:** User clicked localhost links and pages never loaded. Agent's boot-up probe using `nc` and `lsof` confirmed TCP listeners on ports 4000, 4001, and 4002, but `curl` requests hung indefinitely. Servers appeared alive but were unresponsive. Additionally, agent used `127.0.0.1` in URLs instead of the standard `localhost`.
+
+**Root Cause:** The three Next.js dev server processes (PIDs 28348, 64678, 19795) had been running for 6 minutes to 3+ days from previous sessions. Over time they entered a zombie state where the Node.js process still held the TCP socket open (accepting connections at the kernel level) but was no longer processing HTTP requests. The initial boot-up probe relied on `lsof` (port occupied) and `nc` (TCP connect succeeds) as health indicators, but neither test exercises the HTTP layer. A process can accept TCP connections without ever responding to them.
+
+**Resolution:** Killed all three stale processes (`kill -9`), cleared `.next` caches for all three apps, restarted fresh. All servers responded to `curl http://localhost:<port>/` within 12 seconds. URLs now use `localhost` instead of `127.0.0.1`.
+
+**Principle extracted -> `engineering-anti-patterns.md` EAP-063: TCP-level checks are not health checks**
+
+---
+
+### ENG-115: Hero image below intro blurb — block list position vs. template position
+
+**Issue:** Hero image renders after introBlurb, description, and companyNote because it's a block in the `content` array. User wants hero image always above the intro blurb as a fixed template element.
+
+**Root Cause:** The hero block type was treated like any other content block. No extraction logic separated it from the block list. The template rendering order placed all blocks after the intro sections.
+
+**Cross-category note:** Also documented as FB-101 (design).
+
+**Resolution:** Extracted hero from content blocks with `useMemo`, rendering it at the top of `<main>` before introBlurb. Created `contentBlocks` array that filters out hero blocks, preserving `originalIndex` for CMS field path references. All `blockMgr` operations now use `cmsIndex` (original array position) rather than display `blockIndex` to prevent off-by-one writes. Template change applies to all case studies automatically.
+
+---
+
+### ENG-114: Lexical toolbar invisible — undefined CSS token references
+
+**Issue:** User reported "Bad UI, edit modal clashing with content." The LexicalToolbar (floating rich text format bar) rendered with a transparent background, making buttons appear directly on top of content text.
+
+**Root Cause:** `.lexToolbar` referenced `var(--portfolio-bg-elevated)` and `.lexToolbarBtn:hover` referenced `var(--portfolio-bg-subtle)` — both CSS custom properties that don't exist in the design token system. They resolve to `initial` (transparent). The correct tokens are `--portfolio-surface-primary` and `--portfolio-surface-secondary`.
+
+**Cross-category note:** Also documented as FB-100 (design).
+
+**Resolution:** Replaced three undefined CSS custom properties in `inline-edit.module.scss`:
+- `.lexToolbar` background: `var(--portfolio-bg-elevated)` → `var(--portfolio-surface-primary)`
+- `.lexToolbarBtn:hover` background: `var(--portfolio-bg-subtle)` → `var(--portfolio-surface-secondary)`
+- `.lexCode` background: `var(--portfolio-bg-subtle)` → `var(--portfolio-surface-secondary)`
+Also replaced hardcoded `z-index: 100` with `var(--portfolio-z-dropdown)` and `box-shadow` with `var(--portfolio-shadow-lg)` to use the token system consistently.
+
+---
+
+### ENG-113: Lexical MarkdownShortcuts missing `CodeNode` dependency
+
+**Date:** 2026-04-04
+
+**Issue:** Runtime error on case study pages with richText blocks: "MarkdownShortcuts: missing dependency code for transformer. Ensure node dependency is included in editor initial config."
+
+**Root Cause:** `LexicalBlockEditor` uses `TRANSFORMERS` from `@lexical/markdown` (which includes the `CODE` block transformer) but `EDITOR_NODES` didn't include `CodeNode`. The `registerMarkdownShortcuts` function validates that all node dependencies for each transformer are registered.
+
+**Resolution:** Added `CodeNode` from `@lexical/code` to the `EDITOR_NODES` array. The package was already installed as a transitive dependency of `@payloadcms/richtext-lexical`.
+
+**Lesson:** When using `TRANSFORMERS` (the full set) from `@lexical/markdown`, every transformer's node dependency must be in the editor config. If you don't want to support a transformer's node type, build a custom transformer list instead.
+
+---
+
+### ENG-112: DndContext `aria-describedby` hydration mismatch on case study blocks
+
+**Date:** 2026-04-04
+
+**Issue:** Hydration attribute mismatch on every `SortableBlock` — server rendered `aria-describedby="DndDescribedBy-0"` but client expected `DndDescribedBy-2`.
+
+**Root Cause:** `@dnd-kit/core`'s `DndContext` uses an auto-incrementing counter for its accessibility ID. The counter value differs between server SSR and client hydration because other components (or React strict mode) increment it on the client before `ProjectClient` mounts.
+
+**Resolution:** Added `id="project-blocks"` prop to `DndContext`, which produces a stable `DndDescribedBy-project-blocks` instead of the counter-based ID.
+
+**Lesson:** Always pass a stable `id` to `DndContext` in SSR environments. The auto-generated counter-based ID is inherently non-deterministic across server/client boundaries.
+
+---
+
+### ENG-111: Rich text hydration mismatch — `<p>` inside `<p>` on case study description
+
+**Date:** 2026-04-04
+
+**Issue:** Hydration failure on `/work/meteor` — server-rendered HTML didn't match client. React reported `dangerouslySetInnerHTML.__html` differed: server had the full description HTML, client had `""`.
+
+**Root Cause:** `EditableText` was rendered with `as="p"` for rich text fields (`description`, `introBlurbBody`) whose `htmlContent` contains block-level `<p>` tags from Payload's Lexical-to-HTML conversion. This produced `<p><p><strong>...</strong></p></p>` — illegal per the HTML spec. The browser's parser auto-closes the outer `<p>` when it encounters the inner `<p>`, restructuring the DOM. React's hydration then sees a different tree than what it rendered on the server.
+
+**Resolution:** Changed `as="p"` to `as="div"` for all `EditableText` instances that use `isRichText` + `htmlContent` (description, introBlurbBody). Also changed the non-admin fallback paths from `<p dangerouslySetInnerHTML>` to `<div dangerouslySetInnerHTML>` for the same fields. Plain-text fallbacks (`<p>{text}</p>`) remain unchanged since they contain no nested block elements.
+
+**Lesson:** Rich text HTML from CMS (Lexical → HTML) always contains block-level elements (`<p>`, `<h2>`, etc.). The wrapper element for `dangerouslySetInnerHTML` must be a flow container (`div`) not a phrasing element (`p`, `span`). This is an instance of EAP-014 (hydration mismatches from invalid HTML).
+
+---
+
+## Session: 2026-04-04 — Inline edit system enhancements
+
+### ENG-107: Inline edit system — Lexical style round-trip, selection formatting, section CRUD, image upload
+
+**Issue:** Multiple inline editing limitations reported: (1) Bold/italic couldn't be applied to individual words — entire text block toggled. (2) No font family or color selection. (3) Case study sections couldn't be added/reordered/deleted without code changes. (4) Images couldn't be uploaded directly from the inline editor. (5) Hero image used a static map instead of CMS data.
+
+**Root Cause:**
+1. **Formatting:** `toggleBold`/`toggleItalic` in `TextFormatBar` and `EditableText` used `el.style.fontWeight`/`el.style.fontStyle` for no-selection case, overriding all child `<strong>`/`<em>` tags via CSS cascade.
+2. **Style preservation:** `htmlToLexicalDocument()` only extracted formatting from semantic tags (B, I, U, S), ignoring inline `style` attributes. `lexicalToHtml()` only emitted format bitmask tags, not `style` fields.
+3. **Section management:** No CRUD API existed for sections; `ProjectClient.tsx` rendered sections as a static loop.
+4. **Image upload:** No upload component existed; hero image used `COVER_IMAGES` static map.
+
+**Resolution:**
+1. **Lexical style round-trip** (`api.ts`, `lexical.ts`): Added `extractInlineStyle()` to parse `font-family` and `color` from inline styles and `<font color>` elements. Modified `collectTextNodes()` to propagate styles. Updated `mergeAdjacentNodes()` to check both `format` and `style`. Updated `lexicalToHtml()` to emit `<span style="...">` when a text node has a `style` field.
+2. **Selection-level formatting** (`TextFormatBar.tsx`, `EditableText.tsx`): Replaced `el.style.fontWeight`/`el.style.fontStyle` with `selectAllContent()` + `execCommand('bold'/'italic')` for no-selection case. Added `wrapSelectionWithStyle()` helper for font-weight, font-size, font-family, and color. Bold toggle now clears `el.style.fontWeight` to prevent cascade conflicts.
+3. **Font family picker** (`token-map.ts`, `TextFormatBar.tsx`): Added `FONT_FAMILY_SCALE` (8 entries) and `matchFontFamily()`. Dropdown uses selection-aware `wrapSelectionWithStyle('font-family', css)`.
+4. **Color picker** (`TextFormatBar.tsx`): Converted read-only color swatch to dropdown of `COLOR_TOKENS`. Uses `execCommand('foreColor')` for selection-aware color.
+5. **Section CRUD** (`SectionManager.tsx`, `ProjectClient.tsx`): Created `useSectionManager` hook with `addSection`/`deleteSection`/`moveSection` that PATCH the project's `sections` array. `SectionToolbar` renders per-section move/delete controls. `AddSectionButton` at sections end.
+6. **Image upload** (`ImageUploadZone.tsx`, `ProjectClient.tsx`): Created `ImageUploadZone` (hero image) and `SectionImageUpload` (section images) with drag-and-drop + click-to-upload. Upload via `POST /api/media`, then PATCH the project field.
+7. **Hero image from CMS** (`page.tsx`): Extracted `heroImageUrl` from `doc.heroImage` relation. Falls back to `COVER_IMAGES` static map if CMS has no hero image.
+
+**Cross-category note:** Also documented as FB-099 (design — toolbar accessibility, contrast fix, font/color pickers).
+
+**Lesson:** `el.style.fontWeight` on a contentEditable root creates a cascade conflict that makes per-word bold toggling impossible. Always use semantic tags (`<strong>`, `<em>`) or `<span>` wrappers for formatting within contentEditable — never apply formatting as an inline style on the root element itself. This applies to any CSS property where per-word granularity is needed.
+
+---
+
+## Session: 2026-04-03 — Sidebar SCSS module migration
+
+### ENG-106: Sidebar .module.css → .module.scss migration (build verification)
+
+**Issue:** Sidebar shell refactored from Tailwind utility classes to full SCSS module with Élan DS tokens. Module renamed from `.css` to `.scss`, requiring build-chain verification.
+
+**Root cause:** Proactive refactoring — not a bug. Engineering dimension of FB-098.
+
+**Resolution:** Deleted `sidebar.module.css`, created `sidebar.module.scss` with `@use 'mixins/...'` and `@use 'tokens/...'` imports (resolved via `sassOptions.loadPaths` → `src/styles/`). Import in TSX changed from `styles` to `s` alias. Full flush-and-restart verified: HTTP 200 on `/` and `/components/button`, class names in rendered HTML confirmed as SCSS module hashes with no Tailwind remnants.
+
+**Cross-category note:** Also documented as FB-098 (design).
 
 ---
 
@@ -891,5 +1164,160 @@ This is an instance of EAP-016 (conditional rendering hiding inline-editable emp
 7. Manually updated Payload's generated `importMap.js` to remove the deleted ViewSiteLink reference.
 
 **Lesson:** Payload's `importMap.js` is auto-generated but doesn't always regenerate when components are removed from config. After deleting an admin component, always check and manually clean the import map, then restart with a cleared `.next` cache. Without this, the admin panel returns 500 with a "Module not found" error.
+
+---
+
+### ENG-108: Image management and section layout controls for inline editor
+
+**Date:** 2026-04-03
+
+**Issue:** The inline editing system supported uploading images to sections but had no controls for deleting images, reordering them, choosing layout styles, adding per-image captions, or toggling section dividers. All image layout was hardcoded by count, dividers were always rendered, and captions were section-level only.
+
+**Resolution:**
+1. **Schema:** Added `layout` (select, 8 options), `showDivider` (checkbox), and per-image `caption` (text) fields to the Projects sections schema in `Projects.ts`. Pushed via `push-schema.ts` ALTER TABLE statements.
+2. **Server data flow:** Updated `page.tsx` section mapping to pass through `layout`, `showDivider`, and per-image data as `images: Array<{ url, caption? }>` (replacing flat `imageUrls: string[]`). Updated `ProjectSection` type in `ProjectClient.tsx`.
+3. **ImageManager component:** Created `ImageManager.tsx` with per-image admin overlay (delete, move left/right, replace, add) using the same `patchSections` pattern as `SectionManager`.
+4. **Layout picker:** Added layout preset selector to `SectionToolbar` with 8 layout options. Added CSS grid classes (`imageGridLeftHeavy`, `imageGridRightHeavy`, `imageGrid3Equal`, `imageStacked`, `imageFullWidth`) to `page.module.scss`. Layout selection logic uses the CMS `layout` field, falling back to count-based auto when set to `'auto'`.
+5. **Divider toggle:** Added `showDivider` toggle to `SectionToolbar` and conditional divider rendering in `ProjectClient`.
+6. **Per-image captions:** Wrapped each image in `<figure>` with `<figcaption>`. Admin mode renders `EditableText` targeting `sections[i].images[j].caption`; visitor mode renders plain `<figcaption>`.
+7. **SectionManager refactor:** Added `patchSectionField` to `useSectionManager` for field-level patches (layout, showDivider). Updated `addSection` defaults to include `layout: 'auto'` and `showDivider: true`.
+
+**Lesson:** When adding new fields to Payload array sub-tables, the push-schema script needs explicit ALTER TABLE statements with `DO $$ BEGIN ... EXCEPTION WHEN duplicate_column` guards. The table naming convention is `{collection}_{arrayField}` for top-level arrays and `{collection}_{arrayField}_{subArrayField}` for nested arrays (e.g., `projects_sections_images`).
+
+---
+
+### ENG-109: Payload crash on startup — testimonials.text column type mismatch kills inline editing
+
+**Date:** 2026-04-03
+
+**Issue:** Inline editing was completely broken — double-clicking text fields didn't enter edit mode, the format bar didn't appear, and image management controls were invisible. The admin banner showed correctly, confirming `isAdmin=true`, but all client-side interactivity was dead.
+
+**Root Cause:** Payload's auto-schema-push on startup was trying to `ALTER TABLE "testimonials" ALTER COLUMN "text" SET DATA TYPE jsonb` but PostgreSQL rejected it because varchar can't be automatically cast to jsonb. This caused `payloadInitError: true`, which propagated as an `Uncaught Error` to the browser via React Server Components. The browser-side error crashed React hydration, preventing all event handlers from being attached — so the page rendered (server HTML) but nothing was interactive.
+
+Secondary issue: the Sass `darken()` function was deprecated, producing warnings that cluttered logs but didn't block compilation.
+
+**Resolution:**
+1. Manually ran `ALTER TABLE "testimonials" ALTER COLUMN "text" TYPE jsonb USING text::jsonb` to fix the column type with an explicit cast.
+2. Killed dev server, cleared `.next` cache, restarted — Payload initialized cleanly.
+3. Replaced deprecated `darken($accent, 6%)` with `$portfolio-accent-70` token (2 occurrences in inline-edit SCSS).
+4. Verified: Payload API returns 200, project data includes new fields (`layout`, `showDivider`), no errors in server logs.
+
+**Lesson:** When Payload's auto-schema-push fails (e.g., incompatible column type change), the error doesn't just affect the admin panel — it propagates through React Server Components as an uncaught browser error that kills ALL client-side interactivity on the entire site. The symptom (editing doesn't work) is disconnected from the cause (unrelated table migration failure). Always check `payloadInitError` in server logs when client-side features silently break.
+
+---
+
+### ENG-110: Block editor redesign — section model to content blocks architecture
+
+**Date:** 2026-04-04
+
+**Issue:** The inline editing system was built on a rigid section model where each section was a fixed tuple of `(heading + body + images[] + caption + layout + showDivider)`. Every user complaint traced back to this structural rigidity: can't add standalone text blocks, can't move content above the hero, can't reorder content within a section, adding a section forces a divider, layout selector doesn't affect empty image slots.
+
+**Root Cause:** Architectural — the CMS schema imposed a fixed content structure that couldn't accommodate the user's compositional needs. Incremental fixes would never resolve the fundamental ordering and flexibility complaints.
+
+**Resolution:**
+1. **Schema migration:** Added a `content: blocks` field to `Projects.ts` with 5 block types: `heading` (text + level), `richText` (Lexical body), `imageGroup` (layout + images[] + caption), `divider` (no fields), `hero` (image + caption). Payload auto-pushed the new block tables successfully.
+2. **Data migration:** Wrote `src/scripts/migrate-sections-to-blocks.ts` that converts each project's `sections` array → ordered blocks. Safe to re-run (skips projects with existing content blocks). Migrated all 9 projects.
+3. **Rendering pipeline:** Rewrote `page.tsx` to map raw Payload blocks to a typed `ContentBlock` union, and `ProjectClient.tsx` to render blocks via a switch-based block renderer. ScrollSpy sections derived from heading blocks.
+4. **Block editor chrome:** Created `BlockToolbar` (per-block floating toolbar using DS `Button`, `DropdownMenu`, `Tooltip`), `BetweenBlockInsert` (Notion-style "+" affordance between blocks), and `BlockInsertMenu` (dropdown with all 5 block types).
+5. **Block manager hook:** `useBlockManager.ts` — CRUD operations (add/delete/move/patchField) for the blocks array, plus image operations (add/remove/reorder within imageGroup blocks). All operations fetch current state, transform, and PATCH back.
+6. **Accessibility:** `role="list"/"listitem"`, `role="toolbar"` on block toolbars, `aria-label` on all icon-only buttons, `Alt+ArrowUp/Down` keyboard reorder, `aria-live="polite"` live region for announcements, `tabIndex` focus management, keyboard-accessible drop zone.
+7. **Legacy compatibility:** Old `sections` field retained but conditionally hidden in admin when `content` blocks exist. `heroImage` field also conditionally hidden when populated.
+
+**Lesson:** When user complaints about a content editing system are all structural (ordering, composition, flexibility), the fix is architectural (schema redesign), not incremental (patching the existing model). Payload's `blocks` field type is the idiomatic solution for flexible content — it provides discriminated union storage with per-type tables, exactly matching the polymorphic block pattern.
+
+**Cross-category note:** Also documented as FB-102 (design).
+
+---
+
+#### ENG-104: "Intro blurb CMS fields + frontend rendering + inline edit support"
+
+**Issue:** Adding two new top-level fields (`introBlurbHeadline`, `introBlurbBody`) to the Projects CMS collection and wiring them through the full data pipeline: Payload schema → server-side extraction → client rendering → inline edit support.
+
+**Root Cause:** Content strategy required a new "trailer" component between the hero and scope statement on case study pages. No CMS fields existed for this content; no rendering logic existed in the frontend.
+
+**Resolution:**
+1. Added `introBlurbHeadline` (text) and `introBlurbBody` (richText) fields to `Projects.ts` Content tab, before `description`.
+2. Updated `description` admin label from "Case study intro paragraph" to "Scope statement (2-4 sentences)."
+3. Updated `page.tsx` data extraction to include the new fields (plain text + HTML conversion via `safeConvertToHtml`).
+4. Updated `ProjectData` type and `ProjectClient.tsx` rendering with `EditableText` wrappers for inline edit support.
+5. Added SCSS styles (`.introBlurb`, `.introBlurbHeadline`, `.introBlurbBody`) using existing design tokens.
+6. Ran `push-schema.ts` to update the database.
+
+**Cross-category note:** Also documented as CF-012 (content) — this is the engineering implementation of the intro blurb integration, luxury positioning, and three thermal zones content strategy.
+
+---
+
+### Block Editor Enhancement — Per-Block Lexical + Markdown Adapter
+
+**Date:** 2026-04-04
+
+**Issue:** The content editing UX inside case study richText blocks was lossy and unreliable: formatting was lost on save/load due to the `contentEditable` → `document.execCommand` → HTML → Lexical JSON round-trip pipeline. Undo/redo didn't work. Bold/italic applied to the whole block instead of selected text. No cross-block keyboard flow. No direct image dropping. No drag-to-reorder. Agent content creation was consuming ~200-250 tokens per richText paragraph (raw Lexical JSON) when 30-50 tokens (Markdown) would suffice.
+
+**Root Cause:** The editing layer used browser-native `contentEditable` + `document.execCommand` (deprecated API), converting user edits to HTML, then parsing HTML back to Lexical JSON for storage. This pipeline was inherently lossy — complex formatting, styles, and structure degraded at each conversion step. Additionally, agents had no efficient way to read/write richText block content since the only format was verbose Lexical JSON.
+
+**Resolution (7 phases):**
+1. **Phase 0 — Markdown adapter:** Created `src/lib/content-helpers.ts` with `markdownToLexical`/`lexicalToMarkdown` (using `@lexical/headless` + `@lexical/markdown`) for 8x more token-efficient agent content authoring. Added `createCaseStudyBlocks` and `readBlocksAsMarkdown` agent helpers. Updated `case-study-authoring` skill Phase 3 to reference current `content: blocks[]` schema.
+2. **Phase 1 — Per-block Lexical:** Created `LexicalBlockEditor.tsx` (mounts a Lexical `LexicalComposer` per richText block) and `LexicalToolbar.tsx` (floating toolbar using DS `ButtonSelect`, `DropdownMenu`, `ColorPicker`, `Tooltip`). Updated save path to accept Lexical JSON directly (skipping HTML conversion). Passes raw `bodyLexical` from server to client for admin rendering.
+3. **Phase 2 — Cross-block keyboard:** Created `useBlockKeyboardNav` hook — Enter at end creates new richText block, Backspace in empty block deletes it, ArrowUp/Down cross block boundaries.
+4. **Phase 3 — Direct image dropping:** Native drag events on content area with positional block detection. Drop indicator line shows insertion point. Existing imageGroup grids accept additional drops.
+5. **Phase 4 — Block drag-to-reorder:** `@dnd-kit/sortable` wraps block list. Drag handle appears on hover. Added `reorderBlock` method to `useBlockManager` for single-operation array moves.
+6. **Phase 5 — Chrome polish:** Single-click edit mode for headings (`singleClickEdit` prop on `EditableText`). Fixed inline `style` in `BlockToolbar` (replaced with `.levelLabel` class). Filled imageGroup grids accept drops.
+7. **Phase 6 — Server rendering:** Replaced custom `lexicalToHtml` with Payload's `convertLexicalToHTML` from `@payloadcms/richtext-lexical/html` for full-fidelity visitor rendering.
+
+**Key architectural decisions:**
+- Lexical pinned at 0.41.0 to match `@payloadcms/richtext-lexical` 3.80.0's internal version
+- Only standard Lexical nodes used (paragraph, text, linebreak) — no custom nodes, ensuring Payload admin compatibility
+- Blocks architecture preserved — agents still CRUD flat JSON blocks via Payload REST API
+- `TextFormatBar.tsx` deprecated for richText blocks but still available for plain `EditableText` fields
+
+**Lesson:** When the storage model is right but the editing layer is wrong, replace the editing layer surgically. The `contentEditable` + `execCommand` approach was the single broken component — everything else (block CRUD, image management, section navigation) just needed UX polish. A full Lexical migration would have required rewriting all content strategy skills and agents for marginal human UX benefit.
+
+---
+
+### Hero Image Skeleton — Mandatory First Block for All Case Studies
+
+**Date:** 2026-04-04
+
+**Issue:** Case studies created by the authoring skill had no hero image block. The hero placeholder was only rendered when a hero block existed in CMS data, but `createCaseStudyBlocks` only emitted one when `heroImageId` was provided (i.e., never for new case studies). The authoring skill had no enforcement point for hero presence.
+
+**Root Cause:** Gap between the CMS data model (hero block required `image` as NOT NULL) and the authoring workflow (no images exist at authoring time). The skill couldn't create a placeholder hero because the DB constraint prevented it.
+
+**Resolution (6 layers):**
+1. **CMS schema** (`Projects.ts`): Made hero `image` field not required. Added `placeholderLabel` text field (conditionally visible when no image).
+2. **Database** (`push-schema.ts`): `ALTER TABLE projects_blocks_hero ALTER COLUMN image_id DROP NOT NULL` + `ADD COLUMN placeholder_label varchar`.
+3. **Content helpers** (`content-helpers.ts`): `createCaseStudyBlocks` now ALWAYS emits a hero block as the first block. `heroPlaceholderLabel` option sets the label (defaults to "Hero — Case study cover image").
+4. **Server mapper** (`page.tsx`): Passes `placeholderLabel` through on hero blocks.
+5. **Client renderer** (`ProjectClient.tsx`): Hero section renders unconditionally (no `heroBlock &&` guard). Dynamic label from block data replaces hardcoded text.
+6. **Skill + review** (`case-study-authoring/SKILL.md`, `case-study-review.md`): Hero is mandatory in Phase 2 artifact mapping, Phase 3 materialization, Phase 4 quality checks (new Check 16).
+
+**Lesson:** Skeleton placeholders need the same enforcement chain as real content. A placeholder that only works "when configured" will be skipped by default. The fix is to make the helper function emit it unconditionally, so agents can't forget it. Code enforcement > prompt enforcement.
+
+---
+
+### Grid Reorder Disconnected from Case Study Navigation Order
+
+**Date:** 2026-04-05
+
+**Issue:** Masonry grid drag-and-drop reorder on the homepage only saved the display order to `site-config.gridOrder`. The case study prev/next navigation buttons derived their sequence from each project's `order` field in the CMS. Dragging tiles in the masonry view had no effect on the navigation sequence within case studies.
+
+**Root Cause:** Two independent ordering systems serving the same conceptual sequence. `gridOrder` (in site-config global) controlled homepage tile display order. The `order` field (on each project document) controlled case study prev/next navigation. The `saveReorder` function only updated `gridOrder`, leaving individual project `order` fields stale.
+
+**Resolution:** Modified `saveReorder` in `HomeClient.tsx` to also update each project's `order` field after saving `gridOrder`. Projects are extracted from the ordered items (filtering out testimonials), and each project gets a PATCH request setting `order` to its 1-based position in the sequence. The existing prev/next navigation logic in `page.tsx` (which queries by `order` field) then automatically reflects the masonry order.
+
+**Lesson:** When the same conceptual sequence (project ordering) is consumed by multiple features (homepage grid, case study navigation), mutations to that sequence must update all representations atomically. A display-only save that doesn't propagate to the data model creates a silent desync. Anti-pattern: EAP-070 (Dual ordering systems without sync).
+
+---
+
+### TestimonialCard pretext API mismatch
+
+**Date:** 2026-04-05
+
+**Issue:** Runtime TypeError: `pretext.layoutNextLineRange is not a function` in `TestimonialCard.tsx` useEffect. The quote-mark text wrapping logic called nonexistent functions on the `@chenglou/pretext` library.
+
+**Root Cause:** The code called `pretext.layoutNextLineRange()` and `pretext.materializeLineRange()`, but the installed version (0.0.4) exports `layoutNextLine()` which returns a `LayoutLine` object directly (with `.text`, `.width`, `.start`, `.end`). The two-step range-then-materialize pattern doesn't exist in this API.
+
+**Resolution:** Replaced `layoutNextLineRange` + `materializeLineRange` with the single `layoutNextLine` call. The returned `LayoutLine` already contains `text` and `end` cursor, so no materialization step is needed.
+
+**Lesson:** When using dynamic imports of niche libraries, verify the actual exported API against `dist/*.d.ts` before writing call sites. Type declarations are the source of truth for what a package actually exports, especially for pre-1.0 packages where APIs shift between versions.
 
 ---

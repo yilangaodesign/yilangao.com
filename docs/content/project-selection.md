@@ -25,8 +25,13 @@ This is the portfolio version of the LTV framework's resource allocation princip
 
 ### 8.4 Titling
 
-Project titles and thumbnails are the "above the fold" of each project. They must communicate the problem domain and work type in a glance.
+Homepage card titles are now the case study's creative tension headline (the
+`introBlurbHeadline` field). They hook through intrigue and situation tension, not
+domain description. Domain relevance is communicated by the `category` line below
+the title and the thumbnail image together.
 
-- **Good:** "Redesigning the Checkout Flow" — immediately parseable
-- **Bad:** "Project Moonshot" — cute but opaque
-- **Reference — Joseph Zhang:** "Notion / Digital toolmaking", "Cursor AI / AI code editor" — company + domain in 2-3 words
+- **Good:** "I saved the page my own team gave up on." — tension, protagonist, curiosity
+- **Bad:** "Project Moonshot" — cute but opaque, no tension
+- **Reference — Joseph Zhang:** His pattern "Notion / Digital toolmaking" maps to our
+  `Headline / Category` model. The headline carries intrigue; category carries the
+  domain signal that Zhang's company name carried.

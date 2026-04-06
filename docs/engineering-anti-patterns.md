@@ -4,7 +4,7 @@
 >
 > **Who reads this:** AI agents before making code changes — scan for relevant anti-patterns.
 > **Who writes this:** AI agents when an incident reveals a new anti-pattern.
-> **Last updated:** 2026-04-02 (EAP-062: Adding a Payload collection without manual schema push causes admin 500)
+> **Last updated:** 2026-04-04 (EAP-069: Turbopack routes-manifest regression in Next.js 16.2.x)
 
 ## Category Index
 
@@ -16,12 +16,12 @@
 | CMS / Inline Edit | EAP-016, EAP-023, EAP-029 | 3 active | 3 |
 | Save Flow / Error Handling | EAP-017, EAP-018, EAP-020, EAP-024 | 4 active | 4 |
 | Hydration / SSR / React State | EAP-013, EAP-014, EAP-022, EAP-054, EAP-056 | 5 active | 5 |
-| Build / Toolchain / CSS | EAP-011, EAP-012, EAP-031, EAP-035, EAP-038‡, EAP-039, EAP-040 | 7 active | 7 |
+| Build / Toolchain / CSS | EAP-011, EAP-012, EAP-031, EAP-035, EAP-038‡, EAP-039, EAP-040, EAP-069 | 8 active | 8 |
 | Documentation Process | EAP-008, EAP-010, EAP-027, EAP-032 | 4 active | 4 |
-| Dev Workflow | EAP-002, EAP-003, EAP-009 | 3 active | 3 |
+| Dev Workflow | EAP-002, EAP-003, EAP-009, EAP-068 | 4 active | 4 |
 | Interaction / DOM | EAP-025, EAP-036, EAP-053 | 3 active | 3 |
 | Deployment / CI Build | EAP-060, EAP-061 | 2 active | 2 |
-| **Total** | | **48 active · 1 resolved** | **49** |
+| **Total** | | **50 active · 1 resolved** | **51** |
 
 > † EAP-038 "One-Way Playground Experiment" · ‡ EAP-038 "SCSS Modules with `@use` Under Turbopack" — duplicate ID, two distinct entries.
 
@@ -1047,13 +1047,140 @@ Also update the non-admin rendering fallback to use `dangerouslySetInnerHTML` wh
 
 ---
 
-## EAP-NNN: [Short Name]
+## EAP-063: Element-level inline style on contentEditable root for per-word formatting
 
-**Trigger:** [What action or pattern triggers this]
+**Trigger:** Setting `el.style.fontWeight`, `el.style.fontStyle`, or similar CSS properties directly on a `contentEditable` element to toggle formatting (bold, italic, etc.).
 
-**Why it's wrong:** [The technical and process reason]
+**Why it's wrong:** CSS inline styles on the root element override all child elements via the cascade. If `el.style.fontWeight = '700'` is set, inner `<strong>` tags become invisible (text is already 700). Users can no longer selectively un-bold individual words because removing `<strong>` doesn't reduce the weight below the parent's inline 700. This creates a one-way formatting trap.
 
-**Correct alternative:** [What to do instead]
+**Correct alternative:** Always use `document.execCommand('bold')` for bold toggling — it adds/removes semantic `<strong>` tags that can be individually manipulated. For the no-selection case (toggle all content), select all content first (`range.selectNodeContents(el)` → `execCommand('bold')` → `range.collapse(false)`), then clear any leftover `el.style.fontWeight` with `el.style.removeProperty('font-weight')`. For non-binary formatting (font-weight, font-size, font-family, color), use `<span style="...">` wrappers via `range.extractContents()` + `range.insertNode()`.
 
-**Incident:** [Optional — reference to ENG-NNN]
+**Incident:** ENG-107 (2026-04-04) — Bold/italic formatting on individual words didn't work in case study inline editor.
+
+---
+
+## EAP-063: Payload column type change without manual USING clause
+
+**Trigger:** Changing a Payload collection field type from `text` to `richText` (varchar → jsonb) without running a manual ALTER TABLE with `USING` clause.
+
+**Why it's wrong:** Payload's auto-schema-push attempts `ALTER COLUMN SET DATA TYPE jsonb` which PostgreSQL rejects for varchar → jsonb conversion. The resulting `payloadInitError` propagates through React Server Components to the browser as an uncaught error, crashing React hydration across the ENTIRE site — not just the affected collection. The symptom (inline editing broken) is completely disconnected from the cause (unrelated testimonials table).
+
+**Correct alternative:** When changing a Payload field type that maps to an incompatible PostgreSQL column type, add a manual migration to `src/scripts/push-schema.ts` with the explicit USING cast: `ALTER TABLE "table" ALTER COLUMN "col" TYPE jsonb USING col::jsonb`. Run this BEFORE restarting the dev server.
+
+**Incident:** ENG-109 (2026-04-03) — Inline editing completely broken site-wide because testimonials.text type mismatch crashed Payload init.
+
+---
+
+## EAP-066: contentEditable + document.execCommand for Rich Text Editing
+
+**Trigger:** Building or maintaining a rich text editing surface using the browser's native `contentEditable` attribute and `document.execCommand()` API.
+
+**Why it's wrong:** `document.execCommand` is deprecated and behaves inconsistently across browsers. The round-trip pipeline (user edit → HTML extraction → parse to structured format → save → load → re-render) is inherently lossy — formatting degrades at each step. Bold/italic applies to the wrong scope, undo/redo doesn't work, and selection state is unreliable. When the storage format is Lexical JSON (as in Payload CMS), the HTML ↔ Lexical conversion adds a second lossy translation layer.
+
+**Correct alternative:** Mount a Lexical editor instance directly. Since Payload already stores Lexical JSON, per-block `LexicalComposer` components eliminate the conversion pipeline entirely — user edits produce Lexical state that serializes directly to the storage format. Use DS components for the toolbar UI.
+
+**Incident:** Block Editor Enhancement (2026-04-04) — richText blocks used `contentEditable` + `execCommand`, causing formatting loss, whole-block formatting, no undo/redo.
+
+---
+
+## EAP-067: Rich Text HTML Inside Phrasing Elements (`<p>`, `<span>`)
+
+**Trigger:** Using `as="p"` or `as="span"` on `EditableText` with `isRichText`/`htmlContent`, or wrapping CMS-generated HTML in `<p dangerouslySetInnerHTML>`.
+
+**Why it's wrong:** Rich text from Payload's Lexical-to-HTML conversion always contains block-level elements (`<p>`, `<h2>`, `<ul>`, etc.). Wrapping them in a `<p>` produces `<p><p>...</p></p>` — illegal per HTML spec. The browser auto-closes the outer `<p>` when it encounters the inner one, restructuring the DOM. React hydration then fails because the server-rendered tree differs from the client-expected tree. The error manifests as `__html` content mismatch (server has content, client shows `""`).
+
+**Correct alternative:** Use `as="div"` (or another flow container) for any `EditableText` with `isRichText`. For non-admin fallbacks, use `<div dangerouslySetInnerHTML>` instead of `<p dangerouslySetInnerHTML>`. Only use `<p>` when the content is guaranteed to be plain text (no nested block elements).
+
+**Incident:** ENG-111 (2026-04-04) — `/work/meteor` hydration failure on description field.
+
+---
+
+## EAP-068: Treating TCP Listen as a Health Check for Dev Servers
+
+**Status: ACTIVE**
+
+**Trigger:** Using `lsof`, `nc`, or `ss` to confirm a port is occupied and concluding the dev server is healthy.
+
+**Why it's wrong:** A Next.js dev server can enter a zombie state where the Node.js process keeps the TCP socket open (kernel accepts connections) but never processes HTTP requests. This happens after long idle periods, machine sleep/wake cycles, or resource exhaustion. `lsof -i :PORT` shows LISTEN, `nc -z` succeeds, but `curl` hangs forever. The boot-up procedure reports "already running" while the user sees a blank page that never loads.
+
+**Correct alternative:** Always probe with an HTTP request that has a timeout:
+```bash
+curl -s -o /dev/null -w "%{http_code}" --max-time 5 http://localhost:<PORT>/
 ```
+If the response is not `200` or `3xx` within 5 seconds, the server is dead regardless of what `lsof` says. Kill it, clear `.next`, and restart. Use `localhost` (not `127.0.0.1`) in all dev URLs to match how users access the server.
+
+**Incident:** ENG-116 (2026-04-04) — Three servers accepted TCP but hung on HTTP for 6 min to 3+ days.
+
+---
+
+## EAP-069: Running Next.js 16.2.x Dev Server with Turbopack (Default)
+
+**Status: ACTIVE (temporary — remove when Turbopack fix ships)**
+
+**Trigger:** Running `next dev` on Next.js 16.2.0 or 16.2.1, which defaults to Turbopack.
+
+**Why it's wrong:** Turbopack in Next.js 16.2.x has a regression where `.next/dev/routes-manifest.json` is never generated. Static routes (`/`) work, but all dynamic routes (`/work/[slug]`, etc.) fail with `ENOENT: no such file or directory`. The error returns HTTP 500 to the browser ("this page isn't working"). This is a known upstream bug (vercel/next.js#91609, #91864).
+
+**Correct alternative:** Use the `--webpack` flag until the bug is fixed:
+```json
+"dev": "next dev --port 4000 --webpack"
+```
+Webpack generates the routes manifest correctly. Monitor Next.js releases for a Turbopack fix, then revert to the default bundler.
+
+**Incident:** ENG-117 (2026-04-04) — All `/work/*` case study pages returned 500.
+
+---
+
+## EAP-070: Uploading media with original filenames (collision on unique constraint)
+
+**Status: RESOLVED**
+
+**Trigger:** Calling `uploadMedia()` with files whose names, after sanitization, match an existing media entry's filename.
+
+**Why it's wrong:** Payload's upload collections enforce unique filenames. Common file naming patterns (macOS screenshots, "image.png", "hero.png") produce identical sanitized names. The second upload fails with "A field value must be unique." This is especially confusing because the error appears on the *project save*, not the media upload step, due to how `ImageUploadZone` chains the two operations.
+
+**Correct alternative:** Append a timestamp (or other unique suffix) to the filename stem before uploading: `${stem}-${Date.now()}${ext}`. This is now the default behavior in `uploadMedia()`.
+
+**Incident:** ENG-123 (2026-04-06)
+
+---
+
+## EAP-071: Writing to legacy fields when content blocks have replaced them
+
+**Status: ACTIVE**
+
+**Trigger:** An upload, inline edit, or API write that targets a legacy/deprecated field (e.g., `heroImage`) when the data model has migrated to a new structure (e.g., hero content blocks).
+
+**Why it's wrong:** The read path may prioritize the new structure. If the new structure exists (even empty), the legacy field is never reached. Data appears saved (the legacy field is populated) but never displays. This creates a "ghost write" — the write succeeds, the thumbnail updates (because it reads from the legacy field), but the detail page doesn't show the change.
+
+**Correct alternative:** Always write to the canonical field in the current data model. If backward compatibility requires it, write to both. If the legacy field is still in use by other views (e.g., home page thumbnails), add a fallback merge in the read path that fills empty new-structure fields from the legacy field.
+
+**Incident:** ENG-123 (2026-04-06)
+
+---
+
+**Anti-pattern: Using `setNested()` with array-indexed field paths for Payload PATCH requests**
+
+**Status: ACTIVE**
+
+**Trigger:** Calling `updateCollectionField()` (or any function that uses `setNested`) with a field path like `content.2.body` that contains a numeric array index.
+
+**Why it's wrong:** `setNested()` builds the request body by creating intermediate objects/arrays. When the path contains a numeric index (e.g., `content.2.body`), it creates a sparse JavaScript array: `[undefined, undefined, {body: ...}]`. JSON.stringify converts this to `[null, null, {body: ...}]`. Payload CMS receives this as the entire array value and rejects it (HTTP 500) because the null entries are invalid blocks. The data is never persisted, but the client-side editor still shows the edit, creating a "phantom save" that reverts on refresh.
+
+**Correct alternative:** For array-element updates, use the fetch-modify-save pattern: (1) GET the current document, (2) clone the array and patch only the target element, (3) PATCH the full array field (e.g., field `content` with the complete array). This is what `useBlockManager.patchContent` already does correctly.
+
+**Incident:** ENG-121 (2026-04-04) — LexicalBlockEditor edits silently failed to persist.
+
+---
+
+**Anti-pattern: Dual ordering systems without sync (EAP-070)**
+
+**Status: RESOLVED**
+
+**Trigger:** A single conceptual sequence (e.g., project ordering) is stored in two independent locations (e.g., `gridOrder` in a global config AND per-document `order` fields), and a mutation only updates one.
+
+**Why it's wrong:** Features that read from different representations of the same sequence silently diverge. The homepage grid shows one order, the case study prev/next navigation shows another. The user sees correct ordering in one place and stale ordering in another, with no error or warning. This is a class of "split-brain" data bugs that only surface through user confusion.
+
+**Correct alternative:** When the same sequence is consumed by multiple features, mutations must update all representations atomically. Either: (a) write to all stores in the same save operation, or (b) designate one store as canonical and derive all reads from it. Option (a) is simpler when the number of consumers is small and known.
+
+**Incident:** Grid reorder (2026-04-05) — masonry view drag saved `gridOrder` but not project `order` fields, causing case study navigation to ignore reordering.

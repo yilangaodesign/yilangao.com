@@ -4,7 +4,7 @@
 >
 > **Who reads this:** AI agents before making UI changes — scan for relevant anti-patterns.
 > **Who writes this:** AI agents when a feedback cycle reveals a new anti-pattern.
-> **Last updated:** 2026-04-03 (AP-055: Hand-picked hex values for color scales)
+> **Last updated:** 2026-04-06 (AP-061: Uniform step inversion for atmospheric/decorative colors)
 
 ---
 
@@ -15,13 +15,13 @@
 | CSS Cascade & Build | AP-001, AP-002, AP-003, AP-008, AP-021, AP-038 | 6 | 6 |
 | Spacing & Layout | AP-004, AP-005, AP-006, AP-007, AP-009, AP-018, AP-020, AP-027, AP-045, AP-048† | 10 | 10 |
 | Positioning & Transforms | AP-013, AP-031, AP-033 | 3 | 3 |
-| Theming & Dark Mode | AP-042, AP-043, AP-044, AP-047 | 4 | 4 |
+| Theming & Dark Mode | AP-042, AP-043, AP-044, AP-047, AP-061 | 5 | 5 |
 | Interaction & Pointer Behavior | AP-011, AP-012, AP-022, AP-025, AP-035 | 5 | 5 |
 | Navigation & Menus | AP-014, AP-015, AP-016, AP-029, AP-046, AP-049 | 6 | 6 |
-| Visual Hierarchy & Affordances | AP-010, AP-017, AP-019, AP-026, AP-030, AP-032, AP-039, AP-040, AP-041, AP-048‡, AP-050, AP-051, AP-052, AP-054 | 14 | 14 |
+| Visual Hierarchy & Affordances | AP-010, AP-017, AP-019, AP-026, AP-030, AP-032, AP-039, AP-040, AP-041, AP-048‡, AP-050, AP-051, AP-052, AP-054, AP-057, AP-060 | 16 | 16 |
 | Form & Input UX | AP-023, AP-024, AP-028, AP-036 | 4 | 4 |
 | Admin UI Patterns | AP-034, AP-037 | 2 | 2 |
-| **Total** | | **54** | **54** |
+| **Total** | | **56** | **56** |
 
 > **†** AP-048 "Independent Padding Decisions Across Adjacent Panels" (spacing entry)
 > **‡** AP-048 "Incremental State-by-State Implementation Without a Holistic Model" (state modeling entry)
@@ -525,7 +525,7 @@ This cleanly separates two intents: "I want to go to this specific section" (cli
 4. Override child buttons' self-hiding (`button { opacity: 1; transform: scale(1) }` within the hover rule) since the overlay handles group visibility.
 5. Real content (LinkedIn button, avatar, name/role) stays in its natural flow position, identical to visitor view.
 
-**Frustration caused:** 1 round — user identified admin buttons displacing LinkedIn to the wrong position and violating Fitts' law.
+**Frustration caused:** 2 rounds — (1) user identified admin buttons displacing LinkedIn to the wrong position and violating Fitts' law; (2) drag handle in block list occupying 24px as invisible flex child, indenting all block content vs intro blurb (FB-105).
 
 ---
 
@@ -982,3 +982,51 @@ Use `var(--ds-*, #{$scss-fallback})`. The CSS custom property adapts at runtime;
 **Correct alternative:** Define color scales in OKLCH with explicit lightness, chroma, and hue curves. Anchor the key brand step, then derive all other steps mathematically. Document the OKLCH coordinates alongside hex values so the scale is auditable. This is the approach used by Material 3, Radix Colors, and the rebuilt Lumen scale.
 
 **Frustration caused:** 2 rounds — original hue discontinuity (pre-Lumen) and this lightness cliff (steps 40–60).
+
+---
+
+### AP-056: Exposing design system tokens in user-facing UI
+
+**Trigger:** Displaying token names (`$portfolio-font-sans`), CSS variable names, rem values, or other internal implementation identifiers in menus, dropdowns, or labels visible to end users.
+
+**Why it's wrong:** Users operate in their own conceptual model — they think in terms of "bold", "14px", "Geist Sans", not `$portfolio-weight-bold` or `0.875rem`. Showing implementation details violates the fundamental UX principle of matching the system's language to the user's language (Nielsen's heuristic #2). It creates cognitive noise, makes the interface feel like a developer tool rather than a creative tool, and communicates that the product wasn't designed with the user's perspective in mind.
+
+**Correct alternative:** Show only human-readable labels in all user-facing controls. Token mapping happens invisibly in the code path: user picks "Medium" → code applies `$portfolio-weight-medium` → CSS renders weight 500. The user never sees the token name. Data structures can retain token references for internal use — they just must never appear in rendered output.
+
+**Frustration caused:** 1 round — all three inline edit toolbar menus (font family, size, weight) showed token names alongside labels.
+
+---
+
+### AP-060: Inconsistent external link visual treatments
+
+**Trigger:** Creating a new external link with different color, font weight, or arrow indicator than existing external links on the site.
+
+**Why it's wrong:** External links are a cross-page visual primitive. When each page or section invents its own link style (blue with SVG arrow, gray with `↗` character, black bold), the site feels visually fragmented and users lose the ability to scan for link affordances reliably. Each new instance copies whichever pattern was nearest, compounding the drift.
+
+**Correct alternative:** All external links use the canonical pattern: `$portfolio-text-primary` color, `body-sm` weight, `↗` character with `.arrow` class (`caption` size, `opacity: 0.5`), `inline-flex` with gap. External links are distinguished by the arrow glyph, not by color. The `$portfolio-text-link` color is reserved for interactive controls (buttons, form elements), not for navigation links in content areas.
+
+**Frustration caused:** 1 round - 5 distinct link patterns across 4 files.
+
+---
+
+### AP-057: Bypassing DS components with custom-styled native elements
+
+**Trigger:** Using a plain `<Link>` or `<a>` with custom CSS (e.g., `.backLink`) for a button-like action when a design system `Button` component exists.
+
+**Why it's wrong:** Every instance duplicates visual decisions (padding, hover states, typography, icon sizing) that the DS component already encodes. When the DS component evolves (new sizes, updated tokens, dark mode fixes), the hand-rolled elements drift out of sync. New pages copy the hand-rolled pattern instead of importing the DS component, compounding the drift. The pattern also signals to future agents and contributors that the DS is incomplete, encouraging more bypasses.
+
+**Correct alternative:** If the DS component doesn't support the needed element type, upgrade the component (e.g., make `Button` polymorphic to render as `<Link>`). Then use the DS component everywhere. One capability gap in the DS is cheaper to fix than N hand-rolled instances to maintain.
+
+**Frustration caused:** 1 round — "Back" button on case study pages + 3 other pages using custom `.backLink` CSS instead of `Button`.
+
+---
+
+### AP-061: Uniform step inversion for atmospheric/decorative colors
+
+**Trigger:** Applying standard brightness inversion (step-60 light to step-100/70 dark) to a Tier 2 (brand/marketing) color whose purpose is atmospheric rather than functional.
+
+**Why it's wrong:** Standard step inversion assumes every color serves a functional purpose in both modes. Atmospheric colors (e.g., Terra warm amber) exist to create mood and warmth in light mode. Inverting terra-10 (#f5f1ec, warm cream) to terra-100 (#170d03, near-black) produces a surface with no atmospheric quality and no functional purpose. It's neither warm nor neutral — just muddy. No major design system has made warm cream atmospherics work in dark mode. Notion drops warm beige to cool dark gray; Anthropic's warm ivory is fundamentally light-mode.
+
+**Correct alternative:** Tier 2 surface tokens fall back to neutral dark surfaces in dark mode (`neutral-90`, `neutral-80`). Foreground tokens (text, border) may still use standard step inversion because they need WCAG contrast guarantees. The tier classification determines the dark mode strategy, not the property type alone. See `docs/design/color.md` 9.3b and `docs/design.md` 7.9.
+
+**Frustration caused:** 1 round — pressure test identified Terra dark mode surfaces as muddy and purposeless, leading to industry research and neutral-fallback adoption.

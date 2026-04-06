@@ -4,9 +4,211 @@
 >
 > **Who reads this:** AI agents at session start (scan recent entries for context), and during content feedback processing (check for recurring patterns).
 > **Who writes this:** AI agents after each content feedback cycle.
-> **Last updated:** 2026-03-30 (CFB-019: Token Architecture tab IA inverted — rationale before anatomy, section blurb missing domain context)
+> **Last updated:** 2026-04-05 (CFB-028: External review triage & evidence anchoring framework)
 >
 > **For agent skills:** Read only the first 30 lines of this file (most recent entries) for pattern detection. The full file is a historical audit trail — do not read it in its entirety during normal work.
+
+---
+
+## Session: 2026-04-06 — ETRO Framework Article (New Format: Deep Article)
+
+#### CFB-029: "The ETRO Framework will not be a case study but a deep article"
+
+**Intent:** Transform a raw, messy ~5,500-word framework document into a polished ~1,800-word column-style article for the portfolio. Same personality and writing style as case studies but in article format - longer than a case study, shorter than a Medium deep-dive. All startup names redacted. Logic restructured around a narrative arc rather than textbook pillar-by-pillar definitions.
+
+**Root Cause:** The raw material had three structural problems: (1) throat-clearing opening ("AI models are commoditizing") that could be anyone on LinkedIn, (2) academic textbook structure (definition, definition, definition, case study, critique, answer) instead of a narrative arc, (3) too many competing examples diluting each other (six different companies/products). The strongest thread - "built it, got challenged, refined it, arrived at simpler truth" - was buried under structural noise.
+
+**Resolution:**
+1. **Rethought opening:** Cold open with the behavioral shift ("Six weeks after launch, users stopped checking") instead of industry commentary. Earns the right to introduce the framework through a specific, visceral moment.
+2. **Restructured logic:** Five sections following a narrative arc: the evidence (Twelve Thousand Lines of Doubt) -> the framework (Four Pillars, One Job) -> the challenge (The Challenge That Changed Everything) -> the answer (Volume Dial, Not Light Switch) -> the verdict (Scaffolding or Structure. Know Which.)
+3. **Redacted names:** Goldman Sachs -> "a financial institution I probably can't name" (wry acknowledgment). Norm AI, Pay-i, Devin, Salesforce all removed or generalized. Management analogy from the unnamed CEO preserved as the dramatic turn.
+4. **Cut ruthlessly:** Removed UX Patterns bullet lists, Principles appendix, Emerging Frontiers speculation, Trust Beyond the Interface section, Devin deep-dive. ~5,500 words -> ~1,800 words.
+5. **Applied voice techniques:** Section titles use Object Substitution ("Twelve Thousand Lines of Doubt"), Framework Inversion ("Volume Dial, Not Light Switch"), and Verdict + Staccato ("Scaffolding or Structure. Know Which."). Blurb headline uses Deliberate Ambiguity ("Trust Has a Shelf Life. Sometimes.").
+6. **Materialized to CMS** as project entry (slug: etro-framework, id: 6, updated from project-six placeholder).
+
+**New pattern: Article format in the case study infrastructure.** The case study page anatomy (hero, sidebar, intro blurb, content blocks) works for long-form articles when the sidebar carries author/context metadata instead of project metadata. This extends the portfolio's content types beyond case studies. The voice rules from `voice-style.md` apply but with relaxed word count constraints - article sections can carry longer prose than the 1-3 sentence case study feature sections.
+
+**Pattern extracted -> `content.md`:** Consider adding a §19 for non-case-study content types (articles, frameworks, opinion pieces) if this format recurs.
+
+---
+
+## Session: 2026-04-05 — External Review Triage & Evidence Anchoring Framework
+
+#### CFB-028: "Two external reviewers evaluated case study writing quality"
+
+**Intent:** Two independent reviewers assessed the Meteor and Lacework case studies. The goal was to identify genuine content gaps versus suggestions that would weaken top-of-funnel conversion if followed. Evaluation focused on writing quality and persuasiveness for a UX portfolio, not general copywriting.
+
+**Root Cause:** Both reviewers independently identified the same gap: hero metrics float without derivation. The 95% and 58% numbers are compelling but unanchored - a reader who wants to believe them has no arithmetic to hold onto within the scan window. This was the only genuine content gap.
+
+**Resolution - What was adopted:**
+1. **Metric derivation anchoring** (Lacework): Added "in task-based evaluations with internal users" to scope statement. Anchors the 58% without inviting sample-size scrutiny.
+2. **Stakes escalation** (Meteor S3): Added Jet ultimatum stakes ("engineers estimated six more months - past our deadline, past our budget justification"). Makes the existential risk of the migration crisis concrete.
+
+**Resolution - What was adapted (deferred to systemic infrastructure):**
+- **Pattern diversity:** Reviewers noted "both follow the same framework." With only 2 case studies, this is voice consistency, not repetition. Built a diversity gate and Portfolio Coherence Manifest to catch this proactively as case studies accumulate.
+
+**Resolution - What was rejected (with reasoning):**
+| Suggestion | Decision | Reasoning |
+|---|---|---|
+| Add failure/vulnerability sections | Reject | Failure is already embedded as story setup. Confessional asides conflict with outcome-oriented luxury positioning. |
+| Tone down "self-marketing copy" language | Reject | "Read how I turned..." and "I saved the page..." are documented gold standards. Muting hooks reduces conversion. |
+| Add methodology sections for metrics | Reject | Violates visual-first, text-minimal posture. One derivation clause per metric is the right calibration. |
+| Disclaim role scope | Reject | "Drove feature strategy" is accurate for founding designer with no PM. Prepare interview answer, don't weaken portfolio. |
+
+**Patterns extracted:**
+- **CAP-025 (Floating Metric):** New anti-pattern. A hero metric without derivation visible in the scan window is a trust liability. Three-category taxonomy: derived metrics need before/after absolutes, self-anchoring metrics need domain clarity, behavioral observations need temporal anchors.
+- **CAP-026 (Employment Classification Signal):** New anti-pattern. Portfolio text that reveals diminishing employment types (internship, contract) contradicts senior-level positioning. Narrowed: founding/sole/first-hire labels are assets, not triggers.
+- **Check 17 (Metric Derivation Proximity):** New compliance check using the three-category taxonomy.
+- **Check 18 (Credibility Stress Test):** New perception check for role claims, impact claims, and employment signals.
+- **Portfolio Coherence Manifest:** New infrastructure for tracking stylistic diversity across case studies.
+- **Named Narrative Shapes:** Five named arc patterns added to narrative-arc.md for diversity classification.
+- **Interview Defense Notes:** New Phase 3b in the authoring skill. Produces companion files with metric defense, role scope precision, and prepared responses for strategic omissions.
+
+---
+
+## Session: 2026-04-05 — Meteor Case Study Full Rebuild
+
+#### CFB-027: "Write up the case study for Goldman Sachs Meteor - treat as brand new, strip away existing"
+
+**Intent:** Full rebuild of the Meteor case study. User dissatisfied with v1 skeleton (ETRO framework thesis). Source material: Rengo AI R3 interview transcript where user presented the case study, with wording tailored to an AI startup's needs. Goal: demonstrate founding designer judgment and relevant experience for a general portfolio audience.
+
+**Root Cause:** V1 thesis (ETRO trust framework) treated features as the story when the real story is the strategic judgment that made those features possible. The case study needed to fill a portfolio gap: 0-to-1 product creation and founding-designer scoping decisions.
+
+**Resolution:**
+1. Completed full 4-phase case-study-authoring workflow (Analyze, Plan, Write, Review).
+2. New thesis: "Three counterintuitive scoping bets that made a 0-to-1 platform adoptable."
+3. Three decision-structured sections with user-directed titles: "The Scope Buffet" (Object Substitution T6), "Not the Squeaky Wheel" (Framework Inversion T7), "Nobody Migrates Halfway" (Verdict T8).
+4. Headline: "I had to choose whom NOT to design for." (Protagonist Framing T10).
+5. Route rewritten from legacy `sections` array to `content` blocks via `createCaseStudyBlocks`.
+6. 16 image placeholders (1 hero + 15 across 3 sections) ready for screenshot replacement.
+7. ETRO framework demoted from thesis to visual evidence within Section 3.
+
+**Patterns extracted:**
+- **Negation threading as cohesive device:** When a thesis centers on counterintuitive exclusion, carrying a negation word through titles (NOT/Not/Nobody) creates structural cohesion. S1 breaks the pattern intentionally (setup before discipline). User-discovered pattern, transferable to any contrarian thesis. Documented in dossier positive signals.
+- **Agent overreach on jargon:** Agent pushed back on "scope" as jargon for a tech audience. User correctly identified this as a basic industry term. Lesson: the jargon gate in technical-framing.md should not fire on domain fundamentals. Reserve pushback for genuinely obscure terminology.
+- **Decision sections over feature sections (reinforced):** Structuring around choices (what, whom, how) rather than outputs (feature A, feature B) is the right model for senior/strategic signal. Already in style preferences; now confirmed across two case studies (Lacework and Meteor).
+
+---
+
+## Session: 2026-04-04 — Title Semantic Redefinition
+
+#### CFB-026: "Sidebar title should be app name; intro blurb headline is the official case study title"
+
+**Intent:** Promote `introBlurbHeadline` to the official case study title. The homepage masonry card should show the creative tension headline, not the app name. The `category` line and thumbnail provide domain context.
+
+**Root Cause:** The previous system used `title` (app name) as the homepage card title, hiding the most engaging content (the creative headline) behind a click. The intro blurb headline techniques (Protagonist Framing, Verdict-as-Headline) produce strong hooks that are wasted when only visible inside the case study.
+
+**Resolution:**
+1. Updated authoring skill materialization map: `title` = app name, `introBlurbHeadline` = case study title / creative headline.
+2. Updated `case-study.md` page anatomy: `# Application Name` (was `# Project Title`). Added CMS storage note explaining homepage card now reads `introBlurbHeadline`.
+3. Updated `conversion-funnel.md`: homepage cards now hook through headline intrigue + category/thumbnail for domain signal.
+4. Updated `project-selection.md` §8.4: Joseph Zhang's "Company / Domain" pattern now maps to "Headline / Category" in our model.
+5. Updated `self-audit.md` §11.2: project card titles hook through intrigue; domain communicated by category + thumbnail.
+6. Updated `language-patterns.md`: blurb headlines are now also homepage card titles, raising stakes on headline quality.
+
+**Pattern extracted:** Homepage card semantics shifted from domain-first (app name + category) to intrigue-first (creative headline + category). This aligns with the luxury positioning principle - the card is now a trailer, not a label.
+
+**Cross-category note:** Also documented as FB-106 (design) and ENG-120 (engineering).
+
+---
+
+## Session: 2026-04-04 — Voice Calibration System
+
+#### CFB-025: "Rework the Lacework case study based on interview transcript material"
+
+**Intent:** Full rebuild of Lacework case study using new raw material (Norm AI interview transcript where the user presented the project). User wanted the case study rewritten with all content skills now in place, using the transcript as the primary source.
+
+**Root Cause:** Previous version (v1) was written before the full content skill system was established. While nothing was "particularly off," the case study lacked the thesis-driven structure, intro blurb, voice calibration, and narrative arc that the skills now enforce. The interview transcript provided richer signal material than the original sources.
+
+**Resolution:**
+1. Phase 1 (Analyze): Extracted signal inventory from 38-page interview transcript. Identified 3 trade-off moments (Tableau vs. in-app, page arrangement, visualization evolution), 4 metrics, and multiple CSM quotes. Technical resonance scan found authentic parallel to AI consumption-based pricing.
+2. Phase 2 (Plan): Selected thesis "billing model transition - self-service." Mapped 7 beats to 3-section anatomy. User provided creative direction for all headings: "Five Matryoshkas Deep", "Build Instead of Buy", "Donut. Avoid at All Cost."
+3. Phase 3 (Write + Materialize): New intro blurb (headline: "I saved the page my own team gave up on", body: 64 words/6 sentences). New scope statement with Snowflake/LendingTree social proof and AI pricing parallel. Three feature sections totaling ~125 words. Migrated from legacy sections to content blocks format. Hero metric changed from "2x/page discoverability" to "58%/usability improvement." Duration corrected from "~3 months" to "7 weeks" per transcript.
+4. Phase 4 (Review): 14/14 quality checks PASS. Dossier updated with v2 content map, voice samples, and evolution timeline.
+
+**Pattern extracted:** User creative direction in section headings and blurb headlines produces stronger memorability (Check 7) and vividness (Check 14) than agent-generated alternatives. The agent's role in these elements is integration and constraint enforcement, not generation.
+
+---
+
+#### CFB-024: Prompt system optimized for constraint compliance over voice production
+
+**Intent:** The user observed that their handwritten draft for the Elan case study was significantly more vivid than anything the system generated, despite the system following all content rules correctly. The gap between the user's natural voice and the system's output indicated a structural deficit in the prompt architecture - the rules describe what NOT to write but provide no model of what TO write.
+
+**Root Cause:** The content strategy system has 22 anti-patterns, banned word lists, fragment caps, and luxury positioning constraints - all optimized for preventing bad writing. No document encoded the user's actual voice techniques (metaphor-driven hooks, punch-counterpunch rhythm, cultural in-group signaling, escalation beats, wry redirects). The system interpreted "luxury positioning" as "clinical restraint" rather than "confident specificity." Result: technically correct, emotionally flat output on every first draft.
+
+**Resolution:**
+1. Created `docs/content/personal-voice.md` (Section 17) - universal voice spoke with calibration samples, 5 named techniques, and a two-tier refinement protocol.
+2. Revised `voice-style.md` - "no scene-setting" became "no bland scene-setting"; fragment cap zone-scoped (free in Zone 1, capped in Zone 3); added "Luxury and personality are not opposites" reframe.
+3. Added Check 14 (Vividness test) to `case-study-review.md` - picture/podcast/shared-pain tests apply universally.
+4. Added Step 4b (Voice Refinement Protocol) to `content-iteration` skill - two-tier constraint model for when user provides raw draft text.
+5. Wired technique library into `case-study-authoring` skill Phase 3 as Step 0 (voice calibration).
+6. Added CAP-023 (Voice Flattening During Refinement) to anti-patterns catalog.
+7. Added Voice Samples to Elan project dossier.
+
+**Pattern extracted -> `content.md` Section 17 + `voice-style.md` 13.2: The prompt system must encode positive voice targets (what TO write), not just negative constraints (what NOT to write). One unified voice across all case studies, calibrated warmer than clinical. When the user provides raw draft text, the refinement protocol distinguishes Tier 1 constraints (always enforce) from Tier 2 constraints (yield to user voice).**
+
+---
+
+## Session: 2026-04-04 — Voice register pivot for Élan case study
+
+#### CFB-023: User draft established conversational, culturally sharp voice register
+
+**Intent:** The user provided their own draft for the Élan intro blurb with a fundamentally different voice register than the agent's initial version. The agent's version was formal, structured, and impersonal ("How do you maintain design consistency..."). The user's version was conversational, first-person, irreverent, and culturally specific ("Teaching Einstein...", "Afraid of that default Tailwind blue-violet? Me too.", "AI design slop").
+
+**Root Cause:** The agent defaulted to the "luxury positioning" Zone 1 voice (restrained, precise, factual) without considering that the Élan case study's target audience (designers and engineers who vibe code) would respond better to a voice that signals in-group membership. The user's draft uses cultural references (Tailwind blue-violet, AI slop, "every session starts from zero") that immediately establish credibility with anyone who has tried vibe coding. The formal voice was technically correct but emotionally flat.
+
+**Resolution:**
+1. Rewrote headline, blurb body, scope statement, and all section bodies in the user's conversational register.
+2. Filled in placeholder gaps ("xxxx", "blah blah") with specific, grounded content maintaining the voice.
+3. Section bodies reworked for cultural sharpness: "color.surface.brand.bold - not color-1, not --primary-dark" (relatable bad names), "First time the agent broke dark mode, I wrote it down" (personal narrative).
+4. Documented voice register as a project-specific style preference in the dossier.
+
+**Pattern extracted: The default "luxury positioning" voice is not universally correct. Case studies targeting technical audiences (designers, engineers, vibe coders) benefit from a culturally sharp, first-person voice that signals shared experience. The voice register should match the audience, not the format.**
+
+---
+
+## Session: 2026-04-04 — Em dash violation in Élan case study
+
+#### CFB-022: "You use em dashes. This is an anti-pattern. You're never supposed to do that."
+
+**Intent:** The user identified that the agent used em dashes (U+2014) throughout the Élan case study content despite an explicit rule in `docs/content/voice-style.md` line 73: "Em dashes: never. Use a regular dash - like this. Max one per section." This is a recurring behavioral failure, not a knowledge gap. The rule existed and the agent did not follow it.
+
+**Root Cause:** The agent defaults to em dashes as a stylistic device because they are standard in formal English typography. This default overrides the project-specific rule unless the agent actively checks `voice-style.md` before writing. The rule was read during skill activation but not retained during the actual writing phase. This is the same class of failure as EAP-027 (documentation as deferred post-step): the agent treats voice rules as background context rather than active constraints during generation.
+
+**Resolution:**
+1. Replaced all em dashes in `update-elan/route.ts` with regular dashes or sentence breaks.
+2. Added CAP-022 to `content-anti-patterns.md`.
+3. Updated frequency map in `content.md`.
+
+**Pattern extracted: Em dash usage is an AI voice tell (extends CAP-017). The agent must check `voice-style.md` line 73 as a hard constraint during every content writing task, not just during review.**
+
+---
+
+## Session: 2026-04-04 — Élan Design System Case Study Full Rebuild
+
+#### CFB-021: Thesis pivot from "AI-native design system" to "compounding design knowledge"
+
+**Intent:** The user requested a complete rewrite of the Élan Design System case study. Three specific corrections emerged:
+1. Don't over-index on engineering bug fixes (Turbopack, hydration, CMS sync) — those are the AI agent's work, not the designer's.
+2. Center on DESIGN corrections that accumulated into rules — the designer's contribution is the system architecture (naming, escalation paths, feedback routing), not the bug fixes.
+3. Frame through a "growth design" lens — early components needed heavy hand-holding (spacing 15×, states 8×), later components needed refinement only. This maturity curve IS the evidence that the system works.
+
+**Root Cause:** The previous draft conflated "engineering incidents fixed" with "designer decisions made." A designer cannot credibly claim they personally resolved Turbopack cache invalidation or hydration mismatches. The design system's value for the designer is the DESIGN knowledge it accumulates — spacing rules, dark mode contracts, state modeling protocols, semantic naming conventions. The engineering guardrails are valuable but belong to the agent's competence, not the designer's portfolio claim.
+
+**Resolution:**
+1. Rewrote thesis: "A design system that learns from every failure — where documented design corrections compound into rules that make each session more effective than the last."
+2. Reduced sections from 4 to 3: "How the System Learns" (learning mechanism), "Naming as Documentation" (knowledge encoding), "One Component, Seven Corrections" (concrete proof).
+3. Dropped EscalationTimeline, ComponentShowcase, FunnelDiagram visuals. Kept IncidentDensityMap, TokenGrid, InteractionShowcase.
+4. Reframed all section text around DESIGN decisions, not engineering fixes.
+5. Updated duration from "2 days" to "2026 – Present" (reflecting continuous evolution).
+6. Hero metric changed from "47+" to "54 / design rules accumulated from real corrections" (placeholder — user flagged as needing further refinement).
+
+**Pattern extracted → `content-anti-patterns.md`: When writing a case study about a system built with AI, distinguish between what the designer decided and what the AI agent executed. Engineering fixes belong to the agent; system design (naming, escalation, documentation architecture) belongs to the designer. Overclaiming AI agent work as designer expertise breaks credibility.**
+
+**Open items:**
+- Hero metric needs user confirmation — "54" may still feel like a count rather than a value statement.
+- User wants "fake A/B test" comparing early vs. late session design quality. Requires chronological analysis of design feedback log.
+- User suggested comparing with generic designer skills for framing inspiration.
 
 ---
 
@@ -557,6 +759,163 @@ This session was not a single piece of feedback — it was the foundational anal
 **Pattern extracted → SKILL.md "Token Page Template" section:** Every foundational styles page must have Token Architecture as its first SectionTitle, explaining the naming formula. This is a content strategy requirement — naming conventions are essential reference content for both human and agent consumers.
 
 **Cross-category note:** Also documented as FB-095 (design) — the IA placement and heading hierarchy are design decisions that intersect with this content strategy decision.
+
+---
+
+#### CF-014: "Technical vocabulary strategy — AI/systems terminology for case studies"
+
+**Intent:** Ensure case studies use AI and systems terminology when genuinely warranted, positioning it prominently to signal fluency to technical hiring managers and startup founders, while never misapplying terms.
+
+**Root Cause:** The content system had no mechanism for evaluating whether technical terms were applicable to a case study's content. AI-relevant vocabulary was either absent (missing a signal opportunity) or at risk of being slapped on without substance (which would be worse than silence).
+
+**Resolution:**
+1. Created `docs/content/technical-framing.md` (§16) with: the three-gate test (structural match, evidence gate, terminology accuracy), a curated vocabulary table of 16 durable AI/systems concepts, the authentic parallel technique for non-AI work with genuine structural parallels, a placement hierarchy, and a freshness protocol.
+2. Wired a "Technical Resonance Scan" into the authoring skill Phase 1 (runs alongside signal inventory), vocabulary placement into Phase 2 Step 4, and updated Phase 4 to 13 quality checks.
+3. Added Check 13 (Technical vocabulary accuracy) to the review checklist and CAP-020 (Buzzword Misapplication) to anti-patterns.
+4. Cross-referenced from `voice-style.md` §13.2 positioning frame.
+
+**Pattern extracted → `technical-framing.md` §16:** Technical vocabulary decisions are upstream of language patterns — the system must decide *which concepts to surface* before deciding *how to phrase them*. The three-gate test prevents both silence (missing opportunity) and misapplication (red flag).
+
+---
+
+#### CF-013: "Write up — trigger word and intake protocol for case study authoring"
+
+**Intent:** Create a single magic-word trigger ("write up") that activates the full case study authoring pipeline, similar to how "boot up" starts servers and "ship it" triggers release.
+
+**Root Cause:** The authoring skill existed but had no snappy trigger — Route 15 relied on intent-matching ("user provides notes/transcripts") rather than a keyword. This made the workflow less discoverable and harder to invoke reliably.
+
+**Resolution:**
+1. Updated AGENTS.md Route 15 with "write up" as primary trigger plus aliases ("write this up", "draft this", "turn this into a case study").
+2. Added an Intake Protocol section to the authoring skill with scenario detection table, steering hints, and checkpoint documentation.
+3. Design principle: detect-and-go with optional steering. No questionnaire before Phase 1 — the agent starts working immediately and pauses at built-in checkpoints. Only asks a question in the bare scenario (no material, no project named).
+
+**Pattern extracted → `case-study-authoring/SKILL.md` Intake Protocol section:** Trigger-activated skills should detect context and start working, not interrogate. Use the skill's existing checkpoints for steering.
+
+---
+
+#### CF-012: "Intro blurb integration + luxury positioning + three thermal zones"
+
+**Intent:** Integrate an intro blurb (headline + body) at the top of each case study to hook readers into scrolling. Establish a luxury positioning meta-constraint governing all case study text. Define a voice coherence model (Three Thermal Zones) to bridge the punchy blurb into the restrained body.
+
+**Root Cause:** The content strategy system had no mechanism for a "trailer" component between the hero and scope statement. Voice rules didn't address how to transition between two very different registers on the same page. There was no explicit naming for the portfolio's positioning philosophy (luxury vs. mass market).
+
+**Resolution:**
+1. Added §3.7 (Intro Blurb + Three Thermal Zones) and §3.8 (Luxury Positioning Principle) to `case-study.md`.
+2. Added two CMS fields (`introBlurbHeadline`, `introBlurbBody`) to Projects collection.
+3. Updated page anatomy template, scope statement bridge sentence, narrative arc compression table.
+4. Wired blurb into authoring skill (Phase 2 + 3), review checklist (Checks 11-12), anti-patterns (CAP-018, CAP-019).
+5. Added voice cross-references for contrarian-line echo points and luxury positioning foundation.
+
+**Pattern extracted → `case-study.md` §3.7 + §3.8:** The intro blurb is a page anatomy component with its own thermal zone. Luxury positioning is the overarching meta-constraint that unifies all content voice decisions.
+
+**Cross-category note:** Also documented as ENG-104 (engineering) — CMS schema change, frontend rendering, inline edit support.
+
+---
+
+#### CF-015: "Include all of them in the dictionary — they all have reasons"
+
+**Intent:** Expand the technical vocabulary table in `docs/content/technical-framing.md` with 10 additional AI/systems terms (ReAct, generator-critic pattern, agent harnessing, LangChain/agent framework patterns, system of action, swarm/swarm intelligence, multi-agent systems, observability, long-horizon agent, AI agency/degrees of autonomy). The user's projects directly use these concepts; the agent needs complete definitions to evaluate applicability during the technical resonance scan rather than omitting terms it doesn't recognize.
+
+**Root Cause:** The initial vocabulary (15 terms) was conservative — several user-provided terms were assessed as "too academic," "too tied to a specific framework," or "covered by existing terms." But the user's actual work uses these concepts (design system architecture, prompt engineering, agent orchestration), and the three-gate test already prevents misuse. An incomplete dictionary means the agent can't even consider terms it doesn't know.
+
+**Resolution:**
+1. Added 10 new rows to §16.2 vocabulary table in `technical-framing.md`, each with full 5-column entries (definition, applies-when, does-not-apply-when, example framing).
+2. Reframed several terms for durability: "GAN-inspired" → "Generator-critic pattern (adversarial review)," "Swarm mode" → "Swarm / swarm intelligence," "AI Agency" → "AI agency / degrees of autonomy," "LangChain" → "LangChain / agent framework patterns."
+3. Total vocabulary now 25 terms.
+
+**Pattern extracted → `technical-framing.md` §16.2:** The vocabulary is a reference dictionary, not a usage mandate. Completeness is more important than conservatism — the three-gate test is the usage filter, not the dictionary itself.
+
+---
+
+#### CF-016: "Intro blurb should be the only prominent text; remove description as template concept"
+
+**Intent:** Eliminate the "description" as a distinct case study template element. The intro blurb body should be the sole prominent entry text (medium weight, primary color). Existing description content should not be deleted but rendered as regular body text. Future case studies should have no description field - only the intro blurb.
+
+**Root Cause:** Two competing text tiers (intro blurb body at secondary weight/color vs. description at medium weight/primary color) created visual hierarchy confusion. The description appeared more important than the intro blurb despite being lower on the page. This redundancy diluted the intro blurb's role as the hook.
+
+**Resolution:**
+1. Promoted intro blurb body styling to medium weight, primary color (matching the former description).
+2. Demoted the description section to legacy status - `body-sm`, `text-secondary`, conditional render.
+3. Updated `docs/content/case-study.md` §3.7 to document the policy: no separate description section, all prominent text goes in the intro blurb.
+
+**Pattern extracted → `case-study.md` §3.7:** The intro blurb is the single prominent entry text element. Typography uses `body-lg`, `font-weight: medium`, `text-primary`. The `description` field is legacy - existing content is preserved as regular body text, but new case studies must not use it.
+
+**Cross-category note:** Also documented as FB-104 (design).
+
+---
+
+#### CF-017: "Hero image different dimensions than 16:9 - crop, adjust, or burden on designer?"
+
+**Intent:** Ensure the case study hero template handles images of any aspect ratio without cropping, and document the adaptive behavior so future case study generation and authoring workflows produce correct output.
+
+**Root Cause:** The hero container enforced `aspect-ratio: 16/9` with `overflow: hidden`, silently cropping non-standard images. The case study documentation described the hero as using `width: 100%; height: auto` but the implementation contradicted this by constraining all images to 16:9.
+
+**Resolution:**
+1. Split `.heroInner` into base wrapper (adaptive) and `.heroSkeleton` modifier (16:9 placeholder only when no image exists).
+2. Updated `docs/content/case-study.md` §3.2 "Hero responsive behavior" to document: the hero container adapts to the uploaded image's natural aspect ratio; the 16:9 skeleton is a placeholder shape, not an enforced constraint; the designer controls hero proportions by choosing image dimensions.
+
+**Pattern extracted → `case-study.md` §3.2:** Added "Adaptive image dimensions" paragraph. The hero renders images at their natural ratio - no cropping, no letterboxing. 4:3, 2:1, 16:9 all render correctly.
+
+**Cross-category note:** Also documented as FB-106 (design - vertical breathing room and adaptive container).
+
+---
+
+#### CF-018: "Divider lines between sections are too much; need separation between intro and article"
+
+**Intent:** Dividers should mark structural zone boundaries, not chapter breaks within a continuous narrative. The reading flow between case study sections should feel like one cohesive story, not a series of separate items. A visual separator is needed between the intro zone and the article body to signal the register change.
+
+**Root Cause:** `createCaseStudyBlocks` defaulted `showDivider` to `true`, inserting `<hr>` blocks between every feature section. This fragmented the narrative arc and created friction - readers encountered visual stop signs that discouraged scrolling. Meanwhile, no visual boundary existed between the intro zone (blurb + scope statement) and the article body, despite a clear register change (Zone 1/2 to Zone 3).
+
+**Resolution:**
+1. Flipped `showDivider` default to opt-in (`=== true`) in `content-helpers.ts`.
+2. Added `.articleSeparator` as a template-level structural divider between intro zone and content blocks.
+3. Documented the principle in `case-study.md` §3.9 (Divider Usage Principle).
+4. Added CAP-024 (Divider Overuse Between Narrative Sections) to `content-anti-patterns.md`.
+5. Updated `case-study-authoring/SKILL.md` Phase 3 block type documentation.
+
+**Pattern extracted -> `case-study.md` §3.9:** Dividers mark zone boundaries (intro-to-article, article-to-navigation). Within the article, whitespace provides inter-section separation. The structural divider is a template-level element, not an authored content block.
+
+**Cross-category note:** Also documented as FB-107 (design).
+
+---
+
+#### CF-019: "Divider should sit between intro blurb and scope statement, not after scope statement"
+
+**Intent:** The scope statement is the beginning of the article, not part of the intro zone. The structural divider should signal this transition - hook above, article below. Additionally, feature sections within the article need more breathing room (whitespace, not dividers).
+
+**Root Cause:** The previous zone model treated the scope statement and company callout as part of the "intro zone" (Zone 1 + Zone 2), placing the divider after all of them. User feedback clarified that the scope statement IS the article start, so the divider belongs between the intro blurb and the scope statement. This is a zone redefinition, not just a layout change.
+
+**Resolution:**
+1. Moved `<hr>` placement in `ProjectClient.tsx` from after legacyDescription/companyCallout to between introBlurb and legacyDescription.
+2. Updated anatomy diagram in `case-study.md` section 3.2 - divider now sits between Zone 1 (intro blurb) and Zone 2 (article: scope statement, feature sections).
+3. Updated section 3.9 (Divider Usage Principle) to define intro zone as blurb only; article begins at scope statement.
+4. Updated CAP-024 zone reference in `content-anti-patterns.md`.
+
+**Pattern extracted -> `case-study.md` §3.9:** Intro zone = title + hook body only. The scope statement is the first element of the article, not part of the intro. Divider marks the hook-to-article boundary.
+
+**Cross-category note:** Also documented as FB-109 (design).
+
+---
+
+#### CF-020: "Hero metrics should have a tooltip explaining how the number was derived"
+
+**Intent:** Add non-invasive progressive disclosure to hero metrics (the big numbers in the case study sidebar) so skeptical hiring managers can see the derivation methodology without the metric losing its visual impact.
+
+**Root Cause:** Hero metrics like "58% usability improvement" and "95% noise reduction" are Derived metrics (per the metric taxonomy in `voice-style.md` section 13.1). The scope statement text contains a derivation anchor, but it's several scroll-lengths away from the number. Co-locating the derivation with the metric via a tooltip closes that gap without disrupting the visual hierarchy.
+
+**Resolution:**
+1. Added `tooltip` field to `HERO_METRICS` map in `page.tsx` for Lacework and Meteor.
+2. Imported `InfoTooltip` in `ProjectClient.tsx` and rendered it next to the metric label (inside a new `.heroMetricLabelRow` flex wrapper).
+3. Tooltip content follows content guardrails: 1-2 sentences, confident factual tone, no defensiveness.
+4. Elan Design System metric ("54 design corrections") has no tooltip - it's a self-anchoring count that doesn't need derivation.
+
+**Tooltip content:**
+- Lacework: "Perceived ease-of-use scores from task-based evaluations with the customer success team. Scores rose from 60 to 95 out of 100."
+- Meteor: "A representative basket review went from ~12,000 spreadsheet rows to ~560 exception flags. The remaining rows are auto-validated."
+
+**Pattern extracted -> `content.md`:** Derived metrics benefit from co-located derivation anchors (tooltips). Self-anchoring metrics (counts, user numbers) do not. This is a selective application of the Evidence Anchoring framework.
+
+**Cross-category note:** Also documented in the design log (tooltip as a UI pattern) and engineering log (ENG-122).
 
 ---
 

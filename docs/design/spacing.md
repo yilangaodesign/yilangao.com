@@ -80,7 +80,25 @@ Buttons must never be placed directly adjacent to each other — horizontally or
 
 Every container boundary (sidebar edge, card edge, header edge) must have **visible** padding separating it from its children. If you can't see the gap, it's wrong.
 
-### 1.5 Sidebar Internal Spacing (Collapsed-First)
+### 1.5 Full-Width Splash Inset Symmetry
+
+When a full-width element (hero splash, feature banner) uses horizontal inset at any breakpoint, it must apply equivalent vertical inset. Directional asymmetry in padding - horizontal but not vertical - creates a visual imbalance where the element feels "pressed against" the top/bottom edges. If the element is not a deliberate full-bleed takeover, all four sides need breathing room.
+
+- **Mobile (no horizontal padding):** Vertical padding still applies (`spacer-3x` = 24px top/bottom) to prevent the content from being flush against the preceding/following elements.
+- **Tablet+ (horizontal padding appears):** Vertical padding matches or tracks the horizontal value. At `sm`, 24px vertical / 16px horizontal. At `md`, 32px all four sides.
+- **Full-bleed exception:** If the design intent is a full-viewport takeover (no padding on any side), omit all inset. The rule targets the in-between case where horizontal padding exists but vertical does not.
+
+### 1.7 Overlay Pointer Inset on Rounded Containers
+
+When an overlay element (tooltip, popover, dropdown) displays a pointer (caret, arrow, triangle) against a container with rounded corners, the pointer must be inset from the container edge by **at least the container's border-radius**. The pointer is geometrically sharp; placing it inside the radius zone visually breaks the corner curve and creates a jarring sharp-meets-round collision.
+
+- **Tooltip caret:** `arrowPadding = radius-sm` (4px). The caret sits inside the flat portion of the container edge, clear of the corner rounding.
+- **Future popovers/dropdowns:** Same rule applies. Inset >= border-radius.
+- **Centered pointers:** When a pointer is explicitly centered (`caret="center"` in the tooltip), it is far from any corner by definition, so the inset can be 0. The rule only matters when the pointer could drift to the edge via alignment or collision-shifting.
+
+This is a geometric constraint, not an aesthetic preference. It applies to all overlay components in the design system.
+
+### 1.6 Sidebar Internal Spacing (Collapsed-First)
 
 The collapsed state is the **canonical spacing reference**. The expanded state must match it exactly on every shared vertical axis so that toggling never causes tabs to jump.
 

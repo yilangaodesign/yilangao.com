@@ -13,7 +13,7 @@ Use this to evaluate the portfolio against the mental model. The audit follows t
 
 ### 11.2 Layer 1 → Layer 2 Transition (Magic Number)
 
-- Do project titles and thumbnails communicate the problem domain clearly?
+- Do project card titles (creative headlines) hook through intrigue, while category + thumbnails communicate the problem domain clearly?
 - Would a hiring manager for your target role see at least 2 relevant projects?
 - Are you curating (3-5 strong projects) or dumping (8+ with uneven quality)?
 - Within 60 seconds, can a visitor achieve all three magic number signals: specialization understood, relevant project identified, concrete outcome encountered?
@@ -26,6 +26,7 @@ Use this to evaluate the portfolio against the mental model. The audit follows t
 - Do case studies demonstrate decisions and trade-offs, not just process?
 - Is there evidence of impact — quantitative, qualitative, or both?
 - Does the level of strategic thinking match the seniority of target roles?
+- For each hero metric, can a skeptical reader verify the claim within 5 seconds? Classify the metric type (derived / self-anchoring / behavioral) and check accordingly. See Check 17 in `case-study-review.md`.
 
 ### 11.4 Layer 3 — Barrier Building (Conversion)
 
@@ -33,3 +34,4 @@ Use this to evaluate the portfolio against the mental model. The audit follows t
 - Is the path from "I'm interested" to "I've reached out" frictionless?
 - Does the portfolio leave the visitor with a clear sense of what working with you would be like?
 - Would the hiring manager share this portfolio with a colleague? What would they say?
+- Across all case studies, do blurb headlines use at least 2 different primary techniques? Do narrative shapes vary? Check the Portfolio Coherence Manifest (`docs/content/portfolio-coherence.md`) for repetition flags.

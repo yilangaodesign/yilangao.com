@@ -50,6 +50,87 @@ Lumen is a custom blue-violet accent scale built in OKLCH — a perceptual color
 
 The Lumen accent IS the brand. It must never be replaced with Carbon's blue for interactive elements.
 
+### 9.3b Brand Accent: Terra Warm Amber
+
+**Added 2026-04-05. Hue tuned 2026-04-05 (91.4deg to 70deg for redder warmth). Renamed Sand to Terra 2026-04-05.**
+
+Terra is a custom warm-amber accent scale built in OKLCH, following the identical construction methodology as Lumen. The seed color `#FAF9F6` established the warm family direction; the hue was then tuned to 70deg for a richer, redder warmth that reads as amber/sienna rather than gold. Terra provides a warm, earthy complement to Lumen's cool blue-violet.
+
+**Construction parameters (OKLCH):**
+- **Lightness:** Identical two-segment even ramp as Lumen - deltaL ~0.093 (steps 10-60), deltaL ~0.081 (steps 60-100)
+- **Chroma:** Sine bell peaking at step 60 (C = 0.135), tapering toward both extremes. Scaled at 0.480x Lumen's peak chroma to match warm earth-tone gamut limits
+- **Hue:** Constant 70deg across all steps (no hue discontinuity). Seed `#FAF9F6` has hue ~91deg in OKLCH; tuned -21deg toward red for warmer amber character
+
+**Hue separation from other palette families:**
+- vs Lumen accent (269.7deg): ~200deg separation
+- vs Yellow (Carbon, ~100deg): ~30deg separation. Terra is distinctly warmer/redder, and at lower chroma. Yellow reads as vivid caution/alert; Terra reads as warm earth.
+- vs Orange (Carbon, ~55deg): ~15deg separation. Orange steps are at full Carbon chroma (much higher); Terra uses the scaled-down sine arc. Semantic role prevents confusion.
+
+| Step | Hex | OKLCH (L, C, H) | vs White | vs #161616 | Usage |
+|------|-----|-----------------|----------|------------|-------|
+| 10 | #f5f1ec | 0.96, 0.008, 70 | 1.1:1 | 16.1:1 | Terra tint backgrounds, surface-terra-subtle (light mode) |
+| 20 | #e0d0bf | 0.87, 0.030, 70 | 1.5:1 | 12.0:1 | Warm highlight, hover backgrounds |
+| 30 | #ccb091 | 0.77, 0.053, 70 | 2.1:1 | 8.8:1 | Decorative borders, disabled states |
+| 40 | #b89062 | 0.68, 0.079, 70 | 2.9:1 | 6.2:1 | Dark mode text-terra (passes 4.5:1 on #161616) |
+| 50 | #a4702c | 0.59, 0.106, 70 | 4.3:1 | 4.3:1 | Dark mode border-terra (passes 3:1 both) |
+| 60 | **#915000** | **0.50, 0.135, 70** | **6.3:1** | 2.9:1 | **Brand anchor.** Text, border (light mode). Content-layer only. |
+| 70 | #743b00 | 0.41, 0.123, 70 | 8.9:1 | 2.0:1 | Deep accent |
+| 80 | #542a00 | 0.33, 0.096, 70 | 12.3:1 | 1.5:1 | Deep accent |
+| 90 | #341b00 | 0.25, 0.062, 70 | 16.1:1 | 1.1:1 | Near-black warm accent |
+| 100 | #170d03 | 0.17, 0.028, 70 | 19.2:1 | 1.1:1 | Darkest Terra step |
+
+**Brightness inversion (§9.12 compliant):**
+| Property | Light mode | Dark mode | Light contrast on white | Dark contrast on #161616 |
+|----------|-----------|-----------|------------------------|-------------------------|
+| Text | terra-60 (#915000) | terra-40 (#b89062) | 6.30:1 | 6.20:1 |
+| Border | terra-60 (#915000) | terra-50 (#a4702c) | 6.30:1 | 4.30:1 |
+| Surface bold | terra-60 (#915000) | neutral-80 (#393939) | — | — |
+| Surface subtle | terra-10 (#f5f1ec) | neutral-90 (#262626) | — | — |
+
+*Icon and action tokens removed (Tier 2 scope restriction). Surface dark mode uses neutral fallback, not step inversion. See "Dark Mode Strategy" below.*
+
+**Color Tier Architecture:**
+
+The design system uses a two-tier color model to serve both a portfolio/marketing site and future B2B desktop tools:
+
+- **Tier 1 (Functional):** Neutral, Lumen, Positive, Negative, Warning, Extended palette. Ships in every product. All tokens participate in standard light/dark step inversion.
+- **Tier 2 (Brand/Marketing):** Terra. Appears in portfolio case studies, testimonial cards, onboarding flows, empty states, and marketing/landing pages within products. Surface tokens fall back to neutral in dark mode. Foreground tokens (text, border) invert normally.
+
+Tier 2 colors do NOT appear in: daily-use product chrome, data tables, forms, navigation, or status indicators.
+
+**Usage Scope:**
+
+Allowed (content layer):
+- Case study section backgrounds (`surface-terra-subtle`)
+- Pull-quote / testimonial card backgrounds (`surface-terra-subtle`)
+- Project category tags - static labels, not interactive (`surface-terra-subtle` bg, `text-terra` text)
+- Decorative borders in content (`border-terra`)
+- Hero/cover warm tint (`surface-terra-subtle`)
+- Onboarding, empty states, marketing moments within future products
+
+Prohibited (UI layer):
+- Buttons, links, focus rings (use Lumen) - `action-terra` token removed to enforce
+- Navigation chrome (use Neutral)
+- Status indicators (use functional colors from Tier 1)
+- Body text, headings, form elements (use Neutral)
+- Data visualization (indistinguishable from Orange at dark steps)
+- Functional icons (use Neutral or Lumen) - `icon-terra` token removed to enforce
+
+Edge case: `text-terra` on white passes WCAG AA (6.3:1) but is restricted to short labels, tags, and eyebrow text in content areas.
+
+**Dark Mode Strategy:**
+
+Terra surface tokens (`surface-terra-subtle`, `surface-terra-bold`) map to neutral dark surfaces in dark mode. Warmth is a light-mode brand expression only. No major design system has made warm cream atmospherics work in dark mode:
+- Notion: warm beige (#F7F6F3) becomes cool dark gray (#2F3437) in dark mode
+- Anthropic: warm ivory (#F5F0E8) editorial aesthetic is fundamentally light-mode
+- Spotify: brand green is mode-invariant but restricted to logo/badge contexts, never a surface tint
+
+Text and border tokens (`text-terra`, `border-terra`) retain warm hue via standard step inversion (60/40 and 60/50). These foreground elements need WCAG contrast in both modes, and the lighter Terra steps are visible and appropriate on dark backgrounds for tag labels and decorative rules.
+
+**Orange coexistence:**
+
+Orange (Carbon, ~46deg at step 60) has 14.6deg hue separation from Terra. Perceptual overlap exists at dark steps (distance 0.021 at step 80). Decision: **keep both.** Orange is a Tier 1 functional status color in the caution-major severity tier (Yellow < Orange < Red). Terra is a Tier 2 content-layer atmospheric accent. They serve different semantic roles, belong to different tiers, and never appear in the same context. The Blue/Lumen removal precedent does not apply because Blue and Lumen competed for the same role (primary interactive); Orange and Terra do not.
+
 ### 9.4 Carbon Color Provenance
 
 The extended palette (`$portfolio-red-*`, `$portfolio-green-*`, etc.) is sourced directly from `@carbon/colors` v11. These are the exact hex values from the IBM Design Language — they are not approximations. The neutral gray family (`$portfolio-neutral-*`) was already identical to Carbon's gray palette before this expansion.
@@ -223,6 +304,9 @@ The following color families are defined in `_colors.scss` but have no current U
 | Negative | red-60 (#DA1E28) | red-40 (#FF8389) | 5.00:1 | 7.63:1 |
 | Positive | green-60 (#198038) | green-40 (#42BE65) | 5.02:1 | 7.57:1 |
 | Warning | yellow-60 (#8E6A00) | yellow-40 (#D2A106) | 4.99:1 | 7.62:1 |
+| Terra (text only) | terra-60 (#915000) | terra-40 (#b89062) | 6.30:1 | 6.20:1 |
+
+*Terra icon token removed (Tier 2 scope restriction). See §9.3b.*
 
 **Implementation — border/action token map (step-60/step-50):**
 
@@ -231,6 +315,11 @@ The following color families are defined in `_colors.scss` but have no current U
 | Negative | red-60 (#DA1E28) | red-50 (#FA4D56) | 5.00:1 | 5.40:1 |
 | Positive | green-60 (#198038) | green-50 (#24A148) | 5.02:1 | 5.40:1 |
 | Warning | yellow-60 (#8E6A00) | yellow-50 (#B28600) | 4.99:1 | 5.43:1 |
+| Terra (border only) | terra-60 (#915000) | terra-50 (#a4702c) | 6.30:1 | 4.30:1 |
+
+*Terra action token removed (Tier 2 scope restriction). See §9.3b.*
+
+**Surface (Tier 2 — neutral fallback):** Terra surface tokens do not follow standard step inversion. In dark mode, `surface-terra-subtle` maps to `neutral-90` (#262626) and `surface-terra-bold` maps to `neutral-80` (#393939). Warmth is a light-mode brand expression only. See §9.3b "Dark Mode Strategy" for rationale.
 
 **When adding a new functional color role** (e.g., `info`), apply the same rules: step-60 as the light-mode SCSS source, step-40 dark override for text/icon, step-50 dark override for border/action. Verify contrast against both white and #161616 before shipping.
 
@@ -243,5 +332,5 @@ The following color families are defined in `_colors.scss` but have no current U
 | **Accent scale perceptual uniformity** | **Resolved (2026-04-03)** | Rebuilt entire scale in OKLCH with grade 60 as anchor. Even lightness ramp (deltaL ~0.09), sine chroma arc, constant hue 269.7deg. The old scale had a 60% lightness cliff at step 50-to-60; the new scale has <2% asymmetry across the critical 40-60 zone. Dark-half chroma subsequently optimized to reduce max/min perceptual distance ratio from 1.48x to 1.33x (steps 70-100 redistributed). |
 | **Carbon Blue vs. Accent hue collision** | **Resolved (2026-04-03)** | Blue family removed. Blue-60 (#0F62FE, hue ~219deg) was only ~20deg from accent-60 (#3336FF, hue ~270deg). `$portfolio-support-info` remapped to `$portfolio-cyan-70`. |
 | **Carbon Purple vs. Accent overlap** | **Resolved (2026-04-03)** | Kept. Purple-60 (#8A3FFC, hue ~268deg) has ~29deg separation from the accent and leans red-violet vs the accent's blue-violet. Perceptually distinct. |
-| **Dark mode semantic tokens** | Mostly resolved | Text/icon (step-60/step-40) and border/action (step-60/step-50) tokens for all four functional roles now have canonical dark-mode overrides (§9.12). Surface tokens remain: `surface-warning-bold` uses yellow-30 in both modes intentionally (bright attention-grabbing background). |
+| **Dark mode semantic tokens** | Mostly resolved | Text/icon (step-60/step-40) and border/action (step-60/step-50) tokens for all five functional roles (negative, positive, warning, terra, brand) now have canonical dark-mode overrides (§9.12). Surface tokens remain: `surface-warning-bold` uses yellow-30 in both modes intentionally (bright attention-grabbing background). |
 | **`support-info` and `support-caution-major` migration** | Partially resolved | `support-info` remapped from `$portfolio-blue-70` to `$portfolio-cyan-70` (#00539A) as part of blue removal. `info` may still warrant its own role. `caution-major` (orange-40) remains legacy-only. |

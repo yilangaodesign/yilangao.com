@@ -15,6 +15,8 @@ Typical section rhythm:
 - 3-6 full-width or half-width images
 - 0-2 one-line captions
 
+**Agent generation note:** When creating a new case study via the authoring skill, the 3-6 images per paragraph rule translates to 3-6 `imagePlaceholders` entries per section in `createCaseStudyBlocks`. Each placeholder must have a specific label describing what image belongs there. The section `layout` field determines how the skeleton grid (and later, real images) arranges. See `case-study-authoring/SKILL.md` Phase 2 Step 2 for the artifact mapping instructions and Phase 3 Step 2 for the materialization format.
+
 ### 4.3 Image Types That Work
 
 | Type | When to use | Example |

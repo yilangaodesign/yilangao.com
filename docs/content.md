@@ -24,6 +24,13 @@
 | §9 | About Page & Supporting Content | [`docs/content/about-page.md`](content/about-page.md) | Editing about page or non-case-study content |
 | §10 | Portfolio Lifecycle & Intervention Matrix | [`docs/content/portfolio-lifecycle.md`](content/portfolio-lifecycle.md) | Mapping hiring stages, adapting for HM segments |
 | §11 | Self-Audit Framework | [`docs/content/self-audit.md`](content/self-audit.md) | Evaluating portfolio against the mental model |
+| §12 | Narrative Arc (7-Beat Framework) | [`docs/content/narrative-arc.md`](content/narrative-arc.md) | Writing or rebuilding a full case study |
+| §13 | Voice & Style | [`docs/content/voice-style.md`](content/voice-style.md) | Writing any case study text |
+| §14 | Case Study Review Checklist | [`docs/content/case-study-review.md`](content/case-study-review.md) | Reviewing or auditing a case study |
+| §15 | Project Dossiers | [`docs/content/projects/`](content/projects/) | Per-project evolution tracking, rebuild context |
+| §16 | Technical Vocabulary Strategy | [`docs/content/technical-framing.md`](content/technical-framing.md) | Writing or editing any case study, especially for technical/startup audiences |
+| §17 | Personal Voice & Techniques | [`docs/content/personal-voice.md`](content/personal-voice.md) | Writing any case study text (universal) |
+| §18 | Portfolio Coherence Manifest | [`docs/content/portfolio-coherence.md`](content/portfolio-coherence.md) | Authoring (diversity gate), reviewing (Check 18), iterating (when edits might break diversity) |
 | App. A | Reference Portfolios | [`docs/content/reference-portfolios.md`](content/reference-portfolios.md) | Competitive benchmarks |
 | App. B | Feedback Frequency Map | *(this file)* | Checking recurring patterns |
 
@@ -44,6 +51,7 @@
 - **Internal tools require more visual evidence, not more text.** When the reader can't visit the live product, screenshots, recordings, and annotated flows must be so clear that the reader feels like they've used the product.
 - **Specificity over generality.** "Improved the user experience" signals nothing. "Activation time dropped 30% in the first month" or "Led design for a 2.5-month marketing site relaunch with 20 interactive graphics coded in React" signals everything.
 - **Conversion rate > application volume.** A small improvement in conversion rate has a multiplicative effect. Doubling application volume doubles effort. Doubling conversion rate doubles outcomes with no additional effort per application.
+- **Luxury positioning governs all case study content.** Show outcomes early, state them as facts, never editorialize why they're impressive. The reader's inference is more powerful than your commentary. See `case-study.md` §3.8 for the full principle and technique rules.
 
 ---
 
@@ -63,10 +71,17 @@
 | **Text verbosity (section body > 3 sentences, scope > 4 sentences)** | **2** | **Critical — escalation threshold** |
 | Interactive visual scoping (widget content must match section topic) | 2 | Medium |
 | Information hierarchy inversion (rationale before outcome, data source over task) | 2 | High |
-| Feature-list case study (WHAT without WHY) — CAP-016 | 1 | High |
+| Feature-list case study (WHAT without WHY) — CAP-016 | 2 | High |
 | Section hierarchy (AI-native thread should be the core narrative) | 1 | High |
 | Token naming examples inconsistent with described convention | 1 | Medium |
 | CMS data sync (headings out of sync → visuals silently drop) | 1 | High |
+| Claiming AI agent work as designer expertise — CAP-021 | 1 | High |
+| Hero metric must communicate value, not volume | 1 | High |
+| Em dash usage (AI voice tell) — CAP-022 | 1 | Critical |
+| Voice flattening during refinement — CAP-023 | 1 | Critical |
+| AI output lacks user's personal voice (clinical register) | 1 | High |
+| Floating metric (hero number without derivation in scan window) - CAP-025 | 1 | Critical |
+| Employment classification signal (diminishing labels in portfolio text) - CAP-026 | 1 | High |
 
 ---
 

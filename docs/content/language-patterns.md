@@ -53,3 +53,45 @@ External links that let someone else vouch for the work:
 - App store links: direct links to the shipped product
 
 For internal tools, third-party validation is harder. Compensate with: company blog posts mentioning the project, internal awards, team size/scope metrics, or quantified impact statements.
+
+### 5.6 Voice & Style Cross-Reference
+
+For expanded sentence rules, banned/preferred words, punctuation policy, metric
+handling, caption craft, and authoring-mode voice posture, see
+[`docs/content/voice-style.md`](voice-style.md). The rules in §5.1-§5.5 above
+and §13 are complementary - language patterns define *what to write*; voice &
+style defines *how to write it*.
+
+### 5.7 The Section Title
+
+Section titles (2-5 words) are compressed arguments, not content previews. A
+strong title works as a standalone interesting statement even without the body
+text below it.
+
+| Weak (Preview) | Strong (Argument) | Technique |
+|---|---|---|
+| "Five Layers to Three" | "Five Matryoshkas Deep" | Object Substitution (T6) |
+| "Why Not Just Keep Tableau" | "Build Instead of Buy" | Framework Inversion (T7) |
+| "Reading the Speedometer" | "Donut. Avoid at All Cost." | Verdict + Staccato (T8 + modifier) |
+| "Improving the Dashboard" | (too generic to fix - needs sharper material) | N/A |
+
+**The Standalone Test:** Remove the section body text. Read only the title.
+Does it make you curious what the argument is? (Argument title - pass.) Or does
+it make you predict what the section explains? (Preview title - fail.)
+
+- "Five Layers to Three" = preview. Numbers describe a transformation but give
+  away the conclusion. Needs the body to be interesting.
+- "Build Instead of Buy" = argument. The reader knows the stance, wants to know
+  the reasoning. Works standalone.
+- "Reading the Speedometer" = preview. Describes what the section is about.
+  Functional, not magnetic.
+- "Donut. Avoid at All Cost." = argument. A judgment that provokes curiosity.
+  Works standalone.
+
+Section titles and blurb headlines (6-10 words) are different beasts. This
+pattern covers section titles. Blurb headlines are now also the homepage card
+title (the official case study title), which raises the stakes on headline
+quality - they must work both as a case study opener and as a masonry grid hook.
+For blurb headline techniques (Protagonist Framing, Verdict-as-Headline at
+longer range), see `case-study.md` section 3.7. For the full technique library,
+see `personal-voice.md` Techniques 6-10.

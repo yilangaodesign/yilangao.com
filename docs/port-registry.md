@@ -23,14 +23,18 @@
 
 | Service | Default Port | Current Port | Status | PID | Notes |
 |---|---|---|---|---|---|
-| Main site (`yilangao.com`) | 4000 | 4000 | running | 70330 | `npm run dev` |
-| Playground | 4001 | 4001 | running | 63663 | `npm run playground` |
-| ASCII Art Studio | 4002 | 4002 | running | 19736 | `npm run ascii-tool` |
+| Main site (`yilangao.com`) | 4000 | 4000 | running | 70189 | `npm run dev` (webpack mode) |
+| Playground | 4001 | 4001 | running | 68810 | `npm run playground` |
+| ASCII Art Studio | 4002 | 4002 | running | 68875 | `npm run ascii-tool` |
 
 ## Change Log
 
 | Timestamp (UTC) | Service | Action | Port | Reason |
 |---|---|---|---|---|
+| 2026-04-04 20:11 | Main site | restarted | 4000 | Switched to webpack bundler — Turbopack 16.2.1 missing routes-manifest.json breaks dynamic routes (ENG-117) |
+| 2026-04-04 20:06 | All services | restarted | 4000–4002 | Killed stale zombie servers (accepting TCP but not HTTP), cleared .next caches, fresh start — ENG-116 |
+| 2026-04-04 20:03 | All services | already running | 4000–4002 | User boot up — TCP listeners on default ports; PIDs refreshed for playground + ASCII |
+| 2026-04-04 05:18 | Main site | already running | 4000 | User boot portfolio — healthy on 4000 (PID refreshed in ledger) |
 | 2026-04-03 03:01 | Playground | started | 4001 | User boot — port was not serving (ledger stale) |
 | 2026-04-01 13:42 | Main site | started | 4000 | Session boot — nothing listening on 4000 |
 | 2026-04-01 13:42 | Playground | started | 4001 | Session boot — nothing listening on 4001; ENG-077 token fix + restart |
@@ -55,3 +59,4 @@
 | 2026-04-03 | Playground | restarted | 4001 | Cleared .next + restarted — typography hierarchy + colors page IA/layout restructure |
 | 2026-04-03 | Playground | restarted | 4001 | Cleared .next + restarted — Checkbox forceMount + transition fix |
 | 2026-04-03 | Playground | restarted | 4001 | Cleared .next + restarted — Checkbox bypass Radix Indicator, icons direct in Root with opacity toggle |
+| 2026-04-04 | Playground | restarted | 4001 | Cleared .next + restarted — logo dark mode fix (mask-image technique) |
