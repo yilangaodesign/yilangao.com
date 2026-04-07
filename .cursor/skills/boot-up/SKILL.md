@@ -19,10 +19,11 @@ description: >-
 
 | User says | Scope |
 |-----------|-------|
-| "boot up" (no qualifier) | All 3 apps |
+| "boot up" (no qualifier) | All 3 apps + login page |
 | "boot up the playground" / "boot up the design system" | Playground only |
 | "boot up the site" / "boot up the main site" | Main site only |
 | "boot up ascii" / "boot up the ascii tool" | ASCII Art Studio only |
+| "boot up the login page" / "I need to see the login page" | Main site + login page confirmation |
 | "I can't see X on localhost" | Infer the app from context |
 
 ## App Registry (quick reference)
@@ -32,6 +33,18 @@ description: >-
 | Main site | 4000 | `npm run dev` | `http://127.0.0.1:4000/` |
 | Playground | 4001 | `npm run playground` | `http://127.0.0.1:4001/` |
 | ASCII Art Studio | 4002 | `npm run ascii-tool` | `http://127.0.0.1:4002/` |
+
+## Key Pages (non-server, part of main site)
+
+| Page | URL | Notes |
+|------|-----|-------|
+| Login page (generic) | `http://localhost:4000/for/unknown?preview=true` | `?preview=true` bypasses session redirect in dev — without it, authenticated users get redirected to `/` |
+| Login page (company-themed) | `http://localhost:4000/for/{slug}?preview=true` | Replace `{slug}` with any company slug from the Companies collection |
+
+The login page is a route on the main site, not a separate server. It requires the
+main site to be running on port 4000. The `?preview=true` query param is a dev-only
+bypass (`NODE_ENV === "development"`) added in `src/app/(frontend)/for/[company]/page.tsx`
+so the page can be viewed even when the user already has a valid session cookie.
 
 Source of truth: AGENTS.md → App Registry. If a new app appears there, add it
 to this table.
@@ -93,6 +106,14 @@ and report them to the user.
 
 Tell the user which apps are now running and give clickable localhost URLs.
 If any app failed to start, explain why.
+
+**Always include the login page URL** when the main site is in scope:
+- Generic: `http://localhost:4000/for/unknown?preview=true`
+- Company-themed: `http://localhost:4000/for/{slug}?preview=true`
+
+The login page doesn't need its own startup — it's a route on the main site.
+But agents must always confirm it's accessible (HTTP 200 on the preview URL)
+and include the URL in the report so the user can reach it without asking.
 
 ## Error Recovery
 

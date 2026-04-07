@@ -111,6 +111,19 @@ The proxy uses **cookie-only validation** (Option A from the architecture plan):
 
 This approach keeps the proxy fast and free of database dependencies.
 
+## Dev Preview Mode
+
+In development (`NODE_ENV === "development"`), appending `?preview=true` to any login
+page URL bypasses the session redirect. This lets authenticated users view and iterate
+on the login UI without clearing cookies.
+
+- Generic: `http://localhost:4000/for/unknown?preview=true`
+- Company-themed: `http://localhost:4000/for/{slug}?preview=true`
+
+The bypass is implemented in `src/app/(frontend)/for/[company]/page.tsx` — the server
+component checks `searchParams.preview` and skips `getCompanyFromSession()` when true.
+This has no effect in production (`NODE_ENV === "production"`).
+
 ## Login Page Theming
 
 The login page at `/for/[company]` is styled with a CSS custom property `--accent-color`
@@ -178,6 +191,9 @@ After any change to the password gate system:
 6. **Visit a case study** — if the company has a matching note, the callout should appear
 7. **Check `/admin`** — should NOT require a password (Payload's own auth applies)
 8. **Check `/admin/companies-dashboard`** — should show the management dashboard
+
+For UI iteration on the login page without clearing cookies, use `?preview=true`
+(dev only): `http://localhost:4000/for/unknown?preview=true`
 
 ## Env Vars
 

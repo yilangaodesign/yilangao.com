@@ -145,8 +145,21 @@ Based on the thesis + material, classify which named narrative shape (see
 
 This is a classification of what emerged from the material, not a template to force
 material into. The ordering matters: analyze beats bottom-up (Steps 1-3) → evaluate
-thesis (Step 4) → classify shape as a top-down label (Step 4b) → check diversity
-against the portfolio (Step 5b). This prevents confirmation bias.
+thesis (Step 4) → classify shape as a top-down label (Step 4b) → recommend technique
+emphasis (Step 4c) → check diversity against the portfolio (Step 5b). This prevents
+confirmation bias.
+
+### Step 4c: Recommend technique emphasis
+
+Based on the material and thesis, identify 2-3 techniques from T1-T15 that will carry
+the most weight in this case study. The material determines the emphasis - professional
+case studies with concrete deliverables naturally pull toward T10, T4, T8; personal or
+theoretical case studies naturally pull toward T11, T13, T15. But there are no walls
+between technique groups (see `personal-voice.md` Technique Weighting note).
+
+Check against `portfolio-coherence.md` to avoid repeating another case study's primary
+technique pair. Present the technique emphasis recommendation at the Phase 1 checkpoint
+alongside thesis and shape.
 
 ### Step 5: Check portfolio coverage
 
@@ -165,8 +178,8 @@ of the six dimensions, check whether the new case study would create a repetitio
    shift the arc, or document justified repetition with reasoning.
 2. **Headline technique:** If 2+ existing case studies use the same primary technique,
    the new one MUST differ. This is a hard constraint.
-3. **Voice register:** Same-domain repetition (e.g., two enterprise projects both
-   professional-declarative) is a flag; cross-domain variance is acceptable.
+3. **Technique emphasis:** No two case studies should share the same primary technique
+   pair. Check the manifest for existing emphasis patterns before committing.
 4. **Metric type, evidence method:** Variation preferred, not required. Flag for the
    user at the Phase 1 checkpoint if the new case study would duplicate an existing
    metric type or evidence method.
@@ -305,6 +318,8 @@ page sections.
 
 Output a plan covering:
 1. Thesis (restated)
+1b. Technique emphasis: T_+T_+T_. Planned placement: which zone/section each
+   emphasized technique appears in. Cross-ref `personal-voice.md` for zone rules.
 2. Beat assignments (what fills each beat, where it lives in the anatomy)
 3. **Intro blurb plan:**
    a. **Blurb headline draft** — use Technique 10 (Protagonist Framing) or Technique 8
@@ -371,7 +386,11 @@ Execute the plan. Apply beats to anatomy following these references:
    a. Read `personal-voice.md` voice samples (§17.1). These are the universal
       register target. Pay attention to Samples 3-5 (headline-specific targets).
    b. Read the project dossier's Voice Samples section (if it exists).
-   c. Read ALL named techniques (1-10 + modifiers). Plan where to use each:
+   c. Read ALL named techniques (1-15 + modifiers + structural patterns). For the
+      techniques flagged in the technique emphasis plan (Phase 1 Step 4c / Phase 2
+      Step 4 item 1b), review their zone rules and guardrails. If T12 (Warranted
+      Vulnerability) is in the emphasis plan, verify that the planned concession
+      does not contradict the thesis. Plan where to use each:
       - Section titles: APPLY one of Technique 6 (Object Substitution), Technique 7
         (Framework Inversion), or Technique 8 (Verdict-as-Headline). A descriptive
         summary title is the default AI output and is NOT acceptable. If the first
@@ -379,10 +398,17 @@ Execute the plan. Apply beats to anatomy following these references:
         Preview Title. Rewrite using the selection heuristic from Phase 2 Step 4.
       - Blurb headline: APPLY Technique 10 (Protagonist Framing) or Technique 8
         (Verdict-as-Headline). Run the luxury compatibility test.
-      - Blurb body: apply In-Group Signal, Survival Frame, Wry Redirect
-      - Section bodies: apply Escalation Beat (universally applicable)
+      - Blurb body: apply In-Group Signal, Survival Frame, Wry Redirect. If T11
+        (Identification) or T12 (Warranted Vulnerability) is in the emphasis plan,
+        this is their primary zone.
+      - Section bodies: apply Escalation Beat (universally applicable). If T13
+        (Anti-Sell) or T14 (Emotional Deflation) is in the emphasis plan, section
+        bodies and scope statement are their zones. If T15 (Closed-Loop Closer)
+        is planned, it belongs in the final section closer.
       - Modifiers (Deliberate Ambiguity, Staccato Authority): layer on top of
         primary techniques where the material supports dual meaning or fragment rhythm.
+      - Structural patterns (Concessive Turn): if the emphasis plan includes T12+T13+T14,
+        consider sequencing them as a Concessive Turn within a section body.
    d. The first draft should use these techniques. It will still be warmer-clinical,
       not the user's full personality - that's expected. The user may inject
       personality via raw draft text, triggering the refinement protocol
