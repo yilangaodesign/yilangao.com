@@ -1,6 +1,5 @@
 @use '../../../styles' as *;
 
-$_testimonial-avatar: var(--portfolio-spacer-4x); // 32px
 $_testimonial-linkedin-btn: 28px;
 $_testimonial-spinner: 12px;
 $_testimonial-editor-w: 260px;
@@ -16,7 +15,7 @@ $_testimonial-admin-gap: 4px;
   flex-direction: column;
   gap: var(--portfolio-spacer-1-5x);
   padding: var(--portfolio-spacer-2x);
-  background-color: var(--portfolio-surface-terra-subtle);
+  background-color: var(--portfolio-surface-terra-minimal);
   border-radius: var(--portfolio-radius-sm);
   text-decoration: none;
   color: inherit;
@@ -49,7 +48,16 @@ $_quote-wrap-gap: 12px;
 .quoteMark {
   width: $_quote-svg-size;
   height: $_quote-svg-size;
-  color: var(--portfolio-text-terra);
+  color: $portfolio-terra-30;
+
+  // EAP-072: SVG fill="currentColor" resolves once at initial render.
+  // On the main site, CSS modules load after client-side navigation
+  // from the password gate, so currentColor caches the inherited
+  // near-black before the module stylesheet arrives. Explicit CSS fill
+  // on <path> is re-evaluated when the stylesheet loads.
+  path {
+    fill: $portfolio-terra-30;
+  }
 }
 
 .quoteMarkFloat {
@@ -63,10 +71,10 @@ $_quote-wrap-gap: 12px;
   width: $_quote-svg-size;
   height: $_quote-svg-size;
   cursor: pointer;
-  transition: color var(--portfolio-duration-fast) var(--portfolio-easing-standard);
+  transition: fill var(--portfolio-duration-fast) var(--portfolio-easing-standard);
 
-  &:hover {
-    color: var(--portfolio-accent-60);
+  &:hover path {
+    fill: var(--portfolio-accent-60);
   }
 
   svg {
@@ -101,37 +109,16 @@ $_quote-wrap-gap: 12px;
 
 .attribution {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: var(--portfolio-spacer-1x);
   margin-top: auto;
 }
 
-.avatar {
-  width: $_testimonial-avatar;
-  height: $_testimonial-avatar;
-  border-radius: var(--portfolio-radius-full);
-  overflow: hidden;
+// Third column in `.attribution`: optional; bottom edge matches the avatar + meta block.
+.connectionNoteAnchor {
+  align-self: flex-end;
   flex-shrink: 0;
-}
-
-.avatarImage {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.avatarInitials {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--portfolio-font-pixel-square);
-  font-size: var(--portfolio-type-xs);
-  font-weight: 900;
-  color: var(--portfolio-text-placeholder);
-  text-transform: uppercase;
-  background-color: var(--portfolio-surface-tertiary);
+  line-height: 0;
 }
 
 .meta {
@@ -142,12 +129,28 @@ $_quote-wrap-gap: 12px;
   min-width: 0;
 }
 
+// Name + LinkedIn share one row so the icon sits beside the name, not at the card edge.
+.nameRow {
+  display: flex;
+  align-items: center;
+  gap: var(--portfolio-spacer-0-25x);
+  min-width: 0;
+}
+
 .name {
   font-family: var(--portfolio-font-sans);
   font-size: var(--portfolio-type-sm);
   font-weight: var(--portfolio-weight-medium);
   color: var(--portfolio-text-primary);
   line-height: var(--portfolio-leading-snug);
+}
+
+.nameRow .name {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .role {
@@ -178,8 +181,8 @@ $_quote-wrap-gap: 12px;
 
 .avatarUploadWrap {
   position: relative;
-  width: 100%;
-  height: 100%;
+  display: inline-flex;
+  flex-shrink: 0;
   border-radius: var(--portfolio-radius-full);
   overflow: hidden;
   cursor: pointer;
@@ -220,7 +223,7 @@ $_quote-wrap-gap: 12px;
 }
 
 // ── LINKEDIN BUTTON ─────────────────────────────────────────────────────────
-// In-flow within the attribution row, adjacent to name/role per Fitts' law.
+// Sits in `.nameRow` immediately after the name (admin edit, visitor link, or placeholder).
 
 .linkedinGroup {
   position: relative;
@@ -236,22 +239,26 @@ $_quote-wrap-gap: 12px;
   height: $_testimonial-linkedin-btn;
   flex-shrink: 0;
   border-radius: var(--portfolio-radius-sm);
-  color: var(--portfolio-text-placeholder);
+  color: var(--portfolio-text-neutral-max);
   transition:
     color var(--portfolio-duration-fast) var(--portfolio-easing-standard),
     background-color var(--portfolio-duration-fast) var(--portfolio-easing-standard);
 
-  &:hover {
-    color: var(--portfolio-text-primary);
-    background-color: var(--portfolio-surface-tertiary);
+  // EAP-072: target <path> with CSS fill. Root `fill="currentColor"` on <svg> can
+  // resolve before the module stylesheet (or theme) applies; `svg { fill }` alone
+  // is not always enough for hover / dark mode accent updates on the main site.
+  svg path {
+    fill: var(--portfolio-text-neutral-max);
+    transition: fill var(--portfolio-duration-fast) var(--portfolio-easing-standard);
   }
-}
-
-.linkedinBtnLinked {
-  color: var(--portfolio-accent-60);
 
   &:hover {
-    color: var(--portfolio-accent-50);
+    color: var(--portfolio-accent-60);
+    background-color: var(--portfolio-surface-tertiary);
+
+    svg path {
+      fill: var(--portfolio-accent-60);
+    }
   }
 }
 

@@ -11,12 +11,27 @@ $_avatar-lg: var(--portfolio-spacer-6x); // 48px
   justify-content: center;
   border-radius: var(--portfolio-radius-full);
   overflow: hidden;
-  background-color: $portfolio-accent-10;
-  color: $portfolio-accent-70;
   font-family: var(--portfolio-font-sans);
   font-weight: var(--portfolio-weight-medium);
   user-select: none;
   flex-shrink: 0;
+}
+
+// ── Tone variants ─────────────────────────────────────────────────────────────
+
+.brand {
+  background-color: $portfolio-accent-10;
+  color: $portfolio-accent-70;
+}
+
+.neutral {
+  background-color: var(--portfolio-surface-neutral-regular);
+  color: var(--portfolio-text-neutral-regular);
+}
+
+.terra {
+  background-color: var(--portfolio-surface-terra-subtle);
+  color: var(--portfolio-text-terra);
 }
 
 .sm {

@@ -4,10 +4,12 @@ import { forwardRef, useState, type ImgHTMLAttributes } from "react";
 import styles from "./Avatar.module.scss";
 
 export type AvatarSize = "sm" | "md" | "lg";
+export type AvatarTone = "brand" | "neutral" | "terra";
 
 export interface AvatarProps
   extends Omit<ImgHTMLAttributes<HTMLImageElement>, "size"> {
   size?: AvatarSize;
+  tone?: AvatarTone;
   name?: string;
   src?: string;
 }
@@ -23,11 +25,11 @@ function getInitials(name: string): string {
 }
 
 export const Avatar = forwardRef<HTMLDivElement, AvatarProps>(
-  ({ size = "md", name, src, alt, className, ...props }, ref) => {
+  ({ size = "md", tone = "brand", name, src, alt, className, ...props }, ref) => {
     const [imgError, setImgError] = useState(false);
     const showImage = src && !imgError;
 
-    const cls = [styles.avatar, styles[size], className]
+    const cls = [styles.avatar, styles[size], styles[tone], className]
       .filter(Boolean)
       .join(" ");
 

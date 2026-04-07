@@ -1,12 +1,19 @@
 "use client";
 
-import Image from "next/image";
-import { useState, useCallback, useRef, useEffect } from "react";
+import {
+  useState,
+  useCallback,
+  useRef,
+  useEffect,
+  type ReactNode,
+} from "react";
 import { useRouter } from "next/navigation.js";
 import { EditableText, DeleteItemButton } from "@/components/inline-edit";
 import { uploadMedia, updateCollectionField } from "@/components/inline-edit/api";
 import type { ApiTarget } from "@/components/inline-edit";
 import EditButton from "@/components/EditButton";
+import { Avatar } from "../Avatar";
+import { InfoTooltip } from "../Tooltip";
 import styles from "./TestimonialCard.module.scss";
 
 export type TestimonialCardProps = {
@@ -18,15 +25,17 @@ export type TestimonialCardProps = {
   avatarUrl?: string | null;
   linkedinUrl?: string | null;
   isAdmin?: boolean;
+  /**
+   * When set, shows the info icon with a tooltip (e.g. how you met the author or your relationship to Yilan).
+   * Omit for cards that do not need this context.
+   */
+  connectionNote?: ReactNode;
 };
 
-function getInitials(name: string): string {
-  return name
-    .split(" ")
-    .map((w) => w[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
+function hasConnectionNote(note: ReactNode | undefined): boolean {
+  if (note == null) return false;
+  if (typeof note === "string") return note.trim().length > 0;
+  return true;
 }
 
 function testimonialTarget(id: string | number): ApiTarget {
@@ -213,18 +222,12 @@ function AvatarUpload({
       }}
       aria-label="Upload avatar photo"
     >
-      {displayUrl ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={displayUrl}
-          alt={personName}
-          className={styles.avatarImage}
-        />
-      ) : (
-        <span className={styles.avatarInitials}>
-          {getInitials(personName)}
-        </span>
-      )}
+      <Avatar
+        name={personName}
+        src={displayUrl || undefined}
+        size="md"
+        tone="terra"
+      />
       <div className={styles.avatarUploadOverlay}>
         {uploading ? (
           <span className={styles.avatarUploadSpinner} />
@@ -273,6 +276,7 @@ export default function TestimonialCard({
   avatarUrl,
   linkedinUrl,
   isAdmin,
+  connectionNote,
 }: TestimonialCardProps) {
   const [mounted, setMounted] = useState(false);
   useEffect(() => { setMounted(true); }, []);
@@ -405,27 +409,20 @@ export default function TestimonialCard({
       </div>
 
       <div className={styles.attribution}>
-        <div className={styles.avatar}>
-          {canEdit ? (
-            <AvatarUpload id={id} personName={name} currentUrl={avatarUrl} />
-          ) : avatarUrl ? (
-            <Image
-              src={avatarUrl}
-              alt={name}
-              width={32}
-              height={32}
-              className={styles.avatarImage}
-            />
-          ) : (
-            <span className={styles.avatarInitials}>
-              {getInitials(name)}
-            </span>
-          )}
-        </div>
+        {canEdit ? (
+          <AvatarUpload id={id} personName={name} currentUrl={avatarUrl} />
+        ) : (
+          <Avatar
+          name={name}
+          src={avatarUrl || undefined}
+          size="md"
+          tone="terra"
+        />
+        )}
 
         <div className={styles.meta}>
-          {canEdit ? (
-            <>
+          <div className={styles.nameRow}>
+            {canEdit ? (
               <EditableText
                 fieldId={`testimonials:${id}:name`}
                 target={testimonialTarget(id)}
@@ -436,62 +433,68 @@ export default function TestimonialCard({
               >
                 {name}
               </EditableText>
-              <EditableText
-                fieldId={`testimonials:${id}:role`}
-                target={testimonialTarget(id)}
-                fieldPath="role"
-                as="span"
-                className={styles.role}
-                label="Role"
-              >
-                {role}
-              </EditableText>
-            </>
-          ) : (
-            <>
+            ) : (
               <span className={styles.name}>{name}</span>
-              <span className={styles.role}>{role}</span>
-            </>
+            )}
+            {canEdit ? (
+              <div className={styles.linkedinGroup}>
+                <button
+                  type="button"
+                  className={styles.linkedinBtn}
+                  onClick={() => setShowLinkedinEditor((v) => !v)}
+                  aria-label={`Edit ${name}'s LinkedIn URL`}
+                >
+                  <LinkedInIcon />
+                </button>
+                {showLinkedinEditor && (
+                  <LinkedInEditor
+                    id={id}
+                    currentUrl={linkedinUrl || ""}
+                    onClose={() => setShowLinkedinEditor(false)}
+                  />
+                )}
+              </div>
+            ) : linkedinUrl ? (
+              <a
+                href={linkedinUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.linkedinBtn}
+                aria-label={`${name}'s LinkedIn`}
+              >
+                <LinkedInIcon />
+              </a>
+            ) : (
+              <span className={styles.linkedinBtn} aria-hidden="true">
+                <LinkedInIcon />
+              </span>
+            )}
+          </div>
+          {canEdit ? (
+            <EditableText
+              fieldId={`testimonials:${id}:role`}
+              target={testimonialTarget(id)}
+              fieldPath="role"
+              as="span"
+              className={styles.role}
+              label="Role"
+            >
+              {role}
+            </EditableText>
+          ) : (
+            <span className={styles.role}>{role}</span>
           )}
         </div>
 
-        {canEdit ? (
-          <div className={styles.linkedinGroup}>
-            <button
-              type="button"
-              className={[
-                styles.linkedinBtn,
-                linkedinUrl ? styles.linkedinBtnLinked : "",
-              ]
-                .filter(Boolean)
-                .join(" ")}
-              onClick={() => setShowLinkedinEditor((v) => !v)}
-              aria-label={`Edit ${name}'s LinkedIn URL`}
-            >
-              <LinkedInIcon />
-            </button>
-            {showLinkedinEditor && (
-              <LinkedInEditor
-                id={id}
-                currentUrl={linkedinUrl || ""}
-                onClose={() => setShowLinkedinEditor(false)}
-              />
-            )}
+        {hasConnectionNote(connectionNote) && (
+          <div className={styles.connectionNoteAnchor}>
+            <InfoTooltip
+              content={connectionNote}
+              contextSize="sm"
+              side="top"
+              align="end"
+            />
           </div>
-        ) : linkedinUrl ? (
-          <a
-            href={linkedinUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.linkedinBtn}
-            aria-label={`${name}'s LinkedIn`}
-          >
-            <LinkedInIcon />
-          </a>
-        ) : (
-          <span className={styles.linkedinBtn} aria-hidden="true">
-            <LinkedInIcon />
-          </span>
         )}
       </div>
     </div>
