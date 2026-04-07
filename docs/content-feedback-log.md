@@ -4,9 +4,31 @@
 >
 > **Who reads this:** AI agents at session start (scan recent entries for context), and during content feedback processing (check for recurring patterns).
 > **Who writes this:** AI agents after each content feedback cycle.
-> **Last updated:** 2026-04-05 (CFB-028: External review triage & evidence anchoring framework)
+> **Last updated:** 2026-04-06 (CFB-030: ETRO editorial revision from external editor critiques)
 >
 > **For agent skills:** Read only the first 30 lines of this file (most recent entries) for pattern detection. The full file is a historical audit trail — do not read it in its entirety during normal work.
+
+---
+
+## Session: 2026-04-06 — ETRO Framework Article Revision (External Editorial Critique Integration)
+
+#### CFB-030: "Two external editors critiqued the ETRO article - integrate feedback"
+
+**Intent:** User received two detailed editorial critiques from experienced column editors. Both editors diagnosed real structural and rhetorical weaknesses but prescribed fixes optimized for standalone column publication, not portfolio artifacts. User requested adversarial analysis of the critiques, then a revision plan integrating the feedback.
+
+**Root Cause:** The original ~1,800-word article had five structural weaknesses: (1) framework led over insight, (2) "I built/developed/refined/validated" pattern repeated throughout, (3) CEO challenge section was the strongest material but underdeveloped, (4) cross-domain validation was thin (compressed from 5,500-word raw source), (5) closing hedged instead of committing.
+
+**Resolution:**
+All 12 editorial recommendations were assessed as "partially adopt and adapt." Key changes:
+1. **Blurb body rewritten:** Removed "I built the trust architecture" construction. Sharpened CEO foreshadowing ("the features I was proudest of might be exactly what slows AI adoption"). Flashed thesis resolution (two roles of trust) as outcome.
+2. **Scope statement restructured:** Insight leads ("Trust features are either scaffolding or permanent structure"), framework name follows. Provenance compressed. Unsupported "most AI products get trust architecture wrong" replaced.
+3. **Section 2 (Four Pillars):** Added trust-dimension mapping sentence. Broke pillar symmetry (reversibility as adoption unlock, observability hardest to prove). Added concrete observability metrics (40% override rate drop, spot-check frequency).
+4. **Section 3 renamed and expanded:** "The Challenge That Changed Everything" (Preview Title) renamed to "Full Transparency Is Its Own Kind of Noise" (Verdict Title). Added genuine reckoning beat: interrogated whether ETRO or noise reduction did heavy lifting, resolved by arguing they were inseparable.
+5. **Section 4 revised:** Added concrete gradient example (behavioral threshold as measurable signal). Added acknowledged open question (gradient turning back up - unsolved). Replaced "I validated this" with vivid cross-domain design decision (IA inversion for growth PM startup). Sharpened trust-currency prose with more specificity and edge.
+6. **Section 5 tightened:** Replaced generic industry closer with personal design commitment ("Every AI product I touch now..."). Cut "AI industry is locked in a false choice" paragraph.
+7. **Sidebar:** Collaborators changed from "Cross-domain product consultations" to "Startup founders" + "Engineering leaders."
+
+**Key editorial principle established:** Editors' diagnostics are usually right; their prescriptions are usually wrong when applied to portfolio artifacts. A column optimizes for argument sharpness and reader utility. A portfolio artifact optimizes for hiring signal and demonstrated judgment. These overlap but diverge on self-critique, framework branding, provenance, and falsifiable claims.
 
 ---
 
@@ -916,6 +938,76 @@ This session was not a single piece of feedback — it was the foundational anal
 **Pattern extracted -> `content.md`:** Derived metrics benefit from co-located derivation anchors (tooltips). Self-anchoring metrics (counts, user numbers) do not. This is a selective application of the Evidence Anchoring framework.
 
 **Cross-category note:** Also documented in the design log (tooltip as a UI pattern) and engineering log (ENG-122).
+
+---
+
+#### CF-022: "I don't like the current tone of the design system case study"
+
+**Intent:** The v3 text uses the right thesis and structure but the prose is machine-telegraphic. Staccato fragments ("Sixteen skills. Three feedback loops. An escalation protocol.") and log-entry-style data ("March 29: wrong spacing tokens, inverted hierarchy") don't read as human writing. User wants parity with Lacework and Meteor voice quality.
+
+**Root Cause:** Over-application of compression. Fragments were used as a default sentence structure rather than a punchline device. Lists were rendered as standalone fragment chains instead of being woven into narrative sentences. Section bodies stated abstract categories instead of telling specific stories with cause-and-consequence. The writing optimized for terseness over readability.
+
+**Resolution:**
+1. Rewrote blurb body: fragments ("MCP servers. Metadata files. Component manifests.") woven into narrative sentences ("MCP servers, metadata files, component manifests - a motor strapped to a carriage"). Added "I" as active subject ("I built one with the agent").
+2. Rewrote scope statement: spec-sheet opener replaced with conversational intro ("Élan is a design system spanning three Next.js applications"). Added editorial voice ("what I actually designed was the collaboration architecture underneath").
+3. Rewrote Section 1: abstract trade-off language replaced with direct address ("The tokens, components, and playground you'd expect from a design system case study - they exist, they work").
+4. Rewrote Section 2: grocery-list opener replaced with a specific story ("I wrote rules. The agent sometimes ignored them. When the same playground verification got skipped six times, the system stopped asking nicely...").
+5. Rewrote Section 3: log-entry-style data replaced with narrative arc with rhetorical questions ("By the end, they'd shifted to refinement: is this headline technique already used in another case study?"). Added insight closer ("not because the agent got smarter, but because the system accumulated what I keep correcting").
+
+**Pattern extracted -> `content-anti-patterns.md`:** Fragment chains as default sentence structure are an AI voice tell (extends CAP-017). Fragments work as punchlines after setup ("Not the food. The chart.") but not as the primary prose rhythm. When every sentence is a fragment, no sentence has impact.
+
+---
+
+#### CF-021: "Super dissatisfied with how the content is written for the design system case study"
+
+**Intent:** Full rebuild of the Élan Design System case study. User expressed comprehensive dissatisfaction with v2 content, thesis, and narrative approach. Requested deep analysis of all internal documentation, agent architecture, feedback loops, and external research on agent-native design systems before rewriting.
+
+**Root Cause:** The v2 thesis ("compounding design knowledge for vibe coding") was too narrow and failed to capture the actual design work - the collaboration architecture (meta-system) rather than the components. The sections showcased existing interactive components (TokenGrid, IncidentDensityMap, InteractionShowcase) rather than arguing about the meta-system. The narrative shape (Accumulation Arc) didn't match the real story (Translation Arc - redefining what "design work" means).
+
+**Resolution:**
+1. Pivoted thesis to "what happens when you stop designing for the agent and start designing with it."
+2. Changed narrative shape from Accumulation Arc to Translation Arc.
+3. Replaced all three sections: "Not the Components" (T7), "The System Behind the System" (T6), "The Rising Floor" (T6).
+4. Introduced horseless carriage metaphor for blurb - pointed industry framing without attacking practitioners.
+5. New headline: "You're looking at the wrong part." (T7 Framework Inversion).
+6. New hero metric: "15 → 3" (maturity-based, corrections per session).
+7. Replaced all Tier 2 interactive visuals with Tier 3 specs (CollaborationLoop, SkillMap dual-view, MaturityTimeline).
+8. Updated dossier, portfolio coherence manifest, page.tsx maps, CMS content, and interview defense notes.
+
+**Pattern extracted -> `content.md`:** When user expresses comprehensive dissatisfaction with a case study (not a specific text fix), the issue is almost always thesis-level, not execution-level. The correct response is a full rebuild (case-study-authoring Phase 1b), not iterative text fixes.
+
+---
+
+#### CF-023: "The essence is there but the way it's written is not intriguing"
+
+**Intent:** User wants the Elan Design System case study to feel human, vivid, and lively - matching the tone quality of the Meteor and Lacework case studies - while preserving the thesis and structure established in CF-021/CF-022.
+
+**Root Cause:** The CF-022 rewrite landed the correct thesis and structure but used declarative prose without cause-and-consequence rhythm. Section bodies read as summaries rather than narrative. The voice framework upgrade (T11-T15, Concessive Turn, technique weighting) hadn't been implemented yet when CF-022 was written.
+
+**Resolution (v1 - reverted in CF-024):**
+Applied T11/T13/T15 techniques mechanically. Over-indexed on "clever contrarian" positioning. Result was vivid but arrogant - see CF-024.
+
+---
+
+#### CF-024: "Reads like a dick, the current writing"
+
+**Intent:** User wants the Elan prose to match the reference writing sample's tone - humble, real, empathetic. The previous rewrite (CF-023 v1) fixed the "machine-generated" problem but overcorrected into condescension.
+
+**Root Cause:** The CF-023 rewrite applied voice techniques (T11 Identification, T13 Anti-Sell, T15 Closed-Loop) as rhetorical positioning rather than honest process description. Three specific failure modes:
+1. **Industry judgment** - "the whole conversation looks the same," "a motor strapped to a carriage" positions author above peers. The reference never does this.
+2. **Secret knowledge claims** - "what you can't see," "what I actually designed" implies the reader is looking at the wrong thing. The reference lets readers arrive at insights themselves.
+3. **False modesty** - "they exist, they work fine" dismisses own work to seem above it. The reference is humble about self ("I'm a decent engineer. Not the best."), never dismissive about the work.
+
+**Resolution:**
+1. Removed horseless carriage metaphor and all industry-positioning language from blurb.
+2. Replaced "what you can't see" tease with honest invitation: "That shift is what I want to show you."
+3. Rewrote scope to be matter-of-fact ("it's not where most of the time went") instead of superiority-coded ("what I actually designed sits underneath").
+4. Section 1: "That trade-off shows" (honest) instead of "they work fine" (dismissive).
+5. Section 2: "before I made it mandatory" (personal agency) instead of "before the system promoted it" (abstracting away responsibility to sound architectural).
+6. Section 3: "The agent didn't get smarter. The rules just accumulated what I kept fixing." (emotional deflation, lets reader draw conclusion) instead of "That shift is what compounding looks like" (telling reader what to think).
+7. All prose now follows reference pattern: humble about self, honest about process, trusts reader to arrive at insight.
+
+**Pattern extracted -> `content-anti-patterns.md`:** **CAP-028: Technique-as-Posturing.** Applying named voice techniques (T11-T15) as rhetorical moves that position the author above peers, rather than as honest process description. Symptoms: industry judgment ("everyone is doing X wrong"), secret knowledge claims ("the part you can't see"), false modesty about own work to imply you're above it. Fix: techniques should emerge from honest narration of what happened, not from clever framing of what others are missing. The reference sample works because it's humble about self and trusts the reader.
 
 ---
 

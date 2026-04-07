@@ -1030,3 +1030,15 @@ Use `var(--ds-*, #{$scss-fallback})`. The CSS custom property adapts at runtime;
 **Correct alternative:** Tier 2 surface tokens fall back to neutral dark surfaces in dark mode (`neutral-90`, `neutral-80`). Foreground tokens (text, border) may still use standard step inversion because they need WCAG contrast guarantees. The tier classification determines the dark mode strategy, not the property type alone. See `docs/design/color.md` 9.3b and `docs/design.md` 7.9.
 
 **Frustration caused:** 1 round — pressure test identified Terra dark mode surfaces as muddy and purposeless, leading to industry research and neutral-fallback adoption.
+
+---
+
+### AP-062: Using non-native font-weight with single-weight decorative fonts
+
+**Trigger:** Applying `font-weight: bold` (700) or any weight other than 500 to a Geist Pixel variant font (Line, Grid, Square, Circle, Triangle).
+
+**Why it's wrong:** Geist Pixel fonts ship with exactly one weight file (500/medium). When the browser encounters a weight it doesn't have a file for, it applies **synthetic bolding** - algorithmically expanding stroke outlines. This fills in the transparent decorative gaps that define each variant's visual identity (horizontal lines in Line, grid intersections in Grid, circular holes in Circle, etc.). The result looks like a generic monospace font with no decorative character. The user sees filled text instead of the intended pattern and assumes the font isn't loading.
+
+**Correct alternative:** Always pair `$portfolio-font-pixel-*` tokens with `$portfolio-weight-medium` (500). Never use `$portfolio-weight-bold`, `$portfolio-weight-semibold`, or any other weight. If heavier visual presence is needed, increase font-size instead of font-weight.
+
+**Frustration caused:** 5 rounds — user reported "it's all filled" / "doesn't look like the lines property" across multiple attempts. Root cause was `font-weight: 700` triggering synthetic bolding; once switched to 500 the line effect appeared immediately.

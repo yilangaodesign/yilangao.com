@@ -290,6 +290,34 @@ running sub-check 3.
    phrasing ("summer" vs "7 weeks"), collaborator descriptions, scope language
    ("helped with" vs "led"). See CAP-026 in `content-anti-patterns.md`.
 
+### Check 19: Technique guardrails
+
+Runs for ALL case studies that use any of T11-T15. If none of the extended
+techniques appear, skip this check.
+
+1. **Warranted Vulnerability (T12):** If used, does competence evidence arrive
+   within 2 sentences of the concession? Does the vulnerability concede something
+   adjacent to (not contradicting) the thesis?
+
+2. **Anti-Sell (T13):** If used, is the conceded limitation something a skeptic
+   would actually challenge? If nobody questioned it, the concession is theatrical.
+
+3. **Identification (T11):** If used, is the shared experience universal enough
+   (80%+ of target audience has lived it) but specific enough (generic readers
+   bounce off)?
+
+4. **Closed-Loop (T15):** If used, does the callback reference a specific word or
+   image from the blurb, not a vague thematic echo?
+
+5. **Consistency check:** Does the case study maintain a consistent personality
+   throughout? Oscillating between confident and vulnerable within a single
+   section reads as insecure. Vulnerability in the blurb + confidence in section
+   bodies = fine. Vulnerability mid-section then confidence two sentences later =
+   not fine.
+
+Cross-ref: `personal-voice.md` Extended Body Techniques (11-15) for full
+technique definitions and zone rules.
+
 ## Scoring
 
 When used for auditing (Phase 1b rebuild), score each check as:
@@ -303,6 +331,7 @@ When used for auditing (Phase 1b rebuild), score each check as:
 ## Cross-references
 
 - Voice and style rules: `docs/content/voice-style.md`
+- Named techniques (T1-T15): `docs/content/personal-voice.md`
 - Anti-patterns catalog: `docs/content-anti-patterns.md`
 - Self-audit framework: `docs/content/self-audit.md`
 - Narrative arc: `docs/content/narrative-arc.md`

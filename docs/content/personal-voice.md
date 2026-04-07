@@ -68,6 +68,28 @@ description. The body opener "Not the food. The chart." resolves the
 ambiguity in 5 words. Shows the designer has opinions and states them as
 rules. 5 words. Source: Lacework case study (2026-04-04).
 
+**Sample 6 (extended body - shared experience + deflation):**
+
+> "I'm a decent engineer. Not the best. Give me a year and I'll build you
+> a solid app after a lot of time on Stack Overflow, weeks hunting bugs,
+> and a crash course in whatever I don't know yet. Give me AI and I'll
+> build that same app in a month. Not a better app. The same one. Faster.
+> That's all AI is. It's a force multiplier."
+
+What makes it work: Opens with a concession that the target audience
+shares (Identification, T11). The specificity of "Stack Overflow, weeks
+hunting bugs" makes the concession feel lived, not performed. "Not a
+better app. The same one. Faster." is Emotional Deflation (T14) -
+describes a 12x productivity gain in three words. The piece earns its
+final claim ("what you were actually contributing all along") by spending
+80% of its word budget conceding and deflating. This is Warranted
+Vulnerability (T12) - the competence evidence (razor-sharp reframe)
+arrives within the same paragraph as the concession.
+
+Note: This sample demonstrates the Concessive Turn structural pattern
+(see §17.2). Use as a calibration target for case studies where the
+thinking is the deliverable.
+
 ## 17.2 Named Technique Library
 
 These are generation tools. The AI should reach for them when writing first
@@ -257,6 +279,149 @@ Techniques 6-8, not standalone.
   single word becomes a complete sentence-heading. Different scale: body
   fragments are seasoning; headline fragments are structural.
 
+### Extended Body Techniques (11-15)
+
+Techniques that expand the body rhythm toolkit. Available to ALL case
+studies. Each technique includes guidance about where it's most effective,
+but no technique is locked to a case study type.
+
+### Technique 11: Identification (Burke)
+
+The reader sees their own experience in the writer's words. Different
+from T2 (In-Group Signal), which creates recognition ("I know your
+world"). Identification creates bond ("I AM in your world").
+
+- **Source:** Kenneth Burke's theory of consubstantiality
+- **Example:** "Stack Overflow, weeks hunting bugs, a crash course in
+  whatever I don't know yet" vs. In-Group Signal: "Afraid of the Tailwind
+  blue-violet?"
+- **Use:** Blurb body or scope statement opening. One identification
+  moment per case study. The identified experience must be universal
+  enough that 80%+ of the target audience has lived it, but specific
+  enough that generic readers bounce off.
+- **Applies to:** Zone 1 (blurb) - primary home. Zone 2 (scope) -
+  acceptable as bridge sentence. Zone 3 (sections) - only as section
+  opener.
+- **Guardrail:** The identified experience must be a SHARED limitation,
+  not a unique weakness. "I spent weeks hunting bugs" = shared. "I'm bad
+  at visual design" = unique, undermining.
+- **Availability:** All case studies. Professional case studies CAN use
+  identification ("Stack Overflow at 2am" resonates everywhere).
+  Personal/theoretical case studies are MORE likely to need it because the
+  material lacks a visible product, so the shared experience does the
+  connecting work.
+
+### Technique 12: Warranted Vulnerability
+
+A concession about limitation made from a position of demonstrated
+competence. The concession is immediately followed by (or embedded
+within) evidence of sharp thinking, which recontextualizes the
+vulnerability as self-awareness rather than weakness.
+
+- **Source:** Brene Brown's warranted vs. unwarranted vulnerability
+  distinction; the Volkswagen "Think Small" anti-sell in advertising
+- **Example:** "I'm a decent engineer. Not the best." followed by a
+  razor-sharp analytical reframe that proves the writer is clearly
+  competent
+- **Use:** Once per case study max. Blurb body or scope statement only.
+  The competence evidence must arrive within 2 sentences of the
+  concession - if the reader has to wait a full section to see competence,
+  the vulnerability is unwarranted.
+- **Usage note:** Strongest when assertive case studies precede it in the
+  portfolio. Without prior credibility, vulnerability risks reading as
+  weakness. This is a weight, not a hard gate.
+- **Anti-pattern:** Conceding something that directly undermines the
+  thesis. If the case study argues "I built a system that encodes design
+  judgment," you cannot concede "I'm not a great designer." The
+  vulnerability must be adjacent to the thesis, not contradicting it.
+
+### Technique 13: The Anti-Sell
+
+Explicitly concede what the project does NOT achieve. By naming what
+you're not claiming, every remaining claim becomes bulletproof.
+
+- **Source:** Ogilvy's "the consumer is not a moron" principle; VW "Think
+  Small"
+- **Example:** "Not a better app. The same one. Faster." / "The
+  meta-system didn't make the agent creative. It made it consistent."
+- **Use:** Scope statement or section body. One per case study. The
+  concession must be genuine (something a skeptic would actually
+  challenge), not theatrical (conceding something nobody questioned).
+- **Applies to:** Zone 2 (scope) or Zone 3 (section body). Never in
+  Zone 1 (blurb) - the blurb must hook, not hedge.
+- **Pairs naturally with** T4 (Escalation Beat): concede the limitation,
+  then show the progression despite it.
+- **Availability:** All case studies. A professional case study can use
+  anti-sell to sharpen claims ("Not a redesign. A rescue operation.").
+  Not limited to personal projects.
+
+### Technique 14: Emotional Deflation
+
+Understate a claim so the reader's own inference does the heavy lifting.
+The opposite of hype. The writer deliberately describes a significant
+result in plain, almost dismissive language.
+
+- **Source:** New Journalism (Didion, Orwell); Hunter S. Thompson's "let
+  the facts do the screaming"
+- **Example:** "Not a better app. The same one. Faster." (describing a
+  12x productivity gain as "faster")
+- **Use:** Outcome descriptions, metric framing. The deflation must be
+  preceded by enough context that the reader can infer the true magnitude.
+  If the reader lacks context to infer, deflation just reads as vagueness.
+- **Distinction from intellectual deflation** (horseless carriage
+  metaphor): Intellectual deflation reframes an industry conversation.
+  Emotional deflation understates a personal claim. Different targets.
+- **Applies to:** All zones. Especially effective in Zone 2 (scope) where
+  luxury positioning already demands understatement.
+
+### Technique 15: Closed-Loop Closer
+
+Return to the opening premise at higher altitude. The closer echoes a
+word, image, or frame from the opening, but the reader's understanding
+has shifted, so the echo means something different.
+
+- **Source:** Songwriting (returning chorus with elevation); screenwriting
+  (callback); essay structure (the concessive turn's resolution)
+- **Example:** Opens with "what I contribute" (decent engineering) ->
+  closes with "what you were actually contributing all along" (pronoun
+  shift I->you, altitude shift from specific to universal)
+- **Use:** Section 3 closer or overall case study closer. One per case
+  study. The callback must be to a specific word or image from the blurb
+  or Section 1, not a vague thematic echo.
+- **Distinction from the current Residue beat:** Residue is
+  forward-looking ("the system is still learning"). Closed-Loop is
+  backward-looking-at-higher-altitude. They can coexist: the closed loop
+  resolves the opening, then the residue points forward.
+
+### Structural Patterns
+
+**The Concessive Turn** is not a technique but a structural pattern that
+sequences T12 + T13 + T14 within a section body: concede a limitation
+(T12), name what you're not claiming (T13), then understate the actual
+result (T14). The turn works because the concession earns the right to
+the claim. Use when a section's argument benefits from intellectual
+honesty - the reader trusts the conclusion more when the writer
+voluntarily narrowed the claim first.
+
+This pattern can appear in any case study type. It's most naturally
+useful when the evidence is experiential (the thinking is the
+deliverable) rather than tangible (the shipped product is the
+deliverable), because experiential evidence benefits more from the
+credibility that concession provides.
+
+### Technique Weighting
+
+The full technique library (T1-T15) is available to every case study. The
+material determines which techniques get emphasized, not a mode
+selection. Professional case studies with concrete deliverables naturally
+pull toward T10 (Protagonist Framing), T4 (Escalation Beat), and T8
+(Verdict). Personal or theoretical case studies naturally pull toward T11
+(Identification), T13 (Anti-Sell), and T15 (Closed-Loop). But there are
+no walls - a professional case study can use Emotional Deflation (T14) to
+understate a result, and a personal case study should still use Verdict
+(T8) in its section titles. The personality is constant. The proportion
+shifts.
+
 ## 17.4 Headline vs. Body Composition
 
 Body techniques (1-5) and headline techniques (6-10) operate at different
@@ -334,6 +499,7 @@ lighter editing. See also CAP-023 in `docs/content-anti-patterns.md`.
 - Blurb headline rules and gold standard references: `docs/content/case-study.md` Section 3.7
 - Section title language pattern (weak/strong table): `docs/content/language-patterns.md` Section 5.7
 - Selection heuristic for headline techniques: `.cursor/skills/case-study-authoring/SKILL.md` Phase 2 Step 4
+- Technique emphasis and portfolio diversity: `docs/content/portfolio-coherence.md`
 - Anti-pattern for voice flattening: CAP-023 in `docs/content-anti-patterns.md`
 - Narrative arc beats: `docs/content/narrative-arc.md`
 - Content iteration refinement step: `.cursor/skills/content-iteration/SKILL.md` Step 4b

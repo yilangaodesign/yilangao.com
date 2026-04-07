@@ -4,10 +4,88 @@
 >
 > **Who reads this:** AI agents at session start (scan recent entries for context), and during feedback processing (check for recurring patterns).
 > **Who writes this:** AI agents after each feedback cycle via the `design-iteration` skill.
-> **Last updated:** 2026-04-06 (FB-118: Terra scope lockdown, color tier architecture, neutral-fallback dark mode)
+> **Last updated:** 2026-04-06 (FB-122 follow-up: Always-on skeleton + media separation)
 >
 > **For agent skills:** Read only the first 30 lines of this file (most recent entries) for pattern detection.
 > **Older entries:** Synthesized in `docs/design-feedback-synthesis.md`. Raw archive in `docs/design-feedback-log-archive.md`.
+
+---
+
+### FB-122: Hero image not filling the slot height
+
+**Date:** 2026-04-06
+
+**User said:** "The image should fill the height of the slot, and currently it isn't. There's a big gap between the bottom of the image and the bottom edge of this image slot."
+
+**Issue:** Hero image appears to not fill the full height of the `.heroInner` container (16:9 aspect-ratio box). User reported a visible gap at the bottom of the hero slot. Persisted across 5 reload attempts.
+
+**Attempted fixes (all failed to resolve user-reported gap):**
+
+1. **CSS `position: absolute; inset: 0` on `.heroImg`** - Hypothesis: `height: 100%` doesn't resolve against `aspect-ratio`-derived heights. Added absolute positioning so the `<img>` fills the `position: relative` container. Compiled CSS confirmed correct. User still saw gap.
+2. **`next/image` with `fill` prop** - Hypothesis: CSS class not applied due to cache/specificity. Switched to Next.js `<Image fill>` which applies positioning via inline styles (highest specificity). User still saw gap.
+3. **CSS `background-image` with `background-size: cover`** - Hypothesis: `<img>` element has inherent rendering quirk. Removed the `<img>` entirely and set the image as a CSS background on `.heroInner`. **Bad engineering practice**: bypasses CMS image pipeline, loses `<img>` semantics + alt text, no image optimization. User correctly called this out. Still showed gap.
+4. **Diagnostic: magenta background on container** - FINALLY stopped implementing and started diagnosing. Added `background: magenta` to `.heroInner` to distinguish "image doesn't fill container" (magenta visible) from "image fills container but has empty space in its own composition" (no magenta visible).
+
+**Root Cause:** The uploaded image file (Figma export) had white/transparent space baked into the bottom of the image. The CSS was correct the entire time - the `<img>` element filled the container and `object-fit: cover` was applied. The "gap" was the image's own whitespace, not a CSS layout failure. Confirmed via magenta diagnostic: no magenta visible = image fills container = problem is in the image file, not the code.
+
+**Resolution:** User re-exported the image from Figma without the extra whitespace. Added `background: $portfolio-neutral-10` as a safety net on `.heroInner` so future images with unexpected transparency show a neutral fill instead of a jarring gap.
+
+**Reflection on failures:**
+
+- **Premature implementation without diagnosis.** I wrote code before confirming the actual problem. Every attempt assumed the root cause was CSS and jumped to a fix. Good debugging starts with observation (what does the browser ACTUALLY render?), forms a hypothesis, then tests it with a diagnostic. I did hypothesis -> implementation -> implementation -> implementation.
+- **Escalating complexity instead of simplifying.** Each failure led to a MORE complex solution (CSS class -> next/image -> background-image) instead of adding a simple diagnostic (background color) to isolate the failure mode. The diagnostic should have been attempt #1, not attempt #4.
+- **Bad engineering practice (attempt 3).** Using `background-image` for CMS-managed content is architecturally wrong: loses `<img>` semantics, alt text, image optimization, and the CMS upload/replace pipeline. I violated the principle that images from the CMS should always flow through the standard `<img>` element.
+- **Not verifying in the browser.** I confirmed compiled CSS was correct in the `.next/` build output but never confirmed what the browser actually rendered. The build being correct doesn't mean the browser displays it correctly.
+
+**Anti-pattern extracted:** When a visual bug persists across multiple CSS fixes, STOP implementing and START diagnosing. Add a visible diagnostic (e.g., `background: magenta`) to isolate whether the gap is CSS layout vs. image content vs. rendering pipeline. This should be step 1, not step 4.
+
+**Resolution:** Image re-exported from Figma. Added neutral fallback background on `.heroInner` as a defensive measure. The CSS fix (`position: absolute; inset: 0; object-fit: cover`) from attempt 1 was correct and is retained.
+
+**Follow-up — Always-On Skeleton (2026-04-06):** Merged the skeleton gradient and flex centering permanently into `.heroInner`, replacing the static neutral fill. The gradient now serves three purposes simultaneously: (1) loading placeholder that prevents layout shift, (2) diagnostic signal for transparent/whitespace image exports, (3) empty-state indicator for admin. The conditional `.heroSkeleton` class was deleted since the absolutely-positioned `<img>` covers the gradient when loaded, and `ImageUploadZone` has its own absolute positioning. Cross-ref: ENG-128.
+
+---
+
+### FB-121: TestimonialCard LinkedIn control beside name
+
+**Date:** 2026-04-06
+
+**User said:** "Move the LinkedIn icon/button next to the person's name instead of having it stand alone on the right-hand side."
+
+**Intent:** Keep the social affordance visually tied to the person it refers to; avoid a floating icon at the trailing edge of the attribution row.
+
+**Resolution:** Wrapped name + LinkedIn (admin button, visitor link, or inert placeholder) in a new `.nameRow` flex row inside `.meta`. Role stays on the second line. Name uses `flex: 0 1 auto` with ellipsis so long names share the row with the icon without pushing it to the card edge.
+
+**Files changed:** `src/components/ui/TestimonialCard/TestimonialCard.tsx`, `src/components/ui/TestimonialCard/TestimonialCard.module.scss`
+
+---
+
+### FB-120: TestimonialCard avatar now composes DS Avatar
+
+**Date:** 2026-04-06
+
+**User said:** "The testimonial component is not using the avatar component in the design system. It should purely, strictly use the design system component and nest it in instead of having independent styling."
+
+**Intent:** Eliminate visual drift in testimonial attribution rows by ensuring avatar presentation is governed by the shared design system primitive, not local one-off styles.
+
+**Resolution:** `TestimonialCard` now renders `Avatar` directly for visitor mode and inside `AvatarUpload` for admin mode. Removed custom avatar rendering (`next/image`, local initials fallback) and deleted local avatar style classes (`.avatar`, `.avatarImage`, `.avatarInitials`). Also switched to a local relative import (`../Avatar`) so the component resolves in both main site and playground builds.
+
+**Pattern extracted -> `design.md` §7.10:** Composite UI components should compose DS primitives instead of re-implementing them.
+
+**Files changed:** `src/components/ui/TestimonialCard/TestimonialCard.tsx`, `src/components/ui/TestimonialCard/TestimonialCard.module.scss`
+
+---
+
+### FB-119: Project sidebar tools badges — regular Badge emphasis
+
+**Date:** 2026-04-06
+
+**User said:** Tools badges on work pages (e.g. Figma) already use the design system `Badge`; switch from subtle to regular styling.
+
+**Intent:** Tool labels in the project meta sidebar should read with standard badge contrast, not the de-emphasized subtle tier.
+
+**Resolution:** In `ProjectClient.tsx`, both the `EditableArray` `renderItem` and the static `p.tools.map` paths now use `emphasis="regular"` instead of `emphasis="subtle"` on `<Badge appearance="neutral" size="sm" shape="squared">`. No other pages rendered tool tags with Badge in this codebase.
+
+**File changed:** `src/app/(frontend)/work/[slug]/ProjectClient.tsx`
 
 ---
 
@@ -53,6 +131,8 @@
 **Note:** Sand palette renamed to Terra. Icon-sand token removed (Tier 2 scope restriction); quotation mark should use text-terra or border-terra instead.
 
 **File changed:** `src/components/ui/TestimonialCard/TestimonialCard.module.scss` (lines 19-20, 52)
+
+**Cross-category note:** The quotation mark color change exposed ENG-126 / EAP-072 (SVG `fill="currentColor"` stale after client-side navigation). The color was applied correctly in CSS but didn't render because the SVG fill attribute cached the inherited black before the stylesheet loaded. Fixed with explicit CSS `fill` on path elements.
 
 ---
 
@@ -2081,4 +2161,83 @@ Max/min perceptual distance ratio improved from **1.48x → 1.33x**. Range narro
 - Terra's hue proximity to Carbon Yellow (~10-15deg) and Orange (~15deg) is not a semantic collision because they serve different roles and different tiers (Tier 2 brand accent vs. Tier 1 warning/caution)
 - Atmospheric/decorative colors warrant different dark mode strategies than functional colors. Neutral fallback preserves intent better than step inversion for warm surfaces
 - culori npm package proved reliable for OKLCH-to-hex batch conversion and contrast computation
+
+---
+
+### FB-XXX — Avatar Tone Variants (2026-04-06)
+
+**Trigger:** User request for Avatar color themes beyond the brand accent - a neutral (black/gray) variant and a terra (warm amber) variant.
+
+**What was decided:**
+- Added `tone` prop to Avatar with three values: `brand` (default, existing blue-violet), `neutral` (grayscale), `terra` (warm amber)
+- Brand tone keeps raw palette refs (`$portfolio-accent-10`/`$portfolio-accent-70`) since the accent scale lacks full semantic token coverage
+- Neutral and terra tones use CSS custom properties (`--portfolio-surface-neutral-regular`/`--portfolio-text-neutral-regular` and `--portfolio-surface-terra-subtle`/`--portfolio-text-terra`) so dark mode swaps come free
+- Prop named `tone` (semantic intent: "which color family") rather than `colorScheme` or `variant` (implementation-leaning or too generic)
+- Playground page updated with a Tones demo section and props table entry
+
+**What was learned:**
+- The semantic token system (property-role-emphasis) makes adding themed variants trivial when the target scale already has surface and text tokens. Neutral and terra both had the right tokens; brand accent doesn't yet, creating a minor asymmetry
+- Tone variants only affect the initials fallback state - when an image loads, the background is fully covered. This means the tone is a graceful degradation detail, not a primary visual differentiator
+
+---
+
+### Login page DS compliance audit and refactoring
+
+**Date:** 2026-04-06
+
+**What was the intent:** Audit the login page (`/for/[company]`) for Élan design system compliance and replace all re-implemented components and hardcoded values with DS components and tokens.
+
+**What was decided:**
+- Replaced the raw `<input>` with DS `<Input>` (size="lg", label prop, status/feedbackMessage for errors)
+- Replaced the raw `<button>` with DS `<Button>` (appearance="highlight", emphasis="bold", fullWidth)
+- Removed the custom Eyebrow-style `<label>` (now handled by Input's built-in label)
+- Removed the separate error `<div>` (now handled by Input's feedbackMessage)
+- Replaced all hardcoded values (border-radius 8px, opacity 0.5, transition 0.15s ease, letter-spacing 0.08em, dimensions) with design tokens
+- Removed redundant inline `style={{ backgroundColor: accent }}` on accent bar — now uses `var(--accent-color)` from parent scope
+- Per-company accent theming preserved via CSS custom property override on `.page`, with a 3-class specificity chain (`.page .card .submit`) to cleanly override DS Button's highlight/bold hover
+
+**What was learned:**
+- DS Button's hover states use compiled SCSS variables (`$portfolio-accent-70`) not CSS custom properties, making runtime theming of hover colors impossible without specificity overrides. A future improvement could make Button's hover/active states read from CSS custom properties for easier theming
+- The DS Input subsumes label, error display, and accessibility attributes (aria-invalid, aria-describedby, role="alert") — re-implementing these in page-level code loses all those built-in behaviors
+- When overriding DS component styles for per-page theming, scoped CSS custom property overrides on ancestor elements are the cleanest approach for base states. For hover/active, a 3-class ancestor chain provides deterministic specificity without fragile hacks
+
+### Geist Pixel fonts: weight mismatch destroys decorative rendering
+
+**Date:** 2026-04-06
+
+**What was the intent:** Apply Geist Pixel Line font to the login page greeting heading with bold weight and later attempt an outlined (hollow) text effect.
+
+**What was decided:**
+- Geist Pixel variant fonts (Line, Grid, Square, Circle, Triangle) ship at a single weight: **500 (medium)**. The `@font-face` declaration in the compiled CSS confirms `font-weight: 500` with no other weight files
+- Applying `font-weight: 700` (bold) or any weight other than 500 causes the browser to **synthetically bold** the glyphs. Synthetic bolding expands stroke outlines, which fills in the transparent decorative gaps that give each pixel variant its visual identity (horizontal lines in Line, grid pattern in Grid, etc.)
+- The fix is to always use `$portfolio-weight-medium` (500) when using any `$portfolio-font-pixel-*` token
+- Separately, `-webkit-text-stroke` / `-webkit-text-fill-color: transparent` does not produce a hollow/outlined effect with Geist Pixel fonts. Multiple approaches were attempted (text-stroke, text-shadow, paint-order). The root cause is unresolved but may be related to how pixel fonts render at the glyph level. This remains an open issue for future investigation
+- The `$portfolio-type-3xs` token (0.5rem / 8px) was found in use on a login footer - well below the 12px accessibility minimum. Token existence does not imply suitability for all contexts
+
+**What was learned:**
+- **Critical rule: Geist Pixel fonts MUST use `$portfolio-weight-medium` (500).** Any other weight triggers synthetic bolding that destroys the decorative effect. This applies to all five variants (Line, Grid, Square, Circle, Triangle)
+- When a font ships with a single weight, the token system should enforce it. The typography docs (§18.1) correctly mark pixel fonts as "decorative accent" with "no semantic mixins," but don't document the weight constraint. This should be added to `docs/design/typography.md`
+- Accessibility floor: never use type tokens smaller than `$portfolio-type-xs` (0.75rem / 12px) for any visible text, regardless of whether smaller tokens exist in the scale. The sub-12px tokens exist for non-text use cases (e.g., spacing, optical adjustments)
+- Cross-category note: also documented as AP-062 (design anti-patterns)
+
+### Login page split layout with halftone portrait
+
+**Date:** 2026-04-06
+
+**What was the intent:** Add an interactive halftone portrait canvas to the left side of the login page, creating a split layout that gives the page a strong visual anchor while keeping the login form functional and centered on the right.
+
+**What was decided:**
+- Split layout: 50/50 flex with canvas pane on left, form pane on right on desktop
+- Canvas never mounted on mobile (below 769px) - `matchMedia` guard in JS, not CSS `display: none`. This prevents downloading the 4.6 MB video and allocating WebGL resources on mobile devices entirely
+- Canvas renders at a fixed square resolution (1200x1200); `object-fit: cover` on the canvas element fills the tall pane by cropping edges. No shader distortion because the render resolution stays square
+- Removed the accent bar (`<div className={styles.accentBar} />`) - it was a leftover decorative element that competed with the halftone portrait as a visual anchor and added visual noise to the simplified layout
+- Form pane uses `flex: 1` so it naturally expands to full width when the canvas pane is absent (mobile/SSR), keeping the single-column experience intact
+- No SCSS media query needed - the conditional rendering in JS handles the responsive behavior cleanly
+- The HalftonePortrait component is page-specific (colocated in `src/app/(frontend)/for/[company]/`), not a DS component - it has no playground page or registry entry
+
+**What was learned:**
+- For login pages, a bold visual asset on one side and a clean form on the other is a well-established pattern (Stripe, Linear, Figma all use variants). The key is that the visual element should be interactive or animated - a static image feels like a placeholder. The halftone portrait's mouse-reactive shader provides the "alive" feeling that differentiates this from a stock photo split layout
+- Conditional mounting via `matchMedia` is strictly better than CSS `display: none` for heavy client-only components. CSS hiding still downloads assets, initializes WebGL, and runs the animation loop invisibly. The JS guard prevents all of this
+- Removing the accent bar was the right call - in a split layout, the portrait IS the accent. Having both creates competing visual anchors. The greeting text alone provides enough hierarchy in the card header
+- Cross-category note: also documented in engineering feedback log
 

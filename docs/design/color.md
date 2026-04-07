@@ -68,6 +68,7 @@ Terra is a custom warm-amber accent scale built in OKLCH, following the identica
 
 | Step | Hex | OKLCH (L, C, H) | vs White | vs #161616 | Usage |
 |------|-----|-----------------|----------|------------|-------|
+| 05 | #faf8f6 | 0.98, 0.003, 70 | 1.06:1 | 17.1:1 | Barely-there warm surface, surface-terra-minimal (light mode). Custom addition like neutral-05. |
 | 10 | #f5f1ec | 0.96, 0.008, 70 | 1.1:1 | 16.1:1 | Terra tint backgrounds, surface-terra-subtle (light mode) |
 | 20 | #e0d0bf | 0.87, 0.030, 70 | 1.5:1 | 12.0:1 | Warm highlight, hover backgrounds |
 | 30 | #ccb091 | 0.77, 0.053, 70 | 2.1:1 | 8.8:1 | Decorative borders, disabled states |
@@ -86,6 +87,7 @@ Terra is a custom warm-amber accent scale built in OKLCH, following the identica
 | Border | terra-60 (#915000) | terra-50 (#a4702c) | 6.30:1 | 4.30:1 |
 | Surface bold | terra-60 (#915000) | neutral-80 (#393939) | — | — |
 | Surface subtle | terra-10 (#f5f1ec) | neutral-90 (#262626) | — | — |
+| Surface minimal | terra-05 (#faf8f6) | neutral-100 (#161616) | — | — |
 
 *Icon and action tokens removed (Tier 2 scope restriction). Surface dark mode uses neutral fallback, not step inversion. See "Dark Mode Strategy" below.*
 
@@ -101,11 +103,12 @@ Tier 2 colors do NOT appear in: daily-use product chrome, data tables, forms, na
 **Usage Scope:**
 
 Allowed (content layer):
+- Page-level barely-there warm wash (`surface-terra-minimal`)
 - Case study section backgrounds (`surface-terra-subtle`)
 - Pull-quote / testimonial card backgrounds (`surface-terra-subtle`)
 - Project category tags - static labels, not interactive (`surface-terra-subtle` bg, `text-terra` text)
 - Decorative borders in content (`border-terra`)
-- Hero/cover warm tint (`surface-terra-subtle`)
+- Hero/cover warm tint (`surface-terra-subtle` or `surface-terra-minimal`)
 - Onboarding, empty states, marketing moments within future products
 
 Prohibited (UI layer):
@@ -120,7 +123,7 @@ Edge case: `text-terra` on white passes WCAG AA (6.3:1) but is restricted to sho
 
 **Dark Mode Strategy:**
 
-Terra surface tokens (`surface-terra-subtle`, `surface-terra-bold`) map to neutral dark surfaces in dark mode. Warmth is a light-mode brand expression only. No major design system has made warm cream atmospherics work in dark mode:
+Terra surface tokens (`surface-terra-minimal`, `surface-terra-subtle`, `surface-terra-bold`) map to neutral dark surfaces in dark mode. Warmth is a light-mode brand expression only. No major design system has made warm cream atmospherics work in dark mode:
 - Notion: warm beige (#F7F6F3) becomes cool dark gray (#2F3437) in dark mode
 - Anthropic: warm ivory (#F5F0E8) editorial aesthetic is fundamentally light-mode
 - Spotify: brand green is mode-invariant but restricted to logo/badge contexts, never a surface tint
@@ -140,6 +143,7 @@ The extended palette (`$portfolio-red-*`, `$portfolio-green-*`, etc.) is sourced
 
 **Additions:**
 - `$portfolio-neutral-05` (#F9F9F9) — yilangao.com addition for a subtle secondary surface.
+- `$portfolio-terra-05` (#faf8f6) — Custom step between white and terra-10 for barely-there warm surfaces. Follows the neutral-05 precedent. See §9.3b.
 
 ### 9.5 Token Architecture: Property · Role · Emphasis
 
@@ -319,7 +323,7 @@ The following color families are defined in `_colors.scss` but have no current U
 
 *Terra action token removed (Tier 2 scope restriction). See §9.3b.*
 
-**Surface (Tier 2 — neutral fallback):** Terra surface tokens do not follow standard step inversion. In dark mode, `surface-terra-subtle` maps to `neutral-90` (#262626) and `surface-terra-bold` maps to `neutral-80` (#393939). Warmth is a light-mode brand expression only. See §9.3b "Dark Mode Strategy" for rationale.
+**Surface (Tier 2 — neutral fallback):** Terra surface tokens do not follow standard step inversion. In dark mode, `surface-terra-minimal` maps to `neutral-100` (#161616), `surface-terra-subtle` maps to `neutral-90` (#262626), and `surface-terra-bold` maps to `neutral-80` (#393939). Warmth is a light-mode brand expression only. See §9.3b "Dark Mode Strategy" for rationale.
 
 **When adding a new functional color role** (e.g., `info`), apply the same rules: step-60 as the light-mode SCSS source, step-40 dark override for text/icon, step-50 dark override for border/action. Verify contrast against both white and #161616 before shipping.
 

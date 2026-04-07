@@ -4,7 +4,7 @@
 >
 > **Who reads this:** AI agents before making code changes — scan for relevant anti-patterns.
 > **Who writes this:** AI agents when an incident reveals a new anti-pattern.
-> **Last updated:** 2026-04-04 (EAP-069: Turbopack routes-manifest regression in Next.js 16.2.x)
+> **Last updated:** 2026-04-06 (EAP-072: prefer path-level CSS fill; ENG-127)
 
 ## Category Index
 
@@ -16,12 +16,12 @@
 | CMS / Inline Edit | EAP-016, EAP-023, EAP-029 | 3 active | 3 |
 | Save Flow / Error Handling | EAP-017, EAP-018, EAP-020, EAP-024 | 4 active | 4 |
 | Hydration / SSR / React State | EAP-013, EAP-014, EAP-022, EAP-054, EAP-056 | 5 active | 5 |
-| Build / Toolchain / CSS | EAP-011, EAP-012, EAP-031, EAP-035, EAP-038‡, EAP-039, EAP-040, EAP-069 | 8 active | 8 |
+| Build / Toolchain / CSS | EAP-011, EAP-012, EAP-031, EAP-035, EAP-038‡, EAP-039, EAP-040, EAP-069, EAP-072 | 9 active | 9 |
 | Documentation Process | EAP-008, EAP-010, EAP-027, EAP-032 | 4 active | 4 |
-| Dev Workflow | EAP-002, EAP-003, EAP-009, EAP-068 | 4 active | 4 |
+| Dev Workflow | EAP-002, EAP-003, EAP-009, EAP-068, EAP-073 | 5 active | 5 |
 | Interaction / DOM | EAP-025, EAP-036, EAP-053 | 3 active | 3 |
 | Deployment / CI Build | EAP-060, EAP-061 | 2 active | 2 |
-| **Total** | | **50 active · 1 resolved** | **51** |
+| **Total** | | **51 active · 1 resolved** | **52** |
 
 > † EAP-038 "One-Way Playground Experiment" · ‡ EAP-038 "SCSS Modules with `@use` Under Turbopack" — duplicate ID, two distinct entries.
 
@@ -1184,3 +1184,46 @@ Webpack generates the routes manifest correctly. Monitor Next.js releases for a 
 **Correct alternative:** When the same sequence is consumed by multiple features, mutations must update all representations atomically. Either: (a) write to all stores in the same save operation, or (b) designate one store as canonical and derive all reads from it. Option (a) is simpler when the number of consumers is small and known.
 
 **Incident:** Grid reorder (2026-04-05) — masonry view drag saved `gridOrder` but not project `order` fields, causing case study navigation to ignore reordering.
+
+---
+
+## EAP-072: SVG fill="currentColor" stale after client-side navigation
+
+**Status: ACTIVE**
+
+**Trigger:** An SVG component uses `fill="currentColor"` (HTML attribute) to inherit color from a CSS module class, and the component renders after a client-side navigation (`router.push()`, `<Link>`) from a different route.
+
+**Why it's wrong:** When a component renders after client-side navigation, its CSS module is loaded dynamically via JavaScript. The SVG's `fill="currentColor"` attribute resolves during initial render before the module stylesheet arrives, caching the inherited text color (typically near-black from `body`). When the stylesheet loads and sets the CSS `color` property, browsers do not re-resolve `currentColor` in already-resolved SVG fill attributes. Properties without inherited defaults (like `background-color`) are unaffected because there's no stale value to cache. This makes the bug intermittent and route-dependent: direct navigation works (CSS in initial HTML), client-side navigation doesn't.
+
+**Correct alternative:** When an SVG component's fill color comes from a CSS module class, always add an explicit CSS `fill` rule targeting **`path` (or other painted shape) elements** in the module. CSS `fill` on `<path>` is re-evaluated when stylesheets load and on `:hover` / theme changes, unlike `currentColor` baked into SVG HTML attributes. Prefer `path { fill: … }` over relying on `svg { fill: … }` alone when the root `<svg>` still has `fill="currentColor"` — the latter pattern failed for TestimonialCard LinkedIn hover accent (ENG-127). Keep `fill="currentColor"` in the HTML as a fallback for pre-CSS render:
+
+```scss
+.icon {
+  color: var(--portfolio-text-terra);
+
+  path {
+    fill: var(--portfolio-text-terra);
+  }
+}
+```
+
+**Scope:** Any SVG using `fill="currentColor"` that renders on a page reached via client-side navigation. On this site, the password gate (`/for/[company]` → `router.push("/")`) makes the homepage the primary risk area. Admin-only components (inline edit, modals) are lower risk since they load with their own route CSS.
+
+**Incident:** ENG-126 (2026-04-06) — TestimonialCard quotation marks rendered black instead of Terra amber on the main site.
+
+---
+
+## EAP-073: Implementing Before Diagnosing Visual Bugs
+
+**Trigger:** A user reports a visual bug (e.g., "the image doesn't fill the slot"). The agent writes a CSS fix immediately.
+
+**Why it's wrong:** Without diagnosing WHAT the browser actually renders, the agent has no way to distinguish between: (a) the CSS isn't being applied (specificity, cache, class mismatch), (b) the CSS is applied but produces wrong output (layout model misunderstanding), or (c) the visual appearance is correct but the content itself (e.g., the image composition) creates the perceived gap. Four consecutive implementation attempts — `position: absolute`, `next/image fill`, `background-image`, then diagnostic — wasted the user's time because the first three all targeted the same hypothesis without testing it.
+
+**Correct approach:**
+1. **Step 1 (diagnostic):** Add `background: magenta` (or similar high-contrast color) to the container to determine whether the gap is the container background showing through (CSS issue) or the image's own content (not a CSS issue).
+2. **Step 2 (hypothesis):** Based on the diagnostic, form a targeted hypothesis.
+3. **Step 3 (implement):** Apply the minimal fix that addresses the confirmed root cause.
+
+**Also wrong:** Escalating to worse engineering practices (`background-image` for CMS content, inline styles) when simpler approaches don't work. Complexity escalation without diagnosis is a sign of guessing, not debugging.
+
+**Incident:** FB-122 (2026-04-06) — Hero image gap reported 5 times across 4 failed CSS fixes.

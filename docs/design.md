@@ -4,7 +4,7 @@
 >
 > **Who reads this:** AI agents routed here by `AGENTS.md` Pre-Flight. Read the Section Index first, then open only the spoke file matching your task.
 > **Who writes this:** AI agents after processing user feedback via the `design-iteration` skill.
-> **Last updated:** 2026-04-06 (7.9: Tier 2 colors follow different dark mode rules)
+> **Last updated:** 2026-04-06 (7.10: Composite components must compose DS primitives)
 
 ---
 
@@ -165,6 +165,16 @@ Tier 2 (brand/marketing) colors may use different dark mode strategies than Tier
 
 **Applies to:** Any color family classified as Tier 2 in the Color Tier Architecture (currently: Terra). See `docs/design/color.md` 9.3b.
 
+### 7.10 Composite Components Must Compose DS Primitives
+
+When a design system primitive exists for a UI role (for example `Avatar`), composite components must use that primitive directly instead of recreating local rendering and styling for the same role.
+
+**The rule:** If a component can be built by composing existing DS primitives, do that first. Local fallback implementations (`img` + initials spans + custom avatar classes) are only allowed when the primitive cannot satisfy a required behavior.
+
+**Why this exists:** `TestimonialCard` implemented its own avatar fallback, sizing, and styling while a DS `Avatar` primitive already existed. The local version drifted to neutral colors and a different typography treatment, creating visible inconsistency inside the same design system. The fix was to compose `Avatar` in both visitor and admin upload paths and remove duplicated avatar styles.
+
+**Applies to:** All `src/components/ui/*` composites and site-level components that render core primitive roles (avatar, badge, button, input, etc.).
+
 ---
 
 ## Appendix: Feedback Frequency Map
@@ -201,7 +211,7 @@ Tier 2 (brand/marketing) colors may use different dark mode strategies than Tier
 | Interactive visual scoping (content must match section topic) | 1 | High |
 | False affordances (static elements styled as interactive) | 1 | High |
 | Responsive breakpoints / cross-app parity | 1 | High |
-| DS compliance (token adoption, mixin usage, brand color) | 1 | High |
+| DS compliance (token adoption, mixin usage, brand color) | 2 | High - FB-120: TestimonialCard now composes DS Avatar in visitor + admin paths. |
 | Undocumented patterns (gradient bg, masonry, dark surface alpha) | 1 | Medium |
 | Button component sizing (icon/label proportionality, vertical padding) | 1 | High |
 | NavItem sizing (padding, gap, trailing icon parity, touch tier) | 1 | High |
@@ -211,6 +221,7 @@ Tier 2 (brand/marketing) colors may use different dark mode strategies than Tier
 | Spacing must account for visual overflow, not box-model edges | 1 | High |
 | Semantic intent naming (props/tokens named by context, not CSS effect) | 1 | Critical — FB-071: Eyebrow `mono` renamed to `metric`. Establishes guardrail Design #8 and Process Principle §7.7. |
 | Slot semantic separation (distinct roles for affix vs icon vs generic content) | 1 | High — FB-073: Input `trailing` slot added. `suffix` was conflating value affixes with generic content like Kbd. |
+| Decorative font weight mismatch (synthetic bolding destroys pixel font patterns) | 1 | High — AP-062: Geist Pixel fonts ship at weight 500 only. Using 700 triggers synthetic bolding that fills decorative gaps. |
 
 ---
 

@@ -4,7 +4,7 @@
 >
 > **Who reads this:** AI agents routed here by `AGENTS.md` Pre-Flight. Read the Section Index first, then follow the link to the spoke file matching your task.
 > **Who writes this:** AI agents after processing engineering feedback via the `engineering-iteration` skill.
-> **Last updated:** 2026-04-04 (ENG-117: Turbopack routes-manifest missing; switched to webpack; EAP-069 added)
+> **Last updated:** 2026-04-06 (ENG-127: LinkedIn SVG path-level fill; EAP-072 clarification)
 
 ---
 
@@ -109,7 +109,7 @@ Recurring incidents should be escalated up this hierarchy until they stop recurr
 | Rules-layer enforcement gap | 1 | Critical |
 | Port management | 0 | Critical |
 | Localhost verification | 1 | Critical |
-| Build / bundler issues (React 19 compat) | 5 | **Critical — 3 failed fixes (ENG-017→018→019). Rule: no `<script>` in React tree. See EAP-013. ENG-117: Turbopack 16.2.x missing routes-manifest.json — switched main site to `--webpack` until upstream fix. See EAP-069.** |
+| Build / bundler issues (React 19 compat) | 6 | **Critical — 3 failed fixes (ENG-017→018→019). Rule: no `<script>` in React tree. See EAP-013. ENG-117: Turbopack 16.2.x missing routes-manifest.json — switched main site to `--webpack` until upstream fix. See EAP-069. ENG-126 / ENG-127: SVG `fill="currentColor"` stale after client-side navigation from password gate — CSS module `color` loads dynamically, but `currentColor` in SVG attributes resolves to inherited black before stylesheet arrives. Fix: target `<path>` with CSS `fill` directly (`svg { fill }` alone failed for LinkedIn hover accent). See EAP-072.** |
 | Turbopack cache / HMR delivery failure | 6+ | **Critical — ESCALATED TWICE. ENG-047, ENG-056, ENG-067, ENG-085, ENG-094, ENG-095 + undocumented. Previous "soft" protocol (curl → hard-refresh → flush as fallback) failed 6+ times because the agent stopped at step 1-2 and reported success. AGENTS.md #11 REWRITTEN: flush-and-restart is now the MANDATORY DEFAULT, not a fallback. After ANY playground edit: kill server → `rm -rf playground/.next` → restart → curl verify → report done. No HMR reliance. No exceptions. See EAP-042 (escalated).** |
 | Verification gap (reporting done without browser check) | 3 | **Critical — promoted to Hard Guardrail #10 (ENG-020). curl ≠ verification.** |
 | Process automation gaps | 1 | High |

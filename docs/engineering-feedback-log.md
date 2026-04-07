@@ -4,10 +4,97 @@
 >
 > **Who reads this:** AI agents at session start (scan recent entries for context), and during incident response (check for recurring patterns).
 > **Who writes this:** AI agents after each incident resolution via the `engineering-iteration` skill.
-> **Last updated:** 2026-04-06 (ENG-125: Hero image re-upload missing + dimension mismatch)
+> **Last updated:** 2026-04-06 (ENG-129: Elan interactive components)
 >
 > **For agent skills:** Read only the first 30 lines of this file (most recent entries) for pattern detection.
 > **Older entries:** Synthesized in `docs/engineering-feedback-synthesis.md`. Raw archive in `docs/engineering-feedback-log-archive.md`.
+
+---
+
+### ENG-129: Elan interactive components (CollaborationLoop, SkillMap, MaturityTimeline)
+
+**Date:** 2026-04-06
+
+**Issue:** The Elan Design System case study page needed three interactive visualization components to illustrate the human-agent collaboration architecture. No existing components existed; the page had 5 existing elan-visuals but these three were planned and wired but unbuilt.
+
+**Root Cause:** Greenfield implementation. INTERACTIVE_VISUALS map in `page.tsx` already referenced `CollaborationLoop`, `SkillMap`, and `MaturityTimeline` by name, but VISUAL_COMPONENTS in `ProjectClient.tsx` had no matching entries. The components simply didn't exist yet.
+
+**Resolution:**
+- Added Category Index table to `docs/content-anti-patterns.md` (prerequisite for SkillMap treemap - grouped 28 CAPs into 6 categories)
+- Installed `d3-hierarchy` + `@types/d3-hierarchy` for squarified treemap layout
+- Built `CollaborationLoop.tsx` + SCSS module: 8-step sequential correction lifecycle with step dots, track fill, and detail panel showing real file paths and code excerpts
+- Built `SkillMap.tsx` + SCSS module: dual-view (Tabs) with Operations card grid (16 skills in 5 categories, click-to-expand) and Knowledge treemap (d3-hierarchy squarified, 3 domains, hover tooltips)
+- Built `MaturityTimeline.tsx` + SCSS module: stacked bar chart with severity/domain toggle, milestone annotations, hover popovers
+- Each new component has its own `.module.scss` file (existing 5 keep shared file) per plan decision for maintainability
+- All 3 registered in `index.ts` barrel and `VISUAL_COMPONENTS` map in `ProjectClient.tsx`
+- CMS materialized via `POST /api/update-elan`, TypeScript compiles cleanly, cross-app parity check passed (elan-visuals exempt from EAP-007 per precedent)
+
+**Lesson:** Splitting SCSS into per-component modules for new components while preserving the shared file for existing ones is a pragmatic trade-off: existing code isn't disrupted, but new work benefits from better isolation. The d3-hierarchy approach (compute layout, render with DOM/CSS) avoids pulling in a full charting library while getting mathematically correct treemap proportions.
+
+---
+
+### ENG-128: Media separation + video upload pipeline
+
+**Date:** 2026-04-06
+
+**Issue:** Two structural problems: (1) The masonry view thumbnail and case study hero shared the same `heroImage` field - uploading from either surface wrote to the same CMS field, making them inseparable. (2) The media pipeline only accepted `image/*` and `application/pdf` - no video support, and all rendering locations used hardcoded `<img>` tags.
+
+**Root Cause:** The `heroImage` field on `Projects` was originally the only image field. When content blocks were added with their own `hero` block type, the homepage still read from `heroImage`, and `replaceHeroImage` wrote to both the block and the legacy field. No `thumbnail` field existed. The `Media` collection MIME allowlist and all upload zones were image-only by design.
+
+**Resolution:**
+- Added a new `thumbnail` upload field to `Projects.ts` (independent of `heroImage`)
+- Homepage data fetch reads `thumbnail` first with `heroImage` fallback (migration path)
+- `ProjectEditModal` now writes to `thumbnail` instead of `heroImage`
+- `replaceHeroImage` no longer writes to the legacy `heroImage` field
+- `heroImage` field hidden in admin with `condition: () => false`
+- `Media.ts` mimeTypes expanded to `['image/*', 'video/*', 'application/pdf']`
+- Created `MediaRenderer` component that renders `<video autoPlay muted loop playsInline>` for video MIME types, `<img>` otherwise
+- All upload zones (`ImageUploadZone`, `SectionImageUpload`, `ProjectEditModal`, hero replace) accept `image/*,video/*`
+- `mimeType` threaded through both data pipelines (homepage + case study page)
+- All 4 rendering locations (masonry card, hero, image groups, modal preview) use `MediaRenderer`
+- `push-schema.ts` updated to add `thumbnail_id` column
+
+**Lesson:** When a CMS field serves double duty (homepage card + case study hero), it should be split into two fields rather than sharing one. The coupling was invisible until the user wanted different assets in each location. Migration path (fallback to old field) prevents data loss during the transition.
+
+Cross-ref: FB-122 (design feedback log - always-on skeleton, same session)
+
+---
+
+### ENG-127: TestimonialCard LinkedIn icon — Lumen hover not visible (EAP-072 follow-up)
+
+**Date:** 2026-04-06
+
+**Issue:** After styling the LinkedIn control for default black and hover Lumen (`--portfolio-accent-60`), the brand blue did not show on hover in practice (including dark mode). User suspected the same SVG coloring failure as ENG-126.
+
+**Root Cause:** ENG-126 fixed quotation marks with explicit CSS `fill` on `<path>`. The LinkedIn follow-up only set `fill` on the `<svg>` element. The icon still declares `fill="currentColor"` on the root `<svg>`. That attribute-driven `currentColor` resolution can remain decoupled from later CSS updates the same way as path-level `currentColor` — `svg { fill: var(...) }` alone did not reliably drive the painted path through hover / theme in this component.
+
+**Resolution:** Moved LinkedIn fills to **`svg path`** for default and `:hover` (Lumen `accent-60`), with `transition: fill` on the path. Matches the EAP-072 pattern used for `QuoteMark` paths.
+
+**Anti-pattern:** EAP-072 (clarified in anti-patterns doc) — prefer explicit `path { fill }`, not only `svg { fill }`, when the SVG uses `fill="currentColor"` on the root.
+
+**Files changed:** `src/components/ui/TestimonialCard/TestimonialCard.module.scss`, `docs/engineering-anti-patterns.md`
+
+**Cross-category note:** Related to design LinkedIn color request; same technical class as ENG-126.
+
+---
+
+### ENG-126: SVG fill="currentColor" stale after client-side navigation (EAP-072)
+
+**Date:** 2026-04-06
+
+**Issue:** TestimonialCard quotation mark SVG rendered near-black on the main site despite CSS module setting `color: var(--portfolio-text-terra)` (#915000, warm amber). The same component rendered correctly in the playground. Background-color and sizing from the same CSS module worked fine.
+
+**Root Cause:** The password gate forces all visitors through `/for/[company]`, then client-side navigates (`router.push("/")`) to the homepage. The homepage CSS module (containing TestimonialCard styles) is always loaded dynamically via JS after navigation, never in the initial HTML. SVG `fill="currentColor"` (HTML attribute) resolves during initial render when `color` is still inherited near-black (#161616 from body). When the CSS module loads and sets `color: var(--portfolio-text-terra)`, the `color` property updates, but **browsers don't re-resolve `currentColor` in already-resolved SVG `fill` HTML attributes.** Properties without inherited defaults (like `background-color`) don't suffer this issue because there's no stale value to cache.
+
+**Why playground worked:** The playground loads the component directly on its own page, so the CSS module is in the initial HTML response. `currentColor` resolves correctly on first render.
+
+**Resolution:** Added explicit CSS `fill` rules targeting SVG `<path>` elements instead of relying on `currentColor` inheritance. CSS `fill` properties are re-evaluated when stylesheets load. Applied to: quoteMark visitor mode (`.quoteMark path`), admin hover (`.quoteMarkEditable:hover path`), and LinkedIn icon (`.linkedinBtn svg` + hover/linked states). Kept `fill="currentColor"` in HTML as fallback for pre-CSS render.
+
+**Anti-pattern:** EAP-072 — Never rely solely on SVG `fill="currentColor"` to pick up a CSS module's `color` value when the component may render after client-side navigation. Always add a CSS `fill` rule on the SVG element or its `path` children.
+
+**Files changed:** `src/components/ui/TestimonialCard/TestimonialCard.module.scss`
+
+**Cross-category note:** Also documented as FB-117 (design) for the visual change from neutral to Terra palette.
 
 ---
 
@@ -1319,5 +1406,60 @@ Secondary issue: the Sass `darken()` function was deprecated, producing warnings
 **Resolution:** Replaced `layoutNextLineRange` + `materializeLineRange` with the single `layoutNextLine` call. The returned `LayoutLine` already contains `text` and `end` cursor, so no materialization step is needed.
 
 **Lesson:** When using dynamic imports of niche libraries, verify the actual exported API against `dist/*.d.ts` before writing call sites. Type declarations are the source of truth for what a package actually exports, especially for pre-1.0 packages where APIs shift between versions.
+
+---
+
+### Login page inaccessible during UI iteration
+
+**Date:** 2026-04-06
+
+**Issue:** User needed to make UI edits to the login page (`/for/[company]`) but couldn't view it on localhost because they were already authenticated. The server component redirects authenticated visitors to `/` before the login form renders. The login page was also missing from the boot-up skill and port registry, so "boot up" didn't surface its URL.
+
+**Root Cause:** The login page's server component unconditionally checks for an existing session and redirects away, with no development bypass. Additionally, the boot-up procedure only tracked server processes (main site, playground, ASCII Art Studio) and had no concept of key pages that need to be accessible for development work.
+
+**Resolution:** Added a `?preview=true` query param bypass in `src/app/(frontend)/for/[company]/page.tsx` that skips the session redirect when `NODE_ENV === "development"`. Updated the boot-up skill to include a "Key Pages" table, added the login page to the port registry as a key page, and documented the dev preview mode in the password gate skill. Now "boot up" always surfaces the login page URL in its report.
+
+**Lesson:** Dev servers aren't the only things developers need access to. Pages behind authentication gates need documented dev-mode bypass routes. The boot-up skill should track not just processes/ports but also key pages that are part of the active development surface.
+
+---
+
+### Login page rebuilt components instead of using DS
+
+**Date:** 2026-04-06
+
+**Issue:** The login page (`/for/[company]`) re-implemented Input, Button, and Eyebrow components from scratch in page-level SCSS instead of using the design system components from `src/components/ui/`. It also had 12+ hardcoded values (border-radius, opacity, transitions, letter-spacing, dimensions) bypassing the token system.
+
+**Root Cause:** The login page was built before the DS Input and Button components existed (or before they reached feature parity). Once the DS components matured, the login page was never migrated. No audit process existed to catch pages using raw HTML where DS components are available.
+
+**Resolution:** Replaced raw `<input>` with DS `<Input>`, raw `<button>` with DS `<Button>`. Removed 60+ lines of re-implemented component SCSS (`.inputGroup`, `.label`, `.input`, `.submit`, `.error`). Replaced all hardcoded values with tokens (`--portfolio-radius-xs`, `$portfolio-spacer-4x`, `$portfolio-border-width-thick`, `--portfolio-opacity-hover`, `--portfolio-action-brand-bold`). Per-company accent theming preserved via scoped CSS custom property overrides.
+
+**Lesson:** Pages built before DS components mature will silently drift from the system unless there's a periodic audit. Consider adding a DS compliance linter or checklist for pages that render form elements — any raw `<input>`, `<button>`, or `<select>` outside of `src/components/ui/` is a candidate for migration. Cross-category note: also documented in design feedback log.
+
+---
+
+### Halftone portrait component ported to login page
+
+**Date:** 2026-04-06
+
+**Issue:** The login page needed a visual anchor - an interactive halftone portrait canvas from a separate Vite project (Portrait Halftone) needed to be integrated as the left pane of a split login layout.
+
+**Root Cause:** The HalftonePortrait component lived in an external Vite project using `?raw` shader imports and `import * as THREE`. These patterns are incompatible with Next.js webpack: Vite's `?raw` suffix doesn't work, and wildcard Three.js imports bloat the bundle (~600 KB). The component also used `forwardRef`/`useImperativeHandle` and download controls not needed for the login page.
+
+**Resolution:**
+- Installed `three` + `@types/three` as dependencies
+- Created `HalftonePortrait.tsx` and `useInteractionVelocity.ts` colocated with the login page (`src/app/(frontend)/for/[company]/`) - page-specific, not in `src/components/`
+- Inlined GLSL shaders as template literal string constants (vertex: 6 lines, fragment: 416 lines) to avoid Vite's `?raw` imports
+- Used named Three.js imports (`WebGLRenderer`, `Scene`, etc.) for tree-shaking
+- Removed `forwardRef`, `useImperativeHandle`, download button, video control methods
+- Loaded via `next/dynamic` with `ssr: false` to prevent Three.js SSR crashes
+- Added `matchMedia` guard (`min-width: 769px`) so the canvas is never mounted on mobile, preventing 4.6 MB video download and WebGL resource allocation
+- Canvas renders at fixed 1200x1200; CSS `object-fit: cover` fills the tall pane
+- Preserved `prefers-reduced-motion` behavior (freezes animation)
+- Copied portrait video (4.6 MB, 10s loop) to `public/videos/portrait.mp4`
+- Updated SCSS to split layout with `.canvasPane` (50% width) and `.formPane` (flex: 1)
+- Removed accent bar from markup and SCSS
+- Updated Button specificity chain to `.page .formPane .card .submit` to account for new DOM nesting
+
+**Lesson:** When porting WebGL components between bundlers, the main friction points are shader loading (Vite `?raw` vs webpack loaders vs inline strings) and barrel imports (tree-shaking matters at ~600 KB). Inlining shaders as string constants is the most portable approach - works in any bundler with zero config. The `next/dynamic` + `matchMedia` pattern for conditionally mounting heavy client-only components is a reusable pattern for any route that includes WebGL, maps, or large media - it prevents both SSR crashes and mobile bandwidth waste. Cross-category note: also documented in design feedback log.
 
 ---

@@ -18,7 +18,7 @@ Every font family has exactly one permitted role. Using a font outside its role 
 | **Geist Sans** | `$portfolio-font-sans` | Primary UI | Headings, subtitles, body, labels, captions, stats, legal, helper text — all interface text |
 | **Georgia** | `$portfolio-font-serif` | Quotes only | Pull quotes, block quotes, testimonial text, case study epigraphs. NEVER headings, body, or labels. Even more selective than OneGS (which uses serif for headlines). |
 | **Geist Mono** | `$portfolio-font-mono` | Code only | Code blocks, inline code, terminal output, build hashes. NEVER data numbers, table columns, or stats. Use `font-variant-numeric: tabular-nums` on Geist Sans for numeric alignment. |
-| **Geist Pixel \*** | `$portfolio-font-pixel-*` | Decorative accent | NEVER in interface elements. Only with explicit user instruction. No semantic mixins exist for pixel fonts. |
+| **Geist Pixel \*** | `$portfolio-font-pixel-*` | Decorative accent | NEVER in interface elements. Only with explicit user instruction. No semantic mixins exist for pixel fonts. **MUST use `$portfolio-weight-medium` (500) — the only weight these fonts ship with. Any other weight triggers synthetic bolding that destroys the decorative pattern.** See AP-062. |
 
 ### 18.2 Semantic Mixin Catalogue (28 mixins, 9 categories)
 

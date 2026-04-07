@@ -6,6 +6,18 @@
 > **Who writes this:** AI agents when a content feedback cycle reveals a new anti-pattern.
 > **Last updated:** 2026-03-31 (status markers added, resolved entries compacted)
 
+## Category Index
+
+| Category | IDs | Count |
+|----------|-----|-------|
+| Narrative Structure | CAP-001, 003, 006, 016, 024 | 5 |
+| Voice & Tone | CAP-017, 022, 023, 027, 028 | 5 |
+| Positioning & Claims | CAP-002, 004, 011, 019, 025, 026 | 6 |
+| Information Architecture | CAP-005, 008, 009, 010, 018 | 5 |
+| Specificity & Evidence | CAP-007, 015, 020, 021 | 4 |
+| UX Microcopy | CAP-012, 013, 014 | 3 |
+| **Total** | | **28** |
+
 ---
 
 ## CAP-001: Process-First Case Study Narrative
@@ -382,6 +394,38 @@ For fields with non-obvious formats, add a help line or placeholder with an exam
 **Correct alternative:** Functional descriptors: "Product Designer (sole designer)" not "Design Intern." "7 weeks" not "summer internship." Employment context is interview-only disclosure. See the Portfolio Coherence Manifest (`docs/content/portfolio-coherence.md`) for the employment context tracking field.
 
 **Scope:** All portfolio text. Does NOT apply to interview prep notes (`docs/content/projects/{slug}-interview.md`), where honest disclosure is mandatory.
+
+---
+
+## CAP-027: Fragment Chain as Default Prose
+
+**Status: ACTIVE**
+
+**Trigger:** Section body or blurb body where the majority of sentences are standalone fragments (under 5 words) without a setup sentence that gives them context. Distinct from deliberate staccato punches, which follow a full sentence and land as punchlines.
+
+**Why it's wrong:** Fragment chains are an AI voice tell. They create the impression of compressed authority but actually read as a database printout. When every sentence is a fragment, no sentence has impact - the rhythm flatlines. Human readers expect cause-and-consequence flow; a chain of "Sixteen skills. Three feedback loops. An escalation protocol." communicates a list, not an argument. Extends CAP-017 (AI-Generated Voice Tells).
+
+**Correct alternative:** Weave lists into narrative sentences: "The meta-system has 16 skills routing corrections, three feedback loops encoding them as rules, and an escalation protocol deciding when a rule needs teeth." Use fragments only as punchlines after setup: "Not the food. The chart." (Lacework - setup is the section title "Donut. Avoid at All Cost."). A fragment chain is only acceptable when answering a question posed in the preceding sentence (e.g., Meteor blurb: "How do you design software that moves $79B? As the only designer. No PM.").
+
+**Reference:** CF-022. Elan v3 initial draft had fragment chains in all three section bodies and the blurb. Rewrite wove fragments into narrative sentences.
+
+---
+
+## CAP-028: Technique-as-Posturing
+
+**Status: ACTIVE**
+
+**Trigger:** Applying named voice techniques (T11-T15) in a way that positions the author above peers or the reader, rather than as honest process description. Common symptoms:
+- Industry judgment: "everyone is solving the wrong problem," "the whole conversation looks the same"
+- Secret knowledge: "the part you can't see," "what I actually designed"
+- False modesty about own deliverables to imply being above the work: "they exist, they work fine"
+- Abstracting personal agency into architectural language: "the system promoted it to a hard gate" instead of "I made it mandatory"
+
+**Why it's wrong:** The reference writing sample ("I'm a decent engineer. Not the best.") works because it's humble about self and trusts the reader. It never positions itself above anyone's approach. Techniques like Identification (T11), Anti-Sell (T13), and Closed-Loop (T15) are powerful when they emerge from honest narration of what happened, but become condescending when used to frame what others are missing. "I built one with the agent" is honest. "The whole conversation looks the same: a motor strapped to a carriage" is judgment dressed up as insight.
+
+**Correct alternative:** Describe your process honestly. Concede real costs. Let the reader draw conclusions. Use "I" as a person who made choices (not an author who sees what others don't). Compare: "The agent didn't get smarter. The rules just accumulated what I kept fixing." (honest, reader arrives at insight) vs. "That shift is what compounding looks like." (telling the reader what to think).
+
+**Reference:** CF-024. Elan v3 tone rewrite applied T11/T13/T15 as rhetorical positioning. User response: "reads like a dick." Full rewrite adopted the reference sample's register: humble, real, process-first.
 
 ---
 
