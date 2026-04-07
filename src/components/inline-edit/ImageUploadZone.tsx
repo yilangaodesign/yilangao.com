@@ -30,8 +30,8 @@ export default function ImageUploadZone({
 
   const handleUpload = useCallback(
     async (file: File) => {
-      if (!file.type.startsWith('image/')) {
-        setError('Only image files are supported')
+      if (!file.type.startsWith('image/') && !file.type.startsWith('video/')) {
+        setError('Only image and video files are supported')
         return
       }
       setUploading(true)
@@ -103,7 +103,7 @@ export default function ImageUploadZone({
       <input
         ref={inputRef}
         type="file"
-        accept="image/*"
+        accept="image/*,video/*"
         className={styles.uploadInput}
         onChange={handleFileChange}
         tabIndex={-1}
@@ -146,7 +146,7 @@ export function SectionImageUpload({
 
   const handleUpload = useCallback(
     async (file: File) => {
-      if (!file.type.startsWith('image/')) return
+      if (!file.type.startsWith('image/') && !file.type.startsWith('video/')) return
       setUploading(true)
       setError(null)
       try {
@@ -192,7 +192,7 @@ export function SectionImageUpload({
       <input
         ref={inputRef}
         type="file"
-        accept="image/*"
+        accept="image/*,video/*"
         className={styles.uploadInput}
         onChange={(e) => { const f = e.target.files?.[0]; if (f) handleUpload(f); if (inputRef.current) inputRef.current.value = '' }}
         tabIndex={-1}

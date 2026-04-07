@@ -1,0 +1,252 @@
+@use '../../styles' as *;
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: $portfolio-spacer-2x;
+}
+
+// ── Tab bar ──────────────────────────────────────────────────────────────────
+
+.tabList {
+  align-self: flex-start;
+}
+
+// ── Operations column grid (ref: ccunpacked.dev Tool System) ─────────────────
+
+.operationsGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: $portfolio-spacer-1-5x;
+  padding: $portfolio-spacer-2x;
+  background: $portfolio-surface-neutral-subtle;
+  border-radius: $portfolio-radius-lg;
+  border: 1px solid $portfolio-border-neutral-minimal;
+  overflow-x: auto;
+}
+
+.categoryColumn {
+  display: flex;
+  flex-direction: column;
+  gap: $portfolio-spacer-0-5x;
+  min-width: 120px;
+}
+
+.categoryHeader {
+  display: flex;
+  align-items: baseline;
+  gap: $portfolio-spacer-0-5x;
+  font-size: $portfolio-type-2xs;
+  font-weight: $portfolio-weight-semibold;
+  text-transform: uppercase;
+  letter-spacing: $portfolio-tracking-wider;
+  color: $portfolio-text-neutral-subtle;
+  padding-bottom: $portfolio-spacer-0-25x;
+  border-bottom: 1px solid $portfolio-border-neutral-minimal;
+  margin-bottom: $portfolio-spacer-0-25x;
+}
+
+.categoryCount {
+  font-weight: $portfolio-weight-regular;
+  color: $portfolio-text-neutral-minimal;
+  font-size: $portfolio-type-3xs;
+}
+
+.skillCard {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: $portfolio-spacer-0-5x $portfolio-spacer-0-5x;
+  background: $portfolio-neutral-00;
+  border: 1px solid $portfolio-border-neutral-minimal;
+  border-radius: $portfolio-radius-sm;
+  cursor: pointer;
+  transition:
+    border-color $portfolio-duration-fast $portfolio-easing-standard,
+    background $portfolio-duration-fast $portfolio-easing-standard;
+  text-align: left;
+
+  &:hover {
+    border-color: $portfolio-border-neutral-subtle;
+    background: $portfolio-neutral-10;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $portfolio-focus;
+    outline-offset: 2px;
+  }
+}
+
+.skillCardExpanded {
+  background: $portfolio-neutral-00;
+  border-color: $portfolio-accent-60;
+}
+
+.skillName {
+  font-family: $portfolio-font-mono;
+  font-size: $portfolio-type-2xs;
+  font-weight: $portfolio-weight-semibold;
+  color: $portfolio-text-neutral-bold;
+  line-height: $portfolio-leading-compact;
+}
+
+.skillTrigger {
+  font-size: $portfolio-type-3xs;
+  color: $portfolio-text-neutral-minimal;
+  line-height: $portfolio-leading-compact;
+}
+
+.skillDetail {
+  margin-top: $portfolio-spacer-0-25x;
+  padding-top: $portfolio-spacer-0-25x;
+  border-top: 1px solid $portfolio-border-neutral-minimal;
+  font-size: $portfolio-type-3xs;
+  line-height: $portfolio-leading-relaxed;
+  color: $portfolio-text-neutral-regular;
+}
+
+// ── Knowledge treemap ────────────────────────────────────────────────────────
+
+.treemapContainer {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: $portfolio-radius-md;
+  overflow: hidden;
+  border: 1px solid $portfolio-border-neutral-minimal;
+  background: $portfolio-neutral-10;
+}
+
+.treemapBlock {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: $portfolio-spacer-0-5x $portfolio-spacer-0-5x;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  cursor: default;
+  box-sizing: border-box;
+  transition:
+    filter $portfolio-duration-fast $portfolio-easing-standard,
+    opacity $portfolio-duration-fast $portfolio-easing-standard,
+    border-color $portfolio-duration-fast $portfolio-easing-standard;
+}
+
+.treemapBlockHovered {
+  filter: brightness(0.92);
+  border-color: rgba(0, 0, 0, 0.2);
+  z-index: 2;
+}
+
+.treemapBlockDimmed {
+  opacity: 0.55;
+}
+
+.treemapLabel {
+  font-size: $portfolio-type-2xs;
+  font-weight: $portfolio-weight-semibold;
+  line-height: $portfolio-leading-compact;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.treemapCount {
+  font-family: $portfolio-font-mono;
+  font-size: $portfolio-type-3xs;
+  line-height: $portfolio-leading-compact;
+  opacity: 0.7;
+}
+
+.treemapTooltip {
+  position: absolute;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: $portfolio-spacer-0-5x $portfolio-spacer-1x;
+  background: $portfolio-surface-inverse-bold;
+  color: $portfolio-text-inverse-bold;
+  border-radius: $portfolio-radius-sm;
+  font-size: $portfolio-type-2xs;
+  line-height: $portfolio-leading-normal;
+  pointer-events: none;
+  white-space: nowrap;
+  box-shadow: $portfolio-shadow-lg;
+  transform: translate(-50%, -100%);
+  margin-top: -10px;
+}
+
+.treemapTooltipName {
+  font-weight: $portfolio-weight-semibold;
+  font-size: $portfolio-type-xs;
+}
+
+.treemapTooltipMeta {
+  opacity: 0.7;
+  font-family: $portfolio-font-mono;
+  font-size: $portfolio-type-3xs;
+}
+
+// ── Domain colors ────────────────────────────────────────────────────────────
+
+.domainDesign {
+  background: $portfolio-purple-20;
+  color: $portfolio-purple-70;
+  border-color: $portfolio-purple-30;
+}
+
+.domainEngineering {
+  background: $portfolio-teal-20;
+  color: $portfolio-teal-70;
+  border-color: $portfolio-teal-30;
+}
+
+.domainContent {
+  background: $portfolio-cyan-20;
+  color: $portfolio-cyan-70;
+  border-color: $portfolio-cyan-30;
+}
+
+// ── Legend ────────────────────────────────────────────────────────────────────
+
+.legend {
+  display: flex;
+  gap: $portfolio-spacer-2x;
+  font-size: $portfolio-type-2xs;
+  color: $portfolio-text-neutral-subtle;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: $portfolio-spacer-0-25x;
+}
+
+.legendDot {
+  width: 10px;
+  height: 10px;
+  border-radius: $portfolio-radius-xs;
+}
+
+.legendDotDesign {
+  background: $portfolio-purple-40;
+}
+
+.legendDotEngineering {
+  background: $portfolio-teal-40;
+}
+
+.legendDotContent {
+  background: $portfolio-cyan-40;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skillCard,
+  .treemapBlock {
+    transition: none;
+  }
+}

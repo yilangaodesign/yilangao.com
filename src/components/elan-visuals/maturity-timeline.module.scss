@@ -1,0 +1,245 @@
+@use '../../styles' as *;
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: $portfolio-spacer-2x;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: $portfolio-spacer-1x;
+}
+
+.toggleGroup {
+  display: flex;
+  border: 1px solid $portfolio-border-neutral-minimal;
+  border-radius: $portfolio-radius-sm;
+  overflow: hidden;
+}
+
+.toggleButton {
+  padding: $portfolio-spacer-0-25x $portfolio-spacer-1x;
+  font-size: $portfolio-type-2xs;
+  font-weight: $portfolio-weight-medium;
+  background: $portfolio-neutral-00;
+  color: $portfolio-text-neutral-subtle;
+  border: none;
+  cursor: pointer;
+  transition:
+    background $portfolio-duration-fast $portfolio-easing-standard,
+    color $portfolio-duration-fast $portfolio-easing-standard;
+
+  &:hover {
+    background: $portfolio-neutral-10;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $portfolio-focus;
+    outline-offset: -2px;
+  }
+
+  & + & {
+    border-left: 1px solid $portfolio-border-neutral-minimal;
+  }
+}
+
+.toggleButtonActive {
+  background: $portfolio-neutral-80;
+  color: $portfolio-neutral-00;
+
+  &:hover {
+    background: $portfolio-neutral-70;
+  }
+}
+
+// ── Chart ────────────────────────────────────────────────────────────────────
+
+.chart {
+  display: flex;
+  flex-direction: column;
+  gap: $portfolio-spacer-0-5x;
+}
+
+.chartArea {
+  display: flex;
+  align-items: flex-end;
+  gap: $portfolio-spacer-1x;
+  height: 220px;
+  padding-bottom: $portfolio-spacer-0-5x;
+  border-bottom: 1px solid $portfolio-border-neutral-minimal;
+}
+
+.barColumn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $portfolio-spacer-0-25x;
+  height: 100%;
+  position: relative;
+}
+
+.barStack {
+  display: flex;
+  flex-direction: column-reverse;
+  width: 100%;
+  max-width: 72px;
+  border-radius: $portfolio-radius-xs $portfolio-radius-xs 0 0;
+  overflow: hidden;
+  margin-top: auto;
+}
+
+.barSegment {
+  width: 100%;
+  min-height: 2px;
+  position: relative;
+  cursor: default;
+  transition: opacity $portfolio-duration-fast $portfolio-easing-standard;
+
+  &:hover {
+    opacity: 0.85;
+  }
+}
+
+// ── Severity colors ──────────────────────────────────────────────────────────
+
+.severityFundamental {
+  background: $portfolio-red-20;
+  border-bottom: 1px solid $portfolio-red-40;
+}
+
+.severityStructural {
+  background: $portfolio-orange-20;
+  border-bottom: 1px solid $portfolio-orange-40;
+}
+
+.severityRefinement {
+  background: $portfolio-green-20;
+  border-bottom: 1px solid $portfolio-green-40;
+}
+
+// ── Domain colors (same as SkillMap) ─────────────────────────────────────────
+
+.domainDesign {
+  background: $portfolio-purple-20;
+  border-bottom: 1px solid $portfolio-purple-40;
+}
+
+.domainEngineering {
+  background: $portfolio-teal-20;
+  border-bottom: 1px solid $portfolio-teal-40;
+}
+
+.domainContent {
+  background: $portfolio-cyan-20;
+  border-bottom: 1px solid $portfolio-cyan-40;
+}
+
+// ── Labels ───────────────────────────────────────────────────────────────────
+
+.barLabel {
+  font-size: $portfolio-type-2xs;
+  color: $portfolio-text-neutral-subtle;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.barCount {
+  font-family: $portfolio-font-mono;
+  font-size: $portfolio-type-2xs;
+  color: $portfolio-text-neutral-regular;
+  position: absolute;
+  top: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+// ── Milestones ───────────────────────────────────────────────────────────────
+
+.milestoneMarker {
+  position: absolute;
+  top: -32px;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: $portfolio-type-3xs;
+  font-weight: $portfolio-weight-medium;
+  color: $portfolio-accent-70;
+  background: $portfolio-accent-10;
+  padding: 1px $portfolio-spacer-0-5x;
+  border-radius: $portfolio-radius-sm;
+  border: 1px solid $portfolio-accent-20;
+}
+
+// ── Legend ────────────────────────────────────────────────────────────────────
+
+.legend {
+  display: flex;
+  gap: $portfolio-spacer-2x;
+  font-size: $portfolio-type-2xs;
+  color: $portfolio-text-neutral-subtle;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: $portfolio-spacer-0-25x;
+}
+
+.legendDot {
+  width: 10px;
+  height: 10px;
+  border-radius: $portfolio-radius-xs;
+}
+
+.legendFundamental {
+  background: $portfolio-red-30;
+}
+
+.legendStructural {
+  background: $portfolio-orange-30;
+}
+
+.legendRefinement {
+  background: $portfolio-green-30;
+}
+
+.legendDesign {
+  background: $portfolio-purple-30;
+}
+
+.legendEngineering {
+  background: $portfolio-teal-30;
+}
+
+.legendContent {
+  background: $portfolio-cyan-30;
+}
+
+// ── Popover ──────────────────────────────────────────────────────────────────
+
+.popover {
+  position: absolute;
+  z-index: 10;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: $portfolio-spacer-0-5x $portfolio-spacer-1x;
+  background: $portfolio-surface-inverse-bold;
+  color: $portfolio-text-inverse-bold;
+  border-radius: $portfolio-radius-sm;
+  font-size: $portfolio-type-2xs;
+  line-height: $portfolio-leading-normal;
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: $portfolio-shadow-md;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .barSegment,
+  .toggleButton {
+    transition: none;
+  }
+}

@@ -1,0 +1,893 @@
+@use '../../styles' as *;
+
+// ── Container ────────────────────────────────────────────────────────────────
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: $portfolio-spacer-1-5x;
+  padding: $portfolio-spacer-2x $portfolio-spacer-3x;
+  background: $portfolio-surface-neutral-subtle;
+  border-radius: $portfolio-radius-lg;
+  border: 1px solid $portfolio-border-neutral-minimal;
+}
+
+// ── Step nav (dots + labels) ─────────────────────────────────────────────────
+
+.stepNav {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0;
+  position: relative;
+  padding: 0 $portfolio-spacer-1x;
+}
+
+.stepTrack {
+  position: absolute;
+  top: 16px;
+  left: 40px;
+  right: 40px;
+  height: 2px;
+  background: $portfolio-neutral-20;
+  z-index: 0;
+}
+
+.stepTrackFill {
+  height: 100%;
+  background: $portfolio-accent-60;
+  transition: width 300ms $portfolio-easing-standard;
+}
+
+.stepDotWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  z-index: 1;
+}
+
+.stepDot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: $portfolio-radius-full;
+  border: 2px solid $portfolio-neutral-20;
+  background: $portfolio-neutral-00;
+  font-family: $portfolio-font-mono;
+  font-size: $portfolio-type-xs;
+  font-weight: $portfolio-weight-medium;
+  color: $portfolio-text-neutral-minimal;
+  cursor: pointer;
+  transition:
+    border-color 200ms $portfolio-easing-standard,
+    background 200ms $portfolio-easing-standard,
+    color 200ms $portfolio-easing-standard;
+
+  &:hover {
+    border-color: $portfolio-neutral-40;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $portfolio-focus;
+    outline-offset: 2px;
+  }
+}
+
+.stepDotCompleted {
+  border-color: $portfolio-accent-60;
+  background: $portfolio-accent-10;
+  color: $portfolio-accent-70;
+}
+
+.stepDotActive {
+  border-color: $portfolio-accent-60;
+  background: $portfolio-accent-60;
+  color: $portfolio-neutral-00;
+}
+
+.stepDotLabel {
+  margin-top: 4px;
+  font-size: $portfolio-type-3xs;
+  color: $portfolio-text-neutral-minimal;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 72px;
+}
+
+.stepDotLabelActive {
+  color: $portfolio-text-neutral-bold;
+  font-weight: $portfolio-weight-semibold;
+}
+
+// ── Detail panel ─────────────────────────────────────────────────────────────
+
+.detailPanel {
+  display: flex;
+  flex-direction: column;
+  gap: $portfolio-spacer-1x;
+  padding: $portfolio-spacer-2x;
+  background: $portfolio-neutral-00;
+  border-radius: $portfolio-radius-md;
+  border: 1px solid $portfolio-border-neutral-minimal;
+}
+
+.detailHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $portfolio-spacer-1x;
+}
+
+.detailHeaderLeft {
+  display: flex;
+  align-items: center;
+  gap: $portfolio-spacer-0-5x;
+}
+
+.detailStepNum {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: $portfolio-radius-full;
+  background: $portfolio-accent-60;
+  color: $portfolio-neutral-00;
+  font-family: $portfolio-font-mono;
+  font-size: $portfolio-type-2xs;
+  font-weight: $portfolio-weight-semibold;
+  flex-shrink: 0;
+}
+
+.detailTitle {
+  font-size: $portfolio-type-base;
+  font-weight: $portfolio-weight-semibold;
+  color: $portfolio-text-neutral-bold;
+}
+
+.detailFile {
+  font-family: $portfolio-font-mono;
+  font-size: $portfolio-type-2xs;
+  color: $portfolio-accent-70;
+  background: $portfolio-accent-10;
+  padding: 2px $portfolio-spacer-0-5x;
+  border-radius: $portfolio-radius-sm;
+  white-space: nowrap;
+}
+
+.detailSubtitle {
+  font-size: $portfolio-type-sm;
+  color: $portfolio-text-neutral-regular;
+  margin: 0;
+}
+
+.detailFooter {
+  font-size: $portfolio-type-xs;
+  color: $portfolio-text-neutral-subtle;
+  margin: 0;
+  line-height: $portfolio-leading-relaxed;
+}
+
+// ── Visual area ──────────────────────────────────────────────────────────────
+
+.vizArea {
+  padding: $portfolio-spacer-1-5x;
+  background: $portfolio-neutral-10;
+  border-radius: $portfolio-radius-md;
+  border: 1px solid $portfolio-border-neutral-minimal;
+  min-height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// ── Viz 1: Chat bubble ───────────────────────────────────────────────────────
+
+.vizChat {
+  width: 100%;
+  max-width: 480px;
+}
+
+.vizChatRow {
+  display: flex;
+  gap: $portfolio-spacer-0-5x;
+  align-items: flex-start;
+}
+
+.vizChatAvatar {
+  width: 28px;
+  height: 28px;
+  border-radius: $portfolio-radius-full;
+  background: $portfolio-purple-30;
+  flex-shrink: 0;
+}
+
+.vizChatContent {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.vizChatName {
+  font-size: $portfolio-type-2xs;
+  font-weight: $portfolio-weight-semibold;
+  color: $portfolio-text-neutral-bold;
+}
+
+.vizChatBubble {
+  font-size: $portfolio-type-xs;
+  line-height: $portfolio-leading-relaxed;
+  color: $portfolio-text-neutral-regular;
+  background: $portfolio-neutral-00;
+  border: 1px solid $portfolio-border-neutral-minimal;
+  border-radius: $portfolio-radius-sm;
+  padding: $portfolio-spacer-0-5x $portfolio-spacer-1x;
+}
+
+.vizChatMeta {
+  font-size: $portfolio-type-3xs;
+  color: $portfolio-text-neutral-minimal;
+  margin-top: 2px;
+}
+
+// ── Viz 2: Routing ───────────────────────────────────────────────────────────
+
+.vizRouting {
+  display: flex;
+  align-items: center;
+  gap: $portfolio-spacer-1-5x;
+  width: 100%;
+  max-width: 520px;
+}
+
+.vizRoutingList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.vizRoutingItem {
+  display: flex;
+  align-items: center;
+  gap: $portfolio-spacer-0-25x;
+  font-size: $portfolio-type-2xs;
+  font-family: $portfolio-font-mono;
+  color: $portfolio-text-neutral-minimal;
+  padding: 3px $portfolio-spacer-0-5x;
+  border-radius: $portfolio-radius-xs;
+  background: $portfolio-neutral-00;
+  border: 1px solid transparent;
+}
+
+.vizRoutingMatch {
+  color: $portfolio-accent-70;
+  background: $portfolio-accent-10;
+  border-color: $portfolio-accent-30;
+  font-weight: $portfolio-weight-semibold;
+}
+
+.vizRoutingCheck {
+  width: 14px;
+  font-size: $portfolio-type-2xs;
+  color: $portfolio-accent-60;
+  text-align: center;
+}
+
+.vizRoutingArrow {
+  font-size: $portfolio-type-lg;
+  color: $portfolio-accent-60;
+  flex-shrink: 0;
+}
+
+.vizRoutingTarget {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: $portfolio-spacer-0-5x $portfolio-spacer-1x;
+  background: $portfolio-accent-10;
+  border: 1px solid $portfolio-accent-30;
+  border-radius: $portfolio-radius-sm;
+  flex-shrink: 0;
+}
+
+.vizRoutingTargetLabel {
+  font-family: $portfolio-font-mono;
+  font-size: $portfolio-type-xs;
+  font-weight: $portfolio-weight-semibold;
+  color: $portfolio-accent-70;
+}
+
+.vizRoutingTargetSub {
+  font-size: $portfolio-type-3xs;
+  color: $portfolio-accent-60;
+}
+
+// ── Viz 3: Document card ─────────────────────────────────────────────────────
+
+.vizDoc {
+  width: 100%;
+  max-width: 400px;
+}
+
+.vizDocHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: $portfolio-font-mono;
+  font-size: $portfolio-type-2xs;
+  font-weight: $portfolio-weight-semibold;
+  color: $portfolio-text-neutral-subtle;
+  padding: $portfolio-spacer-0-25x $portfolio-spacer-0-5x;
+  background: $portfolio-neutral-20;
+  border-radius: $portfolio-radius-sm $portfolio-radius-sm 0 0;
+}
+
+.vizDocCount {
+  font-weight: $portfolio-weight-regular;
+  color: $portfolio-text-neutral-minimal;
+  font-size: $portfolio-type-3xs;
+}
+
+.vizDocBody {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  background: $portfolio-neutral-00;
+  border: 1px solid $portfolio-border-neutral-minimal;
+  border-top: none;
+  border-radius: 0 0 $portfolio-radius-sm $portfolio-radius-sm;
+  overflow: hidden;
+}
+
+.vizDocRow {
+  display: flex;
+  align-items: center;
+  gap: $portfolio-spacer-0-5x;
+  padding: $portfolio-spacer-0-25x $portfolio-spacer-0-5x;
+  font-size: $portfolio-type-2xs;
+  color: $portfolio-text-neutral-minimal;
+  border-bottom: 1px solid $portfolio-border-neutral-minimal;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.vizDocRowMatch {
+  background: $portfolio-accent-10;
+  color: $portfolio-text-neutral-bold;
+  font-weight: $portfolio-weight-medium;
+}
+
+.vizDocId {
+  font-family: $portfolio-font-mono;
+  font-weight: $portfolio-weight-semibold;
+  flex-shrink: 0;
+  min-width: 48px;
+}
+
+.vizDocName {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vizDocRowNoMatch {
+  background: $portfolio-orange-10;
+  color: $portfolio-orange-60;
+  font-weight: $portfolio-weight-medium;
+  justify-content: center;
+  gap: $portfolio-spacer-0-5x;
+}
+
+.vizDocNoMatchLabel {
+  font-size: $portfolio-type-2xs;
+  font-style: italic;
+}
+
+.vizDocBadge {
+  font-size: $portfolio-type-3xs;
+  font-weight: $portfolio-weight-semibold;
+  color: $portfolio-orange-70;
+  background: $portfolio-orange-20;
+  padding: 1px 6px;
+  border-radius: $portfolio-radius-xs;
+  flex-shrink: 0;
+}
+
+// ── Viz 4: Diagnose - rounds timeline ────────────────────────────────────────
+
+.vizRounds {
+  display: flex;
+  flex-direction: column;
+  gap: $portfolio-spacer-1x;
+  width: 100%;
+  max-width: 480px;
+}
+
+.vizRoundsTimeline {
+  display: flex;
+  gap: $portfolio-spacer-0-5x;
+}
+
+.vizRoundsItem {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: $portfolio-spacer-0-5x $portfolio-spacer-0-25x;
+  background: $portfolio-neutral-00;
+  border: 1px solid $portfolio-border-neutral-minimal;
+  border-radius: $portfolio-radius-sm;
+}
+
+.vizRoundsItemFinal {
+  border-color: $portfolio-accent-30;
+  background: $portfolio-accent-10;
+}
+
+.vizRoundsNum {
+  width: 20px;
+  height: 20px;
+  border-radius: $portfolio-radius-full;
+  background: $portfolio-neutral-20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: $portfolio-font-mono;
+  font-size: $portfolio-type-3xs;
+  font-weight: $portfolio-weight-semibold;
+  color: $portfolio-text-neutral-regular;
+
+  .vizRoundsItemFinal & {
+    background: $portfolio-accent-60;
+    color: $portfolio-neutral-00;
+  }
+}
+
+.vizRoundsDetail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  text-align: center;
+}
+
+.vizRoundsFixed {
+  font-size: $portfolio-type-3xs;
+  color: $portfolio-green-60;
+
+  &::before {
+    content: "\2713 ";
+  }
+}
+
+.vizRoundsBroke {
+  font-size: $portfolio-type-3xs;
+  color: $portfolio-red-60;
+
+  &::before {
+    content: "\2717 ";
+  }
+}
+
+.vizRoundsInsight {
+  font-size: $portfolio-type-3xs;
+  font-weight: $portfolio-weight-semibold;
+  color: $portfolio-accent-70;
+}
+
+.vizRoundsVerdict {
+  text-align: center;
+  font-size: $portfolio-type-2xs;
+  font-weight: $portfolio-weight-medium;
+  color: $portfolio-text-neutral-bold;
+  padding: $portfolio-spacer-0-25x $portfolio-spacer-1x;
+  background: $portfolio-orange-10;
+  border: 1px solid $portfolio-orange-30;
+  border-radius: $portfolio-radius-sm;
+}
+
+// ── Viz 5: State table ───────────────────────────────────────────────────────
+
+.vizStateTable {
+  width: 100%;
+  max-width: 480px;
+}
+
+.vizStateHeader {
+  font-family: $portfolio-font-mono;
+  font-size: $portfolio-type-2xs;
+  font-weight: $portfolio-weight-semibold;
+  color: $portfolio-text-neutral-subtle;
+  padding: $portfolio-spacer-0-25x $portfolio-spacer-0-5x;
+  background: $portfolio-neutral-20;
+  border-radius: $portfolio-radius-sm $portfolio-radius-sm 0 0;
+}
+
+.vizStateGrid {
+  display: grid;
+  grid-template-columns: auto 1fr 1fr 1fr 1fr;
+  background: $portfolio-neutral-00;
+  border: 1px solid $portfolio-border-neutral-minimal;
+  border-top: none;
+  border-radius: 0 0 $portfolio-radius-sm $portfolio-radius-sm;
+  overflow: hidden;
+}
+
+.vizStateColHead {
+  font-size: $portfolio-type-3xs;
+  font-weight: $portfolio-weight-semibold;
+  text-transform: uppercase;
+  letter-spacing: $portfolio-tracking-wider;
+  color: $portfolio-text-neutral-subtle;
+  padding: 4px $portfolio-spacer-0-5x;
+  background: $portfolio-neutral-10;
+  border-bottom: 1px solid $portfolio-border-neutral-minimal;
+}
+
+.vizStateRowLabel {
+  font-size: $portfolio-type-2xs;
+  font-weight: $portfolio-weight-semibold;
+  color: $portfolio-text-neutral-bold;
+  padding: 4px $portfolio-spacer-0-5x;
+  border-bottom: 1px solid $portfolio-border-neutral-minimal;
+  white-space: nowrap;
+}
+
+.vizStateCell {
+  font-family: $portfolio-font-mono;
+  font-size: $portfolio-type-3xs;
+  color: $portfolio-text-neutral-regular;
+  padding: 4px $portfolio-spacer-0-5x;
+  border-bottom: 1px solid $portfolio-border-neutral-minimal;
+}
+
+// ── Viz 6: Log entry ─────────────────────────────────────────────────────────
+
+.vizLog {
+  width: 100%;
+  max-width: 420px;
+}
+
+.vizLogHeader {
+  font-family: $portfolio-font-mono;
+  font-size: $portfolio-type-2xs;
+  font-weight: $portfolio-weight-semibold;
+  color: $portfolio-text-neutral-subtle;
+  padding: $portfolio-spacer-0-25x $portfolio-spacer-0-5x;
+  background: $portfolio-neutral-20;
+  border-radius: $portfolio-radius-sm $portfolio-radius-sm 0 0;
+}
+
+.vizLogBody {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  background: $portfolio-neutral-00;
+  border: 1px solid $portfolio-border-neutral-minimal;
+  border-top: none;
+  border-radius: 0 0 $portfolio-radius-sm $portfolio-radius-sm;
+  overflow: hidden;
+}
+
+.vizLogRow {
+  display: flex;
+  align-items: center;
+  gap: $portfolio-spacer-0-5x;
+  padding: $portfolio-spacer-0-25x $portfolio-spacer-0-5x;
+  font-size: $portfolio-type-2xs;
+  border-bottom: 1px solid $portfolio-border-neutral-minimal;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.vizLogRowOld {
+  color: $portfolio-text-neutral-minimal;
+  opacity: 0.5;
+}
+
+.vizLogRowNew {
+  color: $portfolio-text-neutral-bold;
+  background: $portfolio-accent-10;
+  font-weight: $portfolio-weight-medium;
+}
+
+.vizLogId {
+  font-family: $portfolio-font-mono;
+  font-weight: $portfolio-weight-semibold;
+  flex-shrink: 0;
+  min-width: 48px;
+}
+
+.vizLogText {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vizLogBadge {
+  font-size: $portfolio-type-3xs;
+  font-weight: $portfolio-weight-semibold;
+  color: $portfolio-accent-70;
+  background: $portfolio-accent-20;
+  padding: 1px 6px;
+  border-radius: $portfolio-radius-xs;
+  flex-shrink: 0;
+}
+
+// ── Viz 7: Dual anti-pattern cards ───────────────────────────────────────────
+
+.vizDualAP {
+  display: flex;
+  gap: $portfolio-spacer-1x;
+  width: 100%;
+  max-width: 480px;
+}
+
+.vizDualAPCard {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: $portfolio-spacer-0-25x;
+  padding: $portfolio-spacer-0-5x $portfolio-spacer-1x;
+  background: $portfolio-neutral-00;
+  border: 1px solid $portfolio-accent-30;
+  border-radius: $portfolio-radius-sm;
+}
+
+.vizDualAPHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.vizDualAPId {
+  font-family: $portfolio-font-mono;
+  font-size: $portfolio-type-xs;
+  font-weight: $portfolio-weight-semibold;
+  color: $portfolio-accent-70;
+}
+
+.vizDualAPBadge {
+  font-size: $portfolio-type-3xs;
+  font-weight: $portfolio-weight-medium;
+  color: $portfolio-text-neutral-subtle;
+  background: $portfolio-neutral-10;
+  padding: 1px 6px;
+  border-radius: $portfolio-radius-xs;
+}
+
+.vizDualAPName {
+  font-size: $portfolio-type-2xs;
+  color: $portfolio-text-neutral-regular;
+  line-height: $portfolio-leading-relaxed;
+}
+
+.vizDualAPMeta {
+  display: flex;
+  align-items: center;
+  gap: $portfolio-spacer-0-25x;
+  margin-top: 2px;
+}
+
+.vizDualAPNew {
+  font-size: $portfolio-type-3xs;
+  font-weight: $portfolio-weight-semibold;
+  color: $portfolio-accent-70;
+}
+
+.vizCounterPill {
+  font-family: $portfolio-font-mono;
+  font-size: $portfolio-type-3xs;
+  padding: 1px 6px;
+  background: $portfolio-neutral-10;
+  border: 1px solid $portfolio-border-neutral-minimal;
+  border-radius: $portfolio-radius-xs;
+  color: $portfolio-text-neutral-regular;
+}
+
+// ── Viz 8: Guardrail ─────────────────────────────────────────────────────────
+
+.vizGuardrail {
+  display: flex;
+  flex-direction: column;
+  gap: $portfolio-spacer-1-5x;
+  width: 100%;
+  max-width: 400px;
+}
+
+.vizGuardrailMeter {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  position: relative;
+  padding: 0 $portfolio-spacer-1x;
+}
+
+.vizGuardrailTrack {
+  position: absolute;
+  top: 14px;
+  left: 28px;
+  right: 28px;
+  height: 3px;
+  background: $portfolio-neutral-20;
+  z-index: 0;
+}
+
+.vizGuardrailTrackFill {
+  height: 100%;
+  width: 100%;
+  background: $portfolio-accent-60;
+}
+
+.vizGuardrailTier {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  z-index: 1;
+}
+
+.vizGuardrailDot {
+  width: 28px;
+  height: 28px;
+  border-radius: $portfolio-radius-full;
+  border: 2px solid $portfolio-neutral-30;
+  background: $portfolio-neutral-00;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: $portfolio-font-mono;
+  font-size: $portfolio-type-2xs;
+  color: $portfolio-text-neutral-minimal;
+}
+
+.vizGuardrailDotActive {
+  border-color: $portfolio-accent-60;
+  background: $portfolio-accent-60;
+  color: $portfolio-neutral-00;
+}
+
+.vizGuardrailTierLabel {
+  font-size: $portfolio-type-3xs;
+  color: $portfolio-text-neutral-minimal;
+}
+
+.vizGuardrailTierLabelActive {
+  color: $portfolio-text-neutral-bold;
+  font-weight: $portfolio-weight-semibold;
+}
+
+.vizGuardrailRule {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: $portfolio-spacer-0-5x $portfolio-spacer-1x;
+  background: $portfolio-neutral-00;
+  border: 1px solid $portfolio-accent-30;
+  border-left: 3px solid $portfolio-accent-60;
+  border-radius: $portfolio-radius-sm;
+}
+
+.vizGuardrailRuleHeader {
+  font-family: $portfolio-font-mono;
+  font-size: $portfolio-type-2xs;
+  font-weight: $portfolio-weight-semibold;
+  color: $portfolio-accent-70;
+}
+
+.vizGuardrailRuleText {
+  font-size: $portfolio-type-2xs;
+  color: $portfolio-text-neutral-regular;
+  line-height: $portfolio-leading-relaxed;
+}
+
+// ── Transport bar ────────────────────────────────────────────────────────────
+
+.transport {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $portfolio-spacer-0-5x 0;
+  border-top: 1px solid $portfolio-border-neutral-minimal;
+}
+
+.transportControls {
+  display: flex;
+  align-items: center;
+  gap: $portfolio-spacer-0-25x;
+}
+
+.transportBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid $portfolio-border-neutral-minimal;
+  border-radius: $portfolio-radius-sm;
+  background: $portfolio-neutral-00;
+  color: $portfolio-text-neutral-regular;
+  font-size: $portfolio-type-sm;
+  cursor: pointer;
+
+  &:hover {
+    background: $portfolio-neutral-10;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $portfolio-focus;
+    outline-offset: 2px;
+  }
+}
+
+.transportPlayBtn {
+  width: 32px;
+  height: 32px;
+  border-radius: $portfolio-radius-full;
+  border-color: $portfolio-accent-60;
+  color: $portfolio-accent-60;
+  font-size: $portfolio-type-xs;
+}
+
+.transportCounter {
+  font-family: $portfolio-font-mono;
+  font-size: $portfolio-type-xs;
+  color: $portfolio-text-neutral-subtle;
+}
+
+.transportSpeed {
+  display: flex;
+  align-items: center;
+  gap: $portfolio-spacer-0-25x;
+}
+
+.transportSpeedBtn {
+  padding: 2px $portfolio-spacer-0-5x;
+  border: 1px solid $portfolio-border-neutral-minimal;
+  border-radius: $portfolio-radius-xs;
+  background: $portfolio-neutral-00;
+  font-family: $portfolio-font-mono;
+  font-size: $portfolio-type-3xs;
+  color: $portfolio-text-neutral-subtle;
+  cursor: pointer;
+
+  &:hover {
+    background: $portfolio-neutral-10;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $portfolio-focus;
+    outline-offset: 2px;
+  }
+}
+
+.transportSpeedBtnActive {
+  background: $portfolio-accent-10;
+  border-color: $portfolio-accent-30;
+  color: $portfolio-accent-70;
+  font-weight: $portfolio-weight-semibold;
+}
+
+// ── Reduced motion ───────────────────────────────────────────────────────────
+
+@media (prefers-reduced-motion: reduce) {
+  .stepDot,
+  .stepTrackFill {
+    transition: none;
+  }
+}

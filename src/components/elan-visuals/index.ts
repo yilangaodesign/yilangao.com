@@ -3,3 +3,6 @@ export { default as ComponentShowcase } from "./ComponentShowcase";
 export { default as EscalationTimeline } from "./EscalationTimeline";
 export { default as InteractionShowcase } from "./InteractionShowcase";
 export { default as IncidentDensityMap } from "./IncidentDensityMap";
+export { default as CollaborationLoop } from "./CollaborationLoop";
+export { default as SkillMap } from "./SkillMap";
+export { default as MaturityTimeline } from "./MaturityTimeline";

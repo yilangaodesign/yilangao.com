@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { uploadMedia } from '@/components/inline-edit/api'
+import MediaRenderer from '@/components/ui/MediaRenderer/MediaRenderer'
 import styles from './ProjectEditModal.module.scss'
 
 interface MediaDoc {
@@ -19,7 +20,8 @@ export interface ProjectForEdit {
   introBlurbHeadline?: string
   category: string
   coverImage?: string | null
-  heroImageId?: string | number | null
+  coverMimeType?: string | null
+  thumbnailId?: string | number | null
 }
 
 interface ProjectEditModalProps {
@@ -33,7 +35,8 @@ export default function ProjectEditModal({ project, onClose, onSaved }: ProjectE
   const [introBlurbHeadline, setIntroBlurbHeadline] = useState(project.introBlurbHeadline ?? '')
   const [category, setCategory] = useState(project.category)
   const [coverUrl, setCoverUrl] = useState(project.coverImage ?? null)
-  const [heroImageId, setHeroImageId] = useState<number | string | null>(project.heroImageId ?? null)
+  const [coverMimeType, setCoverMimeType] = useState<string | null>(project.coverMimeType ?? null)
+  const [thumbnailId, setThumbnailId] = useState<number | string | null>(project.thumbnailId ?? null)
 
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -50,7 +53,7 @@ export default function ProjectEditModal({ project, onClose, onSaved }: ProjectE
     if (mediaLoaded) return
     setMediaLoading(true)
     try {
-      const res = await fetch('/api/media?limit=30&sort=-createdAt&where[mimeType][like]=image', {
+      const res = await fetch('/api/media?limit=30&sort=-createdAt', {
         credentials: 'include',
       })
       if (res.ok) {
@@ -80,7 +83,8 @@ export default function ProjectEditModal({ project, onClose, onSaved }: ProjectE
     try {
       const media = await uploadMedia(file, file.name.replace(/\.[^.]+$/, ''))
       setCoverUrl(media.url)
-      setHeroImageId(media.id)
+      setCoverMimeType(file.type || null)
+      setThumbnailId(media.id)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Upload failed')
     } finally {
@@ -90,9 +94,9 @@ export default function ProjectEditModal({ project, onClose, onSaved }: ProjectE
   }, [])
 
   const selectMedia = useCallback((doc: MediaDoc) => {
-    const thumbUrl = doc.sizes?.thumbnail?.url ?? doc.url
-    setCoverUrl(thumbUrl !== doc.url ? doc.url : doc.url)
-    setHeroImageId(doc.id)
+    setCoverUrl(doc.url)
+    setCoverMimeType(doc.mimeType ?? null)
+    setThumbnailId(doc.id)
     setBrowseOpen(false)
   }, [])
 
@@ -104,7 +108,7 @@ export default function ProjectEditModal({ project, onClose, onSaved }: ProjectE
       if (title !== project.title) body.title = title
       if (introBlurbHeadline !== (project.introBlurbHeadline ?? '')) body.introBlurbHeadline = introBlurbHeadline
       if (category !== project.category) body.category = category
-      if (heroImageId !== project.heroImageId) body.heroImage = heroImageId
+      if (thumbnailId !== project.thumbnailId) body.thumbnail = thumbnailId
 
       if (Object.keys(body).length === 0) {
         onClose()
@@ -129,7 +133,7 @@ export default function ProjectEditModal({ project, onClose, onSaved }: ProjectE
     } finally {
       setSaving(false)
     }
-  }, [title, introBlurbHeadline, category, heroImageId, project, onClose, onSaved])
+  }, [title, introBlurbHeadline, category, thumbnailId, project, onClose, onSaved])
 
   const openDashboard = useCallback(() => {
     window.open(`/admin/collections/projects/${project.id}`, '_blank')
@@ -168,7 +172,7 @@ export default function ProjectEditModal({ project, onClose, onSaved }: ProjectE
             <label className={styles.fieldLabel}>Cover Image</label>
             <div className={styles.coverPreview}>
               {coverUrl ? (
-                <img src={coverUrl} alt="Cover preview" className={styles.coverImg} />
+                <MediaRenderer src={coverUrl} mimeType={coverMimeType} alt="Cover preview" className={styles.coverImg} />
               ) : (
                 <div className={styles.coverPlaceholder}>
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden>
@@ -213,7 +217,7 @@ export default function ProjectEditModal({ project, onClose, onSaved }: ProjectE
               <input
                 ref={fileRef}
                 type="file"
-                accept="image/*"
+                accept="image/*,video/*"
                 onChange={handleFileUpload}
                 className={styles.hiddenInput}
                 tabIndex={-1}
@@ -237,16 +241,24 @@ export default function ProjectEditModal({ project, onClose, onSaved }: ProjectE
                         type="button"
                         className={[
                           styles.mediaThumbnail,
-                          heroImageId === doc.id ? styles.mediaThumbnailSelected : '',
+                          thumbnailId === doc.id ? styles.mediaThumbnailSelected : '',
                         ].filter(Boolean).join(' ')}
                         onClick={() => selectMedia(doc)}
                         title={doc.filename}
                       >
-                        <img
-                          src={doc.sizes?.thumbnail?.url ?? doc.url}
-                          alt={doc.filename}
-                          className={styles.mediaThumbnailImg}
-                        />
+                        {doc.mimeType?.startsWith('video/') ? (
+                          <div className={styles.mediaThumbnailImg} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden>
+                              <polygon points="5,3 19,12 5,21" fill="currentColor" />
+                            </svg>
+                          </div>
+                        ) : (
+                          <img
+                            src={doc.sizes?.thumbnail?.url ?? doc.url}
+                            alt={doc.filename}
+                            className={styles.mediaThumbnailImg}
+                          />
+                        )}
                       </button>
                     ))}
                   </div>
