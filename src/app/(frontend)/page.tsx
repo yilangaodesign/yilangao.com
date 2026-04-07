@@ -51,7 +51,7 @@ const FALLBACK_TESTIMONIALS = [
 ];
 
 export default async function Home() {
-  let projects: { id?: string | number; slug: string; title: string; introBlurbHeadline?: string; category: string; featured: boolean; coverImage?: string | null; heroImageId?: string | number | null }[] = FALLBACK_PROJECTS;
+  let projects: { id?: string | number; slug: string; title: string; introBlurbHeadline?: string; category: string; featured: boolean; coverImage?: string | null; coverMimeType?: string | null; thumbnailId?: string | number | null }[] = FALLBACK_PROJECTS;
   let testimonials: { id?: string | number; text: string; textHtml?: string; name: string; role: string; avatarUrl?: string | null; linkedinUrl?: string | null }[] = FALLBACK_TESTIMONIALS;
   let teams = FALLBACK_TEAMS;
   let links = FALLBACK_LINKS;
@@ -75,7 +75,8 @@ export default async function Home() {
 
     if (projectsRes.docs.length > 0) {
       projects = projectsRes.docs.map((p) => {
-        const hero = p.heroImage as { id?: string | number; url?: string } | null | undefined;
+        const thumb = (p as Record<string, unknown>).thumbnail as { id?: string | number; url?: string; mimeType?: string } | null | undefined;
+        const hero = p.heroImage as { id?: string | number; url?: string; mimeType?: string } | null | undefined;
         return {
           id: p.id,
           slug: p.slug,
@@ -83,8 +84,9 @@ export default async function Home() {
           introBlurbHeadline: (p as Record<string, unknown>).introBlurbHeadline as string | undefined,
           category: p.category,
           featured: p.featured ?? false,
-          coverImage: hero?.url ?? null,
-          heroImageId: hero?.id ?? null,
+          coverImage: thumb?.url ?? hero?.url ?? null,
+          coverMimeType: thumb?.mimeType ?? hero?.mimeType ?? null,
+          thumbnailId: thumb?.id ?? null,
         };
       });
     }

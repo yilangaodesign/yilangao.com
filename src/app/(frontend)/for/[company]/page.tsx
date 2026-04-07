@@ -5,21 +5,32 @@ import LoginClient from "./LoginClient";
 
 type Props = {
   params: Promise<{ company: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
-export default async function LoginPage({ params }: Props) {
+export default async function LoginPage({ params, searchParams }: Props) {
   const { company } = await params;
+  const query = await searchParams;
 
-  const existingSession = await getCompanyFromSession();
-  if (existingSession) {
-    redirect("/");
+  const isDevPreview =
+    process.env.NODE_ENV === "development" && query.preview === "true";
+
+  if (!isDevPreview) {
+    const existingSession = await getCompanyFromSession();
+    if (existingSession) {
+      redirect("/");
+    }
   }
 
   const config = await getCompanyBySlug(company);
 
   const theme = config && config.active
-    ? { accent: config.accent, greeting: config.greeting, companyName: config.name }
-    : { accent: "#888888", greeting: "Welcome", companyName: null };
+    ? {
+        accent: config.accent || null,
+        greeting: config.greeting,
+        companyName: config.name,
+      }
+    : { accent: null, greeting: "Welcome", companyName: null };
 
   return (
     <LoginClient

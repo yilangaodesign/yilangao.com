@@ -1,14 +1,43 @@
-@use "../../../../styles/tokens/colors" as *;
-@use "../../../../styles/tokens/typography" as *;
-@use "../../../../styles/tokens/spacing" as *;
+@use "../../../../styles" as *;
 
 .page {
   display: flex;
-  align-items: center;
   justify-content: center;
   min-height: 100dvh;
-  padding: $portfolio-spacer-6x;
   background: var(--portfolio-surface-primary);
+}
+
+.inner {
+  display: flex;
+  width: 100%;
+  max-width: 1120px;
+  min-height: 100dvh;
+}
+
+.canvasPane {
+  flex: 0 0 50%;
+  height: 100dvh;
+  overflow: hidden;
+  position: relative;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
+}
+
+.canvas {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  inset: 0;
+}
+
+.formPane {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $portfolio-spacer-6x;
 }
 
 .card {
@@ -16,117 +45,56 @@
   max-width: 380px;
   display: flex;
   flex-direction: column;
-  gap: $portfolio-spacer-5x;
+  gap: 0;
 }
 
 .header {
-  display: flex;
-  flex-direction: column;
-  gap: $portfolio-spacer-1-5x;
+  margin-bottom: $portfolio-spacer-4x;
 }
 
 .greeting {
-  font-family: var(--portfolio-font-sans);
-  font-size: var(--portfolio-type-xl);
-  font-weight: var(--portfolio-weight-semibold);
+  font-family: $portfolio-font-pixel-line;
+  font-size: 5.25rem;
+  font-weight: $portfolio-weight-medium;
   color: var(--portfolio-text-neutral-bold);
-  line-height: var(--portfolio-leading-tight);
-}
-
-.subtitle {
-  font-family: var(--portfolio-font-sans);
-  font-size: var(--portfolio-type-sm);
-  font-weight: var(--portfolio-weight-regular);
-  color: var(--portfolio-text-neutral-subtle);
-  line-height: var(--portfolio-leading-normal);
-}
-
-.accentBar {
-  width: 32px;
-  height: 3px;
-  border-radius: 2px;
+  line-height: 1;
 }
 
 .form {
   display: flex;
   flex-direction: column;
-  gap: $portfolio-spacer-3x;
+  gap: $portfolio-spacer-1-5x;
 }
 
-.inputGroup {
-  display: flex;
-  flex-direction: column;
-  gap: $portfolio-spacer-1x;
-}
-
-.label {
-  font-family: var(--portfolio-font-mono);
-  font-size: var(--portfolio-type-3xs);
-  font-weight: var(--portfolio-weight-medium);
-  color: var(--portfolio-text-neutral-subtle);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
-.input {
-  width: 100%;
-  padding: $portfolio-spacer-2-5x $portfolio-spacer-3x;
-  font-family: var(--portfolio-font-mono);
-  font-size: var(--portfolio-type-sm);
-  color: var(--portfolio-text-neutral-bold);
-  background: var(--portfolio-surface-neutral-minimal);
-  border: 1px solid var(--portfolio-border-neutral-subtle);
-  border-radius: 8px;
-  outline: none;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
-
-  &::placeholder {
-    color: var(--portfolio-text-neutral-minimal);
-  }
-
-  &:focus {
-    border-color: var(--accent-color, var(--portfolio-border-brand-bold));
-    box-shadow: 0 0 0 3px color-mix(in oklch, var(--accent-color, #{$portfolio-accent-40}) 15%, transparent);
-  }
-}
-
-.submit {
-  width: 100%;
-  padding: $portfolio-spacer-2-5x $portfolio-spacer-4x;
-  font-family: var(--portfolio-font-sans);
-  font-size: var(--portfolio-type-sm);
-  font-weight: var(--portfolio-weight-medium);
-  color: var(--portfolio-text-always-light-bold);
-  background: var(--accent-color, var(--portfolio-surface-brand-bold));
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: opacity 0.15s ease, transform 0.1s ease;
+// Per-company accent override for DS Button.
+// Ancestor chain ensures specificity beats Button.module.scss's .highlight.bold:hover.
+.page .inner .formPane .card .submit {
+  background-color: var(--accent-color, var(--portfolio-action-brand-bold));
 
   &:hover:not(:disabled) {
-    opacity: 0.9;
+    background-color: var(--accent-color, var(--portfolio-action-brand-bold));
+    opacity: var(--portfolio-opacity-hover);
   }
 
   &:active:not(:disabled) {
-    transform: scale(0.98);
+    background-color: var(--accent-color, var(--portfolio-action-brand-bold));
   }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-}
-
-.error {
-  font-family: var(--portfolio-font-sans);
-  font-size: var(--portfolio-type-xs);
-  color: var(--portfolio-text-negative);
-  min-height: 1.4em;
 }
 
 .footer {
+  margin-top: $portfolio-spacer-2x;
   font-family: var(--portfolio-font-sans);
-  font-size: var(--portfolio-type-3xs);
-  color: var(--portfolio-text-neutral-minimal);
+  font-size: $portfolio-type-xs;
+  color: var(--portfolio-text-neutral-subtle);
   text-align: center;
+}
+
+.footerLink {
+  color: var(--portfolio-text-neutral-regular);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+
+  &:hover {
+    color: var(--portfolio-text-neutral-bold);
+  }
 }

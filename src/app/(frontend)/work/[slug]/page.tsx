@@ -16,7 +16,11 @@ const HERO_METRICS: Record<string, { value: string; label: string; tooltip?: str
     label: "usability improvement",
     tooltip: "Perceived ease-of-use scores from task-based evaluations with the customer success team. Scores rose from 60 to 95 out of 100.",
   },
-  "elan-design-system": { value: "54", label: "design corrections the agent will never make twice" },
+  "elan-design-system": {
+    value: "15 \u2192 3",
+    label: "Avg corrections / session",
+    tooltip: "Correction density across 40+ sessions over 8 days. Early sessions averaged 15 fundamental corrections (wrong tokens, inverted hierarchy, generic positioning). Late sessions averaged 3 refinement-level adjustments (voice register, headline technique, portfolio diversity).",
+  },
   meteor: {
     value: "95%",
     label: "noise reduction",
@@ -49,20 +53,20 @@ const COVER_IMAGES: Record<string, string> = {
 
 const INTERACTIVE_VISUALS: Record<string, Record<string, { component: string; playgroundUrl: string; playgroundLabel: string }>> = {
   "elan-design-system": {
-    "How the System Learns": {
-      component: "IncidentDensityMap",
+    "Not the Components": {
+      component: "CollaborationLoop",
       playgroundUrl: "https://yilangao-design-system.vercel.app",
-      playgroundLabel: "Explore the full design system →",
+      playgroundLabel: "Explore the full design system \u2192",
     },
-    "Naming as Documentation": {
-      component: "TokenGrid",
-      playgroundUrl: "https://yilangao-design-system.vercel.app/tokens/colors",
-      playgroundLabel: "Explore the color system in the playground →",
+    "The System Behind the System": {
+      component: "SkillMap",
+      playgroundUrl: "https://yilangao-design-system.vercel.app",
+      playgroundLabel: "Explore the full design system \u2192",
     },
-    "One Component, Seven Corrections": {
-      component: "InteractionShowcase",
-      playgroundUrl: "https://yilangao-design-system.vercel.app/components/scroll-spy",
-      playgroundLabel: "Try the ScrollSpy in the playground →",
+    "The Rising Floor": {
+      component: "MaturityTimeline",
+      playgroundUrl: "https://yilangao-design-system.vercel.app",
+      playgroundLabel: "Explore the full design system \u2192",
     },
   },
 };
@@ -111,12 +115,12 @@ function mapContentBlocks(rawBlocks: RawBlock[]): ContentBlock[] {
       case 'imageGroup': {
         const images = (b.images ?? [])
           .map((img) => {
-            const media = img.image as { url?: string } | null
+            const media = img.image as { url?: string; mimeType?: string } | null
             const url = media?.url ?? null
             if (!url) return null
-            return { url, caption: img.caption ?? undefined }
+            return { url, mimeType: media?.mimeType ?? undefined, caption: img.caption ?? undefined }
           })
-          .filter(Boolean) as { url: string; caption?: string }[]
+          .filter(Boolean) as { url: string; mimeType?: string; caption?: string }[]
         return {
           ...base,
           blockType: 'imageGroup' as const,
@@ -129,11 +133,12 @@ function mapContentBlocks(rawBlocks: RawBlock[]): ContentBlock[] {
       case 'divider':
         return { ...base, blockType: 'divider' as const }
       case 'hero': {
-        const heroMedia = b.image as { url?: string } | null
+        const heroMedia = b.image as { url?: string; mimeType?: string } | null
         return {
           ...base,
           blockType: 'hero' as const,
           imageUrl: heroMedia?.url ?? undefined,
+          mimeType: heroMedia?.mimeType ?? undefined,
           caption: b.caption ?? undefined,
           placeholderLabel: b.placeholderLabel as string | undefined,
         }

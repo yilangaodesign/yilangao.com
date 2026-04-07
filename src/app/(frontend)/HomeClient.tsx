@@ -37,6 +37,7 @@ import {
 } from "@/components/inline-edit";
 import type { ApiTarget, FieldDefinition } from "@/components/inline-edit";
 import { Eyebrow } from "@/components/ui/Eyebrow";
+import MediaRenderer from "@/components/ui/MediaRenderer/MediaRenderer";
 import styles from "./page.module.scss";
 
 type Project = {
@@ -47,7 +48,8 @@ type Project = {
   category: string;
   featured: boolean;
   coverImage?: string | null;
-  heroImageId?: string | number | null;
+  coverMimeType?: string | null;
+  thumbnailId?: string | number | null;
 };
 
 type Team = { name: string; url: string; period: string };
@@ -81,8 +83,9 @@ function ProjectCard({ project, isAdmin, onEdit }: { project: Project; isAdmin?:
     <Link href={`/work/${project.slug}`} className={`${styles.projectCard} ${project.featured ? styles.projectCardFeatured : ""}`}>
       <div className={styles.projectHero}>
         {project.coverImage ? (
-          <img
+          <MediaRenderer
             src={project.coverImage}
+            mimeType={project.coverMimeType}
             alt={`${project.title} cover`}
             className={styles.projectCoverImg}
           />
@@ -325,7 +328,8 @@ export default function HomeClient({
       introBlurbHeadline: p.introBlurbHeadline ?? '',
       category: p.category,
       coverImage: p.coverImage ?? null,
-      heroImageId: p.heroImageId ?? null,
+      coverMimeType: p.coverMimeType ?? null,
+      thumbnailId: p.thumbnailId ?? null,
     });
   }, []);
 

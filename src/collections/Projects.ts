@@ -81,12 +81,20 @@ export const Projects: CollectionConfig = {
               },
             },
             {
+              name: 'thumbnail',
+              type: 'upload',
+              relationTo: 'media',
+              admin: {
+                description: 'Masonry grid thumbnail — independent of the case study hero. Shown on the homepage card.',
+              },
+            },
+            {
               name: 'heroImage',
               type: 'upload',
               relationTo: 'media',
               admin: {
-                description: 'Legacy field — use a hero block in content instead',
-                condition: (_data, siblingData) => !!(siblingData as Record<string, unknown>)?.heroImage,
+                description: 'Deprecated — thumbnails use the "thumbnail" field; hero uses content blocks.',
+                condition: () => false,
               },
             },
             {

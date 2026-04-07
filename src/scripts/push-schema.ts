@@ -109,6 +109,13 @@ async function pushSchema() {
     EXCEPTION
       WHEN duplicate_column THEN NULL;
     END $$`,
+
+    // Add thumbnail_id to projects (independent of heroImage)
+    `DO $$ BEGIN
+      ALTER TABLE "projects" ADD COLUMN "thumbnail_id" integer REFERENCES "media"("id") ON DELETE SET NULL;
+    EXCEPTION
+      WHEN duplicate_column THEN NULL;
+    END $$`,
   ]
 
   for (const sql of statements) {

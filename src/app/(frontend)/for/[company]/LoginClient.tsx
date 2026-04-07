@@ -1,22 +1,40 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useEffect, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 import { validatePassword } from "./actions";
+import { Input } from "@/components/ui/Input";
+import { Button } from "@/components/ui/Button";
 import styles from "./login.module.scss";
+
+const HalftonePortrait = dynamic(() => import("./HalftonePortrait"), {
+  ssr: false,
+});
 
 type Props = {
   company: string;
-  accent: string;
+  accent: string | null;
   greeting: string;
   companyName: string | null;
 };
 
 export default function LoginClient({ company, accent, greeting, companyName }: Props) {
+  const trimmedName = companyName?.trim();
+  const headline = trimmedName ? `${greeting}, ${trimmedName}` : greeting;
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isPending, startTransition] = useTransition();
+  const [showCanvas, setShowCanvas] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 769px)");
+    setShowCanvas(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setShowCanvas(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -36,51 +54,55 @@ export default function LoginClient({ company, accent, greeting, companyName }: 
   return (
     <div
       className={styles.page}
-      style={{ "--accent-color": accent } as React.CSSProperties}
+      style={accent ? { "--accent-color": accent } as React.CSSProperties : undefined}
     >
-      <div className={styles.card}>
-        <div className={styles.header}>
-          <div className={styles.accentBar} style={{ backgroundColor: accent }} />
-          <h1 className={styles.greeting}>{greeting}</h1>
-          <p className={styles.subtitle}>
-            {companyName
-              ? `This portfolio was prepared for ${companyName}. Enter the password I shared to continue.`
-              : "Enter the password I shared to view my portfolio."}
-          </p>
+      <div className={styles.inner}>
+        <div className={styles.canvasPane}>
+          {showCanvas && (
+            <HalftonePortrait videoSrc="/videos/portrait.mp4" className={styles.canvas} />
+          )}
         </div>
+        <div className={styles.formPane}>
+          <div className={styles.card}>
+            <div className={styles.header}>
+              <h1 className={styles.greeting}>{headline}</h1>
+            </div>
 
-        <form className={styles.form} onSubmit={handleSubmit}>
-          <div className={styles.inputGroup}>
-            <label htmlFor="password" className={styles.label}>
-              Password
-            </label>
-            <input
-              id="password"
-              type="password"
-              className={styles.input}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter password"
-              autoFocus
-              autoComplete="off"
-              disabled={isPending}
-            />
-          </div>
-          <div className={styles.error} role="alert">
-            {error}
-          </div>
-          <button
-            type="submit"
-            className={styles.submit}
-            disabled={isPending || !password.trim()}
-          >
-            {isPending ? "Verifying…" : "View Portfolio"}
-          </button>
-        </form>
+            <form className={styles.form} onSubmit={handleSubmit}>
+              <Input
+                label="Password"
+                type="password"
+                size="lg"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter password"
+                autoFocus
+                autoComplete="off"
+                disabled={isPending}
+                status={error ? "error" : "none"}
+                feedbackMessage={error || undefined}
+              />
+              <Button
+                appearance="highlight"
+                emphasis="bold"
+                size="lg"
+                fullWidth
+                type="submit"
+                disabled={isPending || !password.trim()}
+                className={styles.submit}
+              >
+                {isPending ? "Verifying\u2026" : "View Portfolio"}
+              </Button>
+            </form>
 
-        <p className={styles.footer}>
-          Yilan Gao · Portfolio Preview
-        </p>
+            <p className={styles.footer}>
+              Having trouble? Reach me at{" "}
+              <a href="mailto:yilangaodesign@gmail.com" className={styles.footerLink}>
+                yilangaodesign@gmail.com
+              </a>
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );

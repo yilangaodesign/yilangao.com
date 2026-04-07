@@ -3,20 +3,56 @@ import { getPayload } from 'payload'
 import config from '@payload-config'
 import { markdownToLexical, createCaseStudyBlocks } from '@/lib/content-helpers'
 
+const BLURB_HEADLINE = "You're looking at the wrong part."
+
+const BLURB_BODY =
+  "I built a design system for vibe coding. You've probably heard this story before. You may have built your own, or at least thought about it.\n\nThis isn't about that. Everyone's excited about making design systems readable to agents. I want to show you what happened when I documented the failures instead - each correction became a rule the agent couldn't break next time. After forty sessions, the corrections nearly disappeared. Not because the work got easier."
+
+const SCOPE_STATEMENT =
+  "Élan spans three Next.js apps with tokens, components, and a playground, published as an npm package. I'm the sole designer and engineer. The visual layer took effort, but it's not where most of the time went. Underneath: 16 skills routing my corrections into documentation, 130+ anti-patterns encoding what not to repeat, and an escalation protocol deciding when a rule stops being optional. Over 40+ sessions, corrections dropped from 15 fundamental issues per session to 3 refinement-level ones."
+
+const CONTENT_BLOCKS = createCaseStudyBlocks(
+  [
+    {
+      heading: 'Not the Components',
+      bodyMarkdown:
+        "The tokens, components, and playground are real and they work. But every hour I spent on the collaboration architecture was an hour not spent polishing what's on screen. That trade-off shows. Below is what it bought: one correction traced from my feedback to permanent rule.",
+      layout: 'stacked',
+      imagePlaceholders: [
+        'Before and after: the same design task handled in session 1 vs. session 40',
+      ],
+    },
+    {
+      heading: 'The System Behind the System',
+      bodyMarkdown:
+        "I wrote rules for the agent. It ignored some of them. The same playground verification got skipped six times before I made it mandatory. Figuring out where that line sits - when a suggestion needs to become a constraint - is where most of the design time actually went.",
+      layout: 'stacked',
+    },
+    {
+      heading: 'The Rising Floor',
+      bodyMarkdown:
+        "Early on, I was correcting spacing tokens and inverted hierarchy. Basic stuff. By the end, the corrections looked different: is this headline technique reused from another case study? Should the tone shift here? The agent didn't get smarter. The rules just accumulated what I kept fixing.",
+      layout: 'stacked',
+    },
+  ],
+  {
+    heroPlaceholderLabel:
+      'Hero - Élan Design System: design playground with token architecture and interactive components',
+  },
+)
+
 const ELAN_DATA = {
-  title: '\u00c9lan Design System',
+  title: 'Élan Design System',
   slug: 'elan-design-system',
-  category: 'Design Systems \u00b7 Design Infrastructure',
+  category: 'Design Systems \u00b7 AI Collaboration Architecture',
   featured: true,
-  order: 2,
-  introBlurbHeadline: 'Teaching Einstein to build a design system - when he\u2019s six',
-  introBlurbBody: markdownToLexical(
-    'Sounds ridiculous? That\u2019s what everyone vibe coding an app is dealing with right now. AI has the knowledge of the world - if you teach it how to use it. I\u2019ve been vibe coding since GPT came out. Every session starts from zero. Spacing rules, color decisions, interaction patterns, gone. Afraid of that default Tailwind blue-violet? Me too. I built \u00c9lan to escape AI design slop and ship components that actually look like a designer made them.'
-  ),
-  description: markdownToLexical(
-    '\u00c9lan is a design system I built from scratch as sole designer and engineer. Token architecture, component library, interactive playground, and 54 documented design patterns the agent reads before writing a single component. Every naming convention is machine-parseable. Every guardrail comes from a real correction, not a style guide prescribed upfront. Published as an npm package, consumed by three apps, continuously evolving.'
-  ),
-  role: 'Designer & Engineer (sole creator)',
+  order: 3,
+  introBlurbHeadline: BLURB_HEADLINE,
+  introBlurbBody: markdownToLexical(BLURB_BODY),
+  description: markdownToLexical(SCOPE_STATEMENT),
+  content: CONTENT_BLOCKS,
+  sections: [],
+  role: 'Designer & Engineer',
   collaborators: [
     { name: 'AI Coding Agent (Cursor + Claude)' },
     { name: 'Open-Source Libraries (Radix UI, Carbon, Geist)' },
@@ -41,22 +77,6 @@ const ELAN_DATA = {
       href: 'https://github.com/yilangaodesign/design-system',
     },
   ],
-  content: createCaseStudyBlocks([
-    {
-      heading: 'How the System Learns',
-      bodyMarkdown: 'First time the agent broke dark mode, I wrote it down. Third time, I made it a rule. Now it checks before it touches a single color.',
-    },
-    {
-      heading: 'Naming as Documentation',
-      bodyMarkdown: 'color.surface.brand.bold - not color-1, not --primary-dark. The name tells the agent exactly what the token does. No lookup table needed.',
-    },
-    {
-      heading: 'One Component, Seven Corrections',
-      bodyMarkdown: 'ScrollSpy took four tries. Click and drag share the same pointer. Turns out you need a 3px dead zone to tell them apart. The model stays the same. The system around it sharpens.',
-    },
-  ], {
-    heroPlaceholderLabel: 'Hero — Design system component library with token architecture',
-  }),
 }
 
 export async function POST() {
@@ -65,25 +85,6 @@ export async function POST() {
   }
 
   const payload = await getPayload({ config })
-
-  const existingById = await payload.findByID({
-    collection: 'projects',
-    id: 9,
-  }).catch(() => null)
-
-  if (existingById) {
-    await payload.update({
-      collection: 'projects',
-      id: 9,
-      data: ELAN_DATA as never,
-    })
-    return NextResponse.json({
-      action: 'updated',
-      id: 9,
-      slug: 'elan-design-system',
-      url: '/work/elan-design-system',
-    })
-  }
 
   const existingBySlug = await payload.find({
     collection: 'projects',
@@ -99,7 +100,7 @@ export async function POST() {
       data: ELAN_DATA as never,
     })
     return NextResponse.json({
-      action: 'updated-existing',
+      action: 'updated',
       id: doc.id,
       slug: 'elan-design-system',
       url: '/work/elan-design-system',

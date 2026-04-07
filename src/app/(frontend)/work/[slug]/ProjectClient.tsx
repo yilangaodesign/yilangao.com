@@ -27,6 +27,9 @@ import {
   EscalationTimeline,
   InteractionShowcase,
   IncidentDensityMap,
+  CollaborationLoop,
+  SkillMap,
+  MaturityTimeline,
 } from "@/components/elan-visuals";
 import {
   DndContext,
@@ -46,6 +49,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { InfoTooltip } from "@/components/ui/Tooltip";
+import MediaRenderer from "@/components/ui/MediaRenderer/MediaRenderer";
 import elanStyles from "@/components/elan-visuals/elan-visuals.module.scss";
 import styles from "./page.module.scss";
 
@@ -54,9 +58,9 @@ import styles from "./page.module.scss";
 export type ContentBlock =
   | { id: string; blockType: 'heading'; text: string; level: 'h2' | 'h3' }
   | { id: string; blockType: 'richText'; body: string; bodyHtml?: string; bodyLexical?: Record<string, unknown> }
-  | { id: string; blockType: 'imageGroup'; layout: string; images: { url: string; caption?: string }[]; caption?: string; placeholderLabels?: string[] }
+  | { id: string; blockType: 'imageGroup'; layout: string; images: { url: string; mimeType?: string; caption?: string }[]; caption?: string; placeholderLabels?: string[] }
   | { id: string; blockType: 'divider' }
-  | { id: string; blockType: 'hero'; imageUrl?: string; caption?: string; placeholderLabel?: string };
+  | { id: string; blockType: 'hero'; imageUrl?: string; mimeType?: string; caption?: string; placeholderLabel?: string };
 
 type Collaborator = { name: string };
 type Tool = { name: string };
@@ -161,6 +165,9 @@ const VISUAL_COMPONENTS: Record<string, React.ComponentType> = {
   EscalationTimeline,
   InteractionShowcase,
   IncidentDensityMap,
+  CollaborationLoop,
+  SkillMap,
+  MaturityTimeline,
 };
 
 function InteractiveVisual({ config }: { config: InteractiveVisualConfig }) {
@@ -295,7 +302,7 @@ export default function ProjectClient({
   const [heroUploading, setHeroUploading] = useState(false);
 
   const replaceHeroImage = useCallback(async (file: File) => {
-    if (!file.type.startsWith('image/') || !p.id) return;
+    if ((!file.type.startsWith('image/') && !file.type.startsWith('video/')) || !p.id) return;
     setHeroUploading(true);
     try {
       const media = await uploadMedia(file, file.name.replace(/\.[^.]+$/, ''));
@@ -307,7 +314,6 @@ export default function ProjectClient({
         blocks[heroBlockIndex] = { ...blocks[heroBlockIndex], image: media.id };
         await updateCollectionField('projects', p.id, 'content', blocks);
       }
-      await updateCollectionField('projects', p.id, 'heroImage', media.id);
       router.refresh();
     } catch {
       // Upload errors surface via the block manager pattern
@@ -414,7 +420,7 @@ export default function ProjectClient({
       ? contentBlocks[displayIdx].originalIndex
       : (contentBlocks.length > 0 ? contentBlocks[contentBlocks.length - 1].originalIndex + 1 : 0)
 
-    const files = Array.from(e.dataTransfer.files).filter((f) => f.type.startsWith('image/'))
+    const files = Array.from(e.dataTransfer.files).filter((f) => f.type.startsWith('image/') || f.type.startsWith('video/'))
     if (files.length === 0) return
 
     blockMgr.addBlock('imageGroup', cmsIdx)
@@ -435,11 +441,12 @@ export default function ProjectClient({
       {/* ── FULL-WIDTH HERO SPLASH ── */}
       <FadeIn>
         <section className={styles.heroSection}>
-          <div className={`${styles.heroInner} ${!heroBlock?.imageUrl ? styles.heroSkeleton : ''}`}>
+          <div className={styles.heroInner}>
             {heroBlock?.imageUrl ? (
               <>
-                <img
+                <MediaRenderer
                   src={heroBlock.imageUrl}
+                  mimeType={heroBlock.mimeType}
                   alt={`${p.title} — case study cover`}
                   className={styles.heroImg}
                 />
@@ -470,7 +477,7 @@ export default function ProjectClient({
                     <input
                       ref={heroFileRef}
                       type="file"
-                      accept="image/*"
+                      accept="image/*,video/*"
                       onChange={handleHeroFileChange}
                       tabIndex={-1}
                       hidden
@@ -631,13 +638,13 @@ export default function ProjectClient({
                         label="Tools"
                         className={styles.toolTags}
                         renderItem={(t, i) => (
-                          <Badge key={i} appearance="neutral" emphasis="subtle" size="sm" shape="squared">{t.name}</Badge>
+                          <Badge key={i} appearance="neutral" emphasis="regular" size="sm" shape="squared">{t.name}</Badge>
                         )}
                       />
                     ) : (
                       <div className={styles.toolTags}>
                         {p.tools.map((t, i) => (
-                          <Badge key={i} appearance="neutral" emphasis="subtle" size="sm" shape="squared">{t.name}</Badge>
+                          <Badge key={i} appearance="neutral" emphasis="regular" size="sm" shape="squared">{t.name}</Badge>
                         ))}
                       </div>
                     )}
@@ -841,7 +848,7 @@ export default function ProjectClient({
                     const handleFileSelect = () => {
                       const input = document.createElement('input')
                       input.type = 'file'
-                      input.accept = 'image/*'
+                      input.accept = 'image/*,video/*'
                       input.multiple = true
                       input.onchange = () => {
                         const files = Array.from(input.files ?? [])
@@ -864,7 +871,7 @@ export default function ProjectClient({
                             >
                               {block.images.map((img, idx) => (
                                 <figure key={idx} className={styles.sectionFigure}>
-                                  <img src={img.url} alt={`Image ${idx + 1}`} className={styles.sectionImg} />
+                                  <MediaRenderer src={img.url} mimeType={img.mimeType} alt={`Image ${idx + 1}`} className={styles.sectionImg} />
                                   {isAdmin && projectTarget ? (
                                     <EditableText
                                       fieldId={`proj:${p.id}:content.${cmsIndex}.images.${idx}.caption`}

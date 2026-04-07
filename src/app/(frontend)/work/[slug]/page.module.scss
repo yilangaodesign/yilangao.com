@@ -63,7 +63,7 @@
   flex-direction: column;
   gap: $portfolio-spacer-3x;
   padding: $portfolio-spacer-3x;
-  background: $portfolio-surface-terra-subtle;
+  background: $portfolio-surface-terra-minimal;
   border-radius: $portfolio-radius-md;
 }
 
@@ -249,6 +249,15 @@
   aspect-ratio: 16 / 9;
   overflow: hidden;
   position: relative;
+  background: linear-gradient(
+    145deg,
+    $portfolio-neutral-10 0%,
+    $portfolio-neutral-20 40%,
+    $portfolio-neutral-10 100%
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   @media #{$elan-mq-sm} {
     border-radius: $portfolio-radius-sm;
@@ -259,19 +268,9 @@
   }
 }
 
-.heroSkeleton {
-  background: linear-gradient(
-    145deg,
-    $portfolio-neutral-10 0%,
-    $portfolio-neutral-20 40%,
-    $portfolio-neutral-10 100%
-  );
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 .heroImg {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   display: block;
