@@ -25,18 +25,26 @@ const longQuoteCode = `<TestimonialCard
   linkedinUrl="https://linkedin.com/in/example"
 />`;
 
+const withConnectionNoteCode = `<TestimonialCard
+  text="Working with Yilan raised the bar for craft and clarity across our product org."
+  name="Alex Rivera"
+  role="Design Director, Northwind"
+  linkedinUrl="https://linkedin.com/in/example"
+  connectionNote="We met through the Design Systems Collective; later collaborated on the 2024 audit."
+/>`;
+
 export default function TestimonialCardPage() {
   return (
     <Shell title="TestimonialCard">
       <div className="max-w-5xl space-y-10">
         <SectionHeading
           title="TestimonialCard"
-          description="A quote card for user testimonials. Features a decorative quotation mark, italic quote text, attribution with avatar initials, and a LinkedIn icon. Designed for the homepage masonry grid alongside project cards. Supports CMS inline editing when isAdmin=true."
+          description="A quote card for user testimonials: quotation mark, italic quote, attribution (avatar, name, role, LinkedIn). Optionally pass connectionNote to show an info tooltip about how you met the author or your relationship to them. Omit it when that context is not needed. Supports CMS inline editing when isAdmin=true."
         />
 
         <ComponentPreview
-          title="With LinkedIn URL"
-          description="Full testimonial card with clickable LinkedIn icon."
+          title="With LinkedIn URL (no connection note)"
+          description="Default variant: no info icon. Pass connectionNote only when you want the relationship / how-we-met tooltip."
           code={basicCode}
         >
           <div className="w-full flex justify-center">
@@ -84,6 +92,24 @@ export default function TestimonialCardPage() {
           </div>
         </ComponentPreview>
 
+        <ComponentPreview
+          title="With connection note (how we met)"
+          description="When connectionNote is set, an info icon appears (bottom-aligned with attribution). Hover for tooltip copy about relationship to the author."
+          code={withConnectionNoteCode}
+        >
+          <div className="w-full flex justify-center">
+            <div className="max-w-xs w-full">
+              <TestimonialCard
+                text="Working with Yilan raised the bar for craft and clarity across our product org."
+                name="Alex Rivera"
+                role="Design Director, Northwind"
+                linkedinUrl="#"
+                connectionNote="We met through the Design Systems Collective; later collaborated on the 2024 audit."
+              />
+            </div>
+          </div>
+        </ComponentPreview>
+
         <div>
           <SubsectionHeading>Props</SubsectionHeading>
           <PropsTable
@@ -122,6 +148,12 @@ export default function TestimonialCardPage() {
                 name: "isAdmin",
                 type: "boolean",
                 description: "When true, text fields become inline-editable and an EditButton appears.",
+              },
+              {
+                name: "connectionNote",
+                type: "ReactNode",
+                description:
+                  "Optional. When provided (non-empty), shows the info icon with this tooltip body — typically how you met the author or your relationship to Yilan. Omit for cards without that context.",
               },
             ]}
           />

@@ -477,6 +477,7 @@ export default function ColorsPage() {
                 </thead>
                 <tbody>
                   {[
+                    { step: 5, hex: "#FAF8F6", oklch: "0.98, 0.003, 70", w: "1.06:1", d: "17.1:1" },
                     { step: 10, hex: "#F5F1EC", oklch: "0.96, 0.008, 70", w: "1.1:1", d: "16.1:1" },
                     { step: 20, hex: "#E0D0BF", oklch: "0.87, 0.030, 70", w: "1.5:1", d: "12.0:1" },
                     { step: 30, hex: "#CCB091", oklch: "0.77, 0.053, 70", w: "2.1:1", d: "8.8:1" },

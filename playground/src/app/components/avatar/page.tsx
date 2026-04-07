@@ -20,6 +20,12 @@ const initialsCode = `import { Avatar } from "@ds/Avatar";
 <Avatar name="Alex Rivera" />
 <Avatar name="Kai" />`;
 
+const tonesCode = `import { Avatar } from "@ds/Avatar";
+
+<Avatar name="Jane Doe" tone="brand" />
+<Avatar name="Jane Doe" tone="neutral" />
+<Avatar name="Jane Doe" tone="terra" />`;
+
 const sizesCode = `import { Avatar } from "@ds/Avatar";
 
 <Avatar name="AB" size="sm" />
@@ -51,6 +57,25 @@ function InitialsDemo() {
       <Avatar name="Jane Doe" />
       <Avatar name="Alex Rivera" />
       <Avatar name="Kai" />
+    </div>
+  );
+}
+
+function TonesDemo() {
+  return (
+    <div className="flex items-end gap-4">
+      <div className="flex flex-col items-center gap-2">
+        <Avatar name="Jane Doe" tone="brand" />
+        <span className="text-xs text-muted-foreground">brand</span>
+      </div>
+      <div className="flex flex-col items-center gap-2">
+        <Avatar name="Jane Doe" tone="neutral" />
+        <span className="text-xs text-muted-foreground">neutral</span>
+      </div>
+      <div className="flex flex-col items-center gap-2">
+        <Avatar name="Jane Doe" tone="terra" />
+        <span className="text-xs text-muted-foreground">terra</span>
+      </div>
     </div>
   );
 }
@@ -116,6 +141,14 @@ export default function AvatarPage() {
         </ComponentPreview>
 
         <ComponentPreview
+          title="Tones"
+          description="Three color tones: brand (default blue-violet accent), neutral (grayscale), and terra (warm amber)."
+          code={tonesCode}
+        >
+          <TonesDemo />
+        </ComponentPreview>
+
+        <ComponentPreview
           title="Sizes"
           description="Three sizes: sm (32px), md (40px), and lg (56px)."
           code={sizesCode}
@@ -151,6 +184,13 @@ export default function AvatarPage() {
                 type: '"sm" | "md" | "lg"',
                 default: '"md"',
                 description: "Avatar size: 32px, 40px, or 56px",
+              },
+              {
+                name: "tone",
+                type: '"brand" | "neutral" | "terra"',
+                default: '"brand"',
+                description:
+                  "Color tone for the initials fallback background and text",
               },
               {
                 name: "className",
