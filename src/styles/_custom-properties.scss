@@ -44,6 +44,7 @@
   --portfolio-surface-warning-subtle: #{$portfolio-surface-warning-subtle};
   --portfolio-surface-terra-bold: #{$portfolio-surface-terra-bold};
   --portfolio-surface-terra-subtle: #{$portfolio-surface-terra-subtle};
+  --portfolio-surface-terra-minimal: #{$portfolio-surface-terra-minimal};
   --portfolio-surface-overlay: #{$portfolio-surface-overlay};
   --portfolio-surface-always-dark: #{$portfolio-surface-always-dark};
   --portfolio-surface-always-light: #{$portfolio-surface-always-light};
@@ -331,8 +332,9 @@
   --portfolio-surface-positive-subtle: #{$portfolio-green-100};
   --portfolio-surface-warning-bold: #{$portfolio-yellow-30};
   --portfolio-surface-warning-subtle: #{$portfolio-yellow-100};
-  --portfolio-surface-terra-bold: #{$portfolio-neutral-80};    // Tier 2 neutral fallback — warmth is light-mode only
-  --portfolio-surface-terra-subtle: #{$portfolio-neutral-90};  // Tier 2 neutral fallback — warmth is light-mode only
+  --portfolio-surface-terra-bold: #{$portfolio-neutral-80};      // Tier 2 neutral fallback — warmth is light-mode only
+  --portfolio-surface-terra-subtle: #{$portfolio-neutral-90};    // Tier 2 neutral fallback — warmth is light-mode only
+  --portfolio-surface-terra-minimal: #{$portfolio-neutral-100};  // Tier 2 neutral fallback — warmth is light-mode only
   --portfolio-surface-overlay: rgba(0, 0, 0, 0.7);
 
   // ── Overlay interaction states ───────────────────────────────────────────

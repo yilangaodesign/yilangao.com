@@ -63,10 +63,11 @@ $portfolio-accent-100: #070D29;  // oklch(0.17, 0.058, 269.7)
 //            Scaled at 0.480× Lumen's peak to match warm earth-tone gamut
 //   Hue — constant 70° across all steps (no hue discontinuity)
 //
-// The scale progresses from warm cream (#f5f1ec) through caramel/sienna to
-// rich umber (#170d03), providing a full-range warm accent complement to
-// Lumen's cool blue-violet.
+// The scale progresses from barely-there warmth (#faf8f6) through caramel/sienna
+// to rich umber (#170d03), providing a full-range warm accent complement to
+// Lumen's cool blue-violet. Step 05 is a custom addition (like neutral-05).
 
+$portfolio-terra-05: #faf8f6;   // oklch(0.98, 0.003, 70) — custom addition, like neutral-05
 $portfolio-terra-10: #f5f1ec;   // oklch(0.96, 0.008, 70)
 $portfolio-terra-20: #e0d0bf;   // oklch(0.87, 0.030, 70)
 $portfolio-terra-30: #ccb091;   // oklch(0.77, 0.053, 70)
@@ -240,6 +241,7 @@ $portfolio-surface-warning-bold: $portfolio-yellow-30;
 $portfolio-surface-warning-subtle: $portfolio-yellow-10;
 $portfolio-surface-terra-bold: $portfolio-terra-60;
 $portfolio-surface-terra-subtle: $portfolio-terra-10;
+$portfolio-surface-terra-minimal: $portfolio-terra-05;
 $portfolio-surface-overlay: rgba(0, 0, 0, 0.5);
 
 // — Always tokens (invariant across color modes — One GS surface/always pattern)
