@@ -136,3 +136,75 @@ export const DropdownMenuSeparator = () => (
 export function DropdownMenuShortcut({ children }: { children: ReactNode }) {
   return <span className={styles.shortcut}>{children}</span>;
 }
+
+// ---------------------------------------------------------------------------
+// Sub-menu — trigger + content for nested menus
+// ---------------------------------------------------------------------------
+
+export const DropdownMenuSubTrigger = forwardRef<
+  HTMLDivElement,
+  { children: ReactNode; className?: string }
+>(({ className, children, ...props }, ref) => (
+  <DropdownPrimitive.SubTrigger
+    ref={ref}
+    className={[menuStyles.item, styles.subTrigger, className]
+      .filter(Boolean)
+      .join(" ")}
+    {...props}
+  >
+    <span className={menuStyles.itemLabel}>{children}</span>
+    <svg
+      width="10"
+      height="10"
+      viewBox="0 0 10 10"
+      fill="none"
+      aria-hidden
+      className={styles.subChevron}
+    >
+      <path
+        d="M3.5 2L6.5 5L3.5 8"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  </DropdownPrimitive.SubTrigger>
+));
+
+DropdownMenuSubTrigger.displayName = "DropdownMenuSubTrigger";
+
+export const DropdownMenuSubContent = forwardRef<
+  HTMLDivElement,
+  DropdownMenuContentProps
+>(
+  (
+    {
+      className,
+      sideOffset = 4,
+      size = "sm",
+      appearance = "neutral",
+      ...props
+    },
+    ref,
+  ) => (
+    <DropdownPrimitive.Portal>
+      <DropdownPrimitive.SubContent
+        ref={ref}
+        className={[
+          menuStyles.menu,
+          menuStyles[size],
+          menuStyles[appearance],
+          styles.animated,
+          className,
+        ]
+          .filter(Boolean)
+          .join(" ")}
+        sideOffset={sideOffset}
+        {...props}
+      />
+    </DropdownPrimitive.Portal>
+  ),
+);
+
+DropdownMenuSubContent.displayName = "DropdownMenuSubContent";

@@ -23,6 +23,22 @@
   letter-spacing: var(--portfolio-tracking-wide);
 }
 
+.subTrigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  &[data-state='open'] {
+    background-color: var(--portfolio-surface-neutral-subtle);
+  }
+}
+
+.subChevron {
+  flex-shrink: 0;
+  margin-left: auto;
+  opacity: 0.5;
+}
+
 @keyframes slideDown {
   from { opacity: 0; transform: translateY(-4px); }
   to { opacity: 1; transform: translateY(0); }
