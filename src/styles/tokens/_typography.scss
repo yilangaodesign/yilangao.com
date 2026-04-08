@@ -3,12 +3,12 @@
 //   Token                          → Primary Font          | Category        | Role
 //   ──────────────────────────────   ─────────────────────   ──────────────   ──────────────────────
 //   $portfolio-font-sans           → Geist Sans            | Sans-serif      | Primary UI, headings, body, labels
-//   $portfolio-font-serif          → Georgia               | Serif           | Quotes only — never headings or body
+//   $portfolio-font-serif          → IBM Plex Serif         | Serif           | Case study intro title + quotes — not general headings or body
 //   $portfolio-font-mono           → Geist Mono            | Monospace       | Code + hero metrics (tabular data)
 //   $portfolio-font-pixel-*        → Geist Pixel variants  | Display/accent  | Decorative only — never UI elements
 
 $portfolio-font-sans: var(--font-geist-sans), 'Inter', system-ui, -apple-system, sans-serif;
-$portfolio-font-serif: 'Georgia', 'Times New Roman', serif;
+$portfolio-font-serif: var(--font-ibm-plex-serif), 'Georgia', serif;
 $portfolio-font-mono: var(--font-geist-mono), 'JetBrains Mono', ui-monospace, monospace;
 $portfolio-font-pixel-square: var(--font-geist-pixel-square), monospace;
 $portfolio-font-pixel-grid: var(--font-geist-pixel-grid), monospace;

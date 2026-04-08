@@ -171,7 +171,7 @@
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// QUOTES (3) — Georgia serif, regular weight, relaxed leading
+// QUOTES (3) — IBM Plex Serif, regular weight, relaxed leading
 // Serif restricted to quotes per OneGS + Carbon guidance. More selective than OneGS.
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -357,6 +357,16 @@
   font-family: $portfolio-font-sans;
   font-size: clamp(#{$portfolio-type-2xl}, 3vw + 0.5rem, #{$portfolio-type-4xl});
   font-weight: $portfolio-weight-semibold;
+  line-height: $portfolio-leading-snug;
+  letter-spacing: $portfolio-tracking-tight;
+  color: var(--portfolio-text-primary);
+}
+
+// Case study page intro title (introBlurbHeadline) — IBM Plex Serif, fluid scale aligned with heading-display-fluid, lighter weight
+@mixin heading-case-study-intro {
+  font-family: $portfolio-font-serif;
+  font-size: clamp(#{$portfolio-type-4xl}, 5vw + 1rem, #{$portfolio-type-6xl});
+  font-weight: $portfolio-weight-medium;
   line-height: $portfolio-leading-snug;
   letter-spacing: $portfolio-tracking-tight;
   color: var(--portfolio-text-primary);
