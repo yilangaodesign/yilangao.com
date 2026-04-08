@@ -77,6 +77,8 @@ runs without pausing — the content map was already approved in Phase 2.
 | 3b | Interview Defense Notes | Autonomous (output at Phase 4 checkpoint) | `portfolio-coherence.md` (employment context), project dossier |
 | 4 | Review + dossier update | Run quality checks; create/refresh project dossier | `case-study-review.md`, `content-anti-patterns.md`, `self-audit.md` |
 
+**Case study page title typography:** The `introBlurbHeadline` field renders in **IBM Plex Serif** via the shared template (`@include heading-case-study-intro` in `src/app/(frontend)/work/[slug]/page.module.scss`). Authors supply text only; font is not set in CMS.
+
 ---
 
 ## Phase 1a: Analyze Raw Materials
