@@ -4,6 +4,30 @@ All notable changes to the Élan design system are documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.7.0] — 2026-04-08
+
+Minor release: case study intro typography (IBM Plex Serif, `heading-case-study-intro`), MediaRenderer SCSS module, expanded DropdownMenu, portfolio and project page updates, CMS collection and schema-push tooling, inline-edit refinements.
+
+### Added
+
+- **MediaRenderer**: dedicated SCSS module for layout and media chrome
+- **Typography**: `heading-case-study-intro` mixin and serif token alignment with IBM Plex Serif
+- **Schema**: `push-schema.ts` extensions for Payload alignment
+
+### Changed
+
+- **DropdownMenu**: expanded styles, APIs, and exports
+- **Project / work pages**: `ProjectClient`, styles, and related server page wiring
+- **Home / company gate**: layout, login, and marketing page updates
+- **Inline edit**: `EditableText`, block manager, and token map updates
+- **CMS**: `Companies` and `Projects` collection tweaks; `company-data` and Lexical helpers
+- **Playground**: typography token documentation synced with main tokens
+- **Documentation**: engineering feedback log archival, design/engineering notes, port registry
+
+### Released with this checkpoint
+
+- **ASCII Art Studio** 0.5.2 (dev/release sync; no functional app changes in this batch)
+
 ## [2.5.0] — 2026-04-06
 
 Minor release: new Tooltip subsystem (InfoTooltip, TooltipProvider), block editor for inline editing, Etro case study API, expanded content framework.
