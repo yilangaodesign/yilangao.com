@@ -4,10 +4,32 @@
 >
 > **Who reads this:** AI agents at session start (scan recent entries for context), and during feedback processing (check for recurring patterns).
 > **Who writes this:** AI agents after each feedback cycle via the `design-iteration` skill.
-> **Last updated:** 2026-04-06 (FB-122 follow-up: Always-on skeleton + media separation)
+> **Last updated:** 2026-04-07 (FB-124: Testimonial card name in IBM Plex Serif)
 >
 > **For agent skills:** Read only the first 30 lines of this file (most recent entries) for pattern detection.
 > **Older entries:** Synthesized in `docs/design-feedback-synthesis.md`. Raw archive in `docs/design-feedback-log-archive.md`.
+
+---
+
+### FB-124: Testimonial card attribution name — IBM Plex Serif
+
+**Date:** 2026-04-07
+
+**User said:** Change the font for the user's name in the testimonial card to IBM Plex Serif, at the component level.
+
+**Resolution:** Updated `.name` in `TestimonialCard.module.scss` from `$portfolio-font-sans` to `$portfolio-font-serif`. The serif token was already loaded via `next/font/google` and available as `--font-ibm-plex-serif`. Updated `docs/design/typography.md` permitted contexts to include "testimonial attribution names." Consistent with the existing serif role (testimonial text, quotes, editorial contexts).
+
+---
+
+### FB-123: Case study page intro headline — IBM Plex Serif
+
+**Date:** 2026-04-07
+
+**User said:** Case study pages should render the header (intro blurb headline / Case Study Title) in IBM Plex Serif, including the template docs so future case studies inherit it.
+
+**Resolution:** Added `@mixin heading-case-study-intro` in `src/styles/mixins/_typography.scss` (`$portfolio-font-serif`). `.introBlurbHeadline` in `work/[slug]/page.module.scss` uses this mixin. Updated `src/styles/tokens/_typography.scss` comment for serif role. Documented in `docs/content/case-study.md` §3.2 anatomy. All case studies use `ProjectClient` + shared module, so no per-slug changes.
+
+**Follow-up (same thread):** Thinner weight (**Medium 500**) and larger fluid scale: now matches `heading-display-fluid` (4xl–6xl; was Bold 700 at 2xl–4xl, then 3xl–5xl).
 
 ---
 

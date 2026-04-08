@@ -15,7 +15,7 @@ Borrow from journalism. Lead with the conclusion (impact, outcome, key insight),
 
 ┌─────────────────┬────────────────────────────────────────┐
 │                 │                                        │
-│ ## App Name     │ # [Case Study Title: 6-10 words]       │  ← Intro Blurb (Zone 1)
+│ ## App Name     │ # [Case Study Title: 6-10 words]       │  ← Intro Blurb (Zone 1); title set in IBM Plex Serif (`heading-case-study-intro`)
 │ [descriptor]    │ [Intro body: 4-6 sentences, ≤80 words] │
 │                 │                                        │
 │ [HERO METRIC]   │ ---                                    │  ← structural divider (hook → article)

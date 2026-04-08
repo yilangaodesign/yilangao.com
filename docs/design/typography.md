@@ -16,11 +16,11 @@ Every font family has exactly one permitted role. Using a font outside its role 
 | Font | Token | Role | Permitted contexts |
 |------|-------|------|--------------------|
 | **Geist Sans** | `$portfolio-font-sans` | Primary UI | Headings, subtitles, body, labels, captions, stats, legal, helper text — all interface text |
-| **Georgia** | `$portfolio-font-serif` | Quotes only | Pull quotes, block quotes, testimonial text, case study epigraphs. NEVER headings, body, or labels. Even more selective than OneGS (which uses serif for headlines). |
+| **IBM Plex Serif** | `$portfolio-font-serif` | Editorial serif | Case study page intro title (`heading-case-study-intro` / `introBlurbHeadline`); pull quotes, block quotes, testimonial text, testimonial attribution names, epigraphs. Not general UI headings, body, or labels. Loaded via Google Fonts (`next/font/google`); CSS variable `--font-ibm-plex-serif`. Falls back to Georgia. |
 | **Geist Mono** | `$portfolio-font-mono` | Code only | Code blocks, inline code, terminal output, build hashes. NEVER data numbers, table columns, or stats. Use `font-variant-numeric: tabular-nums` on Geist Sans for numeric alignment. |
 | **Geist Pixel \*** | `$portfolio-font-pixel-*` | Decorative accent | NEVER in interface elements. Only with explicit user instruction. No semantic mixins exist for pixel fonts. **MUST use `$portfolio-weight-medium` (500) — the only weight these fonts ship with. Any other weight triggers synthetic bolding that destroys the decorative pattern.** See AP-062. |
 
-### 18.2 Semantic Mixin Catalogue (28 mixins, 9 categories)
+### 18.2 Semantic Mixin Catalogue (29 mixins, 9 categories)
 
 All mixins are in `src/styles/mixins/_typography.scss`. Usage: `@include heading-1;`
 
@@ -34,6 +34,12 @@ All mixins are in `src/styles/mixins/_typography.scss`. Usage: `@include heading
 | `heading-3` | 3xl (30px) | Semibold 600 | Snug 1.25 | Normal | Subsection titles |
 
 Fluid variants available: `heading-display-fluid`, `heading-1-fluid`, `heading-2-fluid`, `heading-3-fluid` — use `clamp()` to scale between mobile and desktop.
+
+#### Case study intro title — IBM Plex Serif
+
+| Mixin | Size | Weight | Leading | Tracking | Use |
+|-------|------|--------|---------|----------|-----|
+| `heading-case-study-intro` | 4xl–6xl (fluid, same clamp as `heading-display-fluid`) | Medium 500 | Snug 1.25 | Tight -0.02em | Case study template only: `work/[slug]/page.module.scss` `.introBlurbHeadline` |
 
 #### Subtitles — Geist Sans (adopted from OneGS)
 
@@ -60,7 +66,9 @@ Fluid variants available: `heading-display-fluid`, `heading-1-fluid`, `heading-2
 | `body-compact` | sm (14px) | Regular 400 | Compact 1.15 | Dense panels, sidebars, data tables |
 | `body-compact-xs` | xs (12px) | Regular 400 | Compact 1.15 | Very dense tables, metadata rows |
 
-#### Quotes — Georgia (adopted from OneGS + Carbon)
+#### Quotes — IBM Plex Serif (replaces Georgia; adopted from OneGS + Carbon)
+
+Italic quote styles only; the case study intro title uses `heading-case-study-intro` (serif, not italic).
 
 | Mixin | Size | Weight | Leading | Use |
 |-------|------|--------|---------|-----|

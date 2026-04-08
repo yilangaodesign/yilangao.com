@@ -1047,6 +1047,18 @@ Also update the non-admin rendering fallback to use `dangerouslySetInnerHTML` wh
 
 ---
 
+## EAP-073: `EditableText` without `inlineTypography` while applying inline HTML formatting on a Payload `text` field
+
+**Trigger:** Using default `EditableText` on a `text` field while the admin can apply bold, font weight, or font family via `contenteditable` (keyboard shortcuts or token toolbar), expecting the change to persist.
+
+**Why it's wrong:** Default `handleInput` uses `textContent`, which drops all inline markup. The preview may still show formatting until blur, but the value committed to the dirty map matches the old plain string, so save skips or overwrites with plain text.
+
+**Correct alternative:** If the field stores an HTML fragment in a `text` column, pass `inlineTypography` so `innerHTML` is captured, pass `storedValue` for accurate dirty comparison when `children` is a plain projection, pass `htmlContent` when the stored value includes tags, and use `plainTextFromInlineHtml()` for `children` where needed. If the field should be true Lexical rich text, use Payload `richText` + `isRichText` instead.
+
+**Incident:** ENG-131 (2026-04-07) — Site identity name formatting did not persist after inline edit save.
+
+---
+
 ## EAP-063: Element-level inline style on contentEditable root for per-word formatting
 
 **Trigger:** Setting `el.style.fontWeight`, `el.style.fontStyle`, or similar CSS properties directly on a `contentEditable` element to toggle formatting (bold, italic, etc.).
@@ -1227,3 +1239,51 @@ Webpack generates the routes manifest correctly. Monitor Next.js releases for a 
 **Also wrong:** Escalating to worse engineering practices (`background-image` for CMS content, inline styles) when simpler approaches don't work. Complexity escalation without diagnosis is a sign of guessing, not debugging.
 
 **Incident:** FB-122 (2026-04-06) — Hero image gap reported 5 times across 4 failed CSS fixes.
+
+---
+
+## EAP-075: Payload Schema Drift Hanging Non-Interactive Dev Server
+
+**Trigger:** A field is removed from a Payload collection schema in code, but the corresponding database column is not dropped. The dev server is started in a non-interactive shell (background process, CI, agent-controlled terminal).
+
+**Why it's wrong:** Payload's auto-push detects the schema drift and prompts interactively: "You're about to delete X column — Accept? (y/N)". In a non-interactive environment, this prompt blocks the entire Node.js process forever. The server accepts TCP connections but never responds to HTTP requests, making it look like a zombie server rather than a blocked prompt.
+
+**Correct approach:**
+1. When removing a field from a Payload collection, always drop the column via SQL BEFORE restarting the dev server: `ALTER TABLE <table> DROP COLUMN <column>`.
+2. Add column drops to `src/scripts/push-schema.ts` as `DO $$ BEGIN ... EXCEPTION WHEN undefined_column THEN NULL; END $$` blocks.
+3. If the server hangs on "Pulling schema from database..." and then stops producing output, check for an interactive prompt by reading the full terminal output — the prompt may be hidden by spinner ANSI codes.
+
+**Incident:** ENG-133 (2026-04-08) — `company_name` column removed from Projects schema but not from DB. Payload prompted for destructive schema push, blocking the server in a background shell.
+
+---
+
+## EAP-076: Repeated `.next` Cache Clears When node_modules Is Corrupted
+
+**Trigger:** The webpack dev server returns 500 on every page. The agent clears `.next` and restarts, gets the same error, clears `.next` again, tries Turbopack, gets the same error — repeatedly escalating cache clears without addressing the actual corruption source.
+
+**Why it's wrong:** When BOTH webpack and Turbopack fail with the same symptom (missing manifests, missing runtime files), the problem is not in the `.next` build cache — it's in the source artifacts that the bundler uses to generate those files. Clearing `.next` only removes the output; if the input (node_modules) is corrupted, the output will be identically broken on every rebuild.
+
+**Correct approach:**
+1. If clearing `.next` doesn't fix a bundler failure, escalate immediately to `rm -rf node_modules && npm install`.
+2. Diagnostic signal: if the error mentions missing files that the bundler should GENERATE (manifests, runtime.js, _document.js), but the `.next` directory is empty or freshly cleared, the bundler itself is broken — not the cache.
+3. Never clear `.next` more than twice for the same error. The second clear is already redundant; a third is wasted time.
+4. Next.js's "Ready in Xms" only means the HTTP listener is bound. It does NOT mean the bundler is functional. Always verify with an actual page request.
+
+**Incident:** ENG-134 (2026-04-08) — Four `.next` clears and two bundler mode switches before identifying corrupted node_modules as the root cause.
+
+---
+
+## EAP-074: Deleting Capacity Metadata on First Content Mutation / Multi-Layer Data Stripping
+
+**Trigger:** A data structure has both "capacity" metadata (e.g., `placeholderLabels` defining how many slots exist) and "content" data (e.g., `images` array). The metadata is stripped at multiple independent layers: a mutation function deletes it, a server-side mapping conditionally excludes it, and the client renders a binary all-or-nothing view.
+
+**Why it's wrong:** The capacity metadata defines the total structure (how many slots, what each slot represents). When multiple layers independently decide to strip it, fixing one layer is insufficient - the bug appears unchanged because another layer still drops the data. This makes debugging deceptive: "I fixed it but it still doesn't work" leads to confusion about whether the fix was correct.
+
+**Correct approach:**
+1. Never delete capacity/schema metadata during content mutations. The metadata is structural, not transient.
+2. Server-side mapping functions should pass metadata through unconditionally. Filtering decisions belong in the rendering layer, not the data layer.
+3. Rendering should iterate over the capacity metadata (e.g., `placeholderLabels.map`) and check per-slot whether content exists, not branch on a single boolean (`images.length > 0`).
+4. When debugging a "fix didn't work" report, trace the full data path: mutation -> storage -> fetch -> mapping -> rendering. Each layer can independently filter, transform, or discard data.
+5. Descriptive metadata (like placeholder labels) that becomes content metadata (like alt text) should be transferred at the point of content creation, not discarded.
+
+**Incident:** ENG-132 (2026-04-07) — Three independent layers stripped `placeholderLabels`: CMS mutation (`delete`), server mapping (conditional `undefined`), client rendering (binary conditional). Fixing only the first layer appeared to have no effect.
