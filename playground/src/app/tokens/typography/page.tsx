@@ -16,7 +16,7 @@ const scrollSpySections = [
 ];
 
 function getFontFamily(font: string): string | undefined {
-  if (font === "Serif") return "'Georgia', 'Times New Roman', serif";
+  if (font === "Serif") return "var(--font-ibm-plex-serif), 'Georgia', serif";
   if (font === "Mono")
     return "var(--font-geist-mono), 'JetBrains Mono', ui-monospace, monospace";
   return undefined;
@@ -29,7 +29,7 @@ export default function TypographyPage() {
       <div className="max-w-5xl">
         <SectionHeading
           title="Typography"
-          description="28 semantic mixins across 9 categories, built on a 13-step type scale. Primary face: Geist Sans. Serif (Georgia) restricted to quotes. Mono (Geist Mono) restricted to code. Informed by OneGS and IBM Carbon."
+          description="29 semantic mixins across 9 categories, built on a 13-step type scale. Primary face: Geist Sans. IBM Plex Serif for case study intro titles and quotes. Mono (Geist Mono) restricted to code. Informed by OneGS and IBM Carbon."
         />
 
         <SectionTitle id="token-architecture">Token Architecture</SectionTitle>

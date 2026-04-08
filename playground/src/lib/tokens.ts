@@ -439,7 +439,7 @@ export type TypographyCategory = {
 export const typography = {
   fonts: [
     { name: "Geist Sans", value: "var(--font-geist-sans), 'Inter', system-ui, -apple-system, sans-serif", token: "$portfolio-font-sans", category: "Sans-serif", role: "Primary UI — headings, body, labels, stats" },
-    { name: "Georgia (Serif)", value: "'Georgia', 'Times New Roman', serif", token: "$portfolio-font-serif", category: "Serif", role: "Quotes only — never headings or body" },
+    { name: "IBM Plex Serif", value: "var(--font-ibm-plex-serif), 'Georgia', serif", token: "$portfolio-font-serif", category: "Serif", role: "Case study intro title + quotes — not general UI headings or body" },
     { name: "Geist Mono", value: "var(--font-geist-mono), 'JetBrains Mono', ui-monospace, monospace", token: "$portfolio-font-mono", category: "Monospace", role: "Code only — never data numbers" },
     { name: "Geist Pixel Square", value: "var(--font-geist-pixel-square), monospace", token: "$portfolio-font-pixel-square", category: "Display / Pixel", role: "Decorative accent only" },
     { name: "Geist Pixel Grid", value: "var(--font-geist-pixel-grid), monospace", token: "$portfolio-font-pixel-grid", category: "Display / Pixel", role: "Decorative accent only" },
@@ -489,12 +489,13 @@ export const typography = {
   categories: [
     {
       name: "Headings",
-      description: "Geist Sans, bold/semibold. Fluid variants available for responsive layouts.",
+      description: "Geist Sans, bold/semibold. Fluid variants available for responsive layouts. Case study intro titles use IBM Plex Serif via heading-case-study-intro.",
       mixins: [
         { name: "heading-display", font: "Sans", size: "6xl (60px)", weight: "Bold 700", leading: "Tight 1.1", tracking: "Tight", use: "Hero sections" },
         { name: "heading-1", font: "Sans", size: "5xl (48px)", weight: "Bold 700", leading: "Tight 1.1", tracking: "Tight", use: "Page titles" },
         { name: "heading-2", font: "Sans", size: "4xl (36px)", weight: "Semibold 600", leading: "Snug 1.25", tracking: "Tight", use: "Section titles" },
         { name: "heading-3", font: "Sans", size: "3xl (30px)", weight: "Semibold 600", leading: "Snug 1.25", use: "Subsection titles" },
+        { name: "heading-case-study-intro", font: "Serif", size: "4xl–6xl (fluid)", weight: "Medium 500", leading: "Snug 1.25", tracking: "Tight", use: "Case study page intro title (introBlurbHeadline)" },
       ],
     },
     {
@@ -526,7 +527,7 @@ export const typography = {
     },
     {
       name: "Quotes",
-      description: "Georgia serif, italic. Serif restricted to quotes per OneGS + Carbon guidance.",
+      description: "IBM Plex Serif, italic. Pull quotes and block quotes; case study intro titles use heading-case-study-intro (serif, not italic).",
       mixins: [
         { name: "quote-lg", font: "Serif", size: "2xl (24px)", weight: "Regular 400", leading: "Relaxed 1.625", extras: "italic", use: "Pull quotes, testimonials" },
         { name: "quote-base", font: "Serif", size: "xl (20px)", weight: "Regular 400", leading: "Relaxed 1.625", extras: "italic", use: "Inline block quotes" },
