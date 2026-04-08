@@ -1,0 +1,49 @@
+@use '../../../styles' as *;
+
+.wrapper {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+}
+
+.skeleton {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    110deg,
+    $portfolio-neutral-10 8%,
+    $portfolio-neutral-20 18%,
+    $portfolio-neutral-10 33%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+.media {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity $portfolio-duration-moderate $portfolio-easing-standard;
+}
+
+.loaded {
+  .media {
+    opacity: 1;
+  }
+
+  .skeleton {
+    opacity: 0;
+    transition: opacity $portfolio-duration-moderate $portfolio-easing-standard;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
