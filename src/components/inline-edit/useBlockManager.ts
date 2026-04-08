@@ -144,7 +144,6 @@ export default function useBlockManager(target: ApiTarget | undefined) {
       setBusy(true)
       setError(null)
       try {
-        const media = await uploadMedia(file, file.name.replace(/\.[^.]+$/, ''))
         const res = await fetch(`/api/${target.slug}/${target.id}`, {
           credentials: 'include',
         })
@@ -153,9 +152,12 @@ export default function useBlockManager(target: ApiTarget | undefined) {
         const blocks = [...(json.content ?? [])] as Record<string, unknown>[]
         const block = { ...blocks[blockIndex] }
         const images = [...((block.images ?? []) as unknown[])]
-        images.push({ image: media.id })
+        const labels = (block.placeholderLabels ?? []) as string[]
+        const slotLabel = labels[images.length] || ''
+        const alt = slotLabel || file.name.replace(/\.[^.]+$/, '')
+        const media = await uploadMedia(file, alt)
+        images.push({ image: media.id, caption: slotLabel || null })
         block.images = images
-        delete block.placeholderLabels
         blocks[blockIndex] = block
         await updateCollectionField(target.slug, target.id, 'content', blocks)
         router.refresh()

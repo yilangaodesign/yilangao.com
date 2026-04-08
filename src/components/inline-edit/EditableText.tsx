@@ -22,6 +22,13 @@ interface EditableTextProps {
   children: React.ReactNode
   multiline?: boolean
   isRichText?: boolean
+  /** Exact value from the CMS for dirty detection when it can differ from `children` (e.g. HTML fragment vs plain). */
+  storedValue?: string
+  /**
+   * When true, inline bold/weight/font changes from contenteditable are read and saved as an HTML string
+   * on a plain Payload `text` field. Without this, only textContent is captured so formatting never persists.
+   */
+  inlineTypography?: boolean
   htmlContent?: string
   label?: string
   singleClickEdit?: boolean
@@ -44,6 +51,8 @@ export default function EditableText({
   children,
   multiline = false,
   isRichText = false,
+  storedValue,
+  inlineTypography = false,
   htmlContent,
   label,
   singleClickEdit = false,
@@ -70,6 +79,9 @@ export default function EditableText({
         ? String(children)
         : ''
 
+  const canonicalStored =
+    typeof storedValue === 'string' ? storedValue : childText
+
   useEffect(() => {
     if (!isAdmin) return
     originalTextRef.current = childText
@@ -77,10 +89,10 @@ export default function EditableText({
       fieldId,
       target,
       fieldPath,
-      originalValue: childText,
+      originalValue: canonicalStored,
       isRichText,
     })
-  }, [ctx, isAdmin, fieldId, target, fieldPath, childText, isRichText])
+  }, [ctx, isAdmin, fieldId, target, fieldPath, childText, canonicalStored, isRichText])
 
   const flushPendingValue = useCallback(() => {
     if (pendingValueRef.current !== null && ctx) {
@@ -138,9 +150,13 @@ export default function EditableText({
   const handleInput = useCallback(() => {
     const el = elRef.current
     if (!el || !ctx) return
-    const val = isRichText ? el.innerHTML : (el.textContent ?? '').trim()
+    const val = isRichText
+      ? el.innerHTML
+      : inlineTypography
+        ? el.innerHTML.trim()
+        : (el.textContent ?? '').trim()
     pendingValueRef.current = val
-  }, [ctx, fieldId, isRichText])
+  }, [ctx, fieldId, isRichText, inlineTypography])
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
@@ -197,14 +213,14 @@ export default function EditableText({
       if (e.key === 'Escape') {
         const el = elRef.current
         if (el) {
-          if (isRichText) {
+          if (isRichText || inlineTypography) {
             el.innerHTML = originalHtmlRef.current
           } else {
             el.textContent = originalTextRef.current
           }
         }
         pendingValueRef.current = null
-        ctx?.setFieldValue(fieldId, originalTextRef.current)
+        ctx?.setFieldValue(fieldId, canonicalStored)
         deactivate()
       }
       if (e.key === 'Enter' && !multiline) {
@@ -212,7 +228,7 @@ export default function EditableText({
         deactivate()
       }
     },
-    [ctx, fieldId, multiline, isRichText, deactivate, handleInput],
+    [ctx, fieldId, multiline, isRichText, inlineTypography, canonicalStored, deactivate, handleInput],
   )
 
   const handleBlur = useCallback(() => {
@@ -253,7 +269,11 @@ export default function EditableText({
     onBlur: isEditing ? handleBlur : undefined,
   }
 
-  const dirtyHasHtml = showDirtyText && isRichText && dirtyValue!.includes('<')
+  const dirtyHasHtml =
+    showDirtyText &&
+    (isRichText || inlineTypography) &&
+    typeof dirtyValue === 'string' &&
+    dirtyValue.includes('<')
   const useHtml = dirtyHasHtml || (!showDirtyText && !!htmlContent)
 
   if (useHtml) {

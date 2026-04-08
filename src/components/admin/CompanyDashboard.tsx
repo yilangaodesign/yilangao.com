@@ -34,7 +34,7 @@ const EMPTY_FORM: FormData = {
   password: '',
   active: true,
   accent: '#888888',
-  greeting: 'Welcome',
+  greeting: 'Welcome.',
   layoutVariant: 'centered',
   caseStudyNotes: [],
 }
@@ -90,7 +90,7 @@ export default function CompanyDashboard() {
           password: doc.password,
           active: doc.active ?? true,
           accent: doc.accent || '#888888',
-          greeting: doc.greeting || 'Welcome',
+          greeting: doc.greeting || 'Welcome.',
           layoutVariant: doc.layoutVariant || 'centered',
           caseStudyNotes: (doc.caseStudyNotes as Company['caseStudyNotes']) || [],
           lastLoginAt: (doc.lastLoginAt as string) || null,

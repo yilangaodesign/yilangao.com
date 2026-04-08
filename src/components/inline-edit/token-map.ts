@@ -29,7 +29,7 @@ export const WEIGHT_SCALE = [
 export const FONT_FAMILY_SCALE = [
   { token: '$portfolio-font-sans', name: 'Geist Sans', css: 'var(--font-geist-sans), system-ui, sans-serif' },
   { token: '$portfolio-font-mono', name: 'Geist Mono', css: 'var(--font-geist-mono), ui-monospace, monospace' },
-  { token: '$portfolio-font-serif', name: 'Serif', css: 'Georgia, "Times New Roman", serif' },
+  { token: '$portfolio-font-serif', name: 'IBM Plex Serif', css: 'var(--font-ibm-plex-serif), Georgia, serif' },
   { token: '$portfolio-font-pixel-square', name: 'Pixel Square', css: 'var(--font-geist-pixel-square), monospace' },
   { token: '$portfolio-font-pixel-grid', name: 'Pixel Grid', css: 'var(--font-geist-pixel-grid), monospace' },
   { token: '$portfolio-font-pixel-circle', name: 'Pixel Circle', css: 'var(--font-geist-pixel-circle), monospace' },

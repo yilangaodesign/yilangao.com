@@ -19,6 +19,8 @@ export interface ProjectForEdit {
   title: string
   introBlurbHeadline?: string
   category: string
+  cardLine1?: string
+  cardLine2?: string
   coverImage?: string | null
   coverMimeType?: string | null
   thumbnailId?: string | number | null
@@ -34,6 +36,8 @@ export default function ProjectEditModal({ project, onClose, onSaved }: ProjectE
   const [title, setTitle] = useState(project.title)
   const [introBlurbHeadline, setIntroBlurbHeadline] = useState(project.introBlurbHeadline ?? '')
   const [category, setCategory] = useState(project.category)
+  const [cardLine1, setCardLine1] = useState(project.cardLine1 ?? '')
+  const [cardLine2, setCardLine2] = useState(project.cardLine2 ?? '')
   const [coverUrl, setCoverUrl] = useState(project.coverImage ?? null)
   const [coverMimeType, setCoverMimeType] = useState<string | null>(project.coverMimeType ?? null)
   const [thumbnailId, setThumbnailId] = useState<number | string | null>(project.thumbnailId ?? null)
@@ -108,6 +112,8 @@ export default function ProjectEditModal({ project, onClose, onSaved }: ProjectE
       if (title !== project.title) body.title = title
       if (introBlurbHeadline !== (project.introBlurbHeadline ?? '')) body.introBlurbHeadline = introBlurbHeadline
       if (category !== project.category) body.category = category
+      if (cardLine1 !== (project.cardLine1 ?? '')) body.cardLine1 = cardLine1
+      if (cardLine2 !== (project.cardLine2 ?? '')) body.cardLine2 = cardLine2
       if (thumbnailId !== project.thumbnailId) body.thumbnail = thumbnailId
 
       if (Object.keys(body).length === 0) {
@@ -133,7 +139,7 @@ export default function ProjectEditModal({ project, onClose, onSaved }: ProjectE
     } finally {
       setSaving(false)
     }
-  }, [title, introBlurbHeadline, category, thumbnailId, project, onClose, onSaved])
+  }, [title, introBlurbHeadline, category, cardLine1, cardLine2, thumbnailId, project, onClose, onSaved])
 
   const openDashboard = useCallback(() => {
     window.open(`/admin/collections/projects/${project.id}`, '_blank')
@@ -300,6 +306,32 @@ export default function ProjectEditModal({ project, onClose, onSaved }: ProjectE
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
                 placeholder="e.g. Enterprise SaaS"
+              />
+            </div>
+          </div>
+
+          <div className={styles.section}>
+            <label className={styles.fieldLabel}>Card Overlay Labels</label>
+            <div className={styles.fieldGroup}>
+              <label className={styles.fieldLabel} htmlFor="project-card-line1">Line 1 (large, serif)</label>
+              <input
+                id="project-card-line1"
+                type="text"
+                className={styles.fieldInput}
+                value={cardLine1}
+                onChange={(e) => setCardLine1(e.target.value)}
+                placeholder="e.g. Goldman Sachs, Lacework"
+              />
+            </div>
+            <div className={styles.fieldGroup}>
+              <label className={styles.fieldLabel} htmlFor="project-card-line2">Line 2 (smaller, sans)</label>
+              <input
+                id="project-card-line2"
+                type="text"
+                className={styles.fieldInput}
+                value={cardLine2}
+                onChange={(e) => setCardLine2(e.target.value)}
+                placeholder="e.g. Meteor, FortiCNAPP"
               />
             </div>
           </div>
