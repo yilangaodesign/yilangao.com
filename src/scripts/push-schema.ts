@@ -116,6 +116,19 @@ async function pushSchema() {
     EXCEPTION
       WHEN duplicate_column THEN NULL;
     END $$`,
+
+    // Card overlay — independent label fields (not coupled to title)
+    `DO $$ BEGIN
+      ALTER TABLE "projects" ADD COLUMN "card_line1" varchar;
+    EXCEPTION
+      WHEN duplicate_column THEN NULL;
+    END $$`,
+    `DO $$ BEGIN
+      ALTER TABLE "projects" ADD COLUMN "card_line2" varchar;
+    EXCEPTION
+      WHEN duplicate_column THEN NULL;
+    END $$`,
+
   ]
 
   for (const sql of statements) {
@@ -126,6 +139,26 @@ async function pushSchema() {
       const pgErr = err as { message?: string }
       console.log('  ⚠', pgErr.message?.slice(0, 80) || 'unknown error')
     }
+  }
+
+  // Enable RLS on all public tables (ENG-130)
+  // Supabase exposes public schema via PostgREST API by default.
+  // Without RLS, the anon key grants full CRUD access to all Payload tables.
+  // The postgres superuser role (used by Payload via pooler) bypasses RLS automatically.
+  const { rows: unprotected } = await client.query(
+    "SELECT tablename FROM pg_tables WHERE schemaname = 'public' AND rowsecurity = false"
+  )
+  for (const row of unprotected) {
+    try {
+      await client.query(`ALTER TABLE public."${row.tablename}" ENABLE ROW LEVEL SECURITY`)
+      console.log('  ✓ RLS enabled on', row.tablename)
+    } catch (err: unknown) {
+      const pgErr = err as { message?: string }
+      console.log('  ⚠ RLS on', row.tablename, ':', pgErr.message?.slice(0, 80))
+    }
+  }
+  if (unprotected.length === 0) {
+    console.log('  ✓ All public tables already have RLS enabled')
   }
 
   await client.end()

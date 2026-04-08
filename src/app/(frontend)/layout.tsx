@@ -8,9 +8,25 @@ import {
   GeistPixelTriangle,
   GeistPixelLine,
 } from "geist/font/pixel";
+import { IBM_Plex_Sans, IBM_Plex_Serif } from "next/font/google";
 import "../globals.scss";
 import elan from "../../../elan.json";
 import { TooltipProvider } from "@/components/ui/Tooltip";
+
+const ibmPlexSans = IBM_Plex_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  variable: "--font-ibm-plex-sans",
+  display: "swap",
+});
+
+const ibmPlexSerif = IBM_Plex_Serif({
+  subsets: ["latin"],
+  weight: ["100", "200", "300", "400", "500", "600", "700"],
+  style: ["normal", "italic"],
+  variable: "--font-ibm-plex-serif",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "Yilan Gao — UX Designer",
@@ -26,6 +42,8 @@ const fontVariables = [
   GeistPixelCircle.variable,
   GeistPixelTriangle.variable,
   GeistPixelLine.variable,
+  ibmPlexSans.variable,
+  ibmPlexSerif.variable,
 ].join(" ");
 
 export default function RootLayout({

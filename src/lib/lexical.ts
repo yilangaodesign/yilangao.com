@@ -112,6 +112,24 @@ export function makeLexicalParagraph(text: string) {
   };
 }
 
+/**
+ * Plain text for display / accessibility when a text field may store a small HTML fragment
+ * (inline bold, font-weight, font-family from contenteditable).
+ */
+export function plainTextFromInlineHtml(html: string): string {
+  if (!html || !html.includes('<')) return html
+  return html
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .trim()
+}
+
 export function extractLexicalText(value: unknown): string {
   if (!value) return '';
 

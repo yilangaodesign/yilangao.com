@@ -115,19 +115,19 @@ function mapContentBlocks(rawBlocks: RawBlock[]): ContentBlock[] {
       case 'imageGroup': {
         const images = (b.images ?? [])
           .map((img) => {
-            const media = img.image as { url?: string; mimeType?: string } | null
+            const media = img.image as { url?: string; mimeType?: string; alt?: string } | null
             const url = media?.url ?? null
             if (!url) return null
-            return { url, mimeType: media?.mimeType ?? undefined, caption: img.caption ?? undefined }
+            return { url, mimeType: media?.mimeType ?? undefined, alt: media?.alt ?? undefined, caption: img.caption ?? undefined }
           })
-          .filter(Boolean) as { url: string; mimeType?: string; caption?: string }[]
+          .filter(Boolean) as { url: string; mimeType?: string; alt?: string; caption?: string }[]
         return {
           ...base,
           blockType: 'imageGroup' as const,
           layout: b.layout ?? 'auto',
           images,
           caption: b.caption ?? undefined,
-          placeholderLabels: images.length === 0 ? (b.placeholderLabels ?? undefined) : undefined,
+          placeholderLabels: b.placeholderLabels ?? undefined,
         }
       }
       case 'divider':

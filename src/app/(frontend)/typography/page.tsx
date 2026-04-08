@@ -48,18 +48,23 @@ const FONT_FAMILIES: FontFamily[] = [
     ],
   },
   {
-    id: "georgia",
-    name: "Georgia",
+    id: "ibm-plex-serif",
+    name: "IBM Plex Serif",
     category: "Serif",
     token: "$portfolio-font-serif",
-    cssVar: "—",
-    fallbacks: "Times New Roman, serif",
-    cssValue: "'Georgia', 'Times New Roman', serif",
+    cssVar: "--font-ibm-plex-serif",
+    fallbacks: "Georgia, serif",
+    cssValue: "var(--font-ibm-plex-serif), 'Georgia', serif",
     description:
-      "A classic web-safe serif designed by Matthew Carter. Excellent for editorial headings and long-form body text. No installation needed — available on all platforms.",
+      "IBM's open-source serif typeface, designed for digital interfaces. Pairs naturally with Geist Sans for pull quotes and testimonials. Loaded via Google Fonts with all weights.",
     isVariable: false,
     weights: [
+      { label: "Thin", value: 100 },
+      { label: "Extra Light", value: 200 },
+      { label: "Light", value: 300 },
       { label: "Regular", value: 400 },
+      { label: "Medium", value: 500 },
+      { label: "Semi Bold", value: 600 },
       { label: "Bold", value: 700 },
     ],
   },
@@ -178,7 +183,7 @@ function fontFamilyCSS(id: string): string {
   const map: Record<string, string> = {
     "geist-sans":
       "var(--font-geist-sans), 'Inter', system-ui, -apple-system, sans-serif",
-    georgia: "'Georgia', 'Times New Roman', serif",
+    "ibm-plex-serif": "var(--font-ibm-plex-serif), 'Georgia', serif",
     "geist-mono":
       "var(--font-geist-mono), 'JetBrains Mono', ui-monospace, monospace",
     "geist-pixel-square": "var(--font-geist-pixel-square), monospace",
@@ -306,7 +311,7 @@ function MixingPlayground() {
   }));
 
   const [headingFont, setHeadingFont] = useState("geist-sans");
-  const [bodyFont, setBodyFont] = useState("georgia");
+  const [bodyFont, setBodyFont] = useState("ibm-plex-serif");
   const [monoFont, setMonoFont] = useState("geist-mono");
   const [labelFont, setLabelFont] = useState("geist-sans");
 

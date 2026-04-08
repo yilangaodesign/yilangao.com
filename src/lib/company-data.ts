@@ -33,7 +33,7 @@ export async function getCompanyBySlug(slug: string): Promise<CompanyRecord | nu
       password: doc.password as string,
       active: (doc.active as boolean) ?? true,
       accent: (doc.accent as string) || '#888888',
-      greeting: (doc.greeting as string) || 'Welcome',
+      greeting: (doc.greeting as string) || 'Welcome.',
       layoutVariant: (doc.layoutVariant as string) || 'centered',
       caseStudyNotes: ((doc.caseStudyNotes as CompanyRecord['caseStudyNotes']) || []),
       lastLoginAt: (doc.lastLoginAt as string) || null,

@@ -21,7 +21,8 @@ type Props = {
 
 export default function LoginClient({ company, accent, greeting, companyName }: Props) {
   const trimmedName = companyName?.trim();
-  const headline = trimmedName ? `${greeting}, ${trimmedName}` : greeting;
+  const greetingForPair = greeting.replace(/\.\s*$/, "");
+  const headline = trimmedName ? `${greetingForPair}, ${trimmedName}` : greeting;
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isPending, startTransition] = useTransition();

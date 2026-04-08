@@ -30,7 +30,7 @@ export default async function LoginPage({ params, searchParams }: Props) {
         greeting: config.greeting,
         companyName: config.name,
       }
-    : { accent: null, greeting: "Welcome", companyName: null };
+    : { accent: null, greeting: "Welcome.", companyName: null };
 
   return (
     <LoginClient

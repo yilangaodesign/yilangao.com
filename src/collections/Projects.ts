@@ -16,7 +16,21 @@ export const Projects: CollectionConfig = {
       type: 'text',
       required: true,
       admin: {
-        description: 'Application or product name (e.g. "Lacework", "Goldman Sachs Meteor"). Shown in sidebar and navigation.',
+        description: 'Application or product name (e.g. "Meteor", "Lacework"). Shown in sidebar and navigation.',
+      },
+    },
+    {
+      name: 'cardLine1',
+      type: 'text',
+      admin: {
+        description: 'Card overlay — primary text (large, serif). Typically company or brand. Leave blank to hide.',
+      },
+    },
+    {
+      name: 'cardLine2',
+      type: 'text',
+      admin: {
+        description: 'Card overlay — secondary text (smaller, sans). Typically app or product. Leave blank to hide.',
       },
     },
     {

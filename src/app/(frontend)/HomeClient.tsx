@@ -39,16 +39,21 @@ import type { ApiTarget, FieldDefinition } from "@/components/inline-edit";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import MediaRenderer from "@/components/ui/MediaRenderer/MediaRenderer";
 import styles from "./page.module.scss";
+import { plainTextFromInlineHtml } from "@/lib/lexical";
 
 type Project = {
   id?: string | number;
   slug: string;
   title: string;
+  cardLine1?: string;
+  cardLine2?: string;
   introBlurbHeadline?: string;
   category: string;
   featured: boolean;
   coverImage?: string | null;
   coverMimeType?: string | null;
+  coverWidth?: number | null;
+  coverHeight?: number | null;
   thumbnailId?: string | number | null;
 };
 
@@ -79,6 +84,10 @@ function projectTarget(id: string | number): ApiTarget {
 }
 
 function ProjectCard({ project, isAdmin, onEdit }: { project: Project; isAdmin?: boolean; onEdit?: (project: Project) => void }) {
+  const hasLine1 = !!project.cardLine1;
+  const hasLine2 = !!project.cardLine2;
+  const showOverlay = isAdmin || hasLine1 || hasLine2;
+
   return (
     <Link href={`/work/${project.slug}`} className={`${styles.projectCard} ${project.featured ? styles.projectCardFeatured : ""}`}>
       <div className={styles.projectHero}>
@@ -88,9 +97,39 @@ function ProjectCard({ project, isAdmin, onEdit }: { project: Project; isAdmin?:
             mimeType={project.coverMimeType}
             alt={`${project.title} cover`}
             className={styles.projectCoverImg}
+            width={project.coverWidth}
+            height={project.coverHeight}
           />
         ) : (
           <div className={styles.projectImage} />
+        )}
+        {showOverlay && (
+          <div className={styles.cardOverlay}>
+            {(hasLine1 || isAdmin) && project.id && (
+              <EditableText
+                fieldId={`projects:${project.id}:cardLine1`}
+                target={projectTarget(project.id)}
+                fieldPath="cardLine1"
+                as="span"
+                className={`${styles.cardOverlayLine1}${!hasLine1 ? ` ${styles.cardOverlayPlaceholder}` : ''}`}
+                label="Card Line 1"
+              >
+                {project.cardLine1 || 'Line 1'}
+              </EditableText>
+            )}
+            {(hasLine2 || isAdmin) && project.id && (
+              <EditableText
+                fieldId={`projects:${project.id}:cardLine2`}
+                target={projectTarget(project.id)}
+                fieldPath="cardLine2"
+                as="span"
+                className={`${styles.cardOverlayLine2}${!hasLine2 ? ` ${styles.cardOverlayPlaceholder}` : ''}`}
+                label="Card Line 2"
+              >
+                {project.cardLine2 || 'Line 2'}
+              </EditableText>
+            )}
+          </div>
         )}
         {isAdmin && project.id && (
           <div className={styles.cardAdminActions}>
@@ -327,6 +366,8 @@ export default function HomeClient({
       title: p.title,
       introBlurbHeadline: p.introBlurbHeadline ?? '',
       category: p.category,
+      cardLine1: p.cardLine1 ?? '',
+      cardLine2: p.cardLine2 ?? '',
       coverImage: p.coverImage ?? null,
       coverMimeType: p.coverMimeType ?? null,
       thumbnailId: p.thumbnailId ?? null,
@@ -485,8 +526,13 @@ export default function HomeClient({
                     as="h1"
                     className={styles.name}
                     label="Name"
+                    storedValue={siteConfig.name}
+                    htmlContent={
+                      siteConfig.name.includes("<") ? siteConfig.name : undefined
+                    }
+                    inlineTypography
                   >
-                    {siteConfig.name}
+                    {plainTextFromInlineHtml(siteConfig.name)}
                   </EditableText>
                 </div>
                 <EditableText

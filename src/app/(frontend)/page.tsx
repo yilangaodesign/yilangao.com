@@ -51,7 +51,7 @@ const FALLBACK_TESTIMONIALS = [
 ];
 
 export default async function Home() {
-  let projects: { id?: string | number; slug: string; title: string; introBlurbHeadline?: string; category: string; featured: boolean; coverImage?: string | null; coverMimeType?: string | null; thumbnailId?: string | number | null }[] = FALLBACK_PROJECTS;
+  let projects: { id?: string | number; slug: string; title: string; cardLine1?: string; cardLine2?: string; introBlurbHeadline?: string; category: string; featured: boolean; coverImage?: string | null; coverMimeType?: string | null; coverWidth?: number | null; coverHeight?: number | null; thumbnailId?: string | number | null }[] = FALLBACK_PROJECTS;
   let testimonials: { id?: string | number; text: string; textHtml?: string; name: string; role: string; avatarUrl?: string | null; linkedinUrl?: string | null }[] = FALLBACK_TESTIMONIALS;
   let teams = FALLBACK_TEAMS;
   let links = FALLBACK_LINKS;
@@ -75,17 +75,22 @@ export default async function Home() {
 
     if (projectsRes.docs.length > 0) {
       projects = projectsRes.docs.map((p) => {
-        const thumb = (p as Record<string, unknown>).thumbnail as { id?: string | number; url?: string; mimeType?: string } | null | undefined;
-        const hero = p.heroImage as { id?: string | number; url?: string; mimeType?: string } | null | undefined;
+        const thumb = (p as Record<string, unknown>).thumbnail as { id?: string | number; url?: string; mimeType?: string; width?: number; height?: number } | null | undefined;
+        const hero = p.heroImage as { id?: string | number; url?: string; mimeType?: string; width?: number; height?: number } | null | undefined;
+        const cover = thumb ?? hero;
         return {
           id: p.id,
           slug: p.slug,
           title: p.title,
+          cardLine1: (p as Record<string, unknown>).cardLine1 as string | undefined,
+          cardLine2: (p as Record<string, unknown>).cardLine2 as string | undefined,
           introBlurbHeadline: (p as Record<string, unknown>).introBlurbHeadline as string | undefined,
           category: p.category,
           featured: p.featured ?? false,
-          coverImage: thumb?.url ?? hero?.url ?? null,
-          coverMimeType: thumb?.mimeType ?? hero?.mimeType ?? null,
+          coverImage: cover?.url ?? null,
+          coverMimeType: cover?.mimeType ?? null,
+          coverWidth: cover?.width ?? null,
+          coverHeight: cover?.height ?? null,
           thumbnailId: thumb?.id ?? null,
         };
       });

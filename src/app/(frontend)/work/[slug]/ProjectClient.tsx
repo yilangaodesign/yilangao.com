@@ -58,7 +58,7 @@ import styles from "./page.module.scss";
 export type ContentBlock =
   | { id: string; blockType: 'heading'; text: string; level: 'h2' | 'h3' }
   | { id: string; blockType: 'richText'; body: string; bodyHtml?: string; bodyLexical?: Record<string, unknown> }
-  | { id: string; blockType: 'imageGroup'; layout: string; images: { url: string; mimeType?: string; caption?: string }[]; caption?: string; placeholderLabels?: string[] }
+  | { id: string; blockType: 'imageGroup'; layout: string; images: { url: string; mimeType?: string; alt?: string; caption?: string }[]; caption?: string; placeholderLabels?: string[] }
   | { id: string; blockType: 'divider' }
   | { id: string; blockType: 'hero'; imageUrl?: string; mimeType?: string; caption?: string; placeholderLabel?: string };
 
@@ -337,7 +337,7 @@ export default function ProjectClient({
 
   const spySections: ScrollSpySection[] = useMemo(
     () => [
-      { id: 'overview', label: 'Overview' },
+      { id: 'intro', label: 'Overview' },
       ...contentBlocks
         .filter((item): item is { block: ContentBlock & { blockType: 'heading' }; originalIndex: number } => item.block.blockType === 'heading')
         .map(({ block }) => ({
@@ -649,6 +649,7 @@ export default function ProjectClient({
                       </div>
                     )}
                   </div>
+                  {(projectTarget || p.externalLinks.length > 0) && (
                   <div className={styles.metaGroup}>
                     <Eyebrow className={styles.metaLabel}>Links</Eyebrow>
                     {projectTarget ? (
@@ -676,6 +677,7 @@ export default function ProjectClient({
                       </div>
                     )}
                   </div>
+                  )}
                 </div>
               </div>
             </FadeIn>
@@ -686,7 +688,7 @@ export default function ProjectClient({
         <main className={styles.content}>
           {p.introBlurbHeadline && (
             <FadeIn>
-              <div className={styles.introBlurb}>
+              <div id="intro" className={styles.introBlurb}>
                 {projectTarget ? (
                   <EditableText
                     fieldId={`proj:${p.id}:introBlurbHeadline`}
@@ -862,7 +864,84 @@ export default function ProjectClient({
                     }
                     return (
                       <FadeIn>
-                        {block.images.length > 0 ? (
+                        {block.placeholderLabels && block.placeholderLabels.length > 0 ? (
+                          <div
+                            className={styles.placeholderGrid}
+                            onDragOver={isAdmin ? (e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'copy' } : undefined}
+                            onDrop={isAdmin ? handleFileDrop : undefined}
+                          >
+                            {block.placeholderLabels.map((lbl, idx) => {
+                              const img = block.images[idx];
+                              if (img) {
+                                return (
+                                  <figure
+                                    key={idx}
+                                    className={[
+                                      styles.sectionFigure,
+                                      idx === 0 && block.placeholderLabels!.length >= 3 ? styles.slotWide : '',
+                                    ].filter(Boolean).join(' ')}
+                                  >
+                                    <MediaRenderer src={img.url} mimeType={img.mimeType} alt={img.alt || lbl} className={styles.sectionImg} />
+                                    {isAdmin && projectTarget ? (
+                                      <EditableText
+                                        fieldId={`proj:${p.id}:content.${cmsIndex}.images.${idx}.caption`}
+                                        target={projectTarget}
+                                        fieldPath={`content.${cmsIndex}.images.${idx}.caption`}
+                                        as="figcaption"
+                                        className={styles.figCaption}
+                                        label={`${lbl} caption`}
+                                      >
+                                        {img.caption || ''}
+                                      </EditableText>
+                                    ) : img.caption ? (
+                                      <figcaption className={styles.figCaption}>{img.caption}</figcaption>
+                                    ) : null}
+                                    {isAdmin && (
+                                      <div className={styles.imageOverlay}>
+                                        <button
+                                          type="button"
+                                          className={styles.imageOverlayBtn}
+                                          onClick={() => blockMgr.moveImageInBlock(cmsIndex, idx, -1)}
+                                          disabled={blockMgr.busy || idx === 0}
+                                          aria-label="Move image left"
+                                        >◂</button>
+                                        <button
+                                          type="button"
+                                          className={styles.imageOverlayBtn}
+                                          onClick={() => blockMgr.moveImageInBlock(cmsIndex, idx, 1)}
+                                          disabled={blockMgr.busy || idx === block.images.length - 1}
+                                          aria-label="Move image right"
+                                        >▸</button>
+                                        <button
+                                          type="button"
+                                          className={[styles.imageOverlayBtn, styles.imageOverlayBtnDanger].join(' ')}
+                                          onClick={() => blockMgr.removeImageFromBlock(cmsIndex, idx)}
+                                          disabled={blockMgr.busy}
+                                          aria-label="Remove image"
+                                        >✕</button>
+                                      </div>
+                                    )}
+                                  </figure>
+                                );
+                              }
+                              return (
+                                <div
+                                  key={idx}
+                                  className={idx === 0 && block.placeholderLabels!.length >= 3
+                                    ? styles.labeledPlaceholderWide : styles.labeledPlaceholder}
+                                  onClick={isAdmin ? handleFileSelect : undefined}
+                                  role={isAdmin ? 'button' : undefined}
+                                  tabIndex={isAdmin ? 0 : undefined}
+                                >
+                                  <span className={styles.placeholderLabel}>{lbl}</span>
+                                  <span className={styles.placeholderIndex}>
+                                    Image {idx + 1} of {block.placeholderLabels!.length}
+                                  </span>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        ) : block.images.length > 0 ? (
                           <>
                             <div
                               className={getLayoutClass(block.layout, block.images.length)}
@@ -871,7 +950,7 @@ export default function ProjectClient({
                             >
                               {block.images.map((img, idx) => (
                                 <figure key={idx} className={styles.sectionFigure}>
-                                  <MediaRenderer src={img.url} mimeType={img.mimeType} alt={`Image ${idx + 1}`} className={styles.sectionImg} />
+                                  <MediaRenderer src={img.url} mimeType={img.mimeType} alt={img.alt || `Image ${idx + 1}`} className={styles.sectionImg} />
                                   {isAdmin && projectTarget ? (
                                     <EditableText
                                       fieldId={`proj:${p.id}:content.${cmsIndex}.images.${idx}.caption`}
@@ -928,28 +1007,6 @@ export default function ProjectClient({
                               </button>
                             )}
                           </>
-                        ) : block.placeholderLabels && block.placeholderLabels.length > 0 ? (
-                          <div
-                            className={styles.placeholderGrid}
-                            onDragOver={isAdmin ? (e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'copy' } : undefined}
-                            onDrop={isAdmin ? handleFileDrop : undefined}
-                            onClick={isAdmin ? handleFileSelect : undefined}
-                            role={isAdmin ? 'button' : undefined}
-                            tabIndex={isAdmin ? 0 : undefined}
-                          >
-                            {block.placeholderLabels.map((lbl, idx) => (
-                              <div
-                                key={idx}
-                                className={idx === 0 && block.placeholderLabels!.length >= 3
-                                  ? styles.labeledPlaceholderWide : styles.labeledPlaceholder}
-                              >
-                                <span className={styles.placeholderLabel}>{lbl}</span>
-                                <span className={styles.placeholderIndex}>
-                                  Image {idx + 1} of {block.placeholderLabels!.length}
-                                </span>
-                              </div>
-                            ))}
-                          </div>
                         ) : isAdmin ? (
                           <div
                             className={styles.dropZone}

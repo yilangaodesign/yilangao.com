@@ -330,8 +330,7 @@
 }
 
 .introBlurbHeadline {
-  @include heading-2-fluid;
-  font-weight: $portfolio-weight-bold;
+  @include heading-case-study-intro;
   margin-bottom: $portfolio-spacer-2x;
 }
 
@@ -631,6 +630,12 @@
   @extend .labeledPlaceholder;
   aspect-ratio: 21 / 9;
 
+  @media #{$elan-mq-sm} {
+    grid-column: span 2;
+  }
+}
+
+.slotWide {
   @media #{$elan-mq-sm} {
     grid-column: span 2;
   }

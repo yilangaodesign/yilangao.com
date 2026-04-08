@@ -65,7 +65,7 @@ export const Companies: CollectionConfig = {
             {
               name: 'greeting',
               type: 'text',
-              defaultValue: 'Welcome',
+              defaultValue: 'Welcome.',
               admin: {
                 description: 'Heading on the login page (e.g. "Hi, Google team")',
               },

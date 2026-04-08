@@ -283,6 +283,51 @@
   }
 }
 
+.cardOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: $portfolio-spacer-0-25x;
+  padding: $portfolio-spacer-1x;
+  background: rgba(0, 0, 0, 0.72);
+  opacity: 0;
+  transition: opacity $portfolio-duration-moderate $portfolio-easing-standard;
+  pointer-events: none;
+  z-index: 1;
+
+  .projectCard:hover & {
+    opacity: 1;
+  }
+}
+
+.cardOverlayLine1 {
+  font-family: $portfolio-font-serif;
+  font-size: $portfolio-type-2xl;
+  font-weight: $portfolio-weight-regular;
+  line-height: $portfolio-leading-snug;
+  color: $portfolio-neutral-00;
+  text-align: center;
+  pointer-events: auto;
+}
+
+.cardOverlayLine2 {
+  font-family: var(--font-ibm-plex-sans), 'IBM Plex Sans', sans-serif;
+  font-size: $portfolio-type-base;
+  font-weight: $portfolio-weight-regular;
+  line-height: $portfolio-leading-snug;
+  color: rgba(255, 255, 255, 0.7);
+  text-align: center;
+  pointer-events: auto;
+}
+
+.cardOverlayPlaceholder {
+  opacity: 0.35;
+  font-style: italic;
+}
+
 .cardAdminActions {
   position: absolute;
   top: $portfolio-spacer-1x;
@@ -344,7 +389,6 @@
 
 .projectCoverImg {
   width: 100%;
-  height: auto;
   display: block;
   transition: transform $portfolio-duration-slow $portfolio-easing-standard;
 }

@@ -49,13 +49,14 @@
 }
 
 .header {
-  margin-bottom: $portfolio-spacer-4x;
+  margin-bottom: $portfolio-spacer-3x;
 }
 
 .greeting {
-  font-family: $portfolio-font-pixel-line;
+  font-family: $portfolio-font-serif;
   font-size: 5.25rem;
-  font-weight: $portfolio-weight-medium;
+  font-weight: 400;
+  letter-spacing: $portfolio-tracking-tight;
   color: var(--portfolio-text-neutral-bold);
   line-height: 1;
 }
