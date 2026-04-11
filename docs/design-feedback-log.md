@@ -4,10 +4,264 @@
 >
 > **Who reads this:** AI agents at session start (scan recent entries for context), and during feedback processing (check for recurring patterns).
 > **Who writes this:** AI agents after each feedback cycle via the `design-iteration` skill.
-> **Last updated:** 2026-04-07 (FB-124: Testimonial card name in IBM Plex Serif)
+> **Last updated:** 2026-04-10 (FB-142: Home case study section — symmetrical top/bottom margin)
 >
 > **For agent skills:** Read only the first 30 lines of this file (most recent entries) for pattern detection.
 > **Older entries:** Synthesized in `docs/design-feedback-synthesis.md`. Raw archive in `docs/design-feedback-log-archive.md`.
+
+---
+
+### FB-142: Home case study section - symmetrical top/bottom margin
+
+**Date:** 2026-04-10
+
+**User direction:** The last case study subline sat right against the footer with no breathing room, while the top of the section had generous space. The gap was asymmetrical - lots of air above, almost none below.
+
+**Root cause:** `.caseStudies` had `margin-top: 10x` / `14x` but zero `margin-bottom`. Two earlier attempts targeted the wrong layer (headline-subline gap, then essay-specific link padding) - both reverted.
+
+**Resolution:**
+- `page.module.scss` - `.caseStudies` now mirrors top margin at the bottom: `margin-bottom: $portfolio-spacer-10x` / `$portfolio-spacer-14x` at `md`.
+- Removed `.caseStudyLinkEssay` modifier (wrong layer).
+- `HomeClient.tsx` - reverted essay-specific className logic; all links use plain `caseStudyLink`.
+
+---
+
+### FB-141: Site footer — Experience vs Links row rhythm
+
+**Date:** 2026-04-10
+
+**User direction:** Align per-line vertical spacing in the Experience (`teams`) column with the Links column in the sticky footer.
+
+**Resolution:**
+- `SiteFooter.module.scss`: Introduced shared `$footer-list-row-block-size` (`type-sm` × `leading-normal`) for one body-sm line; applied `min-block-size` to `.teamItem` and new `.linkItem` so both columns use the same row height baseline.
+- `.teamPeriod`: override `line-height` to `$portfolio-leading-normal` (code-sm defaults to compact leading, which shortened Experience rows vs link rows).
+- `.teamItem`: `align-items: center` (was baseline) for consistent vertical centering with `.linkItem`.
+- `SiteFooter.tsx`: `className={styles.linkItem}` on Links list items.
+
+---
+
+### FB-140: Site footer — Terra subtle surface + softer wide shadow
+
+**Date:** 2026-04-09
+
+**User direction:** Lighten the sticky footer band (previous Terra token or one step lighter on the terrain scale) and widen the very soft drop shadow cast from the main column onto the footer without making it harsh.
+
+**Resolution:**
+- `.footer` in `SiteFooter.module.scss`: `background-color` from `$portfolio-terra-20` to `var(--portfolio-surface-terra-subtle)` (Terra-10; aligns with nav/home subtle tier and uses dark-mode neutral fallback from `_custom-properties.scss`).
+- `.contentWrapper` `box-shadow`: from `0 4px 12px -4px rgba(0,0,0,0.05)` to `0 10px 48px -8px rgba(0,0,0,0.035)` for a larger blur radius and softer alpha so the penumbra spreads more.
+
+---
+
+### FB-139: Login page — Terra-10 background (page, canvas pane, shader)
+
+**Date:** 2026-04-09
+
+**User direction:** Shift the password-gate login surface from Terra-05 to Terra-10 (`#f5f1ec`), including the halftone canvas and related colors.
+
+**Resolution:**
+- `.page` and `.canvasPane` in `for/[company]/login.module.scss`: `background: $portfolio-terra-10`
+- `HalftonePortrait` fragment shader `BG_COLOR`: `vec3(0.961, 0.945, 0.925)` (sRGB for `#f5f1ec`)
+- `WebGLRenderer.setClearColor(0xf5f1ec, 1)` so clears match Terra-10
+- Canvas sizing moved from inline styles into `.canvas canvas` in `login.module.scss` (same principle as FB-134: shader + CSS must agree)
+
+**Cross-category note:** Supersedes the Terra-05 login background in FB-134; same audit rule (CSS + WebGL + clear color).
+
+---
+
+### FB-138: Case study sidebar meta — remove tinted card background
+
+**Date:** 2026-04-09
+
+**User direction:** Remove the meta sidebar background color on case study pages. No fill on that section (plain against the page surface).
+
+**Resolution:** `.sidebarCard` in `work/[slug]/page.module.scss`: removed `background: var(--portfolio-surface-terra-minimal)` so the left column reads as open layout on the same canvas as `.page` (see FB-137 for prior white-canvas context).
+
+**Cross-category note:** Supersedes the sidebar portion of FB-137; page-level white canvas from FB-137 is unchanged.
+
+---
+
+### FB-137: Case study pages — white canvas, sidebar meta card Terra-05
+
+**Date:** 2026-04-09
+
+**User direction:** Make all case study (`/work/[slug]`) pages use a white page background. Change the left sidebar meta info card from the previous warm subtle surface to Terra-05.
+
+**Resolution:**
+- `.page` in `work/[slug]/page.module.scss`: `background: var(--portfolio-surface-primary)` (white in light mode, maps to primary neutral in dark if theme toggles).
+- `.sidebarCard`: `background` from `$portfolio-surface-terra-subtle` (terra-10) to `var(--portfolio-surface-terra-minimal)` (terra-05 / `$portfolio-terra-05`).
+
+**Principle:** Case study long-form reads benefit from a clean white canvas so imagery and body copy separate clearly from the global terra-minimal body. The sidebar card stays warm but one step lighter than before so it reads as a distinct inset panel against white.
+
+---
+
+### FB-136: Button `onColor` variant for colored surfaces
+
+**Date:** 2026-04-09
+
+**What happened:** After shifting the site's background to `terra-05`, buttons using solid neutral hover/active states (like `neutral-05`, `neutral-10`, `neutral-20`) created a cool-gray tint that clashed with the warm surface. The existing `always-dark` / `always-light` appearances already solved this for locked-theme buttons via overlay tokens, but theme-responsive appearances (neutral, highlight, etc.) still used solid colors.
+
+**Root cause:** The Button component's interaction states were designed for white/black backgrounds. On tinted/colored surfaces, swapping to an absolute neutral gray for hover breaks visual harmony because the hue shifts from warm to cool.
+
+**Resolution:** Added `onColor?: boolean` prop to Button. When enabled, `regular`, `subtle`, and `minimal` emphases use transparent overlay tokens (`overlay-black-*` in light, `overlay-white-*` in dark) instead of solid color swaps. `bold` emphasis is unaffected (opaque fill is self-contained). Overlay intensity matches the established `always-dark` / `always-light` patterns: regular/minimal hover at 4%/8% (light) or 8%/12% (dark), subtle base/hover/active at 10%/14%/20% in both modes.
+
+**What was learned:**
+- Overlay tokens already existed in the DS (`$portfolio-overlay-white-*`, `$portfolio-overlay-black-*`) with a comprehensive range. No new primitives were needed.
+- The `always-dark` and `always-light` button appearances already demonstrated the overlay-state pattern. The new `onColor` modifier generalizes this to all theme-responsive appearances.
+- On colored surfaces, only transparent/semi-transparent button emphases (regular, subtle, minimal) are affected. Bold buttons with opaque fills are visually independent of the surface behind them.
+
+---
+
+### FB-135: Typed text overflow with glyph-safe clipping
+
+**Date:** 2026-04-09
+
+**User direction:** Ultra-long passwords overflowed the input area with no truncation. The typed text overlay must (1) clip to the available width, (2) show the END of the text (what was last typed), (3) no ellipsis, and (4) NOT clip glyph ascenders/descenders (the "j" tittle problem we already solved).
+
+**Resolution:** Added `width: calc(100% - 50px)` and `overflow: hidden` to `.typedText`, plus a `useEffect` that sets `scrollLeft = scrollWidth` on each keystroke to scroll the clipped box to the right end. Internal padding (`6px top, 4px bottom, 4px left`) creates glyph breathing room within the clipped box so serif overshoots render fully.
+
+**Regression note:** The initial implementation used `overflow: hidden` without padding, immediately reintroducing the glyph clipping from FB-129. Fixed in the same round by adding internal padding — but this was a preventable regression. See ENG-141.
+
+---
+
+### FB-134: Login page — Terra-05 background and halftone portrait color match
+
+**Date:** 2026-04-09
+
+**User direction:** Change the login page background from white to Terra-05 (`#faf8f6`). After applying it, the left-side halftone portrait canvas still had a white background (the WebGL shader's `BG_COLOR` was `vec3(1.0, 1.0, 1.0)`), creating a visible color seam.
+
+**Resolution:**
+- `.page` background changed to `$portfolio-terra-05`
+- Shader `BG_COLOR` updated to `vec3(0.980, 0.973, 0.965)` — the sRGB equivalent of `#faf8f6`
+
+**Principle:** When changing a page background color, audit all rendering contexts on that page — CSS backgrounds, canvas/WebGL clear colors, SVG fills, and image backgrounds all need to match. Shader colors are hardcoded values, not design tokens, so they won't update automatically.
+
+---
+
+### FB-133: Global Terra selection highlight across entire site
+
+**Date:** 2026-04-09
+
+**User direction:** The Terra-20 selection highlight applied only to the login input. Apply it consistently across the entire website — every text selection should use the same Terra warm amber.
+
+**Resolution:**
+- Changed `$portfolio-highlight` token from `$portfolio-accent-20` (Lumen blue-violet) to `$portfolio-terra-20`
+- Updated dark mode custom property from `$portfolio-accent-90` to `$portfolio-terra-50` for visibility on dark surfaces
+- Changed `globals.scss` `::selection` text color from `$portfolio-accent-90` to `color: inherit` — selected text keeps its existing color rather than shifting to a palette-specific tint
+- Removed the now-redundant login-specific `background: $portfolio-terra-20` from the login input's `::selection`
+
+**Principle:** Selection highlight is a site-wide brand surface. Define it once via the semantic token (`$portfolio-highlight` / `var(--portfolio-highlight)`), not per-component.
+
+---
+
+### FB-132: Placeholder/typed text horizontal alignment
+
+**Date:** 2026-04-09
+
+**User direction:** The placeholder "(what I told you)" did not start at the same horizontal position as the typed text — placeholder was at `left: 10px`, typed text at `left: 4px`.
+
+**Resolution:** Changed `.placeholder` from `left: 10px` to `left: 4px` to match `.typedText`.
+
+**Principle:** All text overlays on the same input must share the same `left` offset. When one overlay is adjusted, audit the others.
+
+---
+
+### FB-130: Login page — branded selection highlight with Terra
+
+**Date:** 2026-04-08
+
+**User direction:** The default browser blue selection highlight on the password input is indistinguishable from the browser default. Use a brand color family instead. Lumen (blue-violet) was too close to the default blue; Terra (warm amber) immediately reads as intentional.
+
+**Resolution:** `::selection { background: $portfolio-terra-20; color: transparent; }` on the input element. The `color: transparent` hides the native (invisible) text in selection, while the Terra-20 warm amber tint replaces the browser blue. The overlay span renders the visible text on top of the highlight.
+
+**Principle:** Selection highlights are a micro-branding opportunity. When using custom text rendering (overlay spans), the `::selection` on the underlying input becomes a controllable design surface. Default browser blue is a missed chance — use a brand palette that's visually distinct from the default.
+
+---
+
+### FB-129: Login page — serif glyph clipping on `<input>` elements
+
+**Date:** 2026-04-08
+
+**User direction:** The lowercase "j" in IBM Plex Serif at 2.75rem had its top-left tittle dot clipped when rendered inside a native `<input>` element. Multiple attempts at CSS fixes (padding, overflow, box-sizing) failed — the browser's internal text rendering clips glyphs at the text origin regardless.
+
+**Resolution:** Replaced the native input text with a custom rendering approach: the `<input>` text is `color: transparent` (invisible), and a sibling `<span>` (`.typedText`) renders the same text via an absolutely positioned overlay. The `<span>` has no internal clipping boundary, so serif flourishes render fully. The caret remains visible via `caret-color`. This is the same pattern used for the custom placeholder.
+
+**Principle:** When using large serif fonts in `<input>` elements, browser-native text clipping at the glyph origin is unfixable via CSS. The text overlay pattern (invisible input + visible span) is the only reliable approach for glyph-perfect rendering of serif typography in form inputs.
+
+**Cross-category note:** Also documented as ENG-139 (engineering — browser limitation discovery).
+
+---
+
+### FB-128: Login page — icon sizing and alignment for oversized input text
+
+**Date:** 2026-04-08
+
+**User direction:** The error status icon (22px from the Input lg size) was disproportionately small next to the 2.75rem (44px) serif text. Both the error icon and the arrow submit button were vertically centered by the Input component's `align-items: center`, but at the oversized font they appeared to "fly too high" from the underline.
+
+**Resolution:**
+- Status icon resized to 28px via `.passwordInput [class*="statusIcon"] { width: 28px; height: 28px; }`
+- Both icons pushed toward the underline via `align-self: flex-end; margin-bottom: 2px;` on `.statusIcon` and `.trailingSlot`
+- Uses attribute selectors (`[class*="..."]`) to target Input component internals from login page SCSS
+
+**Principle:** When overriding a component's font-size far beyond its design intent, the component's icon sizing and vertical alignment break because they're calibrated for the original size. Override icon dimensions and alignment in the page-specific SCSS, not the component — the component's defaults are correct for normal usage.
+
+---
+
+### FB-127: Login page — input/footer alignment and layout stability
+
+**Date:** 2026-04-08
+
+**User direction:** The footer "Having trouble?" text was center-aligned while the input was left-aligned, creating visual misalignment. The input container also grew vertically when the error state appeared, causing the entire flex-centered card to shift both up (Welcome text) and down (footer).
+
+**Resolution:**
+- Removed `text-align: center` from `.footer` — now left-aligned, sharing the same left edge as the input and greeting
+- Changed `.inputArea` from `min-height: 90px` to `height: 100px; overflow: visible` — the fixed height prevents the card from growing when error text appears, while `overflow: visible` ensures the error message still renders
+
+**Principle:** In flex-centered layouts, any height change in children causes the parent to recalculate centering, shifting ALL siblings. Use fixed `height` (not `min-height`) with `overflow: visible` to reserve space for conditional content like error messages. See also ENG-137.
+
+**Cross-category note:** Also documented as ENG-137 (engineering — layout stability pattern).
+
+---
+
+### FB-126: Login page — password-as-name greeting concept
+
+**Date:** 2026-04-08
+
+**User direction:** The password gate page is reconceived as a coherent greeting sentence. The password for each company page IS the hiring manager's name. The greeting reads "Welcome," and the input field continues the sentence with the typed name in plain text (not redacted dots). Example: applying to Cognition's design team, the password is "Joseph" (the hiring manager's name). The user types "Joseph" and sees "Welcome, Joseph" as a complete greeting.
+
+**Concept:** The password field serves dual purpose - authentication and personalized greeting. This turns a security gate into a moment of warmth: the visitor types a name, and the page greets them back. The "joke" is that the password is hiding in plain sight as part of the greeting. It's a design portfolio, not a bank - the security is social (you need to know who to ask), not cryptographic.
+
+**Implementation:**
+- Greeting always ends with comma ("Welcome,"), not period
+- Input is `type="text"` (visible text, no redaction dots)
+- Input text uses IBM Plex Serif font at 2.75rem (greeting is 3.75rem) - close enough for visual coherence as one sentence, distinct enough to signal it's an input
+- Tight spacing between greeting and input (4px instead of 24px) so they read as a flowing two-line sentence
+- `companyName` removed from headline logic (the typed password/name replaces it)
+- Arrow submit button appears in the input's trailing slot when the user starts typing
+
+**Per-company configuration note:** Each company entry in the CMS should set its password to the hiring manager's first name. The `greeting` field (e.g., "Welcome.") provides the sentence opener. This concept replaces the earlier plan to append company name into the greeting headline directly.
+
+**Design principle:** Authentication UX doesn't have to feel like a barrier. When security requirements are low (portfolio access, not financial data), the gate can be a design moment that reinforces the portfolio's personality.
+
+**Files changed:** `LoginClient.tsx`, `login.module.scss`, `page.tsx` (all in `src/app/(frontend)/for/[company]/`)
+
+---
+
+### FB-125: Button shape axis — default zero radius, opt-in soft corners
+
+**Date:** 2026-04-08
+
+**What was the intent:** Align the Button component's default appearance with the B2B design posture (§0: "near-zero" corner radius). The previous default had `border-radius: var(--portfolio-radius-sm)` (2px) on all buttons. The user wanted zero radius as the default and the rounded variant available as an explicit opt-in.
+
+**What was decided:**
+- Added `ButtonShape` type: `"default" | "soft"`
+- New `shape` prop on `Button` (default: `"default"`)
+- `shape="default"`: `border-radius: 0` (sharp corners)
+- `shape="soft"`: `border-radius: var(--portfolio-radius-sm)` (2px, the previous default)
+- Base `.button` class changed from `border-radius: var(--portfolio-radius-sm)` to `border-radius: 0`
+- Updated `docs/design/corner-radius.md` §8.2 to document the Button shape prop
+
+**What was learned:**
+- The prior default (2px on all buttons) contradicted the design posture's "near-zero" principle. Making the sharp edge the default enforces the B2B aesthetic by default, with rounded corners requiring an explicit design decision. This prevents radius drift where new buttons silently accumulate rounded corners without intentional choice.
 
 ---
 
@@ -2262,4 +2516,186 @@ Max/min perceptual distance ratio improved from **1.48x → 1.33x**. Range narro
 - Conditional mounting via `matchMedia` is strictly better than CSS `display: none` for heavy client-only components. CSS hiding still downloads assets, initializes WebGL, and runs the animation loop invisibly. The JS guard prevents all of this
 - Removing the accent bar was the right call - in a split layout, the portrait IS the accent. Having both creates competing visual anchors. The greeting text alone provides enough hierarchy in the card header
 - Cross-category note: also documented in engineering feedback log
+
+---
+
+## Session: 2026-04-09 — Logo/name moved to nav lost original styling
+
+### FB-078: "Font is IBM Plex Serif! And thinner!"
+
+**Date:** 2026-04-09
+
+**What happened:** When moving the logo mark + name from the sidebar identity section into the top Navigation component, the original visual properties were not preserved. Three rounds of correction were needed: (1) the logo mark and text were scaled down to match the nav's small text size instead of keeping their original `2xl` sizing, (2) the font family was set to sans-serif instead of the original IBM Plex Serif, (3) the font weight was set to bold instead of the original regular (400) weight. The CMS stored the name with inline HTML that set the serif font and lighter weight, overriding the `.name` SCSS class defaults.
+
+**Root cause:** When relocating a styled element, the agent read the SCSS class (`.name`) but not the runtime-rendered result. The `.name` class had `font-family: sans`, `font-weight: bold` as CSS defaults, but the `EditableText` component's `htmlContent` + `inlineTypography` props applied CMS-stored inline formatting that overrode those defaults to IBM Plex Serif at regular weight. The agent copied the SCSS source of truth instead of the visual source of truth.
+
+**Anti-pattern:** **DAP-078: When relocating a styled element, always match the rendered visual output, not the CSS class defaults.** Elements with CMS-driven rich text, inline styles, or override props may look completely different from their SCSS class. Before moving, inspect (or ask about) the actual rendered font, weight, size, and color - not just the class definition.
+
+**What was learned:**
+- CSS class values are a floor, not the ceiling. CMS content with `htmlContent` / `inlineTypography` can completely override font-family, weight, and other properties
+- When moving an element between components, verify visual fidelity against the rendered output, not the stylesheet
+- Multiple rounds of "you didn't match the original" feedback on the same move is a signal that the initial approach (read SCSS, copy values) was fundamentally wrong
+
+---
+
+## Session: 2026-04-09 — Reveal footer (sticky hidden-page effect)
+
+### FB-079: Footer should be revealed like a hidden page underneath
+
+**Date:** 2026-04-09
+
+**What happened:** The user wanted the homepage footer to use a "sticky reveal" effect - instead of the footer being a normal block at the bottom of the page, the main content should behave like a page sitting on top, scrolling up to reveal the footer that was quietly sitting underneath all along. This is the inverse of the earlier Redo Media "cover" scroll pattern (content scrolls up to cover what follows); here content scrolls up to reveal what's underneath.
+
+**Implementation:** Added a `.contentWrapper` div around all content above the footer. The wrapper has `position: relative; z-index: 1` and an opaque background matching the body (`var(--portfolio-surface-terra-minimal)`). The footer uses `position: sticky; bottom: 0; z-index: 0`. The sticky positioning pins the footer at the viewport bottom while the opaque content wrapper covers it. As the user scrolls to the bottom, the content slides away and the footer is naturally revealed. Moved the original `margin-top` spacing from the footer to `padding-bottom` on the content wrapper so the opaque background extends through the gap.
+
+**What was learned:**
+- The sticky reveal pattern requires three ingredients: (1) sticky + bottom: 0 on the revealed element, (2) relative + z-index on the covering content, (3) opaque background on the covering content matching the page background
+- Moving margin from the revealed element to padding on the covering wrapper ensures the opaque layer fills the gap - transparent margin would expose the footer prematurely
+- The background-color must use the CSS custom property (`var(--portfolio-surface-terra-minimal)`) rather than the SCSS token to ensure dark mode parity
+
+---
+
+## Session: 2026-04-09 — Nav logo mark hover state not synced with text
+
+### FB-079: "Visual consistency - if it's in the same item, their states should sync"
+
+**Date:** 2026-04-09
+
+**What happened:** The nav logo text ("Yilan Gao") had a hover state transitioning to black (`text-neutral-max`), but the adjacent logo mark (SVG image) stayed static blue on hover. Both elements are children of the same `<a>` link, so their interactive states should be visually synchronized.
+
+**Root cause:** When adding the hover state for the logo text, the agent treated mark and text as independent elements rather than as parts of a single interactive unit. The hover was only applied to `.logoText` and `.logoMark` was ignored.
+
+**Resolution:** Converted `.logoMark` from an `<img>` to a `<span>` using `mask-image: url(...)` with `background-color: $portfolio-accent-60` as the default color. On hover, `background-color` transitions to `var(--portfolio-text-neutral-max)`. This keeps both default and hover states expressed as DS tokens. Initial attempt used `filter: brightness(0)` which was a raw CSS hack violating the token system.
+
+**Design principle:** **DAP-079: All children of a single interactive element (link, button) must share synchronized hover/active/focus states.** If one child changes color on hover, all siblings must respond. This is especially easy to miss when children use different color mechanisms (CSS `color` vs SVG `fill` vs `<img>` with `filter`).
+
+---
+
+### FB-080: "The login page shouldn't have any navigation bar"
+
+**Date:** 2026-04-09
+
+**What happened:** The site navigation (logo + links bar) was rendering on the login page. The user pointed out that a login/gate page should never show site navigation. It leaks the site structure before access is granted and creates dead links that redirect back to login.
+
+**Root cause:** The `Navigation` component was rendered in the shared `(frontend)/layout.tsx`, which wraps ALL routes including the login page at `for/[company]`. In Next.js App Router, layouts are additive and cannot be skipped by child routes.
+
+**Resolution:** Restructured using Next.js route groups. Removed `Navigation` from the shared `(frontend)/layout.tsx` (base layout: fonts, body, providers only). Created a `(site)` route group with its own layout that renders `Navigation`. Moved all portfolio pages into `(site)/`. Gate pages (`for/[company]`) remain outside `(site)/` and inherit only the base layout. SCSS relative imports were updated to account for the extra directory depth.
+
+**Design principle:** **Gate pages (login, password entry) must NEVER show site navigation.** Navigation is a portfolio-internal affordance. The separation must be structural (route groups), not conditional (pathname checks). See `docs/design/navigation.md` §4.8.
+
+---
+
+### FB-081: "Halftone portrait strokes too thick and blurry"
+
+**Date:** 2026-04-09
+
+**What happened:** The halftone portrait on the login page had strokes that looked thick and blurry rather than the intended fine, etched quality. Dark areas of the face appeared blobby with overlapping heavy dashes.
+
+**Root cause:** The dash sizing parameters were too aggressive for the effect's density. `DASH_THICK_MAX = 3.5` and `DASH_LENGTH_MAX = 30.0` with gentle power curves (`pow(x, 0.6)`) meant most dashes in dark areas were near-maximum size. Additionally, the fixed-size buffer with CSS compositing introduced an interpolation step that softened edges.
+
+**Resolution:** Reduced maximum dash dimensions (`THICK_MAX` 3.5 → 3.0, `LENGTH_MAX` 30 → 22), steepened power curves (thickness exponent 0.6 → 0.85, length exponent 0.7 → 0.9) for more gradual dark-area ramp, tightened anti-aliasing, and switched to native-resolution rendering.
+
+**Design principle:** **DAP-081: Halftone/engraving effects should err on the side of fineness.** Thick strokes make the effect look coarse and graphic; thin strokes create an elegant, etched quality. In dark areas, overlapping dashes compound perceived thickness - the power curves mapping darkness-to-size must be steep enough to prevent most dashes from clustering at maximum.
+
+**Cross-category note:** Also documented as ENG-107/ENG-108 (engineering). ENG-107's rendering approach change was reverted due to distortion; the parameter tuning (thinner strokes, steeper curves) was kept.
+
+---
+
+### FB-084: Footer restructured to 4-column layout with Terra20 background
+
+**Date:** 2026-04-09
+
+**What happened:** User requested the email be separated into its own column, the footer background be a step darker in the Terra spectrum, and the columns be narrower with more spacing between them.
+
+**Root cause:** The footer had evolved from a simple CTA+email row to a multi-section component but was still using a 3-column `1fr` grid that stretched columns to fill. The background was `terra-subtle` (terra-10), same as the page content area, making the footer blend in rather than read as a distinct zone.
+
+**Resolution:**
+- Email moved to a dedicated 4th column on the right under a "Contact" eyebrow label
+- Background changed from `var(--portfolio-surface-terra-subtle)` (terra-10) to `$portfolio-terra-20` - one step darker in the Terra scale
+- Grid changed from `repeat(3, 1fr)` to `repeat(4, auto)` with `justify-content: space-between`, making columns content-width
+- Column max-width capped at 240px
+- Gap increased from `$portfolio-spacer-4x` (32px) to `$portfolio-spacer-8x` (64px)
+- All values use design system tokens - no raw pixel values
+
+**Design principle:** Footer sections should be visually distinct from the main content area. A single-step darker surface token creates separation without heaviness. Content-width columns (`auto`) with generous gaps read more refined than equal-width columns that stretch to fill.
+
+**Cross-category note:** Also documented as ENG-144 (engineering).
+
+---
+
+### FB-083: Homepage-v1 archived; major visual redesign of home page layout
+
+**Date:** 2026-04-09
+
+**What happened:** User initiated a new visual direction for the home page. The previous layout (two-column: sticky sidebar + masonry project grid) was archived to `archive/homepage-v1/` for future retrieval. The redesign involved:
+1. Removing the masonry project grid and all testimonial interleaving from the home page
+2. Moving About (bio), Experience (teams list), and Links from the left sidebar to the footer as horizontal columns
+3. Moving the role tagline ("AI Native Product Builder") from the page body to the right side of the top navigation bar
+4. Leaving only the location text in the home page body
+
+**Root cause:** Deliberate creative decision - not a fix. The user wanted to rethink the home page layout while preserving the ability to revert.
+
+**Resolution:** The home page now has a minimal body (location only) with all informational content distributed to the footer (about, experience, links, contact) and navigation (role tagline). The CMS still controls all text. The project grid is gone from the home page but the `/work/[slug]` case study detail pages are completely untouched. The archived version can be restored by copying the three files from `archive/homepage-v1/` back to `src/app/(frontend)/(site)/`.
+
+**Design principle:** When starting a major visual redesign, archive the current version as a complete, self-contained snapshot before making changes. This eliminates the fear of "losing" the current design and enables confident experimentation. The archive is view-layer only - CMS data, schema, and other pages stay in place.
+
+**Cross-category note:** Also documented as ENG-145 (engineering).
+
+---
+
+### FB-082: Home page and navbar background changed to Terra10
+
+**Date:** 2026-04-09
+
+**What happened:** User requested the home page content and navbar to use Terra10 (`#f5f1ec`) instead of the current Terra05 (`#faf8f6`). First attempt set `background-color` on `.page` (`<main>`) but the change was invisible because an inner `contentWrapper` div painted Terra05 over it.
+
+**Root cause:** The `siteShellStyles.contentWrapper` has an opaque background (`--portfolio-surface-terra-minimal` / Terra05) for the sticky footer scroll-reveal effect (z-index layering). Setting a background on the parent `<main>` has no visual effect because the child wrapper fully covers it.
+
+**Resolution:**
+- **Navbar:** `Navigation.module.scss` `.nav` background changed from `$portfolio-terra-05` (SCSS direct reference) to `var(--portfolio-surface-terra-subtle)` (CSS custom property, Terra10 in light mode, neutral-90 in dark mode).
+- **Home page:** Added `.contentWrapperTerraSubtle` composed class in `SiteFooter.module.scss` that inherits from `.contentWrapper` but overrides background to `var(--portfolio-surface-terra-subtle)`. `HomeClient.tsx` uses this class. Case study pages remain on `.contentWrapper` (Terra05).
+- `.page` in `page.module.scss` also has Terra10 as a safety net, though the wrapper is what's visually dominant.
+
+**Design principle:** When a component uses z-index layering with opaque backgrounds for scroll effects, the visible surface token lives on the topmost opaque layer, not the structural parent. Setting color on a parent that's fully occluded by a child is a no-op.
+
+**Cross-category note:** Also documented as ENG-109 (engineering).
+
+---
+
+### FB-083: Case study intro headlines as homepage navigation
+
+**Date:** 2026-04-09
+
+**What happened:** User requested that the homepage display the `introBlurbHeadline` from each case study as large serif links directing to their respective `/work/[slug]` pages, with a one-liner blurb underneath each headline.
+
+**Resolution:**
+- Server component (`page.tsx`) fetches all projects sorted by `order`, extracts `slug` and `introBlurbHeadline` for those that have one set, passes as `caseStudies` prop.
+- Client component (`HomeClient.tsx`) renders them as a staggered list of `<Link>` elements inside a `<nav>` with `aria-label`. Each link contains a headline `<span>` and a blurb `<span>`.
+- **Headline typography:** `$portfolio-font-serif` (IBM Plex Serif) at `clamp($portfolio-type-4xl, 6vw + 1rem, $portfolio-type-8xl)` - the fluid range reaches the largest token in the DS (6rem / 96px) on wide viewports, scaling down to 2.25rem (36px) on mobile. Color: `var(--portfolio-text-primary)`.
+- **Blurb typography:** `$portfolio-font-serif` at `clamp($portfolio-type-2xl, 2vw + 0.5rem, $portfolio-type-3xl)` (24-30px fluid), weight light (300). Color: `$portfolio-text-neutral-regular` (#525252).
+- **Hover pattern (coordinated):** On `.caseStudyLink:hover`, both children shift one step lighter in the neutral scale - headline goes `primary` → `neutral-regular`, blurb goes `neutral-regular` → `neutral-subtle`. Both use `transition: color 0.2s ease`. This keeps the visual hierarchy between headline and blurb consistent across resting and hover states.
+- Section spacing: `$portfolio-spacer-12x` (96px) mobile / `$portfolio-spacer-16x` (128px) desktop.
+
+**Design principle — coordinated hover states:** When a single interactive region (link, card, button) contains multiple text elements at different hierarchy levels, each element's hover state must shift by the same relative step in the token scale. This preserves the resting visual hierarchy during interaction. Never apply hover to just one element while leaving siblings static - the inconsistency reads as a broken affordance.
+
+---
+
+### FB-084: Zero corner radius branding enforcement
+
+**Date:** 2026-04-10
+
+**What happened:** User established a core branding decision for the portfolio website: zero border-radius on all elements. The initial documentation (branding.md) was created but no CSS/SCSS changes were made. User reported that badges, image containers, and placeholder cards all still had visible rounded corners.
+
+**Root cause:** Documentation-only change. The branding rule was written into `docs/design/branding.md` and referenced in `AGENTS.md`, but the actual SCSS files and CSS custom properties were never modified. Border-radius came from two sources: (1) CSS custom properties (`var(--portfolio-radius-*)`) used by DS components, and (2) SCSS variables (`$portfolio-radius-*`) compiled directly into page-level styles.
+
+**Resolution:**
+- Created `src/app/(frontend)/(site)/layout.module.scss` with CSS custom property overrides that zero out `--portfolio-radius-xs` through `--portfolio-radius-2xl`. This handles all DS components (Badge squared, Card, Input, Dialog, Tooltip, etc.) rendered inside the `(site)` route group.
+- `--portfolio-radius-full` is intentionally NOT overridden to preserve structural exceptions (Avatar, Toggle, Slider, ProgressBar).
+- Updated `(site)/layout.tsx` to wrap content in a `div.siteWrapper` that applies the overrides.
+- Fixed Badge `squared` variant SCSS to use `border-radius: 0` instead of `var(--portfolio-radius-sm)`.
+- Replaced all SCSS variable radius values with `0` in every `(site)` page SCSS file: `page.module.scss`, `work/[slug]/page.module.scss`, `experiments/page.module.scss`, `contact/page.module.scss`, `typography/page.module.scss`, `design-system/motion/page.module.scss`.
+- Fixed Badge usages: `HomeClient.tsx` essay badge and `ExperimentsClient.tsx` tags now use `shape="squared"` instead of `pill`.
+- Added Hard Guardrail Design #9 in `AGENTS.md` and Pre-Flight route 16 for mandatory branding reference reading.
+
+**Design principle — documentation is not implementation:** Writing a rule into a reference file does not change the rendered output. Branding decisions that affect visual properties must be implemented in CSS/SCSS alongside the documentation. The two-pronged approach (CSS custom property override for DS components + direct SCSS variable replacement for page-level styles) ensures complete coverage.
 

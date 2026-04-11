@@ -19,7 +19,14 @@
 - The default for any new element is `rounded-sm` (2px). If you're unsure, use `rounded-sm`.
 - `rounded-full` is reserved for elements whose identity depends on being circular or pill-shaped.
 - When in doubt, prefer sharper. A 0px corner is always acceptable; an 8px corner rarely is.
+- **Button `shape` prop:** The `Button` component defaults to `shape="default"` (0px radius). Use `shape="soft"` to opt into the `rounded-sm` (2px) radius when the context calls for a gentler appearance.
 
-### 8.3 Rationale
+### 8.3 Portfolio Website Override
 
-B2B products communicate precision, density, and utility. Large corner radii signal friendliness and approachability — appropriate for consumer apps but incongruent with professional tools. The 0–2px range keeps edges crisp while avoiding the harshness of perfectly square corners.
+**The portfolio website (yilangao.com) uses zero border-radius on all elements.** The radius scale above applies to the design system generally (playground, other apps), but the main site strips all corner radius as a branding decision. See [`docs/design/branding.md`](branding.md) §1 for the full rule, exceptions, and enforcement checklist.
+
+When working on the portfolio site: ignore the `rounded-sm` default above and use `0` for everything except structural exceptions (avatars, progress bars, toggle switches).
+
+### 8.4 Rationale
+
+B2B products communicate precision, density, and utility. Large corner radii signal friendliness and approachability — appropriate for consumer apps but incongruent with professional tools. The 0–2px range keeps edges crisp while avoiding the harshness of perfectly square corners. The portfolio takes this further with a full zero-radius identity — see branding rationale in §1.4 of the branding reference.

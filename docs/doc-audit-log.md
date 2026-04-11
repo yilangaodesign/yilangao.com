@@ -66,3 +66,41 @@
 - Duplicate IDs found: AP-048 (two design entries share the same ID), EAP-038 (two engineering entries share the same ID). These should be renumbered in the next session.
 - `content-feedback-log.md` (20 entries, 553 lines) is approaching the 30-entry threshold — will need archival infrastructure (synthesis + archive files) when it exceeds 30.
 - Consider creating `docs/engineering/*.md` spoke files if `engineering.md` grows beyond hub size.
+
+---
+
+## Audit — 2026-04-11
+
+**Scope:** Targeted audit after progressive asset preloading pipeline (ENG-115) implementation. Focused on architecture consistency, repo map accuracy, and cross-file references.
+**Triggered by:** User request following ENG-115 implementation.
+
+### Findings
+
+| # | Finding | Severity | Resolution |
+|---|---------|----------|------------|
+| 1 | `architecture.md` §7 Repo Map showed flat route structure (`about/ work/ blog/` under `app/`), but routes now live under `(frontend)/(site)/` with a shared shell layout | Critical | Rewrote Repo Map to show `(frontend)/(site)/` nesting, `(payload)/`, `for/[company]/` outside shell |
+| 2 | `architecture.md` §2 had no mention of route architecture or the `(site)` route group (Navigation + SiteFooter shell) | Moderate | Added "Route Architecture" subsection with ASCII tree and explanation |
+| 3 | `architecture.md` §2 UI component list showed 15 components, actual count is 46 | Critical | Replaced flat list with categorized inventory (Forms, Layout, Navigation, Overlays, Motion, Theming) |
+| 4 | `architecture.md` had no mention of the preloading pipeline despite it being a core architectural feature | Moderate | Added "Progressive Asset Preloading (ENG-115)" subsection under §2 with diagram and two-layer cache explanation |
+| 5 | `architecture.md` §3 Playground listed 11 component previews by name — actual count is 44 pages | Moderate | Replaced with count + pattern description (avoids future drift) |
+| 6 | `architecture.md` Repo Map was missing: `src/hooks/`, `src/components/CursorThumbnail/`, `src/components/SiteFooter/`, `website.json`, `ascii-tool/`, `scripts/version-*.mjs`, preloading lib files | Moderate | All listed in updated Repo Map |
+| 7 | `engineering/storage.md` covered only Supabase Storage (backend) — no mention of frontend asset caching/preloading | Moderate | Added §12.5 "Frontend Asset Preloading" with loading levels table, two-layer cache model, key files, and concurrency rules |
+| 8 | `engineering.md` Section Index §12 described as "Media Storage" — too narrow after adding §12.5 | Low | Updated to "Media Storage & Preloading" |
+| 9 | ENG-115 feedback log entry lacked the deliberate no-persistence rationale for the PreloadManager cache | Moderate | Added follow-up section to ENG-115 documenting the two-layer cache design and why sessionStorage persistence was rejected |
+
+### Files Modified
+
+- `docs/architecture.md` — Route Architecture subsection, Progressive Asset Preloading subsection, full Repo Map rewrite, UI component inventory update, Playground component count update, updated timestamp
+- `docs/engineering/storage.md` — Added §12.5 (Frontend Asset Preloading), updated timestamp
+- `docs/engineering.md` — Updated §12 label in Section Index, updated timestamp
+- `docs/engineering-feedback-log.md` — Added cache persistence rationale follow-up to ENG-115
+
+### Carry-forward from Previous Audit
+
+- **Still open:** Duplicate IDs AP-048 (design) and EAP-038 (engineering) need renumbering.
+- **Still open:** `content-feedback-log.md` approaching 30-entry archival threshold.
+
+### Notes for Next Audit
+
+- Verify `architecture.md` component count stays in sync with `src/components/ui/` — the categorized format is more maintainable but counts may drift.
+- Check if the playground's "44 pages" count is still accurate.

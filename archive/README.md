@@ -14,6 +14,9 @@ revisit past explorations.
 archive/
   experiment-01/     Artifacts shelved from the experiment-01 branch
   experiment-02/     Artifacts shelved from the experiment-02 branch
+  homepage-v1/       Home page snapshot (2026-04-09) — two-column sidebar + masonry grid
+    pages/           page.tsx (server), HomeClient.tsx (client)
+    styles/          page.module.scss
   shared/            Design system explorations not tied to a single experiment
     tokens/          Color palettes, type scales, etc. that were tried but not adopted
     components/      Generic components explored but not kept

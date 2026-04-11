@@ -4,9 +4,38 @@
 >
 > **Who reads this:** AI agents at session start (scan recent entries for context), and during content feedback processing (check for recurring patterns).
 > **Who writes this:** AI agents after each content feedback cycle.
-> **Last updated:** 2026-04-06 (CFB-030: ETRO editorial revision from external editor critiques)
+> **Last updated:** 2026-04-10 (CFB-032: Site nav tagline — role line refresh)
 >
 > **For agent skills:** Read only the first 30 lines of this file (most recent entries) for pattern detection. The full file is a historical audit trail — do not read it in its entirety during normal work.
+
+---
+
+## Session: 2026-04-10 — Site Nav Tagline
+
+#### CFB-032: Top navigation tagline text update
+
+**Intent:** Replace the identity line shown next to the site name in the main nav with a clearer formulation of role and employer.
+
+**Resolution:** Updated `SITE_ROLE_DISPLAY` in `src/lib/site-role-display.ts` to `Designer, AI Systems & Experience | Goldman Sachs`. Extended `resolveSiteRoleFromCms` so rows still storing the previous canonical string (`AI-Native Product Builder. Currently at Goldman Sachs`) normalize to the new line without a manual CMS edit.
+
+---
+
+## Session: 2026-04-08 — Login Page Placeholder Copy
+
+#### CFB-031: Login page placeholder — "(what I told you)"
+
+**Intent:** With the password-as-name concept (password is visible text, not dots), the placeholder/ghost text needed to serve two masters: (1) tell users to type their password, and (2) not break the "Welcome, ___" greeting sentence visually or tonally.
+
+**Exploration path:** Three options were tested live:
+1. **Ellipsis (`…`)** — Minimalist. "Welcome, ..." reads as an incomplete thought. Visually weightless at 2.75rem serif. Lets the design speak. But the user wanted to evaluate alternatives.
+2. **"your password"** — Functional sentence fragment. "Welcome, your password" is unmistakable but flat. Tested and moved on.
+3. **"(what I told you)"** — Conversational parenthetical. Implies a prior relationship ("I already gave you the password via email/message"). Has personality without being precious. The parentheses signal it's an aside, not part of the greeting sentence.
+
+**Decision:** "(what I told you)" — selected by the user for its tonal balance between functional clarity and personality. It's idiot-proof (the parentheses and phrasing make it obviously a prompt, not content), conversational (assumes a human relationship), and portfolio-appropriate (a design portfolio can afford warmth that a banking app cannot).
+
+**Principle:** At oversized display fonts (2.75rem+), placeholder text is a visual event, not a footnote. Length matters as much as tone — "Type your password" at 44px serif would dominate the layout. Shorter placeholders let the greeting and the input share the visual stage. When the placeholder IS visible at display scale, treat it as UX microcopy with brand voice, not boilerplate.
+
+**Cross-category note:** The placeholder required a custom rendering approach (span overlay instead of native `placeholder` attribute) due to browser focus behavior disabling `text-overflow: ellipsis` — documented as ENG-139.
 
 ---
 

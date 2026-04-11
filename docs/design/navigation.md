@@ -183,3 +183,33 @@ When a component has multiple display modes (collapsed/expanded sidebar, mobile/
 Never allow transient state from one mode to persist visually in another mode where it doesn't belong. A flyout that stays open when the sidebar expands creates a duplicate control. A hover state that persists when the layout changes creates a ghost element.
 
 The safest default is **reset on mode change**: `useEffect(() => { setOpen(false); setQuery(""); }, [collapsed])`. Transfer is more polished but requires more careful state management.
+
+---
+
+## §4.8 Gate Pages — Navigation Exclusion
+
+**Source:** Session 2026-04-09, "The login page shouldn't have any navigation bar."
+
+Gate pages (login, password entry, onboarding) exist OUTSIDE the authenticated experience. They are the boundary the visitor crosses to enter the portfolio. Navigation belongs to the world inside that boundary, not outside it.
+
+**Principle:** The site navigation must NEVER appear on gate pages (login, password entry). Navigation is a portfolio-internal affordance. Showing it on gate pages:
+- Leaks the site structure before the visitor has gained access
+- Creates dead links (the visitor has no session, so nav links redirect back to login)
+- Dilutes the focused, intentional feel of the gate experience
+
+**Implementation:** Next.js route groups enforce this structurally, not conditionally. The `(frontend)` layout provides shared infrastructure (fonts, body, providers) but no navigation. The `(site)` route group adds navigation via its own layout. Gate routes (`for/[company]`) sit outside `(site)` and inherit only the base layout.
+
+```
+src/app/(frontend)/
+  layout.tsx              ← shared (fonts, body, providers) — NO navigation
+  for/[company]/          ← gate pages (login) — no nav
+  (site)/
+    layout.tsx            ← adds Navigation
+    page.tsx              ← home
+    about/
+    work/
+    contact/
+    ...                   ← all portfolio pages — have nav
+```
+
+**Why structural, not conditional:** A layout that checks the pathname and hides the nav is fragile (new gate routes must be added to an exclusion list) and renders Navigation in the DOM regardless. Route groups make the separation architectural — new gate pages automatically inherit the correct layout by being placed outside `(site)/`.

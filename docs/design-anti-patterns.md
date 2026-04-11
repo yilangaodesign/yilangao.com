@@ -19,9 +19,9 @@
 | Interaction & Pointer Behavior | AP-011, AP-012, AP-022, AP-025, AP-035 | 5 | 5 |
 | Navigation & Menus | AP-014, AP-015, AP-016, AP-029, AP-046, AP-049 | 6 | 6 |
 | Visual Hierarchy & Affordances | AP-010, AP-017, AP-019, AP-026, AP-030, AP-032, AP-039, AP-040, AP-041, AP-048‡, AP-050, AP-051, AP-052, AP-054, AP-057, AP-060 | 16 | 16 |
-| Form & Input UX | AP-023, AP-024, AP-028, AP-036 | 4 | 4 |
+| Form & Input UX | AP-023, AP-024, AP-028, AP-036, AP-064, AP-065 | 6 | 6 |
 | Admin UI Patterns | AP-034, AP-037 | 2 | 2 |
-| **Total** | | **56** | **56** |
+| **Total** | | **58** | **58** |
 
 > **†** AP-048 "Independent Padding Decisions Across Adjacent Panels" (spacing entry)
 > **‡** AP-048 "Incremental State-by-State Implementation Without a Holistic Model" (state modeling entry)
@@ -861,15 +861,17 @@ Use `var(--ds-*, #{$scss-fallback})`. The CSS custom property adapts at runtime;
 
 ---
 
-## AP-054: Changing border-width Without Padding Compensation
+## AP-054: Changing border-width on State Transitions
 
-**Trigger:** Writing CSS that changes `border-width` (or `border-bottom-width`) on `:focus`, `:focus-within`, `:hover`, or `:active` without simultaneously reducing padding by the same amount.
+**Trigger:** Writing CSS that changes `border-width` (or `border-bottom-width`) on `:focus`, `:focus-within`, `:hover`, or `:active`.
 
-**Why it's wrong:** Changing `border-width` without compensating padding causes layout reflow. The extra pixels push all internal content (text, icons, placeholders) inward, producing a visible jump/flicker every time the state changes. This is especially noticeable on form inputs where focus toggles rapidly.
+**Why it's wrong:** Changing `border-width` on state transitions triggers browser layout reflow. Even with padding compensation (`calc(padding - offset)`), the reflow is visible in flex-centered layouts where the parent recalculates centering. The math may be correct (total height is stable), but the browser's rendering pipeline is not atomic — the reflow frame causes a visible jitter on surrounding elements. This was observed three times: FB-088 (internal content shift), this session (external layout jitter on login page greeting text above the input, inside a `justify-content: center` flex parent).
 
-**Correct alternative:** Use CSS custom properties for base padding (`--_ic-py`, `--_ic-px`) and a `--_border-offset` variable (default `0px`, set to the border increase on focus). Compute padding as `calc(var(--_ic-py) - var(--_border-offset))`. When border goes from 1px to 2px, set `--_border-offset: 1px` — content stays fixed while the border visually thickens. This preserves distinct state affordances (thin→thick) without layout shift.
+**Correct alternative:** Never change `border-width` on interactive states. Use a constant border width (e.g., `$portfolio-border-width-regular` / 2px) at all times with permanent padding compensation (`--_border-offset: 1px`). Differentiate states by `border-color` only: resting (subtle), hover (bold), focus (bold). This is zero-layout-shift by construction — no reflow, no centering recalculation, no jitter.
 
-**Frustration caused:** 1 round — user noticed "everything jumps" on input click.
+**Previous (insufficient) alternative:** Padding compensation via `--_border-offset` variable flipped from `0px` to `1px` on focus. This fixed internal content shift but still caused external layout jitter in flex-centered containers.
+
+**Frustration caused:** 3 rounds — FB-088 (internal shift), FB-086 (box-shadow rejected, switched to border-width), this session (external jitter still present despite padding compensation).
 
 ---
 
@@ -954,6 +956,30 @@ Use `var(--ds-*, #{$scss-fallback})`. The CSS custom property adapts at runtime;
 **Correct alternative:** Create co-located SCSS modules (`*.module.scss`) that `@use` DS mixins and reference `var(--portfolio-*)` custom properties. Import as `import s from "./component.module.scss"` and use `className={s.className}`. Dynamic data-driven values (e.g., `style={{ backgroundColor: tokenColor }}`) are the one acceptable inline style. See SKILL.md "Styling Policy" section.
 
 **Frustration caused:** 3+ rounds — user repeatedly flagged Tailwind in playground across multiple sessions.
+
+---
+
+## AP-064: Native `<input>` Text Rendering for Display-Scale Serif Fonts
+
+**Trigger:** Using a native `<input>` element to render serif text at display scale (2rem+), where glyph flourishes (tittles, hooks, swashes) have negative left side-bearing.
+
+**Why it's wrong:** The browser's `<input>` element clips text at the glyph origin with an internal boundary that no CSS can override (padding, overflow, box-sizing all tested exhaustively). Serif characters like "j", "f", or italic glyphs that extend left of their origin get clipped at the leftmost pixel. This is invisible at normal font sizes (14-18px) because the overhang is sub-pixel, but at 2.75rem (44px) the clipping is obvious.
+
+**Correct alternative:** Text overlay pattern: make the input's text `color: transparent` (preserving caret via `caret-color`), and render a sibling `<span>` with `position: absolute` displaying the same value. The `<span>` has standard DOM text rendering with no internal clip. Handle `::selection` on the hidden input to show a branded highlight.
+
+**Frustration caused:** 6+ rounds — user escalated through multiple CSS-only attempts before the root cause was identified as a browser limitation. See FB-129, ENG-139.
+
+---
+
+## AP-065: Centered-Align Footer Text Below Left-Aligned Form Elements
+
+**Trigger:** Using `text-align: center` on helper/footer text below a left-aligned input field or form group, where the form and footer share a narrow container.
+
+**Why it's wrong:** The footer's visual left edge doesn't align with the input's left edge, creating a jagged left column. At narrow widths (380px card), the centering indent is small but perceptible — the eye expects a shared left edge. The user reads this as "these elements aren't related" even though they are.
+
+**Correct alternative:** Left-align the footer to share the same left edge as the form elements above. In narrow containers (under ~500px), left-alignment creates a cleaner visual stack than centering.
+
+**Frustration caused:** 1 round — FB-127.
 
 ---
 

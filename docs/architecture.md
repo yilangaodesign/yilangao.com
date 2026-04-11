@@ -4,7 +4,7 @@
 > and playground UI relate to each other — where code lives, how it flows, how it's
 > published, and how it's deployed.
 >
-> **Last updated:** 2026-04-02
+> **Last updated:** 2026-04-11 (ENG-115: progressive preloading pipeline, `(site)` route group, repo map refresh)
 
 ---
 
@@ -95,6 +95,28 @@ The `NPM_TOKEN` needs `read:packages` scope (or `write:packages` for publishing)
 
 **Framework:** Next.js 16 with Sass, Framer Motion, Payload CMS
 **Dev port:** 4000
+**Version manifest:** `website.json`
+
+### Route Architecture
+
+```
+src/app/
+├── (frontend)/               # Public-facing, behind proxy.ts password gate
+│   ├── (site)/               # Route group with shared Navigation + SiteFooter shell
+│   │   ├── page.tsx          # Homepage
+│   │   ├── about/            # About page
+│   │   ├── work/             # Case study list
+│   │   ├── work/[slug]/      # Case study detail
+│   │   ├── blog/ contact/ reading/ experiments/ typography/
+│   │   ├── design-system/motion/
+│   │   └── layout.tsx        # Shell layout (Navigation + SiteFooter from CMS)
+│   ├── for/[company]/        # Login page (outside site shell — no nav/footer)
+│   ├── api/                  # API routes
+│   └── layout.tsx            # Frontend root layout (globals, fonts, AdminBar)
+└── (payload)/                # Payload CMS admin panel
+```
+
+The `(site)` route group wraps all portfolio pages in a shared shell (Navigation bar + SiteFooter), both populated from the CMS `site-config` global. The login page (`for/[company]`) sits outside this group — it renders a standalone themed page without the navigation or footer.
 
 ### How It Consumes the Design System
 
@@ -106,13 +128,33 @@ The `NPM_TOKEN` needs `read:packages` scope (or `write:packages` for publishing)
 
 ### UI Component Layer (`src/components/ui/`)
 
-Foundational UI primitives live in `src/components/ui/`, organized by component:
+Foundational UI primitives live in `src/components/ui/`, organized by component (46 total):
 
 ```
 src/components/ui/
-  Button/       Card/        Badge/       Divider/     Avatar/
-  Input/        Textarea/    Select/      Checkbox/    Toggle/
-  Tooltip/      Dialog/      DropdownMenu/ Tabs/       Toast/
+  ── Forms & Inputs ──────────────────────────────────────────────
+  Button/  ButtonSelect/  Input/  Textarea/  Select/  Checkbox/
+  Toggle/  Slider/  ScrubInput/  ColorPicker/  Dropzone/
+
+  ── Layout & Structure ──────────────────────────────────────────
+  Card/  Badge/  BadgeOverlay/  Divider/  Avatar/  Eyebrow/
+  Table/  DescriptionList/  TextRow/  ProgressBar/  InlineCode/
+  CodeBlock/  Kbd/
+
+  ── Navigation & Shell ──────────────────────────────────────────
+  Navigation/  NavItem/  Footer/  VerticalNav/  Menu/  Tabs/
+  ScrollSpy/  CommandMenu/  Sheet/
+
+  ── Overlays & Feedback ─────────────────────────────────────────
+  Tooltip/  Dialog/  DropdownMenu/  Toast/  TestimonialCard/
+
+  ── Motion & Animation ──────────────────────────────────────────
+  FadeIn/  StaggerChildren/  MountEntrance/  ExpandCollapse/
+  ArrowReveal/  Marquee/
+
+  ── Theming ─────────────────────────────────────────────────────
+  ThemeToggle/  ThemeProvider/
+
   index.ts      (barrel re-export)
 ```
 
@@ -134,6 +176,27 @@ import { Button, Card, Badge } from "@/components/ui";
 
 **Tier 4 — Headless data layer (future):** For complex data-heavy components, use headless logic libraries: `@tanstack/react-table` for data tables, `react-hook-form` + `zod` for form validation, `react-day-picker` for date picking, `@tanstack/react-virtual` for virtualized lists. These handle logic without imposing design.
 
+### Progressive Asset Preloading (ENG-115)
+
+The site pre-downloads images and videos before the user navigates to them, eliminating loading delays across the portfolio browsing experience:
+
+```
+Login page                    Homepage                       Case study
+─────────                     ────────                       ──────────
+Server renders                On hydration, PreloadManager   bump(slug) promotes
+<link rel="preload">          seeds the manifest:            that study's assets
+for cursor thumbnails         1. Heroes (Tier 1, 3 parallel) to Tier 0 (highest
+(Tier 0, before JS)           2. Content (Tier 2, sequential) priority)
+```
+
+**The PreloadManager** (`src/lib/preload-manager.ts`) is a module-level singleton that survives client-side route transitions (unlike React state, which unmounts). It maintains a priority queue and a `loaded` Set for deduplication. When a user enters a case study, `bump(slug)` promotes that study's content to the front of the queue.
+
+**Two cache layers:**
+- **JS memory** (`PreloadManager.loaded`): dedup tracker, resets on refresh. Intentionally not persisted.
+- **Browser HTTP cache** (disk): stores actual bytes via CDN `Cache-Control` headers. Survives refresh. This is the real persistence layer.
+
+For full details see `docs/engineering/storage.md` §12.5.
+
 ### Local vs Package Tokens
 
 | Location | Role |
@@ -154,7 +217,7 @@ import { Button, Card, Badge } from "@/components/ui";
 ### What It Provides
 
 - **Token galleries** — color, typography, spacing, motion, elevation
-- **Component previews** — FadeIn, Marquee, ArrowReveal, ExpandCollapse, MountEntrance, Navigation, Footer, ThemeToggle, Button, ScrollSpy, TestimonialCard
+- **Component previews** — 44 pages under `playground/src/app/components/`, one per `src/components/ui/` component. Each page is a thin harness that imports and renders the production component via `@ds/*` alias (see playground skill for rules).
 - **Archive browser** — UI for browsing, restoring, and managing archived experiments
 - **Fuzzy search** — Fuse.js-powered sidebar search across all pages
 
@@ -416,21 +479,40 @@ Once a local UI component is stable and used in production:
 yilangao.com/
 ├── src/                          # Main site source
 │   ├── app/                      # Next.js App Router pages
-│   │   ├── design-system/        # Motion showcase (uses package)
-│   │   ├── about/ work/ blog/ contact/ reading/ experiments/
-│   │   ├── for/[company]/        # Password gate login page (themed per company)
-│   │   └── api/                  # Payload CMS API routes
+│   │   ├── (frontend)/           # Public-facing routes (behind password gate)
+│   │   │   ├── (site)/           # Route group: Navigation + SiteFooter shell
+│   │   │   │   ├── page.tsx      # Homepage (case study list + asset manifest)
+│   │   │   │   ├── about/ work/ blog/ contact/ reading/ experiments/ typography/
+│   │   │   │   ├── work/[slug]/  # Case study detail page
+│   │   │   │   ├── design-system/motion/  # Motion showcase
+│   │   │   │   └── layout.tsx    # Shared shell: Navigation + SiteFooter
+│   │   │   ├── for/[company]/    # Password gate login page (themed per company)
+│   │   │   ├── layout.tsx        # Frontend root layout (globals, fonts)
+│   │   │   └── api/              # Payload CMS API routes (seed, update-elan)
+│   │   └── (payload)/            # Payload CMS admin
 │   ├── collections/              # Payload CMS collection definitions
 │   │   └── Companies.ts          # Company access control (passwords, themes, analytics)
 │   ├── components/               # Site components
 │   │   ├── ui/                   # Foundational UI primitives (Button, Card, etc.)
+│   │   ├── CursorThumbnail/      # Cursor-following thumbnail on homepage hover
+│   │   ├── SiteFooter/           # Site-wide footer with bio, teams, links
 │   │   └── admin/                # Payload admin customizations + CompanyDashboard
+│   ├── hooks/                    # Custom React hooks
+│   │   └── use-cursor-thumbnail.ts  # Pointer tracking, lerp animation, preload delegation
 │   ├── styles/                   # Site-specific SCSS (overrides + local tokens)
 │   │   ├── tokens/               # Local token files
 │   │   └── mixins/               # Local mixins
-│   ├── lib/                      # Utilities
+│   ├── lib/                      # Shared utilities
 │   │   ├── company-session.ts    # Password gate session cookie utilities
-│   │   └── company-data.ts       # Company Payload queries (getCompanyBySlug, analytics)
+│   │   ├── company-data.ts       # Company Payload queries (getCompanyBySlug, analytics)
+│   │   ├── preload-manager.ts    # Progressive asset preloading singleton (ENG-115)
+│   │   ├── extract-content-urls.ts  # RawBlock/AssetEntry/AssetManifest types + URL extractor
+│   │   ├── resolve-thumbnail-url.ts # Cursor thumbnail URL resolver
+│   │   ├── project-filters.ts    # HIDDEN_FROM_HOME + isVisibleOnHome predicate
+│   │   ├── payload.ts            # Payload client factory
+│   │   ├── lexical.ts            # Lexical rich text extraction and conversion
+│   │   ├── home-case-subline.ts  # Homepage case study subline copy
+│   │   └── ...                   # Additional utilities (admin-auth, motion, breakpoints)
 │   ├── scripts/                  # One-time scripts
 │   │   └── seed-companies.ts     # Migrate companies.json → Payload collection
 │   └── proxy.ts                  # Server-side password gate (Next.js 16 proxy)
@@ -440,22 +522,27 @@ yilangao.com/
 │   │   ├── components/           # Sidebar, shell, previews, archive UI
 │   │   └── lib/                  # Token data mirror, archive manifest
 │   └── package.json              # Independent dependencies
+├── ascii-tool/                   # ASCII Art Studio (separate Next.js app)
+│   └── package.json              # Independent dependencies
 ├── archive/                      # Shelved experiments
 │   └── registry.json             # Component/artifact registry
 ├── scripts/
-│   └── sync-tokens.mjs           # SCSS → playground token sync
+│   ├── sync-tokens.mjs           # SCSS → playground token sync
+│   └── version-*.mjs             # Version analysis, bump, and release scripts
 ├── docs/
 │   ├── architecture.md           # ← This file
 │   ├── design.md                 # Design knowledge hub → docs/design/*.md spokes
-│   ├── engineering.md            # Engineering knowledge hub
+│   ├── engineering.md            # Engineering knowledge hub → docs/engineering/*.md spokes
 │   ├── content.md                # Content strategy hub → docs/content/*.md spokes
 │   ├── design/                   # Design spoke files (color, spacing, navigation, etc.)
+│   ├── engineering/              # Engineering spoke files (storage, port-mgmt, debugging, etc.)
 │   ├── content/                  # Content spoke files (case-study, homepage, etc.)
 │   ├── *-anti-patterns.md        # Anti-pattern catalogs (design, engineering, content)
 │   ├── *-feedback-log.md         # Active feedback logs (30 entries each)
 │   ├── *-feedback-log-archive.md # Archived feedback entries (cold storage)
 │   ├── *-feedback-synthesis.md   # Distilled lessons from archived entries
 │   └── port-registry.md          # Dev server port assignments
+├── website.json                  # Main site version manifest
 ├── AGENTS.md                     # AI agent rules and protocols
 ├── renovate.json                 # Auto-update design system dependency
 └── package.json                  # Main site dependencies

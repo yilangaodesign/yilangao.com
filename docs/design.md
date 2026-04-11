@@ -35,6 +35,7 @@
 | §21 | Undocumented Patterns | [`docs/design/admin-ui.md`](design/admin-ui.md) | DS gap analysis |
 | §22 | Button Sizing | [`docs/design/button-sizing.md`](design/button-sizing.md) | Icon/label proportionality |
 | §23 | Tooltip | [`docs/design/tooltip.md`](design/tooltip.md) | Tooltip component, InfoTooltip, placement, content guardrails |
+| §24 | Branding — yilangao.com | [`docs/design/branding.md`](design/branding.md) | **Always** for portfolio site UI work |
 | §7 | Process Principles | *(this file)* | Meta — how to diagnose |
 | App. | Frequency Map | *(this file)* | Checking recurring patterns |
 
@@ -222,6 +223,11 @@ When a design system primitive exists for a UI role (for example `Avatar`), comp
 | Semantic intent naming (props/tokens named by context, not CSS effect) | 1 | Critical — FB-071: Eyebrow `mono` renamed to `metric`. Establishes guardrail Design #8 and Process Principle §7.7. |
 | Slot semantic separation (distinct roles for affix vs icon vs generic content) | 1 | High — FB-073: Input `trailing` slot added. `suffix` was conflating value affixes with generic content like Kbd. |
 | Decorative font weight mismatch (synthetic bolding destroys pixel font patterns) | 1 | High — AP-062: Geist Pixel fonts ship at weight 500 only. Using 700 triggers synthetic bolding that fills decorative gaps. |
+| Display-scale serif in native `<input>` (glyph clipping) | 1 | High — FB-129: Browser clips serif flourishes at text origin. Text overlay pattern is the only fix. See AP-064, EAP-077. |
+| Component icon sizing at overridden font scale | 1 | High — FB-128: Icons calibrated for lg (22px) are disproportionate when font overridden to 2.75rem (44px). Override icon size + alignment in page SCSS. |
+| Selection highlight as brand micro-touchpoint | 1 | Medium — FB-130: `::selection` background with brand palette (Terra-20) instead of browser default blue. |
+| Footer/form left-edge alignment in narrow cards | 1 | Medium — FB-127: Centered footer under left-aligned form creates jagged left column. See AP-065. |
+| Button states on colored surfaces (solid vs overlay) | 1 | High — FB-136: `onColor` prop swaps solid hover/active to transparent overlays for tinted backgrounds. |
 
 ---
 

@@ -23,7 +23,7 @@
 
 | Service | Default Port | Current Port | Status | PID | Notes |
 |---|---|---|---|---|---|
-| Main site (`yilangao.com`) | 4000 | 4000 | running | 40363 | `npm run dev` (webpack mode) |
+| Main site (`yilangao.com`) | 4000 | 4000 | running | 30583 | `npm run dev` (webpack mode) |
 | Playground | 4001 | 4001 | running | 40407 | `npm run playground` |
 | ASCII Art Studio | 4002 | 4002 | running | 31667 | `npm run ascii-tool` |
 
@@ -38,6 +38,8 @@
 
 | Timestamp (UTC) | Service | Action | Port | Reason |
 |---|---|---|---|---|
+| 2026-04-09 20:35 | Main site | restarted | 4000 | User kill + reboot login page — SIGKILL prior node listener, cleared `.next`, fresh `npm run dev` |
+| 2026-04-08 22:06 | Main site | restarted | 4000 | Restarted to pick up next.config.ts images.remotePatterns for next/image optimization |
 | 2026-04-08 21:35 | Main site, Playground | started | 4000, 4001 | User boot up — main site had listener on 4000 but HTTP timed out (stuck node 49260); SIGKILL + `npm run dev`; playground was down; `npm run playground`; ASCII already healthy on 4002 |
 | 2026-04-08 | All services | restarted | 4000–4002 | Stale server hanging on Payload schema push prompt (company_name column drift); killed all, dropped stale column, cleared .next, fresh start |
 | 2026-04-07 | All services | started | 4000–4002 | User boot up — ports not responding; main site, playground, ASCII Art Studio started; PIDs recorded |
