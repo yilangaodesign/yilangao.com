@@ -1,0 +1,155 @@
+@use '../../styles' as *;
+
+// Shared with home + case studies: main column sits above sticky footer band.
+
+.contentWrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 1;
+  background-color: var(--portfolio-surface-terra-minimal);
+  padding-bottom: $portfolio-spacer-6x;
+  box-shadow: 0 10px 48px -8px rgba(0, 0, 0, 0.035);
+}
+
+.contentWrapperTerraSubtle {
+  composes: contentWrapper;
+  background-color: var(--portfolio-surface-terra-subtle);
+}
+
+.contentWrapperNeutralMinimal {
+  composes: contentWrapper;
+  background-color: var(--portfolio-surface-neutral-minimal);
+}
+
+.footer {
+  position: sticky;
+  bottom: 0;
+  z-index: 0;
+  background-color: var(--portfolio-surface-terra-subtle);
+}
+
+.footerInner {
+  max-width: $elan-container-wide;
+  margin: 0 auto;
+  padding: $portfolio-spacer-5x $portfolio-spacer-2x;
+
+  @media #{$elan-mq-md} {
+    padding: $portfolio-spacer-5x $portfolio-spacer-4x;
+  }
+}
+
+.footerColumns {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $portfolio-spacer-3x;
+
+  @media #{$elan-mq-sm} {
+    grid-template-columns: repeat(4, auto);
+    justify-content: space-between;
+    gap: $portfolio-spacer-8x;
+  }
+}
+
+.footerColumn {
+  display: flex;
+  flex-direction: column;
+  gap: $portfolio-spacer-1x;
+  max-width: 240px;
+}
+
+.columnLabel {
+  display: block;
+  color: $portfolio-text-placeholder;
+  margin-bottom: $portfolio-spacer-0-5x;
+}
+
+.footerBio {
+  @include body-sm;
+  line-height: $portfolio-leading-relaxed;
+  color: $portfolio-text-secondary;
+}
+
+.footerEmail {
+  @include body-sm;
+  color: $portfolio-text-primary;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: $portfolio-spacer-0-5x;
+  transition: color $portfolio-duration-fast $portfolio-easing-standard;
+
+  &:hover { color: $portfolio-text-secondary; }
+}
+
+// ── TEAMS ────────────────────────────────────────────────────────────────────
+
+// Shared vertical rhythm with links column (body-sm × normal leading per row).
+$footer-list-row-block-size: calc(#{$portfolio-type-sm} * #{$portfolio-leading-normal});
+
+.teamsList {
+  display: flex;
+  flex-direction: column;
+  gap: $portfolio-spacer-1x;
+}
+
+.teamItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $portfolio-spacer-1-5x;
+  min-block-size: $footer-list-row-block-size;
+}
+
+.teamLink {
+  @include body-sm;
+  color: $portfolio-text-primary;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: $portfolio-spacer-0-5x;
+  transition: color $portfolio-duration-fast $portfolio-easing-standard;
+
+  &:hover { color: $portfolio-text-secondary; }
+}
+
+.teamPeriod {
+  @include code-sm;
+  // Match body-sm line box so row height matches `.linksList` rows (code-sm defaults to compact leading).
+  line-height: $portfolio-leading-normal;
+  color: $portfolio-text-placeholder;
+  min-width: 1.5ch;
+  text-align: right;
+}
+
+// ── LINKS ────────────────────────────────────────────────────────────────────
+
+.linksList {
+  display: flex;
+  flex-direction: column;
+  gap: $portfolio-spacer-1x;
+}
+
+.linkItem {
+  display: flex;
+  align-items: center;
+  min-block-size: $footer-list-row-block-size;
+}
+
+.externalLink {
+  @include body-sm;
+  color: $portfolio-text-primary;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: $portfolio-spacer-0-5x;
+  transition: color $portfolio-duration-fast $portfolio-easing-standard;
+
+  &:hover { color: $portfolio-text-secondary; }
+}
+
+.arrow {
+  @include caption;
+  opacity: 0.5;
+}

@@ -1,0 +1,52 @@
+@use '../../styles' as *;
+
+.cursorThumb {
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: grid;
+  pointer-events: none;
+  overflow: hidden;
+  border-radius: $portfolio-radius-none;
+  opacity: 0;
+  scale: 0;
+  transition:
+    opacity $portfolio-duration-moderate $portfolio-easing-exit 60ms,
+    scale $portfolio-duration-moderate $portfolio-easing-exit 60ms;
+  will-change: translate, opacity, scale;
+  z-index: $portfolio-z-dropdown;
+}
+
+.isVisible {
+  opacity: 1;
+  scale: 1;
+  transition:
+    opacity $portfolio-duration-slower $portfolio-easing-expressive 80ms,
+    scale $portfolio-duration-slower $portfolio-easing-expressive 80ms;
+}
+
+.cursorThumbMedia {
+  grid-area: 1 / 1;
+  display: block;
+  width: 160px;
+  height: 120px;
+  object-fit: cover;
+}
+
+.fadeIn {
+  animation: dissolve-in $portfolio-duration-fast $portfolio-easing-standard forwards;
+}
+
+.fadeOut {
+  animation: dissolve-out $portfolio-duration-fast $portfolio-easing-standard forwards;
+}
+
+@keyframes dissolve-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes dissolve-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
