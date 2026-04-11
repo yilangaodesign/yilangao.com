@@ -22,7 +22,7 @@
     font-weight: var(--portfolio-weight-regular);
     line-height: var(--portfolio-leading-normal);
     color: var(--portfolio-text-primary);
-    background: var(--portfolio-surface-primary);
+    background: var(--portfolio-surface-terra-minimal);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -47,7 +47,7 @@
 
   ::selection {
     background-color: var(--portfolio-highlight);
-    color: #{$portfolio-accent-90};
+    color: inherit;
   }
 }
 
