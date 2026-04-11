@@ -286,6 +286,7 @@ export default function TestimonialCard({
 
   useEffect(() => {
     if (canEdit) return;
+    if (textHtml) return;
     const el = quoteRef.current;
     if (!el) return;
 
@@ -333,7 +334,7 @@ export default function TestimonialCard({
       disposed = true;
       ro?.disconnect();
     };
-  }, [text, canEdit]);
+  }, [text, textHtml, canEdit]);
 
   return (
     <div className={styles.card}>
@@ -373,7 +374,7 @@ export default function TestimonialCard({
             fieldId={`testimonials:${id}:text`}
             target={testimonialTarget(id)}
             fieldPath="text"
-            as="p"
+            as="div"
             className={styles.quoteText}
             multiline
             isRichText
@@ -382,24 +383,30 @@ export default function TestimonialCard({
           >
             {text}
           </EditableText>
+        ) : wrappedLines ? (
+          <div ref={quoteRef} className={styles.quoteText}>
+            {wrappedLines.map((line, i) => (
+              <span
+                key={i}
+                className={
+                  line.indented
+                    ? styles.lineBesideSvg
+                    : styles.lineFullWidth
+                }
+              >
+                {line.text}
+              </span>
+            ))}
+          </div>
+        ) : textHtml ? (
+          <div
+            ref={quoteRef}
+            className={styles.quoteText}
+            dangerouslySetInnerHTML={{ __html: textHtml }}
+          />
         ) : (
           <div ref={quoteRef} className={styles.quoteText}>
-            {wrappedLines
-              ? wrappedLines.map((line, i) => (
-                  <span
-                    key={i}
-                    className={
-                      line.indented
-                        ? styles.lineBesideSvg
-                        : styles.lineFullWidth
-                    }
-                  >
-                    {line.text}
-                  </span>
-                ))
-              : textHtml
-                ? <span dangerouslySetInnerHTML={{ __html: textHtml }} />
-                : text}
+            {text}
           </div>
         )}
       </div>

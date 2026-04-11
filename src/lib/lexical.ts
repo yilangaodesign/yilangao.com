@@ -58,10 +58,9 @@ export function lexicalToHtml(value: unknown): string {
     if (node.type === 'root') {
       const paragraphs = node.children.filter((c) => c.type === 'paragraph');
       if (paragraphs.length > 1) {
-        const result = paragraphs
-          .map((child) => lexicalToHtml(child))
-          .join('<br>');
-        return result;
+        return paragraphs
+          .map((child) => `<p>${lexicalToHtml(child)}</p>`)
+          .join('');
       }
     }
     return node.children.map((child) => lexicalToHtml(child)).join('');

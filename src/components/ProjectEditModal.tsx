@@ -178,7 +178,7 @@ export default function ProjectEditModal({ project, onClose, onSaved }: ProjectE
             <label className={styles.fieldLabel}>Cover Image</label>
             <div className={styles.coverPreview}>
               {coverUrl ? (
-                <MediaRenderer src={coverUrl} mimeType={coverMimeType} alt="Cover preview" className={styles.coverImg} />
+                <MediaRenderer src={coverUrl} mimeType={coverMimeType} alt="Cover preview" className={styles.coverImg} unoptimized />
               ) : (
                 <div className={styles.coverPlaceholder}>
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden>

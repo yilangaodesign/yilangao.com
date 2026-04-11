@@ -32,6 +32,9 @@ const closeIcon = (
 )
 
 export default function AdminBar({ editUrl, editLabel = 'Edit this page' }: AdminBarProps) {
+  // Temporarily disabled — re-enable by removing this early return
+  return null
+
   const [dismissed, setDismissed] = useState(false)
 
   const editLinkClass = [

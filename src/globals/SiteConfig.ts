@@ -1,5 +1,7 @@
 import type { GlobalConfig } from 'payload'
 
+import { SITE_ROLE_DISPLAY } from '@/lib/site-role-display'
+
 export const SiteConfig: GlobalConfig = {
   slug: 'site-config',
   label: 'Site Config',
@@ -28,7 +30,7 @@ export const SiteConfig: GlobalConfig = {
               name: 'role',
               type: 'text',
               required: true,
-              defaultValue: 'UX Designer',
+              defaultValue: SITE_ROLE_DISPLAY,
             },
             {
               name: 'location',

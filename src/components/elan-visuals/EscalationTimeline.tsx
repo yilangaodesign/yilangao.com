@@ -141,6 +141,7 @@ function ArchitectureDag() {
           size="xs"
           appearance="neutral"
           emphasis="regular"
+          onColor
           onClick={() => setZoom((z) => Math.min(z + 0.15, 2))}
           aria-label="Zoom in"
         >+</Button>
@@ -149,6 +150,7 @@ function ArchitectureDag() {
           size="xs"
           appearance="neutral"
           emphasis="regular"
+          onColor
           onClick={() => setZoom((z) => Math.max(z - 0.15, 0.5))}
           aria-label="Zoom out"
         >&minus;</Button>
@@ -157,6 +159,7 @@ function ArchitectureDag() {
           size="xs"
           appearance="neutral"
           emphasis="regular"
+          onColor
           onClick={() => { setPan({ x: 0, y: 0 }); setZoom(1); }}
           aria-label="Reset view"
         >&#8634;</Button>

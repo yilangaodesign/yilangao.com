@@ -83,6 +83,7 @@ function ToolbarButton({
         size="xs"
         emphasis="minimal"
         appearance={active ? 'highlight' : 'neutral'}
+        onColor
         iconOnly
         onClick={onClick}
         disabled={disabled}
@@ -166,7 +167,7 @@ export function BlockToolbar({
   return (
     <div className={styles.blockToolbar} role="toolbar" aria-label={`Block ${index + 1} controls`}>
       <BlockInsertMenu onInsert={onInsertAbove} disabled={busy}>
-        <Button size="xs" emphasis="minimal" appearance="neutral" iconOnly aria-label="Add block above">
+        <Button size="xs" emphasis="minimal" appearance="neutral" onColor iconOnly aria-label="Add block above">
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
             <path d="M6 2v8M2 6h8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
           </svg>
@@ -194,7 +195,7 @@ export function BlockToolbar({
           <span className={styles.blockToolbarSep} aria-hidden />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button size="xs" emphasis="minimal" appearance="neutral" iconOnly aria-label="Image layout" disabled={busy}>
+              <Button size="xs" emphasis="minimal" appearance="neutral" onColor iconOnly aria-label="Image layout" disabled={busy}>
                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
                   <rect x="1" y="1" width="4" height="4" rx="0.5" stroke="currentColor" strokeWidth="1" />
                   <rect x="7" y="1" width="4" height="4" rx="0.5" stroke="currentColor" strokeWidth="1" />

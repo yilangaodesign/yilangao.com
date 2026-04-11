@@ -1,6 +1,8 @@
 import { getPayload } from 'payload'
 import config from '@payload-config'
 
+import { SITE_ROLE_DISPLAY } from '@/lib/site-role-display'
+
 const PROJECTS = [
   { slug: "lacework", title: "Lacework", category: "Enterprise SaaS \u00b7 Data Visualization", featured: true, order: 1 },
   { slug: "meteor", title: "Meteor", category: "Financial Operations \u00b7 Founding Design", featured: true, order: 3 },
@@ -264,7 +266,7 @@ async function seed() {
     slug: 'site-config',
     data: {
       name: 'Yilan Gao',
-      role: 'UX Designer',
+      role: SITE_ROLE_DISPLAY,
       location: 'City, ST',
       email: 'hello@example.com',
       teams: [
