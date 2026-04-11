@@ -32,5 +32,5 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": ["node_modules", "playground", "ascii-tool"]
+  "exclude": ["node_modules", "playground", "ascii-tool", "archive"]
 }

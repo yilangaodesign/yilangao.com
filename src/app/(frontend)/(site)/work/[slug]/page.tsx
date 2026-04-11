@@ -149,6 +149,7 @@ const FALLBACK_BLOCKS: ContentBlock[] = [
 ]
 
 const FALLBACK_PROJECT = {
+  slug: "" as string | undefined,
   title: "Project Title",
   category: "Digital toolmaking",
   introBlurbHeadline: undefined as string | undefined,

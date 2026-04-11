@@ -232,7 +232,7 @@ export function useCursorThumbnail(items: CaseStudyWithThumb[]) {
 
           const quickTransition = leaveTimerRef.current !== null;
           if (quickTransition) {
-            clearTimeout(leaveTimerRef.current);
+            clearTimeout(leaveTimerRef.current!);
             leaveTimerRef.current = null;
           }
 
