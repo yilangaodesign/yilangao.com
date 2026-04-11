@@ -4,10 +4,10 @@
  */
 export const website = {
   name: "yilangao.com",
-  version: "1.0.0",
+  version: "1.1.0",
   release: {
-    version: "1.0.0",
-    name: "yilangao.com 1.0.0",
-    releasedAt: "2026-04-09T00:00:00.000Z",
+    version: "1.1.0",
+    name: "yilangao.com 1.1.0",
+    releasedAt: "2026-04-11T15:19:30.326Z",
   },
 } as const;
