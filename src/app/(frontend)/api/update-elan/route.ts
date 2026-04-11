@@ -2,8 +2,7 @@ import { NextResponse } from 'next/server'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 import { markdownToLexical, createCaseStudyBlocks } from '@/lib/content-helpers'
-
-const BLURB_HEADLINE = "You're looking at the wrong part."
+import { INTRO_HEADLINE_BY_SLUG } from '@/lib/case-study-intro-headline'
 
 const BLURB_BODY =
   "I built a design system for vibe coding. You've probably heard this story before. You may have built your own, or at least thought about it.\n\nThis isn't about that. Everyone's excited about making design systems readable to agents. I want to show you what happened when I documented the failures instead - each correction became a rule the agent couldn't break next time. After forty sessions, the corrections nearly disappeared. Not because the work got easier."
@@ -47,7 +46,7 @@ const ELAN_DATA = {
   category: 'Design Systems \u00b7 AI Collaboration Architecture',
   featured: true,
   order: 3,
-  introBlurbHeadline: BLURB_HEADLINE,
+  introBlurbHeadline: INTRO_HEADLINE_BY_SLUG['elan-design-system'],
   introBlurbBody: markdownToLexical(BLURB_BODY),
   description: markdownToLexical(SCOPE_STATEMENT),
   content: CONTENT_BLOCKS,

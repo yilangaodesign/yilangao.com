@@ -3,6 +3,7 @@ import { getPayload } from 'payload'
 import config from '@payload-config'
 import { makeLexicalParagraph } from '@/lib/lexical'
 import { createCaseStudyBlocks } from '@/lib/content-helpers'
+import { INTRO_HEADLINE_BY_SLUG } from '@/lib/case-study-intro-headline'
 
 const LACEWORK_DATA = {
   title: 'Lacework',
@@ -10,7 +11,7 @@ const LACEWORK_DATA = {
   category: 'Enterprise SaaS \u00b7 Data Visualization',
   featured: true,
   order: 1,
-  introBlurbHeadline: 'I saved the page my own team gave up on',
+  introBlurbHeadline: INTRO_HEADLINE_BY_SLUG.lacework,
   introBlurbBody: makeLexicalParagraph(
     "Lacework built a usage page so customers could manage their own subscriptions. Half of them didn't know it existed. Customer success - the team paid to guide users through purchases - didn't use it either. They had Tableau reports instead. Then came the switch to consumption-based billing, where every customer gets a unique package. Read how I rebuilt that page - 58% more usable in 7 weeks."
   ),

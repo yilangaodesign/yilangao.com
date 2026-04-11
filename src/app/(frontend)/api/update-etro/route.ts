@@ -2,8 +2,7 @@ import { NextResponse } from 'next/server'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 import { markdownToLexical, createCaseStudyBlocks } from '@/lib/content-helpers'
-
-const BLURB_HEADLINE = 'Trust Has a Shelf Life. Sometimes.'
+import { INTRO_HEADLINE_BY_SLUG } from '@/lib/case-study-intro-headline'
 
 const BLURB_BODY =
   'Six weeks after launch, users stopped checking the system\'s work. Not because they were lazy. Because the system had earned it. Then a CEO told me the features I was proudest of might be exactly what slows AI adoption. He was right - and wrong. Trust architecture plays two fundamentally different roles depending on stakes. Most product teams don\'t know which one they\'re building.'
@@ -77,7 +76,7 @@ const ETRO_DATA = {
   category: 'Design Strategy \u00b7 AI Trust Architecture',
   featured: false,
   order: 5,
-  introBlurbHeadline: BLURB_HEADLINE,
+  introBlurbHeadline: INTRO_HEADLINE_BY_SLUG['etro-framework'],
   introBlurbBody: markdownToLexical(BLURB_BODY),
   description: markdownToLexical(SCOPE_STATEMENT),
   content: CONTENT_BLOCKS,

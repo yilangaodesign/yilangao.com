@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 
+import { SITE_ROLE_DISPLAY } from '@/lib/site-role-display'
+
 const PROJECTS = [
   { slug: "lacework", title: "Lacework", category: "Enterprise SaaS \u00b7 Data Visualization", featured: true, order: 1 },
   { slug: "project-two", title: "Project Title Two", category: "Consumer Product", featured: true, order: 2 },
@@ -192,7 +194,7 @@ export async function POST() {
     slug: 'site-config',
     data: {
       name: 'Yilan Gao',
-      role: 'UX Designer',
+      role: SITE_ROLE_DISPLAY,
       location: 'City, ST',
       email: 'hello@example.com',
       teams: [

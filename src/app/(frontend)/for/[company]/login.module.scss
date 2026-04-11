@@ -4,7 +4,7 @@
   display: flex;
   justify-content: center;
   min-height: 100dvh;
-  background: var(--portfolio-surface-primary);
+  background: $portfolio-terra-10;
 }
 
 .inner {
@@ -12,6 +12,10 @@
   width: 100%;
   max-width: 1120px;
   min-height: 100dvh;
+
+  @media (min-width: 1800px) {
+    max-width: 80vw;
+  }
 }
 
 .canvasPane {
@@ -19,6 +23,7 @@
   height: 100dvh;
   overflow: hidden;
   position: relative;
+  background: $portfolio-terra-10;
 
   @media (max-width: 768px) {
     display: none;
@@ -30,6 +35,13 @@
   height: 100%;
   position: absolute;
   inset: 0;
+
+  canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 }
 
 .formPane {
@@ -49,12 +61,12 @@
 }
 
 .header {
-  margin-bottom: $portfolio-spacer-3x;
+  margin-bottom: $portfolio-spacer-0-5x;
 }
 
 .greeting {
   font-family: $portfolio-font-serif;
-  font-size: 5.25rem;
+  font-size: 3.75rem;
   font-weight: 400;
   letter-spacing: $portfolio-tracking-tight;
   color: var(--portfolio-text-neutral-bold);
@@ -64,30 +76,126 @@
 .form {
   display: flex;
   flex-direction: column;
-  gap: $portfolio-spacer-1-5x;
 }
 
-// Per-company accent override for DS Button.
-// Ancestor chain ensures specificity beats Button.module.scss's .highlight.bold:hover.
-.page .inner .formPane .card .submit {
-  background-color: var(--accent-color, var(--portfolio-action-brand-bold));
+.inputArea {
+  position: relative;
+  height: 100px;
+  overflow: visible;
+  max-width: 360px;
+}
 
-  &:hover:not(:disabled) {
-    background-color: var(--accent-color, var(--portfolio-action-brand-bold));
-    opacity: var(--portfolio-opacity-hover);
+.placeholder {
+  position: absolute;
+  top: 16px;
+  left: 4px;
+  width: calc(100% - 7px);
+  height: 1.2em;
+  font-family: $portfolio-font-serif;
+  font-size: 2.75rem;
+  font-weight: 400;
+  letter-spacing: $portfolio-tracking-tight;
+  color: var(--portfolio-text-neutral-minimal);
+  line-height: 1;
+  pointer-events: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  z-index: 1;
+}
+
+.placeholderTruncated {
+  width: calc(100% - 50px);
+}
+
+.passwordInput {
+  max-width: 360px;
+}
+
+.passwordInput input {
+  font-family: $portfolio-font-serif;
+  font-size: 2.75rem;
+  font-weight: 400;
+  letter-spacing: $portfolio-tracking-tight;
+  color: transparent;
+  line-height: 1;
+  caret-color: var(--portfolio-text-neutral-bold);
+
+  &::selection {
+    color: transparent;
+  }
+}
+
+.typedText {
+  position: absolute;
+  top: 10px;
+  left: 0;
+  width: calc(100% - 50px);
+  padding: 6px 0 4px 4px;
+  font-family: $portfolio-font-serif;
+  font-size: 2.75rem;
+  font-weight: 400;
+  letter-spacing: $portfolio-tracking-tight;
+  color: var(--portfolio-text-neutral-bold);
+  line-height: 1;
+  pointer-events: none;
+  white-space: nowrap;
+  overflow: hidden;
+  z-index: 1;
+}
+
+// The Input component sizes icons for its default font-size (18px at lg).
+// Our 2.75rem override makes those icons disproportionately small and
+// vertically centered too high relative to the baseline/underline.
+.passwordInput [class*="statusIcon"] {
+  width: 28px;
+  height: 28px;
+  align-self: flex-end;
+  margin-bottom: 2px;
+}
+
+.passwordInput [class*="trailingSlot"] {
+  align-self: flex-end;
+  margin-bottom: 2px;
+}
+
+.submitBtn {
+  @include button-reset;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--portfolio-text-neutral-bold);
+  opacity: 0;
+  transform: translateX(-8px);
+  pointer-events: none;
+  transition:
+    opacity $portfolio-duration-slow $portfolio-easing-entrance,
+    transform $portfolio-duration-slow $portfolio-easing-entrance;
+
+  svg {
+    @include transition-fast;
   }
 
-  &:active:not(:disabled) {
-    background-color: var(--accent-color, var(--portfolio-action-brand-bold));
+  &:hover svg {
+    transform: translateX(1px);
   }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.submitVisible {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
 }
 
 .footer {
   margin-top: $portfolio-spacer-2x;
   font-family: var(--portfolio-font-sans);
-  font-size: $portfolio-type-xs;
+  font-size: $portfolio-type-sm;
   color: var(--portfolio-text-neutral-subtle);
-  text-align: center;
 }
 
 .footerLink {

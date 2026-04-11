@@ -64,7 +64,8 @@ const float MAX_H_OFFSET_DARK = 1.5;
 const float ANGLE_MAGNITUDE = 0.12;
 const float MAX_ANGLE_DEVIATION = 0.087;
 
-const vec3 BG_COLOR = vec3(1.0, 1.0, 1.0);
+// Terra10 (#f5f1ec) — matches $portfolio-terra-10
+const vec3 BG_COLOR = vec3(0.961, 0.945, 0.925);
 const vec3 DASH_COLOR = vec3(0.2, 0.212, 1.0);
 
 float getLuminance(vec3 color) {
@@ -287,13 +288,25 @@ export default function HalftonePortrait({ videoSrc, className }: HalftonePortra
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    const container = containerRef.current;
+    if (!canvas || !container) return;
 
     const prefersReducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)"
     ).matches;
 
     const pixelRatio = Math.min(window.devicePixelRatio, 2);
+
+    // Target ~2400 physical pixels regardless of DPR so detail is consistent
+    // across Retina (2x) and non-Retina (1x) displays. Also ensures the
+    // buffer is at least as large as the container to prevent upscaling.
+    // GPU cost is identical on both: 2400² physical pixels = 5.76M.
+    const renderSize = Math.max(
+      container.clientWidth,
+      container.clientHeight,
+      RENDER_SIZE,
+      Math.ceil(2400 / pixelRatio),
+    );
     const renderer = new WebGLRenderer({
       canvas,
       antialias: false,
@@ -301,7 +314,9 @@ export default function HalftonePortrait({ videoSrc, className }: HalftonePortra
       preserveDrawingBuffer: false,
     });
     renderer.setPixelRatio(pixelRatio);
-    renderer.setSize(RENDER_SIZE, RENDER_SIZE, false);
+    renderer.setSize(renderSize, renderSize, false);
+    // Terra10 (#f5f1ec) — matches page / $portfolio-terra-10
+    renderer.setClearColor(0xf5f1ec, 1);
 
     const scene = new Scene();
     const camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
@@ -314,7 +329,7 @@ export default function HalftonePortrait({ videoSrc, className }: HalftonePortra
     const uniforms = {
       uTexture: { value: null as VideoTexture | null },
       uResolution: {
-        value: new Vector2(RENDER_SIZE * pixelRatio, RENDER_SIZE * pixelRatio),
+        value: new Vector2(renderSize * pixelRatio, renderSize * pixelRatio),
       },
       uMouse: { value: new Vector2(0.5, 0.5) },
       uMouseVel: { value: new Vector2(0, 0) },
@@ -411,10 +426,7 @@ export default function HalftonePortrait({ videoSrc, className }: HalftonePortra
 
   return (
     <div ref={containerRef} className={className}>
-      <canvas
-        ref={canvasRef}
-        style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-      />
+      <canvas ref={canvasRef} />
     </div>
   );
 }

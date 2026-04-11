@@ -2,8 +2,7 @@ import { NextResponse } from 'next/server'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 import { markdownToLexical, createCaseStudyBlocks } from '@/lib/content-helpers'
-
-const BLURB_HEADLINE = 'I had to choose whom NOT to design for.'
+import { INTRO_HEADLINE_BY_SLUG } from '@/lib/case-study-intro-headline'
 
 const BLURB_BODY =
   'How do you design software that moves $79B in assets daily? As the only designer. No PM. Two user groups who want opposite things. Halfway through, a wall that nearly killed adoption. Meteor is a story of three counterintuitive bets I made mid-flight - who to prioritize, what to deliberately not build, and a migration risk nobody saw coming. Read how I turned an error-prone ETF workflow into an exception-driven system that cut 12,000 lines of data to 560.'
@@ -65,7 +64,7 @@ const METEOR_DATA = {
   category: 'Financial Operations \u00b7 Founding Design',
   featured: true,
   order: 3,
-  introBlurbHeadline: BLURB_HEADLINE,
+  introBlurbHeadline: INTRO_HEADLINE_BY_SLUG.meteor,
   introBlurbBody: markdownToLexical(BLURB_BODY),
   description: markdownToLexical(SCOPE_STATEMENT),
   content: CONTENT_BLOCKS,

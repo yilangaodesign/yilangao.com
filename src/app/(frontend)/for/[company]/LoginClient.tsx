@@ -1,11 +1,10 @@
 "use client";
 
-import { useState, useEffect, useTransition } from "react";
+import { useState, useEffect, useRef, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { validatePassword } from "./actions";
 import { Input } from "@/components/ui/Input";
-import { Button } from "@/components/ui/Button";
 import styles from "./login.module.scss";
 
 const HalftonePortrait = dynamic(() => import("./HalftonePortrait"), {
@@ -16,18 +15,24 @@ type Props = {
   company: string;
   accent: string | null;
   greeting: string;
-  companyName: string | null;
 };
 
-export default function LoginClient({ company, accent, greeting, companyName }: Props) {
-  const trimmedName = companyName?.trim();
-  const greetingForPair = greeting.replace(/\.\s*$/, "");
-  const headline = trimmedName ? `${greetingForPair}, ${trimmedName}` : greeting;
+export default function LoginClient({ company, accent, greeting }: Props) {
+  const headline = greeting.replace(/\.\s*$/, ",");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isPending, startTransition] = useTransition();
   const [showCanvas, setShowCanvas] = useState(false);
   const router = useRouter();
+
+  const hasPassword = password.trim().length > 0;
+  const typedTextRef = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    if (typedTextRef.current) {
+      typedTextRef.current.scrollLeft = typedTextRef.current.scrollWidth;
+    }
+  }, [password]);
 
   useEffect(() => {
     const mq = window.matchMedia("(min-width: 769px)");
@@ -70,34 +75,66 @@ export default function LoginClient({ company, accent, greeting, companyName }: 
             </div>
 
             <form className={styles.form} onSubmit={handleSubmit}>
-              <Input
-                label="Password"
-                type="password"
-                size="lg"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter password"
-                autoFocus
-                autoComplete="off"
-                disabled={isPending}
-                status={error ? "error" : "none"}
-                feedbackMessage={error || undefined}
-              />
-              <Button
-                appearance="highlight"
-                emphasis="bold"
-                size="lg"
-                fullWidth
-                type="submit"
-                disabled={isPending || !password.trim()}
-                className={styles.submit}
-              >
-                {isPending ? "Verifying\u2026" : "View Portfolio"}
-              </Button>
+              <div className={styles.inputArea}>
+                {!password ? (
+                  <span
+                    className={`${styles.placeholder}${error ? ` ${styles.placeholderTruncated}` : ""}`}
+                    aria-hidden="true"
+                  >
+                    (what I told you)
+                  </span>
+                ) : (
+                  <span ref={typedTextRef} className={styles.typedText} aria-hidden="true">
+                    {password}
+                  </span>
+                )}
+                <Input
+                  aria-label="Password"
+                  type="text"
+                  emphasis="minimal"
+                  size="lg"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  autoFocus
+                  autoComplete="off"
+                  disabled={isPending}
+                  status={error ? "error" : "none"}
+                  feedbackMessage={error || undefined}
+                  className={styles.passwordInput}
+                  trailing={
+                    <button
+                      type="submit"
+                      className={[
+                        styles.submitBtn,
+                        hasPassword && !isPending ? styles.submitVisible : "",
+                      ].filter(Boolean).join(" ")}
+                      disabled={isPending || !hasPassword}
+                      tabIndex={hasPassword ? 0 : -1}
+                      aria-label="View portfolio"
+                    >
+                      <svg
+                        width="28"
+                        height="28"
+                        viewBox="0 0 18 18"
+                        fill="none"
+                        aria-hidden="true"
+                      >
+                        <path
+                          d="M3.75 9H14.25M10 4.5L14.25 9L10 13.5"
+                          stroke="currentColor"
+                          strokeWidth="1.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </button>
+                  }
+                />
+              </div>
             </form>
 
             <p className={styles.footer}>
-              Having trouble? Reach me at{" "}
+              Stuck? Just say hi -{" "}
               <a href="mailto:yilangaodesign@gmail.com" className={styles.footerLink}>
                 yilangaodesign@gmail.com
               </a>
