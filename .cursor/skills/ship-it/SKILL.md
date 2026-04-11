@@ -244,7 +244,7 @@ user with the final summary.
 
 > Accumulated lessons from past ship-it runs. Scan before each release.
 > Escalation: 3+ occurrences → promote to procedure change or guardrail.
-> Last updated: 2026-04-03 (5 pitfalls from REL-001, REL-004)
+> Last updated: 2026-04-11 (7 pitfalls from REL-001, REL-004, REL-009)
 
 ### REL-AP-001: Version sync targets left uncommitted before branch switch
 
@@ -331,3 +331,42 @@ merge.
 1. It is imported by at least one other file (`grep -r` for the export)
 2. All its imports resolve (check `package.json` for third-party deps)
 If either check fails, flag the file as dead code and exclude from commit.
+
+### REL-AP-006: Archive directory included in tsconfig type checking
+
+**Occurrences:** 1 (REL-009)
+
+**Trigger:** `archive/` directory contains shelved code with stale type
+references (e.g., old `SiteFooter` prop shapes). The root `tsconfig.json`
+`exclude` array only listed `node_modules`, `playground`, `ascii-tool` —
+not `archive`.
+
+**Failure:** Build gate failed with TypeScript errors in
+`archive/homepage-v1/pages/HomeClient.tsx` referencing a `footerCta`
+prop that no longer exists in the current `SiteFooterConfig` type.
+
+**Fix:** Added `"archive"` to the `tsconfig.json` `exclude` array.
+When shelving code to archive, verify it won't be type-checked by any
+tsconfig in the repo.
+
+### REL-AP-007: version:auto misclassifies Next.js route group renames as URL breaking changes
+
+**Occurrences:** 1 (REL-009)
+
+**Trigger:** `website:version:auto` detected file renames from
+`src/app/(frontend)/about/page.tsx` to
+`src/app/(frontend)/(site)/about/page.tsx` as URL breaking changes
+and recommended a Major bump (1.0.0 → 2.0.0).
+
+**Failure:** No build failure — the version was caught during review
+and corrected to Minor (1.1.0). But if accepted blindly, it would
+have created a misleading major version jump.
+
+**Root cause:** The version-analyze script treats parenthesized
+directory names (Next.js route groups) as URL segments. Route groups
+like `(site)` are organizational — they don't affect the URL structure.
+
+**Fix:** Manually override the auto-analyzer when the "breaking change"
+is a route group reorganization. Long-term: update `version-analyze.mjs`
+to recognize `(parenthesized)` directories as route groups that don't
+affect URLs.

@@ -4,7 +4,29 @@
 >
 > **Who reads this:** AI agents when the `ship-it` skill is activated — scan recent entries for recurring pitfalls before starting a new release.
 > **Who writes this:** AI agents after each ship-it run via the Post-Release Audit protocol in `ship-it/SKILL.md`.
-> **Last updated:** 2026-04-08 (REL-008: Élan 2.7.0, ASCII Art Studio 0.5.2)
+> **Last updated:** 2026-04-11 (REL-009: Élan 2.8.0, yilangao.com 1.1.0, ASCII Art Studio 0.5.3)
+
+---
+
+## REL-009 — Élan 2.8.0, yilangao.com 1.1.0, ASCII Art Studio 0.5.3 (2026-04-11)
+
+**Scope:** 112 files merged to `main` via fast-forward: 11 dependency-ordered layer commits, 1 build-fix commit, 1 release commit, 1 dev patch bump on `dev` after merge
+**Semver:** Minor for Élan (2.7.0 → 2.8.0: new CursorThumbnail, SiteFooter components + UI updates). Minor for yilangao.com (1.0.0 → 1.1.0: (site) route group migration, new page utilities). Patch for ASCII Art Studio (0.5.2 → 0.5.3: release sync, no new app code).
+**Previous release:** Élan 2.7.0, ASCII Art Studio 0.5.2
+
+**Incidents during release:**
+- **Build gate: 3 TypeScript errors.** (1) Archived `archive/homepage-v1/` was not excluded from `tsconfig.json`, causing stale type errors from old `SiteFooter` props. **Resolution:** Added `archive` to tsconfig `exclude` array. (2) New `(site)/work/[slug]/page.tsx` used `slug` property not in `FALLBACK_PROJECT` type. **Resolution:** Added `slug` to fallback object. (3) `use-cursor-thumbnail.ts` had `clearTimeout(leaveTimerRef.current)` where TypeScript couldn't narrow past the null check through a ref. **Resolution:** Added non-null assertion `!` after the guard.
+- **Website version:auto false positive.** `version:auto` detected page renames (`(frontend)/about → (frontend)/(site)/about`) as URL breaking changes and recommended Major (1.0.0 → 2.0.0). Route groups don't affect URLs in Next.js. **Resolution:** Manually corrected to Minor (1.1.0). This is a gap in the auto-analyzer's understanding of Next.js route groups.
+- **Vercel post-deploy poll:** `vercel ls --prod` from repo root shows playground (Queued at poll time). Main site project not visible from repo root CLI context per REL-008.
+
+**Build gate:** All three apps passed after fix commit. Same non-blocking Sass `darken()` deprecation warnings as REL-007/008.
+
+**Layer classification notes:**
+- 11 commits across 8 populated layers (L0 Config, L1 Docs, L2 Tokens, L3 Deps, L5 New Components, L6 UI Updates, L7 Site Components, L8 Frontend Pages split into 3 commits, L9 Playground).
+- L8 split into route group migration (51 files), API routes + password gate (9 files), and homepage v1 archive (3 files) to keep commits focused.
+- Git detected most `(site)` moves as renames — clean history.
+- New lib files verified against REL-AP-005 (all imported by new pages, no third-party dep issues).
+- No macOS duplicates or debug logs found in Phase 2 clean.
 
 ---
 
