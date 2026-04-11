@@ -2,7 +2,6 @@
 
 import { FadeIn } from "@/components/ui/FadeIn";
 import Navigation from "@/components/ui/Navigation/Navigation";
-import Footer from "@/components/ui/Footer/Footer";
 import ScrollSpy from "@/components/ui/ScrollSpy/ScrollSpy";
 import AdminBar from "@/components/AdminBar";
 import {
@@ -124,7 +123,6 @@ export default function AboutClient({
           </section>
         </FadeIn>
       </div>
-      <Footer />
       {isAdmin && <InlineEditBar />}
     </main>
   );

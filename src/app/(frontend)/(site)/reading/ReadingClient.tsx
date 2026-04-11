@@ -2,7 +2,6 @@
 
 import { FadeIn } from "@/components/ui/FadeIn";
 import Navigation from "@/components/ui/Navigation/Navigation";
-import Footer from "@/components/ui/Footer/Footer";
 import AdminBar from "@/components/AdminBar";
 import EditButton from "@/components/EditButton";
 import {
@@ -60,7 +59,6 @@ export default function ReadingClient({ books, isAdmin }: { books: Book[]; isAdm
           </ul>
         </FadeIn>
       </div>
-      <Footer />
       {isAdmin && <InlineEditBar />}
     </main>
   );

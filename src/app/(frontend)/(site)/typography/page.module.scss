@@ -1,4 +1,4 @@
-@use '../../../styles' as *;
+@use '../../../../styles' as *;
 
 .page {
   min-height: 100vh;
@@ -110,7 +110,7 @@
 
 .fontCard {
   border: 1px solid $portfolio-border-subtle;
-  border-radius: $portfolio-radius-sm;
+  border-radius: 0;
   margin-bottom: $portfolio-spacer-2x;
   overflow: hidden;
 }
@@ -156,7 +156,7 @@
   color: $portfolio-accent-60;
   background: rgba($portfolio-accent-60, 0.08);
   padding: 2px 6px;
-  border-radius: $portfolio-radius-sm;
+  border-radius: 0;
   display: inline-block;
   margin-bottom: $portfolio-spacer-0-5x;
 }
@@ -212,7 +212,7 @@
 .weightItem {
   padding: $portfolio-spacer-1-5x;
   border: 1px solid $portfolio-border-subtle;
-  border-radius: $portfolio-radius-sm;
+  border-radius: 0;
 }
 
 .weightValue {
@@ -290,7 +290,7 @@
 
 .playground {
   border: 1px solid $portfolio-border-subtle;
-  border-radius: $portfolio-radius-sm;
+  border-radius: 0;
   overflow: hidden;
 }
 
@@ -323,7 +323,7 @@
   color: $portfolio-text-primary;
   background: $portfolio-surface-primary;
   border: 1px solid $portfolio-border-subtle;
-  border-radius: $portfolio-radius-sm;
+  border-radius: 0;
   padding: $portfolio-spacer-0-5x $portfolio-spacer-1-5x;
   cursor: pointer;
   transition: border-color $portfolio-duration-fast $portfolio-easing-standard;
@@ -364,7 +364,7 @@
   color: $portfolio-text-secondary;
   background: $portfolio-surface-secondary;
   padding: $portfolio-spacer-1-5x $portfolio-spacer-2x;
-  border-radius: $portfolio-radius-sm;
+  border-radius: 0;
   border: 1px solid $portfolio-border-subtle;
 }
 

@@ -1,4 +1,4 @@
-@use "../../../styles" as *;
+@use "../../../../styles" as *;
 
 // ── PAGE ────────────────────────────────────────────────────────────────────
 
@@ -39,7 +39,7 @@
 .navPill {
   @include flex-between;
   padding: $portfolio-spacer-1x $portfolio-spacer-2x;
-  border-radius: $portfolio-radius-full;
+  border-radius: 0;
   background-color: $portfolio-overlay-white-04;
   backdrop-filter: blur(12px) saturate(140%);
   border: 1px solid $portfolio-overlay-white-08;
@@ -87,7 +87,7 @@
   color: $portfolio-text-always-light-bold;
   background-color: transparent;
   padding: $portfolio-spacer-0-5x $portfolio-spacer-2x;
-  border-radius: $portfolio-radius-full;
+  border-radius: 0;
   border: 1px solid $portfolio-overlay-white-40;
   text-decoration: none;
   white-space: nowrap;
@@ -186,7 +186,7 @@
 .rowThumb {
   width: 140px;
   height: 88px;
-  border-radius: $portfolio-radius-sm;
+  border-radius: 0;
   overflow: hidden;
   flex-shrink: 0;
 
@@ -205,7 +205,7 @@
     $portfolio-neutral-80 50%,
     $portfolio-accent-80 100%
   );
-  border-radius: $portfolio-radius-sm;
+  border-radius: 0;
   will-change: transform;
 }
 

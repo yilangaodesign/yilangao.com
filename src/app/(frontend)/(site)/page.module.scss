@@ -1,0 +1,112 @@
+@use '../../../styles' as *;
+
+// ── PAGE ─────────────────────────────────────────────────────────────────────
+
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--portfolio-surface-terra-subtle);
+}
+
+// ── LAYOUT ───────────────────────────────────────────────────────────────────
+
+.layout {
+  flex: 1;
+  max-width: $elan-container-wide;
+  margin: 0 auto;
+  width: 100%;
+  padding: $portfolio-spacer-2x $portfolio-spacer-2x;
+
+  @media #{$elan-mq-sm} {
+    padding: $portfolio-spacer-3x $portfolio-spacer-4x;
+  }
+}
+
+// ── CASE STUDY HEADLINES ─────────────────────────────────────────────────────
+
+.caseStudies {
+  margin-top: $portfolio-spacer-10x;
+  margin-bottom: $portfolio-spacer-16x;
+
+  @media #{$elan-mq-md} {
+    margin-top: $portfolio-spacer-14x;
+    margin-bottom: $portfolio-spacer-20x;
+  }
+}
+
+.caseStudyList {
+  display: flex;
+  flex-direction: column;
+  gap: $portfolio-spacer-17x;
+
+  @media #{$elan-mq-md} {
+    gap: $portfolio-spacer-20x;
+  }
+}
+
+.caseStudyLink {
+  display: block;
+  text-decoration: none;
+  transition: color 0.2s ease;
+  padding-top: $portfolio-spacer-6x;
+  padding-bottom: 0;
+  margin-top: (-$portfolio-spacer-6x);
+  margin-bottom: 0;
+
+  @media #{$elan-mq-md} {
+    padding-top: $portfolio-spacer-8x;
+    padding-bottom: 0;
+    margin-top: (-$portfolio-spacer-8x);
+    margin-bottom: 0;
+  }
+
+  &:hover .caseStudyHeadline,
+  &:hover .caseStudyBlurb {
+    color: var(--portfolio-text-primary);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+    border-radius: 0;
+  }
+}
+
+.caseStudyHeadline {
+  display: block;
+  font-family: $portfolio-font-serif;
+  font-size: clamp(#{$portfolio-type-3xl}, 5vw + 1rem, #{$portfolio-type-7xl});
+  font-weight: $portfolio-weight-regular;
+  line-height: $portfolio-leading-tight;
+  letter-spacing: $portfolio-tracking-tight;
+  color: $portfolio-text-neutral-regular;
+  transition: color 0.2s ease;
+}
+
+.caseStudyBlurb {
+  display: block;
+  font-family: $portfolio-font-serif;
+  font-size: clamp(#{$portfolio-type-2xl}, 2vw + 0.5rem, #{$portfolio-type-3xl});
+  font-weight: $portfolio-weight-light;
+  line-height: $portfolio-leading-relaxed;
+  font-style: italic;
+  color: $portfolio-text-neutral-regular;
+  margin-top: $portfolio-spacer-3x;
+  transition: color 0.2s ease;
+}
+
+// ── SECTION DIVIDER ─────────────────────────────────────────────────────────
+
+.sectionDivider {
+  margin: $portfolio-spacer-4x 0;
+
+  @media #{$elan-mq-md} {
+    margin: $portfolio-spacer-6x 0;
+  }
+}
+
+// ── ESSAY BADGE ─────────────────────────────────────────────────────────────
+
+.essayBadge {
+  margin-bottom: $portfolio-spacer-1-5x;
+}

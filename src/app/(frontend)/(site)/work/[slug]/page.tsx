@@ -7,6 +7,7 @@ import { isAdminAuthenticated } from "@/lib/admin-auth";
 import { getCompanyFromSession } from "@/lib/company-session";
 import { getCompanyBySlug } from "@/lib/company-data";
 import { RefreshRouteOnSave } from "@/components/RefreshRouteOnSave";
+import type { RawBlock } from "@/lib/extract-content-urls";
 import ProjectClient from "./ProjectClient";
 import type { ContentBlock } from "./ProjectClient";
 
@@ -86,20 +87,6 @@ function safeConvertToHtml(value: unknown): string {
   }
 }
 
-type RawBlock = {
-  id?: string
-  blockType: string
-  text?: string
-  level?: string
-  body?: unknown
-  layout?: string | null
-  images?: { image: unknown; caption?: string | null }[]
-  caption?: string | null
-  image?: unknown
-  placeholderLabels?: string[]
-  placeholderLabel?: string
-}
-
 function mapContentBlocks(rawBlocks: RawBlock[]): ContentBlock[] {
   return rawBlocks.map((b) => {
     const base = { id: b.id ?? '' }
@@ -115,8 +102,10 @@ function mapContentBlocks(rawBlocks: RawBlock[]): ContentBlock[] {
       case 'imageGroup': {
         const images = (b.images ?? [])
           .map((img) => {
-            const media = img.image as { url?: string; mimeType?: string; alt?: string } | null
-            const url = media?.url ?? null
+            const media = img.image as { url?: string; mimeType?: string; alt?: string; sizes?: { card?: { url?: string }; hero?: { url?: string } } } | null
+            const isVid = media?.mimeType?.startsWith('video/')
+            const derivedUrl = !isVid ? (media?.sizes?.card?.url ?? media?.sizes?.hero?.url) : null
+            const url = derivedUrl ?? media?.url ?? null
             if (!url) return null
             return { url, mimeType: media?.mimeType ?? undefined, alt: media?.alt ?? undefined, caption: img.caption ?? undefined }
           })
@@ -133,11 +122,13 @@ function mapContentBlocks(rawBlocks: RawBlock[]): ContentBlock[] {
       case 'divider':
         return { ...base, blockType: 'divider' as const }
       case 'hero': {
-        const heroMedia = b.image as { url?: string; mimeType?: string } | null
+        const heroMedia = b.image as { url?: string; mimeType?: string; sizes?: { hero?: { url?: string } } } | null
+        const isVid = heroMedia?.mimeType?.startsWith('video/')
+        const heroDerivUrl = !isVid ? heroMedia?.sizes?.hero?.url : null
         return {
           ...base,
           blockType: 'hero' as const,
-          imageUrl: heroMedia?.url ?? undefined,
+          imageUrl: heroDerivUrl ?? heroMedia?.url ?? undefined,
           mimeType: heroMedia?.mimeType ?? undefined,
           caption: b.caption ?? undefined,
           placeholderLabel: b.placeholderLabel as string | undefined,
@@ -195,10 +186,12 @@ export default async function ProjectPage({ params }: Props) {
 
   try {
     const payload = await getPayloadClient();
+
     const res = await payload.find({
       collection: "projects",
       where: { slug: { equals: slug } },
       limit: 1,
+      depth: 2,
     });
 
     if (res.docs.length > 0) {
@@ -228,6 +221,7 @@ export default async function ProjectPage({ params }: Props) {
 
       project = {
         id: doc.id,
+        slug: doc.slug,
         title: doc.title,
         category: doc.category,
         introBlurbHeadline: introBlurbHeadline || undefined,

@@ -32,12 +32,14 @@
 
 // ── SIDEBAR (LEFT) ───────────────────────────────────────────────────────────
 
+$_nav-height: 45px;
+
 .sidebar {
   @media #{$elan-mq-md} {
     width: 300px;
     flex-shrink: 0;
     position: sticky;
-    top: $portfolio-spacer-3x;
+    top: calc(#{$_nav-height} + #{$portfolio-spacer-3x});
     align-self: flex-start;
   }
 }
@@ -242,6 +244,8 @@
 }
 
 // ── PROJECT CARD ─────────────────────────────────────────────────────────────
+// Masonry card hover overlay (cardLine1 / cardLine2). Markup lives in HomeClient.tsx.
+$show-project-card-hover-overlay: false;
 
 .projectCard {
   display: block;
@@ -300,6 +304,13 @@
 
   .projectCard:hover & {
     opacity: 1;
+  }
+}
+
+@if not $show-project-card-hover-overlay {
+  .cardOverlay {
+    display: none !important;
+    pointer-events: none !important;
   }
 }
 
@@ -532,39 +543,4 @@
   box-shadow: $portfolio-shadow-lg;
   opacity: 0.92;
   pointer-events: none;
-}
-
-// ── FOOTER ───────────────────────────────────────────────────────────────────
-
-.footer {
-  border-top: 1px solid $portfolio-border-subtle;
-  margin-top: $portfolio-spacer-6x;
-}
-
-.footerInner {
-  max-width: $elan-container-wide;
-  margin: 0 auto;
-  padding: $portfolio-spacer-3x $portfolio-spacer-2x;
-  display: flex;
-  flex-direction: row;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: $portfolio-spacer-2x;
-}
-
-.footerCta {
-  @include body-sm-medium;
-  color: $portfolio-text-primary;
-}
-
-.footerEmail {
-  @include body-sm;
-  color: $portfolio-text-secondary;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  gap: $portfolio-spacer-0-5x;
-  transition: color $portfolio-duration-fast $portfolio-easing-standard;
-
-  &:hover { color: $portfolio-text-primary; }
 }

@@ -1,7 +1,8 @@
 "use client";
 
-import { useCallback, useMemo, useRef, useState, type ChangeEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
+import { PreloadManager } from "@/lib/preload-manager";
 import { FadeIn } from "@/components/ui/FadeIn";
 import AdminBar from "@/components/AdminBar";
 import ScrollSpy from "@/components/ui/ScrollSpy/ScrollSpy";
@@ -51,6 +52,7 @@ import { Eyebrow } from "@/components/ui/Eyebrow";
 import { InfoTooltip } from "@/components/ui/Tooltip";
 import MediaRenderer from "@/components/ui/MediaRenderer/MediaRenderer";
 import elanStyles from "@/components/elan-visuals/elan-visuals.module.scss";
+import { siteShellStyles } from "@/components/SiteFooter";
 import styles from "./page.module.scss";
 
 /* ── Block types (shared with page.tsx server component) ── */
@@ -68,6 +70,7 @@ type ExternalLink = { label: string; href: string };
 
 type ProjectData = {
   id?: string | number;
+  slug?: string;
   title: string;
   category: string;
   introBlurbHeadline?: string;
@@ -265,6 +268,15 @@ function getLayoutClass(layout: string, imageCount: number): string {
   return styles.imageGrid3;
 }
 
+function getImageSizes(layout: string, imageCount: number): string {
+  const effective = layout === 'auto'
+    ? (imageCount === 1 ? 'full-width' : imageCount === 2 ? 'grid-2-equal' : 'grid-3-equal')
+    : layout;
+  if (effective.startsWith('grid-3')) return '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw';
+  if (effective.startsWith('grid-2')) return '(max-width: 640px) 100vw, 50vw';
+  return '100vw';
+}
+
 export default function ProjectClient({
   project,
   prevProject,
@@ -282,6 +294,12 @@ export default function ProjectClient({
 }) {
   const p = project;
   const router = useRouter();
+
+  useEffect(() => {
+    if (p.slug) {
+      PreloadManager.bump(p.slug);
+    }
+  }, [p.slug]);
 
   const projectTarget: ApiTarget | undefined = useMemo(
     () => p.id ? { type: 'collection', slug: 'projects', id: p.id } : undefined,
@@ -435,6 +453,7 @@ export default function ProjectClient({
 
   const page = (
     <article className={styles.page}>
+      <div className={siteShellStyles.contentWrapperNeutralMinimal}>
       {isAdmin && <AdminBar editUrl={editUrl} editLabel={`Edit "${p.title}"`} />}
       <ScrollSpy sections={spySections} />
 
@@ -449,6 +468,8 @@ export default function ProjectClient({
                   mimeType={heroBlock.mimeType}
                   alt={`${p.title} — case study cover`}
                   className={styles.heroImg}
+                  priority
+                  sizes="100vw"
                 />
                 {isAdmin && p.id && (
                   <>
@@ -508,18 +529,6 @@ export default function ProjectClient({
         {/* ── LEFT SIDEBAR ── */}
         <aside className={styles.sidebar}>
           <div className={styles.sidebarInner}>
-            <FadeIn>
-              <Button
-                href="/"
-                appearance="neutral"
-                emphasis="minimal"
-                size="sm"
-                leadingIcon={<ArrowLeft />}
-              >
-                Back
-              </Button>
-            </FadeIn>
-
             <FadeIn delay={0.05}>
               <div className={styles.sidebarCard}>
                 <div className={styles.projectIdentity}>
@@ -881,7 +890,7 @@ export default function ProjectClient({
                                       idx === 0 && block.placeholderLabels!.length >= 3 ? styles.slotWide : '',
                                     ].filter(Boolean).join(' ')}
                                   >
-                                    <MediaRenderer src={img.url} mimeType={img.mimeType} alt={img.alt || lbl} className={styles.sectionImg} />
+                                    <MediaRenderer src={img.url} mimeType={img.mimeType} alt={img.alt || lbl} className={styles.sectionImg} sizes={getImageSizes(block.layout, block.placeholderLabels!.length)} />
                                     {isAdmin && projectTarget ? (
                                       <EditableText
                                         fieldId={`proj:${p.id}:content.${cmsIndex}.images.${idx}.caption`}
@@ -950,7 +959,7 @@ export default function ProjectClient({
                             >
                               {block.images.map((img, idx) => (
                                 <figure key={idx} className={styles.sectionFigure}>
-                                  <MediaRenderer src={img.url} mimeType={img.mimeType} alt={img.alt || `Image ${idx + 1}`} className={styles.sectionImg} />
+                                  <MediaRenderer src={img.url} mimeType={img.mimeType} alt={img.alt || `Image ${idx + 1}`} className={styles.sectionImg} sizes={getImageSizes(block.layout, block.images.length)} />
                                   {isAdmin && projectTarget ? (
                                     <EditableText
                                       fieldId={`proj:${p.id}:content.${cmsIndex}.images.${idx}.caption`}
@@ -1155,6 +1164,7 @@ export default function ProjectClient({
                     appearance="neutral"
                     emphasis="minimal"
                     size="sm"
+                    onColor
                     leadingIcon={<ArrowLeft />}
                     className={styles.projectNavLink}
                   >
@@ -1172,6 +1182,7 @@ export default function ProjectClient({
                     appearance="neutral"
                     emphasis="minimal"
                     size="sm"
+                    onColor
                     trailingIcon={<ArrowRight />}
                     className={`${styles.projectNavLink} ${styles.projectNavLinkNext}`}
                   >
@@ -1187,6 +1198,7 @@ export default function ProjectClient({
             </nav>
           )}
         </main>
+      </div>
       </div>
 
       {isAdmin && <InlineEditBar />}

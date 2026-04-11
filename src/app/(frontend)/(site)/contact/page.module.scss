@@ -1,4 +1,4 @@
-@use "../../../styles" as *;
+@use "../../../../styles" as *;
 
 $card-margin: $portfolio-spacer-2x;
 
@@ -56,7 +56,7 @@ $card-margin: $portfolio-spacer-2x;
   color: $portfolio-text-primary;
   background-color: transparent;
   padding: $portfolio-spacer-utility-0-75x $portfolio-spacer-utility-2-25x;
-  border-radius: $portfolio-radius-full;
+  border-radius: 0;
   border: 1px solid $portfolio-text-primary;
   text-decoration: none;
   @include transition-fast;
@@ -69,7 +69,7 @@ $card-margin: $portfolio-spacer-2x;
   position: relative;
   flex: 1;
   margin: $card-margin;
-  border-radius: $portfolio-radius-sm;
+  border-radius: 0;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -146,7 +146,7 @@ $card-margin: $portfolio-spacer-2x;
 .testimonialSlider {
   background-color: $portfolio-overlay-white-05;
   border: 1px solid $portfolio-overlay-white-07;
-  border-radius: $portfolio-radius-sm;
+  border-radius: 0;
   padding: $portfolio-spacer-2-5x;
   max-width: 360px;
 }
@@ -225,7 +225,7 @@ $card-margin: $portfolio-spacer-2x;
   align-items: center;
   justify-content: center;
   border: 1px solid $portfolio-overlay-white-10;
-  border-radius: $portfolio-radius-sm;
+  border-radius: 0;
   color: $portfolio-overlay-white-40;
   @include transition-fast;
 
@@ -290,7 +290,7 @@ $card-margin: $portfolio-spacer-2x;
   padding: 0 $portfolio-spacer-utility-1-25x;
   margin-right: $portfolio-spacer-3x;
   background-color: $portfolio-overlay-white-06;
-  border-radius: $portfolio-radius-sm;
+  border-radius: 0;
   font-size: $portfolio-type-xs;
   font-weight: $portfolio-weight-medium;
   color: $portfolio-overlay-white-30;
@@ -316,7 +316,7 @@ $card-margin: $portfolio-spacer-2x;
   width: 100%;
   max-width: 420px;
   background-color: $portfolio-neutral-00;
-  border-radius: $portfolio-radius-sm;
+  border-radius: 0;
   padding: $portfolio-spacer-4x $portfolio-spacer-3x;
   box-shadow: $portfolio-shadow-xl;
 
@@ -356,7 +356,7 @@ $card-margin: $portfolio-spacer-2x;
   color: $portfolio-text-primary;
   background-color: $portfolio-neutral-05;
   border: 1px solid $portfolio-neutral-20;
-  border-radius: $portfolio-radius-sm;
+  border-radius: 0;
   padding: $portfolio-spacer-utility-1-25x $portfolio-spacer-1-5x;
   outline: none;
   @include form-field-focus;
@@ -387,7 +387,7 @@ $card-margin: $portfolio-spacer-2x;
   color: $portfolio-text-always-light-bold;
   background-color: $portfolio-surface-inverse;
   border: none;
-  border-radius: $portfolio-radius-sm;
+  border-radius: 0;
   padding: $portfolio-spacer-utility-1-25x $portfolio-spacer-3x;
   cursor: pointer;
   width: 100%;

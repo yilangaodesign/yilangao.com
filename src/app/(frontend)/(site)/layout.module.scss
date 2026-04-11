@@ -1,0 +1,32 @@
+@use '../../../styles' as *;
+
+// ── ZERO RADIUS OVERRIDE ─────────────────────────────────────────────────────
+// Portfolio branding: all border-radius is 0 on the public site.
+// This overrides CSS custom properties so DS components (Badge, Card, Input,
+// Dialog, Tooltip, etc.) all render with sharp corners when inside the (site)
+// route group. Structural exceptions (Avatar, Toggle, Slider, ProgressBar)
+// restore their radius locally in their own SCSS modules.
+// See docs/design/branding.md §1 for the full rule.
+
+.siteWrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+
+  --portfolio-radius-xs: 0;
+  --portfolio-radius-sm: 0;
+  --portfolio-radius-md: 0;
+  --portfolio-radius-lg: 0;
+  --portfolio-radius-xl: 0;
+  --portfolio-radius-2xl: 0;
+  // --portfolio-radius-full is intentionally NOT overridden.
+  // Structural exceptions (Avatar, Toggle, Slider, ProgressBar) depend on it
+  // for circular shapes. Badge pill shape should not be used on the portfolio —
+  // always pass shape="squared" per docs/design/branding.md §1.2.
+}
+
+.contentArea {
+  flex: 1;
+  position: relative;
+  z-index: 1;
+}

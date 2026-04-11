@@ -1,4 +1,4 @@
-@use '../../../../styles' as *;
+@use '../../../../../styles' as *;
 
 // ── PAGE ─────────────────────────────────────────────────────────────────────
 
@@ -6,7 +6,7 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-
+  background: var(--portfolio-surface-primary);
 }
 
 // ── TWO-COLUMN LAYOUT ────────────────────────────────────────────────────────
@@ -33,13 +33,17 @@
 }
 
 // ── SIDEBAR (LEFT) ───────────────────────────────────────────────────────────
+// Match sticky offset to site Navigation (see (site)/page.module.scss) so the
+// sidebar clears the nav bar instead of sitting flush under the viewport top.
+
+$_nav-height: 45px;
 
 .sidebar {
   @media #{$elan-mq-md} {
     width: 300px;
     flex-shrink: 0;
     position: sticky;
-    top: $portfolio-spacer-3x;
+    top: calc(#{$_nav-height} + #{$portfolio-spacer-3x});
     align-self: flex-start;
   }
 }
@@ -63,8 +67,7 @@
   flex-direction: column;
   gap: $portfolio-spacer-3x;
   padding: $portfolio-spacer-3x;
-  background: $portfolio-surface-terra-minimal;
-  border-radius: $portfolio-radius-md;
+  border-radius: 0;
 }
 
 // ── BACK LINK ────────────────────────────────────────────────────────────────
@@ -260,11 +263,11 @@
   justify-content: center;
 
   @media #{$elan-mq-sm} {
-    border-radius: $portfolio-radius-sm;
+    border-radius: 0;
   }
 
   @media #{$elan-mq-md} {
-    border-radius: $portfolio-radius-md;
+    border-radius: 0;
   }
 }
 
@@ -311,7 +314,7 @@
   gap: $portfolio-spacer-1x;
   padding: $portfolio-spacer-1x $portfolio-spacer-2x;
   background: rgba(0, 0, 0, 0.7);
-  border-radius: $portfolio-radius-sm;
+  border-radius: 0;
   color: #fff;
   @include body-sm-medium;
   opacity: 0;
@@ -372,7 +375,7 @@
 .blockListDragOver {
   outline: 2px dashed $portfolio-accent-50;
   outline-offset: 4px;
-  border-radius: $portfolio-radius-sm;
+  border-radius: 0;
 }
 
 .blockItem {
@@ -408,7 +411,7 @@
   border: none;
   background: transparent;
   color: var(--portfolio-text-placeholder);
-  border-radius: $portfolio-radius-xs;
+  border-radius: 0;
   cursor: grab;
   opacity: 0;
   transition: opacity var(--portfolio-duration-fast) ease, color var(--portfolio-duration-fast) ease;
@@ -435,7 +438,7 @@
 .dropIndicator {
   height: 3px;
   background: $portfolio-accent-50;
-  border-radius: 2px;
+  border-radius: 0;
   margin: $portfolio-spacer-0-5x 0;
   animation: dropPulse 1s ease-in-out infinite alternate;
 }
@@ -453,7 +456,7 @@
 .sectionImg {
   width: 100%;
   height: auto;
-  border-radius: $portfolio-radius-md;
+  border-radius: 0;
   object-fit: cover;
 }
 
@@ -504,7 +507,7 @@
     $portfolio-neutral-20 40%,
     $portfolio-neutral-10 100%
   );
-  border-radius: $portfolio-radius-sm;
+  border-radius: 0;
 }
 
 .imagePlaceholderWide {
@@ -516,7 +519,7 @@
     $portfolio-neutral-20 40%,
     $portfolio-neutral-10 100%
   );
-  border-radius: $portfolio-radius-sm;
+  border-radius: 0;
 }
 
 .imageGrid2 {
@@ -615,7 +618,7 @@
 .labeledPlaceholder {
   width: 100%;
   aspect-ratio: 16 / 10;
-  border-radius: $portfolio-radius-sm;
+  border-radius: 0;
   border: 2px dashed $portfolio-border-subtle;
   background: $portfolio-surface-secondary;
   display: flex;
@@ -721,7 +724,7 @@
   margin-bottom: $portfolio-spacer-6x;
   background: var(--portfolio-surface-neutral-minimal);
   border-left: 3px solid var(--portfolio-border-brand-bold);
-  border-radius: 0 8px 8px 0;
+  border-radius: 0;
   display: flex;
   flex-direction: column;
   gap: $portfolio-spacer-1-5x;

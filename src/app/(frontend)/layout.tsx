@@ -10,12 +10,13 @@ import {
 } from "geist/font/pixel";
 import { IBM_Plex_Sans, IBM_Plex_Serif } from "next/font/google";
 import "../globals.scss";
+import website from "../../../website.json";
 import elan from "../../../elan.json";
 import { TooltipProvider } from "@/components/ui/Tooltip";
 
 const ibmPlexSans = IBM_Plex_Sans({
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
+  weight: ["300", "400", "500", "600"],
   variable: "--font-ibm-plex-sans",
   display: "swap",
 });
@@ -31,7 +32,7 @@ const ibmPlexSerif = IBM_Plex_Serif({
 export const metadata: Metadata = {
   title: "Yilan Gao — UX Designer",
   description: "Portfolio of Yilan Gao, UX Designer crafting thoughtful digital experiences.",
-  generator: `${elan.name} ${elan.release.version}`,
+  generator: `${website.name} ${website.release.version} (${elan.name} ${elan.release.version})`,
 };
 
 const fontVariables = [
@@ -54,7 +55,9 @@ export default function RootLayout({
   return (
     <html lang="en" data-theme="light" className={fontVariables}>
       <body>
-          <TooltipProvider>{children}</TooltipProvider>
+          <TooltipProvider>
+            {children}
+          </TooltipProvider>
         </body>
     </html>
   );

@@ -131,7 +131,7 @@ export default function ContactClient({ testimonials, clients, isAdmin }: Contac
                           fieldId={`testimonial:${current.id}:text`}
                           target={testimonialTarget(current.id)}
                           fieldPath="text"
-                          as="p"
+                          as={current.textHtml ? "div" : "p"}
                           className={styles.sliderText}
                           multiline
                           isRichText
@@ -141,7 +141,7 @@ export default function ContactClient({ testimonials, clients, isAdmin }: Contac
                           {current.text}
                         </EditableText>
                       ) : current.textHtml ? (
-                        <p className={styles.sliderText} dangerouslySetInnerHTML={{ __html: current.textHtml }} />
+                        <div className={styles.sliderText} dangerouslySetInnerHTML={{ __html: current.textHtml }} />
                       ) : (
                         <p className={styles.sliderText}>{current.text}</p>
                       )}

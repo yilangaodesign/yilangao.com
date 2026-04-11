@@ -114,7 +114,7 @@ function ExperimentRow({
         </AnimatePresence>
         <div className={styles.rowTags}>
           {item.tags.map((t) => (
-            <Badge key={t} appearance="always-light" emphasis="regular" size="sm" shape="pill" mono className={styles.tag}>{t}</Badge>
+            <Badge key={t} appearance="always-light" emphasis="regular" size="sm" shape="squared" mono className={styles.tag}>{t}</Badge>
           ))}
         </div>
       </div>
@@ -213,6 +213,7 @@ export default function ExperimentsClient({ experiments, isAdmin }: { experiment
             appearance="neutral"
             emphasis="minimal"
             size="sm"
+            onColor
             leadingIcon={
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
                 <path d="M8.5 3L4.5 7L8.5 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />

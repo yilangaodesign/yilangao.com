@@ -1,5 +1,5 @@
-@use "../../../../styles" as *;
-@use "../../../../styles/mixins/interactive" as local;
+@use "../../../../../styles" as *;
+@use "../../../../../styles/mixins/interactive" as local;
 
 // ── PAGE ─────────────────────────────────────────────────────────────────────
 
@@ -123,7 +123,7 @@
 .demoArea {
   background-color: $portfolio-surface-secondary;
   border: 1px solid $portfolio-border-subtle;
-  border-radius: $portfolio-radius-sm;
+  border-radius: 0;
   padding: $portfolio-spacer-4x;
   min-height: 120px;
   display: flex;
@@ -205,7 +205,7 @@
 .easingCard {
   padding: $portfolio-spacer-2x;
   border: 1px solid $portfolio-border-subtle;
-  border-radius: $portfolio-radius-sm;
+  border-radius: 0;
   text-align: center;
 }
 
@@ -227,7 +227,7 @@
 .easingTrack {
   height: 4px;
   background-color: $portfolio-surface-tertiary;
-  border-radius: $portfolio-radius-full;
+  border-radius: 0;
   position: relative;
   overflow: hidden;
 }
@@ -237,7 +237,7 @@
   top: -4px;
   width: 12px;
   height: 12px;
-  border-radius: $portfolio-radius-full;
+  border-radius: 0;
   background-color: $portfolio-accent-60;
 }
 
@@ -252,7 +252,7 @@
   color: $portfolio-accent-60;
   padding: $portfolio-spacer-0-5x $portfolio-spacer-1-5x;
   border: 1px solid $portfolio-accent-60;
-  border-radius: $portfolio-radius-sm;
+  border-radius: 0;
   @include transition-fast;
 
   &:hover {
@@ -266,7 +266,7 @@
 .sampleCard {
   width: 160px;
   border: 1px solid $portfolio-border-subtle;
-  border-radius: $portfolio-radius-sm;
+  border-radius: 0;
   overflow: hidden;
   cursor: pointer;
   @include hover-lift;
@@ -296,7 +296,7 @@
 .compoundCard {
   width: 200px;
   border: 1px solid $portfolio-border-subtle;
-  border-radius: $portfolio-radius-sm;
+  border-radius: 0;
   overflow: hidden;
   cursor: pointer;
   @include local.compound-card-hover(".compoundImage", ".compoundTitle");
@@ -322,7 +322,7 @@
   color: #fff;
   background-color: $portfolio-surface-inverse;
   border: none;
-  border-radius: $portfolio-radius-sm;
+  border-radius: 0;
   padding: $portfolio-spacer-1x $portfolio-spacer-3x;
   cursor: pointer;
   @include local.hover-micro-lift;
@@ -334,7 +334,7 @@
   color: $portfolio-text-primary;
   background-color: $portfolio-surface-secondary;
   border: 1px solid $portfolio-border-subtle;
-  border-radius: $portfolio-radius-sm;
+  border-radius: 0;
   padding: $portfolio-spacer-1x $portfolio-spacer-1-5x;
   outline: none;
   width: 240px;
@@ -381,7 +381,7 @@
 .staggerBox {
   height: 48px;
   background-color: $portfolio-accent-20;
-  border-radius: $portfolio-radius-sm;
+  border-radius: 0;
 }
 
 // ── EXPAND DEMO ──────────────────────────────────────────────────────────────
@@ -407,7 +407,7 @@
   padding: 0 $portfolio-spacer-1-5x;
   margin-right: $portfolio-spacer-3x;
   background-color: $portfolio-surface-tertiary;
-  border-radius: $portfolio-radius-sm;
+  border-radius: 0;
   font-family: $portfolio-font-mono;
   font-size: $portfolio-type-xs;
   color: $portfolio-text-secondary;
@@ -456,7 +456,7 @@
   height: 100px;
   margin-bottom: $portfolio-spacer-2x;
   background-color: $portfolio-surface-secondary;
-  border-radius: $portfolio-radius-sm;
+  border-radius: 0;
 }
 
 // ── ARROW DEMO ───────────────────────────────────────────────────────────────
@@ -467,7 +467,7 @@
   gap: $portfolio-spacer-2x;
   padding: $portfolio-spacer-1-5x;
   border: 1px solid $portfolio-border-subtle;
-  border-radius: $portfolio-radius-sm;
+  border-radius: 0;
   cursor: pointer;
   width: 100%;
   @include transition-fast;
@@ -489,7 +489,7 @@
   width: 120px;
   height: 80px;
   background: linear-gradient(135deg, $portfolio-accent-20 0%, $portfolio-accent-40 100%);
-  border-radius: $portfolio-radius-sm;
+  border-radius: 0;
   @include local.hover-scale;
 }
 
