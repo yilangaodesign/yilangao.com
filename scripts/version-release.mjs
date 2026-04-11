@@ -28,6 +28,13 @@ const APPS = {
       { path: 'playground/src/lib/elan.ts', exportName: 'elan' },
     ],
   },
+  website: {
+    displayName: 'yilangao.com',
+    manifest: 'website.json',
+    syncTargets: [
+      { path: 'src/lib/website-version.ts', exportName: 'website' },
+    ],
+  },
   'ascii-studio': {
     displayName: 'ASCII Art Studio',
     manifest: 'ascii-studio.json',
