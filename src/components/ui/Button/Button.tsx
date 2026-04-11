@@ -21,10 +21,14 @@ export type ButtonEmphasis = "bold" | "regular" | "subtle" | "minimal";
 
 export type ButtonSize = "xs" | "sm" | "md" | "lg" | "xl";
 
+export type ButtonShape = "default" | "soft";
+
 type SharedProps = {
   appearance?: ButtonAppearance;
   emphasis?: ButtonEmphasis;
   size?: ButtonSize;
+  shape?: ButtonShape;
+  onColor?: boolean;
   iconOnly?: boolean;
   fullWidth?: boolean;
   leadingIcon?: ReactNode;
@@ -57,6 +61,8 @@ export const Button = forwardRef<
       appearance = "neutral",
       emphasis = "bold",
       size = "lg",
+      shape = "default",
+      onColor = false,
       iconOnly = false,
       fullWidth = false,
       leadingIcon,
@@ -73,6 +79,8 @@ export const Button = forwardRef<
       styles[appearance],
       styles[emphasis],
       styles[size],
+      shape !== "default" && styles[shape],
+      onColor && styles.onColor,
       iconOnly && styles.iconOnly,
       fullWidth && styles.fullWidth,
       className,
@@ -103,7 +111,7 @@ export const Button = forwardRef<
       </>
     );
 
-    if (isLinkProps({ ...rest, appearance, emphasis, size, iconOnly, fullWidth, leadingIcon, trailingIcon, trailingSlot, className, children })) {
+    if (isLinkProps({ ...rest, appearance, emphasis, size, onColor, iconOnly, fullWidth, leadingIcon, trailingIcon, trailingSlot, className, children })) {
       const { href, ...linkRest } = rest as ButtonAsLink;
       const isExternal = href.startsWith("http") || href.startsWith("//");
 

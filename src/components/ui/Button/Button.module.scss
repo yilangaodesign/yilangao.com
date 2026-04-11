@@ -24,8 +24,8 @@ $_btn-icon-xl: var(--portfolio-spacer-3x); // 24px
   justify-content: center;
   font-family: var(--portfolio-font-sans);
   font-weight: var(--portfolio-weight-medium);
-  border-radius: var(--portfolio-radius-sm);
-  border: 1px solid transparent;
+  border-radius: 0;
+  border: $portfolio-border-width-thin solid transparent;
   white-space: nowrap;
   user-select: none;
   cursor: pointer;
@@ -74,6 +74,12 @@ $_btn-icon-xl: var(--portfolio-spacer-3x); // 24px
 // =============================================================================
 // APPEARANCE × EMPHASIS
 // =============================================================================
+
+// Outlined buttons use the "regular" border-width token (2px) so they carry
+// the same visual weight as Input and other outlined form elements.
+.regular {
+  border-width: $portfolio-border-width-regular;
+}
 
 // ---------------------------------------------------------------------------
 // Neutral
@@ -468,6 +474,43 @@ $_btn-icon-xl: var(--portfolio-spacer-3x); // 24px
   }
 }
 
+// ---------------------------------------------------------------------------
+// On-Color — overlay-based states for colored surfaces
+// ---------------------------------------------------------------------------
+// Swap solid hover/active backgrounds to transparent overlays that blend
+// with any tinted surface (e.g. terra-05). Bold emphasis is unaffected
+// because it carries its own opaque fill. Overlay intensity matches the
+// established always-dark / always-light patterns.
+
+.onColor {
+  &.regular,
+  &.minimal {
+    &:hover:not(:disabled) { background-color: $portfolio-overlay-black-04; }
+    &:active:not(:disabled) { background-color: $portfolio-overlay-black-08; }
+
+    :global([data-theme="dark"]) &,
+    :global(.dark) & {
+      &:hover:not(:disabled) { background-color: $portfolio-overlay-white-08; }
+      &:active:not(:disabled) { background-color: $portfolio-overlay-white-12; }
+    }
+  }
+
+  &.subtle {
+    background-color: $portfolio-overlay-black-10;
+
+    &:hover:not(:disabled) { background-color: $portfolio-overlay-black-14; }
+    &:active:not(:disabled) { background-color: $portfolio-overlay-black-20; }
+
+    :global([data-theme="dark"]) &,
+    :global(.dark) & {
+      background-color: $portfolio-overlay-white-10;
+
+      &:hover:not(:disabled) { background-color: $portfolio-overlay-white-14; }
+      &:active:not(:disabled) { background-color: $portfolio-overlay-white-20; }
+    }
+  }
+}
+
 // =============================================================================
 // SIZES — One GS reference model
 // =============================================================================
@@ -537,6 +580,14 @@ $_btn-icon-xl: var(--portfolio-spacer-3x); // 24px
     width: $_btn-icon-xl;
     height: $_btn-icon-xl;
   }
+}
+
+// =============================================================================
+// SHAPE
+// =============================================================================
+
+.soft {
+  border-radius: var(--portfolio-radius-sm);
 }
 
 // =============================================================================

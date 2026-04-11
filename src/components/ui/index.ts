@@ -5,6 +5,7 @@ export type {
   ButtonAppearance,
   ButtonEmphasis,
   ButtonSize,
+  ButtonShape,
 } from "./Button";
 
 export { Card, CardHeader, CardBody, CardFooter } from "./Card";

@@ -4,9 +4,23 @@
   position: sticky;
   top: 0;
   z-index: var(--portfolio-z-sticky);
-  background-color: rgba($portfolio-surface-primary, 0.9);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--portfolio-border-subtle);
+  background-color: var(--portfolio-surface-terra-subtle);
+  box-shadow: 0 4px 12px -4px rgba(0, 0, 0, 0.05);
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 10px;
+    transform: translateY(100%);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.2), transparent);
+    -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.2), transparent);
+    pointer-events: none;
+  }
 }
 
 .navInner {
@@ -23,16 +37,43 @@
 }
 
 .logo {
-  font-family: var(--portfolio-font-sans);
-  font-size: var(--portfolio-type-sm);
-  font-weight: var(--portfolio-weight-medium);
-  color: var(--portfolio-text-primary);
+  display: inline-flex;
+  align-items: center;
+  gap: $portfolio-spacer-0-5x;
   text-decoration: none;
   @include transition-fast;
 
   &:hover {
-    color: var(--portfolio-text-secondary);
+    .logoMark {
+      background-color: var(--portfolio-text-neutral-max);
+    }
+
+    .logoText {
+      color: var(--portfolio-text-neutral-max);
+    }
   }
+}
+
+.logoMark {
+  display: inline-block;
+  height: calc($portfolio-type-2xl * 1.2);
+  aspect-ratio: 1;
+  flex-shrink: 0;
+  background-color: $portfolio-accent-60;
+  mask-image: url('/images/yg-logo.svg');
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  @include transition-fast;
+}
+
+.logoText {
+  font-family: $portfolio-font-serif;
+  font-size: $portfolio-type-2xl;
+  font-weight: $portfolio-weight-regular;
+  line-height: $portfolio-leading-snug;
+  color: $portfolio-accent-60;
+  letter-spacing: $portfolio-tracking-tight;
+  @include transition-fast;
 }
 
 .links {
@@ -57,4 +98,9 @@
 .linkActive {
   color: var(--portfolio-text-primary);
   font-weight: var(--portfolio-weight-medium);
+}
+
+.tagline {
+  @include body-sm;
+  color: var(--portfolio-text-secondary);
 }

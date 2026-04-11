@@ -92,6 +92,14 @@ $_quote-wrap-gap: 12px;
   font-style: italic;
   line-height: var(--portfolio-leading-relaxed);
   color: var(--portfolio-text-secondary);
+
+  p {
+    margin: 0 0 0.75em;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
 }
 
 .lineBesideSvg {

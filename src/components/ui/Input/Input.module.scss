@@ -217,17 +217,16 @@ $_input-icon-xl: var(--portfolio-spacer-3x); // 24px
 .regular {
   .inputContainer {
     background-color: var(--portfolio-surface-neutral-minimal);
-    border: 1px solid var(--portfolio-border-neutral-subtle);
+    border: $portfolio-border-width-regular solid var(--portfolio-border-neutral-subtle);
     border-radius: var(--portfolio-radius-sm);
+    --_border-offset: 1px;
 
     &:hover:not(.disabled):not(.readOnly) {
       border-color: var(--portfolio-border-neutral-bold);
     }
 
     &:focus-within:not(.disabled) {
-      border-width: 2px;
       border-color: var(--portfolio-border-neutral-bold);
-      --_border-offset: 1px;
     }
   }
 
@@ -264,17 +263,16 @@ $_input-icon-xl: var(--portfolio-spacer-3x); // 24px
   .inputContainer {
     background-color: transparent;
     border: none;
-    border-bottom: 1px solid var(--portfolio-border-neutral-subtle);
+    border-bottom: $portfolio-border-width-regular solid var(--portfolio-border-neutral-subtle);
     border-radius: 0;
+    --_border-offset: 1px;
 
     &:hover:not(.disabled):not(.readOnly) {
       border-bottom-color: var(--portfolio-border-neutral-bold);
     }
 
     &:focus-within:not(.disabled) {
-      border-bottom-width: 2px;
       border-bottom-color: var(--portfolio-border-neutral-bold);
-      padding-bottom: calc(var(--_ic-py) - 1px);
     }
   }
 

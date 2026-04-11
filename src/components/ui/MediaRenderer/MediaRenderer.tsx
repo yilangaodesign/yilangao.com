@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import Image from "next/image";
 import styles from "./MediaRenderer.module.scss";
 
 interface MediaRendererProps {
@@ -10,6 +11,9 @@ interface MediaRendererProps {
   className?: string;
   width?: number | null;
   height?: number | null;
+  priority?: boolean;
+  sizes?: string;
+  unoptimized?: boolean;
 }
 
 export default function MediaRenderer({
@@ -19,6 +23,9 @@ export default function MediaRenderer({
   className,
   width,
   height,
+  priority,
+  sizes = '100vw',
+  unoptimized,
 }: MediaRendererProps) {
   const hasDimensions = !!(width && height);
   const [loaded, setLoaded] = useState(false);
@@ -26,27 +33,10 @@ export default function MediaRenderer({
 
   const isVideo = mimeType?.startsWith('video/');
 
-  if (!hasDimensions) {
-    if (isVideo) {
-      return (
-        <video
-          src={src}
-          className={className}
-          autoPlay
-          muted
-          loop
-          playsInline
-          aria-label={alt}
-        />
-      );
-    }
-    return <img src={src} alt={alt} className={className} />;
-  }
-
   return (
     <div
       className={`${styles.wrapper} ${loaded ? styles.loaded : ''} ${className ?? ''}`}
-      style={{ aspectRatio: `${width} / ${height}` }}
+      style={hasDimensions ? { aspectRatio: `${width} / ${height}` } : undefined}
     >
       {!loaded && (
         <div className={styles.skeleton} aria-hidden="true" />
@@ -59,13 +49,18 @@ export default function MediaRenderer({
           muted
           loop
           playsInline
+          preload="metadata"
           aria-label={alt}
           onLoadedData={onLoad}
         />
       ) : (
-        <img
+        <Image
           src={src}
           alt={alt}
+          fill
+          sizes={sizes}
+          priority={priority}
+          unoptimized={unoptimized}
           className={styles.media}
           onLoad={onLoad}
         />
