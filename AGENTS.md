@@ -23,6 +23,7 @@ dispatched by the orchestrator. Follow these rules:
 6. **ALWAYS** use flex layout with in-flow spacers for fixed sidebars — never rely on padding-left offsets
 7. **NEVER** use SVG to render text, labels, or component UI — SVG is permitted only for icons, logos, and decorative illustrations. Text in SVG bypasses the typography token system, breaks copy/paste, and is invisible to screen readers.
 8. **ALWAYS** name component props, CSS classes, and design tokens by **semantic intent** (when/why to use), never by **visual implementation** (what CSS changes). An agent must be able to decide whether to use a prop from its name alone, in one reasoning step, without knowing the underlying CSS. Bad: `mono` (implementation — "use monospace font"). Good: `metric` (intent — "this labels a statistic"). Bad: `rounded` (implementation). Good: `pill` (intent — "tag/badge shape"). This applies to every new prop, variant, token, and CSS class. See §7.7 in `docs/design.md`.
+9. **NEVER** add border-radius to any element on the portfolio website (yilangao.com / main site) — the portfolio identity is zero corner radius on all elements. Badges must use `shape="squared"`. The only exceptions are structural shapes (avatars, progress bars, toggle switches, spinners). Read `docs/design/branding.md` before generating any portfolio UI. See §24 in `docs/design.md`.
 
 **Content:**
 1. **NEVER** write case study text that exceeds 4 consecutive sentences without a visual break — the target is 80-85% visual, 15-20% text
@@ -51,7 +52,7 @@ dispatched by the orchestrator. Follow these rules:
 14. **NEVER** branch rendered output on `typeof window` or `window.location` in client components — this causes hydration mismatches. Use `useState` + `useEffect` to defer client-only values. See EAP-014.
 15. **NEVER** use barrel imports from `lucide-react` in the playground (`import { X } from "lucide-react"`) — Turbopack's `optimizePackageImports` resolves named exports to wrong icon components on server vs client, causing hydration mismatches. Use individual imports: `import X from "lucide-react/dist/esm/icons/x"`. This also applies to any large barrel-export package in `playground/` where SSR parity matters. See EAP-056.
 16. **ALWAYS** run the Cross-App Parity Checklist after creating or modifying anything in `src/`
-17. **NEVER** merge to `main` without first running `npm run version:release` for each app with unreleased changes — every checkpoint is a versioned release. Check all manifests (`elan.json`, `ascii-studio.json`, etc.) to see if `version` differs from `release.version`.
+17. **NEVER** merge to `main` without first running `npm run version:release` for each app with unreleased changes — every checkpoint is a versioned release. Check all manifests (`elan.json`, `website.json`, `ascii-studio.json`) to see if `version` differs from `release.version`.
 18. **ALWAYS** run the CMS-Frontend Parity Checklist after adding, removing, or renaming any CMS field or frontend data field. A field that exists in one layer but not all three (schema, data fetch, UI) is a bug. See EAP-019.
 19. **ALWAYS** run `src/scripts/push-schema.ts` (or equivalent SQL) after adding a new Payload collection — Payload 3's auto-push does NOT work on this project. The admin will 500 with "column does not exist" until the table + `payload_locked_documents_rels` column are created manually. After pushing, restart the dev server. See EAP-062.
 20. **NEVER** create a component that renders CMS data without inline edit support — every text field from a Payload collection or global MUST be wrapped in `EditableText` (with `fieldId`, `target`, `fieldPath`) when `isAdmin`. The component MUST accept `id` and `isAdmin` props, and include an `EditButton`. A component that renders CMS text as plain elements is incomplete. See EAP-029.
@@ -63,6 +64,7 @@ dispatched by the orchestrator. Follow these rules:
     - **Ambiguous** → Ask the user before proceeding
     This classification is a **central guardrail** — it applies regardless of which skill or route activated the task (design-iteration, engineering-iteration, or direct playground work). When the user explicitly overrides this gate, document the exception reason and scope before proceeding.
 23. **NEVER** modify `src/proxy.ts`, `src/collections/Companies.ts`, `src/lib/company-session.ts`, or `src/lib/company-data.ts` without first reading `.cursor/skills/password-gate/SKILL.md`. These files form the visitor access boundary — incorrect changes can expose the site publicly or lock out all visitors.
+24. **ALWAYS** update the playground page when adding a new variant, prop, or visual state to any DS component in `src/components/ui/`. Before writing: (1) read the existing playground page (`playground/src/app/components/<name>/page.tsx`) to understand structure, section ordering, and conventions; (2) add a `ComponentPreview` for the new variant in the logical position; (3) update the `PropsTable`; (4) update Notes if the variant has usage guidance. A variant that exists in code but not in the playground is invisible to consumers. See EAP-082.
 
 # Pre-Flight: Conditional Reading
 
@@ -166,6 +168,12 @@ skill assignment, and gate identification internally.
     → If the rebuild involves new interactive components (Tier 3 artifacts), the skill
       may trigger the orchestrator for cross-category dispatch.
 
+16. **Am I generating or modifying UI for the portfolio website (main site)?**
+    (any file under `src/app/(frontend)/(site)/`, or any component in `src/components/` consumed by the main site)
+    → Read `docs/design/branding.md`.
+    → The branding reference contains identity rules (zero corner radius, Badge shape overrides, etc.) that override general DS defaults.
+    → This route is **mandatory** for all portfolio UI work. It sits alongside design/engineering/content docs — not as a replacement.
+
 Do NOT read docs that don't match your task. Do NOT read full doc files when only one section is relevant. The Section Index exists so you can target-read.
 
 # Self-Audit Protocol
@@ -183,19 +191,19 @@ Do NOT read docs that don't match your task. Do NOT read full doc files when onl
 > Workflow 3 requires write access; if in a read-only mode, note the
 > requirement and let the user/system handle the transition.
 
-16. **Is the user asking me to adversarially audit a plan or proposal?**
+17. **Is the user asking me to adversarially audit a plan or proposal?**
     (triggers: "pressure test plan")
     → Activate `plan-audit` skill at `.cursor/skills/plan-audit/SKILL.md`.
     → Prerequisite: a plan, proposal, or set of proposed changes exists in context.
     → Mode: any (read-only skill).
 
-17. **Is the user asking me to check a plan's structure and sequencing?**
+18. **Is the user asking me to check a plan's structure and sequencing?**
     (triggers: "meta audit plan")
     → Activate `plan-structure` skill at `.cursor/skills/plan-structure/SKILL.md`.
     → Prerequisite: a plan or proposal exists and its logical content is finalized.
     → Mode: any (read-only skill).
 
-18. **Is the user asking me to stress-test existing content?**
+19. **Is the user asking me to stress-test existing content?**
     (triggers: "content stress test", "fresh eyes", "recheck portfolio")
     → Activate `stress-test` skill at `.cursor/skills/stress-test/SKILL.md`.
     → Mode: requires write access (modifies files, pushes to CMS).
@@ -258,7 +266,7 @@ This monorepo contains multiple Next.js apps. **This is the single source of tru
 
 | App | Directory | Port | Version manifest | Script | Audience | Production URL | Vercel Project | Hosting |
 |-----|-----------|------|------------------|--------|----------|---------------|----------------|---------|
-| **Main site** | `src/` (root) | 4000 | `elan.json` | `npm run dev` | Visitors, editors | `new.yilangao.com` (interim) | `yilangao-portfolio` | Vercel |
+| **Main site** | `src/` (root) | 4000 | `website.json` | `npm run dev` | Visitors, editors | `new.yilangao.com` (interim) | `yilangao-portfolio` | Vercel |
 | **Playground** | `playground/` | 4001 | — (reads `elan.json` via synced `elan.ts`) | `npm run playground` | Developers/designers | — | `yilangao-design-system` | Vercel |
 | **ASCII Art Studio** | `ascii-tool/` | 4002 | `ascii-studio.json` | `npm run ascii-tool` | Public users | — | — | Not deployed |
 
