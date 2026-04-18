@@ -414,7 +414,7 @@ export const colors = {
   interaction: [
     { name: "Focus", value: "#3336FF", token: "$portfolio-focus", ref: "$portfolio-accent-60", darkValue: "#4E6CFF" },
     { name: "Focus Inset", value: "#FFFFFF", token: "$portfolio-focus-inset", ref: "$portfolio-neutral-00", darkValue: "#161616" },
-    { name: "Highlight", value: "#C5D4FF", token: "$portfolio-highlight", ref: "$portfolio-accent-20", darkValue: "#0F1560" },
+    { name: "Highlight", value: "#E0D0BF", token: "$portfolio-highlight", ref: "$portfolio-terra-20", darkValue: "#A4702C" },
   ] as SemanticToken[],
 };
 // @sync-tokens:end

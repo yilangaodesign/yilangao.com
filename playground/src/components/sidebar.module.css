@@ -1,0 +1,19 @@
+.sectionLabel {
+  font-size: var(--type-2xs);
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-sidebar-muted-foreground);
+  opacity: 0.5;
+}
+
+.groupLabel {
+  font-size: var(--type-2xs);
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-sidebar-muted-foreground);
+  opacity: 0.4;
+}
