@@ -56,7 +56,7 @@ If it's a new issue:
 ### Step 4: Implement the Fix
 
 - Follow the inverted pyramid - lead with outcome, not context.
-- Maintain 80-85% visual, 15-20% text ratio.
+- Maintain ~60% visual, ~40% text ratio for case studies. Essay-type content is text-majority.
 - Every word must earn its place - cut generic language.
 - Verify the fix reads correctly at the hiring manager's scan speed (15-60 seconds).
 

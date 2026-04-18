@@ -26,7 +26,7 @@ dispatched by the orchestrator. Follow these rules:
 9. **NEVER** add border-radius to any element on the portfolio website (yilangao.com / main site) — the portfolio identity is zero corner radius on all elements. Badges must use `shape="squared"`. The only exceptions are structural shapes (avatars, progress bars, toggle switches, spinners). Read `docs/design/branding.md` before generating any portfolio UI. See §24 in `docs/design.md`.
 
 **Content:**
-1. **NEVER** write case study text that exceeds 4 consecutive sentences without a visual break — the target is 80-85% visual, 15-20% text
+1. **NEVER** write a paragraph that exceeds 3 sentences — the target is ~60% visual, ~40% text for case studies. Essay-type content is text-majority. No paragraph exceeds 3 sentences; whitespace between paragraphs is mandatory.
 2. **NEVER** lead a case study with process methodology (research → ideate → prototype → test) — lead with the problem and outcome (inverted pyramid)
 3. **NEVER** use generic positioning language ("delightful experiences", "user-centered solutions") — every word must be specific enough that it couldn't describe a different designer
 4. **NEVER** describe an internal tool with paragraphs when screenshots exist — replace every descriptive paragraph with a full-width screenshot + one-line caption
@@ -65,6 +65,7 @@ dispatched by the orchestrator. Follow these rules:
     This classification is a **central guardrail** — it applies regardless of which skill or route activated the task (design-iteration, engineering-iteration, or direct playground work). When the user explicitly overrides this gate, document the exception reason and scope before proceeding.
 23. **NEVER** modify `src/proxy.ts`, `src/collections/Companies.ts`, `src/lib/company-session.ts`, or `src/lib/company-data.ts` without first reading `.cursor/skills/password-gate/SKILL.md`. These files form the visitor access boundary — incorrect changes can expose the site publicly or lock out all visitors.
 24. **ALWAYS** update the playground page when adding a new variant, prop, or visual state to any DS component in `src/components/ui/`. Before writing: (1) read the existing playground page (`playground/src/app/components/<name>/page.tsx`) to understand structure, section ordering, and conventions; (2) add a `ComponentPreview` for the new variant in the logical position; (3) update the `PropsTable`; (4) update Notes if the variant has usage guidance. A variant that exists in code but not in the playground is invisible to consumers. See EAP-082.
+25. **ALWAYS** call the content seeding endpoint after modifying any `src/app/(frontend)/api/update-*/route.ts` file. These files are content *definitions*, not content *deployments* — the CMS database is unchanged until the POST endpoint is called. After every edit: (1) `curl -X POST http://localhost:4000/api/update-{slug}` and confirm `action: "updated"` in the response, (2) verify via `curl` or Payload REST API that the new content is present in the CMS, (3) only then report the content edit as done. A saved file with uncalled endpoint is an incomplete task. See EAP-087.
 
 # Pre-Flight: Conditional Reading
 
@@ -168,11 +169,11 @@ skill assignment, and gate identification internally.
     → If the rebuild involves new interactive components (Tier 3 artifacts), the skill
       may trigger the orchestrator for cross-category dispatch.
 
-16. **Am I generating or modifying UI for the portfolio website (main site)?**
-    (any file under `src/app/(frontend)/(site)/`, or any component in `src/components/` consumed by the main site)
+16. **Am I doing any work on the portfolio website (main site) — UI, content, or strategy?**
+    (any file under `src/app/(frontend)/(site)/`, or any component in `src/components/` consumed by the main site, or any content/strategy work for the portfolio)
     → Read `docs/design/branding.md`.
-    → The branding reference contains identity rules (zero corner radius, Badge shape overrides, etc.) that override general DS defaults.
-    → This route is **mandatory** for all portfolio UI work. It sits alongside design/engineering/content docs — not as a replacement.
+    → The branding reference contains brand identity (position, personality, edges), taste and tradition, atmospheric dials, visual identity rules (zero corner radius, Badge shape overrides, etc.), and the proof map.
+    → This route is **mandatory** for all portfolio work. It is **additive to** Route 3 (content routing) and Route 1 (design routing) — read `branding.md` in addition to your category-specific docs, not instead of them.
 
 Do NOT read docs that don't match your task. Do NOT read full doc files when only one section is relevant. The Section Index exists so you can target-read.
 
@@ -225,6 +226,12 @@ Do NOT read docs that don't match your task. Do NOT read full doc files when onl
 **Check 2 — Main site delivery (if you touched `src/` files that affect the main site):**
 1. Verify the main site dev server is running on port 4000
 2. `curl` the affected page and confirm HTTP 200
+
+**Check 3 — Content seeding delivery (if you touched any `src/app/(frontend)/api/update-*/route.ts` file):**
+1. Call `curl -X POST http://localhost:4000/api/update-{slug}` for each modified seeding route
+2. Confirm the response contains `"action": "updated"` (not an error)
+3. Verify via Payload REST API (`curl http://localhost:4000/api/projects?where[slug][equals]={slug}`) that at least one distinctive string from your edit is present in the CMS data
+4. Only then proceed to Post-Flight / respond
 
 **If a check fails, fix it before proceeding. Do NOT document or respond with "please hard refresh."**
 

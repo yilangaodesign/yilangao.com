@@ -83,6 +83,15 @@ runs without pausing — the content map was already approved in Phase 2.
 
 ## Phase 1a: Analyze Raw Materials
 
+### Step 0: Content type triage
+
+Before analyzing materials, classify the content type:
+
+- **Case study (default):** Shipped UI, visual assets, product screens. ~60% visual, ~40% text. 400-600 words. 15-25 image slots.
+- **Essay:** Written argument, framework, opinion (e.g., ETRO). Text-majority. No word cap. No image floor. Paragraph cap (3 sentences) still applies.
+
+The content type determines ratio targets, word limits, sidebar metadata, and which review checks apply. See `visual-economy.md` section 4.1.
+
 ### Step 1: Classify source material
 
 Different source types carry different signals.
@@ -145,6 +154,10 @@ Based on the thesis + material, classify which named narrative shape (see
 - Contrarian Discovery, Rescue Arc, Accumulation Arc, Constraint Theater, or
   Translation Arc
 
+For essays: classify into existing shapes where they fit (see `narrative-arc.md`
+§12.9 "Essay Shape Classification"). ETRO = Accumulation Arc. Contrarian opinion =
+Contrarian Discovery. If nothing fits, record "unclassified."
+
 This is a classification of what emerged from the material, not a template to force
 material into. The ordering matters: analyze beats bottom-up (Steps 1-3) → evaluate
 thesis (Step 4) → classify shape as a top-down label (Step 4b) → recommend technique
@@ -173,7 +186,7 @@ thinking, pick an angle that fills a gap. Reference `docs/content/project-select
 ### Step 5b: Pattern diversity check
 
 Read the Portfolio Coherence Manifest (`docs/content/portfolio-coherence.md`). For each
-of the six dimensions, check whether the new case study would create a repetition:
+of the seven dimensions, check whether the new case study would create a repetition:
 
 1. **Narrative shape:** Does the emerging shape (classified in Step 4b — see
    `narrative-arc.md` §12.9) match an existing one? If so, reframe the thesis to
@@ -187,6 +200,8 @@ of the six dimensions, check whether the new case study would create a repetitio
    metric type or evidence method.
 5. **Employment context:** Populate the interview-only field. Flag disclosure strategy
    needs for Phase 3b (Interview Defense Notes).
+6. **Content format:** Record whether this is a case study or essay. For essays, skip
+   metric-type and evidence-method repetition checks (these dimensions are N/A for essays).
 
 Output: a "diversity constraint" note for Phase 2 planning + a draft manifest entry
 for the new case study. The manifest is updated at Phase 4 (dossier step) after the
@@ -291,8 +306,8 @@ with License buried 5 layers deep", not "Screenshot"), (c) suggested layout usin
 CMS-native values: `full-width` for hero shots, `grid-2-equal` for before/after pairs,
 `grid-3-equal` or `grid-3-bento` for component showcases, `stacked` for sequential
 flows, (d) image count per section following `visual-economy.md` section 4.2: one
-paragraph of text buys 3-6 images. Target: 15-25 total image slots across the case
-study. User uploads the images later.
+section of text accompanies 3-6 images. Target: 15-25 total image slots across the case
+study. User uploads the images later. For essays, there is no image floor.
 
 **Tier 2 — Interactive (existing):** Component already in `src/components/elan-visuals/`
 or similar. In rebuild mode, audit against thesis (keep / modify / replace). In authoring
@@ -359,9 +374,11 @@ Output a plan covering:
    or product screenshot that anchors the entire case study.
 5b. **Image skeleton plan** — For each feature section, list the image placeholders
    to create. Each placeholder has a descriptive label. Each section gets one
-   imageGroup with a layout choice and N placeholder labels. The plan must satisfy
-   the 80-85% visual / 15-20% text ratio from `visual-economy.md`. Minimum 2 image
-   slots per section. Present at the Phase 2 checkpoint alongside the content map.
+   imageGroup with a layout choice and N placeholder labels. For case studies, the plan
+   must satisfy the ~60% visual / ~40% text ratio from `visual-economy.md` with minimum
+   2 image slots per section. For essays, there is no image floor - use images only when
+   they carry evidence the prose cannot. Present at the Phase 2 checkpoint alongside the
+   content map.
 6. Sidebar metadata (role, collaborators, duration, tools, links)
 7. Recycled content from dossier (if rebuild mode)
 8. Style constraints to monitor
@@ -427,14 +444,21 @@ Execute the plan. Apply beats to anatomy following these references:
    bridges from the blurb's energy (see §3.3).
 3. **Feature sections** - restrained, declarative, thesis-serving.
 
-**Key constraints:**
+**Key constraints (case studies):**
 - Intro blurb: headline 6-10 words, body ≤80 words, 4-6 sentences
-- Under 300 words total for feature section body text
-- 1-3 sentences per feature section body
+- 400-600 words total for feature section body text
+- 3-6 sentences per feature section body (max 3 per paragraph)
 - Scope statement: 2-4 sentences
-- 80-85% visual, 15-20% text
+- ~60% visual, ~40% text
 - Every sentence serves the thesis
 - Luxury positioning (§3.8): state outcomes as facts, never editorialize
+
+**Key constraints (essays):**
+- No word cap for body text
+- No section sentence cap (paragraph cap of 3 sentences still applies)
+- Text-majority — no image floor
+- Adapted sidebar: no hero metric, no tools, optional collaborators, add related case study link
+- All other voice/style rules apply
 
 ### Step 2: Materialize to CMS
 
