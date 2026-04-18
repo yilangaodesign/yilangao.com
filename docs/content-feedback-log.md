@@ -4,13 +4,46 @@
 >
 > **Who reads this:** AI agents at session start (scan recent entries for context), and during content feedback processing (check for recurring patterns).
 > **Who writes this:** AI agents after each content feedback cycle.
-> **Last updated:** 2026-04-10 (CFB-032: Site nav tagline — role line refresh)
+> **Last updated:** 2026-04-12 (CFB-034: ETRO voice rewrite — parallel-structure encyclopedia)
 >
 > **For agent skills:** Read only the first 30 lines of this file (most recent entries) for pattern detection. The full file is a historical audit trail — do not read it in its entirety during normal work.
 
 ---
 
+## Session: 2026-04-12 — ETRO Voice Rewrite
+
+#### CFB-034: "ETRO essay doesn't read like a human wrote it - machine-compiled literature review voice"
+
+**Intent:** User said the ETRO essay reads like "a bunch of machine spit out some summary chunks" with "no logic, no storyline, just jumping around." Requested rewrite to match the approved voice from Meteor, Lacework, and Elan case studies.
+
+**Root Cause:** Six structural problems: (1) Section 2 repeated a 4-part parallel pattern (theory -> external example -> "In my system...") creating encyclopedic monotony. (2) External examples (medical AI, legal contracts, code review agents, autonomous vehicles) were spectator summaries with zero personal stake. (3) No narrative connective tissue between sections. (4) Literature-review sentences ("Across 90 studies...") created academic distance incompatible with the practitioner voice. (5) Bold sub-headers mid-section made it read like a reference doc. (6) Paragraphs over-explained, violating the "treats the visitor as an intellectual equal" brand principle.
+
+**Resolution:** Major rewrite of all five sections. Section 2 collapsed from ~1,200 words of parallel structure to ~450 words of narrative - each ETRO element introduced through what happened in the system, not through theory-then-application. All external examples deleted. All bold sub-headers deleted. All literature-review sentences deleted. Section 3 cut CEO resume-padding and put reader in the conversation. Section 4 removed redundant gradient explanations (said the same thing three times). Section 5 cut the self-summarizing opener. Blurb last line sharpened. Scope run-on sentence broken into three.
+
+**Extracted Pattern:** The "parallel-structure encyclopedia" is a distinct AI writing failure mode - when asked to cover N items, the default output is N identical mini-essays with the same beat pattern. The fix is not to rewrite each mini-essay but to refuse the parallel structure entirely and let items emerge from narrative. Related to CAP-017 (AI voice tells) but a structural variant, not a vocabulary one.
+
+---
+
 ## Session: 2026-04-10 — Site Nav Tagline
+
+#### CFB-033: "ETRO framework rewrite - theoretical grounding, multi-voice challenge, temporal framing"
+
+**Intent:** Rebuild the ETRO essay from "case study dressed as a framework" into "a real framework illustrated by a case study." User wanted: (1) the CEO challenge foregrounded as the blurb's hook, (2) theoretical grounding under each ETRO element, (3) cross-domain validation from multiple CEO conversations, (4) framework claims separated from Meteor examples.
+
+**Root Cause:** The original essay asserted the four elements without justification, treated one CEO's pushback as a single-voice challenge, and used Meteor features as both product examples and framework definitions. The blurb underweighted the challenge-and-refinement narrative.
+
+**Resolution:**
+1. Blurb rewritten with Punch-Counterpunch (T1) structure: earned trust -> CEO challenge -> vulnerability ("I agreed too quickly") -> cross-domain validation -> thesis. 79/80 words.
+2. Scope statement adds $79B AUM provenance, multi-CEO challenge, honest position ("calibrated transparency, not maximum transparency").
+3. Section 2 renamed from "Four Pillars, One Job" (pillar metaphor contradicted the argument) to "Present, Past, Future, Always." (Object Title + Staccato Authority). Four-questions temporal framing added. Each element gets four-beat structure: human problem, theoretical grounding, second-domain example, tagged Meteor instance.
+4. Section 3 enhanced with intellectual-weight framing, actual follow-up email language (Warranted Vulnerability, T12), cross-domain proof via onBeacon consultation, and "trust as relationship" claim.
+5. Section 4 gets closing theoretical loop connecting gradient back to four questions.
+6. Section 5 pacing fixes + closed-loop callback (T15) to Section 1's "twelve thousand lines."
+7. All paragraphs verified against 3-sentence cap. All "pillar" references updated to "element" or "question."
+
+**Pattern extracted:** The temporal-layers framing (present/past/future/always) is a reusable justification pattern for any multi-element framework: map elements to distinct temporal modes to argue theoretical completeness.
+
+---
 
 #### CFB-032: Top navigation tagline text update
 

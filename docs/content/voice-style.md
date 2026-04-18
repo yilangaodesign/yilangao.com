@@ -41,8 +41,7 @@ sentence breathe when the idea needs room.
 
 ### Paragraph shape
 
-1-3 sentences per paragraph. Four sentences signals "essay." Case studies are
-not essays.
+1-3 sentences per paragraph. Four sentences signals a wall of text. Case studies follow the ~60/40 visual-prose model. Essay-type content (opinion pieces, written arguments like ETRO) follows a text-majority model - see `visual-economy.md` section 4.1.
 
 One idea per paragraph. If a paragraph has a setup and a payoff, split them.
 

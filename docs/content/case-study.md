@@ -23,17 +23,17 @@ Borrow from journalism. Lead with the conclusion (impact, outcome, key insight),
 │                 │ [Scope statement: 2-4 sentences]       │  ← Article begins (Zone 2)
 │ Role: [title]   │                                        │
 │ Collaborators   │ ## [Feature Section 1 Title]           │  ← Feature sections continue Zone 2
-│ Duration        │ [1-3 sentences: what + why]            │
+│ Duration        │ [3-6 sentences: max 3/paragraph]       │
 │ Tools           │ [Full-width screenshot]                │
 │ [Links ↗]       │ [Detail crops / interaction GIFs]      │
 │                 │ [One-line caption]                     │
 │  (sticky)       │                                        │     (whitespace only between sections)
 │                 │ ## [Feature Section 2 Title]           │
-│                 │ [1-3 sentences]                        │
+│                 │ [3-6 sentences: max 3/paragraph]       │
 │                 │ [Before/after or state progression]    │
 │                 │                                        │     (whitespace only between sections)
 │                 │ ## [Feature Section 3 Title]           │
-│                 │ [1-3 sentences]                        │
+│                 │ [3-6 sentences: max 3/paragraph]       │
 │                 │ [System diagram or component overview] │
 └─────────────────┴────────────────────────────────────────┘
 ```
@@ -53,6 +53,22 @@ Borrow from journalism. Lead with the conclusion (impact, outcome, key insight),
 **Duration field semantics:** The Duration metadata field communicates project length — a velocity and scope signal. Use "~3 months", "6 weeks", "2024 – Present". Never use ship dates here (e.g., "Shipped August 2022"). Ship dates provide temporal context and belong in the scope statement narrative. If a ship date and a duration both appear, they must say different things — otherwise one is wasted metadata. See CAP-014.
 
 **Collaborator display:** Each collaborator/stakeholder group renders on its own line. "Product Management", "Engineering", "Customer Success" are distinct entries, not a comma-separated list. This gives the sidebar a clean, scannable structure where the reader can quickly assess cross-functional scope.
+
+#### Essay Sidebar Variant
+
+When the content type is **essay** (not a case study), the sidebar metadata adapts:
+
+| Field | Case study | Essay |
+|-------|-----------|-------|
+| Role | Title at the company | Role/authority (e.g., "Practitioner & Author") |
+| Hero metric | Required | Omitted |
+| Collaborators | Named groups | Optional (may be solo) |
+| Duration | Project duration | Timespan (e.g., "2024 - Present") |
+| Tools | Technology stack | Omitted |
+| Links | Product links, press | Related case study link, external references |
+| Format indicator | — | "Essay" (signals content type to the reader) |
+
+The essay sidebar is intentionally lighter. It communicates authority and context without the project-scoping metadata that a shipped product needs.
 
 ### 3.3 The Scope Statement (Intro Paragraph)
 
@@ -93,7 +109,7 @@ This is a construction pattern. See CAP-025 in `content-anti-patterns.md` for th
 Each section follows a consistent rhythm:
 
 1. **Section title** (2-5 words): An argument, not a label. See Section Title Strategy below.
-2. **Context paragraph** (1-3 sentences): What was designed and why it mattered. Never process — always outcome or intent.
+2. **Context paragraph** (3-6 sentences, max 3 per paragraph): What was designed and why it mattered. Never process — always outcome or intent.
 3. **2-6 full-width images**: The primary communication medium. Screenshots, UI states, interaction moments.
 4. **Occasional one-line captions**: Specificity signals beneath images.
 
@@ -129,7 +145,7 @@ preview.
 See `personal-voice.md` Techniques 6-10 for headline generation techniques.
 See `case-study-review.md` Check 7 for validation against this anti-pattern.
 
-**Target per case study:** 3-4 feature sections. Total text under 300 words. Total images: 15-25.
+**Target per case study:** 3-4 feature sections. Total text: 400-600 words. Total images: 15-25.
 
 **Luxury positioning (§3.8):** Feature section text must state decisions and trade-offs as facts — never editorialize about difficulty or impressiveness. "We could serve both user groups or serve one well. We chose one." The reader evaluates the judgment. See §3.8 for the full constraint.
 
@@ -148,8 +164,8 @@ The **narrative arc** (`docs/content/narrative-arc.md`) and the **page anatomy**
 2. The **Anatomy** is a visual container. It defines the fixed page structure: hero
    image, title, sidebar metadata, scope statement, and feature sections.
 3. The Arc **instructs** the Anatomy. After analysis, the Arc compresses its beats
-   into the Anatomy's compact format — under 300 words for feature section text,
-   1-3 sentences per section, 80-85% visual density.
+   into the Anatomy's compact format — 400-600 words for feature section text,
+   3-6 sentences per section (max 3 per paragraph), ~60% visual / ~40% text.
 
 The page has three zones with different levels of freedom:
 
@@ -160,7 +176,7 @@ The page has three zones with different levels of freedom:
   Links. The Arc decides what values go here based on material analysis. These map
   to Payload `Projects` metadata fields.
 - **Right main area (semi-structured):** Intro blurb and scope statement at top, then
-  N feature sections, each with 1-3 sentences + visuals. The Arc determines how many
+  N feature sections, each with 3-6 sentences (max 3 per paragraph) + visuals. The Arc determines how many
   sections, what each argues, and what visuals belong where — but the Anatomy
   constrains the density.
 
@@ -176,7 +192,7 @@ for the `INTERACTIVE_VISUALS` map (per CFB-014 / ENG-054).
 
 - **No "Design Process" sections.** No double diamond, no "Research → Ideate → Prototype → Test" flowcharts.
 - **No user personas or journey maps.** The thinking is embedded in the work, not explained around it.
-- **No walls of body text.** Nothing exceeds 4 sentences in a row.
+- **No walls of body text.** No paragraph exceeds 3 sentences. Whitespace between paragraphs is mandatory.
 - **No separate "Results" section at the bottom.** Impact is stated upfront in the intro, not saved for the end.
 - **No generic language.** No "delightful experiences", "user-centered", "intuitive interfaces."
 
@@ -215,6 +231,8 @@ intriguing (headline) and time-to-value compliant (body closer).
 
 #### Three Thermal Zones
 
+The Three Thermal Zones are the operational voice gradient *within a single case study*. For the overarching atmospheric register that governs the brand as a whole (warmth/coldness, formality/informality, density/spareness, etc.), see `docs/design/branding.md` section 4 (Atmospheric Dials). The dials set the overall brand register; the zones modulate voice within that register across the page.
+
 The blurb and the case study body sit on opposite ends of a voice spectrum. A
 controlled gradient bridges them — the scope statement is the cooldown, and visual
 hierarchy (typography size decreasing) signals that each register is supposed to be
@@ -226,8 +244,8 @@ different.
 - **Zone 2: Scope statement (warm → precise)** — The bridge. First sentence carries
   forward-leaning momentum (short, punchy) but NOT rhetorical questions or "you."
   By sentence 2-3, fully in the credentials register. See §3.3.
-- **Zone 3: Feature sections (precise)** — Fully restrained, declarative. 1-3
-  sentences. The voice `voice-style.md` already defines. No change.
+- **Zone 3: Feature sections (precise)** — Fully restrained, declarative. 3-6
+  sentences per section (max 3 per paragraph). The voice `voice-style.md` already defines.
 
 Existing escape valves maintain cohesion: contrarian lines (1-2 per case study) and
 one wry aside are the echo points inside the body that reference the blurb's energy.

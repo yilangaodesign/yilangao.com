@@ -6,6 +6,17 @@
 > - Rebuild audits (Phase 1b, pre-rebuild quality assessment)
 > - Future evaluator agent (as scoring rubric)
 
+## Format Gate (run before all checks)
+
+**Classify the content format before running checks:**
+
+- **Case study (default):** Run all 19 checks.
+- **Essay:** Skip Checks 15 (visual density), 16 (hero image), and 17 (metric derivation). All other checks apply.
+
+See `visual-economy.md` section 4.1 for the content type triage definition.
+
+---
+
 ## The Checks
 
 Run every check against the written output. Fix what fails.
@@ -208,7 +219,7 @@ fix a flat blurb. See also CAP-023 (Voice Flattening During Refinement) in
 Count image blocks (both uploaded and placeholder) per feature section.
 
 1. **Per-section minimum:** Every feature section must have at least 2 image
-   slots (placeholder or real). A text-only section fails the 80-85% visual
+   slots (placeholder or real). A text-only section fails the ~60% visual / ~40% text
    target regardless of prose quality.
 2. **Total count:** The entire case study should have 15-25 image slots across
    all sections. Under 15 means the page will feel text-heavy when images are
@@ -221,7 +232,7 @@ Count image blocks (both uploaded and placeholder) per feature section.
    Sequential flows should use `stacked`. Hero shots should use `full-width`.
    Mismatched layouts create visual noise when images are uploaded.
 
-See `visual-economy.md` section 4.2 for the section rhythm rule (1-3 sentences
+See `visual-economy.md` section 4.2 for the section rhythm rule (3-6 sentences
 \+ 3-6 images).
 
 ### Check 16: Hero image presence

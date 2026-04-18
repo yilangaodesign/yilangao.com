@@ -2680,6 +2680,27 @@ Max/min perceptual distance ratio improved from **1.48x → 1.33x**. Range narro
 
 ---
 
+### FB-085: Cursor thumbnail - horizontal rail model
+
+**Date:** 2026-04-11
+
+**What happened:** User identified contradictory positioning logic in the cursor thumbnail interaction. The thumbnail's y-position was computed by four competing systems in sequence (cursor y lerp, above/below preference, hard clamp to Link rect, global text-rect nudge), each partially overriding the previous. The nudge system scanned all headline rects on the page globally, causing cross-row interference. The reference element was the full `<Link>` (headline + subline + badge), preventing intended subline overlap.
+
+**Root cause:** Incremental layering of positioning rules without a unified model. Each system was individually correct but the combination created irreconcilable conflicts: the lerp was invisible because the clamp always won, and the nudge could push the thumbnail back into the zone the clamp had just cleared.
+
+**Resolution:** Replaced all four competing y-position systems with a single deterministic "horizontal rail" model:
+- Y is fixed at `headlineRect.bottom + RAIL_GAP` (8px, from DS token `$portfolio-spacer-1x`).
+- Viewport exception: if no room below, thumbnail dissolves out (120ms `[data-dissolving]` CSS transition), repositions above the headline while invisible, then dissolves back in. Never lerps through the headline.
+- Row-to-row transitions use independent x+y lerp for a natural curved arc.
+- X continues to track the cursor with the existing lerp and edge-flip logic.
+- Subline overlap is now intentional (reference element changed from `<Link>` to `[data-cursor-text]` headline span).
+
+**Design principles learned:**
+- **One calculation, one position:** When a positioned element's constraints are fully deterministic (anchored to another element, not the cursor), express the position as a single formula, not as a chain of lerp-then-clamp-then-nudge. Competing smoothing systems create emergent bugs that no individual system owns.
+- **Non-spatial transition for forbidden zones:** When a positional transition would cross a forbidden zone (the headline), use a non-spatial transition (dissolve/fade). Reserve spatial transitions (lerp, arc) for open space.
+
+---
+
 ### FB-084: Zero corner radius branding enforcement
 
 **Date:** 2026-04-10
@@ -2698,4 +2719,18 @@ Max/min perceptual distance ratio improved from **1.48x → 1.33x**. Range narro
 - Added Hard Guardrail Design #9 in `AGENTS.md` and Pre-Flight route 16 for mandatory branding reference reading.
 
 **Design principle — documentation is not implementation:** Writing a rule into a reference file does not change the rendered output. Branding decisions that affect visual properties must be implemented in CSS/SCSS alongside the documentation. The two-pronged approach (CSS custom property override for DS components + direct SCSS variable replacement for page-level styles) ensures complete coverage.
+
+---
+
+### FB-086: Inline links in case study content should match metaLink style
+
+**Date:** 2026-04-12
+
+**Issue:** Links within case study rich text content blocks (description and section body) used browser-default styling (blue, underlined), while external links in the sidebar used a portfolio-native style (primary text color, no underline, trailing ↗ arrow). The inconsistency broke visual cohesion.
+
+**Resolution:** Added link styling to `.legacyDescriptionText a`, `.sectionBody a`, `.lexContentEditable a`, and `.lexLink` - all matching the `metaLink` pattern: primary text color, no text-decoration, `::after` arrow pseudo-element, hover dims to secondary. Also added `LinkPlugin` and `ClickableLinkPlugin` to the Lexical editor, plus a link toggle button in the toolbar so admins can add/remove links inline.
+
+**Cross-category note:** Also documented as ENG-118 (engineering) for the Lexical plugin additions.
+
+**Design principle:** All link affordances within a single page should use the same visual language. When rich text HTML is injected via `dangerouslySetInnerHTML`, links inherit browser defaults unless explicitly styled at the container level.
 

@@ -121,10 +121,10 @@ A single paragraph serving multiple narrative functions is intentional.
 
 **Planning budget vs output target:** The prompt's 500-800 word target is the
 Arc's **planning budget** — how much narrative material the analysis phase
-produces. The final output respects the anatomy's visual-first constraints:
-under 300 words total for feature section body text, 1-3 sentences per section.
-The Arc ensures the RIGHT 300 words are chosen; the anatomy ensures only 300
-words appear.
+produces. The final output respects the anatomy's constraints:
+400-600 words total for feature section body text, 3-6 sentences per section
+(max 3 per paragraph). The Arc ensures the RIGHT 400-600 words are chosen; the
+anatomy ensures they appear in the right density.
 
 ## 12.3 Trade-Off Writing Methodology
 
@@ -302,6 +302,15 @@ Shape classification occurs at **Phase 1 Step 4b** in the case-study-authoring s
 4. Step 5: Check portfolio coverage + diversity gate (reads manifest, checks if shape creates repetition)
 
 This ordering prevents confirmation bias: analyze beats (bottom-up) → classify shape (top-down label) → check diversity (cross-portfolio).
+
+### Essay Shape Classification
+
+Essays should be classified into existing shapes where they fit. Map to the closest match:
+- ETRO = Accumulation Arc (a system that started small and compounded)
+- Contrarian opinion piece = Contrarian Discovery
+- "What broke and what I learned" = Rescue Arc
+
+If no existing shape fits, record "unclassified." Define new shapes only after 3+ unclassified essays accumulate. This prevents shape proliferation while acknowledging that essays may not always map cleanly.
 
 ### Diversity Tracking
 

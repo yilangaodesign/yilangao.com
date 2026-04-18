@@ -457,7 +457,7 @@ carries voice energy that the refinement must preserve.
 - Banned words (`voice-style.md` 13.1 table)
 - Em dash ban (use regular dash with spaces)
 - Thesis coherence (every sentence serves the thesis)
-- Word count limits (blurb: 80 words, section body: 1-3 sentences)
+- Word count limits (blurb: 80 words, section body: 3-6 sentences, max 3 per paragraph)
 - No credential performance / no editorializing outcomes (CAP-019)
 - No buzzword misapplication (CAP-020)
 

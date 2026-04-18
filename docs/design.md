@@ -35,7 +35,7 @@
 | §21 | Undocumented Patterns | [`docs/design/admin-ui.md`](design/admin-ui.md) | DS gap analysis |
 | §22 | Button Sizing | [`docs/design/button-sizing.md`](design/button-sizing.md) | Icon/label proportionality |
 | §23 | Tooltip | [`docs/design/tooltip.md`](design/tooltip.md) | Tooltip component, InfoTooltip, placement, content guardrails |
-| §24 | Branding — yilangao.com | [`docs/design/branding.md`](design/branding.md) | **Always** for portfolio site UI work |
+| §24 | Branding — yilangao.com | [`docs/design/branding.md`](design/branding.md) | **Always** for portfolio work (UI, content, or strategy). Covers: zero corner radius, brand position & personality, taste & tradition, atmospheric dials, visual identity, proof map. |
 | §7 | Process Principles | *(this file)* | Meta — how to diagnose |
 | App. | Frequency Map | *(this file)* | Checking recurring patterns |
 

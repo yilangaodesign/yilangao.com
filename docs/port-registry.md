@@ -23,9 +23,9 @@
 
 | Service | Default Port | Current Port | Status | PID | Notes |
 |---|---|---|---|---|---|
-| Main site (`yilangao.com`) | 4000 | 4000 | running | 30583 | `npm run dev` (webpack mode) |
-| Playground | 4001 | 4001 | running | 40407 | `npm run playground` |
-| ASCII Art Studio | 4002 | 4002 | running | 31667 | `npm run ascii-tool` |
+| Main site (`yilangao.com`) | 4000 | 4000 | running | 40177 | `npm run dev` (webpack mode) |
+| Playground | 4001 | 4001 | running | 95085 | `npm run playground` (`--webpack`; see ENG-150) |
+| ASCII Art Studio | 4002 | 4002 | running | 95088 | `npm run ascii-tool` (`--webpack`; see ENG-150) |
 
 ## Key Pages (on main site, no separate server)
 
@@ -38,6 +38,10 @@
 
 | Timestamp (UTC) | Service | Action | Port | Reason |
 |---|---|---|---|---|
+| 2026-04-17 15:49 | Main site | restarted | 4000 | User-visible old homepage (ENG-151) — deleted shadowing `src/app/(frontend)/{page,HomeClient}.tsx` (v1), cleared `.next`, fresh `npm run dev`; new canonical homepage served from `(frontend)/(site)/page.tsx` |
+| 2026-04-17 15:07 | Playground, ASCII Art Studio | restarted | 4001, 4002 | User boot up — prior listeners unhealthy (Turbopack BMI2 panic / hung HTTP); dev scripts aligned with `--webpack`; fresh `npm run playground` / `npm run ascii-tool`; PIDs from `lsof` |
+| 2026-04-14 00:11 | Main site, Playground, ASCII Art Studio | started | 4000–4002 | User boot up — nothing listening on 4000–4002; fresh `npm run dev` / `npm run playground` / `npm run ascii-tool`; PIDs from `lsof` |
+| 2026-04-11 20:57 | Main site, Playground, ASCII Art Studio | restarted | 4000–4002 | User boot up — listeners on 4000–4002 accepted TCP but HTTP timed out (zombie node); SIGKILL + fresh `npm run dev` / `npm run playground` / `npm run ascii-tool` |
 | 2026-04-09 20:35 | Main site | restarted | 4000 | User kill + reboot login page — SIGKILL prior node listener, cleared `.next`, fresh `npm run dev` |
 | 2026-04-08 22:06 | Main site | restarted | 4000 | Restarted to pick up next.config.ts images.remotePatterns for next/image optimization |
 | 2026-04-08 21:35 | Main site, Playground | started | 4000, 4001 | User boot up — main site had listener on 4000 but HTTP timed out (stuck node 49260); SIGKILL + `npm run dev`; playground was down; `npm run playground`; ASCII already healthy on 4002 |

@@ -4,7 +4,7 @@
 >
 > **Who reads this:** AI agents before making code changes — scan for relevant anti-patterns.
 > **Who writes this:** AI agents when an incident reveals a new anti-pattern.
-> **Last updated:** 2026-04-06 (EAP-072: prefer path-level CSS fill; ENG-127)
+> **Last updated:** 2026-04-17 (EAP-088: archived page files left at original route path — Next route group silent shadowing; ENG-151)
 
 ## Category Index
 
@@ -16,12 +16,12 @@
 | CMS / Inline Edit | EAP-016, EAP-023, EAP-029 | 3 active | 3 |
 | Save Flow / Error Handling | EAP-017, EAP-018, EAP-020, EAP-024 | 4 active | 4 |
 | Hydration / SSR / React State | EAP-013, EAP-014, EAP-022, EAP-054, EAP-056 | 5 active | 5 |
-| Build / Toolchain / CSS | EAP-011, EAP-012, EAP-031, EAP-035, EAP-038‡, EAP-039, EAP-040, EAP-069, EAP-072, EAP-077, EAP-078, EAP-080 | 12 active | 12 |
+| Build / Toolchain / CSS | EAP-011, EAP-012, EAP-031, EAP-035, EAP-038‡, EAP-039, EAP-040, EAP-069, EAP-072, EAP-077, EAP-078, EAP-080, EAP-088 | 13 active | 13 |
 | Documentation Process | EAP-008, EAP-010, EAP-027, EAP-032 | 4 active | 4 |
 | Dev Workflow | EAP-002, EAP-003, EAP-009, EAP-068, EAP-073 | 5 active | 5 |
 | Interaction / DOM | EAP-025, EAP-036, EAP-053 | 3 active | 3 |
 | Deployment / CI Build | EAP-060, EAP-061, EAP-079 | 3 active | 3 |
-| **Total** | | **51 active · 1 resolved** | **52** |
+| **Total** | | **52 active · 1 resolved** | **53** |
 
 > † EAP-038 "One-Way Playground Experiment" · ‡ EAP-038 "SCSS Modules with `@use` Under Turbopack" — duplicate ID, two distinct entries.
 
@@ -1455,6 +1455,18 @@ The parent layout always sees a constant box. Any content that exceeds the heigh
 
 **Incident:** ENG-113 (2026-04-10) — Cursor thumbnail flew from top-left viewport corner instead of growing from cursor position. Three fix attempts (React timing, pre-positioning, stable wrapper div) all failed because the root cause was CSS composition order, not DOM lifecycle.
 
+## EAP-087: Modifying a Content Seeding Route Without Calling the Endpoint
+
+**Trigger:** Editing any `src/app/(frontend)/api/update-*/route.ts` file (content constants, block structure, blurb, scope, section headings) without calling the corresponding POST endpoint to push the changes to the CMS database.
+
+**Why it's dangerous:** These route files are content *definitions*, not content *deployments*. The file can be saved, linted, and committed while the CMS database still contains the old content. The agent reports the task as done, the user navigates to the page, and sees stale content. The disconnect is invisible during implementation because the agent never verifies the frontend output.
+
+**Correct approach:** After modifying any `update-*` route file: (1) call the POST endpoint (`curl -X POST http://localhost:4000/api/update-{slug}`), (2) confirm the response shows `action: "updated"`, (3) verify via Payload REST API or frontend curl that the new content is present. All three steps are mandatory before reporting the content edit as done.
+
+**Applies to:** `update-etro`, `update-meteor`, `update-lacework`, `update-elan`, and any future `update-*` seeding routes.
+
+**Incident:** ENG-149 (2026-04-12) — Entire ETRO essay rewrite (9 tasks, 5 sections, blurb, scope) completed without ever calling the endpoint. User saw unchanged content on the live page.
+
 ## EAP-086: Per-Frame Collision Detection Feeding Variable Offsets into a Fixed-Range Lerp
 
 **Trigger:** Running `getBoundingClientRect()` collision checks every frame in a RAF loop and using the result to modify an offset that's smoothed by a lerp designed for small, binary flips.
@@ -1464,3 +1476,18 @@ The parent layout always sees a constant box. Any content that exceeds the heigh
 **Correct approach:** For element-avoidance near a cursor-following element: (1) compute the avoidance zone once on `pointerenter` and commit to a fixed offset for the duration of the hover, or (2) use opacity reduction on overlap instead of repositioning, or (3) use a separate post-processing nudge with its own easing, applied after all other position calculations, checking overlap against the un-nudged natural position to prevent oscillation.
 
 **Incident:** ENG-114 (2026-04-11) — Text-avoidance collision detection made the cursor thumbnail stop following the cursor. Reverted, then re-implemented using approach (3): a separate `nudgeRef` with `NUDGE_EASING = 0.3`, cached text rects on `pointerenter`, overlap checked against natural position only.
+
+**Update (2026-04-11, ENG-116):** Approach (3) was itself superseded by a deterministic "horizontal rail" model. When the element's vertical position is fully determined by another element's rect (not the cursor), the correct approach is to compute position as a single formula (`headlineRect.bottom + RAIL_GAP`) rather than adding avoidance layers. The nudge system, text-rect collection, and cursor y lerp were all removed. The anti-pattern remains valid for cases where the positioned element genuinely tracks the cursor in both axes — but for cursor-following UI where one axis is anchor-determined, prefer deterministic positioning over collision avoidance.
+
+## EAP-088: Archiving a Page by Copying Instead of Deleting the Original
+
+**Trigger:** When a page is "archived" (e.g., copied to `archive/<feature>/pages/`), the originals under `src/app/.../page.tsx` and its co-located `*Client.tsx` are left in place and marked as untracked in git.
+
+**Why it's dangerous:** Next.js App Router **route groups** (folder names in parentheses, e.g. `(site)`) do not contribute URL segments. Two sibling files — `src/app/(frontend)/page.tsx` and `src/app/(frontend)/(site)/page.tsx` — therefore both bind to `/`. Next.js webpack dev mode does **not** throw a "conflicting page" error for this configuration; it silently chooses the shallower file. The archival appears successful (new page code exists, old page lives in `archive/`), but the **old page is still what production serves**. The bug survives every reload, every `.next` flush, every restart, because the file system itself is the source of truth. It can persist invisibly for days — ENG-151 lived for 8 days after ENG-145 "archived" the v1 homepage.
+
+**Correct approach:** Archival means **move**, not **copy**. After copying files into `archive/`, delete the originals and verify:
+1. `git status` shows the old paths as deleted (not just untracked).
+2. Curl the route with a distinctive string from the *new* page (not a shared nav/footer element) and grep the response. Example: for a homepage swap, grep for a class name that only exists in the new `HomeClient.tsx`, not `"Yilan Gao"` which would appear in both.
+3. Grep the whole `src/app/` tree for duplicate `page.tsx` at the same URL resolution. In particular, remember that `app/X/page.tsx` and `app/X/(group)/page.tsx` resolve to the same URL.
+
+**Incident:** ENG-151 (2026-04-17) — Old `src/app/(frontend)/page.tsx` + `HomeClient.tsx` (v1 masonry homepage) remained on disk after ENG-145 (2026-04-09) copied them into `archive/homepage-v1/pages/`. Both shadowed the canonical `src/app/(frontend)/(site)/page.tsx`. User reported the wrong homepage was served on localhost:4000 after `boot up`. Fix: deleted the two shadowing files; new homepage served immediately after cache flush.

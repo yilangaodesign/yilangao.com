@@ -10,15 +10,16 @@ Active voice. Specific. Ambitious but defensible.
 | "I worked on the design" | "I led design for the marketing site relaunch, a 2.5-month project" |
 | "We made an app" | "We designed the Elementals reveal experience to be full of anticipation and delight" |
 
-### 5.2 The Feature Label
+### 5.2 The Feature Section Text
 
-Section text serves as a **label for what the images/visuals show**, not an explanation of the design process. Each sentence should do one of three things:
+Section text has two jobs: (1) frame what the images show, and (2) carry the argument images can't convey (strategy, trade-offs, alternatives). Visual points: image leads, text frames. Strategic points: text leads (the decision is the work). Each sentence should do one of four things:
 
 1. **Name the design intent:** "full of anticipation and delight", "feel luxurious and high-fashion"
 2. **Describe one specific interesting detail:** "Every time someone clicks the white rabbit, a new quote is generated via ChatGPT"
 3. **Establish context:** "marks one of the first high-profile streetwear partnerships between a web3 company and high fashion"
+4. **State a trade-off or alternative considered:** "We could serve both user groups or serve one well. We chose one."
 
-**Hard limit: 1-3 sentences per section body.** If an interactive visual or image already demonstrates the point, the text must not restate it — it labels what the reader is about to see, then gets out of the way. "Adding rationale" does not mean "adding sentences" — it means replacing vague sentences with specific ones. (CFB-015: raised 2× in one session.)
+**Hard limit: 3-6 sentences per section body (max 3 per paragraph).** Whitespace between paragraphs is mandatory. If an interactive visual or image already demonstrates the point, the text must not restate it. "Adding rationale" does not mean "adding sentences" — it means replacing vague sentences with specific ones. (This reverses CFB-015 enforcement. The ratio model shifted from 80/20 to 60/40. The CFB-015 behavioral correction still applies: "adding rationale" = replacing vague sentences with specific ones, not padding with filler.)
 
 ### 5.3 The Craft Caption
 

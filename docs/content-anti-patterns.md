@@ -429,6 +429,20 @@ For fields with non-obvious formats, add a help line or placeholder with an exam
 
 ---
 
+## CAP-029: Parallel-Structure Encyclopedia
+
+**Status: ACTIVE**
+
+**Trigger:** When covering N items (framework elements, design principles, features), the output is N identical mini-essays with the same beat pattern: definition, theory, external example, "in my system." Each block is structurally identical to the previous one. The reader gets the pattern by the second item and skims the rest.
+
+**Why it's wrong:** It reads like compilation, not writing. No human writes four consecutive blocks with the same structure. It signals the author organized information into a template and filled it in four times, which is exactly what an AI does when asked to "cover each element." The voice disappears because the structure is doing all the work. Additionally, external examples the writer has no personal stake in (medical AI, legal contracts, autonomous vehicles) read like Wikipedia summaries and create spectator distance.
+
+**Correct alternative:** Refuse the parallel structure. Let items emerge from narrative where they are needed. "The first question users asked, every time: why did you flag this row?" introduces explainability through what happened, not through a definition block. If all N items need coverage, vary the beat pattern per item - one gets a full paragraph, another gets two sentences, a third emerges as a surprise in a story about something else. External examples must be earned (the writer was in the room, not reading about it).
+
+**Reference:** CFB-034. ETRO essay Section 2 had four identical blocks (Explainability, Traceability, Reversibility, Observability) each following theory -> external example -> "In the system I built, this looked like..." Collapsed from ~1,200 words to ~450 by introducing each element through what actually happened.
+
+---
+
 ## Entry Template
 
 ```markdown

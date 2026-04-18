@@ -1,21 +1,31 @@
 # §4. Image-to-Text Ratio & Visual Economy
 
-### 4.1 The Ratio
+### 4.1 Content Type Triage
 
-**Target: 80-85% visual surface area, 15-20% text.**
+Before applying ratio and word-count rules, classify the content type:
 
-Both Joseph Zhang and Ryo Lu operate at or above this ratio. Ryo Lu approaches 90%+ visual — his portfolio (built inside Notion itself) is primarily screenshots with project title, year, and a brief descriptor.
+| | Case study (default) | Essay |
+|---|---|---|
+| **When** | Shipped UI, visual assets, product screens | Written argument, framework, opinion (e.g., ETRO) |
+| **Ratio** | ~60% visual, ~40% text | Text-majority |
+| **Word count** | 400-600 words (feature section body text) | No cap |
+| **Sentences/section** | 3-6 (max 3 per paragraph) | No section cap (paragraph cap of 3 sentences still applies) |
+| **Image slots** | 15-25 total, 2-6 per section | No image floor |
+
+The practitioner-writing tradition this brand belongs to (Stripe blog, Linear Readme, Julia Evans, Figma blog) treats text as a near-equal partner to visuals. Text frames what images show and carries the argument images can't convey (strategy, trade-offs, alternatives). See `docs/design/branding.md` section 3 for the full tradition reference.
 
 ### 4.2 The Rhythm
 
-**One paragraph of text buys you 3-6 images.** Never the reverse. The images carry the argument; the text provides just enough framing for the images to be legible.
+**Text and images are near-equal partners.** Text frames what the images show and carries the argument images can't convey. Images carry the visual evidence. Neither dominates.
 
-Typical section rhythm:
-- 1-3 sentences of context
+Typical section rhythm (case studies):
+- 3-6 sentences of context (max 3 per paragraph, whitespace between paragraphs)
 - 3-6 full-width or half-width images
 - 0-2 one-line captions
 
-**Agent generation note:** When creating a new case study via the authoring skill, the 3-6 images per paragraph rule translates to 3-6 `imagePlaceholders` entries per section in `createCaseStudyBlocks`. Each placeholder must have a specific label describing what image belongs there. The section `layout` field determines how the skeleton grid (and later, real images) arranges. See `case-study-authoring/SKILL.md` Phase 2 Step 2 for the artifact mapping instructions and Phase 3 Step 2 for the materialization format.
+For essays: paragraphs follow the same 3-sentence cap, but there is no section sentence cap and no image floor.
+
+**Agent generation note:** When creating a new case study via the authoring skill, the 3-6 images per section rule translates to 3-6 `imagePlaceholders` entries per section in `createCaseStudyBlocks`. Each placeholder must have a specific label describing what image belongs there. The section `layout` field determines how the skeleton grid (and later, real images) arranges. For essays, there is no image floor - use images only when they carry evidence the prose cannot. See `case-study-authoring/SKILL.md` Phase 2 Step 2 for the artifact mapping instructions and Phase 3 Step 2 for the materialization format.
 
 ### 4.3 Image Types That Work
 

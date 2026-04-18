@@ -4,10 +4,52 @@
 >
 > **Who reads this:** AI agents at session start (scan recent entries for context), and during incident response (check for recurring patterns).
 > **Who writes this:** AI agents after each incident resolution via the `engineering-iteration` skill.
-> **Last updated:** 2026-04-11 (ENG-147: SiteFooter duplicated across pages with inconsistent data)
+> **Last updated:** 2026-04-17 (ENG-151: Main site serving archived homepage-v1 — route conflict between `(frontend)/page.tsx` and `(frontend)/(site)/page.tsx`)
 >
 > **For agent skills:** Read only the first 30 lines of this file (most recent entries) for pattern detection.
 > **Older entries:** Synthesized in `docs/engineering-feedback-synthesis.md`. Raw archive in `docs/engineering-feedback-log-archive.md`.
+
+---
+
+### ENG-151: Main site still serving archived homepage-v1 after `boot up`
+
+**Date:** 2026-04-17
+
+**Issue:** User reported the wrong homepage was served on localhost:4000 after boot up — the screenshot showed the v1 layout (sidebar + masonry grid + "Reorder tiles" button + interleaved testimonial cards). That version was supposed to be archived in ENG-145 (2026-04-09).
+
+**Root cause:** Two untracked files still lived at the root of `src/app/(frontend)/` — `page.tsx` and `HomeClient.tsx` — which are older copies of the v1 homepage (last modified Apr 7). Because Next.js route groups (`(site)`) do not contribute URL segments, both `src/app/(frontend)/page.tsx` and `src/app/(frontend)/(site)/page.tsx` resolve to `/`. Next's webpack dev mode did not throw a "conflicting page" error; it silently resolved `/` to `(frontend)/page.tsx` (the shallower file), which rendered the archived v1 `HomeClient.tsx` — hence the old layout with `Reorder tiles`, dnd-kit, and `ProjectEditModal`. The canonical new homepage in `(frontend)/(site)/page.tsx` (caseStudies list → thumbnails) was never hit. The `boot up` skill was not at fault — it probes HTTP 200 and PID, not route resolution. Copies of the v1 files already exist in `archive/homepage-v1/pages/`, so deleting the root duplicates is safe.
+
+**Resolution:** Deleted `src/app/(frontend)/page.tsx` (7704 B) and `src/app/(frontend)/HomeClient.tsx` (29254 B). Both were already preserved in `archive/homepage-v1/pages/`, so no content was lost. Killed main site PID 5756, `rm -rf .next`, restarted `npm run dev`. Verified by forging a valid session cookie (HMAC-SHA256 of slug using `SESSION_SECRET`) and curling `/` — the response includes `/_next/static/css/app/(frontend)/(site)/page.css` and `caseStudyList`, with zero occurrences of `Reorder tiles`, `ProjectEditModal`, `@dnd-kit`, `gridOrder`, or `masonry`. New PID 40177 recorded in port registry. Also observed: the first restart got wedged in a Payload pg pool retry loop (`Request timed out after 3000ms` → `write EPIPE` / `read ECONNRESET`) for ~10 minutes; direct `pg.Client` + `SELECT 1` to the same `DATABASE_URL` succeeded, confirming the DB was healthy and the process-local pool was poisoned. A second fresh start (`pkill` + `rm -rf .next` + `npm run dev`) came up cleanly in 571ms.
+
+**Principle:** When archiving a page, **delete** the old files — do not leave them at their original path. Next.js route groups (`(site)`) do not contribute URL segments, so two sibling files at `app/(frontend)/page.tsx` and `app/(frontend)/(site)/page.tsx` both bind to `/`. In webpack dev mode this resolves silently to the shallower file instead of throwing a build error, which is exactly how the ENG-145 archival left the v1 homepage live for eight days. Any future homepage swap must (1) move files to `archive/`, (2) delete the originals, (3) verify via `curl` that a distinctive string from the new page (not a shared nav element) is present in the response before reporting done.
+
+---
+
+### ENG-150: Playground and ASCII dev servers — Turbopack panicked on BMI2; HTTP hung on first request
+
+**Date:** 2026-04-17
+
+**Issue:** During `boot up`, playground (4001) and ASCII Art Studio (4002) had listeners but `curl` to `/` timed out after connecting (0 bytes). Logs showed Turbopack workers panicking: `CPU doesn't support the bmi2 instructions` (qfilter / Rust). Main site on 4000 already used `next dev --webpack` (ENG-117).
+
+**Root cause:** `playground` and `ascii-tool` defaulted to Turbopack. On hosts or sandboxes without BMI2, Turbopack can crash during proxy/route compilation, leaving the process listening but unable to complete HTTP responses.
+
+**Resolution:** Added `--webpack` to `playground/package.json` and `ascii-tool/package.json` `dev` scripts so all three apps match the main site bundler choice. Killed stale listeners and restarted `npm run playground` and `npm run ascii-tool`. Updated `docs/port-registry.md` with new PIDs.
+
+**Principle:** Secondary apps in the monorepo should not default to a stricter CPU path than the main site when the main site already standardized on webpack for Next 16.2.x stability.
+
+---
+
+### ENG-149: ETRO essay content rewrite not visible on website - seeding endpoint never called
+
+**Date:** 2026-04-12
+
+**Issue:** User reported that the ETRO essay content was not updated on the website after a major content rewrite. The `src/app/(frontend)/api/update-etro/route.ts` file had been extensively modified with new blurb, scope statement, section headings, and body content, but the CMS database still contained the old content.
+
+**Root cause:** The update route file is a content seeding script - it defines the content as constants and pushes them to the CMS database when the POST endpoint is called. Modifying the file only changes the *definition*; the content doesn't reach the database until `curl -X POST http://localhost:4000/api/update-etro` is called. The entire rewrite session (9 todos, multiple sections) completed without ever calling the endpoint. The agent treated "file saved" as "content deployed."
+
+**Resolution:** Called the POST endpoint (`curl -X POST http://localhost:4000/api/update-etro`), which returned `{ action: "updated", id: 6 }`. Verified via Payload REST API that all new headings ("Present, Past, Future, Always.", etc.), blurb, and scope statement were now in the database. Added Hard Guardrail #25 to AGENTS.md requiring endpoint invocation + frontend verification after any `update-*` route modification. Added EAP-087 to anti-patterns.
+
+**Principle:** Modifying a content definition file is not the same as deploying content. Any pipeline with a "push" step (seeding routes, migration scripts, schema push) requires the push to be executed and verified as part of the task. "Code written" is not "job done" when the code is a deployment artifact.
 
 ---
 
@@ -983,5 +1025,56 @@ Persisting the `loaded` Set (e.g., sessionStorage) was considered and rejected:
 - **Refresh semantics:** A refresh is an intentional "start fresh" gesture. Re-running the pipeline from scratch picks up any new asset URLs from the server component (fresh depth:2 query).
 
 The browser HTTP cache is the correct persistence layer — it's already there, handles invalidation automatically, and costs nothing to maintain.
+
+---
+
+### ENG-118: Lexical editor link support (LinkPlugin + toolbar toggle)
+
+**Date:** 2026-04-12
+
+**Issue:** The `LexicalBlockEditor` did not include `LinkPlugin` or `ClickableLinkPlugin`, meaning links stored in Lexical state could lose their link nature during editing. The floating toolbar also lacked a link toggle button.
+
+**Root cause:** The editor was initialized with `LinkNode` and `AutoLinkNode` in the node list, but the corresponding plugins that handle link creation/deletion/clicking were not mounted.
+
+**Resolution:** Added `LinkPlugin` and `ClickableLinkPlugin` from `@lexical/react` to the editor's plugin tree. Added a `link` class to the editor theme mapped to `.lexLink`. Added a link toggle button to `LexicalToolbar` using `TOGGLE_LINK_COMMAND` (prompts for URL, sets `target="_blank"`). Added link styling (`.lexLink`, `.lexContentEditable a`) matching the portfolio metaLink pattern.
+
+**Cross-category note:** Also documented as FB-086 (design).
+
+---
+
+### ENG-117: Project nav prev/next should track home page visibility and order
+
+**Date:** 2026-04-12
+
+**Issue:** User reported that the bottom prev/next navigation on case study pages used the raw CMS `order` field to find adjacent projects, regardless of whether those projects were visible on the home page. Projects hidden from home (e.g., `illustrations`, `ascii-studio`) or missing `introBlurbHeadline` could appear as prev/next targets, breaking the user's mental model of sequential navigation.
+
+**Root cause:** The prev/next queries used two separate `payload.find` calls filtering only by `order` (`less_than` / `greater_than` the current project's order). The home page applied a separate visibility filter (`isVisibleOnHome`) after fetching, but the case study page never consulted that filter.
+
+**Resolution:** Replaced the two order-based adjacent queries with a single fetch of all projects (sorted by `order`, `depth: 0` for efficiency), filtered through the same `isVisibleOnHome` predicate used by the home page, then located the current project's index in the filtered list and picked `[idx-1]` / `[idx+1]` as prev/next. Projects not on the home page now have no prev/next nav.
+
+**Principle:** Navigation sequences should be derived from the same source of truth as the list they represent. When two views share the same ordered dataset (home page list and case study prev/next), they must use the same filter and sort criteria. Divergence between "what I see in the list" and "where prev/next takes me" is always a bug.
+
+---
+
+### ENG-116: Cursor thumbnail - rail model rewrite (resolves competing y-position systems)
+
+**Date:** 2026-04-11
+
+**Issue:** User reported contradictory cursor thumbnail behavior. Investigation revealed four competing y-position systems (cursor y lerp, vertical preference, hard clamp, global text-rect nudge) that partially overrode each other every frame. The nudge system (ENG-114, EAP-086) scanned all `[data-cursor-text]` elements globally and could cause cross-row interference. The reference element (`activeElRef` = full `<Link>`) prevented intended subline overlap.
+
+**Root cause:** Incremental layering of positioning systems without a unified model. Each system was individually rational but they formed a conflict chain: lerp -> preference -> clamp -> nudge, where each could override the previous.
+
+**Resolution:** Replaced all four systems with a deterministic "horizontal rail" model in `use-cursor-thumbnail.ts`:
+- Y is `headlineRect.bottom + RAIL_GAP` (8px). No cursor y tracking.
+- Viewport exception: dissolve transition (`[data-dissolving]` data attribute, 120ms CSS transition) for below-to-above flips. Never lerps through the headline zone.
+- Row-to-row transitions: independent x+y lerp produces natural curved arc.
+- Reference element changed from `<Link>` to `[data-cursor-text]` span (`headlineElRef`).
+- Removed: `textRectsRef`, `nudgeRef`, `NUDGE_EASING`, `NUDGE_PAD`, `appliedOffsetRef.y`, cursor y lerp, hard clamp block, text-rect collection on enter.
+- Added: `headlineElRef`, `railYRef`, `flipSideRef`, `dissolvingRef`, `dissolveTimerRef`, `RAIL_GAP`, `FLIP_DISSOLVE_MS`.
+- Pressure-tested twice: fixed stale closure in dissolve timeout (compute `freshX` from live refs), CSS transition timing mismatch (dedicated `[data-dissolving]` rule instead of inline opacity), dissolve+re-enter race (timer cleanup on enter and hide).
+
+**Cross-category note:** Also documented as FB-085 (design).
+
+**Principle:** When a positioned element's constraints are fully deterministic, express position as a single formula. Competing smoothing systems (lerp, clamp, nudge) create emergent oscillation that no individual system owns. Supersedes the approach (3) recommendation in EAP-086 — the deterministic rail eliminates the need for post-processing nudge entirely.
 
 ---
