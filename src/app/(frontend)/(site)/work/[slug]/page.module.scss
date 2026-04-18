@@ -358,6 +358,23 @@ $_nav-height: 45px;
   @include body-base;
   line-height: $portfolio-leading-relaxed;
   color: $portfolio-text-secondary;
+
+  a {
+    color: $portfolio-text-primary;
+    text-decoration: none;
+    white-space: nowrap;
+    @include transition-fast;
+
+    &::after {
+      content: " \2197";
+      @include caption;
+      opacity: 0.5;
+    }
+
+    &:hover {
+      color: $portfolio-text-secondary;
+    }
+  }
 }
 
 .divider {
@@ -482,6 +499,23 @@ $_nav-height: 45px;
   line-height: $portfolio-leading-relaxed;
   color: $portfolio-text-secondary;
   margin-bottom: $portfolio-spacer-4x;
+
+  a {
+    color: $portfolio-text-primary;
+    text-decoration: none;
+    white-space: nowrap;
+    @include transition-fast;
+
+    &::after {
+      content: " \2197";
+      @include caption;
+      opacity: 0.5;
+    }
+
+    &:hover {
+      color: $portfolio-text-secondary;
+    }
+  }
 }
 
 // ── INTERACTIVE VISUAL BLOCKS ─────────────────────────────────────────────────

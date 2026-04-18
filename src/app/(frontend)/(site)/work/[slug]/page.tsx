@@ -6,6 +6,7 @@ import type { SerializedEditorState } from "lexical";
 import { isAdminAuthenticated } from "@/lib/admin-auth";
 import { getCompanyFromSession } from "@/lib/company-session";
 import { getCompanyBySlug } from "@/lib/company-data";
+import { isVisibleOnHome } from "@/lib/project-filters";
 import { RefreshRouteOnSave } from "@/components/RefreshRouteOnSave";
 import type { RawBlock } from "@/lib/extract-content-urls";
 import ProjectClient from "./ProjectClient";
@@ -244,28 +245,28 @@ export default async function ProjectPage({ params }: Props) {
         content: contentBlocks,
       };
 
-      const currentOrder = doc.order ?? 0;
+      const allRes = await payload.find({
+        collection: "projects",
+        sort: "order",
+        limit: 100,
+        depth: 0,
+      });
 
-      const [prevRes, nextRes] = await Promise.all([
-        payload.find({
-          collection: "projects",
-          where: { order: { less_than: currentOrder } },
-          sort: "-order",
-          limit: 1,
+      const homeVisible = allRes.docs.filter((d) =>
+        isVisibleOnHome({
+          slug: d.slug,
+          introBlurbHeadline: (d as Record<string, unknown>).introBlurbHeadline as string | undefined,
         }),
-        payload.find({
-          collection: "projects",
-          where: { order: { greater_than: currentOrder } },
-          sort: "order",
-          limit: 1,
-        }),
-      ]);
+      );
 
-      if (prevRes.docs.length > 0) {
-        prevProject = { slug: prevRes.docs[0].slug, title: prevRes.docs[0].title };
+      const currentIdx = homeVisible.findIndex((d) => d.slug === doc.slug);
+      if (currentIdx > 0) {
+        const prev = homeVisible[currentIdx - 1];
+        prevProject = { slug: prev.slug, title: prev.title };
       }
-      if (nextRes.docs.length > 0) {
-        nextProject = { slug: nextRes.docs[0].slug, title: nextRes.docs[0].title };
+      if (currentIdx !== -1 && currentIdx < homeVisible.length - 1) {
+        const next = homeVisible[currentIdx + 1];
+        nextProject = { slug: next.slug, title: next.title };
       }
     } else {
       notFound();

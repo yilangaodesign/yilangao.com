@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
 import { PreloadManager } from "@/lib/preload-manager";
 import { FadeIn } from "@/components/ui/FadeIn";
@@ -294,6 +294,10 @@ export default function ProjectClient({
 }) {
   const p = project;
   const router = useRouter();
+
+  useLayoutEffect(() => {
+    window.scrollTo(0, 0);
+  }, [p.slug]);
 
   useEffect(() => {
     if (p.slug) {

@@ -14,6 +14,7 @@ import { CursorThumbnail } from "@/components/CursorThumbnail";
 import { useCursorThumbnail } from "@/hooks/use-cursor-thumbnail";
 import { PreloadManager } from "@/lib/preload-manager";
 import type { AssetManifest } from "@/lib/extract-content-urls";
+import { useScrollRestoration } from "@/hooks/use-scroll-restoration";
 import { siteShellStyles } from "@/components/SiteFooter";
 import styles from "./page.module.scss";
 
@@ -37,6 +38,7 @@ export default function HomeClient({
 }) {
   const { thumbRef, thumbSrc, thumbKind, isVisible, handleError, handleMediaReady, getBlockHandlers } =
     useCursorThumbnail(caseStudies);
+  const { savePosition } = useScrollRestoration("home");
 
   useEffect(() => {
     if (assetManifest.length > 0) {
@@ -61,7 +63,7 @@ export default function HomeClient({
                   <Fragment key={cs.slug}>
                     {needsDivider && <Divider className={styles.sectionDivider} />}
                     <StaggerItem>
-                      <Link href={`/work/${cs.slug}`} className={styles.caseStudyLink} {...getBlockHandlers(i)}>
+                      <Link href={`/work/${cs.slug}`} className={styles.caseStudyLink} onClick={savePosition} {...getBlockHandlers(i)}>
                         {isEssay && (
                           <Badge appearance="neutral" emphasis="minimal" size="sm" shape="squared" className={styles.essayBadge}>
                             Essay
