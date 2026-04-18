@@ -4,6 +4,27 @@ All notable changes to the Élan design system are documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.9.0] — 2026-04-17
+
+Minor release: playground sidebar module, inline-edit refinements, and site-level polish shipped alongside ASCII Art Studio SegmentedControl and yilangao.com copy updates.
+
+### Added
+
+- **Playground**: new `sidebar.module.css` for dedicated sidebar styling
+- **Hooks**: `useScrollRestoration` for back-navigation scroll preservation
+
+### Changed
+
+- **Inline edit**: Lexical block editor and toolbar refinements, updated inline-edit SCSS module
+- **CursorThumbnail**: module styling updates, adjustments to `useCursorThumbnail` hook
+- **Playground / ASCII tool**: dev servers pinned to webpack (`next dev --webpack`) for HMR stability
+- **Documentation**: expanded content framework (case-study, narrative-arc, voice-style, visual-economy, reference-portfolios), design branding, engineering and content knowledge bases, and port registry
+
+### Released with this checkpoint
+
+- **ASCII Art Studio** 0.6.0 — new `SegmentedControl` primitive
+- **yilangao.com** 1.1.1 — homepage, project case study (work/[slug]), and Etro seeding route refinements
+
 ## [2.7.0] — 2026-04-08
 
 Minor release: case study intro typography (IBM Plex Serif, `heading-case-study-intro`), MediaRenderer SCSS module, expanded DropdownMenu, portfolio and project page updates, CMS collection and schema-push tooling, inline-edit refinements.
