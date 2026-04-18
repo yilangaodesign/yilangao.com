@@ -4,7 +4,31 @@
 >
 > **Who reads this:** AI agents when the `ship-it` skill is activated — scan recent entries for recurring pitfalls before starting a new release.
 > **Who writes this:** AI agents after each ship-it run via the Post-Release Audit protocol in `ship-it/SKILL.md`.
-> **Last updated:** 2026-04-11 (REL-009: Élan 2.8.0, yilangao.com 1.1.0, ASCII Art Studio 0.5.3)
+> **Last updated:** 2026-04-17 (REL-010: Élan 2.9.0, yilangao.com 1.1.1, ASCII Art Studio 0.6.0)
+
+---
+
+## REL-010 — Élan 2.9.0, yilangao.com 1.1.1, ASCII Art Studio 0.6.0 (2026-04-17)
+
+**Scope:** 38 working-tree files across 7 dependency-ordered layer commits, 1 release commit, 1 dev patch bump on `dev` after merge (48 files shown in fast-forward diff including release artifacts)
+**Semver:** Minor for Élan (2.8.1 → 2.9.0: new playground `sidebar.module.css`, `useScrollRestoration` hook, inline-edit and CursorThumbnail refinements). Patch for yilangao.com (1.1.0 → 1.1.1: homepage, project case study, and Etro seeding route refinements). Minor for ASCII Art Studio (0.5.4 → 0.6.0: new `SegmentedControl` primitive + dev script change).
+**Previous release:** Élan 2.8.0, yilangao.com 1.1.0, ASCII Art Studio 0.5.3
+
+**Incidents during release:**
+- **REL-AP-005 triggered for the third time.** Untracked `src/lib/utils.ts` (shadcn `cn` + `tailwind-merge`) was present again as dead code with no imports and no `tailwind-merge` in `package.json`. **Resolution:** deleted in Phase 2 clean before staging. This is now the 3rd occurrence (REL-004, REL-005 context, REL-010) — **escalation criterion met, see Escalation Check below.**
+- **Phase 2 macOS duplicate load was heavy.** 13 `* 2.*` junk files + a full `src/styles 2/` directory tree were untracked in the working tree from prior macOS Finder or iCloud sync duplication. All deleted in Phase 2 clean with no functional impact.
+- **Vercel post-deploy poll:** playground (`yilangao-design-system`) deployment was **Queued** ~1m after push, matching REL-008/REL-009 pattern. Main site (`yilangao-portfolio`) project is not visible from repo root `vercel ls --prod` per REL-008 — `.vercel/project.json` links to playground.
+
+**Build gate:** All three apps passed on first attempt. Playground build ~500s, main site build ~1234s (dominated by TypeScript), ASCII tool build ~210s. Same non-blocking Sass `darken()` deprecation warnings in `ProjectEditModal.module.scss` as REL-007/008/009.
+
+**Layer classification notes:**
+- 7 commits across 6 populated layers (L0 Config, L1 Docs, L3 Scripts, L5 New primitives, L7 Site components, L8 Frontend pages, L9 Playground). L2 Tokens, L4 Deletions, L6 `src/components/ui/` updates, L10 ASCII tool src were all empty.
+- L3 captured a script-only change (`dev: next dev --webpack`) for both playground and ascii-tool — not a dependency add/remove. Template adapted via REL-AP-004 flexibility.
+- New `ascii-tool/src/components/ui/segmented-control.tsx` is not yet wired into any ASCII tool page but its imports (`cn` from `@/lib/utils`, `tailwind-merge`, `clsx`) all resolve — passed REL-AP-005 dead code check because dependencies exist. Distinction: REL-AP-005 blocks commits only when imports fail to resolve, not when the component is simply unused.
+- `src/hooks/use-scroll-restoration.ts` (new) was classified into L5 (new lib). The matching consumer change (`HomeClient.tsx` importing it) went into L8 — intermediate build state is fine because L5 commits the new file before L8 imports it.
+
+**Escalation check (REL-AP-005, 3rd occurrence):**
+REL-AP-005 (dead `src/lib/utils.ts` with missing `tailwind-merge` dependency) has now triggered 3 times. This is a **procedure gap** — the file keeps being regenerated (likely by automated scaffolding tools or editor templates that assume a shadcn/ui setup that this repo does not have). Promotion action: this gap should be addressed by adding a pre-Phase-1 check in the ship-it skill that explicitly looks for `src/lib/utils.ts` (and the twin `src/lib/utils 2.ts`) as a known-to-regenerate artifact, or by adding `src/lib/utils.ts` and `src/lib/utils 2.ts` to `.gitignore` so the file cannot be accidentally committed. Leaving as documented pitfall for now; propose `.gitignore` entry in the next content/engineering iteration session.
 
 ---
 
