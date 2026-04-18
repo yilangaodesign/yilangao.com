@@ -12,6 +12,8 @@ import { registerMarkdownShortcuts, TRANSFORMERS } from '@lexical/markdown'
 import { HeadingNode, QuoteNode } from '@lexical/rich-text'
 import { ListNode, ListItemNode } from '@lexical/list'
 import { LinkNode, AutoLinkNode } from '@lexical/link'
+import { LinkPlugin } from '@lexical/react/LexicalLinkPlugin'
+import { ClickableLinkPlugin } from '@lexical/react/LexicalClickableLinkPlugin'
 import { CodeNode } from '@lexical/code'
 import {
   BLUR_COMMAND,
@@ -36,6 +38,7 @@ const EDITOR_NODES = [HeadingNode, QuoteNode, ListNode, ListItemNode, LinkNode, 
 function editorTheme() {
   return {
     paragraph: styles.lexParagraph,
+    link: styles.lexLink,
     text: {
       bold: styles.lexBold,
       italic: styles.lexItalic,
@@ -322,6 +325,8 @@ export default function LexicalBlockEditor({
           }
           ErrorBoundary={LexicalErrorBoundary}
         />
+        <LinkPlugin />
+        <ClickableLinkPlugin />
         <HistoryPlugin />
         <OnChangePlugin onChange={handleChange} />
         <MarkdownShortcutsPlugin />

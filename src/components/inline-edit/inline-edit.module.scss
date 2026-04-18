@@ -1625,6 +1625,23 @@ $accent-light: rgba($portfolio-accent-60, 0.06);
   line-height: 1.7;
   color: var(--portfolio-text-primary);
   cursor: text;
+
+  a {
+    color: var(--portfolio-text-primary);
+    text-decoration: none;
+    white-space: nowrap;
+    @include transition-fast;
+
+    &::after {
+      content: " \2197";
+      @include caption;
+      opacity: 0.5;
+    }
+
+    &:hover {
+      color: var(--portfolio-text-secondary);
+    }
+  }
 }
 
 .lexPlaceholder {
@@ -1644,6 +1661,23 @@ $accent-light: rgba($portfolio-accent-60, 0.06);
 
   &:last-child {
     margin-bottom: 0;
+  }
+}
+
+.lexLink {
+  color: var(--portfolio-text-primary);
+  text-decoration: none;
+  white-space: nowrap;
+  @include transition-fast;
+
+  &::after {
+    content: " \2197";
+    @include caption;
+    opacity: 0.5;
+  }
+
+  &:hover {
+    color: var(--portfolio-text-secondary);
   }
 }
 

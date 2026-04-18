@@ -11,10 +11,11 @@ const OFFSET = 16;
 const EDGE_PAD = 16;
 const LERP_FACTOR = 0.25;
 const FLIP_EASING = 0.12;
-const NUDGE_EASING = 0.3;
-const NUDGE_PAD = 8;
 const LERP_THRESHOLD = 0.5;
 const TRANSITION_GRACE_MS = 150;
+// Mirrors $portfolio-spacer-1x (8px) — breathing space between headline and rail
+const RAIL_GAP = 8;
+const FLIP_DISSOLVE_MS = 120;
 
 type MediaKind = "image" | "video";
 type CaseStudyWithThumb = { thumbnailUrl?: string; thumbnailKind?: MediaKind };
@@ -43,23 +44,24 @@ export function useCursorThumbnail(items: CaseStudyWithThumb[]) {
   const rafRef = useRef<number | null>(null);
   const thumbRef = useRef<HTMLDivElement | null>(null);
   const thumbSizeRef = useRef({ w: 0, h: 0 });
-  const appliedOffsetRef = useRef({ x: OFFSET, y: OFFSET });
-  const textRectsRef = useRef<DOMRect[]>([]);
-  const nudgeRef = useRef(0);
+  const appliedOffsetRef = useRef({ x: OFFSET });
   const leaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const activeElRef = useRef<HTMLElement | null>(null);
   const visibleRef = useRef(false);
+  const headlineElRef = useRef<Element | null>(null);
+  const railYRef = useRef({ current: 0, target: 0 });
+  const flipSideRef = useRef<"below" | "above">("below");
+  const dissolvingRef = useRef(false);
+  const dissolveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const easing = prefersReduced ? 1.0 : LERP_FACTOR;
   const flipEasing = prefersReduced ? 1.0 : FLIP_EASING;
-  const nudgeEasing = prefersReduced ? 1.0 : NUDGE_EASING;
 
   const tick = useCallback(() => {
     const cur = currentRef.current;
     const tgt = targetRef.current;
 
     cur.x += (tgt.x - cur.x) * easing;
-    cur.y += (tgt.y - cur.y) * easing;
 
     if (thumbSizeRef.current.w === 0 && thumbRef.current) {
       thumbSizeRef.current.w = thumbRef.current.offsetWidth;
@@ -69,77 +71,81 @@ export function useCursorThumbnail(items: CaseStudyWithThumb[]) {
     const tw = thumbSizeRef.current.w;
     const th = thumbSizeRef.current.h;
 
-    const elRect = activeElRef.current?.getBoundingClientRect() ?? null;
-
     const targetOffsetX =
       cur.x + OFFSET + tw + EDGE_PAD > window.innerWidth ? -OFFSET - tw : OFFSET;
-    // Prefer below the header element; only go above when viewport has no room
-    const targetOffsetY =
-      elRect && th > 0
-        ? elRect.bottom + th + EDGE_PAD > window.innerHeight
-          ? -OFFSET - th
-          : OFFSET
-        : cur.y + OFFSET + th + EDGE_PAD > window.innerHeight
-          ? -OFFSET - th
-          : OFFSET;
 
     const ao = appliedOffsetRef.current;
     ao.x += (targetOffsetX - ao.x) * flipEasing;
-    ao.y += (targetOffsetY - ao.y) * flipEasing;
 
     const naturalX = cur.x + ao.x;
-    let naturalY = cur.y + ao.y;
 
-    // Hard clamp: thumbnail must never overlap the header it belongs to
-    if (elRect && th > 0) {
-      const fitsBelow = elRect.bottom + th + EDGE_PAD <= window.innerHeight;
-      if (fitsBelow) {
-        naturalY = Math.max(naturalY, elRect.bottom);
-      } else {
-        naturalY = Math.min(naturalY, elRect.top - th);
+    // Rail y: determined by headline rect, not cursor
+    const headlineRect = headlineElRef.current?.getBoundingClientRect() ?? null;
+
+    if (headlineRect && th > 0) {
+      const fitsBelow =
+        headlineRect.bottom + RAIL_GAP + th + EDGE_PAD <= window.innerHeight;
+      const newSide = fitsBelow ? "below" : "above";
+
+      const targetRailY = fitsBelow
+        ? headlineRect.bottom + RAIL_GAP
+        : Math.max(0, headlineRect.top - RAIL_GAP - th);
+
+      if (newSide !== flipSideRef.current && !dissolvingRef.current) {
+        dissolvingRef.current = true;
+        flipSideRef.current = newSide;
+
+        if (thumbRef.current) {
+          thumbRef.current.dataset.dissolving = "";
+        }
+
+        dissolveTimerRef.current = setTimeout(() => {
+          dissolveTimerRef.current = null;
+
+          const freshX = currentRef.current.x + appliedOffsetRef.current.x;
+
+          railYRef.current.current = targetRailY;
+          railYRef.current.target = targetRailY;
+
+          if (thumbRef.current) {
+            thumbRef.current.style.translate = `${freshX}px ${targetRailY}px`;
+            delete thumbRef.current.dataset.dissolving;
+          }
+
+          dissolvingRef.current = false;
+        }, FLIP_DISSOLVE_MS);
+      } else if (!dissolvingRef.current) {
+        flipSideRef.current = newSide;
+        railYRef.current.target = targetRailY;
       }
     }
 
-    let targetNudge = 0;
-    if (tw > 0 && th > 0) {
-      for (const rect of textRectsRef.current) {
-        if (naturalX + tw <= rect.left || naturalX >= rect.right) continue;
-        if (naturalY + th <= rect.top || naturalY >= rect.bottom) continue;
-        const pushDown = rect.bottom + NUDGE_PAD - naturalY;
-        const pushUp = naturalY + th - rect.top + NUDGE_PAD;
-        targetNudge = pushDown <= pushUp ? pushDown : -pushUp;
-        break;
-      }
-    }
-    nudgeRef.current += (targetNudge - nudgeRef.current) * nudgeEasing;
-    if (Math.abs(nudgeRef.current) < LERP_THRESHOLD) nudgeRef.current = 0;
+    const ry = railYRef.current;
+    ry.current += (ry.target - ry.current) * easing;
+    const naturalY = ry.current;
 
-    if (thumbRef.current) {
+    if (!dissolvingRef.current && thumbRef.current) {
       const originX = targetOffsetX >= 0 ? "left" : "right";
-      const originY = targetOffsetY >= 0 ? "top" : "bottom";
+      const originY = flipSideRef.current === "below" ? "top" : "bottom";
       thumbRef.current.style.transformOrigin = `${originX} ${originY}`;
-      thumbRef.current.style.translate = `${naturalX}px ${naturalY + nudgeRef.current}px`;
+      thumbRef.current.style.translate = `${naturalX}px ${naturalY}px`;
     }
 
     const deltaX = Math.abs(tgt.x - cur.x);
-    const deltaY = Math.abs(tgt.y - cur.y);
     const flipDeltaX = Math.abs(targetOffsetX - ao.x);
-    const flipDeltaY = Math.abs(targetOffsetY - ao.y);
-    const nudgeDelta = Math.abs(targetNudge - nudgeRef.current);
+    const railDeltaY = Math.abs(ry.target - ry.current);
 
     if (
       visibleRef.current ||
       deltaX > LERP_THRESHOLD ||
-      deltaY > LERP_THRESHOLD ||
       flipDeltaX > LERP_THRESHOLD ||
-      flipDeltaY > LERP_THRESHOLD ||
-      nudgeDelta > LERP_THRESHOLD
+      railDeltaY > LERP_THRESHOLD
     ) {
       rafRef.current = requestAnimationFrame(tick);
     } else {
       rafRef.current = null;
     }
-  }, [easing, flipEasing, nudgeEasing]);
+  }, [easing, flipEasing]);
 
   const startLoop = useCallback(() => {
     if (rafRef.current === null) {
@@ -156,6 +162,10 @@ export function useCursorThumbnail(items: CaseStudyWithThumb[]) {
       if (leaveTimerRef.current !== null) {
         clearTimeout(leaveTimerRef.current);
         leaveTimerRef.current = null;
+      }
+      if (dissolveTimerRef.current !== null) {
+        clearTimeout(dissolveTimerRef.current);
+        dissolveTimerRef.current = null;
       }
     };
   }, []);
@@ -192,7 +202,15 @@ export function useCursorThumbnail(items: CaseStudyWithThumb[]) {
       clearTimeout(leaveTimerRef.current);
       leaveTimerRef.current = null;
     }
-    textRectsRef.current = [];
+    if (dissolveTimerRef.current !== null) {
+      clearTimeout(dissolveTimerRef.current);
+      dissolveTimerRef.current = null;
+    }
+    dissolvingRef.current = false;
+    if (thumbRef.current) {
+      delete thumbRef.current.dataset.dissolving;
+    }
+    headlineElRef.current = null;
     activeElRef.current = null;
     visibleRef.current = false;
     setVisible(false);
@@ -229,6 +247,18 @@ export function useCursorThumbnail(items: CaseStudyWithThumb[]) {
         onPointerEnter: (e: React.PointerEvent) => {
           if (e.pointerType !== "mouse") return;
           activeElRef.current = e.currentTarget as HTMLElement;
+          headlineElRef.current =
+            e.currentTarget.querySelector("[data-cursor-text]");
+
+          // Cancel any pending dissolve from a previous interaction
+          if (dissolveTimerRef.current) {
+            clearTimeout(dissolveTimerRef.current);
+            dissolveTimerRef.current = null;
+            dissolvingRef.current = false;
+            if (thumbRef.current) {
+              delete thumbRef.current.dataset.dissolving;
+            }
+          }
 
           const quickTransition = leaveTimerRef.current !== null;
           if (quickTransition) {
@@ -236,36 +266,49 @@ export function useCursorThumbnail(items: CaseStudyWithThumb[]) {
             leaveTimerRef.current = null;
           }
 
-          const textEls = document.querySelectorAll("[data-cursor-text]");
-          textRectsRef.current = Array.from(textEls, (el) => el.getBoundingClientRect());
-
           setSrc(url);
           setKind(itemKind);
 
+          // Compute rail y from headline rect
+          const headlineRect =
+            headlineElRef.current?.getBoundingClientRect() ?? null;
+          const th = thumbSizeRef.current.h;
+          const fitsBelow =
+            headlineRect && th > 0
+              ? headlineRect.bottom + RAIL_GAP + th + EDGE_PAD <=
+                window.innerHeight
+              : true;
+          const railY =
+            headlineRect && th > 0
+              ? fitsBelow
+                ? headlineRect.bottom + RAIL_GAP
+                : Math.max(0, headlineRect.top - RAIL_GAP - th)
+              : e.clientY + OFFSET;
+          flipSideRef.current = fitsBelow ? "below" : "above";
+
           if (quickTransition) {
-            // Slide smoothly — keep current position, let lerp move to new target
             targetRef.current.x = e.clientX;
-            targetRef.current.y = e.clientY;
+            // Only update rail target — current stays at old position for curved arc
+            railYRef.current.target = railY;
           } else {
-            nudgeRef.current = 0;
             thumbSizeRef.current = { w: 0, h: 0 };
 
             targetRef.current.x = e.clientX;
-            targetRef.current.y = e.clientY;
             currentRef.current.x = e.clientX;
-            currentRef.current.y = e.clientY;
+
+            // Snap rail y (no lerp on first appear)
+            railYRef.current.current = railY;
+            railYRef.current.target = railY;
 
             const tw = thumbSizeRef.current.w;
-            const th = thumbSizeRef.current.h;
-            const flipX = e.clientX + OFFSET + tw + EDGE_PAD > window.innerWidth;
-            const flipY = e.clientY + OFFSET + th + EDGE_PAD > window.innerHeight;
+            const flipX =
+              e.clientX + OFFSET + tw + EDGE_PAD > window.innerWidth;
             appliedOffsetRef.current.x = flipX ? -OFFSET - tw : OFFSET;
-            appliedOffsetRef.current.y = flipY ? -OFFSET - th : OFFSET;
 
             const el = thumbRef.current;
             if (el) {
-              el.style.transformOrigin = `${flipX ? "right" : "left"} ${flipY ? "bottom" : "top"}`;
-              el.style.translate = `${e.clientX + appliedOffsetRef.current.x}px ${e.clientY + appliedOffsetRef.current.y}px`;
+              el.style.transformOrigin = `${flipX ? "right" : "left"} ${fitsBelow ? "top" : "bottom"}`;
+              el.style.translate = `${e.clientX + appliedOffsetRef.current.x}px ${railY}px`;
             }
 
             visibleRef.current = true;
@@ -278,7 +321,6 @@ export function useCursorThumbnail(items: CaseStudyWithThumb[]) {
         onPointerMove: (e: React.PointerEvent) => {
           if (e.pointerType !== "mouse") return;
           targetRef.current.x = e.clientX;
-          targetRef.current.y = e.clientY;
           startLoop();
         },
 

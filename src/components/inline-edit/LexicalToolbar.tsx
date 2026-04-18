@@ -13,6 +13,8 @@ import {
 import type { RangeSelection, TextFormatType } from 'lexical'
 import { $setBlocksType } from '@lexical/selection'
 import { $createHeadingNode, $isHeadingNode } from '@lexical/rich-text'
+import { TOGGLE_LINK_COMMAND, $isLinkNode } from '@lexical/link'
+import { $findMatchingParent } from '@lexical/utils'
 import { ButtonSelect, ButtonSelectItem } from '@/components/ui/ButtonSelect'
 import { Tooltip } from '@/components/ui/Tooltip'
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/DropdownMenu'
@@ -96,6 +98,7 @@ export default function LexicalToolbar() {
     code: false,
   })
   const [blockType, setBlockType] = useState<BlockState>('paragraph')
+  const [isLink, setIsLink] = useState(false)
   const [isVisible, setIsVisible] = useState(false)
   const [position, setPosition] = useState({ top: 0, left: 0 })
 
@@ -114,6 +117,11 @@ export default function LexicalToolbar() {
 
       setFormat(getFormatState(selection))
       setBlockType(getBlockState(selection))
+
+      const node = selection.anchor.getNode()
+      const parent = node.getParent()
+      setIsLink($isLinkNode(parent) || $isLinkNode(node) || !!$findMatchingParent(node, $isLinkNode))
+
       setIsVisible(true)
     })
   }, [editor])
@@ -190,6 +198,17 @@ export default function LexicalToolbar() {
     [editor],
   )
 
+  const toggleLink = useCallback(() => {
+    if (isLink) {
+      editor.dispatchCommand(TOGGLE_LINK_COMMAND, null)
+    } else {
+      const url = window.prompt('Enter URL')
+      if (url) {
+        editor.dispatchCommand(TOGGLE_LINK_COMMAND, { url, target: '_blank', rel: 'noopener noreferrer' })
+      }
+    }
+  }, [editor, isLink])
+
   const applyColor = useCallback(
     (hex: string) => {
       editor.update(() => {
@@ -259,6 +278,11 @@ export default function LexicalToolbar() {
       </FormatButton>
       <FormatButton label="Code" active={format.code} onClick={() => applyFormat('code')}>
         <code>&lt;/&gt;</code>
+      </FormatButton>
+      <FormatButton label="Link" active={isLink} onClick={toggleLink}>
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+          <path d="M6 8l2-2m-1.5-1.5L8.25 2.75a1.77 1.77 0 012.5 0l.5.5a1.77 1.77 0 010 2.5L9.5 7.5M4.5 6.5L2.75 8.25a1.77 1.77 0 000 2.5l.5.5a1.77 1.77 0 002.5 0L7.5 9.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
       </FormatButton>
 
       <span className={styles.lexToolbarSep} aria-hidden />
