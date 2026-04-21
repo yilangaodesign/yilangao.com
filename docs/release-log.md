@@ -4,7 +4,46 @@
 >
 > **Who reads this:** AI agents when the `ship-it` skill is activated — scan recent entries for recurring pitfalls before starting a new release.
 > **Who writes this:** AI agents after each ship-it run via the Post-Release Audit protocol in `ship-it/SKILL.md`.
-> **Last updated:** 2026-04-17 (REL-010: Élan 2.9.0, yilangao.com 1.1.1, ASCII Art Studio 0.6.0)
+> **Last updated:** 2026-04-21 (REL-011: Élan 2.10.0, yilangao.com 1.2.0, ASCII Art Studio 0.6.1)
+
+---
+
+## REL-011 — Élan 2.10.0, yilangao.com 1.2.0, ASCII Art Studio 0.6.1 (2026-04-21)
+
+**Scope:** ~88 working-tree files across 8 dependency-ordered layer commits, 1 release commit, 2 follow-up commits (1 build-fix, 1 concurrent footer feature), 1 dev patch bump on `dev` after merge (105 files shown in fast-forward diff including release artifacts).
+**Semver:** Minor for Élan (2.9.1 → 2.10.0: 3 new DS primitives — `AlertDialog`, `MediaMuteToggle`, `VideoEmbed`). Minor for yilangao.com (1.1.2 → 1.2.0: video embed block, image-group atomic migration, major inline-edit feature expansion — `ConfirmDelete`, `ToastSurface`, `VideoEmbedInput`, `VideoSettings`, `ImageBlockAdminOverlay`). Patch for ASCII Art Studio (0.6.0 → 0.6.1: release sync only, no app code changes).
+**Previous release:** Élan 2.9.0, yilangao.com 1.1.1, ASCII Art Studio 0.6.0
+
+**Incidents during release:**
+- **Corrupt `playground/node_modules` on first build attempt.** Playground build failed with `ERR_INVALID_PACKAGE_CONFIG` for `next/dist/compiled/text-table/package.json` (file was missing from the compiled bundle — the directory contained only `LICENSE`). Root cause: partial/interrupted install from a prior session. **Resolution:** `rm -rf playground/node_modules playground/.next && npm install` in playground. Rebuild succeeded on retry. Filing as **REL-AP-008** below — this is a new pitfall worth capturing: corrupted node_modules from interrupted installs are not caught by the ship-it Phase 2 clean (which only scans for macOS duplicates and debug logs, not node_modules integrity).
+- **Main site TypeScript error in atomic image block.** `ProjectClient.tsx` line 857 passed `img.url` (typed `string | undefined`) to `MediaRenderer`'s required `src: string` prop. TS did not narrow through the `hasMedia = Boolean(img.url)` guard. **Resolution:** added non-null assertion (`src={img.url!}`) in a separate `fix:` commit atop the release commit. Build passed on retry. Same pattern as REL-009 fix #3 (use-cursor-thumbnail non-null after guard) — TypeScript strict mode doesn't narrow through intermediate boolean variables.
+- **Concurrent IDE edits landed mid-release.** After the release commit was created, `git status` showed 5 additional modified files (`(site)/layout.tsx`, `api/seed/route.ts`, `scripts/seed.ts`, `docs/engineering-feedback-log.md`, `docs/port-registry.md`) with coherent, isolated footer social-link updates (adding Élan DS / Resume / LinkedIn defaults with URL fallback resolution). These were clearly concurrent user edits, not agent side-effects. **Resolution:** committed as a separate `feat:` commit after the build-fix, then re-ran the main site build gate before merge. Rolled into the same release window. No new pitfall — documenting the pattern: the build gate must re-run when any file changes after the release commit, including concurrent edits.
+- **ASCII tool build hung when output was piped through `tail -20`.** First ascii-tool build attempt backgrounded with no output because `tail -20` buffers until EOF. **Resolution:** killed the hung pipe, re-ran with output redirected to a log file (`> /tmp/ascii-build.log 2>&1`), then tailed the log. Build completed in ~7.4min (TypeScript-dominated). No functional failure — documenting as a shell-pipe caveat for long-running builds.
+- **Vercel post-deploy poll:** playground (`yilangao-design-system`) deployment was **Queued** ~1m after push, matching REL-008/009/010 pattern. Main site (`yilangao-portfolio`) project is not visible from repo root `vercel ls --prod` per REL-008.
+
+**Build gate:** All three apps passed after the corrupt-node_modules reinstall and the MediaRenderer fix. Main site build ran twice (before and after the concurrent-edit commit) — both passed. Playground ~47s, main site ~46-58s, ASCII tool ~7.9min (dominated by TypeScript).
+
+**Layer classification notes:**
+- 8 commits across 7 populated layers (L0 Config, L1 Docs, L3 Deps, L5 New primitives + libs + registry, L6 UI updates, L7 Site components, L8 Frontend pages + CMS, L9 Playground). L2 Tokens, L4 Deletions, L10 ASCII tool src were all empty.
+- L5 consolidated 3 new DS components, 3 new `src/lib/*.ts` utility files, and the updated `archive/registry.json` into one commit per Phase 1 rules.
+- REL-AP-005 clean this time — no stray `src/lib/utils.ts`. All 3 new `src/lib/` files (`migrate-image-groups.ts`, `normalize-image-rows.ts`, `parse-video-embed.ts`) verified as imported and dependency-resolved.
+- REL-AP-002 clean — new playground pages for `alert-dialog`, `media-mute-toggle`, `video-embed` all use correct component-preview APIs: `<SubsectionHeading>children</SubsectionHeading>`, `<SourcePath path="..." />`, `<PropsTable props={[...]} />`. Grep-verified before commit.
+- REL-AP-003 clean — the 3 new UI component directories were all-new (no mixed new/modified files in the same directory).
+- `.mcp.json` (untracked local config) added to `.gitignore` in L0 alongside the Next.js image hostname config. No change to the `.gitignore` posture for dev artifacts.
+
+### REL-AP-008: Corrupt `node_modules` from interrupted prior install
+
+**Occurrences:** 1 (REL-011)
+
+**Trigger:** Playground build fails with
+`ERR_INVALID_PACKAGE_CONFIG /playground/node_modules/next/dist/compiled/<sub>/package.json`.
+The referenced `package.json` is missing — the directory exists but contains only `LICENSE`. Cause: a prior `npm install` (possibly from a different session or killed mid-flight) left `node_modules` in a partial/corrupt state.
+
+**Failure:** Build gate halts immediately before TypeScript. No recovery from within the build — the install must be repaired.
+
+**Fix:** `rm -rf playground/node_modules playground/.next && npm install` in the playground directory. Rebuild succeeds.
+
+**Preventative check (to add to Phase 2 Clean in a future ship-it revision):** If any `node_modules/next/dist/compiled/*/` directory is missing its `package.json`, reinstall before proceeding. A lightweight version: if a previous session killed an `npm install` mid-flight, reinstall proactively. Keep as a documented pitfall for now; promote to procedure if it occurs again.
 
 ---
 
