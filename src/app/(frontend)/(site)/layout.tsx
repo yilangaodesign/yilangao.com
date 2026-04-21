@@ -6,6 +6,41 @@ import { extractLexicalText, lexicalToHtml } from "@/lib/lexical";
 import { resolveSiteRoleFromCms } from "@/lib/site-role-display";
 import styles from "./layout.module.scss";
 
+/** Canonical targets when CMS `href` is empty or when using layout fallbacks. */
+const FOOTER_LINK_DEFAULTS_BY_LABEL: Record<
+  string,
+  { href: string; external: boolean }
+> = {
+  "Élan Design System": {
+    href: "https://yilangao-design-system.vercel.app/",
+    external: true,
+  },
+  Resume: {
+    href: "https://drive.google.com/file/d/1IMSeearuPglNJV8MH20Z-BCnhi2idITz/view?usp=sharing",
+    external: true,
+  },
+  Linkedin: {
+    href: "https://www.linkedin.com/in/yilangao/",
+    external: true,
+  },
+};
+
+function resolveFooterSocialLink(l: {
+  label: string;
+  href: string;
+  external?: boolean | null;
+}) {
+  const trimmed = (l.href ?? "").trim();
+  if (trimmed) {
+    return { label: l.label, href: trimmed, external: l.external ?? true };
+  }
+  const def = FOOTER_LINK_DEFAULTS_BY_LABEL[l.label];
+  if (def) {
+    return { label: l.label, href: def.href, external: def.external };
+  }
+  return { label: l.label, href: trimmed, external: l.external ?? true };
+}
+
 const FALLBACK_TEAMS = [
   { name: "Company Name", url: "#", period: "" },
   { name: "Company Name", url: "#", period: "" },
@@ -14,13 +49,12 @@ const FALLBACK_TEAMS = [
   { name: "Company Name", url: "#", period: "" },
 ];
 
-const FALLBACK_LINKS = [
-  { label: "About", href: "/about", external: false },
-  { label: "Experiments", href: "/experiments", external: false },
-  { label: "Linkedin", href: "#", external: true },
-  { label: "Instagram", href: "#", external: true },
-  { label: "Twitter", href: "#", external: true },
-];
+const FALLBACK_LINKS = (
+  Object.entries(FOOTER_LINK_DEFAULTS_BY_LABEL) as [
+    string,
+    { href: string; external: boolean },
+  ][]
+).map(([label, rest]) => ({ label, ...rest }));
 
 export default async function SiteLayout({
   children,
@@ -68,12 +102,8 @@ export default async function SiteLayout({
             : footerConfig.teams,
         links:
           config.socialLinks && config.socialLinks.length > 0
-            ? config.socialLinks.map(
-                (l: { label: string; href: string; external?: boolean | null }) => ({
-                  label: l.label,
-                  href: l.href,
-                  external: l.external ?? true,
-                }),
+            ? config.socialLinks.map((l: { label: string; href: string; external?: boolean | null }) =>
+                resolveFooterSocialLink(l),
               )
             : footerConfig.links,
       };

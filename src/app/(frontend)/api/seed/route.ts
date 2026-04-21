@@ -205,11 +205,17 @@ export async function POST() {
         { name: 'Company Name', url: '#' },
       ],
       socialLinks: [
-        { label: 'About', href: '/about', external: false },
-        { label: 'Experiments', href: '/experiments', external: false },
-        { label: 'Linkedin', href: '#', external: true },
-        { label: 'Instagram', href: '#', external: true },
-        { label: 'Twitter', href: '#', external: true },
+        {
+          label: 'Élan Design System',
+          href: 'https://yilangao-design-system.vercel.app/',
+          external: true,
+        },
+        {
+          label: 'Resume',
+          href: 'https://drive.google.com/file/d/1IMSeearuPglNJV8MH20Z-BCnhi2idITz/view?usp=sharing',
+          external: true,
+        },
+        { label: 'Linkedin', href: 'https://www.linkedin.com/in/yilangao/', external: true },
       ],
       clients: CLIENTS,
       experience: [
