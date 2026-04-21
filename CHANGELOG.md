@@ -4,6 +4,27 @@ All notable changes to the Élan design system are documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.10.0] — 2026-04-21
+
+Minor release: three new DS primitives (AlertDialog, MediaMuteToggle, VideoEmbed), major inline-edit expansion with video embeds and destructive confirmations, and CMS schema additions for video and image-group migration shipped alongside yilangao.com 1.2.0 and ASCII Art Studio 0.6.1.
+
+### Added
+
+- **DS Components**: `AlertDialog` (Radix-based destructive confirmation), `MediaMuteToggle`, `VideoEmbed` with YouTube/Vimeo/Loom support
+- **Inline edit**: `ConfirmDelete` (declarative component + `useConfirm()` hook), `ToastSurface`, `VideoEmbedInput`, `VideoSettings`, `ImageBlockAdminOverlay`, `useStructuralShortcuts`
+- **Libs**: `parse-video-embed.ts`, `normalize-image-rows.ts`, `migrate-image-groups.ts`
+- **Playground**: new pages for `alert-dialog`, `media-mute-toggle`, `video-embed`
+
+### Changed
+
+- **MediaRenderer, Navigation, ScrollSpy** (UI): updated SCSS modules and component internals
+- **Inline edit**: expanded `useBlockManager`, restructured toolbars, overhauled inline-edit SCSS module
+
+### Released with this checkpoint
+
+- **yilangao.com** 1.2.0 — video embed block, image-group atomic migration, expanded inline-edit capabilities, new migration API routes
+- **ASCII Art Studio** 0.6.1 — release sync only (no app code changes)
+
 ## [2.9.0] — 2026-04-17
 
 Minor release: playground sidebar module, inline-edit refinements, and site-level polish shipped alongside ASCII Art Studio SegmentedControl and yilangao.com copy updates.
