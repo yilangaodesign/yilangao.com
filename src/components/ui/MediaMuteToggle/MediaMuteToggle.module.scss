@@ -1,0 +1,64 @@
+@use '../../../styles' as *;
+
+/**
+ * MediaMuteToggle — translucent overlay button for viewer-facing video
+ * mute/unmute. Zero border-radius per branding §1.1. Parent positions via
+ * absolute placement; this component only paints itself.
+ */
+
+.root {
+  @include button-reset;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--portfolio-spacer-0-5x);
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  pointer-events: auto;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.28);
+  transition:
+    background-color var(--portfolio-duration-fast) var(--portfolio-easing-standard),
+    opacity var(--portfolio-duration-fast) var(--portfolio-easing-standard);
+
+  &:hover,
+  &:focus-visible {
+    background: rgba(0, 0, 0, 0.75);
+  }
+
+  &:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+  }
+
+  &[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sm {
+  width: 28px;
+  height: 28px;
+
+  .icon svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+.md {
+  width: 32px;
+  height: 32px;
+
+  .icon svg {
+    width: 16px;
+    height: 16px;
+  }
+}

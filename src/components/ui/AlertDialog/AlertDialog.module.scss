@@ -1,0 +1,104 @@
+@use '../../../styles' as *;
+
+// Component tokens
+$_alert-dialog-max-width: 440px;
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--portfolio-z-modal);
+  background-color: var(--portfolio-surface-overlay);
+
+  &[data-state='open'] {
+    animation: fadeIn var(--portfolio-duration-moderate) var(--portfolio-easing-entrance);
+  }
+  &[data-state='closed'] {
+    animation: fadeOut var(--portfolio-duration-fast) var(--portfolio-easing-exit);
+  }
+}
+
+.content {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: var(--portfolio-z-modal);
+  transform: translate(-50%, -50%);
+  width: 90vw;
+  max-width: $_alert-dialog-max-width;
+  background-color: var(--portfolio-surface-primary);
+  border: 1px solid var(--portfolio-border-subtle);
+  border-radius: var(--portfolio-radius-sm);
+  box-shadow: var(--portfolio-shadow-overlay);
+  padding: var(--portfolio-spacer-4x);
+
+  &:focus {
+    outline: none;
+  }
+
+  &[data-state='open'] {
+    animation: alertIn var(--portfolio-duration-moderate) var(--portfolio-easing-entrance);
+  }
+  &[data-state='closed'] {
+    animation: alertOut var(--portfolio-duration-fast) var(--portfolio-easing-exit);
+  }
+}
+
+.title {
+  font-family: var(--portfolio-font-sans);
+  font-size: var(--portfolio-type-lg);
+  font-weight: var(--portfolio-weight-semibold);
+  line-height: var(--portfolio-leading-snug);
+  color: var(--portfolio-text-primary);
+  margin-bottom: var(--portfolio-spacer-1x);
+}
+
+.description {
+  font-family: var(--portfolio-font-sans);
+  font-size: var(--portfolio-type-sm);
+  line-height: var(--portfolio-leading-normal);
+  color: var(--portfolio-text-secondary);
+  margin-bottom: var(--portfolio-spacer-3x);
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--portfolio-spacer-1x);
+  margin-top: var(--portfolio-spacer-3x);
+}
+
+// ---------------------------------------------------------------------------
+// Animations
+// ---------------------------------------------------------------------------
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes alertIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes alertOut {
+  from {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.96);
+  }
+}

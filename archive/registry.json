@@ -986,6 +986,76 @@
       "hasPreview": false
     },
     {
+      "id": "shared-ui-alert-dialog",
+      "name": "AlertDialog",
+      "type": "Component",
+      "experiment": "shared",
+      "status": "active",
+      "description": "Destructive confirmation dialog with focus trap and mandatory Cancel/Action buttons. Built on @radix-ui/react-alert-dialog. Use for delete confirmations instead of window.confirm or Dialog.",
+      "sourcePath": "src/components/ui/AlertDialog/AlertDialog.tsx",
+      "createdAt": "2026-04-19T00:00:00Z",
+      "createdBy": "cursor",
+      "origin": { "type": "hybrid", "library": "Radix UI", "url": "https://www.radix-ui.com/primitives/docs/components/alert-dialog" },
+      "tags": ["ui", "overlay", "modal", "alert-dialog", "radix", "primitive", "destructive"],
+      "hasPreview": true
+    },
+    {
+      "id": "shared-inline-edit-confirm-delete",
+      "name": "ConfirmDelete",
+      "type": "Component",
+      "experiment": "shared",
+      "status": "active",
+      "description": "Inline-edit destructive confirmation wrapper built on DS AlertDialog. Exports both a declarative <ConfirmDelete trigger title description onConfirm /> component and an imperative useConfirm() hook (for keyboard-initiated deletes). ConfirmProvider is mounted inside InlineEditProvider.",
+      "sourcePath": "src/components/inline-edit/ConfirmDelete.tsx",
+      "createdAt": "2026-04-19T00:00:00Z",
+      "createdBy": "cursor",
+      "origin": { "type": "custom" },
+      "tags": ["inline-edit", "confirmation", "destructive", "cms"],
+      "hasPreview": false
+    },
+    {
+      "id": "shared-inline-edit-video-settings",
+      "name": "VideoSettings",
+      "type": "Component",
+      "experiment": "shared",
+      "status": "active",
+      "description": "Inline-edit overlay for video Media settings. Combines a DS ButtonSelect (Loop/Player playback mode) with a DropdownMenu 'More settings' for Muted and Change/Remove poster frame. Replaces the legacy VideoPlaybackToggle. Writes directly to `media.playbackMode`, `media.muted`, and `media.poster` and calls `router.refresh()` so all renderers re-read from the CMS.",
+      "sourcePath": "src/components/inline-edit/VideoSettings.tsx",
+      "createdAt": "2026-04-19T00:00:00Z",
+      "createdBy": "cursor",
+      "origin": { "type": "custom" },
+      "tags": ["inline-edit", "video", "cms", "ds-composition"],
+      "hasPreview": false
+    },
+    {
+      "id": "shared-inline-edit-image-block-admin-overlay",
+      "name": "ImageBlockAdminOverlay",
+      "type": "Component",
+      "experiment": "shared",
+      "status": "active",
+      "description": "Hover overlay toolbar for images inside an inline-edit imageGroup block. Composes DS Button + Tooltip for Move left / Move right / Replace / Delete. Delete routes through `useBlockManager.confirmRemoveImage` so every removal honors §14 (AlertDialog + toast.undoable). Replaces the legacy raw glyph buttons that caused ENG-162.",
+      "sourcePath": "src/components/inline-edit/ImageBlockAdminOverlay.tsx",
+      "createdAt": "2026-04-19T00:00:00Z",
+      "createdBy": "cursor",
+      "origin": { "type": "custom" },
+      "tags": ["inline-edit", "image", "overlay", "cms", "ds-composition"],
+      "hasPreview": false
+    },
+    {
+      "id": "shared-ui-media-mute-toggle",
+      "name": "MediaMuteToggle",
+      "type": "Component",
+      "experiment": "shared",
+      "status": "active",
+      "description": "Viewer-facing mute/unmute control for videos. Icon-only button with a translucent dark overlay background, intended to be absolute-positioned in the corner of a video surface. Consumed by MediaRenderer on loop videos whose editor opted into sound (media.muted === false) so every visitor — not only admins — can mute or unmute. Zero border-radius per branding §1.1.",
+      "sourcePath": "src/components/ui/MediaMuteToggle/MediaMuteToggle.tsx",
+      "createdAt": "2026-04-19T00:00:00Z",
+      "createdBy": "cursor",
+      "origin": { "type": "custom" },
+      "tags": ["ui", "media", "video", "overlay", "a11y"],
+      "hasPreview": true
+    },
+    {
       "id": "shared-ui-dropdown-menu",
       "name": "DropdownMenu",
       "type": "Component",
@@ -1205,6 +1275,22 @@
         "type": "custom"
       },
       "tags": ["ui", "menu", "list", "action-list", "navigation", "selection"],
+      "hasPreview": true
+    },
+    {
+      "id": "shared-ui-video-embed",
+      "name": "VideoEmbed",
+      "type": "Component",
+      "experiment": "shared",
+      "status": "active",
+      "description": "Privacy-mode iframe embed for YouTube, Vimeo, and Loom. Click-to-load poster defers provider cookies and cuts LCP; idle state renders a native button with an accessible label. Swaps to autoplayUrl on user activation so playback fires from the gesture. Supports custom poster override, auto-thumbnail for YouTube, horizontal/vertical aspect ratios (Shorts), and YouTube ?t=/?start= timestamps. Paired with parseVideoEmbedUrl for URL parsing.",
+      "sourcePath": "src/components/ui/VideoEmbed/VideoEmbed.tsx",
+      "createdAt": "2026-04-18T00:00:00Z",
+      "createdBy": "cursor",
+      "origin": {
+        "type": "custom"
+      },
+      "tags": ["ui", "video", "embed", "iframe", "youtube", "vimeo", "loom", "media", "click-to-load", "privacy"],
       "hasPreview": true
     }
   ]
