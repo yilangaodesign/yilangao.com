@@ -86,7 +86,9 @@ export default async function SiteLayout({
     <div className={styles.siteWrapper}>
       <Navigation appearance="solid" tagline={resolveSiteRoleFromCms(role)} />
       <div className={styles.contentArea}>
-        {children}
+        <div className={styles.contentAreaInner}>
+          {children}
+        </div>
       </div>
       <SiteFooter siteConfig={footerConfig} />
     </div>

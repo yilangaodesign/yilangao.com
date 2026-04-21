@@ -129,6 +129,63 @@ async function pushSchema() {
       WHEN duplicate_column THEN NULL;
     END $$`,
 
+    // Media: video poster (relationship → media). Already live on existing DBs
+    // via Payload auto-push, but codified here so fresh provisions get it.
+    `DO $$ BEGIN
+      ALTER TABLE "media" ADD COLUMN "poster_id" integer REFERENCES "media"("id") ON DELETE SET NULL;
+    EXCEPTION
+      WHEN duplicate_column THEN NULL;
+    END $$`,
+
+    // Media: muted override (ENG-162). This is now the *default state* axis
+    // (starts muted vs starts with sound), only meaningful when
+    // `audio_enabled` is true. See the audio_enabled column below.
+    `DO $$ BEGIN
+      ALTER TABLE "media" ADD COLUMN "muted" boolean DEFAULT true;
+    EXCEPTION
+      WHEN duplicate_column THEN NULL;
+    END $$`,
+
+    // Media: audio_enabled (capability axis). Split out from `muted` in
+    // ENG-170 because the old single-boolean conflated capability
+    // ("does the viewer have a mute toggle?") with default state
+    // ("if audio is exposed, does it start muted?"). New semantics:
+    //   audio_enabled=false → video plays silently, no viewer toggle
+    //                         (the `muted` column is ignored in this case)
+    //   audio_enabled=true  → viewer mute toggle is shown; `muted` decides
+    //                         the starting state
+    // Migration: existing rows where `muted=false` were effectively
+    // "audio on, starts with sound" — preserve by setting audio_enabled=true.
+    // Rows where `muted=true` were "audio off" — preserve by leaving
+    // audio_enabled=false (the default).
+    `DO $$ BEGIN
+      ALTER TABLE "media" ADD COLUMN "audio_enabled" boolean DEFAULT false;
+    EXCEPTION
+      WHEN duplicate_column THEN NULL;
+    END $$`,
+    `UPDATE "media" SET "audio_enabled" = true WHERE "muted" = false AND "audio_enabled" IS NOT TRUE`,
+
+    // Atomic image block (replacing imageGroup's images[] array). Each image
+    // is its own block; rows are formed implicitly by consecutive `image`
+    // blocks whose `row_break` = false continue the row started by their
+    // predecessor. Required for the Figma-like atomic image-block DnD model.
+    `CREATE TABLE IF NOT EXISTS "projects_blocks_image" (
+      "_order" integer NOT NULL,
+      "_parent_id" integer NOT NULL REFERENCES "projects"("id") ON DELETE CASCADE,
+      "_path" text NOT NULL,
+      "id" varchar PRIMARY KEY,
+      "image_id" integer REFERENCES "media"("id") ON DELETE SET NULL,
+      "caption" varchar,
+      "alt" varchar,
+      "row_break" boolean DEFAULT true,
+      "width_fraction" numeric,
+      "placeholder_label" varchar,
+      "block_name" varchar
+    )`,
+    `CREATE INDEX IF NOT EXISTS "projects_blocks_image_parent_idx" ON "projects_blocks_image" ("_parent_id")`,
+    `CREATE INDEX IF NOT EXISTS "projects_blocks_image_order_idx" ON "projects_blocks_image" ("_order")`,
+    `CREATE INDEX IF NOT EXISTS "projects_blocks_image_path_idx" ON "projects_blocks_image" ("_path")`,
+
   ]
 
   for (const sql of statements) {

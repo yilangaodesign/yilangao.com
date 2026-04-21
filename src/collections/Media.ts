@@ -91,5 +91,56 @@ export const Media: CollectionConfig = {
         placeholder: 'e.g., Design review — Q3 2026',
       },
     },
+    {
+      name: 'playbackMode',
+      type: 'select',
+      options: [
+        { label: 'Loop (silent autoplay, no controls — for short UI clips)', value: 'loop' },
+        { label: 'Player (controls, no autoplay — for walkthroughs)', value: 'player' },
+      ],
+      defaultValue: 'loop',
+      admin: {
+        condition: (_, siblingData) =>
+          typeof siblingData?.mimeType === 'string' && siblingData.mimeType.startsWith('video/'),
+        description: 'Loop for clips up to ~10s; Player for narrative walkthroughs with audio or longer runtime.',
+      },
+    },
+    {
+      name: 'audioEnabled',
+      type: 'checkbox',
+      defaultValue: false,
+      label: 'Expose audio controls to viewers',
+      admin: {
+        condition: (_, siblingData) =>
+          typeof siblingData?.mimeType === 'string' && siblingData.mimeType.startsWith('video/'),
+        description:
+          'When off, the video plays silently with no mute/unmute button — use for decorative loops. When on, viewers see a mute toggle, and you choose the starting state below (muted or with sound).',
+      },
+    },
+    {
+      name: 'muted',
+      type: 'checkbox',
+      defaultValue: true,
+      label: 'Starts muted by default',
+      admin: {
+        condition: (_, siblingData) => {
+          if (typeof siblingData?.mimeType !== 'string' || !siblingData.mimeType.startsWith('video/')) return false
+          return siblingData?.audioEnabled === true
+        },
+        description:
+          'Starting state when the page loads. Viewers can always flip it via the mute toggle. Default: start muted (browser-friendly; avoids autoplay policy blocks).',
+      },
+    },
+    {
+      name: 'poster',
+      type: 'upload',
+      relationTo: 'media',
+      filterOptions: () => ({ mimeType: { like: 'image/' } }),
+      admin: {
+        condition: (_, siblingData) =>
+          typeof siblingData?.mimeType === 'string' && siblingData.mimeType.startsWith('video/'),
+        description: 'Optional still frame shown before video loads. Images only (JPEG/PNG/WebP).',
+      },
+    },
   ],
 }

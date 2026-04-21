@@ -29,4 +29,33 @@
   flex: 1;
   position: relative;
   z-index: 1;
+  // Allow the flex child to shrink below its intrinsic min content width so
+  // the overflow scroll container below can take effect at narrow viewports.
+  min-width: 0;
+}
+
+.contentAreaInner {
+  // Default: no width constraint — content fills contentArea naturally.
+}
+
+// ── DESKTOP MIN-WIDTH FLOOR (CONTENT ONLY) ────────────────────────────────
+// Below the sm breakpoint on mouse-driven devices, the page *content* gets a
+// 672px floor with horizontal scroll so case studies and other composed
+// surfaces render at their intended width. Nav and SiteFooter are siblings
+// of `.contentArea`, so they stay fluid to the actual viewport and fall back
+// to their mobile layouts — functional chrome must always be reachable and
+// readable at any width. Scoped to `pointer: fine` so touch devices (which
+// have their own phone composition at any width) are unaffected. See FB-147,
+// FB-149 and `docs/design/responsive.md` §6.10.
+@media (pointer: fine) and (max-width: #{$elan-bp-sm - 1px}) {
+  .contentArea {
+    // Contain the horizontal overflow inside `.contentArea` so it does NOT
+    // grow the document width — siblings (Nav, SiteFooter) stay at viewport
+    // width and remain fully responsive.
+    overflow-x: auto;
+  }
+
+  .contentAreaInner {
+    min-width: $elan-bp-sm;
+  }
 }

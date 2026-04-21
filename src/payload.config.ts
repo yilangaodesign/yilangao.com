@@ -85,7 +85,21 @@ export default buildConfig({
   }),
   plugins: [
     s3Storage({
-      collections: { media: true },
+      collections: {
+        media: {
+          disablePayloadAccessControl: true,
+          generateFileURL: ({ filename, prefix }) => {
+            const bucket = process.env.S3_BUCKET || 'media'
+            const s3Endpoint = process.env.S3_ENDPOINT || ''
+            const publicBase = s3Endpoint.replace(
+              '/storage/v1/s3',
+              '/storage/v1/object/public',
+            )
+            const segments = [publicBase, bucket, prefix, filename].filter(Boolean)
+            return segments.join('/').replace(/([^:])\/\/+/g, '$1/')
+          },
+        },
+      },
       bucket: process.env.S3_BUCKET || 'media',
       config: {
         credentials: {

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
 import { PreloadManager } from "@/lib/preload-manager";
+import { applyImageDropIntent, targetInsertIndex } from "@/lib/normalize-image-rows";
 import { FadeIn } from "@/components/ui/FadeIn";
 import AdminBar from "@/components/AdminBar";
 import ScrollSpy from "@/components/ui/ScrollSpy/ScrollSpy";
@@ -13,6 +14,9 @@ import {
   EditableArray,
   InlineEditBar,
   ImageUploadZone,
+  VideoSettings,
+  ImageBlockAdminOverlay,
+  VideoEmbedInput,
   useBlockManager,
   useBlockKeyboardNav,
   BlockToolbar,
@@ -34,16 +38,17 @@ import {
 } from "@/components/elan-visuals";
 import {
   DndContext,
+  DragOverlay,
   closestCenter,
   PointerSensor,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import type { DragEndEvent } from "@dnd-kit/core";
+import type { DragEndEvent, DragOverEvent, DragStartEvent } from "@dnd-kit/core";
 import {
   SortableContext,
   useSortable,
-  verticalListSortingStrategy,
+  rectSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Badge } from "@/components/ui/Badge";
@@ -51,18 +56,140 @@ import { Button } from "@/components/ui/Button";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { InfoTooltip } from "@/components/ui/Tooltip";
 import MediaRenderer from "@/components/ui/MediaRenderer/MediaRenderer";
+import { VideoEmbed } from "@/components/ui/VideoEmbed";
+import { Dropzone } from "@/components/ui/Dropzone";
+import type { EmbedProvider } from "@/lib/parse-video-embed";
 import elanStyles from "@/components/elan-visuals/elan-visuals.module.scss";
 import { siteShellStyles } from "@/components/SiteFooter";
 import styles from "./page.module.scss";
 
 /* ── Block types (shared with page.tsx server component) ── */
 
+export type ImageContentBlock = {
+  id: string
+  blockType: 'image'
+  url?: string
+  mimeType?: string
+  mediaId?: string | number
+  mediaAlt?: string
+  alt?: string
+  caption?: string
+  rowBreak: boolean
+  widthFraction?: number | null
+  placeholderLabel?: string
+  playbackMode?: 'loop' | 'player'
+  audioEnabled?: boolean
+  muted?: boolean
+  posterUrl?: string
+  width?: number
+  height?: number
+}
+
 export type ContentBlock =
   | { id: string; blockType: 'heading'; text: string; level: 'h2' | 'h3' }
   | { id: string; blockType: 'richText'; body: string; bodyHtml?: string; bodyLexical?: Record<string, unknown> }
-  | { id: string; blockType: 'imageGroup'; layout: string; images: { url: string; mimeType?: string; alt?: string; caption?: string }[]; caption?: string; placeholderLabels?: string[] }
+  | {
+      id: string
+      blockType: 'imageGroup'
+      layout: string
+      images: {
+        url: string
+        mimeType?: string
+        alt?: string
+        caption?: string
+        playbackMode?: 'loop' | 'player'
+        audioEnabled?: boolean
+        muted?: boolean
+        posterUrl?: string
+        mediaId?: string | number
+        width?: number
+        height?: number
+      }[]
+      caption?: string
+      placeholderLabels?: string[]
+    }
+  | ImageContentBlock
   | { id: string; blockType: 'divider' }
-  | { id: string; blockType: 'hero'; imageUrl?: string; mimeType?: string; caption?: string; placeholderLabel?: string };
+  | {
+      id: string
+      blockType: 'hero'
+      imageUrl?: string
+      mimeType?: string
+      caption?: string
+      placeholderLabel?: string
+      playbackMode?: 'loop' | 'player'
+      audioEnabled?: boolean
+      muted?: boolean
+      posterUrl?: string
+      mediaId?: string | number
+    }
+  | {
+      id: string
+      blockType: 'videoEmbed'
+      url?: string
+      provider?: EmbedProvider
+      embedUrl?: string
+      autoplayUrl?: string
+      autoThumbnailUrl?: string
+      isVertical?: boolean
+      startSeconds?: number
+      posterUrl?: string
+      caption?: string
+      placeholderLabel?: string
+    };
+
+// Server-grouped render shape. See `buildRenderItems` in page.tsx.
+// A row is a contiguous run of `image` blocks whose first member has
+// rowBreak=true; subsequent members with rowBreak=false extend the row.
+export type RenderItem =
+  | { kind: 'block'; block: ContentBlock; cmsIndex: number }
+  | { kind: 'row'; items: Array<{ block: ImageContentBlock; cmsIndex: number }> };
+
+/**
+ * Width resolution for a row of atomic image blocks.
+ *
+ * Rules (see plan §3):
+ * 1. If ALL widthFractions are null → equal distribution (each: flex 1 1 0%).
+ * 2. If ALL are explicit and sum≈1.0 → use each as flex-basis percent.
+ * 3. Mixed nulls + explicits:
+ *    - if explicit sum < 1.0 → distribute remainder equally among null members
+ *    - if explicit sum >= 1.0 → fall back to equal distribution, warn in dev
+ * 4. All explicit but sum off from 1.0 → normalize by sum (defensive).
+ */
+function resolveRowFlex(widths: Array<number | null | undefined>): string[] {
+  const n = widths.length
+  if (n === 0) return []
+  const normalized = widths.map((w) => (typeof w === 'number' && Number.isFinite(w) ? w : null))
+  const explicitIdx = normalized.map((w, i) => (w !== null ? i : -1)).filter((i) => i !== -1)
+  const nullCount = n - explicitIdx.length
+  const explicitSum = explicitIdx.reduce((s, i) => s + (normalized[i] as number), 0)
+
+  if (nullCount === n) {
+    return new Array(n).fill('1 1 0%')
+  }
+  if (nullCount === 0) {
+    const sum = explicitSum
+    if (Math.abs(sum - 1) <= 0.01) {
+      return normalized.map((w) => `0 0 ${((w as number) * 100).toFixed(4)}%`)
+    }
+    if (sum > 0) {
+      return normalized.map((w) => `0 0 ${(((w as number) / sum) * 100).toFixed(4)}%`)
+    }
+    return new Array(n).fill('1 1 0%')
+  }
+  if (explicitSum >= 1) {
+    if (process.env.NODE_ENV !== 'production') {
+      console.warn('[ProjectClient] widthFraction sum >= 1 with null members; falling back to equal distribution')
+    }
+    return new Array(n).fill('1 1 0%')
+  }
+  const remainderPer = (1 - explicitSum) / nullCount
+  return normalized.map((w) =>
+    w === null
+      ? `0 0 ${(remainderPer * 100).toFixed(4)}%`
+      : `0 0 ${((w as number) * 100).toFixed(4)}%`,
+  )
+}
 
 type Collaborator = { name: string };
 type Tool = { name: string };
@@ -76,17 +203,14 @@ type ProjectData = {
   introBlurbHeadline?: string;
   introBlurbBody?: string;
   introBlurbBodyHtml?: string;
-  description: string;
-  descriptionHtml?: string;
-  descriptionLexical?: Record<string, unknown>;
   heroMetric?: { value: string; label: string; tooltip?: string };
-  inlineLinks?: Record<string, string>;
   role: string;
   collaborators: Collaborator[];
   duration: string;
   tools: Tool[];
   externalLinks: ExternalLink[];
   content: ContentBlock[];
+  renderItems?: RenderItem[];
 };
 
 type InteractiveVisualConfig = {
@@ -126,32 +250,6 @@ function ArrowRight() {
     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
       <path d="M5.5 3L9.5 7L5.5 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
-  );
-}
-
-function renderTextWithLinks(text: string, links: Record<string, string>) {
-  if (!links || Object.keys(links).length === 0) return <>{text}</>;
-
-  const escaped = Object.keys(links)
-    .sort((a, b) => b.length - a.length)
-    .map((k) => k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
-  const pattern = new RegExp(`(${escaped.join("|")})`);
-  const parts = text.split(pattern);
-
-  return (
-    <>
-      {parts.map((part, i) => {
-        const href = links[part];
-        if (href) {
-          return (
-            <a key={i} href={href} target="_blank" rel="noopener noreferrer" className={styles.inlineLink}>
-              {part}<span className={styles.arrow}>&#8599;</span>
-            </a>
-          );
-        }
-        return <span key={i}>{part}</span>;
-      })}
-    </>
   );
 }
 
@@ -204,14 +302,18 @@ function DragHandleIcon() {
   );
 }
 
+type DropEdge = 'before' | 'after' | 'left' | 'right' | null;
+
 function SortableBlock({
   id,
   children,
   isAdmin,
+  dropPosition,
 }: {
   id: string;
   children: React.ReactNode;
   isAdmin?: boolean;
+  dropPosition?: DropEdge;
 }) {
   const {
     attributes,
@@ -226,11 +328,17 @@ function SortableBlock({
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    opacity: isDragging ? 0.5 : 1,
+    opacity: isDragging ? 0.35 : 1,
   };
 
+  const wrapperClass = [
+    styles.blockWrapper,
+    isDragging && styles.blockWrapperDragging,
+  ].filter(Boolean).join(' ');
+
   return (
-    <div ref={setNodeRef} style={style} {...attributes} className={styles.blockWrapper}>
+    <div ref={setNodeRef} style={style} {...attributes} className={wrapperClass}>
+      {dropPosition === 'before' && <div className={styles.dropLine} aria-hidden />}
       <div className={styles.sortableInner}>
         {isAdmin && (
           <button
@@ -246,7 +354,18 @@ function SortableBlock({
         <div className={styles.sortableContent}>
           {children}
         </div>
+        {/* Vertical landing lines signal "merge into this image's row"
+            (left = drop on this image's left edge, right = drop on its
+            right edge). Horizontal .dropLine above/below signals split
+            into a new row. See ENG-179. */}
+        {dropPosition === 'left' && (
+          <div className={`${styles.dropLineVertical} ${styles.dropLineVerticalLeft}`} aria-hidden />
+        )}
+        {dropPosition === 'right' && (
+          <div className={`${styles.dropLineVertical} ${styles.dropLineVerticalRight}`} aria-hidden />
+        )}
       </div>
+      {dropPosition === 'after' && <div className={styles.dropLine} aria-hidden />}
     </div>
   );
 }
@@ -305,19 +424,33 @@ export default function ProjectClient({
     }
   }, [p.slug]);
 
+  // Optimistic local mirror of `p.content`. `patchContent` in
+  // `useBlockManager` has a ~3–5s roundtrip (GET → PATCH → router.refresh),
+  // during which the server-driven `p.content` prop is stale. Without a
+  // local override the drag-released block snaps back visually until the
+  // refresh completes, making DnD feel broken (ENG-175). When set,
+  // `optimisticContent` takes precedence until fresh server content
+  // arrives, at which point the effect below clears it so the server
+  // remains the source of truth.
+  const [optimisticContent, setOptimisticContent] = useState<ContentBlock[] | null>(null);
+  useEffect(() => {
+    setOptimisticContent(null);
+  }, [p.content]);
+  const activeContent = optimisticContent ?? p.content;
+
   const projectTarget: ApiTarget | undefined = useMemo(
     () => p.id ? { type: 'collection', slug: 'projects', id: p.id } : undefined,
     [p.id],
   );
 
   const heroBlock = useMemo(
-    () => p.content.find((b): b is ContentBlock & { blockType: 'hero' } => b.blockType === 'hero'),
-    [p.content],
+    () => activeContent.find((b): b is ContentBlock & { blockType: 'hero' } => b.blockType === 'hero'),
+    [activeContent],
   );
 
   const heroBlockIndex = useMemo(
-    () => p.content.findIndex(b => b.blockType === 'hero'),
-    [p.content],
+    () => activeContent.findIndex(b => b.blockType === 'hero'),
+    [activeContent],
   );
 
   const heroFileRef = useRef<HTMLInputElement>(null);
@@ -351,11 +484,52 @@ export default function ProjectClient({
   }, [replaceHeroImage]);
 
   const contentBlocks = useMemo(
-    () => p.content
+    () => activeContent
       .map((b, i) => ({ block: b, originalIndex: i }))
       .filter(({ block }) => block.blockType !== 'hero'),
-    [p.content],
+    [activeContent],
   );
+
+  // `displayItems` is the unit the render loop iterates over. A displayItem is
+  // either a single non-image block, a single atomic image block, or a "row"
+  // (contiguous run of atomic image blocks forming a horizontal layout). The
+  // server computes `p.renderItems` from the unfiltered `content` array; we
+  // strip hero blocks here to match `contentBlocks`. Client fallback derives
+  // the same structure if the server payload predates this field.
+  const displayItems = useMemo<RenderItem[]>(() => {
+    // When we have an optimistic override, re-derive row grouping from the
+    // client-side `contentBlocks` (which already mirrors `optimisticContent`).
+    // The server's `p.renderItems` references the pre-reorder `cmsIndex`es
+    // and would misalign the row boundaries until the next refresh completes.
+    if (optimisticContent === null && p.renderItems && p.renderItems.length > 0) {
+      return p.renderItems.filter((item) => {
+        if (item.kind === 'block') return item.block.blockType !== 'hero'
+        return true
+      })
+    }
+    const items: RenderItem[] = []
+    let openRow: Array<{ block: ImageContentBlock; cmsIndex: number }> | null = null
+    const flush = () => {
+      if (openRow && openRow.length > 0) items.push({ kind: 'row', items: openRow })
+      openRow = null
+    }
+    contentBlocks.forEach(({ block, originalIndex }) => {
+      if (block.blockType !== 'image') {
+        flush()
+        items.push({ kind: 'block', block, cmsIndex: originalIndex })
+        return
+      }
+      const img = block as ImageContentBlock
+      if (img.rowBreak === true || openRow === null) {
+        flush()
+        openRow = [{ block: img, cmsIndex: originalIndex }]
+      } else {
+        openRow.push({ block: img, cmsIndex: originalIndex })
+      }
+    })
+    flush()
+    return items
+  }, [p.renderItems, contentBlocks, optimisticContent])
 
   const spySections: ScrollSpySection[] = useMemo(
     () => [
@@ -371,26 +545,201 @@ export default function ProjectClient({
   );
 
   const blockMgr = useBlockManager(projectTarget)
-  const blockNav = useBlockKeyboardNav(blockMgr.addBlock, blockMgr.deleteBlock, contentBlocks.length)
+  // Keyboard nav targets `[data-block-index="${displayIndex}"]` wrappers, so
+  // the bounds check must use the display-item count, not the raw block count.
+  // With atomic image rows (N members → 1 display item) the two diverge.
+  const blockNav = useBlockKeyboardNav(blockMgr.deleteBlock, displayItems.length)
 
   const dndSensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
   )
-  const blockIds = useMemo(
-    () => contentBlocks.map(({ block }, i) => block.id || `block-${i}`),
+  // DnD operates on individual blocks — every image inside a row is its own
+  // sortable so users can reorder or split rows by dragging. The flat id
+  // list preserves the linear CMS order; visual row grouping is handled
+  // purely at render time (see the row branch in the render loop below).
+  // ENG-176: the earlier "row as single unit" scheme prevented intra-row
+  // rearrangement, which was the original intent of the atomic image
+  // migration.
+  const displayIds = useMemo(
+    () => contentBlocks.map(({ block, originalIndex }) => block.id || `block-${originalIndex}`),
     [contentBlocks],
   )
+
+  // Map from sortable id back to the CMS-content index. Used by
+  // `handleDragEnd` to translate drag ids (block ids) into `content[]`
+  // positions for the splice transform.
+  const blockIdToCmsIndex = useMemo(() => {
+    const m = new Map<string, number>()
+    contentBlocks.forEach(({ block, originalIndex }) => {
+      m.set(block.id || `block-${originalIndex}`, originalIndex)
+    })
+    return m
+  }, [contentBlocks])
+
+  const [activeDragId, setActiveDragId] = useState<string | null>(null)
+  const [overDragId, setOverDragId] = useState<string | null>(null)
+  // Intent captured during drag — 'merge' means the dragged image will
+  // join the over-target's row (rowBreak=false); 'split' means it
+  // becomes its own row head (rowBreak=true). `side` drives the visual
+  // indicator on the target block. Null when no merge/split decision
+  // applies (e.g. dragging a non-image block, or dragging over self).
+  // See ENG-179.
+  const [dropIntent, setDropIntent] = useState<{
+    intent: 'merge' | 'split'
+    side: 'left' | 'right' | 'top' | 'bottom'
+  } | null>(null)
+
+  const activeDragFilterIndex = activeDragId ? displayIds.indexOf(activeDragId) : -1
+  const overDragFilterIndex = overDragId ? displayIds.indexOf(overDragId) : -1
+
+  const handleDragStart = useCallback((event: DragStartEvent) => {
+    setActiveDragId(String(event.active.id))
+    setOverDragId(String(event.active.id))
+    setDropIntent(null)
+  }, [])
+
+  // Drop-intent detection from pointer geometry. dnd-kit hands us both
+  // the translated active rect and the target's static rect on every
+  // drag-over frame; the sign and magnitude of their center-delta
+  // encodes which edge the author is aiming at. |dx| > |dy| = the
+  // dragged block is primarily horizontally-displaced from the target,
+  // i.e. the author is trying to place it BESIDE — merge. Otherwise
+  // it's above/below — split. Merge only makes sense when landing on
+  // another image (non-image neighbors are always vertical in this
+  // layout), so non-image targets collapse to split.
+  const handleDragOver = useCallback(
+    (event: DragOverEvent) => {
+      const { active, over } = event
+      if (!over) {
+        setOverDragId(null)
+        setDropIntent(null)
+        return
+      }
+      setOverDragId(String(over.id))
+      if (active.id === over.id) {
+        setDropIntent(null)
+        return
+      }
+      const activeTranslated = active.rect.current?.translated
+      const overRect = over.rect
+      if (!activeTranslated) {
+        setDropIntent(null)
+        return
+      }
+      const ax = (activeTranslated.left + activeTranslated.right) / 2
+      const ay = (activeTranslated.top + activeTranslated.bottom) / 2
+      const ox = (overRect.left + overRect.right) / 2
+      const oy = (overRect.top + overRect.bottom) / 2
+      const dx = ax - ox
+      const dy = ay - oy
+
+      const overCmsIdx = blockIdToCmsIndex.get(String(over.id))
+      const overBlock = overCmsIdx !== undefined ? activeContent[overCmsIdx] : undefined
+      const isOverImage = overBlock?.blockType === 'image'
+      const activeCmsIdx = blockIdToCmsIndex.get(String(active.id))
+      const activeBlock = activeCmsIdx !== undefined ? activeContent[activeCmsIdx] : undefined
+      const isActiveImage = activeBlock?.blockType === 'image'
+
+      if (isOverImage && isActiveImage && Math.abs(dx) > Math.abs(dy)) {
+        setDropIntent({ intent: 'merge', side: dx > 0 ? 'right' : 'left' })
+      } else {
+        setDropIntent({ intent: 'split', side: dy > 0 ? 'bottom' : 'top' })
+      }
+    },
+    [blockIdToCmsIndex, activeContent],
+  )
+
+  const handleDragCancel = useCallback(() => {
+    setActiveDragId(null)
+    setOverDragId(null)
+    setDropIntent(null)
+  }, [])
+
   const handleDragEnd = useCallback(
     (event: DragEndEvent) => {
+      const currentIntent = dropIntent
+      setActiveDragId(null)
+      setOverDragId(null)
+      setDropIntent(null)
       const { active, over } = event
       if (!over || active.id === over.id) return
-      const oldIndex = blockIds.indexOf(String(active.id))
-      const newIndex = blockIds.indexOf(String(over.id))
-      if (oldIndex === -1 || newIndex === -1) return
-      blockMgr.reorderBlock(oldIndex, newIndex)
+      const fromCmsIdx = blockIdToCmsIndex.get(String(active.id))
+      const toCmsIdx = blockIdToCmsIndex.get(String(over.id))
+      if (fromCmsIdx === undefined || toCmsIdx === undefined || fromCmsIdx === toCmsIdx) return
+      // Side-aware target insertion. Merge-right / split-below place the
+      // moved block immediately after the target; merge-left / split-
+      // above place it at the target's slot (pushing target down). The
+      // prior `fromCmsIdx < toCmsIdx ? toCmsIdx - 1 : toCmsIdx` formula
+      // was side-unaware and collapsed both cases into one, which broke
+      // the merge-onto-left-edge scenario (ENG-179).
+      const sideForInsert = currentIntent?.side ?? (fromCmsIdx < toCmsIdx ? 'bottom' : 'top')
+      const preRemovalInsertIdx = targetInsertIndex(toCmsIdx, sideForInsert)
+      const postRemovalToIdx =
+        fromCmsIdx < preRemovalInsertIdx ? preRemovalInsertIdx - 1 : preRemovalInsertIdx
+
+      const activeBlock = activeContent[fromCmsIdx]
+      const isActiveImage = activeBlock?.blockType === 'image'
+
+      // Non-image drag: pure reorder path (no rowBreak semantics apply).
+      // Image drag: explicit merge/split intent transform — see ENG-179
+      // for why the prior "reorder + normalizer" path could not produce
+      // merge (never demoted head → follower) or split-when-landing-
+      // beside-image (never promoted follower → head without a non-image
+      // neighbor).
+      if (isActiveImage && currentIntent) {
+        const intent = currentIntent.intent
+        setOptimisticContent((prev) => {
+          const source = prev ?? activeContent
+          return applyImageDropIntent(
+            source as ContentBlock[],
+            fromCmsIdx,
+            postRemovalToIdx,
+            intent,
+          ) as ContentBlock[]
+        })
+        blockMgr.reorderImageWithDropIntent(fromCmsIdx, postRemovalToIdx, intent)
+      } else {
+        // Non-image drag OR image drag without a captured intent (e.g. a
+        // touch-only interaction where dragOver didn't fire): fall back
+        // to pure reorder + row-head normalization. `applyImageDropIntent`
+        // with intent='split' is a safe no-op on non-image blocks (no
+        // rowBreak field exists to touch) and a conservative default for
+        // images (preserves existing row-head invariant without demoting
+        // the head).
+        setOptimisticContent((prev) => {
+          const source = prev ?? activeContent
+          return applyImageDropIntent(
+            source as ContentBlock[],
+            fromCmsIdx,
+            postRemovalToIdx,
+            'split',
+          ) as ContentBlock[]
+        })
+        blockMgr.reorderBlockRange(fromCmsIdx, 1, postRemovalToIdx)
+      }
     },
-    [blockIds, blockMgr],
+    [blockIdToCmsIndex, blockMgr, activeContent, dropIntent],
   )
+
+  // `activeDragFilterIndex` is a position in the flat, per-block `displayIds`
+  // — i.e. an index into `contentBlocks`. Resolve directly to the block for
+  // the drag ghost label rather than going through `displayItems` (which is
+  // per-display-item, not per-block).
+  const activeDragBlock =
+    activeDragFilterIndex >= 0 ? contentBlocks[activeDragFilterIndex]?.block : undefined
+  const activeDragLabel = useMemo(() => {
+    if (!activeDragBlock) return null
+    switch (activeDragBlock.blockType) {
+      case 'heading': return activeDragBlock.text || 'Heading'
+      case 'richText': return 'Text block'
+      case 'imageGroup': return `Image group · ${activeDragBlock.images?.length ?? 0} images`
+      case 'image': return 'Image'
+      case 'divider': return 'Divider'
+      case 'videoEmbed': return 'Video embed'
+      case 'hero': return 'Hero'
+      default: return 'Block'
+    }
+  }, [activeDragBlock])
 
   const [isDraggingOver, setIsDraggingOver] = useState(false)
   const [dropInsertIndex, setDropInsertIndex] = useState<number | null>(null)
@@ -435,23 +784,184 @@ export default function ProjectClient({
     e.preventDefault()
     dragCounter.current = 0
     setIsDraggingOver(false)
-    const displayIdx = dropInsertIndex ?? contentBlocks.length
+    const displayIdx = dropInsertIndex ?? displayItems.length
     setDropInsertIndex(null)
 
-    const cmsIdx = displayIdx < contentBlocks.length
-      ? contentBlocks[displayIdx].originalIndex
-      : (contentBlocks.length > 0 ? contentBlocks[contentBlocks.length - 1].originalIndex + 1 : 0)
+    // Translate the display-item index to an unfiltered CMS index. For row
+    // items the anchor is the first member's cmsIndex; for the tail case
+    // (dropping past the last item) we use the last item's cmsIndex + count.
+    const getItemStart = (it: RenderItem) =>
+      it.kind === 'block' ? it.cmsIndex : it.items[0].cmsIndex
+    const getItemCount = (it: RenderItem) => (it.kind === 'block' ? 1 : it.items.length)
+    const cmsIdx = displayIdx < displayItems.length
+      ? getItemStart(displayItems[displayIdx])
+      : (displayItems.length > 0
+          ? getItemStart(displayItems[displayItems.length - 1]) + getItemCount(displayItems[displayItems.length - 1])
+          : 0)
 
     const files = Array.from(e.dataTransfer.files).filter((f) => f.type.startsWith('image/') || f.type.startsWith('video/'))
     if (files.length === 0) return
 
-    blockMgr.addBlock('imageGroup', cmsIdx)
-    setTimeout(async () => {
-      for (const file of files) {
-        await blockMgr.addImageToBlock(cmsIdx, file)
+    // Atomic multi-file insert: uploads in parallel, then commits all
+    // new `image` blocks in one patch so the row identity (first block
+    // rowBreak=true, rest false) is deterministic regardless of upload
+    // order. Replaces the legacy imageGroup-then-loop path which both
+    // emitted the wrong block type for the atomic model and raced on
+    // rowBreak assignment (see useBlockManager.insertAtomicImageBlocks
+    // comment for the pressure-test rationale).
+    await blockMgr.insertAtomicImageBlocks(cmsIdx, files)
+  }, [dropInsertIndex, displayItems, blockMgr])
+
+  // Single-atomic-image figure renderer. Shared between the `case 'image':`
+  // branch (standalone block path) and the `kind: 'row'` branch (multi-image
+  // row path). Keeping this as a helper avoids duplicating ~70 lines of JSX
+  // in two render sites. Caption/alt/media rendering semantics match the
+  // legacy `imageGroup` figure — the only difference is that each figure
+  // here is its own block in the CMS, so actions anchor to `imgCmsIndex`.
+  const renderAtomicImageFigure = useCallback(
+    (img: ImageContentBlock, imgCmsIndex: number): React.ReactNode => {
+      const hasMedia = Boolean(img.url)
+      const altText = img.alt || img.mediaAlt || img.caption || img.placeholderLabel || 'Image'
+      const handleReplace = (file: File) => {
+        if (!projectTarget || !p.id) return
+        void (async () => {
+          try {
+            const media = await uploadMedia(file, altText)
+            const res = await fetch(`/api/${projectTarget.slug}/${p.id}`, { credentials: 'include' })
+            if (!res.ok) throw new Error('Failed to fetch project')
+            const json = await res.json()
+            const blocks = [...(json.content ?? [])] as Record<string, unknown>[]
+            const b = { ...blocks[imgCmsIndex] }
+            b.image = media.id
+            // The `placeholderLabel` field's admin condition hides it
+            // once `image` is set, but the stored value survives unless
+            // we explicitly clear it. Leaving it behind would render
+            // twice (once as the image's own alt-source, once in the
+            // dormant Payload field) and create confusion during future
+            // replace flows — clear it here so the slot stops being
+            // "labeled" the moment it becomes "filled."
+            b.placeholderLabel = ''
+            blocks[imgCmsIndex] = b
+            await updateCollectionField(projectTarget.slug, p.id!, 'content', blocks)
+            router.refresh()
+          } catch (e) {
+            console.error('[atomic-image] replace failed', e)
+          }
+        })()
       }
-    }, 500)
-  }, [dropInsertIndex, contentBlocks, blockMgr])
+      return (
+        <FadeIn>
+          {hasMedia ? (
+            <figure className={styles.sectionFigure}>
+              <MediaRenderer
+                src={img.url}
+                mimeType={img.mimeType}
+                playbackMode={img.playbackMode}
+                audioEnabled={img.audioEnabled}
+                muted={img.muted}
+                posterUrl={img.posterUrl}
+                width={img.width}
+                height={img.height}
+                alt={altText}
+                className={styles.sectionImg}
+              />
+              {isAdmin && img.mediaId && img.mimeType?.startsWith('video/') ? (
+                <VideoSettings
+                  mediaId={img.mediaId}
+                  playbackMode={img.playbackMode}
+                  audioEnabled={img.audioEnabled}
+                  muted={img.muted}
+                  posterUrl={img.posterUrl}
+                  className={styles.figPlaybackToggle}
+                />
+              ) : null}
+              {isAdmin && projectTarget ? (
+                <EditableText
+                  fieldId={`proj:${p.id}:content.${imgCmsIndex}.caption`}
+                  target={projectTarget}
+                  fieldPath={`content.${imgCmsIndex}.caption`}
+                  as="figcaption"
+                  className={styles.figCaption}
+                  label="Image caption"
+                >
+                  {img.caption || ''}
+                </EditableText>
+              ) : img.caption ? (
+                <figcaption className={styles.figCaption}>{img.caption}</figcaption>
+              ) : null}
+              {isAdmin && (
+                <ImageBlockAdminOverlay
+                  busy={blockMgr.busy}
+                  onReplace={handleReplace}
+                  onDelete={() => blockMgr.confirmDeleteBlock(imgCmsIndex, 'image')}
+                />
+              )}
+            </figure>
+          ) : isAdmin && projectTarget ? (
+            // Empty atomic image slot. The Dropzone itself is the fill
+            // affordance (click = file picker, drag = upload). The
+            // overlaid trash button is the remove affordance — without
+            // it, empty slots inside a multi-image row had zero delete
+            // path because the outer `BlockToolbar` is suppressed for
+            // `isMultiImageRow` and the per-member wrapper is
+            // drag-only (ENG-180 / FB-160).
+            <div className={styles.emptySlotWrapper}>
+              <Dropzone
+                accept="image/*,video/*"
+                multiple={false}
+                disabled={blockMgr.busy}
+                onFiles={(files) => {
+                  const file = files[0]
+                  if (file) handleReplace(file)
+                }}
+              >
+                {img.placeholderLabel ? (
+                  <div className={styles.atomicSlotLabel}>
+                    <span className={styles.placeholderLabel}>{img.placeholderLabel}</span>
+                    <span className={styles.placeholderHint}>
+                      Drop an image here or click to upload
+                    </span>
+                  </div>
+                ) : undefined}
+              </Dropzone>
+              <div className={styles.emptySlotActions}>
+                <Tooltip content="Delete slot" size="sm">
+                  <Button
+                    type="button"
+                    appearance="negative"
+                    emphasis="bold"
+                    size="xs"
+                    iconOnly
+                    onColor
+                    leadingIcon={
+                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                        <path
+                          d="M2.5 3.5h7M4.5 3.5V2.5a1 1 0 011-1h1a1 1 0 011 1v1M3.5 3.5v6a1 1 0 001 1h3a1 1 0 001-1v-6"
+                          stroke="currentColor"
+                          strokeWidth="1.4"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    }
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      void blockMgr.confirmDeleteBlock(imgCmsIndex, 'image')
+                    }}
+                    disabled={blockMgr.busy}
+                    aria-label="Delete slot"
+                  />
+                </Tooltip>
+              </div>
+            </div>
+          ) : (
+            <div className={styles.imagePlaceholder} />
+          )}
+        </FadeIn>
+      )
+    },
+    [projectTarget, p.id, isAdmin, blockMgr, router],
+  )
 
   const editUrl = p.id ? `/admin/collections/projects/${p.id}` : '/admin/collections/projects';
 
@@ -470,6 +980,10 @@ export default function ProjectClient({
                 <MediaRenderer
                   src={heroBlock.imageUrl}
                   mimeType={heroBlock.mimeType}
+                  playbackMode={heroBlock.playbackMode}
+                  audioEnabled={heroBlock.audioEnabled}
+                  muted={heroBlock.muted}
+                  posterUrl={heroBlock.posterUrl}
                   alt={`${p.title} — case study cover`}
                   className={styles.heroImg}
                   priority
@@ -507,6 +1021,17 @@ export default function ProjectClient({
                       tabIndex={-1}
                       hidden
                     />
+                    {heroBlock.mediaId && heroBlock.mimeType?.startsWith('video/') ? (
+                      <div className={styles.heroPlaybackToggleWrap}>
+                        <VideoSettings
+                          mediaId={heroBlock.mediaId}
+                          playbackMode={heroBlock.playbackMode}
+                          audioEnabled={heroBlock.audioEnabled}
+                          muted={heroBlock.muted}
+                          posterUrl={heroBlock.posterUrl}
+                        />
+                      </div>
+                    ) : null}
                   </>
                 )}
               </>
@@ -746,27 +1271,6 @@ export default function ProjectClient({
             <hr className={styles.articleSeparator} />
           )}
 
-          {p.description && (
-            <FadeIn>
-              <div id="overview" className={styles.legacyDescription}>
-                {isAdmin && projectTarget && p.descriptionLexical ? (
-                  <LexicalBlockEditor
-                    initialState={p.descriptionLexical as unknown as import('lexical').SerializedEditorState}
-                    target={projectTarget}
-                    fieldPath="description"
-                    className={styles.legacyDescriptionText}
-                  />
-                ) : p.descriptionHtml ? (
-                  <div className={styles.legacyDescriptionText} dangerouslySetInnerHTML={{ __html: p.descriptionHtml }} />
-                ) : (
-                  <p className={styles.legacyDescriptionText}>
-                    {renderTextWithLinks(p.description, p.inlineLinks ?? {})}
-                  </p>
-                )}
-              </div>
-            </FadeIn>
-          )}
-
           {companyNote && (
             <FadeIn>
               <aside className={styles.companyCallout}>
@@ -780,12 +1284,19 @@ export default function ProjectClient({
             </FadeIn>
           )}
 
-          {/* Screen reader live region for block operations */}
-          <div id="block-live-region" className="sr-only" aria-live="polite" aria-atomic="true" />
+          {/* Block operations announce via Radix Toast (InlineToastProvider). */}
 
           {/* ── BLOCK RENDERER ── */}
-          <DndContext id="project-blocks" sensors={dndSensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-          <SortableContext items={blockIds} strategy={verticalListSortingStrategy}>
+          <DndContext
+            id="project-blocks"
+            sensors={dndSensors}
+            collisionDetection={closestCenter}
+            onDragStart={handleDragStart}
+            onDragOver={handleDragOver}
+            onDragEnd={handleDragEnd}
+            onDragCancel={handleDragCancel}
+          >
+          <SortableContext items={displayIds} strategy={rectSortingStrategy}>
           <div
             ref={blockListRef}
             className={[styles.blockList, isDraggingOver && styles.blockListDragOver].filter(Boolean).join(' ')}
@@ -795,9 +1306,69 @@ export default function ProjectClient({
             onDragLeave={handleContentDragLeave}
             onDrop={handleContentDrop}
           >
-            {contentBlocks.map(({ block, originalIndex }, blockIndex) => {
-              const cmsIndex = originalIndex;
-              const blockContent = (() => {
+            {displayItems.map((item, blockIndex) => {
+              // For a row, the "anchor" block (used for the toolbar, keyboard
+              // nav, drop-indicator anchoring, and BetweenBlockInsert targets)
+              // is the first row member. Per-member figure rendering happens
+              // inside the `isRow` branch of `blockContent` below.
+              const isRow = item.kind === 'row'
+              const block: ContentBlock = isRow ? item.items[0].block : item.block
+              const cmsIndex: number = isRow ? item.items[0].cmsIndex : item.cmsIndex
+              const isMultiImageRow = isRow && item.items.length > 1
+              const blockContent = isRow
+                ? (() => {
+                    const flexValues = resolveRowFlex(item.items.map(({ block: b }) => b.widthFraction))
+                    return (
+                      <div className={styles.imageRow}>
+                        {item.items.map(({ block: memberBlock, cmsIndex: memberCmsIndex }, memberIdx) => {
+                          const memberFigure = renderAtomicImageFigure(memberBlock, memberCmsIndex)
+                          // ENG-176: inside multi-image rows, each image is
+                          // its own sortable so users can reorder within a
+                          // row or drag an image out to split the row.
+                          // Single-image rows keep the outer SortableBlock
+                          // (wrapping the whole display-item) so there's no
+                          // redundant sortable nesting.
+                          let wrapped: React.ReactNode = memberFigure
+                          if (isAdmin && isMultiImageRow) {
+                            const memberId = memberBlock.id || `block-${memberCmsIndex}`
+                            const memberSortableIdx = displayIds.indexOf(memberId)
+                            let memberDropPos: DropEdge = null
+                            if (
+                              activeDragId &&
+                              overDragFilterIndex !== -1 &&
+                              overDragFilterIndex === memberSortableIdx &&
+                              activeDragFilterIndex !== memberSortableIdx
+                            ) {
+                              // Dropdown edge for per-member target is driven by
+                              // pointer-derived intent (ENG-179). Merge →
+                              // vertical line at left/right of the hovered
+                              // member; split → horizontal line above/below.
+                              memberDropPos = dropIntent
+                                ? dropIntent.intent === 'merge'
+                                  ? dropIntent.side === 'right' ? 'right' : 'left'
+                                  : dropIntent.side === 'bottom' ? 'after' : 'before'
+                                : activeDragFilterIndex > overDragFilterIndex ? 'before' : 'after'
+                            }
+                            wrapped = (
+                              <SortableBlock id={memberId} isAdmin dropPosition={memberDropPos}>
+                                {memberFigure}
+                              </SortableBlock>
+                            )
+                          }
+                          return (
+                            <div
+                              key={memberBlock.id || `${memberCmsIndex}`}
+                              className={styles.imageRowItem}
+                              style={{ flex: flexValues[memberIdx] }}
+                            >
+                              {wrapped}
+                            </div>
+                          )
+                        })}
+                      </div>
+                    )
+                  })()
+                : (() => {
                 switch (block.blockType) {
                   case 'heading': {
                     const visualConfig = interactiveVisuals?.[block.text];
@@ -894,7 +1465,17 @@ export default function ProjectClient({
                                       idx === 0 && block.placeholderLabels!.length >= 3 ? styles.slotWide : '',
                                     ].filter(Boolean).join(' ')}
                                   >
-                                    <MediaRenderer src={img.url} mimeType={img.mimeType} alt={img.alt || lbl} className={styles.sectionImg} sizes={getImageSizes(block.layout, block.placeholderLabels!.length)} />
+                                    <MediaRenderer src={img.url} mimeType={img.mimeType} playbackMode={img.playbackMode} audioEnabled={img.audioEnabled} muted={img.muted} posterUrl={img.posterUrl} width={img.width} height={img.height} alt={img.alt || lbl} className={styles.sectionImg} sizes={getImageSizes(block.layout, block.placeholderLabels!.length)} />
+                                    {isAdmin && img.mediaId && img.mimeType?.startsWith('video/') ? (
+                                      <VideoSettings
+                                        mediaId={img.mediaId}
+                                        playbackMode={img.playbackMode}
+                                        audioEnabled={img.audioEnabled}
+                                        muted={img.muted}
+                                        posterUrl={img.posterUrl}
+                                        className={styles.figPlaybackToggle}
+                                      />
+                                    ) : null}
                                     {isAdmin && projectTarget ? (
                                       <EditableText
                                         fieldId={`proj:${p.id}:content.${cmsIndex}.images.${idx}.caption`}
@@ -910,29 +1491,21 @@ export default function ProjectClient({
                                       <figcaption className={styles.figCaption}>{img.caption}</figcaption>
                                     ) : null}
                                     {isAdmin && (
-                                      <div className={styles.imageOverlay}>
-                                        <button
-                                          type="button"
-                                          className={styles.imageOverlayBtn}
-                                          onClick={() => blockMgr.moveImageInBlock(cmsIndex, idx, -1)}
-                                          disabled={blockMgr.busy || idx === 0}
-                                          aria-label="Move image left"
-                                        >◂</button>
-                                        <button
-                                          type="button"
-                                          className={styles.imageOverlayBtn}
-                                          onClick={() => blockMgr.moveImageInBlock(cmsIndex, idx, 1)}
-                                          disabled={blockMgr.busy || idx === block.images.length - 1}
-                                          aria-label="Move image right"
-                                        >▸</button>
-                                        <button
-                                          type="button"
-                                          className={[styles.imageOverlayBtn, styles.imageOverlayBtnDanger].join(' ')}
-                                          onClick={() => blockMgr.removeImageFromBlock(cmsIndex, idx)}
-                                          disabled={blockMgr.busy}
-                                          aria-label="Remove image"
-                                        >✕</button>
-                                      </div>
+                                      <ImageBlockAdminOverlay
+                                        canMoveLeft={idx > 0}
+                                        canMoveRight={idx < block.images.length - 1}
+                                        busy={blockMgr.busy}
+                                        onMoveLeft={() => blockMgr.moveImageInBlock(cmsIndex, idx, -1)}
+                                        onMoveRight={() => blockMgr.moveImageInBlock(cmsIndex, idx, 1)}
+                                        onReplace={(file) => blockMgr.replaceImageInBlock(cmsIndex, idx, file)}
+                                        onDelete={() =>
+                                          blockMgr.confirmRemoveImage(cmsIndex, idx, {
+                                            filename: img.alt,
+                                            thumbnailUrl: img.url,
+                                            alt: img.alt,
+                                          })
+                                        }
+                                      />
                                     )}
                                   </figure>
                                 );
@@ -946,6 +1519,23 @@ export default function ProjectClient({
                                   role={isAdmin ? 'button' : undefined}
                                   tabIndex={isAdmin ? 0 : undefined}
                                 >
+                                  {isAdmin && (
+                                    <button
+                                      type="button"
+                                      className={styles.placeholderRemove}
+                                      aria-label={`Remove slot "${lbl}"`}
+                                      disabled={blockMgr.busy}
+                                      onClick={(e) => {
+                                        e.stopPropagation()
+                                        void blockMgr.removePlaceholderSlot(cmsIndex, idx)
+                                      }}
+                                      onKeyDown={(e) => e.stopPropagation()}
+                                    >
+                                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                                        <path d="M3 3l6 6M9 3l-6 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                                      </svg>
+                                    </button>
+                                  )}
                                   <span className={styles.placeholderLabel}>{lbl}</span>
                                   <span className={styles.placeholderIndex}>
                                     Image {idx + 1} of {block.placeholderLabels!.length}
@@ -963,7 +1553,17 @@ export default function ProjectClient({
                             >
                               {block.images.map((img, idx) => (
                                 <figure key={idx} className={styles.sectionFigure}>
-                                  <MediaRenderer src={img.url} mimeType={img.mimeType} alt={img.alt || `Image ${idx + 1}`} className={styles.sectionImg} sizes={getImageSizes(block.layout, block.images.length)} />
+                                  <MediaRenderer src={img.url} mimeType={img.mimeType} playbackMode={img.playbackMode} audioEnabled={img.audioEnabled} muted={img.muted} posterUrl={img.posterUrl} width={img.width} height={img.height} alt={img.alt || `Image ${idx + 1}`} className={styles.sectionImg} sizes={getImageSizes(block.layout, block.images.length)} />
+                                  {isAdmin && img.mediaId && img.mimeType?.startsWith('video/') ? (
+                                    <VideoSettings
+                                      mediaId={img.mediaId}
+                                      playbackMode={img.playbackMode}
+                                      audioEnabled={img.audioEnabled}
+                                      muted={img.muted}
+                                      posterUrl={img.posterUrl}
+                                      className={styles.figPlaybackToggle}
+                                    />
+                                  ) : null}
                                   {isAdmin && projectTarget ? (
                                     <EditableText
                                       fieldId={`proj:${p.id}:content.${cmsIndex}.images.${idx}.caption`}
@@ -979,64 +1579,58 @@ export default function ProjectClient({
                                     <figcaption className={styles.figCaption}>{img.caption}</figcaption>
                                   ) : null}
                                   {isAdmin && (
-                                    <div className={styles.imageOverlay}>
-                                      <button
-                                        type="button"
-                                        className={styles.imageOverlayBtn}
-                                        onClick={() => blockMgr.moveImageInBlock(cmsIndex, idx, -1)}
-                                        disabled={blockMgr.busy || idx === 0}
-                                        aria-label="Move image left"
-                                      >◂</button>
-                                      <button
-                                        type="button"
-                                        className={styles.imageOverlayBtn}
-                                        onClick={() => blockMgr.moveImageInBlock(cmsIndex, idx, 1)}
-                                        disabled={blockMgr.busy || idx === block.images.length - 1}
-                                        aria-label="Move image right"
-                                      >▸</button>
-                                      <button
-                                        type="button"
-                                        className={[styles.imageOverlayBtn, styles.imageOverlayBtnDanger].join(' ')}
-                                        onClick={() => blockMgr.removeImageFromBlock(cmsIndex, idx)}
-                                        disabled={blockMgr.busy}
-                                        aria-label="Remove image"
-                                      >✕</button>
-                                    </div>
+                                    <ImageBlockAdminOverlay
+                                      canMoveLeft={idx > 0}
+                                      canMoveRight={idx < block.images.length - 1}
+                                      busy={blockMgr.busy}
+                                      onMoveLeft={() => blockMgr.moveImageInBlock(cmsIndex, idx, -1)}
+                                      onMoveRight={() => blockMgr.moveImageInBlock(cmsIndex, idx, 1)}
+                                      onReplace={(file) => blockMgr.replaceImageInBlock(cmsIndex, idx, file)}
+                                      onDelete={() =>
+                                        blockMgr.confirmRemoveImage(cmsIndex, idx, {
+                                          filename: img.alt,
+                                          thumbnailUrl: img.url,
+                                          alt: img.alt,
+                                        })
+                                      }
+                                    />
                                   )}
                                 </figure>
                               ))}
                             </div>
                             {isAdmin && (
-                              <button
-                                type="button"
-                                className={styles.addBlockBtn}
-                                onClick={handleFileSelect}
-                                disabled={blockMgr.busy}
-                              >
-                                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-                                  <path d="M7 2v10M2 7h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                                </svg>
-                                Add image
-                              </button>
+                              <div className={styles.addImageRow}>
+                                <Button
+                                  type="button"
+                                  appearance="neutral"
+                                  emphasis="subtle"
+                                  size="sm"
+                                  onClick={handleFileSelect}
+                                  disabled={blockMgr.busy}
+                                  leadingIcon={
+                                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                                      <path d="M7 2v10M2 7h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                                    </svg>
+                                  }
+                                >
+                                  Add image
+                                </Button>
+                              </div>
                             )}
                           </>
                         ) : isAdmin ? (
-                          <div
-                            className={styles.dropZone}
-                            onDragOver={(e) => e.preventDefault()}
-                            onDrop={handleFileDrop}
-                            onClick={handleFileSelect}
-                            role="button"
-                            tabIndex={0}
-                            aria-label="Drop images or click to upload"
-                            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleFileSelect(); } }}
-                          >
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                              <rect x="2" y="2" width="20" height="20" rx="3" stroke="currentColor" strokeWidth="1.5" />
-                              <path d="M12 8v8M8 12h8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                            </svg>
-                            <span>Drop images or click to browse</span>
-                          </div>
+                          <Dropzone
+                            accept="image/*,video/*"
+                            multiple
+                            disabled={blockMgr.busy}
+                            onFiles={(files) => {
+                              ;(async () => {
+                                for (const file of files) {
+                                  await blockMgr.addImageToBlock(cmsIndex, file)
+                                }
+                              })()
+                            }}
+                          />
                         ) : (
                           <div className={styles.imagePlaceholder} />
                         )}
@@ -1058,8 +1652,77 @@ export default function ProjectClient({
                     );
                   }
 
+                  case 'image':
+                    return renderAtomicImageFigure(block as ImageContentBlock, cmsIndex)
+
                   case 'divider':
                     return <hr className={styles.divider} />;
+
+                  case 'videoEmbed': {
+                    const hasParsed = !!block.embedUrl && !!block.provider && !!block.autoplayUrl;
+                    return (
+                      <FadeIn>
+                        {hasParsed ? (
+                          <figure className={styles.sectionFigure}>
+                            <VideoEmbed
+                              provider={block.provider!}
+                              embedUrl={block.embedUrl!}
+                              autoplayUrl={block.autoplayUrl!}
+                              posterUrl={block.posterUrl}
+                              autoThumbnailUrl={block.autoThumbnailUrl}
+                              isVertical={block.isVertical}
+                              caption={block.caption}
+                            />
+                            {isAdmin && projectTarget ? (
+                              <EditableText
+                                fieldId={`proj:${p.id}:content.${cmsIndex}.caption`}
+                                target={projectTarget}
+                                fieldPath={`content.${cmsIndex}.caption`}
+                                as="figcaption"
+                                className={styles.figCaption}
+                                label="Video embed caption"
+                              >
+                                {block.caption || ''}
+                              </EditableText>
+                            ) : block.caption ? (
+                              <figcaption className={styles.figCaption}>{block.caption}</figcaption>
+                            ) : null}
+                            {isAdmin && projectTarget && p.id ? (
+                              <VideoEmbedInput
+                                projectId={p.id}
+                                blockIndex={cmsIndex}
+                                currentUrl={block.url}
+                              />
+                            ) : null}
+                          </figure>
+                        ) : isAdmin && projectTarget && p.id ? (
+                          <div className={styles.videoEmbedPlaceholder}>
+                            {projectTarget ? (
+                              <EditableText
+                                fieldId={`proj:${p.id}:content.${cmsIndex}.placeholderLabel`}
+                                target={projectTarget}
+                                fieldPath={`content.${cmsIndex}.placeholderLabel`}
+                                as="span"
+                                className={styles.placeholderLabel}
+                                label="Video embed label"
+                              >
+                                {block.placeholderLabel || 'Video embed'}
+                              </EditableText>
+                            ) : (
+                              <span className={styles.placeholderLabel}>
+                                {block.placeholderLabel || 'Video embed'}
+                              </span>
+                            )}
+                            <VideoEmbedInput
+                              projectId={p.id}
+                              blockIndex={cmsIndex}
+                              currentUrl={block.url}
+                            />
+                          </div>
+                        ) : null}
+                      </FadeIn>
+                    );
+                  }
 
                   default:
                     return null;
@@ -1068,7 +1731,13 @@ export default function ProjectClient({
 
               const headingId = block.blockType === 'heading' ? slugify((block as ContentBlock & { blockType: 'heading' }).text) : undefined;
 
-              const sortableId = block.id || `block-${blockIndex}`
+              // For single-sortable display items, the sortable id is the
+              // block's own id. For multi-image rows there's no outer
+                // SortableBlock — each member has its own id (resolved inside
+              // blockContent above), so this id is used only as a React key.
+              const sortableId = isRow
+                ? (item.items[0].block.id || `block-${item.items[0].cmsIndex}`)
+                : (block.id || `block-${cmsIndex}`)
               const blockInner = (
                 <>
                   {isDraggingOver && dropInsertIndex === blockIndex && (
@@ -1087,25 +1756,24 @@ export default function ProjectClient({
                     tabIndex={isAdmin ? 0 : undefined}
                     data-block-index={blockIndex}
                     onKeyDown={isAdmin ? (e) => {
-                      if (e.altKey && e.key === 'ArrowUp') { e.preventDefault(); blockMgr.moveBlock(cmsIndex, -1); }
-                      if (e.altKey && e.key === 'ArrowDown') { e.preventDefault(); blockMgr.moveBlock(cmsIndex, 1); }
+                      if (e.target !== e.currentTarget) return
+                      if (e.altKey && e.key === 'ArrowUp') { e.preventDefault(); blockMgr.moveBlock(cmsIndex, -1); return }
+                      if (e.altKey && e.key === 'ArrowDown') { e.preventDefault(); blockMgr.moveBlock(cmsIndex, 1); return }
+                      if ((e.metaKey || e.ctrlKey) && e.key === 'Backspace') {
+                        e.preventDefault();
+                        blockMgr.confirmDeleteBlock(cmsIndex, block.blockType);
+                      }
                     } : undefined}
                   >
-                    {isAdmin && projectTarget && (
+                    {isAdmin && projectTarget && !isMultiImageRow && (
                       <BlockToolbar
                         index={blockIndex}
-                        total={contentBlocks.length}
+                        total={displayItems.length}
                         blockType={block.blockType}
                         onMoveUp={() => blockMgr.moveBlock(cmsIndex, -1)}
                         onMoveDown={() => blockMgr.moveBlock(cmsIndex, 1)}
-                        onDelete={() => blockMgr.deleteBlock(cmsIndex)}
+                        onDelete={() => blockMgr.confirmDeleteBlock(cmsIndex, block.blockType)}
                         onInsertAbove={(type: BlockType) => blockMgr.addBlock(type, cmsIndex)}
-                        onLayoutChange={
-                          block.blockType === 'imageGroup'
-                            ? (layout) => blockMgr.patchBlockField(cmsIndex, 'layout', layout)
-                            : undefined
-                        }
-                        currentLayout={block.blockType === 'imageGroup' ? (block as ContentBlock & { blockType: 'imageGroup' }).layout : undefined}
                         onLevelChange={
                           block.blockType === 'heading'
                             ? (level) => blockMgr.patchBlockField(cmsIndex, 'level', level)
@@ -1119,7 +1787,15 @@ export default function ProjectClient({
                   </div>
                   {isAdmin && !isDraggingOver && (
                     <BetweenBlockInsert
-                      onInsert={(type: BlockType) => blockMgr.addBlock(type, cmsIndex + 1)}
+                      onInsert={(type: BlockType) => {
+                        // After-block insert: for a row, insert after the LAST
+                        // row member in CMS order so new blocks land below the
+                        // entire row, not between members.
+                        const tailCmsIndex = isRow
+                          ? item.items[item.items.length - 1].cmsIndex + 1
+                          : cmsIndex + 1
+                        blockMgr.addBlock(type, tailCmsIndex)
+                      }}
                       busy={blockMgr.busy}
                     />
                   )}
@@ -1130,8 +1806,41 @@ export default function ProjectClient({
               )
 
               if (isAdmin) {
+                // Multi-image rows delegate sortability to per-member
+                // SortableBlocks rendered inside `blockContent`, so the
+                // outer wrapper is a plain div. Single-image rows and
+                // non-image blocks still use a single outer SortableBlock.
+                if (isMultiImageRow) {
+                  return <div key={sortableId} className={styles.blockItem}>{blockInner}</div>
+                }
+                // Drop indicator: when dragging, mark the target block with a
+                // visible line on the side the source will land on. Reasoning:
+                // verticalListSortingStrategy already slides items to make
+                // room, but the animation is subtle enough that users read it
+                // as "nothing happened." An explicit accent line removes the
+                // ambiguity. FB-105/AP-035 established that DnD in this
+                // codebase needs a primary affordance stronger than motion.
+                const singleSortableIdx = displayIds.indexOf(sortableId)
+                let dropPosition: DropEdge = null
+                if (
+                  activeDragId &&
+                  overDragFilterIndex !== -1 &&
+                  overDragFilterIndex === singleSortableIdx &&
+                  activeDragFilterIndex !== singleSortableIdx
+                ) {
+                  // Merge intent → vertical line on the side the pointer
+                  // is aimed at (left / right); split intent → horizontal
+                  // line above / below. Falls back to index-direction
+                  // when intent isn't resolved yet (initial frames of a
+                  // drag before dragOver fires). See ENG-179.
+                  dropPosition = dropIntent
+                    ? dropIntent.intent === 'merge'
+                      ? dropIntent.side === 'right' ? 'right' : 'left'
+                      : dropIntent.side === 'bottom' ? 'after' : 'before'
+                    : activeDragFilterIndex > overDragFilterIndex ? 'before' : 'after'
+                }
                 return (
-                  <SortableBlock key={sortableId} id={sortableId} isAdmin>
+                  <SortableBlock key={sortableId} id={sortableId} isAdmin dropPosition={dropPosition}>
                     {blockInner}
                   </SortableBlock>
                 )
@@ -1141,22 +1850,42 @@ export default function ProjectClient({
             })}
           </div>
           </SortableContext>
+          {isAdmin && (
+            <DragOverlay dropAnimation={null}>
+              {activeDragLabel ? (
+                <div className={styles.dragGhost}>
+                  <span className={styles.dragGhostHandle} aria-hidden>
+                    <DragHandleIcon />
+                  </span>
+                  <span className={styles.dragGhostLabel}>{activeDragLabel}</span>
+                </div>
+              ) : null}
+            </DragOverlay>
+          )}
           </DndContext>
 
           {isAdmin && projectTarget && contentBlocks.length === 0 && (
-            <BlockInsertMenu onInsert={(type: BlockType) => blockMgr.addBlock(type)} disabled={blockMgr.busy}>
-              <button type="button" className={styles.addBlockBtn} disabled={blockMgr.busy}>
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-                  <path d="M7 2v10M2 7h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                </svg>
-                Add first block
-              </button>
-            </BlockInsertMenu>
+            <div className={styles.addFirstBlockRow}>
+              <BlockInsertMenu onInsert={(type: BlockType) => blockMgr.addBlock(type)} disabled={blockMgr.busy}>
+                <Button
+                  type="button"
+                  appearance="neutral"
+                  emphasis="subtle"
+                  size="sm"
+                  disabled={blockMgr.busy}
+                  leadingIcon={
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                      <path d="M7 2v10M2 7h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                    </svg>
+                  }
+                >
+                  Add first block
+                </Button>
+              </BlockInsertMenu>
+            </div>
           )}
 
-          {blockMgr.error && (
-            <p className={styles.blockError}>{blockMgr.error}</p>
-          )}
+          {/* Errors surface via toast (Phase 3 — InlineToastProvider). */}
 
           {/* ── PREV / NEXT NAVIGATION ── */}
           {(prevProject || nextProject) && (

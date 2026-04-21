@@ -16,7 +16,6 @@ const CONTENT_BLOCKS = createCaseStudyBlocks(
       heading: 'Not the Components',
       bodyMarkdown:
         "The tokens, components, and playground are real and they work. But every hour I spent on the collaboration architecture was an hour not spent polishing what's on screen. That trade-off shows. Below is what it bought: one correction traced from my feedback to permanent rule.",
-      layout: 'stacked',
       imagePlaceholders: [
         'Before and after: the same design task handled in session 1 vs. session 40',
       ],
@@ -25,18 +24,17 @@ const CONTENT_BLOCKS = createCaseStudyBlocks(
       heading: 'The System Behind the System',
       bodyMarkdown:
         "I wrote rules for the agent. It ignored some of them. The same playground verification got skipped six times before I made it mandatory. Figuring out where that line sits - when a suggestion needs to become a constraint - is where most of the design time actually went.",
-      layout: 'stacked',
     },
     {
       heading: 'The Rising Floor',
       bodyMarkdown:
         "Early on, I was correcting spacing tokens and inverted hierarchy. Basic stuff. By the end, the corrections looked different: is this headline technique reused from another case study? Should the tone shift here? The agent didn't get smarter. The rules just accumulated what I kept fixing.",
-      layout: 'stacked',
     },
   ],
   {
     heroPlaceholderLabel:
       'Hero - Élan Design System: design playground with token architecture and interactive components',
+    scopeStatementMarkdown: SCOPE_STATEMENT,
   },
 )
 
@@ -48,7 +46,6 @@ const ELAN_DATA = {
   order: 3,
   introBlurbHeadline: INTRO_HEADLINE_BY_SLUG['elan-design-system'],
   introBlurbBody: markdownToLexical(BLURB_BODY),
-  description: markdownToLexical(SCOPE_STATEMENT),
   content: CONTENT_BLOCKS,
   sections: [],
   role: 'Designer & Engineer',

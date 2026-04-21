@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { parseVideoEmbedUrl } from '../lib/parse-video-embed'
 
 export const Projects: CollectionConfig = {
   slug: 'projects',
@@ -91,7 +92,8 @@ export const Projects: CollectionConfig = {
               name: 'description',
               type: 'richText',
               admin: {
-                description: 'Scope statement (2-4 sentences) — company context, ownership claim, impact signal.',
+                description: 'Deprecated — scope statement is now the first richText block in `content`. Hidden in admin; kept in schema only for backwards compatibility. See ENG-154.',
+                condition: () => false,
               },
             },
             {
@@ -204,6 +206,59 @@ export const Projects: CollectionConfig = {
                   ],
                 },
                 {
+                  slug: 'image',
+                  labels: { singular: 'Image', plural: 'Images' },
+                  fields: [
+                    {
+                      name: 'image',
+                      type: 'upload',
+                      relationTo: 'media',
+                      required: false,
+                    },
+                    {
+                      name: 'caption',
+                      type: 'text',
+                    },
+                    {
+                      name: 'alt',
+                      type: 'text',
+                      admin: {
+                        description: 'Accessibility alt text. Falls back to caption if empty.',
+                      },
+                    },
+                    {
+                      name: 'rowBreak',
+                      type: 'checkbox',
+                      defaultValue: true,
+                      admin: {
+                        description:
+                          'True = this image starts a new row (stands alone or starts a horizontal group). False = continues the row started by the previous image block.',
+                      },
+                    },
+                    {
+                      name: 'widthFraction',
+                      type: 'number',
+                      required: false,
+                      admin: {
+                        description:
+                          'Optional 0..1 proportion within its row. Null = equal distribution among row members.',
+                      },
+                    },
+                    {
+                      name: 'placeholderLabel',
+                      type: 'text',
+                      admin: {
+                        description:
+                          'Descriptive label shown when no image is uploaded. Cleared when a real image is attached.',
+                        condition: (_data, siblingData) => {
+                          const image = (siblingData as Record<string, unknown>)?.image
+                          return !image
+                        },
+                      },
+                    },
+                  ],
+                },
+                {
                   slug: 'divider',
                   labels: { singular: 'Divider', plural: 'Dividers' },
                   fields: [],
@@ -231,6 +286,49 @@ export const Projects: CollectionConfig = {
                     {
                       name: 'caption',
                       type: 'text',
+                    },
+                  ],
+                },
+                {
+                  slug: 'videoEmbed',
+                  labels: { singular: 'Video Embed', plural: 'Video Embeds' },
+                  fields: [
+                    {
+                      name: 'url',
+                      type: 'text',
+                      admin: {
+                        description:
+                          'Paste a YouTube, Vimeo, or Loom URL. Privacy-mode variants are used where supported (youtube-nocookie, ?dnt=1).',
+                      },
+                      validate: ((value: unknown) => {
+                        if (!value) return true
+                        if (typeof value !== 'string') return 'Must be a string'
+                        return parseVideoEmbedUrl(value)
+                          ? true
+                          : 'Unsupported provider. Use YouTube, Vimeo, or Loom.'
+                      }) as never,
+                    },
+                    {
+                      name: 'poster',
+                      type: 'upload',
+                      relationTo: 'media',
+                      filterOptions: () => ({ mimeType: { like: 'image/' } }),
+                      admin: {
+                        description:
+                          'Optional custom thumbnail. YouTube falls back to its auto-thumb; Vimeo/Loom fall back to a neutral placeholder.',
+                      },
+                    },
+                    { name: 'caption', type: 'text' },
+                    {
+                      name: 'placeholderLabel',
+                      type: 'text',
+                      admin: {
+                        description: 'Descriptive label shown before a URL is pasted.',
+                        condition: (_data, siblingData) => {
+                          const url = (siblingData as Record<string, unknown>)?.url
+                          return !url
+                        },
+                      },
                     },
                   ],
                 },

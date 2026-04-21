@@ -417,7 +417,7 @@ $_nav-height: 45px;
 }
 
 .dragHandle {
-  display: none;
+  display: flex;
   align-items: center;
   justify-content: center;
   width: 20px;
@@ -433,13 +433,26 @@ $_nav-height: 45px;
   opacity: 0;
   transition: opacity var(--portfolio-duration-fast) ease, color var(--portfolio-duration-fast) ease;
 
-  @media #{$elan-mq-md} {
-    display: flex;
-  }
-
   .sortableInner:hover &,
   &:focus-visible {
     opacity: 1;
+  }
+
+  // Touch/no-hover surfaces never fire :hover, so the handle would stay
+  // invisible forever. Keep it softly visible so admins on tablets can find it.
+  @media (hover: none) {
+    opacity: 0.55;
+  }
+
+  // Below the two-column breakpoint the content column fills the viewport
+  // and there is no left gutter wide enough to host the -28px absolute
+  // handle — it would clip off-screen. Flip to an in-flow flex item that
+  // sits beside the content and stays visible.
+  @media not all and #{$elan-mq-md} {
+    position: static;
+    margin-right: $portfolio-spacer-0-5x;
+    opacity: 0.55;
+    flex: 0 0 auto;
   }
 
   &:hover {
@@ -458,6 +471,98 @@ $_nav-height: 45px;
   border-radius: 0;
   margin: $portfolio-spacer-0-5x 0;
   animation: dropPulse 1s ease-in-out infinite alternate;
+}
+
+// DnD reorder: landing line rendered on the target block during drag.
+// Separate from .dropIndicator (which is only for file drops from the
+// desktop). Sits flush against the block edge — not in a gap — because
+// the active source's in-place opacity is already reduced to 0.35, so
+// the gap created by verticalListSortingStrategy reads as the "source
+// hole" and the line reads as the "landing edge."
+.dropLine {
+  height: 2px;
+  background: $portfolio-accent-50;
+  border-radius: 0;
+  margin: 0;
+  animation: dropPulse 1s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+// Vertical variant: merge-into-row drop indicator (ENG-179). Sits
+// flush against the target image's left or right edge to read as "the
+// dragged image will land on this side, joining the same visual row."
+// Positioned absolutely so it overlays the row gap without displacing
+// siblings (verticalListSortingStrategy's sibling-sliding would make
+// the row wobble if this were an in-flow element). The sortableInner
+// is the reference frame because it already wraps the image figure
+// plus the absolutely-positioned drag handle at left: -28px.
+.dropLineVertical {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: $portfolio-accent-50;
+  animation: dropPulse 1s ease-in-out infinite alternate;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.dropLineVerticalLeft {
+  left: -4px;
+}
+
+.dropLineVerticalRight {
+  right: -4px;
+}
+
+.blockWrapperDragging {
+  z-index: 2;
+}
+
+.dragGhost {
+  display: inline-flex;
+  align-items: center;
+  gap: $portfolio-spacer-1x;
+  padding: $portfolio-spacer-0-5x $portfolio-spacer-1x;
+  background: var(--portfolio-surface-primary);
+  color: var(--portfolio-text-primary);
+  border: 1px solid var(--portfolio-border-subtle);
+  border-left: 3px solid $portfolio-accent-50;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  @include body-sm-medium;
+  cursor: grabbing;
+  max-width: 360px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.dragGhostHandle {
+  display: inline-flex;
+  color: var(--portfolio-text-placeholder);
+}
+
+.dragGhostLabel {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Wrapper that parks "Add image" below an imageGroup's figures. The
+ * button itself is a DS primitive; this wrapper only controls spacing
+ * and alignment. Branding §1.1 — no corner radius; DS Button handles
+ * its own (square) chrome. */
+.addImageRow {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: $portfolio-spacer-1x;
+}
+
+/* Wrapper for the "Add first block" empty-state trigger shown when a
+ * project has no content blocks yet. */
+.addFirstBlockRow {
+  display: flex;
+  justify-content: center;
+  margin-top: $portfolio-spacer-2x;
 }
 
 @keyframes dropPulse {
@@ -489,8 +594,14 @@ $_nav-height: 45px;
   margin-bottom: $portfolio-spacer-2x;
 }
 
-.blockItem + .blockItem .sectionHeading,
-.blockWrapper + .blockWrapper .sectionHeading {
+// Between-section spacing lives on the outer block wrapper, not on the
+// inner .sectionHeading, so the absolute-positioned .dragHandle (anchored
+// to .sortableInner's top) aligns with the heading's visible top instead
+// of floating in the margin space above it. `:has()` keeps the selector
+// firing only for blocks that actually start with a heading — plain
+// rich-text blocks still stack tightly.
+.blockItem + .blockItem:has(.sectionHeading),
+.blockWrapper + .blockWrapper:has(.sectionHeading) {
   margin-top: $portfolio-spacer-layout-x-spacious;
 }
 
@@ -606,6 +717,26 @@ $_nav-height: 45px;
   margin-bottom: $portfolio-spacer-2x;
 }
 
+/* Single flex class for atomic image rows. Collapses to a vertical stack
+ * below sm. Per-member `flex-basis` is set inline from widthFraction
+ * resolution (see resolveRowFlex in ProjectClient.tsx). */
+.imageRow {
+  display: flex;
+  flex-direction: column;
+  gap: $portfolio-spacer-2x;
+  margin-bottom: $portfolio-spacer-2x;
+
+  @media #{$elan-mq-sm} {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+}
+
+.imageRowItem {
+  min-width: 0;
+  flex: 1 1 0%;
+}
+
 .imageFullWidth {
   margin-bottom: $portfolio-spacer-2x;
 
@@ -624,6 +755,33 @@ $_nav-height: 45px;
   gap: $portfolio-spacer-0-5x;
   margin: 0;
   position: relative;
+}
+
+.figPlaybackToggle {
+  position: absolute;
+  top: $portfolio-spacer-0-5x;
+  left: $portfolio-spacer-0-5x;
+  z-index: var(--portfolio-z-admin);
+}
+
+.videoEmbedPlaceholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: $portfolio-neutral-90;
+  color: $portfolio-neutral-40;
+  padding: $portfolio-spacer-2x;
+  gap: $portfolio-spacer-1x;
+}
+
+.heroPlaybackToggleWrap {
+  position: absolute;
+  top: $portfolio-spacer-1x;
+  left: $portfolio-spacer-1x;
+  z-index: var(--portfolio-z-admin);
 }
 
 .figCaption {
@@ -650,6 +808,7 @@ $_nav-height: 45px;
 }
 
 .labeledPlaceholder {
+  position: relative;
   width: 100%;
   aspect-ratio: 16 / 10;
   border-radius: 0;
@@ -661,6 +820,53 @@ $_nav-height: 45px;
   justify-content: center;
   gap: $portfolio-spacer-1x;
   padding: $portfolio-spacer-2x;
+}
+
+// Corner X on empty placeholder slots. Authors use this to prune
+// scaffold slots that `case-study-authoring` generated but they do
+// not intend to fill. Only rendered for `isAdmin` in the parent —
+// visitors never see it. Positioned absolute so it does not affect
+// the centered label/index layout. Zero border-radius per branding §1.1.
+// Stops click/keydown propagation so the slot's own click-to-upload
+// and keyboard handler do not fire when the X is activated.
+.placeholderRemove {
+  position: absolute;
+  top: $portfolio-spacer-1x;
+  right: $portfolio-spacer-1x;
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0;
+  border: 1px solid $portfolio-border-subtle;
+  background: var(--portfolio-surface-primary);
+  color: $portfolio-text-secondary;
+  cursor: pointer;
+  padding: 0;
+  opacity: 0;
+  transition: opacity 120ms ease-out, color 120ms ease-out, border-color 120ms ease-out;
+  z-index: 1;
+
+  &:hover,
+  &:focus-visible {
+    color: $portfolio-text-primary;
+    border-color: $portfolio-text-primary;
+    outline: none;
+    opacity: 1;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.4;
+  }
+}
+
+.labeledPlaceholder:hover .placeholderRemove,
+.labeledPlaceholder:focus-within .placeholderRemove,
+.labeledPlaceholderWide:hover .placeholderRemove,
+.labeledPlaceholderWide:focus-within .placeholderRemove {
+  opacity: 1;
 }
 
 .labeledPlaceholderWide {
@@ -688,6 +894,60 @@ $_nav-height: 45px;
 .placeholderIndex {
   @include caption;
   color: $portfolio-text-placeholder;
+}
+
+// Empty atomic image slot wrapper — hosts the Dropzone plus a trash
+// overlay so the "remove this slot" affordance exists in the same
+// visual location as on filled slots (`ImageBlockAdminOverlay`'s
+// top-right trash). Without this, empty slots inside a multi-image
+// row had zero delete path (ENG-180 / FB-160). The wrapper is
+// `position: relative` so the trash can absolute-anchor to its
+// bounding box, and the trash reveals on hover / focus-within so
+// the chrome stays out of the way until the author engages.
+.emptySlotWrapper {
+  position: relative;
+
+  &:hover .emptySlotActions,
+  &:focus-within .emptySlotActions {
+    opacity: 1;
+  }
+}
+
+.emptySlotActions {
+  position: absolute;
+  top: var(--spacer-1x, 8px);
+  right: var(--spacer-1x, 8px);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacer-0-5x, 4px);
+  padding: var(--spacer-0-5x, 4px);
+  background: var(--color-overlay-80, rgba(0, 0, 0, 0.72));
+  pointer-events: auto;
+  z-index: 2;
+  opacity: 0;
+  transition: opacity 120ms ease-out;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.24);
+}
+
+// Atomic image block empty-slot label. After the imageGroup → atomic
+// migration, empty slots that used to live inside a `placeholderGrid`
+// are now independent `image` blocks with a `placeholderLabel` field.
+// The Dropzone body renders this stack so authors still see the
+// slot intent ("Before & After", "Lifecycle map", etc.) and a hint
+// on how to fill it. The outer SortableBlock supplies the drag
+// handle so empty slots are draggable along with filled ones.
+.atomicSlotLabel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $portfolio-spacer-1x;
+  padding: $portfolio-spacer-2x;
+}
+
+.placeholderHint {
+  @include caption;
+  color: $portfolio-text-placeholder;
+  text-align: center;
 }
 
 .imageCaption {

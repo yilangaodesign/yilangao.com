@@ -53,20 +53,61 @@ export function lexicalToMarkdown(json: unknown): string {
 // Agent-friendly case study block helpers
 // ---------------------------------------------------------------------------
 
+export type SectionImage = { image: number | string; caption?: string; alt?: string }
+
 export interface CaseStudySection {
   heading: string
   level?: 'h2' | 'h3'
   bodyMarkdown?: string
-  images?: Array<{ image: number | string; caption?: string }>
-  imagePlaceholders?: string[]
-  layout?: 'auto' | 'full-width' | 'grid-2-equal' | 'grid-2-left-heavy' | 'grid-2-right-heavy' | 'grid-3-bento' | 'grid-3-equal' | 'stacked'
+  /**
+   * Section images. Two shapes are supported:
+   * - `SectionImage[]`  — a single row containing every image.
+   * - `SectionImage[][]` — multiple rows; each inner array is one row.
+   *
+   * The 2D form is the preferred way to express "these images stack" or
+   * "these images pair up" without needing the old `layout` preset.
+   */
+  images?: SectionImage[] | SectionImage[][]
+  /**
+   * Placeholder labels, same shape rules as `images`.
+   * - `string[]`   — single row.
+   * - `string[][]` — multiple rows.
+   */
+  imagePlaceholders?: string[] | string[][]
+  /**
+   * Per-image width fractions (0..1) within each row.
+   * - 1D (`Array<number | null>`) pairs with a 1D `images`/`imagePlaceholders`.
+   * - 2D (`Array<Array<number | null>>`) pairs with a 2D `images`/`imagePlaceholders`,
+   *   one inner array per row.
+   * `null` = equal distribution among unspecified members in that row.
+   */
+  widthFractions?: Array<number | null> | Array<Array<number | null>>
   showDivider?: boolean
+}
+
+function normalizeRows<T>(value: T[] | T[][] | undefined): T[][] {
+  if (!value || value.length === 0) return []
+  return Array.isArray(value[0]) ? (value as T[][]) : [value as T[]]
+}
+
+function normalizeWidthRows(
+  value: CaseStudySection['widthFractions'],
+): Array<Array<number | null>> {
+  if (!value || value.length === 0) return []
+  return Array.isArray(value[0]) ? (value as Array<Array<number | null>>) : [value as Array<number | null>]
 }
 
 export interface CaseStudyBlockOptions {
   heroImageId?: number | string
   heroCaption?: string
   heroPlaceholderLabel?: string
+  /**
+   * Scope statement (Markdown) rendered as the first richText content block,
+   * directly after the hero and before the first section heading. Replaces the
+   * legacy top-level `description` field so it can be edited, moved, and have
+   * blocks inserted around it via the standard block UI. See ENG-154.
+   */
+  scopeStatementMarkdown?: string
 }
 
 /**
@@ -101,6 +142,13 @@ export function createCaseStudyBlocks(
     })
   }
 
+  if (options?.scopeStatementMarkdown) {
+    blocks.push({
+      blockType: 'richText',
+      body: markdownToLexical(options.scopeStatementMarkdown),
+    })
+  }
+
   for (let i = 0; i < sections.length; i++) {
     const s = sections[i]
 
@@ -117,19 +165,41 @@ export function createCaseStudyBlocks(
       })
     }
 
-    if (s.images && s.images.length > 0) {
-      blocks.push({
-        blockType: 'imageGroup',
-        layout: s.layout ?? 'auto',
-        images: s.images,
-        caption: '',
+    // Atomic image blocks: one block per image. Rows are expressed by the
+    // 2D-array shape of `images` / `imagePlaceholders`. The first image of
+    // each row gets `rowBreak: true`; subsequent images continue with
+    // `rowBreak: false`. 1D input is treated as a single row.
+    const imageRows = normalizeRows<SectionImage>(s.images)
+    const placeholderRows = normalizeRows<string>(s.imagePlaceholders)
+    const widthRows = normalizeWidthRows(s.widthFractions)
+
+    if (imageRows.length > 0) {
+      imageRows.forEach((row, rowIdx) => {
+        row.forEach((img, colIdx) => {
+          const imageId =
+            typeof img.image === 'object' && img.image
+              ? (img.image as { id: unknown }).id
+              : img.image
+          blocks.push({
+            blockType: 'image',
+            image: imageId,
+            caption: img.caption ?? '',
+            alt: img.alt ?? '',
+            rowBreak: colIdx === 0,
+            widthFraction: widthRows[rowIdx]?.[colIdx] ?? null,
+          })
+        })
       })
-    } else if (s.imagePlaceholders && s.imagePlaceholders.length > 0) {
-      blocks.push({
-        blockType: 'imageGroup',
-        layout: s.layout ?? 'auto',
-        images: [],
-        placeholderLabels: s.imagePlaceholders,
+    } else if (placeholderRows.length > 0) {
+      placeholderRows.forEach((row, rowIdx) => {
+        row.forEach((label, colIdx) => {
+          blocks.push({
+            blockType: 'image',
+            placeholderLabel: label,
+            rowBreak: colIdx === 0,
+            widthFraction: widthRows[rowIdx]?.[colIdx] ?? null,
+          })
+        })
       })
     }
 
@@ -167,6 +237,11 @@ export function readBlocksAsMarkdown(blocks: unknown[]): string {
         }
         break
       }
+      // Legacy: preserved so existing CMS documents still render correctly
+      // during the transition window. Once the migration (Phase 2) clears
+      // all imageGroup entries from the CMS and the Phase 4 cleanup runs,
+      // this branch can be removed. Until then, keeping both is required
+      // — EAP-019 (data fields must stay visible across all consumers).
       case 'imageGroup': {
         const images = (block.images as Array<{ image: unknown; caption?: string }>) ?? []
         const labels = block.placeholderLabels as string[] | undefined
@@ -184,6 +259,23 @@ export function readBlocksAsMarkdown(blocks: unknown[]): string {
           }
         }
         if (block.caption) lines.push(`_${block.caption}_`)
+        lines.push('')
+        break
+      }
+      // New atomic image block. `rowBreak=false` members belong to the same
+      // visual row as the previous atomic image; the markdown emission flags
+      // the break so a reader can reconstruct the row structure if needed.
+      case 'image': {
+        const id =
+          typeof block.image === 'object' && block.image
+            ? (block.image as { id: unknown }).id
+            : block.image
+        const rowBreakMarker = block.rowBreak === false ? ' [+row]' : ''
+        if (id) {
+          lines.push(`![${block.caption ?? ''}](media:${id})${rowBreakMarker}`)
+        } else if (block.placeholderLabel) {
+          lines.push(`> [IMAGE PLACEHOLDER: ${block.placeholderLabel}]${rowBreakMarker}`)
+        }
         lines.push('')
         break
       }
