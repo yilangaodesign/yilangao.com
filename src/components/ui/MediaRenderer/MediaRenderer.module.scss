@@ -37,6 +37,20 @@
   }
 }
 
+.muteToggle {
+  position: absolute;
+  right: var(--portfolio-spacer-1x);
+  bottom: var(--portfolio-spacer-1x);
+  z-index: 2;
+  opacity: 0;
+  transition: opacity var(--portfolio-duration-fast) var(--portfolio-easing-standard);
+}
+
+.wrapper:hover .muteToggle,
+.wrapper:focus-within .muteToggle {
+  opacity: 1;
+}
+
 @keyframes shimmer {
   0% {
     background-position: 200% 0;

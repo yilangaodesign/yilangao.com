@@ -81,6 +81,44 @@ $_spy-sub-hover-w: 14px;
   }
 }
 
+// Portaled label for the currently-active (or drag-targeted) notch.
+// Rendered as a direct child of <body> so mix-blend-mode: difference blends
+// against the page content below rather than being isolated by the rail's
+// fixed-position stacking context. Color: #fff + difference yields automatic
+// inverse-of-backdrop contrast — black text on light backgrounds, white text
+// on dark backgrounds, without pixel sampling or per-section annotation.
+//
+// Positioning is split across two elements so framer-motion's `x` animation
+// on the inner span does not overwrite the base CSS transform (see FB-156).
+// Anchor owns `position: fixed` + the -100%/-50% placement; the inner span
+// owns only the subtle slide-in `x` animation + opacity fade.
+.highlightLabelAnchor {
+  position: fixed;
+  transform: translate(
+    calc(-100% - var(--portfolio-spacer-1x)),
+    -50%
+  );
+  z-index: var(--portfolio-z-scrollspy);
+  pointer-events: none;
+  will-change: top, left;
+}
+
+.highlightLabel {
+  display: inline-block;
+  font-family: var(--portfolio-font-mono);
+  font-size: var(--portfolio-type-xs);
+  line-height: 1;
+  color: #fff;
+  mix-blend-mode: difference;
+  font-weight: 500;
+  white-space: nowrap;
+  will-change: transform, opacity;
+
+  &[data-depth="1"] {
+    font-weight: 400;
+  }
+}
+
 .tick {
   @include button-reset;
   width: $_spy-dot-w;
