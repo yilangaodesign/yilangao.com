@@ -10,6 +10,10 @@ const nextConfig: NextConfig = {
         hostname: "lrjliluvnkciwnyshexq.supabase.co",
         pathname: "/storage/v1/object/public/**",
       },
+      {
+        protocol: "https",
+        hostname: "i.ytimg.com",
+      },
     ],
   },
 };

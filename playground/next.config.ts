@@ -10,6 +10,14 @@ const nextConfig: NextConfig = {
   sassOptions: {
     loadPaths: [path.resolve(monorepoRoot, "src/styles")],
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "i.ytimg.com",
+      },
+    ],
+  },
   webpack: (config) => {
     // Files imported via @ds/* live in ../src/ — outside playground/.
     // Node module resolution walks up from the file's directory, so it

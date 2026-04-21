@@ -28,6 +28,9 @@
 # production
 /build
 
+# one-shot migration backups (timestamped dumps from src/scripts/migrate-*.ts)
+/scripts/.backups/
+
 # misc
 .DS_Store
 *.pem
@@ -45,6 +48,9 @@ yarn-error.log*
 
 # vercel
 .vercel
+
+# local MCP configuration (per-developer)
+.mcp.json
 
 # typescript
 *.tsbuildinfo
