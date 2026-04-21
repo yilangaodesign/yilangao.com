@@ -72,6 +72,37 @@
   }
 }
 
+// Portaled to <body> so mix-blend-mode: difference blends against page
+// content below the rail's fixed-position stacking context. Auto-inverts
+// label color against any backdrop (dark bg → white text, light bg → black
+// text). Applies only to the currently-active / drag-targeted notch.
+//
+// Positioning is split across two elements so framer-motion's `x` animation
+// on the inner span does not overwrite the base CSS transform (see FB-156).
+.highlightLabelAnchor {
+  position: fixed;
+  transform: translate(calc(-100% - #{$portfolio-spacing-03}), -50%);
+  z-index: 41;
+  pointer-events: none;
+  will-change: top, left;
+}
+
+.highlightLabel {
+  display: inline-block;
+  font-family: $portfolio-font-mono;
+  font-size: $portfolio-type-xs;
+  line-height: 1;
+  color: #fff;
+  mix-blend-mode: difference;
+  font-weight: 500;
+  white-space: nowrap;
+  will-change: transform, opacity;
+
+  &[data-depth="1"] {
+    font-weight: 400;
+  }
+}
+
 .tick {
   @include button-reset;
   width: 16px;

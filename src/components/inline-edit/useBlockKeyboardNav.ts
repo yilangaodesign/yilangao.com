@@ -1,10 +1,8 @@
 'use client'
 
 import { useCallback, useRef } from 'react'
-import type { BlockType } from './useBlockManager'
 
 export interface BlockNavCallbacks {
-  onEnterAtEnd: (blockIndex: number) => void
   onBackspaceAtStart: (blockIndex: number, isEmpty: boolean) => void
   onArrowUp: (blockIndex: number) => void
   onArrowDown: (blockIndex: number) => void
@@ -33,20 +31,11 @@ function focusBlock(index: number, position: 'start' | 'end' = 'start') {
 }
 
 export default function useBlockKeyboardNav(
-  addBlock: (type: BlockType, atIndex?: number) => void,
   deleteBlock: (index: number) => void,
   blockCount: number,
 ): BlockNavCallbacks {
   const blockCountRef = useRef(blockCount)
   blockCountRef.current = blockCount
-
-  const onEnterAtEnd = useCallback(
-    (blockIndex: number) => {
-      addBlock('richText', blockIndex + 1)
-      setTimeout(() => focusBlock(blockIndex + 1, 'start'), 300)
-    },
-    [addBlock],
-  )
 
   const onBackspaceAtStart = useCallback(
     (blockIndex: number, isEmpty: boolean) => {
@@ -75,5 +64,5 @@ export default function useBlockKeyboardNav(
     [],
   )
 
-  return { onEnterAtEnd, onBackspaceAtStart, onArrowUp, onArrowDown }
+  return { onBackspaceAtStart, onArrowUp, onArrowDown }
 }

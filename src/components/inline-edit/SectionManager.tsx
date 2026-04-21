@@ -4,6 +4,8 @@ import { useCallback, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { updateCollectionField } from './api'
 import type { ApiTarget } from './types'
+import { useConfirm } from './ConfirmDelete'
+import { useToast } from './ToastSurface'
 import styles from './inline-edit.module.scss'
 
 const LAYOUT_OPTIONS = [
@@ -19,14 +21,14 @@ const LAYOUT_OPTIONS = [
 
 export default function useSectionManager(target: ApiTarget | undefined) {
   const router = useRouter()
+  const { confirm } = useConfirm()
+  const toast = useToast()
   const [busy, setBusy] = useState(false)
-  const [error, setError] = useState<string | null>(null)
 
   const patchSections = useCallback(
     async (transform: (sections: unknown[]) => unknown[]) => {
       if (!target || target.type !== 'collection' || !target.id) return
       setBusy(true)
-      setError(null)
       try {
         const res = await fetch(`/api/${target.slug}/${target.id}`, {
           credentials: 'include',
@@ -38,12 +40,12 @@ export default function useSectionManager(target: ApiTarget | undefined) {
         await updateCollectionField(target.slug, target.id, 'sections', updated)
         router.refresh()
       } catch (e) {
-        setError(e instanceof Error ? e.message : 'Unknown error')
+        toast.error(e instanceof Error ? e.message : 'Section update failed')
       } finally {
         setBusy(false)
       }
     },
-    [target, router],
+    [target, router, toast],
   )
 
   const addSection = useCallback(() => {
@@ -71,11 +73,15 @@ export default function useSectionManager(target: ApiTarget | undefined) {
   }, [patchSections])
 
   const deleteSection = useCallback(
-    (index: number) => {
-      if (!window.confirm(`Delete section ${index + 1}? This cannot be undone.`)) return
+    async (index: number) => {
+      const ok = await confirm({
+        title: `Delete section ${index + 1}?`,
+        description: 'This cannot be undone. The section and all its content will be removed.',
+      })
+      if (!ok) return
       patchSections((sections) => sections.filter((_, i) => i !== index))
     },
-    [patchSections],
+    [confirm, patchSections],
   )
 
   const moveSection = useCallback(
@@ -104,7 +110,7 @@ export default function useSectionManager(target: ApiTarget | undefined) {
     [patchSections],
   )
 
-  return { busy, error, addSection, deleteSection, moveSection, patchSectionField }
+  return { busy, addSection, deleteSection, moveSection, patchSectionField }
 }
 
 export function SectionToolbar({

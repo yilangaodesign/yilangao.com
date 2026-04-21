@@ -3,6 +3,7 @@
 import { useCallback, useRef, useState, type DragEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import { uploadMedia, updateCollectionField } from './api'
+import { useToast } from './ToastSurface'
 import styles from './inline-edit.module.scss'
 
 interface ImageUploadZoneProps {
@@ -14,6 +15,8 @@ interface ImageUploadZoneProps {
   children?: React.ReactNode
 }
 
+const LARGE_UPLOAD_BYTES = 50 * 1024 * 1024 // 50 MB
+
 export default function ImageUploadZone({
   collection,
   docId,
@@ -23,30 +26,36 @@ export default function ImageUploadZone({
   children,
 }: ImageUploadZoneProps) {
   const router = useRouter()
+  const toast = useToast()
   const inputRef = useRef<HTMLInputElement>(null)
   const [uploading, setUploading] = useState(false)
   const [dragOver, setDragOver] = useState(false)
-  const [error, setError] = useState<string | null>(null)
 
   const handleUpload = useCallback(
     async (file: File) => {
       if (!file.type.startsWith('image/') && !file.type.startsWith('video/')) {
-        setError('Only image and video files are supported')
+        toast.error('Only image and video files are supported')
         return
       }
+      if (file.size > LARGE_UPLOAD_BYTES) {
+        const mb = Math.round(file.size / (1024 * 1024))
+        toast.info(
+          `Large upload (${mb} MB)`,
+          { description: 'For videos, consider compressing to MP4/WebM first — aim for <20 MB.' },
+        )
+      }
       setUploading(true)
-      setError(null)
       try {
         const { id } = await uploadMedia(file, file.name.replace(/\.[^.]+$/, ''))
         await updateCollectionField(collection, docId, fieldPath, id)
         router.refresh()
       } catch (e) {
-        setError(e instanceof Error ? e.message : 'Upload failed')
+        toast.error(e instanceof Error ? e.message : 'Upload failed')
       } finally {
         setUploading(false)
       }
     },
-    [collection, docId, fieldPath, router],
+    [collection, docId, fieldPath, router, toast],
   )
 
   const handleDrop = useCallback(
@@ -119,7 +128,6 @@ export default function ImageUploadZone({
           </span>
         </div>
       )}
-      {error && <span className={styles.uploadError}>{error}</span>}
     </div>
   )
 }
@@ -140,15 +148,14 @@ export function SectionImageUpload({
   className?: string
 }) {
   const router = useRouter()
+  const toast = useToast()
   const inputRef = useRef<HTMLInputElement>(null)
   const [uploading, setUploading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
 
   const handleUpload = useCallback(
     async (file: File) => {
       if (!file.type.startsWith('image/') && !file.type.startsWith('video/')) return
       setUploading(true)
-      setError(null)
       try {
         const { id: mediaId } = await uploadMedia(file, file.name.replace(/\.[^.]+$/, ''))
 
@@ -170,12 +177,12 @@ export function SectionImageUpload({
         await updateCollectionField(collection, docId, 'sections', sections)
         router.refresh()
       } catch (e) {
-        setError(e instanceof Error ? e.message : 'Upload failed')
+        toast.error(e instanceof Error ? e.message : 'Upload failed')
       } finally {
         setUploading(false)
       }
     },
-    [collection, docId, sectionIndex, imageIndex, router],
+    [collection, docId, sectionIndex, imageIndex, router, toast],
   )
 
   return (
@@ -204,7 +211,6 @@ export function SectionImageUpload({
         </svg>
         <span className={styles.uploadLabel}>{uploading ? 'Uploading…' : (label || 'Upload image')}</span>
       </div>
-      {error && <span className={styles.uploadError}>{error}</span>}
     </div>
   )
 }

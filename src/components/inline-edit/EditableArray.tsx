@@ -312,17 +312,32 @@ export default function EditableArray<T extends Record<string, unknown>>({
     return createElement(Tag, { className }, items.map(renderItem))
   }
 
+  const isEmpty = displayItems.length === 0
+
   return (
     <>
       {createElement(
         Tag,
         {
-          className: [className, styles.editableArray].filter(Boolean).join(' '),
+          className: [className, styles.editableArray, isEmpty ? styles.editableArrayEmpty : ''].filter(Boolean).join(' '),
           'data-editable-label': label || fieldPath,
           'data-editable-dirty': dirty || undefined,
           onDoubleClick: openPanel,
         },
-        displayItems.map(renderItem),
+        isEmpty ? (
+          <button
+            type="button"
+            className={styles.editableArrayEmptyCta}
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setLocalItems([]); setItemKeys([]); setPanelOpen(true); }}
+          >
+            <svg width="12" height="12" viewBox="0 0 14 14" fill="none" aria-hidden>
+              <path d="M7 2v10M2 7h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+            </svg>
+            Add {label || fieldPath}
+          </button>
+        ) : (
+          displayItems.map(renderItem)
+        ),
       )}
 
       {panelOpen && mounted && createPortal(
@@ -361,6 +376,19 @@ export default function EditableArray<T extends Record<string, unknown>>({
                     overIndex === index && dragIndex !== index ? styles.arrayItemDropTarget : '',
                   ].filter(Boolean).join(' ')}
                   onDragOver={(e) => handleDragOver(e, index)}
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.target !== e.currentTarget) return
+                    if (e.altKey && e.key === 'ArrowUp' && index > 0) {
+                      e.preventDefault(); reorderItem(index, index - 1); return
+                    }
+                    if (e.altKey && e.key === 'ArrowDown' && index < localItems.length - 1) {
+                      e.preventDefault(); reorderItem(index, index + 1); return
+                    }
+                    if ((e.metaKey || e.ctrlKey) && e.key === 'Backspace') {
+                      e.preventDefault(); deleteItem(index);
+                    }
+                  }}
                 >
                   <button
                     type="button"
@@ -455,6 +483,18 @@ export default function EditableArray<T extends Record<string, unknown>>({
                   </span>
                 </div>
               )}
+
+              <button
+                type="button"
+                className={styles.arrayAddChip}
+                onClick={addItem}
+                disabled={panelSaving}
+              >
+                <svg width="12" height="12" viewBox="0 0 14 14" fill="none" aria-hidden>
+                  <path d="M7 2v10M2 7h10" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+                </svg>
+                Add item
+              </button>
             </div>
 
             <div className={styles.arrayPanelFooter}>

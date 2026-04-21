@@ -368,6 +368,19 @@ export async function updateCollectionField(
   }
 }
 
+/**
+ * A fieldPath like `content.8.images.2.caption` needs the existing document as
+ * a base before calling `setNested`. Without it, `setNested` would invent a
+ * sparse array (`{content: [null, null, …, {images: [null, null, {caption}]}]}`)
+ * that JSON-serializes to leading `null` entries, which Payload rejects with a
+ * 500 because `null` does not match any block schema. Read–modify–write on the
+ * real document is the only safe path for indexed writes — the same pattern
+ * `useBlockManager.patchContent` uses for structural block mutations.
+ */
+function hasArrayIndex(path: string): boolean {
+  return /\.\d+(\.|$)/.test(path)
+}
+
 export async function saveFields(
   dirtyFields: Map<string, DirtyField>,
 ): Promise<void> {
@@ -384,7 +397,17 @@ export async function saveFields(
   }
 
   const requests = Array.from(grouped.values()).map(async ({ target, fields }) => {
-    const body: Record<string, unknown> = {}
+    const needsBase = fields.some((f) => hasArrayIndex(f.fieldPath))
+
+    let base: Record<string, unknown> = {}
+    if (needsBase) {
+      const getRes = await fetch(buildEndpoint(target), { credentials: 'include' })
+      if (!getRes.ok) {
+        const text = await getRes.text().catch(() => '')
+        throw new Error(parsePayloadError(text, getRes.status))
+      }
+      base = await getRes.json()
+    }
 
     for (const field of fields) {
       let value: unknown = field.currentValue
@@ -398,7 +421,18 @@ export async function saveFields(
             : makeLexicalParagraph(str)
         }
       }
-      setNested(body, field.fieldPath, value)
+      setNested(base, field.fieldPath, value)
+    }
+
+    let body: Record<string, unknown>
+    if (needsBase) {
+      const topKeys = new Set(fields.map((f) => f.fieldPath.split('.')[0]))
+      body = {}
+      for (const key of topKeys) {
+        if (key in base) body[key] = base[key]
+      }
+    } else {
+      body = base
     }
 
     const response = await fetch(buildEndpoint(target), {

@@ -53,6 +53,18 @@ $accent-light: rgba($portfolio-accent-60, 0.06);
   }
 }
 
+.editablePlaceholder {
+  display: inline;
+  color: var(--portfolio-text-placeholder);
+  font-style: italic;
+  user-select: none;
+
+  &::before {
+    content: "+ ";
+    font-style: normal;
+  }
+}
+
 /* ── Editable Array ── */
 
 .editableArray {
@@ -93,6 +105,41 @@ $accent-light: rgba($portfolio-accent-60, 0.06);
     &::before {
       background: $portfolio-orange-50;
     }
+  }
+}
+
+.editableArrayEmpty {
+  min-height: 60px;
+  display: flex;
+  align-items: stretch;
+  justify-content: stretch;
+}
+
+.editableArrayEmptyCta {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  border: 1px dashed var(--portfolio-border-subtle);
+  background: transparent;
+  color: var(--portfolio-text-tertiary);
+  font-family: $portfolio-font-sans;
+  font-size: $portfolio-type-xs;
+  cursor: pointer;
+  width: 100%;
+  justify-content: center;
+  transition:
+    border-color var(--portfolio-duration-fast) ease,
+    color var(--portfolio-duration-fast) ease,
+    background var(--portfolio-duration-fast) ease;
+
+  &:hover,
+  &:focus-visible {
+    border-color: $accent;
+    color: $accent;
+    background: var(--portfolio-surface-secondary);
+    outline: none;
   }
 }
 
@@ -422,6 +469,39 @@ $accent-light: rgba($portfolio-accent-60, 0.06);
   }
 }
 
+.arrayAddChip {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: $portfolio-spacer-0-5x;
+  padding: 6px 10px;
+  font-size: $portfolio-type-2xs;
+  font-weight: $portfolio-weight-medium;
+  color: var(--portfolio-text-tertiary);
+  background: transparent;
+  border: 1px dashed var(--portfolio-border-subtle);
+  border-radius: $portfolio-radius-xs;
+  cursor: pointer;
+  transition:
+    border-color var(--portfolio-duration-fast) ease,
+    color var(--portfolio-duration-fast) ease,
+    background var(--portfolio-duration-fast) ease;
+
+  &:hover,
+  &:focus-visible {
+    border-color: $accent;
+    color: $accent;
+    background: $accent-light;
+    outline: none;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
 .arrayDoneBtn {
   padding: $portfolio-spacer-utility-0-75x $portfolio-spacer-2x;
   font-size: $portfolio-type-xs;
@@ -633,100 +713,6 @@ $accent-light: rgba($portfolio-accent-60, 0.06);
     background: $portfolio-red-70;
     opacity: 1;
     transform: scale(1);
-  }
-}
-
-/* ── Delete Confirmation Dialog ── */
-
-.confirmBackdrop {
-  position: fixed;
-  inset: 0;
-  z-index: calc(var(--portfolio-z-admin-modal) + 1);
-  background: var(--portfolio-overlay-black-30);
-}
-
-.confirmDialog {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: calc(var(--portfolio-z-admin-modal) + 2);
-  width: min(360px, 90vw);
-  padding: $portfolio-spacer-2-5x;
-  background: var(--portfolio-surface-primary);
-  border: 1px solid var(--portfolio-border-subtle);
-  border-radius: $portfolio-radius-md;
-  box-shadow: var(--portfolio-shadow-overlay), 0 0 0 1px var(--portfolio-overlay-black-06);
-  font-family: $portfolio-font-sans;
-}
-
-.confirmMessage {
-  font-size: $portfolio-type-sm;
-  font-weight: $portfolio-weight-medium;
-  color: var(--portfolio-text-primary);
-  margin: 0 0 $portfolio-spacer-2x;
-  line-height: 1.5;
-}
-
-.confirmHint {
-  display: block;
-  margin-top: $portfolio-spacer-0-5x;
-  font-size: $portfolio-type-xs;
-  font-weight: $portfolio-weight-regular;
-  color: var(--portfolio-text-secondary);
-}
-
-.confirmError {
-  font-size: $portfolio-type-xs;
-  color: var(--portfolio-text-error);
-  margin: 0 0 $portfolio-spacer-1-5x;
-}
-
-.confirmActions {
-  display: flex;
-  justify-content: flex-end;
-  gap: $portfolio-spacer-1x;
-}
-
-.confirmCancel {
-  padding: $portfolio-spacer-utility-0-75x $portfolio-spacer-utility-1-75x;
-  font-size: $portfolio-type-xs;
-  font-weight: $portfolio-weight-medium;
-  color: var(--portfolio-text-neutral-bold);
-  background: var(--portfolio-surface-primary);
-  border: 1px solid var(--portfolio-border-subtle);
-  border-radius: $portfolio-radius-sm;
-  cursor: pointer;
-  font-family: $portfolio-font-sans;
-
-  &:hover {
-    background: var(--portfolio-surface-secondary);
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-}
-
-.confirmDelete {
-  padding: $portfolio-spacer-utility-0-75x $portfolio-spacer-utility-1-75x;
-  font-size: $portfolio-type-xs;
-  font-weight: $portfolio-weight-semibold;
-  color: var(--portfolio-text-always-light-bold);
-  background: $portfolio-red-60;
-  border: none;
-  border-radius: $portfolio-radius-sm;
-  cursor: pointer;
-  font-family: $portfolio-font-sans;
-
-  &:hover {
-    background: $portfolio-red-70;
-  }
-
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
   }
 }
 
@@ -1316,6 +1302,57 @@ $accent-light: rgba($portfolio-accent-60, 0.06);
   font-family: $portfolio-font-sans;
 }
 
+.uploadWarning {
+  position: absolute;
+  bottom: $portfolio-spacer-utility-0-75x;
+  padding: 2px 6px;
+  font-size: $portfolio-type-2xs;
+  color: var(--portfolio-text-always-light-bold);
+  background: $portfolio-orange-50;
+  font-family: $portfolio-font-sans;
+  max-width: 90%;
+  text-align: center;
+}
+
+/* ── Video Embed URL Input ── */
+
+.videoEmbedInput {
+  display: flex;
+  flex-direction: column;
+  gap: $portfolio-spacer-utility-0-5x;
+  margin-top: $portfolio-spacer-1x;
+  font-family: $portfolio-font-sans;
+}
+
+.videoEmbedInputField {
+  width: 100%;
+  padding: $portfolio-spacer-utility-0-5x $portfolio-spacer-1x;
+  background: var(--portfolio-surface-primary);
+  border: 1px solid var(--portfolio-border-subtle);
+  color: var(--portfolio-text-primary);
+  font: inherit;
+  font-size: $portfolio-type-xs;
+
+  &:focus-visible {
+    outline: 2px solid $accent;
+    outline-offset: -1px;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: wait;
+  }
+}
+
+.videoEmbedInputFeedback {
+  font-size: $portfolio-type-2xs;
+  color: var(--portfolio-text-secondary);
+
+  &[data-valid='false'] {
+    color: $portfolio-orange-50;
+  }
+}
+
 /* ── Image Manager ── */
 
 .imageManager {
@@ -1515,102 +1552,6 @@ $accent-light: rgba($portfolio-accent-60, 0.06);
   padding: $portfolio-spacer-utility-0-5x 0;
 }
 
-.dropZone {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: $portfolio-spacer-1x;
-  min-height: 160px;
-  border: 2px dashed var(--portfolio-border-subtle);
-  border-radius: $portfolio-radius-md;
-  background: var(--portfolio-surface-secondary);
-  color: var(--portfolio-text-secondary);
-  font-size: $portfolio-type-sm;
-  font-family: $portfolio-font-sans;
-  cursor: pointer;
-  transition: border-color var(--portfolio-duration-fast) ease, background var(--portfolio-duration-fast) ease;
-
-  &:hover,
-  &:focus-visible {
-    border-color: $accent;
-    background: rgba($accent, 0.04);
-  }
-}
-
-.imageOverlay {
-  position: absolute;
-  top: $portfolio-spacer-utility-0-5x;
-  right: $portfolio-spacer-utility-0-5x;
-  display: flex;
-  gap: 2px;
-  opacity: 0;
-  transition: opacity var(--portfolio-duration-fast) ease;
-
-  *:hover > &,
-  *:focus-within > & {
-    opacity: 1;
-  }
-}
-
-.imageOverlayBtn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 22px;
-  height: 22px;
-  border: none;
-  border-radius: $portfolio-radius-sm;
-  background: rgba(0, 0, 0, 0.65);
-  color: $portfolio-neutral-00;
-  font-size: 11px;
-  cursor: pointer;
-  padding: 0;
-  line-height: 1;
-
-  &:hover {
-    background: rgba(0, 0, 0, 0.85);
-  }
-
-  &:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-  }
-}
-
-.imageOverlayBtnDanger {
-  &:hover {
-    background: rgba(200, 40, 40, 0.9);
-  }
-}
-
-.addBlockBtn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: $portfolio-spacer-utility-0-5x;
-  width: 100%;
-  padding: $portfolio-spacer-1x;
-  border: 1px dashed var(--portfolio-border-subtle);
-  border-radius: $portfolio-radius-sm;
-  background: transparent;
-  color: var(--portfolio-text-secondary);
-  font-size: $portfolio-type-xs;
-  font-family: $portfolio-font-sans;
-  cursor: pointer;
-  transition: border-color var(--portfolio-duration-fast) ease, color var(--portfolio-duration-fast) ease;
-
-  &:hover {
-    border-color: $accent;
-    color: $accent;
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-}
-
 /* ── Lexical Block Editor ── */
 
 .lexEditorWrapper {
@@ -1785,3 +1726,12 @@ $accent-light: rgba($portfolio-accent-60, 0.06);
   height: 16px;
   border-radius: 50%;
 }
+
+/* ── Toast surface (inline-edit) ── */
+
+.toastBody {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+

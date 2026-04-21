@@ -32,6 +32,12 @@ interface EditableTextProps {
   htmlContent?: string
   label?: string
   singleClickEdit?: boolean
+  /**
+   * Admin-only placeholder shown when the field is empty, not dirty, and not
+   * being edited. Visible only to admins so visitors never see the hint.
+   * Defaults to `Add {label || fieldPath}`.
+   */
+  adminPlaceholder?: string
   [htmlAttr: string]: unknown
 }
 
@@ -56,6 +62,7 @@ export default function EditableText({
   htmlContent,
   label,
   singleClickEdit = false,
+  adminPlaceholder,
   ...htmlAttrs
 }: EditableTextProps) {
   const ctx = useInlineEdit()
@@ -276,10 +283,24 @@ export default function EditableText({
     dirtyValue.includes('<')
   const useHtml = dirtyHasHtml || (!showDirtyText && !!htmlContent)
 
+  // Admin-only empty placeholder: render a hint when there's no value to edit,
+  // so the field is still clickable and discoverable. Not shown while editing
+  // or while a dirty value exists.
+  const hasVisibleValue =
+    (showDirtyText && typeof dirtyValue === 'string' && dirtyValue.trim() !== '') ||
+    (!showDirtyText && (!!htmlContent || childText.trim() !== ''))
+  const showAdminPlaceholder = !isEditing && !hasVisibleValue
+
   if (useHtml) {
     displayProps.dangerouslySetInnerHTML = {
       __html: dirtyHasHtml ? dirtyValue! : htmlContent!,
     }
+  } else if (showAdminPlaceholder) {
+    displayProps.children = (
+      <span className={styles.editablePlaceholder} data-editable-placeholder>
+        {adminPlaceholder || `Add ${label || fieldPath}`}
+      </span>
+    )
   } else {
     displayProps.children = showDirtyText ? dirtyValue : children
   }

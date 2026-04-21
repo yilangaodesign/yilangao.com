@@ -8,7 +8,6 @@ import {
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
 } from '@/components/ui/DropdownMenu'
 import type { BlockType } from './useBlockManager'
 import styles from './inline-edit.module.scss'
@@ -44,21 +43,20 @@ const BLOCK_TYPES: { type: BlockType; label: string; icon: ReactNode }[] = [
     ),
   },
   {
+    type: 'videoEmbed',
+    label: 'Video Embed',
+    icon: (
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+        <path d="M5 4l5 3-5 3V4z" fill="currentColor" stroke="currentColor" strokeWidth="1" strokeLinejoin="round" />
+      </svg>
+    ),
+  },
+  {
     type: 'divider',
     label: 'Divider',
     icon: (
       <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
         <path d="M2 7h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-      </svg>
-    ),
-  },
-  {
-    type: 'hero',
-    label: 'Hero Image',
-    icon: (
-      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-        <rect x="1" y="3" width="12" height="8" rx="1" stroke="currentColor" strokeWidth="1.2" />
-        <path d="M7 6v3M5.5 7.5L7 6l1.5 1.5" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     ),
   },
@@ -126,16 +124,14 @@ export function BlockInsertMenu({
   )
 }
 
-const LAYOUT_OPTIONS = [
-  { value: 'auto', label: 'Auto' },
-  { value: 'full-width', label: 'Full Width' },
-  { value: 'grid-2-equal', label: '2-Col Equal' },
-  { value: 'grid-2-left-heavy', label: '2-Col Left' },
-  { value: 'grid-2-right-heavy', label: '2-Col Right' },
-  { value: 'grid-3-bento', label: '3-Col Bento' },
-  { value: 'grid-3-equal', label: '3-Col Equal' },
-  { value: 'stacked', label: 'Stacked' },
-] as const
+// NOTE: The `imageGroup` layout preset picker was removed when the
+// atomic image model shipped — there is no block-level "layout" concept
+// anymore; rows are derived from each image block's `rowBreak` and
+// `widthFraction` fields (see Projects.ts schema). Legacy imageGroup
+// blocks still render via the transitional `getLayoutClass` path in
+// ProjectClient.tsx, but editors now change layout by breaking/merging
+// rows via drag instead of picking from a dropdown. The picker will be
+// fully deleted alongside the imageGroup schema in the `cleanup` task.
 
 export function BlockToolbar({
   index,
@@ -145,8 +141,6 @@ export function BlockToolbar({
   onMoveDown,
   onDelete,
   onInsertAbove,
-  onLayoutChange,
-  currentLayout,
   onLevelChange,
   currentLevel,
   busy,
@@ -158,8 +152,6 @@ export function BlockToolbar({
   onMoveDown: () => void
   onDelete: () => void
   onInsertAbove: (type: BlockType) => void
-  onLayoutChange?: (layout: string) => void
-  currentLayout?: string
   onLevelChange?: (level: string) => void
   currentLevel?: string
   busy: boolean
@@ -189,34 +181,6 @@ export function BlockToolbar({
           <path d="M2.5 6L6 9.5L9.5 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       </ToolbarButton>
-
-      {onLayoutChange && (
-        <>
-          <span className={styles.blockToolbarSep} aria-hidden />
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button size="xs" emphasis="minimal" appearance="neutral" onColor iconOnly aria-label="Image layout" disabled={busy}>
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-                  <rect x="1" y="1" width="4" height="4" rx="0.5" stroke="currentColor" strokeWidth="1" />
-                  <rect x="7" y="1" width="4" height="4" rx="0.5" stroke="currentColor" strokeWidth="1" />
-                  <rect x="1" y="7" width="4" height="4" rx="0.5" stroke="currentColor" strokeWidth="1" />
-                  <rect x="7" y="7" width="4" height="4" rx="0.5" stroke="currentColor" strokeWidth="1" />
-                </svg>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" size="sm" appearance="always-dark">
-              {LAYOUT_OPTIONS.map((opt) => (
-                <DropdownMenuItem
-                  key={opt.value}
-                  onSelect={() => onLayoutChange(opt.value)}
-                >
-                  {currentLayout === opt.value ? `✓ ${opt.label}` : `  ${opt.label}`}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </>
-      )}
 
       {onLevelChange && (
         <>

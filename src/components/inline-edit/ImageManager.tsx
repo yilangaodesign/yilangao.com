@@ -3,6 +3,8 @@
 import { useCallback, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { uploadMedia, updateCollectionField } from './api'
+import { useConfirm } from './ConfirmDelete'
+import { useToast } from './ToastSurface'
 import styles from './inline-edit.module.scss'
 
 type SectionImage = {
@@ -26,8 +28,9 @@ export default function ImageManager({
   busy,
 }: ImageManagerProps) {
   const router = useRouter()
+  const { confirm } = useConfirm()
+  const toast = useToast()
   const [working, setWorking] = useState(false)
-  const [error, setError] = useState<string | null>(null)
   const addInputRef = useRef<HTMLInputElement>(null)
   const replaceInputRefs = useRef<Map<number, HTMLInputElement>>(new Map())
 
@@ -35,7 +38,6 @@ export default function ImageManager({
     async (transform: (imgs: unknown[]) => unknown[]) => {
       if (working || busy) return
       setWorking(true)
-      setError(null)
       try {
         const res = await fetch(`/api/${collection}/${docId}`, { credentials: 'include' })
         if (!res.ok) throw new Error('Failed to fetch project')
@@ -47,20 +49,24 @@ export default function ImageManager({
         await updateCollectionField(collection, docId, 'sections', sections)
         router.refresh()
       } catch (e) {
-        setError(e instanceof Error ? e.message : 'Unknown error')
+        toast.error(e instanceof Error ? e.message : 'Image update failed')
       } finally {
         setWorking(false)
       }
     },
-    [collection, docId, sectionIndex, working, busy, router],
+    [collection, docId, sectionIndex, working, busy, router, toast],
   )
 
   const deleteImage = useCallback(
-    (idx: number) => {
-      if (!window.confirm(`Delete image ${idx + 1}?`)) return
+    async (idx: number) => {
+      const ok = await confirm({
+        title: `Delete image ${idx + 1}?`,
+        description: 'This cannot be undone. The image will be removed from this section.',
+      })
+      if (!ok) return
       patchImages((imgs) => imgs.filter((_, i) => i !== idx))
     },
-    [patchImages],
+    [confirm, patchImages],
   )
 
   const moveImage = useCallback(
@@ -80,7 +86,6 @@ export default function ImageManager({
     async (idx: number, file: File) => {
       if (!file.type.startsWith('image/')) return
       setWorking(true)
-      setError(null)
       try {
         const { id: mediaId } = await uploadMedia(file, file.name.replace(/\.[^.]+$/, ''))
         const res = await fetch(`/api/${collection}/${docId}`, { credentials: 'include' })
@@ -97,29 +102,28 @@ export default function ImageManager({
         await updateCollectionField(collection, docId, 'sections', sections)
         router.refresh()
       } catch (e) {
-        setError(e instanceof Error ? e.message : 'Replace failed')
+        toast.error(e instanceof Error ? e.message : 'Replace failed')
       } finally {
         setWorking(false)
       }
     },
-    [collection, docId, sectionIndex, router],
+    [collection, docId, sectionIndex, router, toast],
   )
 
   const addImage = useCallback(
     async (file: File) => {
       if (!file.type.startsWith('image/')) return
       setWorking(true)
-      setError(null)
       try {
         const { id: mediaId } = await uploadMedia(file, file.name.replace(/\.[^.]+$/, ''))
         patchImages((imgs) => [...imgs, { image: mediaId }])
       } catch (e) {
-        setError(e instanceof Error ? e.message : 'Upload failed')
+        toast.error(e instanceof Error ? e.message : 'Upload failed')
       } finally {
         setWorking(false)
       }
     },
-    [patchImages],
+    [patchImages, toast],
   )
 
   const disabled = working || busy
@@ -218,8 +222,6 @@ export default function ImageManager({
         }}
         tabIndex={-1}
       />
-
-      {error && <span className={styles.imageManagerError}>{error}</span>}
     </div>
   )
 }

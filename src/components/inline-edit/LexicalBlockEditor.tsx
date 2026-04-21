@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { LexicalComposer } from '@lexical/react/LexicalComposer'
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
 import { ContentEditable } from '@lexical/react/LexicalContentEditable'
@@ -18,13 +18,12 @@ import { CodeNode } from '@lexical/code'
 import {
   BLUR_COMMAND,
   COMMAND_PRIORITY_LOW,
-  KEY_ENTER_COMMAND,
   KEY_BACKSPACE_COMMAND,
   KEY_ARROW_UP_COMMAND,
   KEY_ARROW_DOWN_COMMAND,
+  $getRoot,
   $getSelection,
   $isRangeSelection,
-  $getRoot,
 } from 'lexical'
 import type { EditorState, SerializedEditorState } from 'lexical'
 import type { BlockNavCallbacks } from './useBlockKeyboardNav'
@@ -148,41 +147,12 @@ function BlockNavPlugin({
   const [editor] = useLexicalComposerContext()
 
   useEffect(() => {
-    const unregEnter = editor.registerCommand(
-      KEY_ENTER_COMMAND,
-      (event) => {
-        if (event?.shiftKey) return false
-
-        let atEnd = false
-        editor.getEditorState().read(() => {
-          const sel = $getSelection()
-          if (!$isRangeSelection(sel) || !sel.isCollapsed()) return
-          const root = $getRoot()
-          const lastChild = root.getLastDescendant()
-          if (!lastChild) return
-          const anchor = sel.anchor
-          if (anchor.key === lastChild.getKey()) {
-            const len = lastChild.getTextContentSize?.() ?? lastChild.getTextContent().length
-            if (anchor.offset >= len) atEnd = true
-          }
-        })
-
-        if (atEnd) {
-          event?.preventDefault()
-          nav.onEnterAtEnd(blockIndex)
-          return true
-        }
-        return false
-      },
-      COMMAND_PRIORITY_LOW,
-    )
-
     const unregBackspace = editor.registerCommand(
       KEY_BACKSPACE_COMMAND,
       (event) => {
         let atStart = false
         let isEmpty = false
-        editor.getEditorState().read(() => {
+        editor.read(() => {
           const sel = $getSelection()
           if (!$isRangeSelection(sel) || !sel.isCollapsed()) return
           const root = $getRoot()
@@ -208,7 +178,7 @@ function BlockNavPlugin({
       KEY_ARROW_UP_COMMAND,
       () => {
         let atStart = false
-        editor.getEditorState().read(() => {
+        editor.read(() => {
           const sel = $getSelection()
           if (!$isRangeSelection(sel) || !sel.isCollapsed()) return
           const root = $getRoot()
@@ -230,7 +200,7 @@ function BlockNavPlugin({
       KEY_ARROW_DOWN_COMMAND,
       () => {
         let atEnd = false
-        editor.getEditorState().read(() => {
+        editor.read(() => {
           const sel = $getSelection()
           if (!$isRangeSelection(sel) || !sel.isCollapsed()) return
           const root = $getRoot()
@@ -252,7 +222,6 @@ function BlockNavPlugin({
     )
 
     return () => {
-      unregEnter()
       unregBackspace()
       unregUp()
       unregDown()

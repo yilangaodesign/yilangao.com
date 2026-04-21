@@ -1,5 +1,18 @@
 @use '../../styles' as *;
 
+// ── FOOTER-LOCAL BREAKPOINT ───────────────────────────────────────────────
+// The 4-column wide layout (About + Experience + Links + Contact in a single
+// row) requires ~1120px of viewport to fit its minimum column sum without
+// overflowing. Columns: 260 (About) + 240 (Experience, rigid) + 2×180
+// (Links/Contact min) = 860, plus 3×64 column-gap = 192, plus 2×32 padding
+// = 1116. Round up to 1120 for 4px of safety slack. Below this the compact
+// 2-row layout ("About row 1, others row 2") carries over from `$elan-mq-sm`.
+// We deliberately do NOT use `$elan-mq-md` (1056) here because at 1056 the
+// 4-col layout overflows by ~60px, which would push the footer past the
+// viewport and contradict the FB-149 promise that functional chrome is
+// always reachable. See FB-150.
+$footer-wide-mq: '(min-width: 1120px)';
+
 // Shared with home + case studies: main column sits above sticky footer band.
 
 .contentWrapper {
@@ -43,12 +56,49 @@
 .footerColumns {
   display: grid;
   grid-template-columns: 1fr;
-  gap: $portfolio-spacer-3x;
+  gap: $portfolio-spacer-4x;
+  // Mobile only: narrow the stacked column block and float it in the centre
+  // of the footer so the left-aligned section content reads as intentional
+  // rather than hugging the viewport edge. FB-144.
+  max-width: 240px;
+  margin-inline: auto;
 
+  // ── COMPACT DESKTOP (672–1119px) ─────────────────────────────────────────
+  // About section always occupies row 1 on its own (via `grid-column: 1/-1`
+  // on `.footerColumnAbout`). Experience/Links/Contact flow in row 2 via
+  // `auto-fit` and wrap individually as the viewport narrows. This matches
+  // the reference pattern from Numeric's footer (logo on top, columns below
+  // that wrap one-at-a-time). Desktop only — mobile keeps its centred stack
+  // from FB-144. See FB-148.
+  //
+  // Auto-fit floor is 240px so the Experience column never drops below the
+  // width needed to render its longest row ("Lacework (acq. Fortinet) ↗
+  // 2022") on a single line. Combined with `white-space: nowrap` on
+  // `.teamLink`, the one-line-per-company invariant is enforced at both the
+  // text layer and the grid layer — a design rule, not a happy accident of
+  // current content lengths. See FB-150.
   @media #{$elan-mq-sm} {
-    grid-template-columns: repeat(4, auto);
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: $portfolio-spacer-5x $portfolio-spacer-8x;
+    max-width: none;
+    margin-inline: 0;
+  }
+
+  // ── WIDE DESKTOP (≥1120px) ──────────────────────────────────────────────
+  // All 4 sections sit in a single row. About gets a 260–320px track; the
+  // Experience track is a fixed 240px (the content minimum — company name +
+  // arrow + date, with nowrap); Links and Contact share a 180–240px range.
+  // `space-between` absorbs extra horizontal slack into the inter-column
+  // gaps rather than stretching any single column. See FB-150 for why this
+  // triggers at 1120 instead of `$elan-mq-md` (1056) — the 4-col layout's
+  // minimum column sum exceeds the container at 1056.
+  @media #{$footer-wide-mq} {
+    grid-template-columns:
+      minmax(260px, 320px)
+      240px
+      repeat(2, minmax(180px, 240px));
     justify-content: space-between;
-    gap: $portfolio-spacer-8x;
+    gap: $portfolio-spacer-4x $portfolio-spacer-8x;
   }
 }
 
@@ -57,6 +107,24 @@
   flex-direction: column;
   gap: $portfolio-spacer-1x;
   max-width: 240px;
+}
+
+.footerColumnAbout {
+  // About is the priority section — at compact desktop it spans the entire
+  // row so the bio has room to breathe and the three list columns wrap below
+  // as a cohesive group. Content is capped at 360px inside the full-width
+  // track so the bio column doesn't stretch into a single-line paragraph.
+  @media #{$elan-mq-sm} {
+    grid-column: 1 / -1;
+    max-width: 360px;
+  }
+
+  // At wide desktop About returns to an inline cell; the grid template above
+  // gives it a dedicated 260–320px track in column 1.
+  @media #{$footer-wide-mq} {
+    grid-column: auto;
+    max-width: 320px;
+  }
 }
 
 .columnLabel {
@@ -110,6 +178,17 @@ $footer-list-row-block-size: calc(#{$portfolio-type-sm} * #{$portfolio-leading-n
   align-items: center;
   gap: $portfolio-spacer-0-5x;
   transition: color $portfolio-duration-fast $portfolio-easing-standard;
+
+  // ── ONE-LINE-PER-COMPANY INVARIANT ────────────────────────────────────
+  // The company name + arrow must never wrap to a second line. This is a
+  // design rule: an Experience row represents a single job, and the eye
+  // scans names horizontally in the column. A 2-line company name (from a
+  // narrow column OR a long CMS-entered name) breaks that scanning rhythm
+  // and reads as two separate items. Combined with the 240px floor on the
+  // Experience grid track (see `.footerColumns` compact + wide blocks),
+  // this guarantees the rule at the text layer regardless of viewport.
+  // See FB-150.
+  white-space: nowrap;
 
   &:hover { color: $portfolio-text-secondary; }
 }

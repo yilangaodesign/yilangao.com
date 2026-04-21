@@ -6,9 +6,10 @@ import {
   type MouseEvent,
   type ReactNode,
 } from 'react'
-import { createPortal } from 'react-dom'
 import { useRouter } from 'next/navigation.js'
 import { createCollectionItem, deleteCollectionItem } from './api'
+import { ConfirmDelete } from './ConfirmDelete'
+import { useToast } from './ToastSurface'
 import styles from './inline-edit.module.scss'
 
 /* ── Delete Button ── */
@@ -27,85 +28,45 @@ export function DeleteItemButton({
   className,
 }: DeleteItemButtonProps) {
   const router = useRouter()
-  const [confirming, setConfirming] = useState(false)
-  const [deleting, setDeleting] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const toast = useToast()
 
-  const handleClick = useCallback((e: MouseEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setConfirming(true)
-  }, [])
+  const noun = itemLabel ? `"${itemLabel}"` : `this ${collection.replace(/s$/, '')}`
 
-  const handleCancel = useCallback((e: MouseEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setConfirming(false)
-    setError(null)
-  }, [])
-
-  const handleConfirm = useCallback(async (e: MouseEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setDeleting(true)
-    setError(null)
+  const handleConfirm = useCallback(async () => {
     try {
       await deleteCollectionItem(collection, id)
-      setConfirming(false)
+      toast.success(`Deleted ${itemLabel || collection.replace(/s$/, '')}`)
       router.refresh()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Delete failed')
-    } finally {
-      setDeleting(false)
+      toast.error(err instanceof Error ? err.message : 'Delete failed')
+      throw err
     }
-  }, [collection, id, router])
+  }, [collection, id, itemLabel, router, toast])
 
   return (
-    <>
-      <button
-        type="button"
-        onClick={handleClick}
-        className={[styles.collectionDeleteBtn, className].filter(Boolean).join(' ')}
-        title={`Delete ${itemLabel || collection}`}
-        aria-label={`Delete ${itemLabel || collection}`}
-      >
-        <svg width="12" height="12" viewBox="0 0 14 14" fill="none" aria-hidden>
-          <path d="M2 4h10M5 4V2.5h4V4m-5.5 0l.5 8h6l.5-8" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      </button>
-
-      {confirming && createPortal(
-        <>
-          <div className={styles.confirmBackdrop} onClick={handleCancel} />
-          <div className={styles.confirmDialog} role="alertdialog" aria-label="Confirm delete">
-            <p className={styles.confirmMessage}>
-              Delete {itemLabel ? `"${itemLabel}"` : `this ${collection.replace(/s$/, '')}`}?
-              <span className={styles.confirmHint}>This cannot be undone.</span>
-            </p>
-            {error && <p className={styles.confirmError}>{error}</p>}
-            <div className={styles.confirmActions}>
-              <button
-                type="button"
-                className={styles.confirmCancel}
-                onClick={handleCancel}
-                disabled={deleting}
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                className={styles.confirmDelete}
-                onClick={handleConfirm}
-                disabled={deleting}
-              >
-                {deleting ? 'Deleting…' : 'Delete'}
-              </button>
-            </div>
-          </div>
-        </>,
-        document.body,
-      )}
-    </>
+    <ConfirmDelete
+      title={`Delete ${noun}?`}
+      description="This cannot be undone."
+      onConfirm={handleConfirm}
+      trigger={
+        <button
+          type="button"
+          className={[styles.collectionDeleteBtn, className].filter(Boolean).join(' ')}
+          title={`Delete ${itemLabel || collection}`}
+          aria-label={`Delete ${itemLabel || collection}`}
+        >
+          <svg width="12" height="12" viewBox="0 0 14 14" fill="none" aria-hidden>
+            <path
+              d="M2 4h10M5 4V2.5h4V4m-5.5 0l.5 8h6l.5-8"
+              stroke="currentColor"
+              strokeWidth="1.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
+      }
+    />
   )
 }
 
@@ -129,14 +90,13 @@ export function AddItemCard({
   openAfterCreate = false,
 }: AddItemCardProps) {
   const router = useRouter()
+  const toast = useToast()
   const [creating, setCreating] = useState(false)
-  const [error, setError] = useState<string | null>(null)
 
   const handleClick = useCallback(async (e: MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
     setCreating(true)
-    setError(null)
     try {
       const result = await createCollectionItem(collection, defaults)
       if (openAfterCreate && result.id) {
@@ -144,11 +104,11 @@ export function AddItemCard({
       }
       router.refresh()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Create failed')
+      toast.error(err instanceof Error ? err.message : 'Create failed')
     } finally {
       setCreating(false)
     }
-  }, [collection, defaults, openAfterCreate, router])
+  }, [collection, defaults, openAfterCreate, router, toast])
 
   return (
     <button
@@ -156,7 +116,6 @@ export function AddItemCard({
       onClick={handleClick}
       className={[styles.addItemCard, className].filter(Boolean).join(' ')}
       disabled={creating}
-      title={error || undefined}
     >
       {children || (
         <>
@@ -166,7 +125,6 @@ export function AddItemCard({
           <span className={styles.addItemLabel}>
             {creating ? 'Creating…' : label || `Add ${collection.replace(/s$/, '')}`}
           </span>
-          {error && <span className={styles.addItemError}>{error}</span>}
         </>
       )}
     </button>

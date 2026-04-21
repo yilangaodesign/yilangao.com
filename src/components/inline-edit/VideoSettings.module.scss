@@ -1,0 +1,53 @@
+/* VideoSettings — co-located styles for the inline-edit video settings overlay.
+ *
+ * Branding §1.1 forbids border-radius on portfolio UI; every rule here
+ * keeps corners square. Sizing uses design-token spacers so the overlay
+ * parks inside a figure consistently with other inline-edit chrome.
+ */
+
+/* The consumer is responsible for positioning (the case-study page wraps
+ * us in `.figPlaybackToggle` / `.heroPlaybackToggleWrap`, both
+ * absolutely-positioned). We stay `position: relative` so we don't fight
+ * the wrapper. A standalone usage that wants absolute parking should
+ * pass its own `className`.
+ *
+ * `flex-wrap: wrap` because the overlay now carries a tree of controls
+ * (Row 1: Loop/Player + Audio off/on + More-dropdown. Row 2, only when
+ * Audio is on: Muted/Sound). On narrow figures Row 1 itself may wrap. */
+.root {
+  position: relative;
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacer-0-5x, 4px);
+  padding: var(--spacer-0-5x, 4px);
+  background: var(--color-overlay-80, rgba(0, 0, 0, 0.72));
+  color: var(--color-content-on-dark, #fff);
+  pointer-events: auto;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.24);
+}
+
+/* Secondary row (tree child) for default-state control. `flex-basis: 100%`
+ * forces a line break in the flex-wrap container so the Muted/Sound
+ * control sits on its own line beneath the Audio on/off control,
+ * visually signaling the parent/child relationship (the Muted/Sound row
+ * only exists as a consequence of Audio being on). Indentation echoes
+ * the tree hierarchy. */
+.secondaryRow {
+  flex: 0 0 100%;
+  display: flex;
+  align-items: center;
+  padding-left: var(--spacer-1x, 8px);
+}
+
+.hiddenInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

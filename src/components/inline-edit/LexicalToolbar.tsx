@@ -103,7 +103,7 @@ export default function LexicalToolbar() {
   const [position, setPosition] = useState({ top: 0, left: 0 })
 
   const updateToolbar = useCallback(() => {
-    editor.getEditorState().read(() => {
+    editor.read(() => {
       const selection = $getSelection()
       if (!$isRangeSelection(selection)) {
         setIsVisible(false)

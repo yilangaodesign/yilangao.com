@@ -42,7 +42,7 @@ export function SiteFooter({ siteConfig }: { siteConfig: SiteFooterConfig }) {
     <footer className={styles.footer}>
       <div className={styles.footerInner}>
         <div className={styles.footerColumns}>
-          <section className={styles.footerColumn}>
+          <section className={`${styles.footerColumn} ${styles.footerColumnAbout}`}>
             <Eyebrow as="h2" className={styles.columnLabel}>
               <EditableText
                 fieldId="sc:aboutLabel"

@@ -1,5 +1,21 @@
 'use client'
 
+// ---------------------------------------------------------------------------
+// Inline-edit keyboard shortcut reference (single source of truth)
+//
+//   Cmd/Ctrl-S .......... Save all dirty fields.
+//   Esc ................. Discard field edits (when no editable field active).
+//   Cmd/Ctrl-Backspace .. Delete focused structural item (block / section /
+//                         image / collection row) with confirmation; inside
+//                         LexicalBlockEditor, deletes the focused empty or
+//                         hovered-handle paragraph with toast undo. Plain
+//                         Backspace inside text is unchanged (word delete,
+//                         or block-to-block navigation at start).
+//   Alt-Up / Alt-Down ... Move focused structural item up/down. In Lexical,
+//                         the paragraph-row handle binds Alt-Up/Alt-Down to
+//                         swap top-level nodes.
+// ---------------------------------------------------------------------------
+
 import {
   createContext,
   useCallback,
@@ -12,6 +28,8 @@ import {
 import { useRouter } from 'next/navigation.js'
 import type { DirtyField, InlineEditContextValue } from './types'
 import { saveFields } from './api'
+import { ConfirmProvider } from './ConfirmDelete'
+import { InlineToastProvider } from './ToastSurface'
 
 export const InlineEditContext = createContext<InlineEditContextValue | null>(null)
 
@@ -159,7 +177,9 @@ export default function InlineEditProvider({
 
   return (
     <InlineEditContext.Provider value={value}>
-      {children}
+      <InlineToastProvider>
+        <ConfirmProvider>{children}</ConfirmProvider>
+      </InlineToastProvider>
     </InlineEditContext.Provider>
   )
 }
