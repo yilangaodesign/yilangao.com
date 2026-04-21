@@ -71,6 +71,10 @@ export default function NavigationPage() {
               <span className="text-accent shrink-0">&bull;</span>
               Hover on logo text transitions to <code className="text-xs bg-muted px-1.5 py-0.5 rounded-sm font-mono">text-neutral-max</code> (darkest in DS).
             </li>
+            <li className="flex gap-2">
+              <span className="text-accent shrink-0">&bull;</span>
+              Responsive identity hierarchy: the logo (mark + &ldquo;Yilan Gao&rdquo;) is rigid and never wraps or shrinks. The tagline is elastic - wraps to a second line under squeeze, capped at two lines via <code className="text-xs bg-muted px-1.5 py-0.5 rounded-sm font-mono">-webkit-line-clamp: 2</code>. See <code className="text-xs bg-muted px-1.5 py-0.5 rounded-sm font-mono">docs/design/branding.md</code> &sect;8.
+            </li>
           </ul>
         </div>
 

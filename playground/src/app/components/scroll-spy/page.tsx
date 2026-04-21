@@ -134,6 +134,10 @@ export default function ScrollSpyPage() {
               <span className="text-accent shrink-0">&bull;</span>
               <span><strong>Click:</strong> Clicking a notch scrolls to that section smoothly.</span>
             </li>
+            <li className="flex gap-2">
+              <span className="text-accent shrink-0">&bull;</span>
+              <span><strong>Auto-contrast label:</strong> The current notch&apos;s label is portaled to <code className="text-xs bg-muted px-1.5 py-0.5 rounded-sm font-mono">document.body</code> and uses <code className="text-xs bg-muted px-1.5 py-0.5 rounded-sm font-mono">mix-blend-mode: difference</code> with <code className="text-xs bg-muted px-1.5 py-0.5 rounded-sm font-mono">color: #fff</code>. It automatically inverts against whatever background sits behind it — black text on light sections, white text on dark sections, inverse color on photographic backgrounds. Only the active/drag-targeted label gets this treatment; other labels shown on hover keep their token-driven colors.</span>
+            </li>
           </ul>
         </div>
 
@@ -151,6 +155,10 @@ export default function ScrollSpyPage() {
             <li className="flex gap-2">
               <span className="text-accent shrink-0">&bull;</span>
               <span>State styling uses <code className="text-xs bg-muted px-1.5 py-0.5 rounded-sm font-mono">data-active</code>, <code className="text-xs bg-muted px-1.5 py-0.5 rounded-sm font-mono">data-dragging</code>, and <code className="text-xs bg-muted px-1.5 py-0.5 rounded-sm font-mono">data-hovered</code> attributes.</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="text-accent shrink-0">&bull;</span>
+              <span>The active label is rendered via <code className="text-xs bg-muted px-1.5 py-0.5 rounded-sm font-mono">createPortal</code> to escape the rail&apos;s fixed-position stacking context — required because <code className="text-xs bg-muted px-1.5 py-0.5 rounded-sm font-mono">mix-blend-mode</code> only blends against the parent stacking context&apos;s backdrop. Position stays synced via a <code className="text-xs bg-muted px-1.5 py-0.5 rounded-sm font-mono">getBoundingClientRect</code> read on the active tick.</span>
             </li>
             <li className="flex gap-2">
               <span className="text-accent shrink-0">&bull;</span>

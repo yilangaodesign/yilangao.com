@@ -56,6 +56,7 @@ import Loader from "lucide-react/dist/esm/icons/loader";
 import Columns from "lucide-react/dist/esm/icons/columns";
 import Code2 from "lucide-react/dist/esm/icons/code-2";
 import Heading from "lucide-react/dist/esm/icons/heading";
+import AlertTriangle from "lucide-react/dist/esm/icons/alert-triangle";
 import { cn } from "@/lib/utils";
 import { elan } from "@/lib/elan";
 import s from "./sidebar.module.scss";
@@ -214,6 +215,7 @@ const componentCategories: NavCategory[] = [
     section: "Components",
     links: [
       { href: "/components/command-menu", label: "CommandMenu", icon: Search, group: "Overlays" },
+      { href: "/components/alert-dialog", label: "AlertDialog", icon: AlertTriangle, group: "Overlays" },
       { href: "/components/dialog", label: "Dialog", icon: PanelTopOpen, group: "Overlays" },
       { href: "/components/dropdown-menu", label: "DropdownMenu", icon: ListFilter, group: "Overlays" },
       { href: "/components/menu", label: "Menu", icon: List, group: "Overlays" },
@@ -230,7 +232,9 @@ const componentCategories: NavCategory[] = [
     section: "Components",
     links: [
       { href: "/components/marquee", label: "Marquee", icon: Repeat },
+      { href: "/components/media-mute-toggle", label: "MediaMuteToggle", icon: ToggleRight },
       { href: "/components/testimonial-card", label: "TestimonialCard", icon: MessageSquare },
+      { href: "/components/video-embed", label: "VideoEmbed", icon: Play },
     ],
   },
   {
