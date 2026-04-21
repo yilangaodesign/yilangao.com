@@ -54,7 +54,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Eyebrow } from "@/components/ui/Eyebrow";
-import { InfoTooltip } from "@/components/ui/Tooltip";
+import { InfoTooltip, Tooltip } from "@/components/ui/Tooltip";
 import MediaRenderer from "@/components/ui/MediaRenderer/MediaRenderer";
 import { VideoEmbed } from "@/components/ui/VideoEmbed";
 import { Dropzone } from "@/components/ui/Dropzone";
@@ -854,7 +854,7 @@ export default function ProjectClient({
           {hasMedia ? (
             <figure className={styles.sectionFigure}>
               <MediaRenderer
-                src={img.url}
+                src={img.url!}
                 mimeType={img.mimeType}
                 playbackMode={img.playbackMode}
                 audioEnabled={img.audioEnabled}
