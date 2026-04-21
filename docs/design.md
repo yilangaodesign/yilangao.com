@@ -4,7 +4,7 @@
 >
 > **Who reads this:** AI agents routed here by `AGENTS.md` Pre-Flight. Read the Section Index first, then open only the spoke file matching your task.
 > **Who writes this:** AI agents after processing user feedback via the `design-iteration` skill.
-> **Last updated:** 2026-04-06 (7.10: Composite components must compose DS primitives)
+> **Last updated:** 2026-04-20 (FB-155: ScrollSpy active label auto-contrast via `mix-blend-mode: difference` on a `document.body`-portaled span. New anti-pattern AP-069 on `mix-blend-mode` inside stacking-context-creating ancestors. Content-navigation frequency bumped to 3.) Prior: 7.10 (Composite components must compose DS primitives).
 
 ---
 
@@ -200,7 +200,7 @@ When a design system primitive exists for a UI role (for example `Avatar`), comp
 | Interaction friction (click vs. hover for exploration) | 1 | High |
 | Corner radius too large | 1 | High |
 | Color philosophy / palette governance | 1 | High |
-| Content navigation policy (ScrollSpy threshold, scroll offset) | 2 | High |
+| Content navigation policy (ScrollSpy threshold, scroll offset, auto-contrast label) | 3 | High — FB-155: ScrollSpy active label portaled to `document.body` with `mix-blend-mode: difference` + `color: #fff` so it auto-inverts against any backdrop (dark hero, photographic section, colored block). See AP-069. |
 | Portfolio grid density / scannability | 1 | High |
 | Homepage IA / nav consistency / mobile density | 1 | High |
 | User-centric information filtering (no implementation details in user UI) | 2 | High — FB-100: Removed token names, rem values from inline edit toolbar menus. Established §7.8. |
@@ -211,7 +211,7 @@ When a design system primitive exists for a UI role (for example `Avatar`), comp
 | Admin controls displacing component content (overlay separation) | 2 | High — FB-105: drag handle as invisible flex child indented block list 24px. |
 | Interactive visual scoping (content must match section topic) | 1 | High |
 | False affordances (static elements styled as interactive) | 1 | High |
-| Responsive breakpoints / cross-app parity | 1 | High |
+| Responsive breakpoints / cross-app parity | 2 | High — FB-144: Mobile footer block narrowed and centred via `max-width` + `margin-inline: auto` on the stack container (not per-child), reset at `$elan-mq-sm`. |
 | DS compliance (token adoption, mixin usage, brand color) | 2 | High - FB-120: TestimonialCard now composes DS Avatar in visitor + admin paths. |
 | Undocumented patterns (gradient bg, masonry, dark surface alpha) | 1 | Medium |
 | Button component sizing (icon/label proportionality, vertical padding) | 1 | High |
@@ -228,6 +228,7 @@ When a design system primitive exists for a UI role (for example `Avatar`), comp
 | Selection highlight as brand micro-touchpoint | 1 | Medium — FB-130: `::selection` background with brand palette (Terra-20) instead of browser default blue. |
 | Footer/form left-edge alignment in narrow cards | 1 | Medium — FB-127: Centered footer under left-aligned form creates jagged left column. See AP-065. |
 | Button states on colored surfaces (solid vs overlay) | 1 | High — FB-136: `onColor` prop swaps solid hover/active to transparent overlays for tinted backgrounds. |
+| Navigation identity hierarchy (rigid logo vs elastic tagline under flex compression) | 1 | Critical — FB-146: Logo must never wrap or shrink; tagline may wrap to two lines with line-clamp ceiling. See branding.md §8 and AP-066. |
 
 ---
 

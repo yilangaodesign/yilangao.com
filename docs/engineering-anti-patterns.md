@@ -4,7 +4,7 @@
 >
 > **Who reads this:** AI agents before making code changes — scan for relevant anti-patterns.
 > **Who writes this:** AI agents when an incident reveals a new anti-pattern.
-> **Last updated:** 2026-04-17 (EAP-088: archived page files left at original route path — Next route group silent shadowing; ENG-151)
+> **Last updated:** 2026-04-20 (EAP-110: Reorder-only DnD on a 2-D layout — DnD handlers read only `over.id` and call a pure-reorder primitive, so any operation that needs to change a *relationship* between dragged and target (join a row, split a row, nest, re-parent) silently no-ops. Fires whenever the data model has a relationship bit (row/column/parent pointer) and the layout is 2-D. Fix requires three coordinated changes: (1) intent capture in `handleDragOver` reading `dx`/`dy` between `active.rect` and `over.rect` centers, (2) an atomic transform primitive that does splice + bit flip in one patch, not splice + post-hoc normalize, (3) expanded `dropPosition` vocabulary (`'before' | 'after' | 'left' | 'right'`) so the visual hint can reflect the intent on the axis that matches the layout. ENG-179.) Prior: EAP-108: Gated todo never re-probed after the gate clears — a task blocked on an operational condition (dev server down, data not yet migrated, external quota) gets marked `pending`/`blocked` and the work moves on. When the gating condition later resolves, nothing automatically re-probes; the gated todo sits indefinitely and the feature it gates ships as "done from the code side" while the runtime is still broken. ENG-176 landed a per-image DnD refactor that required the imageGroup → atomic migration to have run; the `run-migration` todo was gated on the EAP-042 dev-server instability and never re-probed when the server recovered. Result: the user tested on live imageGroup data and saw zero DnD change because none of the atomic-image render branches were reachable. Prevention: when declaring a feature complete, re-check every gated todo that mentions the feature's runtime dependencies; a gated todo is feature-incomplete, not workstream-complete. ENG-177. EAP-109: Flat-model migration drops empty slots from a union-ish source model — when moving from (container with N filled children + M scaffold slots) to (flat sequence of atoms), picking `N if N > 0 else M` silently drops the scaffold slots the moment any child is filled. The migration looks clean on empty and fully filled containers but deletes author-declared slot intent on partially filled ones — exactly the most common live state. Fix: iterate `max(N, M)`; emit filled slots with media and empty slots with their label. Prevention: before a union-to-flat migration ships, write out the transform against (a) empty, (b) partially filled, (c) fully filled, (d) over-scaffolded (more labels than images) — and verify each case individually. ENG-177.) Prior: EAP-107: Sortable unit locked to the visual unit rather than the data unit — after the atomic-image migration, `displayIds` and `handleDragEnd` in `ProjectClient.tsx` emitted one id per display-item (one per row-of-N-images) even though the data atom was a single `image` block. Drag worked mechanically but users could not move individual images inside a row, pull one out to split, or reorder within. Three iterations (ENG-171 merge heuristic → ENG-174 revert → ENG-175 optimistic state) all validated block-level DnD against the wrong target. Fix: flattened `displayIds` to one id per `contentBlocks` entry; added `blockIdToCmsIndex`; rewrote `handleDragEnd` as a single-block move; wrapped each image inside a multi-image row in its own `<SortableBlock>`; switched to `rectSortingStrategy`; added `normalizeImageRowBreaks` helper invoked from both reorder primitives in `useBlockManager`. Lesson: at DnD design time, the sortable id list must be flat at the data-atom level. If the data atom is smaller than the visual container, locking the sortable to the container permanently splits what should be a single affordance into a drag + parallel surface (buttons, heuristics). Grouping is a rendering concern; sortability is a data concern. ENG-176.) Prior: EAP-106: Heuristic whose discriminating signal is invariant across the dominant data distribution — ENG-171 shipped a merge-on-drop heuristic that compared horizontal centers of the dragging row and the over row, with the assumption that side-drops would show a different horizontal offset than above/below-drops. After the atomic-image migration, every image block defaults to `rowBreak: true` so every row renders at full page width, giving every pair of rows identical horizontal centers. The heuristic fired on 100% of drops, silently rerouting every reorder into a merge. Fix: reverted the merge branch in `handleDragEnd`; drag is reorder-only. `mergeImageRangeIntoRow` retained in `useBlockManager` for a future explicit merge UI. Lesson: before shipping a heuristic, write down its discriminating signal's variance on the dominant data distribution — when variance is near zero, switch to explicit UI rather than stacking defensive gates. ENG-174.) Prior: EAP-105: Integer scaffolding values carried forward without re-ranking — the `order` field on every project's `update-*/route.ts` was set once at scaffold time and never revisited. New projects claimed the next free integer; old projects kept their original rank. Result: the home page's case-study order encoded CMS-migration sequence rather than portfolio narrative priority for ~21 days. Any integer-ranking field that lives across N files MUST be re-validated against the full set whenever any one file changes. ENG-168 / CFB-038 / CAP-031.) Prior: EAP-102 (class-name-from-the-wrong-module silent bug — `styles.foo` resolves to `undefined` when the imported CSS Module doesn't export `foo`. Browser and compiler stay silent; the rule looks right, the DOM looks unstyled. EAP-103: hand-rolled `<button>` / `<div onClick>` in admin or CMS overlay surfaces — every destructive or state-mutating control inside an inline-edit overlay must compose `@ds/Button`, `@ds/DropdownMenu`, `@ds/Tooltip`, and the destructive path must go through §14 (`useConfirm` + `toast.undoable`); ENG-162.) Prior: EAP-101 (sparse-array PATCH bodies from `setNested({}, fieldPath, value)` on array-indexed paths serialize with leading `null`s and crash Payload with HTTP 500; ENG-165.)
 
 ## Category Index
 
@@ -12,16 +12,18 @@
 |----------|---------|--------|-------|
 | Cross-App Parity & Token Sync | EAP-001, EAP-004, EAP-005, EAP-007, EAP-028, EAP-041 | 6 active | 6 |
 | Playground | EAP-006, EAP-037, EAP-038†, EAP-042, EAP-055 | 5 active | 5 |
-| CMS / Payload Schema | EAP-015, EAP-019, EAP-021, EAP-026, EAP-030, EAP-033, EAP-034, EAP-062 | 7 active · 1 resolved | 8 |
-| CMS / Inline Edit | EAP-016, EAP-023, EAP-029 | 3 active | 3 |
-| Save Flow / Error Handling | EAP-017, EAP-018, EAP-020, EAP-024 | 4 active | 4 |
+| CMS / Payload Schema | EAP-015, EAP-019, EAP-021, EAP-026, EAP-030, EAP-033, EAP-034, EAP-062, EAP-090 | 8 active · 1 resolved | 9 |
+| CMS / Inline Edit | EAP-016, EAP-023, EAP-029, EAP-091, EAP-092, EAP-093, EAP-102, EAP-103 | 8 active | 8 |
+| Save Flow / Error Handling | EAP-017, EAP-018, EAP-020, EAP-024, EAP-101 | 5 active | 5 |
 | Hydration / SSR / React State | EAP-013, EAP-014, EAP-022, EAP-054, EAP-056 | 5 active | 5 |
 | Build / Toolchain / CSS | EAP-011, EAP-012, EAP-031, EAP-035, EAP-038‡, EAP-039, EAP-040, EAP-069, EAP-072, EAP-077, EAP-078, EAP-080, EAP-088 | 13 active | 13 |
-| Documentation Process | EAP-008, EAP-010, EAP-027, EAP-032 | 4 active | 4 |
-| Dev Workflow | EAP-002, EAP-003, EAP-009, EAP-068, EAP-073 | 5 active | 5 |
-| Interaction / DOM | EAP-025, EAP-036, EAP-053 | 3 active | 3 |
+| Documentation Process | EAP-008, EAP-010, EAP-027, EAP-032, EAP-094 | 5 active | 5 |
+| Dev Workflow | EAP-002, EAP-003, EAP-009, EAP-068, EAP-073, EAP-108 | 6 active | 6 |
+| Interaction / DOM | EAP-025, EAP-036, EAP-053, EAP-106, EAP-107, EAP-110 | 6 active | 6 |
 | Deployment / CI Build | EAP-060, EAP-061, EAP-079 | 3 active | 3 |
-| **Total** | | **52 active · 1 resolved** | **53** |
+| Media & Asset Delivery | EAP-098, EAP-099, EAP-100 | 3 active | 3 |
+| Data Migration | EAP-109 | 1 active | 1 |
+| **Total** | | **68 active · 1 resolved** | **69** |
 
 > † EAP-038 "One-Way Playground Experiment" · ‡ EAP-038 "SCSS Modules with `@use` Under Turbopack" — duplicate ID, two distinct entries.
 
@@ -1491,3 +1493,639 @@ The parent layout always sees a constant box. Any content that exceeds the heigh
 3. Grep the whole `src/app/` tree for duplicate `page.tsx` at the same URL resolution. In particular, remember that `app/X/page.tsx` and `app/X/(group)/page.tsx` resolve to the same URL.
 
 **Incident:** ENG-151 (2026-04-17) — Old `src/app/(frontend)/page.tsx` + `HomeClient.tsx` (v1 masonry homepage) remained on disk after ENG-145 (2026-04-09) copied them into `archive/homepage-v1/pages/`. Both shadowed the canonical `src/app/(frontend)/(site)/page.tsx`. User reported the wrong homepage was served on localhost:4000 after `boot up`. Fix: deleted the two shadowing files; new homepage served immediately after cache flush.
+
+---
+
+## EAP-089: Gating Admin-Only UI on a Plumbing Prop That Happens to Be Truthy
+
+**Trigger:** A UI section that should only render for admins (or only render when it has data, for visitors) is wrapped in `{(someTargetProp || value) && (...)}` where `someTargetProp` is a plumbing object like `editTarget`, `projectTarget`, `cmsId` — something whose truthiness mostly tracks "we have enough info to save this field," not "the current viewer is an admin."
+
+**Why it's wrong:** Plumbing props and mode flags look similar in code but diverge on the published site. `projectTarget = p.id ? { type: 'collection', slug: 'projects', id: p.id } : undefined` is truthy for *every* project that has an id — which is every published project. A guard like `{(projectTarget || items.length > 0) && (...)}` therefore **always renders**, whether the viewer is admin or not. The first time the author writes it, the behavior looks correct because they test it in admin mode and see the section. The bug only surfaces on the published site when an optional field is empty — by which time the author is long gone from the code. The archive shows this class of bug regressing: an earlier fix (2026-04-08) used `projectTarget` as shorthand for "editing mode" and shipped a guard that never actually hid anything. The error is impossible to catch by local testing in admin mode; it requires either an explicit visitor-mode test or an explicit type distinction between "plumbing" and "mode."
+
+**Correct alternative:** The only correct gate for "this element should appear in admin mode but not on the published site" is the explicit mode flag — in this codebase, the `isAdmin` prop. Use `{(isAdmin || <field has data>) && (...)}` for optional meta fields. For the editable-vs-plain fallback *inside* a rendered section, combine both: `{isAdmin && projectTarget ? <EditableText …/> : <span …/>}`. `projectTarget` stays in the conjunction because the editable component literally requires the target plumbing; `isAdmin` makes the mode gate explicit and visible.
+
+**Naming rule:** Props named `*Target`, `*Id`, `cms*` describe *what the component can save to*, not *who is looking*. Mode flags are named `isAdmin`, `isEditing`, `mode === 'edit'` — they describe the viewer. Never substitute one for the other, even when they happen to coincide in your test environment.
+
+**Incident:** ENG-153 (2026-04-19) — Case study sidebar "LINKS" eyebrow rendered on the published site for a project with no external links. The guard `(projectTarget || p.externalLinks.length > 0)` always evaluated to `true` because `projectTarget` was defined for every project with an id. Also applied to Role / Collaborators / Duration / Tools in the same sidebar (they happened to always have values on existing projects, so no visible regression — but the same mis-gate was there). Fix: replaced `projectTarget` with `isAdmin` in all five `metaGroup` render gates and in the inner editable-vs-plain branches.
+
+---
+
+## EAP-090: Parallel Content Pipelines on a Block-Editor Page
+
+**Trigger:** A page that already has a typed block array (`content[]`) with full inline-edit chrome (insert above/below, move, delete, change type) *also* renders a user-content paragraph from a separate top-level field, via its own dedicated render path. Common shapes: a "legacy" or "predecessor" field (`description`, `excerpt`, `intro`, `sections`) that shipped before the block system landed, kept "for now" as a fast render path, never reconciled. Another shape: a "canonical" field whose author thought it was too important to express as just another block.
+
+**Why it's wrong:** The block editor's affordances are architecturally bound to the block array. `BlockToolbar`, `BetweenBlockInsert`, `addBlock`, `moveBlock`, and every hover UI reads positions and types from `content[]`. Anything rendered outside that array is permanently invisible to the block UI — no amount of CSS or JSX wrapping can retroactively attach toolbar chrome to a paragraph that doesn't have an index in the block list. Users discover this as "I can't insert a block above this paragraph" (hover has no `BetweenBlockInsert` there) or "I can't delete/move this paragraph" (no `BlockToolbar` wraps it). The cost compounds: every new block type, every new toolbar action, every new keyboard shortcut has to be retrofitted against the legacy path, or the page has two inconsistent editing experiences forever. And because the legacy field is usually rendered at a fixed position (top of page, above `content[]`), users can't even move the block list *above* the legacy field, so the page layout itself is frozen.
+
+**Correct alternative:** One content pipeline per page. If a page uses `content[]`, every user-editable text paragraph on that page lives inside `content[]`. Three options:
+1. **Prefer: synthesize from seeding.** Make the seeding helper (e.g. `createCaseStudyBlocks`) always synthesize a well-known block at a known index (`content[0]` or `content[1]` after hero). Callers pass raw markdown, the helper emits a standard `richText` block. Users see it as an ordinary block, with full affordances. This is how scope statements are handled post-ENG-154.
+2. **If the content has distinct semantics:** Add a new `blockType` to the blocks config (e.g. `blockType: 'scopeStatement'`). Gives type-safe rendering, distinct styling, and still lives in `content[]` with full block affordances. Heavier — requires a new Payload block schema, a new renderer branch, and parity updates.
+3. **Do not:** Add a second top-level richText field and render it inline. That's exactly the pattern this anti-pattern prohibits.
+
+**Migration pattern for legacy fields:** When an old top-level field already has data in production, write a one-time, idempotent migration endpoint: for each document, if the legacy field has content, insert a new block at the canonical index and clear the legacy field. Check idempotency by plain-text match of the target index. Gate with `NODE_ENV !== 'production'` or a dev-only secret. After migration, delete the render path and hide the field in the admin (`admin: { condition: () => false }`) — do **not** remove from schema, so the migration can read existing rows and rollback is possible.
+
+**Incident:** ENG-154 (2026-04-19) — Case study pages rendered a scope-statement paragraph from the top-level `description` field, at a fixed position between hero and `content[]`. Hovering it showed no `BetweenBlockInsert` above (there was no "above" in the block system), no `BlockToolbar`, no way to change type or move it. Root cause: `ProjectClient.tsx` had a dedicated `{p.description && <FadeIn><div id="overview">…</div></FadeIn>}` branch outside the block loop. The identical pattern had already been resolved once for a legacy `sections` field, but the general principle wasn't codified. Fix: migrated every project's `description` into `content[heroIdx+1]` as a `richText` block via `/api/migrate-description-to-block`, taught `createCaseStudyBlocks` to always emit the scope statement as a managed block, deleted the render branch in `ProjectClient.tsx`, hid the field in the schema. Every case study now has exactly one content pipeline.
+
+---
+
+## EAP-094: Trusting a Continuation Summary Over the Filesystem
+
+**Trigger:** A session resumes or compacts context, producing a summary that describes past work as "completed." The agent then proceeds to the next step (verification, response, new task) without actually reading the files the summary claims were edited. The summary is treated as ground truth about the state of the filesystem.
+
+**Why it's wrong:** Continuation summaries describe *intent and belief*, not disk state. They're produced from the agent's memory of what it said it would do, not from a post-hoc `git diff`. When an edit was planned but interrupted, or was attempted but failed silently (e.g. a tool call that didn't land, a multi-step edit where only the first step completed before compaction), the summary will still list it as completed — because the agent *intended* it to be completed. The agent then writes a response to the user that asserts the edit as a fact. The user discovers the missing edit in the UI; the trust cost is high and recurring.
+
+**The specific failure shape from ENG-156:** After a summary claimed "deleted legacy `description` render path from `ProjectClient.tsx`," the agent moved directly to verification without `git diff` or `Grep` against the file. The verification step then picked a generic structural marker (`data-block-index` count, HTTP 200) that passes whether or not the deletion actually happened. The response to the user claimed "legacy description is gone" while the literal `<p class="legacyDescriptionText">Project description.</p>` element was still served on every case study — including being *supplied* by an unrelated fallback string in `page.tsx` (`descPlain = extractLexicalText(doc.description) || "Project description."`) that was also described as deleted but wasn't.
+
+**Correct alternative — three-part ground-truth check at every session boundary:**
+1. **Before trusting any "completed" bullet in a summary, `git diff <file>` or `Grep` for the strings the edit was supposed to remove/add.** If the diff doesn't contain the expected change, the edit didn't land — redo it, don't assume.
+2. **Verify for the bug, not for the framework.** If the user complained about a specific element (`legacyDescriptionText`, a particular text string, a specific class), `curl` and grep for *that*. Generic markers (HTTP 200, block count, "page renders") confirm the page is alive, not that the specific bug is fixed. The correct verification question is always: "would the user's original complaint still be true after my change?" — and the test has to target the exact thing they complained about.
+3. **Distinguish "the edit is described in my summary" from "the edit is in the working tree."** These are different propositions and only one of them is a fact. A summary bullet is never sufficient evidence that a file changed on disk.
+
+**Related anti-patterns:** EAP-010 / EAP-027 (documentation as pre-condition — the documentation half of this failure). EAP-020 family (verification gaps — this is the post-resumption variant). Hard Guardrail #10 (localhost verification — this is the specific reinforcement that structural markers don't substitute for distinctive-string grep).
+
+**Incident:** ENG-156 (2026-04-19) — User reported seeing `<p>Project description.</p>` on every case study under `#overview`, with no editing affordances, immediately after ENG-154 was reported resolved. Root cause: two files (`ProjectClient.tsx`, `page.tsx`) described as edited in the continuation summary were never actually touched. The placeholder text `"Project description."` was even being supplied by a fallback in `page.tsx` that the summary claimed had been removed. Verification in the prior turn grepped for `data-block-index` (which passed trivially) instead of `legacyDescription` or `"Project description"` (which would have immediately exposed the regression). Fix: reread both files, executed the real deletions, grepped for the exact bug strings across all four case studies — zero matches confirms the fix. Pattern recorded because this is the second instance in two sessions where a continuation summary's completion claim was accepted without a filesystem check.
+
+---
+
+## EAP-091: Using `window.confirm` (or Hand-Rolled Portals) in Inline-Edit Paths
+
+**Trigger:** A destructive inline-edit action (delete block / section / image / array item / row) falls back to `window.confirm("…")`, a hand-rolled `createPortal` dialog, or an ad-hoc confirmation state per component.
+
+**Why it's wrong:** Browser `window.confirm` is not themable, not focus-trapped, not announceable to screen readers beyond the browser default, and blocks the main thread. A hand-rolled portal dialog looks correct in one component but drifts — its a11y attributes, focus management, backdrop click behavior, keyboard shortcuts, and styles diverge from every other confirmation surface in the app. Four primitives each with their own confirmation means four different looks, four different keyboard contracts, and four separate places to find a bug when one of them misbehaves. A single DS `AlertDialog` on Radix primitives gives us focus trap, `role="alertdialog"`, themed surfaces, and a single place to change the look.
+
+**Correct alternative:** Import the declarative `ConfirmDelete` (for one-off triggers) or the imperative `useConfirm()` hook (for flows where the confirm has to be awaited inside an async operation) from `src/components/inline-edit/`. Both are mounted under `ConfirmProvider` inside `InlineEditProvider`, so any descendant can call `await confirm({ title, description })` and get a boolean back. Never import `window.confirm` from anywhere in `src/components/inline-edit/` — treat it as a banned API in that tree.
+
+**Incident:** ENG-155 (2026-04-19) — `SectionManager.deleteSection`, `ImageManager.deleteImage`, `CollectionActions.DeleteItemButton`, and `useBlockManager.deleteBlock` all had different confirmation behavior: the first two used `window.confirm`, the third used a hand-rolled portal, and the fourth had no confirmation at all. Migrated every destructive delete to `useConfirm()` / `ConfirmDelete` backed by the new DS `AlertDialog` component. `useBlockManager` gained a `confirmDeleteBlock` async wrapper so toolbar triggers go through confirm while keyboard-at-start fall-through deletes (empty-block merge) can still go direct.
+
+---
+
+## EAP-092: Building Parallel Modal Systems Instead of Reusing `@ds/Dialog` + `@ds/AlertDialog`
+
+**Trigger:** A feature needs a modal (edit panel, picker, confirmation). Instead of reaching for the DS dialog primitives, the agent builds a new overlay: a fixed-position `<div>` with a manual backdrop, its own open state, its own escape-key handling, and its own focus management.
+
+**Why it's wrong:** Modals are high-leverage surfaces for consistency — bad ones are immediately visible and a11y-hostile. Radix Dialog / AlertDialog give us focus trap, `aria-labelledby`, Escape to close, backdrop click, scroll-lock, and portal semantics in ~3 lines of usage. A parallel system that re-implements even one of those incorrectly (a missing focus trap, a backdrop that closes a destructive confirm too eagerly) is a regression. Worse, every parallel modal has to be individually audited when the brand changes, because it doesn't consume shared tokens.
+
+**Correct alternative:** Use `@ds/Dialog` for dismissable modals where any action (including backdrop click) is safe (edit panels, pickers, inline popovers). Use `@ds/AlertDialog` for destructive confirmation — it intentionally does **not** close on backdrop click, because a stray click shouldn't delete a block. If a new primitive is genuinely needed (rare), promote it to `@ds/*` first, then consume it — never inline a modal in a feature directory.
+
+**Incident:** ENG-155 (2026-04-19) — `CollectionActions` had a hand-rolled portal dialog with a manual backdrop and keyboard handler that predated the existence of a DS confirmation primitive. Replaced by adding `AlertDialog` to the DS, registering it in `archive/registry.json`, shipping a playground page at `playground/src/app/components/alert-dialog/page.tsx`, and refactoring `DeleteItemButton` onto `ConfirmDelete`. The old CSS block in `inline-edit.module.scss` was removed so nothing in the tree could fall back to the parallel system.
+
+---
+
+## EAP-093: Building a Second Toast / Announcement System Inside a Feature
+
+**Trigger:** A feature needs to announce a success, an error, an undoable action, or a long-running state. Instead of using the shared toast surface, it invents a local pattern: a `setError` state rendered as a `<span>` next to the control, a `#live-region` `aria-live` div, or a per-component banner.
+
+**Why it's wrong:** Three consequences, in order of how often they bite: (1) **Errors disappear with the component** — if the element unmounts during the operation that failed, the error has no render target. (2) **Screen reader behavior is inconsistent** — some paths announce via `aria-live`, some via `role="status"`, some not at all. (3) **Undo is impossible** — local error state can't express "I did a thing, you have N seconds to undo it" because it has no timing model or action slot. A shared toast system with `success` / `error` / `info` / `undoable` solves all three.
+
+**Correct alternative:** Call `const toast = useToast()` inside any component under `InlineEditProvider` and use `toast.success(msg)`, `toast.error(msg)`, `toast.info(msg, { description, duration })`, or `toast.undoable({ message, onUndo, duration })` for destructive structural ops. Deletions of content rows (Lexical paragraphs, array items, blocks) should prefer `toast.undoable` so the admin can recover from a mistake without navigating through the CMS. Never create a new "live region" div or per-component error span.
+
+**Incident:** ENG-155 (2026-04-19) — `useBlockManager`, `SectionManager`, `ImageManager`, `ImageUploadZone`, and `CollectionActions.AddItemCard` each had a local `error` state rendered inline, plus a parallel `#block-live-region` div for screen readers. Added `InlineToastProvider` + `useToast()` on `@radix-ui/react-toast`, mounted inside `InlineEditProvider` (wraps `ConfirmProvider`). Replaced every `setError` call with a `toast.error()`, deleted `#block-live-region`, and added `toast.undoable` for Lexical paragraph deletes (`ParagraphRowPlugin` snapshots the editor state before delete and replays it on undo). Every structural error now flows through one announced, accessible, dismissable surface.
+
+## EAP-098: Serving Supabase Storage Uploads Through Payload's `/api/media/file/*` Proxy
+
+**Status: ACTIVE**
+
+**Trigger:** Using `@payloadcms/storage-s3` against Supabase Storage with the shorthand `collections: { media: true }`, so `media.url` resolves to `/api/media/file/<filename>` (Payload's access-control proxy) instead of the direct Supabase public URL.
+
+**Why it's wrong:** Three compounding consequences:
+
+1. **Video never plays on refresh.** Payload's Node static handler streams binaries through the app process without advertising `accept-ranges: bytes`. Browsers that can't range-request a video either restart the download from byte 0 on every seek or give up waiting for metadata. Anything over a few MB stalls — the skeleton placeholder stays up forever.
+2. **Zero CDN benefit.** Every media read is an app-server request on the site's own domain, sharing the process with authenticated CMS traffic. Cloudflare's cache in front of Supabase never sees the request, so there's no edge caching, no ETag validation, no `Cache-Control` benefit. Frontend asset preloading (`PreloadManager`) is also defeated — the "cached" binary is only cached in JS memory, not on disk.
+3. **Hard 404s on filename-drift.** Payload's static handler resolves by looking up a media doc whose `filename` equals the URL segment. Any mismatch — a rename hook that didn't re-save, a legacy record with a different filename in the column, case sensitivity, URL-encoding — returns 404. The symptom is indistinguishable from "file missing from storage" even though the file exists in the bucket.
+
+**Correct alternative:** In `src/payload.config.ts`, the `media` entry of `s3Storage({ collections })` must be an **object** with both flags:
+
+```ts
+s3Storage({
+  collections: {
+    media: {
+      disablePayloadAccessControl: true,
+      generateFileURL: ({ filename, prefix }) => {
+        const bucket = process.env.S3_BUCKET || 'media'
+        const publicBase = (process.env.S3_ENDPOINT || '').replace(
+          '/storage/v1/s3',
+          '/storage/v1/object/public',
+        )
+        return [publicBase, bucket, prefix, filename]
+          .filter(Boolean)
+          .join('/')
+          .replace(/([^:])\/\/+/g, '$1/')
+      },
+    },
+  },
+  ...
+})
+```
+
+`disablePayloadAccessControl: true` alone is insufficient for Supabase: the plugin's default URL builder produces `<endpoint>/<bucket>/<filename>`, which for Supabase points at the authenticated S3 API path (`/storage/v1/s3/…`). Anonymous reads against that path return 400. The custom `generateFileURL` rewrites it to the public CDN path (`/storage/v1/object/public/…`). `getAfterReadHook` in `@payloadcms/plugin-cloud-storage` recomputes `url` on every read from the stored `filename`, so there is no DB migration.
+
+**Detection:**
+
+```bash
+rg '/api/media/file/' src/ --type tsx --type ts --type jsx --type js  # should return 0 matches in rendered output
+curl -s "http://localhost:4000/api/media?limit=3&depth=0" | rg '"url":"[^"]*"'
+# every url must start with https://<project-ref>.supabase.co/storage/v1/object/public/
+curl -sI "$(video_src_from_DOM)" | rg 'accept-ranges: bytes'
+# must exist
+```
+
+**Incident:** ENG-160 (2026-04-19) — A 6.8MB `<video>` played fine right after upload (admin was serving from an in-memory Object URL) but stalled indefinitely after refresh, because the persisted `media.url` was the Payload-proxied path, which returned 404 from the static handler for that specific filename and wouldn't have streamed with Range support even if it had matched. Fixed by adding `disablePayloadAccessControl: true` + a custom `generateFileURL` to the `media` collection. All existing records immediately recomputed to direct Supabase URLs on next read.
+
+**Principle:** Static binary delivery must take the shortest, most cacheable path from origin to browser. Routing every media read through the app server is a regression in the best case and a hard 404 in the worst case. If the storage provider exposes a public URL, `url` must resolve to that public URL — never to any endpoint under the app's own domain.
+
+## EAP-101: Sparse-Array PATCH from `setNested` on Indexed FieldPaths
+
+**Status: ACTIVE**
+
+**Trigger:** A "dirty field" inline-edit save flow (like `saveFields` in `src/components/inline-edit/api.ts`) builds each request body by calling `setNested({}, fieldPath, value)` for every queued change and PATCHing the result. For any fieldPath that traverses an array (`content.8.images.2.caption`, `heroMetric.labelList.0.text`, etc.), `setNested` creates `[]` / `{}` holders on demand and writes the value at a numeric slot. Empty leading slots become sparse — `JSON.stringify` serializes them as `null`, and the PATCH body arrives at Payload looking like `{"content":[null,null,...,{"images":[null,null,{"caption":"…"}]}]}`. Payload treats the top-level array as a full replacement, validates each entry, cannot match `null` to any block schema, and returns HTTP 500 with the generic `{"errors":[{"message":"Something went wrong."}]}` that surfaces in the inline-edit toast as "Could not save — the server encountered an error."
+
+**Why it's wrong:** Arrays in JSON have no "merge" or "sparse patch" semantics. A path-based write against a fresh `{}` is only safe when the path passes exclusively through object keys — there is no way to express "update index 2 of this array while leaving 0 and 1 untouched" in a JSON body alone. Payload's PATCH handler for blocks fields replaces the entire array; feeding it a sparse array erases the real blocks you meant to preserve and fails validation on the leading `null`s. The same bug would surface on any project with more than one existing block — it's latent until an editor opens a nested field and hits ⌘S.
+
+The failure is especially sneaky because:
+
+- **Flat fields work fine.** Edits to `title`, `category`, or `introBlurbHeadline` never trigger this path, so the save flow looks healthy until someone touches a caption or a heading inside `content[*]`.
+- **The network tab shows one failed PATCH**, not a cascade. The response body is the opaque `"Something went wrong."` with no stack, no field label, no hint pointing at the body shape.
+- **The block manager quietly does the right thing**, making the inline-edit drift invisible in code review. `useBlockManager.patchContent` already fetches the doc, mutates the full `content` array, and PATCHes it whole — so every "structural" block operation (add/move/delete/replace) succeeds and gives the false impression that nested PATCHes work.
+
+**Correct alternative:** When any dirty field's `fieldPath` contains a numeric segment, fetch the current document first, mutate the fetched object with `setNested` for every dirty field, then extract only the touched top-level keys and PATCH that subset. This is the "read–modify–write" pattern `useBlockManager.patchContent` uses; the inline-edit save flow must stay in parity with it.
+
+```ts
+function hasArrayIndex(path: string): boolean {
+  return /\.\d+(\.|$)/.test(path)
+}
+
+// inside saveFields, per group:
+const needsBase = fields.some((f) => hasArrayIndex(f.fieldPath))
+
+let base: Record<string, unknown> = {}
+if (needsBase) {
+  const getRes = await fetch(buildEndpoint(target), { credentials: 'include' })
+  if (!getRes.ok) throw new Error(parsePayloadError(await getRes.text(), getRes.status))
+  base = await getRes.json()
+}
+
+for (const field of fields) {
+  setNested(base, field.fieldPath, coerce(field))
+}
+
+let body: Record<string, unknown>
+if (needsBase) {
+  const topKeys = new Set(fields.map((f) => f.fieldPath.split('.')[0]))
+  body = Object.fromEntries(Array.from(topKeys).map((k) => [k, base[k]]).filter(([, v]) => v !== undefined))
+} else {
+  body = base
+}
+```
+
+Flat-only saves still skip the extra GET so the happy path stays cheap. The top-key extraction guarantees Payload response metadata (`id`, `updatedAt`, `createdAt`, relationships we didn't mean to touch) is never round-tripped back into the PATCH.
+
+**Detection:**
+
+```bash
+# Any save pipeline building a body with setNested({}, ...) on a path that includes a numeric segment
+rg -nP 'setNested\(\{\}?\s*,\s*[^,]+\.\d' src/ --type ts --type tsx
+
+# Repro directly against a case-study project:
+curl -s -b <cookies> -X PATCH http://127.0.0.1:4000/api/projects/<id> \
+  -H 'Content-Type: application/json' \
+  -d '{"content":[null,null,{"images":[null,{"caption":"x"}]}]}' -w 'HTTP %{http_code}\n'
+# A healthy save path NEVER produces a body like this. HTTP 500 here is the smoking gun.
+
+# On a failing save, the server log will show `PATCH /api/projects/<id> 500 in …ms`
+grep -E 'PATCH /api/projects/[0-9]+ 500' <dev-server-log>
+```
+
+**Incident:** ENG-165 (2026-04-19) — User edited the caption of image 2 inside image-group block 8 on `/work/meteor` ("Upstream cascade: basket management as the highest-leverage intervention point"), hit ⌘S, saw the red toast "Could not save — the server encountered an error." Network tab showed `PATCH /api/projects/2 → 500 {"errors":[{"message":"Something went wrong."}]}`. Reproduced with curl: sparse body `{"content":[null,null,...,{"images":[null,null,{"caption":"TEST"}]}]}` → HTTP 500; the same caption change sent inside the full 15-block array → HTTP 200. Fixed `saveFields` in `src/components/inline-edit/api.ts` by adding `hasArrayIndex` branching + read–modify–write on array-indexed saves, then extracting only the touched top-level keys. Verified post-fix by PATCHing the full content array with a caption mutation and confirming the value round-tripped via GET; caption then restored to its original value.
+
+**Principle:** A PATCH body built by walking a dot-path into a fresh `{}` is a **flat-field-only** construct. The moment any fieldPath traverses an array, the only safe body is one built on top of the real document — either the full document, or a subset of top-level keys whose arrays have been mutated in place. Treat "fieldPath contains a numeric segment" as the single condition that forks the save flow into read–modify–write. Keep the two inline-edit paths — `useBlockManager.patchContent` and `saveFields` — visibly parallel so this parity doesn't drift again.
+
+---
+
+## EAP-100: Passing a Pre-Shrunk CMS Derivative as the Source of `<Image fill sizes="100vw">`
+
+**Status: ACTIVE**
+
+**Trigger:** A server-component data mapper (e.g., `mapContentBlocks` in `src/app/(frontend)/(site)/work/[slug]/page.tsx`) chooses a Payload image derivative — `media.sizes.card.url` (768×512), `media.sizes.hero.url` (1920-wide), etc. — as the URL handed to `<MediaRenderer>` / `<Image fill sizes="100vw">`. The intent is usually "serve a smaller image for performance," but the rendering component is `next/image` with `fill` + a viewport-wide `sizes` hint.
+
+**Why it's wrong:** `next/image` is its own image optimizer. When given a source URL, it generates an entire responsive `srcset` at every device width in `next.config.ts` (default up to `w=3840`) by requesting `/_next/image?url=<source>&w=<N>`. If the `<source>` is already a pre-shrunk derivative, the optimizer **upscales** that derivative to fill the large widths:
+
+- `card` (768×512) → requested at `w=3840` = **5× upscale** = heavy pixelation / softness on any wide Retina display. The user reads this as "my uploads look blurry."
+- `hero` (1920-wide) → requested at `w=3840` = 2× upscale on Retina = borderline-acceptable but still worse than the original.
+
+Payload's image derivatives exist for use cases where the rendered box is **fixed and known** — admin thumbnails, email templates, legacy `<img width=…>` sites. They are the wrong source for `<Image fill>` because that mode intentionally delegates sizing to Next.js. The correct behavior is: give `next/image` the **largest available source** (the original upload), and let it generate the smaller derivatives it actually needs.
+
+The bug compounds because it's **invisible in development**: the rendered figure is the correct shape (EAP-095 is resolved, `width`/`height` flow through), the network waterfall looks normal, HTTP is 200, and the only diagnostic signal is the browser dev warning `Image with src "…" has "fill" prop and "sizes" prop of "100vw", but image is not rendered at full viewport width.` That warning points at `sizes` — a secondary bandwidth concern — and buries the real cost (source resolution).
+
+**Correct alternative:**
+
+1. On the data path, pass the **original upload URL** (`media.url`) to the renderer. Do not prefer a `sizes.card` / `sizes.hero` derivative just because it exists.
+2. Pass the **original dimensions** (`media.width`, `media.height`) so the wrapper's `aspect-ratio` matches the source and EAP-095 stays resolved.
+3. Keep Payload derivatives configured (they're cheap, and admin/email still uses them), but never reach for them on the public render path that uses `<Image fill>`.
+4. Separately, if the Next.js dev warning about `sizes="100vw"` fires for a block that isn't viewport-wide, tighten the `sizes` prop to reflect the actual layout (e.g., `"(min-width: 768px) 800px, 100vw"`) — but understand this is a **bandwidth optimization**, not a blur fix. The blur is fixed by the source URL swap above.
+
+**Detection:**
+
+```bash
+# Any data path reaching for `card` or `hero` derivatives before a Next.js Image render
+rg -n 'sizes\?\.(card|hero)' src/ --type ts --type tsx
+
+# Rendered HTML should point at originals (no `-NNNxNNN.(jpg|png)` suffix on Payload-generated derivatives)
+curl -s <page-url> | rg -oE '_next/image\?url=[^&"]+' | head -5
+
+# Dev-server canary (non-blocking warning, but correlated)
+grep -E 'is not rendered at full viewport width' <dev-server-log>
+```
+
+**Incident:** ENG-163 (2026-04-19) — User reported "the images I upload show a very blurry preview." Inspecting a case-study image showed the served URL was `GS-Lifecycle-Map-…-768x512.jpg` (the `card` derivative), then Next.js requested `&w=3840&q=75`. `mapContentBlocks` preferred `media.sizes.card ?? media.sizes.hero` as the source for the `imageGroup` block, and the `hero` block preferred `media.sizes.hero.url`. Fixed by dropping the derivative preference and passing `media.url` / `media.width` / `media.height` directly. Also cleaned up `src/lib/extract-content-urls.ts` (preload pipeline) which mirrored the same inversion (`sizes?.card ?? sizes?.hero`). Verified in the dev-server log: the rendered image `src` switched from `…-1776651572573-768x512.png` to `…-1776651572573.png` (original) after save. `resolveThumbnailUrl` is intentionally left reaching for the `thumbnail` derivative — it serves small 400×300 card tiles on the index page, which is a legitimate fixed-size use case for derivatives.
+
+**Principle:** Do not pre-optimize for `next/image`. `<Image fill sizes="…">` asks Next.js to generate the responsive ladder; the correct source for that ladder is the **highest-resolution available original**, not a CMS-side derivative. Picking a derivative short-circuits the optimizer and forces an upscale. Derivatives are for fixed-size render paths (admin thumbnails, email), not for `fill` layouts.
+
+## EAP-095: Dropping `width` / `height` on the Data Path That Feeds `<Image fill>`
+
+**Status: ACTIVE**
+
+**Trigger:** A component like `MediaRenderer` uses `next/image` with the `fill` prop and applies `aspect-ratio` to its wrapper only when it receives `width` + `height` props. A server-component data mapper (e.g., `mapContentBlocks` in `src/app/(frontend)/(site)/work/[slug]/page.tsx`) shapes a `url` / `alt` / `caption` / `mimeType` payload from Payload's populated media and normalizes it into the client's `ContentBlock` type — but forgets to carry `media.width` / `media.height` through the transform (or through the `images[]` type on the client side).
+
+**Why it's wrong:** `<Image fill>` sizes itself to its parent. Without `aspect-ratio` (or an explicit height) on the parent, the parent collapses to `height: 0` and the image renders invisible while appearing to have "uploaded successfully" — the POST returned 201, `media.url` is valid, the figure exists in the DOM, and nothing surfaces as an error. The only signal is the next/image dev warning `Image with src "…" has "fill" and a height value of 0`, which is easy to miss against any moderately noisy dev log.
+
+The failure mode is especially sneaky when the empty placeholder state (`.labeledPlaceholder`) had its own `aspect-ratio` while the filled state (`.sectionFigure`) did not — swapping the two on upload switches the layout contract underneath the user without any visible signal. Existing "working" image groups may also all happen to be `<video>` elements that have intrinsic dimensions and route around the bug, leaving the first true image upload as the one that finally trips it.
+
+**Correct alternative:**
+
+1. On the data path, forward `media.width` / `media.height` (prefer the derived size's own dimensions when you're serving a derived URL — e.g., `media.sizes.card.width` / `.height` for a card-sized URL — so the aspect ratio matches the URL actually being served).
+2. Extend every intermediate type (server-to-client `ContentBlock`, component props, mapper return types) to carry `width?` / `height?`.
+3. At the render site, pass both to the `<MediaRenderer>` (or equivalent) call so its wrapper can set `aspect-ratio: ${width} / ${height}` and give `<Image fill>` a real box to lay out in.
+4. For a placeholder ↔ filled swap, ensure the placeholder state and the filled state share an aspect-ratio contract (either both declare one, or both respond to the same data-driven dimensions). Do not let the swap silently drop the layout constraint.
+
+**Detection:**
+
+```bash
+# Any call site passing src but not width/height into a fill-based renderer
+rg -nP '<MediaRenderer[^>]*\bsrc=' --type tsx --type ts | rg -v 'width=' | rg -v 'height='
+
+# Browser/dev-server warning (the canary)
+grep -E 'has "fill" and a height value of 0' <dev-server-log>
+
+# In rendered HTML of a block page, confirm wrappers get an aspect-ratio style
+curl -s <page-url> | rg -oE 'style="aspect-ratio:[^"]+"' | sort -u
+```
+
+**Incident:** ENG-161 (2026-04-19) — Uploading `GS-Lifecycle-Map-…-768x512.jpg` into a placeholder-labeled slot inside an image-group block on the `meteor` project saved the record correctly, but the image rendered invisible. `mapContentBlocks` forwarded `url` / `alt` / `caption` / `mimeType` / `playbackMode` / `posterUrl` into the client-side `imageGroup.images[]` payload but dropped `width` / `height`. `MediaRenderer` therefore produced a wrapper with `width: 100%; height: 100%` but no aspect-ratio, the parent `figure` had no explicit height, and `<Image fill>` reported "height value of 0." Fixed by (a) extending the `media` type in `mapContentBlocks` to include `width` / `height` / `sizes.card.width|height` / `sizes.hero.width|height`, (b) preferring `derivedSize.width` / `.height` over raw `media.width` / `.height` when serving a derived URL, (c) extending `ContentBlock` `imageGroup.images[]` in `ProjectClient.tsx` with `width?` / `height?`, and (d) passing both to the `<MediaRenderer>` call in both the placeholder-grid and non-placeholder render branches. Verified `style="aspect-ratio:768 / 512"` present in rendered HTML and the dev-log warning no longer fires.
+
+**Principle:** Dimensions are load-bearing metadata for `<Image fill>`, not decoration. Any component that renders with `fill` must treat `width` / `height` as a required data contract, and every boundary those values cross — Payload schema, server fetch, normalization, client types, component props — must preserve them. The "height value of 0" warning is a data-flow bug, not a CSS bug: do not reach for `min-height` or a fixed wrapper height to paper over it; fix the missing dimensions at the layer that dropped them.
+
+## EAP-099: Gating on JSX `onLoad` / `onLoadedData` for an SSR'd Media Element
+
+**Status: ACTIVE**
+
+**Trigger:** A client component renders a server-rendered `<video>`, `<audio>`, bare `<img>`, or `<iframe>` that starts fetching bytes as soon as the HTML is parsed. The component uses `useState(false)` to track "loaded," flips it true only inside a JSX `onLoad` / `onLoadedData` handler, and gates visibility (often `opacity: 0` → `opacity: 1`) on that state.
+
+**Why it's wrong:** The native element begins work during HTML parse. React's synthetic `onLoad` / `onLoadedData` handler attaches during commit, which happens after hydration, which happens after the JS bundle downloads, parses, and executes. For any asset served from a CDN — or that hits the browser's disk cache on refresh — the native `load` / `loadeddata` event routinely fires **before** React attaches its listener. The JSX handler then never runs, the "loaded" state stays `false` forever, and the asset is stuck invisible while being fully decoded and, for videos, already playing.
+
+The bug is especially invisible because:
+
+- Nothing in the console complains — the asset loaded successfully.
+- The network tab shows `200 OK`, proper Range responses, and reasonable timings.
+- Debugging from the server side (`curl` the HTML, check `src`) confirms everything is correct.
+- The only symptom is "the skeleton never goes away," which looks identical to the network-layer failure mode it was supposed to indicate.
+
+**Correct alternative:** Always assume the event may have already fired. Pair the JSX handler with a post-mount ref-based check, and (for video/audio) subscribe via native `addEventListener` as a fallback:
+
+```tsx
+const ref = useRef<HTMLVideoElement | null>(null);
+const [loaded, setLoaded] = useState(false);
+
+useEffect(() => {
+  const el = ref.current;
+  if (!el) return;
+  if (el.readyState >= 2) { // HAVE_CURRENT_DATA
+    setLoaded(true);
+    return;
+  }
+  const reveal = () => setLoaded(true);
+  el.addEventListener('loadeddata', reveal, { once: true });
+  el.addEventListener('loadedmetadata', reveal, { once: true });
+  return () => {
+    el.removeEventListener('loadeddata', reveal);
+    el.removeEventListener('loadedmetadata', reveal);
+  };
+}, [src]);
+
+return <video ref={ref} src={src} onLoadedData={() => setLoaded(true)} ... />;
+```
+
+Readiness constants:
+
+| Element | "Already ready" check |
+|---------|----------------------|
+| `<video>` / `<audio>` | `el.readyState >= 2` (HAVE_CURRENT_DATA) — first frame / first chunk decoded |
+| `<img>` (raw) | `el.complete && el.naturalWidth > 0` |
+| `<iframe>` | `el.contentDocument?.readyState === 'complete'` (same-origin only) |
+
+`next/image` handles this correctly internally — its `onLoad` fires on mount for cached images — so images routed through `next/image` don't need the pattern. It's only bare native elements that require the guard.
+
+**Detection:**
+
+```bash
+# Any client component that gates on onLoad/onLoadedData without reading readyState
+rg -nP 'onLoad(edData)?=\s*\{' src/components --type tsx -l | \
+  xargs -I {} sh -c 'rg -L "readyState|\.complete" {} && echo "SUSPECT: {}"'
+
+# Manual browser check: hard-refresh a page with a cached CDN media asset and
+# confirm the skeleton dismisses within one frame.
+```
+
+**Incident:** ENG-160 follow-up (2026-04-19) — After fixing `media.url` to resolve to a direct Supabase CDN URL (EAP-098), the Cloudflare-cached video began firing `loadeddata` *before* React hydrated `MediaRenderer`. The JSX `onLoadedData` handler never ran, the `.loaded` class was never applied, and `.media { opacity: 0 }` kept the already-playing video invisible indefinitely. Fixed by adding a `videoRef` + `useEffect` that checks `readyState >= 2` on mount and subscribes to `loadeddata` / `loadedmetadata` via native `addEventListener`. The previous (broken) `/api/media/file/*` URL masked this for months because the event never fired in the first place.
+
+**Principle:** In a hydrated app, any state derived from a DOM event on an SSR'd native element must also be derivable from the element's readiness properties at mount time. If the only way to reach a given UI state is via an event that the element fires at its own discretion, the UI is at the mercy of a race between HTML parsing and JS hydration — and on a good network, the element wins every time.
+
+## EAP-102: Class-Name-From-The-Wrong-Module Silent Bug
+
+**Status: ACTIVE**
+
+**Trigger:** A component imports a CSS Module (`import styles from './X.module.scss'`) and references class names on the imported object (`styles.foo`, `styles.imageOverlayBtn`). The rules with those names actually live in a **different** module (e.g., `../../components/inline-edit/inline-edit.module.scss`) that no TSX file imports those specific keys from.
+
+**Why it's wrong:** CSS Modules are compiled to an object keyed by the class names declared in the imported `.module.scss` file. Accessing a key that doesn't exist returns `undefined`, not a compile error, not a lint warning, and not a runtime console message. `className={undefined}` renders as a missing attribute. The browser falls back to the user-agent stylesheet and the surface looks "native" — a bare `<button>` with default border-radius and system fonts, a `<div>` with no background, etc. Every layer says the code is fine:
+
+- TypeScript: `styles.foo` is typed `string | undefined` and accepts any key.
+- ESLint: no rule fires.
+- CSS compiler: the orphaned rules in the sibling module compile and are served; nothing references them, so nothing marks them dead.
+- Browser dev tools: "Matched Selectors" is empty — but that's what you'd expect if the bug were in the selector, not the `className=`.
+
+The surface looks wrong and the developer starts editing SCSS that is already correct. The real fix is at the import statement.
+
+**Correct alternative:**
+
+1. Every `styles.X` access must resolve to an exported key in the specific module that's imported at the top of the file. If you want the rules from another module, either (a) move them into the imported module, or (b) import the other module under a distinct alias (`import overlay from '../../components/inline-edit/inline-edit.module.scss'` → `className={overlay.imageOverlay}`).
+2. Prefer **co-locating** styles next to the component that owns them — a `FooComponent.tsx` with a sibling `FooComponent.module.scss`. A component that has to reach across directories for its own class names has its import layer in the wrong place.
+3. When an admin chrome surface looks like the browser default, grep the imported module first for the class key, then the rules. If the key isn't in the module, the rules are orphaned and the `className=` is `undefined` — fix the import, don't touch the rules.
+
+**Detection:**
+
+```bash
+# List every (filename, className used) pair and diff against what the file's *imported* module actually exports.
+# Quick heuristic: grep className references inside a file, then grep the imported .module.scss for matching keys.
+rg -nP "styles\\.[A-Za-z0-9_]+" src/app/\(frontend\)/\(site\)/work/\[slug\]/ProjectClient.tsx -o | sort -u
+rg -nP "^\\.[A-Za-z0-9_]+" src/app/\(frontend\)/\(site\)/work/\[slug\]/page.module.scss -o | sort -u
+# Class names referenced but not defined in the imported file are the silent-bug candidates.
+
+# DOM-side confirmation once suspected:
+# Inspect the element → check "Computed" has no class names from the expected module → check the `.className` DOM prop — if it reads `undefined undefined …` the key lookup is broken.
+```
+
+**Incident:** ENG-162 (2026-04-19) — The inline-edit image-block admin overlay in `ProjectClient.tsx` was rendering as bare unstyled `<button>` glyphs. The image-overlay and "Add image" / drop-zone rules were defined in `src/components/inline-edit/inline-edit.module.scss` (lines 1585–1656) but `ProjectClient.tsx` imports `styles` from `./page.module.scss`. Every `className={styles.imageOverlayBtn}` / `styles.dropZone` / `styles.addBlockBtn` resolved to `undefined`. The fix was structural, not stylistic: rebuild the overlay and empty state out of DS primitives (`Button`, `Tooltip`, `DropdownMenu`, `Dropzone`) with co-located SCSS (`ImageBlockAdminOverlay.module.scss`, `VideoSettings.module.scss`), and delete the orphaned rules from `inline-edit.module.scss`. See also EAP-103 (the companion pattern: raw `<button>` in admin overlays).
+
+**Principle:** A CSS Module object is a strict keyspace. `styles.foo` being `undefined` is not "the rule isn't applying" — it is "the key isn't in this module." When an admin surface looks like the browser default, the first hypothesis is `className=undefined`, and the first file to open is the import statement, not the stylesheet the rules appear to live in.
+
+## EAP-103: Hand-Rolled Native Buttons in Admin / CMS Overlay Surfaces
+
+**Status: ACTIVE**
+
+**Trigger:** A newly-built admin chrome surface — inline-edit overlay, CMS action bar, hover-reveal toolbar — ships with raw DOM elements: `<button>` for reorder / replace / delete glyphs, `<div onClick>` for a drop zone, hand-pilled `<button>` for a Loop / Player toggle, a bare `<button>` for "Add item." No `@/components/ui/Button`, `@/components/ui/ButtonSelect`, `@/components/ui/Tooltip`, `@/components/ui/DropdownMenu`, or `@/components/ui/Dropzone` is imported or composed. The destructive path (delete) runs on a single click with no `AlertDialog` and no `toast.undoable`.
+
+**Why it's wrong:** Admin/CMS overlays are **inside the product**, not in a separate admin shell. They inherit every portfolio-wide rule — zero border-radius (Hard Guardrail #9), focus-visible ring tokens, motion tokens, hover/active state tokens, `data-theme` dark-mode variants — and every §14 CRUD contract rule (destructive confirm, undoable toast, unified keyboard shortcuts). Raw `<button>` / `<div onClick>` skips all of it:
+
+- **Branding violations by construction.** User-agent `<button>` has a non-zero radius on macOS and iOS (system theme), a system font, a gradient background, and an ad-hoc focus ring. None of that matches the portfolio DS. The bug reproduces 100% of the time on admin surfaces on Safari.
+- **Accessibility gaps.** No `Tooltip` means icon-only buttons have no discoverable label beyond `aria-label`; no `focusable` semantics on a `<div onClick>`; no keyboard activation on non-button elements; no `disabled` state visual.
+- **CRUD contract violations.** EAP-091 / EAP-092 / EAP-093 (the `useConfirm` / `@ds/AlertDialog` / `useToast` triad) are impossible to enforce on ad-hoc controls — there's nowhere for the lint rule to hook into.
+- **Drift from the playground and main-site button surfaces.** An admin overlay that uses raw buttons can't be demoed, can't be parity-checked against `@/components/ui/Button`, and breaks the "everything on the portfolio is in the DS" contract.
+
+Every hand-rolled admin control is, in practice, a miniature re-implementation of `@/components/ui/Button`, but worse on every axis. Writing one is the sign that the consuming file didn't treat admin chrome as DS consumers; it treated them as escape hatches from the DS.
+
+**Correct alternative:**
+
+1. Every clickable admin control composes `@/components/ui/Button` (`iconOnly`, `size="xs" | "sm"`, `appearance="neutral" | "destructive"`, `emphasis="bold" | "subtle"`). Icon-only buttons wrap in `@/components/ui/Tooltip` for labels.
+2. Mode switches (Loop / Player, View / Edit, 1× / 2×) use `@/components/ui/ButtonSelect` — not pilled raw buttons.
+3. Overflow menus (Muted toggle, Change poster, Remove poster) use `@/components/ui/DropdownMenu` — not bespoke popovers.
+4. Drop zones use `@/components/ui/Dropzone` — not `<div onDrop>`.
+5. Destructive actions go through `useConfirm()` for the AlertDialog and `toast.undoable(...)` for the undo path. The pre-op snapshot is captured by the caller (usually a block manager) and passed as `onUndo`.
+6. Co-locate overlay SCSS next to the overlay TSX (`FooOverlay.tsx` + `FooOverlay.module.scss`) so the rules can't drift into an orphaned module (see EAP-102).
+
+**Detection:**
+
+```bash
+# Raw <button> anywhere under the inline-edit overlay surfaces
+rg -nP "<button(\s|>)" src/components/inline-edit/ src/app/\(frontend\)/\(site\)/ | rg -v "node_modules"
+
+# <div onClick= inside the inline-edit tree (drop zones, clickable tiles)
+rg -nP "<div[^>]*onClick=" src/components/inline-edit/ src/app/\(frontend\)/\(site\)/
+
+# Any admin-overlay file without a Button / DropdownMenu / Tooltip import
+rg -L "from '@/components/ui/(Button|DropdownMenu|Tooltip|ButtonSelect|Dropzone)'" src/components/inline-edit/*.tsx | rg -v "types.ts|index.ts|api.ts|hooks.ts"
+```
+
+**Incident:** ENG-162 (2026-04-19) — The `imageGroup` admin overlay in `ProjectClient.tsx` used raw `<button>` glyphs (`◂ ▸ ✕`) for reorder/replace/delete, a raw `<button>` for "Add image" / "Add first block," and a bare `<div>` for the empty-state drop zone. `VideoPlaybackToggle` was a hand-pilled `<button>` pair for Loop / Player. None of them composed DS primitives; the delete action ran on a single click with no confirm and no undoable toast. Resolved by replacing every one with DS primitives: `ImageBlockAdminOverlay` (DS `Button iconOnly xs` + `Tooltip`), `VideoSettings` (DS `ButtonSelect` + `DropdownMenu` with `Muted` toggle + poster-frame actions), empty-state `<Dropzone>`, `<Button>` for "Add image" / "Add first block," `useBlockManager.confirmRemoveImage` running `useConfirm` + `toast.undoable`. The silent-styling layer of the same bug is documented separately as EAP-102.
+
+**Principle:** Inline-edit and CMS overlays are first-class DS consumers, not escape hatches from the DS. Every clickable element inside one must compose a DS primitive — `Button`, `ButtonSelect`, `DropdownMenu`, `Tooltip`, `Dropzone` — and every destructive action must honor §14 (`useConfirm` + `toast.undoable`). A raw `<button>` in an admin overlay is presumptively a bug: it's breaking branding, accessibility, and the CRUD contract simultaneously, by construction.
+
+## EAP-105: Integer Scaffolding Values Carried Forward Without Re-Ranking
+
+**Status: ACTIVE**
+
+**Trigger:** A ranking field (`order`, `priority`, `position`, `rank`, `sortIndex`) is defined per-row inside N co-located files — one file per row — instead of in a single manifest. When a new row is added, the author picks "the next free integer" without re-evaluating whether the existing rows are still in the right relative order. Over weeks/months, the visible surface consumes `sort: "<field>"` but the values encode *when each row was scaffolded* instead of *where it belongs in the ranking*. Nothing breaks visibly; the bug presents only as "why is this one at the top?" from someone who knows the intended ranking.
+
+Concrete canonical shape in this codebase: each case study's `order` lives in its own `src/app/(frontend)/api/update-<slug>/route.ts`. The home page at `src/app/(frontend)/(site)/page.tsx` queries `payload.find({ collection: "projects", sort: "order" })`. There is no `order-manifest.ts`, no single file where the ranking decision is recorded. Any re-ranking is an N-file coordinated edit across the fleet of `update-*/route.ts` files plus N POST calls to the seeding endpoints.
+
+**Why it's wrong:**
+
+1. **No single source of truth for the ranking.** Reading one `update-X/route.ts` file tells you nothing about where X sits relative to the rest. An author adding a new case study cannot answer "what order should this be?" without opening every other `update-*/route.ts` file or running a `rg`. In practice, they pick the next free integer.
+2. **Scaffold convention becomes production data.** The scaffolded default — "set `order: N+1` where N is the current max" — was fine as a placeholder but becomes the production ranking the moment the file ships. There is no step in the authoring flow where the author is forced to reconsider the existing integers.
+3. **Drift is invisible.** The data model doesn't encode a constraint ("the top-ranked case study must be the strongest piece"). The CMS accepts any integers. The visible surface renders them in order. The mismatch between the integers and the author's actual narrative priority only surfaces when someone reads the home page and says "wait, why is X first?"
+4. **Re-ranking is expensive.** Changing the order requires editing N files, calling N POST endpoints (Hard Guardrail #25), and verifying the resulting order in the CMS. That expense discourages periodic re-ranking even when the author knows the current order is wrong.
+
+**Correct alternative:**
+
+1. **Always audit the full ranking when adding or editing any ranked row.** When creating or touching any `update-*/route.ts` that defines an `order` integer, run `rg "order: \d+" 'src/app/(frontend)/api/update-'*'/route.ts'` across the fleet and confirm the full sequence reflects the current intended ranking. If it doesn't, re-rank in the same session — do not ship a new row while the existing ones are stale.
+2. **Prefer a single manifest for any cross-row ranking.** When a ranking is shared across N rows, it belongs in one file. Candidate shapes: `src/config/project-order.ts` exporting `PROJECT_ORDER: Record<string, number>`, or a `Globals` entry in Payload. Keeping the ranking in the same file where it's consumed makes the decision visible and the drift impossible to sustain.
+3. **Add a CI / gate check.** A simple `rg` script in a pre-merge step can assert that the integers are strictly increasing and that no two rows share an `order` value. Duplicate integers are a silent ordering bug — the visible order depends on Payload's secondary sort, which the author did not choose.
+4. **Document the ranking decision at the point of authoring.** The case-study-authoring skill should prompt: "At which position should this case study sit on the home page?" and show the current ranking before asking. Without that prompt, the default path is always "append at the bottom" or "claim whatever integer the scaffold wrote."
+
+**Detection:**
+
+```bash
+# Dump the current ranking across all project seeding routes
+rg -nP 'order:\s*\d+' 'src/app/(frontend)/api/update-'*'/route.ts'
+
+# Or, live, from the CMS (main site dev server on :4000):
+curl -sS 'http://localhost:4000/api/projects?sort=order&limit=50&depth=0' \
+  | python3 -c "import sys,json; [print(p.get('order'), p.get('slug')) for p in json.load(sys.stdin).get('docs',[])]"
+```
+
+If the printed order does not match the author's narrative priority when read aloud, the ranking is stale.
+
+**Incident:** ENG-168 (2026-04-20) — The home case-study grid rendered Lacework → Élan → Meteor (Goldman Sachs). The user flagged that Goldman Sachs should lead. `git log --follow -p` on every `update-*/route.ts` showed the `order` integers had been stable since the Mar 30 scaffold (`d9bb2d3`): Lacework was the first case study migrated into the CMS and got `order: 1` by default; Meteor was added later at `order: 3` because that was "the next free integer," not because position 3 was the intended ranking. No commit ever demoted Meteor — the scaffolded default simply persisted. Fixed by swapping Meteor → `order: 1` and Lacework → `order: 2` in the two seeding routes, re-POSTing both endpoints, and verifying via `GET /api/projects?sort=order`.
+
+**Principle:** An integer ranking field scattered across N files is a maintenance hazard disguised as a data model. The moment a scaffold writes `order: N+1` without asking whether N+1 is correct relative to the existing rows, the ranking is silently drifting from the author's intent. Re-ranking must happen every time a ranked row is created or touched, not only when someone points out the result is wrong. When possible, collapse the ranking into a single manifest so the decision is visible and the drift is impossible to sustain.
+
+---
+
+## EAP-106: Heuristic Whose Discriminating Signal Is Invariant Across the Dominant Data Distribution
+
+**Status: ACTIVE**
+
+**Trigger:** A conditional behavior ("do X when the user's intent looks like A, otherwise do Y") is decided by a heuristic whose discriminating signal is a property that *happens to vary in the example cases you reasoned through* but is *constant across the dominant distribution of real data*. The heuristic therefore fires on 100% of real inputs (or 0%), not on the subset it was designed for.
+
+Concrete canonical shape in this codebase: in `handleDragEnd` (ENG-171), the author's goal was a Figma-like drag where side-drops merge and above/below drops reorder. The heuristic: "check whether the dragging element's horizontal center is within 25% of the over target's width from the over target's center." Reasoned through on a whiteboard with rows of different widths, this looks sound. Run on the actual post-migration data — every atomic image block defaults to `rowBreak: true`, so every row is full-page-width, so every pair of rows has *identical* horizontal centers — and the check is trivially true for every drop. Merge fires on 100% of drags, reorder never runs.
+
+The bug is not in the formula. The formula is correct in the abstract. The bug is that the formula's discriminating input (horizontal-center distance) has zero variance in the dominant case.
+
+**Why it's wrong:**
+
+1. **Whiteboard validation masks distribution-invariance.** When you reason through a heuristic on hand-picked examples — "narrow row onto wide row," "narrow row above wide row" — you are picking examples where the discriminating signal *does* vary. Real data may pick from a subspace where it doesn't. Example cases show the heuristic works *in principle*; they don't show it works *in production*.
+2. **Silent 100%-fire failures are the worst kind.** A heuristic that fires in 0% of cases gets reported immediately ("the feature doesn't work at all"). A heuristic that fires in 100% of cases looks like the feature is wired up — every drop produces a response — but the response is always the wrong branch. The user attributes it to "drag feels broken" rather than "intent detection is broken," which takes longer to diagnose.
+3. **Defensive gates stacked on a broken primary signal don't rescue it.** The ENG-171 implementation added a vertical-overlap gate to guard against above/below drops being mis-classified as merges. That gate is also defeated in the dominant case, because dnd-kit's sortable strategy creates a gap at the drop position by shifting neighbors — the active element's translated rect always overlaps the nearest neighbor at release. Adding more weak gates to cover a broken primary signal produces a combinatorially complex check that still fires on 100% of cases.
+
+**Correct alternative:**
+
+1. **Enumerate the dominant data distribution before committing a heuristic.** Before writing the discriminator, ask: "In the most common shape of real data my users will see, what range of values will this signal take?" If the signal is constant or nearly constant across that shape, the heuristic is a no-op regardless of how elegant the math is. Pick a different signal or defer the feature to an explicit UI.
+2. **Prefer explicit UI over inferred intent when intent cannot be cleanly discriminated.** When a gesture has multiple valid interpretations (reorder vs merge) and the available signals don't separate them cleanly, *show the user the choice* rather than guessing. A dedicated drop zone that only appears during drag, a toolbar button, or a keyboard modifier (e.g., hold Shift to merge) all carry explicit intent the user controls. The user stays in charge and the code has no ambiguity to resolve.
+3. **Validate heuristics against production-shaped state, not synthetic examples.** The runtime evidence you need is "what does this heuristic return on the actual rows this page renders?" On this project that means running the migration, loading a case study with a realistic mix of row configurations, and logging the heuristic's output for every drag. When runtime validation is blocked (e.g., EAP-042 dev-server crash), the correct move is to *not ship* intent inference and instead ship the simpler, auditable behavior — reorder only. Defer intent inference to the iteration that can validate it.
+4. **Separate the primitive from the trigger.** `useBlockManager.mergeImageRangeIntoRow` is a valid, tested primitive. The bug was not in the primitive — it was in the trigger that decided when to call it. Keep the primitive; rewire it to an explicit UI later. This preserves the forward progress without keeping the broken auto-inference in the drag path.
+
+**Detection:**
+
+- **During review:** Any `if (heuristic) doA() else doB()` block where the heuristic depends on geometric or statistical properties of user data needs a written answer to "what does this heuristic return on the canonical data case?" Not an example-set answer. A distribution answer.
+- **Post-incident:** Search for recent heuristics whose inputs are positional/geometric (pointer position, element rect, delta) and check whether the dominant layout (after migrations, after the common author flow, on mobile) forces those inputs into a narrow range.
+
+**Incident:** ENG-174 (2026-04-19) — After the atomic-image migration converted all `imageGroup` blocks into single-image `image` blocks with `rowBreak: true`, every row rendered at full page width. The ENG-171 merge-intent heuristic (`|srcCenterX - dstCenterX| <= overRect.width * 0.25`) was trivially satisfied for every drop because all rows had identical centers. Every reorder silently routed to `mergeImageRangeIntoRow`, which flipped the moved block's `rowBreak` to `false` and positioned it adjacent to the destination row rather than at the drop position. User-visible symptom: "drag doesn't work." Resolution: reverted the merge branch; `handleDragEnd` now reorders exclusively. `mergeImageRangeIntoRow` retained in `useBlockManager` for a future explicit merge UI (dedicated drop zone, toolbar button, or keyboard modifier) that can be runtime-validated when EAP-042 unblocks.
+
+**Principle:** A heuristic that decides between two branches is only as good as the variance in its discriminating signal across the data it will actually see. When the signal is constant on the dominant distribution, the heuristic is structurally broken even if the math is right. Before shipping a heuristic-based behavior, the answer to "what is the variance of this signal across the real workload?" must be written down, not hand-waved. When the answer is "near zero," the correct response is explicit UI, not more gates.
+
+---
+
+## EAP-107: Sortable Unit Locked to the Visual Unit Rather Than the Data Unit
+
+**Status: ACTIVE**
+
+**Trigger:** You are adding drag-and-drop to a data model where multiple data atoms render inside one visual container (rows, grids, sections, groupings). The implementation assigns one sortable id per **visual container** rather than one per **data atom**, so the entire group drags as a single unit. Subsequent user requests to "rearrange within the group," "pull an item out of the group," or "split the group" cannot be satisfied by drag and require a second control surface — either a heuristic that tries to detect sub-element intent from drag coordinates, or a parallel UI (buttons, menus, keyboard shortcuts) that duplicates what drag should have done.
+
+Concrete canonical shape in this codebase: after the atomic-image migration, each image became its own `image` block in `content[]` (data atoms). On render, consecutive `image` blocks whose second+ members have `rowBreak: false` grouped into a single `imageRow` flex container (visual container). The sortable layer indexed by `displayItems` emitted one id per container: `row:<first-member-id>` for rows, `<block-id>` for single blocks. A row of three images exposed exactly **one** draggable id to `@dnd-kit`. The drag handle moved all three; `handleDragEnd` called `reorderBlockRange(fromStart, count, toStart)` with `count = 3`. There was no code path that moved image #2 of a three-image row — no such path *could* exist without restructuring the sortable, because no sortable id existed for it. Every follow-up feature request ("drag image out of a row to split it," "reorder within a row," "move one image to another row") was blocked at the foundation. ENG-171 attempted to patch this by adding a merge-on-drop heuristic that detected "drop onto a row" from pointer coordinates (→ EAP-106). That heuristic was a symptom of the mis-scoped sortable, not a fix. ENG-175 added optimistic state, which made the wrong behavior faster but didn't make it right. Only when the sortable was re-scoped — one id per `contentBlocks` entry, flat across rows — did per-image drag become expressible at all.
+
+**Why it's wrong:**
+
+1. **The sortable layer decides what the user can express, before any heuristic runs.** If the sortable has no id for image #2-of-3, no amount of intent detection, no keyboard modifier, no drop-zone magic can let the user drag image #2 separately. The `@dnd-kit` events never fire for sub-elements. Any sub-element UX must be implemented *around* drag (as parallel buttons/menus), permanently splitting what should be a single affordance into two surfaces.
+2. **Visual grouping is a rendering concern, not a sortability concern.** A row of three images is a *visual layout* — flexbox, widthFractions, caption alignment. It is not a *data relationship*; the three images are still three independent blocks in `content[]`. Locking the sortable to the visual container encodes a structural rule that doesn't exist in the data. When the visual container is purely derived state (as `displayItems.kind === 'row'` is — it's computed from consecutive image blocks' `rowBreak` flags at render time), locking sortability to that derived state is a category error.
+3. **The wrong scoping produces infinitely forking UX debt.** Once the sortable is coarse-grained, every new user request ("drag out," "split," "move within row") becomes a one-off feature that needs its own affordance. Those affordances accumulate: merge-on-drop heuristic, merge button in toolbar, split button in overlay, keyboard-shortcut splitter, row-aware reorder primitive, row-aware move-left/move-right. Each is engineering effort; each is cognitive load for the author; none are composable because they emerged individually. The single refactor to flat sortability collapses all of them into "drag the image."
+4. **Migrations that change the data unit without re-scoping the sortable silently break the feature.** This project moved from `imageGroup` (container block with a children array) to atomic `image` (independent blocks grouped by `rowBreak`). The data unit shrank from "group" to "image." The sortable layer was carried forward from the `imageGroup` era (one drag per container) without re-asking "what is the atom now?" The migration correctly updated schema, seed routes, render, and inline-edit primitives — everything except the DnD scope. Atoms at the data layer, groups at the DnD layer: feature broken, visibly.
+
+**Correct alternative:**
+
+1. **At DnD design time, ask: "can the user ever want to drag a sub-element of this sortable?"** If yes, the sortable unit must be the sub-element. Design the visual grouping as a rendering concern *around* the flat sortable — an outer flex container whose children are each individual SortableBlocks — not as a separate sortable layer above individual items.
+2. **Emit one sortable id per data atom.** For any data model where `content[]` is a flat array of blocks, the sortable id list should be `content.filter(isDraggable).map(block => block.id)` — not some derived grouping of those blocks. Grouping is applied at render via `displayItems` (or equivalent) purely for visual wrappers; the sortable never sees the grouping.
+3. **Normalize grouping invariants after every reorder.** When grouping is derived from a flag on each atom (e.g., `rowBreak: boolean` on images), a reorder can land an atom in a neighborhood that violates the invariant (e.g., an image with `rowBreak: false` ends up as the first block in a non-image neighborhood). Apply an invariant-restoring normalizer after each reorder so the derived grouping stays consistent: see `src/lib/normalize-image-rows.ts` for the `normalizeImageRowBreaks` helper — a single pass that promotes the first image of each image run to `rowBreak: true`. The normalizer also gives "drag-to-split" for free: dragging an image out of a row into a non-image neighborhood automatically starts a new row.
+4. **When a sortable is already coarse-grained in production and a feature request reveals the mis-scoping, re-scope the sortable before accepting the request.** Don't bolt on heuristics, don't add parallel buttons. The symptom is the feature request; the cause is the sortable unit. Fix the cause. EAP-106 is what happens when you bolt instead of re-scope.
+
+**Detection:**
+
+- **During design:** For any DnD feature, write down the data atom and the visual unit side-by-side. If they differ, the sortable must be the data atom. Add a one-liner in the PR description: "Sortable unit = <data atom>; visual grouping = <derived>."
+- **During implementation review:** Inspect the code that builds the sortable id list. If the list is derived from a rendering grouping (`displayItems.map`, `rows.map`, etc.), that's the wrong layer. It should be derived from the content/data array directly (`content.map`, `blocks.filter`, etc.).
+- **Post-migration:** When changing the data model (splitting a container into atoms, flattening nested structures, migrating schema), explicitly audit the DnD scope. Check that the sortable id list's cardinality tracks the new atom count, not the old container count.
+
+**Incident:** ENG-176 (2026-04-20) — After the atomic-image migration (ENG-163 to ENG-171), the sortable layer continued to emit one id per row of images. ENG-171 attempted to paper over this with a merge-on-drop heuristic (→ EAP-106). ENG-174 reverted the heuristic but left the coarse-grained sortable intact. ENG-175 added optimistic state, which confirmed block-level DnD worked mechanically but didn't address the user's actual request (per-image drag). Only in ENG-176 did the sortable get flattened to one id per block and the row render branch wrap each image in its own `SortableBlock`, with `normalizeImageRowBreaks` healing row-head invariants after each move. Four iterations, one scope miss, three false resolutions.
+
+**Principle:** The sortable unit is a contract with the user about what they can move. If the data model supports finer-grained movement than the sortable, the feature is structurally incomplete regardless of how polished the DnD interactions look. Before shipping DnD on a grouped layout, the sortable's atom must match the data model's atom — grouping is visual, sortability is structural, and the two must not be conflated.
+
+---
+
+## EAP-108: Gated Todo Never Re-Probed After the Gate Clears
+
+**Status: ACTIVE**
+
+**Trigger:** A task in the todo list depends on an operational condition that cannot be satisfied at the time the task is created — dev server is crashing, a migration must run first, an external service has a quota block, credentials aren't provisioned, a seed endpoint requires a running instance. The task is marked `blocked` / `pending` / `deferred` and the rest of the workstream moves on. When the gating condition later resolves (dev server recovers, next session starts, quota resets), nothing automatically re-probes the condition. The gated todo sits in `pending` indefinitely and the feature it gates ships as "done from the code side" while the runtime behavior is still broken against live data.
+
+Concrete canonical shape in this codebase: the atomic-image migration had three sequential tasks — (1) implement per-image DnD refactor, (2) run `POST /api/migrate-image-groups` against live CMS data, (3) delete the legacy `imageGroup` schema/code paths. Task #2 was marked blocked on the EAP-042 dev-server instability window. Task #1 landed as ENG-176 with the note "runtime verification deferred." Later, when the dev server recovered, nothing re-probed task #2 — it was still in the todo list as `pending`, but no signal fired to re-run it. The user opened `/work/meteor` and saw 3 live `imageGroup` blocks; the atomic-image render branches (the entire ENG-176 refactor) were unreachable from their content because `blockType === 'imageGroup'` falls through to the legacy render path. The DnD refactor was 100% merged and 0% reachable.
+
+**Why it's wrong:**
+
+1. **"Blocked" decays into "silently abandoned" when no alerting mechanism re-probes.** A todo that says `blocked: dev server crashing` is actionable information when the dev server is still crashing. It becomes invisible the moment the session ends or the server recovers — no observer will notice the gate cleared.
+2. **Feature-completeness is a whole-system property, not a whole-codebase property.** Code merged = code exists. Feature delivered = code + migrated data + user-visible runtime behavior. A feature that requires a migration to run is not delivered when the code merges; it is delivered when the runtime against migrated data produces the advertised behavior. Treating these as separate is a category error — from the user's point of view, "shipped code that requires a migration I haven't run" and "nothing changed" are indistinguishable.
+3. **Gated todos create false confidence at feature-complete time.** The developer, reviewing the todo list before reporting "done," sees `[x] implement refactor` and `[ ] run migration (blocked)`. The checked box looks like progress; the blocked box looks like a tracked dependency. In fact the blocked box is an open failure mode that will bite at runtime regardless of whether it's labeled.
+
+**Correct alternative:**
+
+1. **Re-probe every gated operational task before declaring the containing feature done.** When a feature depends on a migration, seed, or external operation that was originally gated, the last step of the feature must be: re-check the gate, run the operation, verify its effect against real data. Don't assume a gate that was closed is still closed — probe it.
+2. **Fuse the feature and its operational dependency in the todo list.** Instead of two separate todos ("implement" + "run migration"), write one with explicit sub-steps: "implement + migrate + verify against /work/meteor." A single checked box should mean the whole thing works end-to-end. If the migration sub-step is blocked, the feature is blocked — don't check the outer box.
+3. **When a gate is identified, name the condition that will signal it has cleared.** Not "blocked — dev server down" but "blocked — retry when `curl localhost:4000/api/projects?limit=1` returns 200." A testable re-probe instruction means any future session can reliably check whether the gate is still active without context reconstruction.
+4. **For features that require migrated data, the verification step is "the migration ran AND the feature behaves correctly on migrated data," not "the code compiles."** HTTP 200 on the feature's page isn't sufficient — the feature's user-visible behavior must be verified against post-migration content.
+
+**Detection:**
+
+- **At feature-complete time:** Grep the active todo list for any item containing words like "migration," "seed," "backfill," "run script," "operational," or "after [N] unblocks." Each hit is a candidate gated dependency that needs re-probing before reporting done.
+- **During incident review:** When a user reports "I tried the feature and nothing changed," check whether any migration, seed, or one-shot operation was expected to run and whether it actually did. Before diving into the code, inspect live data against the code's assumptions.
+
+**Incident:** ENG-177 (2026-04-20) — User tested the ENG-176 per-image DnD feature on `/work/meteor`, reported "I STILL cannot drag the individual image slots." The code was correct and merged; the feature was unreachable because the imageGroup → atomic migration (gated on EAP-042) had never run against the live CMS. Inspecting live data confirmed 3 `imageGroup` blocks with 13 filled and 2 empty placeholder slots — zero atomic `image` blocks. Fix: run the dry-run, audit its output, fix the transform's empty-slot handling (→ EAP-109), run the real migration, verify post-migration state. Entire ENG-176 refactor became reachable only after this step. ~24 hours of "shipped" feature behavior was indistinguishable from "not shipped" to the user.
+
+**Principle:** A feature that requires an operational step is not complete when the code lands. It is complete when the operational step has run against real data and the feature's user-visible behavior has been verified against the resulting state. Gated todos must be re-probed at feature-complete time, not just at session-start time; a gate that cleared silently is the most expensive kind of pending work.
+
+---
+
+## EAP-109: Flat-Model Migration Drops Empty Slots From a Union-ish Source Model
+
+**Status: ACTIVE**
+
+**Trigger:** You are writing a migration from a container data model (a parent block with a children array *and* a parallel scaffold-label array that defines intended slots) to a flat atomic model (one block per slot). The transform iterates one source array or the other with an if/else: `const count = children.length > 0 ? children.length : labels.length`. On fully populated containers the transform produces N atoms; on empty containers it produces M atoms; on **partially populated** containers — the most common live state — it produces only N atoms and silently drops the `M - N` unfilled scaffold slots, destroying author-declared intent.
+
+Concrete canonical shape in this codebase: the `imageGroup` block had two parallel arrays — `images` (filled media references) and `placeholderLabels` (intended slot labels like "Before & After" or "Lifecycle map"). Authors often set up 5 labeled slots but filled only 3, leaving 2 empty drop-zones visible on the admin page. The `transformImageGroup` function in `src/lib/migrate-image-groups.ts` had `const useImages = images.length > 0; const count = useImages ? images.length : labels.length`. On Meteor's first imageGroup (3 filled images + 5 placeholder labels), the migration would have emitted 3 atomic image blocks and dropped 2 labeled slots. The user had asked for per-image drag on all slots including empty ones — the migration would have silently violated that by converting "5 slots, 3 filled" into "3 slots, 3 filled," erasing 2 authoring decisions per group with no warning.
+
+**Why it's wrong:**
+
+1. **Parallel source arrays encode different facts, not duplicate facts.** In the imageGroup model, `images[]` encoded "what is actually here right now" and `placeholderLabels[]` encoded "what the author planned to put here." These are not the same dimension — a filled group has data in one, an unfilled-but-scaffolded group has data in the other, a partially filled group has data in both with different indices. A migration that treats them as "one or the other" picks only one dimension of author intent to preserve.
+2. **Empty slots are author-declared intent, not cleanup debt.** A label like "Before: the daily email-and-spreadsheet review loop with BNY vendor" is a research note the author made about what should go there. Dropping it during migration means the author has to re-research, re-write, and re-label that slot — pure regression of their work. The migration should preserve every slot because every slot is work that was done.
+3. **The most common live state is the most vulnerable.** Empty containers and fully populated containers both round-trip correctly through the bad transform. Partially populated containers — which is the dominant real state in any author workflow where writing happens over time — hit the exact case where the bug fires. The worse the workflow, the more common the state, the more damage the migration does.
+
+**Correct alternative:**
+
+1. **Iterate `max(N, M)` slots, not `N || M`.** The total slot count for any position-indexed union-ish source model is the maximum of the parallel arrays' lengths, because the arrays index the same positions; either array can extend the other.
+2. **For each slot, derive the atom from whichever parallel array has data at that index, defaulting the others.** Filled slot (`images[i]` present) → atom with media and optional caption. Empty slot (`labels[i]` present, `images[i]` absent) → atom with `placeholderLabel` and no media. Both arrays empty at position `i` (shouldn't happen if max was used, but defensive default) → empty atom with neutral defaults.
+3. **Enumerate all four container states during migration review.** Before merging the migration, run the transform (or dry-run it) against: (a) empty container (0 filled, 0 labeled) → should emit 0 atoms; (b) partially filled container (N filled, M > N labeled) → should emit M atoms; (c) fully filled container (N filled, 0 labeled OR N labeled) → should emit N atoms with no label bleed; (d) over-scaffolded container (0 filled, M labeled) → should emit M empty atoms. If any row in that table is wrong, the transform is wrong.
+4. **Verify post-migration counts match pre-migration intent counts, not pre-migration fill counts.** Meteor pre-migration: 3 imageGroups, 21 total slots (sum of `max(images.length, placeholderLabels.length)`). Post-migration atom count under the correct transform: 15 (hero stays separate). Under the incorrect transform: 13 (loses 2 empty slots). The discrepancy is the migration's silent data loss — spotting it requires comparing the right counts.
+
+**Detection:**
+
+- **During migration code review:** Search for `useX ? X : Y` patterns where X and Y are parallel source arrays. Ask: "if X has data AND Y has data at higher indices, does the transform reach those higher indices?" If not, the transform has a silent-drop case.
+- **Before merging the migration:** Write the four-state table described above and verify each row against the transform output. If the migration touches live data and any row is wrong, the migration is not ready to ship.
+- **Post-migration:** Spot-check a partially populated container in the migrated data. Count the atoms. Compare against `max(filled, labeled)` in the pre-migration state. A mismatch indicates EAP-109.
+
+**Incident:** ENG-177 (2026-04-20) — The imageGroup → atomic migration transform was `useImages ? images.length : labels.length`. Meteor's first imageGroup had 3 filled images + 5 placeholder labels. Dry-run output showed `imagesEmitted: 13` total across 3 groups — a loss of 2 empty slots per the over-scaffolded group. Fix: changed to `Math.max(images.length, labels.length)`; iterate slot-wise; emit filled slots with media and empty slots with their `placeholderLabel`. Dry-run re-ran: `imagesEmitted: 15` — matching the expected max-slot count. Then ran the real migration and verified via Payload REST API that both filled and empty atomic slots exist with the correct label text preserved on empty ones ("Before: the daily email-and-spreadsheet review loop with BNY vendor", "After: Meteor auto-generated basket with flagged exception rows", etc.).
+
+**Principle:** When a migration moves from a container-with-parallel-arrays model to a flat model, the target atom count equals the total slot count, which equals the maximum of the parallel arrays' lengths — never a single array's length in isolation. Empty slots in the source model are author intent. They survive the migration as empty atoms; they do not get silently cleaned up. Verification before shipping a union-to-flat migration requires running the transform against every combination of (filled subset, labeled subset) and confirming the emitted atom count equals the union cardinality.
+
+---
+
+## EAP-110: Reorder-Only DnD on a 2-D Layout
+
+**Status: ACTIVE**
+
+**Trigger:** A drag-and-drop system is wired up on a 2-D layout (grid, row/column composition, masonry, anything where the dragged item can be adjacent to the drop target on two different axes) and the DnD handlers read only `over.id` at drop time. `handleDragEnd` looks something like:
+
+```ts
+const fromIdx = getIndex(active.id)
+const toIdx = getIndex(over.id)
+reorder(fromIdx, toIdx)
+```
+
+Pure reorder works. Any operation that requires changing a *relationship* between the dragged item and the drop target — joining them into a shared container, splitting them out of one, nesting one inside the other — silently no-ops because the relationship bit (here `rowBreak: boolean`) is never set by the drop, only by explicit toolbar UI or a schema default.
+
+Concrete canonical shape in this codebase: `ProjectClient.tsx` DnD after the atomic-image migration. Per-image sortability worked (ENG-176). The data model had `rowBreak: boolean` on each `image` block as the row-membership bit — `rowBreak: true` opens a new row, `rowBreak: false` continues the previous row. `handleDragEnd` spliced blocks via `useBlockManager.reorderBlockRange` + `normalizeImageRowBreaks`, which is a one-direction repair: it promotes orphaned followers to row-heads but never demotes a head to a follower. Result: dragging image A next to image B never merged them (both kept `rowBreak: true`); dragging an image out of a multi-image row never split it (its `rowBreak` stayed `false`, the row kept it as a member). The author's only escape was to open the Payload admin and flip the bit manually.
+
+**Why it's wrong:**
+
+1. **`rectSortingStrategy` exposes a 2-D pointer signal; `over.id` throws it away.** At `handleDragOver` and `handleDragEnd` time, `@dnd-kit` provides `active.rect.current.translated` (the dragged block's current translated rect) and `over.rect` (the drop target's rect). The center-delta `dx = activeCenter.x - overCenter.x`, `dy = activeCenter.y - overCenter.y` distinguishes horizontal adjacency (`|dx| > |dy|` → drop is to the left/right of target → intent-within-row / merge) from vertical adjacency (`|dy| > |dx|` → drop is above/below → intent-between-rows / split). The 1-D list index collapses both cases into `toIdx = overIdx` (or `overIdx + 1`), discarding exactly the discriminator.
+2. **"Drop position" vocabulary needs to match layout dimensionality.** A `dropPosition: 'before' | 'after'` prop reflects a 1-D sort contract. On a 2-D layout the vocabulary must expand to `'before' | 'after' | 'left' | 'right'` (or an equivalent pair encoding axis + side). Without the richer vocabulary, the visual hint cannot reflect the intent even if the handlers compute it — the author sees a horizontal line where a vertical one should appear, breaks their mental model of what will happen, and learns to distrust the affordance.
+3. **Transform primitives must set the relationship bit atomically with the splice.** Even with intent captured, routing merge drops through a pure-reorder `reorderBlockRange` means the patch lands with the bit unchanged, a post-hoc normalizer runs and can't tell "this drop should demote" from "this reorder shouldn't touch membership," and the UI renders the wrong row layout. The primitive that handles the drop must take `intent` as a parameter and set the bit in the same patch — anything else races the optimistic update against the normalizer.
+
+**Correct alternative:**
+
+1. **Capture intent in `handleDragOver`, not `handleDragEnd`.** Compute `dx`/`dy` between active and over rect centers every time the pointer crosses a cell boundary. Derive `{ intent: 'merge' | 'split', side: 'left' | 'right' | 'top' | 'bottom' }` and store it in state. `handleDragEnd` reads this state; `handleDragOver`'s role is both to keep it fresh AND to let the render loop draw a visual hint that reflects the live decision.
+2. **Expand the `dropPosition` vocabulary to match the layout.** On a 2-D layout, a visual drop hint needs an axis (horizontal line for split / vertical line for merge) and a side (before/after for split; left/right for merge). Wire the render loop so that `dropPosition` reads from the intent state, not from a single-axis from/to comparison.
+3. **Build a single atomic transform that does splice + bit flip.** In this codebase, `applyImageDropIntent(blocks, fromCmsIdx, postRemovalToIdx, intent)` performs the splice and then sets `rowBreak` on the moved block AND adjusts neighbors: on merge, if the preceding block is an image, demote the moved block's `rowBreak` to `false`; if no preceding image, set it to `true` and demote the follower's `rowBreak` from `true` to `false` so two solos fuse. On split, set the moved block's `rowBreak` to `true` and promote the follower from `false` to `true` so the source row doesn't swallow the next block. The transform is a pure function run identically on the optimistic client state and the server patch, matching the ENG-175 single-source-of-truth contract. A final `normalizeImageRowBreaks` pass defends the "first image after a non-image is a row head" invariant against edge cases.
+4. **Side-aware insertion index, not the generic `from < to ? to-1 : to` shift.** The post-removal insertion index depends on which side of the target the drop lands: `right` / `bottom` → `overIdx + 1`, `left` / `top` → `overIdx`. Then the standard `fromIdx < insertIdx ? insertIdx - 1 : insertIdx` removal shift applies. Using `fromCmsIdx < toCmsIdx ? toCmsIdx - 1 : toCmsIdx` unconditionally collapses merge-left and merge-right onto the same final index and breaks whichever direction doesn't match the reorder heuristic.
+
+**Detection:**
+
+- **During DnD review:** Search `handleDragEnd` for the triple — uses only `over.id`, computes `toIdx` from list position alone, calls a pure-reorder primitive. If yes, and the data model has any relationship bits (row/column/parent pointers), the DnD is reorder-only by construction.
+- **Data-model signal:** Any schema field of the form `<membership>Break: boolean`, `parentId: string | null`, `groupId: string | null`, `columnIndex: number` on an array element IS a relationship bit. If users cannot change that bit by dragging, they must change it via explicit toolbar UI — silent no-op drops on a layout that looks 2-D is EAP-110.
+- **Empirical test:** Try four drops on a 2-D layout. (a) Drag a solo item next to another solo item — do they form a shared row? (b) Drag an item from a multi-item row to a gap — does it split? (c) Reorder within a row — does position change without affecting row membership? (d) Reorder between rows — does position change without breaking adjacent row structure? Any "no" is EAP-110 on the operation that should be producing the relationship change.
+
+**Incident:** ENG-179 (2026-04-20) — User tested ENG-176 per-image DnD on `/work/meteor` and reported that individual image reorder worked but "form rows by dragging" and "break rows by dragging" both silently no-op'd. Root cause was all three failures compounding: `handleDragOver`/`handleDragEnd` read only `over.id`; `reorderBlockRange` + `normalizeImageRowBreaks` had no demote path for merge; `SortableBlock.dropPosition` was `'before' | 'after' | null` with no vertical-line vocabulary. Fix landed the intent capture + `applyImageDropIntent` transform + `reorderImageWithDropIntent` server primitive + expanded `DropEdge = 'before' | 'after' | 'left' | 'right' | null` with a vertical `.dropLineVertical` accent bar at the merge-side gutter. Verified on localhost: merge forms shared rows, split pulls images out, pure reorder still works.
+
+**Principle:** Drag-and-drop on a 2-D layout must read a 2-D pointer signal. `rectSortingStrategy` gives you `active.rect` and `over.rect`; collapsing them to a single list index at drop time throws away the dimension that distinguishes adjacency-within-container (merge / nest) from adjacency-between-containers (split / peer). Intent capture lives in `handleDragOver` so the visual hint can reflect it live; transform primitives set the relationship bit atomically with the splice; the `dropPosition` vocabulary must be rich enough to distinguish each intent visually. When the data model has a relationship bit and the layout is 2-D, "reorder" is always a subset of the valid operations — never the whole contract.

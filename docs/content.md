@@ -82,6 +82,8 @@
 | AI output lacks user's personal voice (clinical register) | 1 | High |
 | Floating metric (hero number without derivation in scan window) - CAP-025 | 1 | Critical |
 | Employment classification signal (diminishing labels in portfolio text) - CAP-026 | 1 | High |
+| Inline bold imported from source markdown - CAP-030 | 1 | High |
+| Case-study blurb contract applied to essay format (lede treated as trailer) | 1 | High |
 
 ---
 

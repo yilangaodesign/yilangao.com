@@ -23,9 +23,9 @@
 
 | Service | Default Port | Current Port | Status | PID | Notes |
 |---|---|---|---|---|---|
-| Main site (`yilangao.com`) | 4000 | 4000 | running | 40177 | `npm run dev` (webpack mode) |
-| Playground | 4001 | 4001 | running | 95085 | `npm run playground` (`--webpack`; see ENG-150) |
-| ASCII Art Studio | 4002 | 4002 | running | 95088 | `npm run ascii-tool` (`--webpack`; see ENG-150) |
+| Main site (`yilangao.com`) | 4000 | 4000 | running | 79976 | `npm run dev` (webpack mode) |
+| Playground | 4001 | 4001 | running | 81689 | `npm run playground` (`--webpack`; see ENG-150) |
+| ASCII Art Studio | 4002 | 4002 | running | 81721 | `npm run ascii-tool` (`--webpack`; see ENG-150) |
 
 ## Key Pages (on main site, no separate server)
 
@@ -38,6 +38,10 @@
 
 | Timestamp (UTC) | Service | Action | Port | Reason |
 |---|---|---|---|---|
+| 2026-04-20 20:55 | All services | restarted | 4000–4002 | `ERR_EMPTY_RESPONSE` on `/for/test?preview=true` — traced to missing `routes-manifest.json` (ENG-117/EAP-069 recurrence). Webpack accepted connections but returned 0 bytes; ENOENT visible in dev log. Clearing `.next` alone did not fix — `rm -rf node_modules && npm install` resolved it (ENG-134 pattern). Post-reinstall: first request 26s (cold compile + Payload schema pull), repeat requests ~300–500ms, `routes-manifest.json` confirmed present. |
+| 2026-04-20 20:37 | Main site | restarted | 4000 | User boot up — prior main-site server stuck at 0.1% CPU on `Compiling /work[slug] ...` for 9+ min after aborted curl probes; SIGKILL + `rm -rf .next` + fresh `npm run dev`. First `/for/[company]` compile took ~3min (webpack dev); subsequent requests ~30s (DB-heavy Payload query). |
+| 2026-04-20 20:24 | Playground, ASCII Art Studio | restarted | 4001, 4002 | Collateral kill from a too-broad `pkill next-server` pattern; fresh `npm run playground` / `npm run ascii-tool`; both healthy (HTTP 200 in ~120ms). |
+| 2026-04-20 14:05 | Main site, Playground, ASCII Art Studio | started | 4000–4002 | User boot up — ports were free; cleared `.next` for all three apps; fresh `npm run dev` / `npm run playground` / `npm run ascii-tool`; LISTEN PIDs from `lsof` (63380, 63445, 63446). Main site terminal showed `○ Compiling proxy ...` after Ready; verify in browser if first HTTP is slow. |
 | 2026-04-17 15:49 | Main site | restarted | 4000 | User-visible old homepage (ENG-151) — deleted shadowing `src/app/(frontend)/{page,HomeClient}.tsx` (v1), cleared `.next`, fresh `npm run dev`; new canonical homepage served from `(frontend)/(site)/page.tsx` |
 | 2026-04-17 15:07 | Playground, ASCII Art Studio | restarted | 4001, 4002 | User boot up — prior listeners unhealthy (Turbopack BMI2 panic / hung HTTP); dev scripts aligned with `--webpack`; fresh `npm run playground` / `npm run ascii-tool`; PIDs from `lsof` |
 | 2026-04-14 00:11 | Main site, Playground, ASCII Art Studio | started | 4000–4002 | User boot up — nothing listening on 4000–4002; fresh `npm run dev` / `npm run playground` / `npm run ascii-tool`; PIDs from `lsof` |

@@ -35,7 +35,8 @@ For essays: paragraphs follow the same 3-sentence cap, but there is no section s
 | **Detail crops** | Showing specific interaction patterns or micro-decisions | A toolbar, a modal, a hover state |
 | **State progression** | Showing a flow or transformation | Empty → loading → populated → error, side by side |
 | **Before/after** | Showing impact of your redesign | Old vs. new, clearly labeled |
-| **Screen recording / GIF** | Showing animation, transitions, or interactive behavior | A drag interaction, a page transition, a loading sequence |
+| **Screen recording / GIF / MP4 loop / MP4 walkthrough** | Showing animation, transitions, or interactive behavior | A drag interaction, a page transition, a loading sequence. Use MP4 `loop` (silent autoplay) for short UI clips under ~10s. Use MP4 `player` mode (controls, no autoplay) for narrative walkthroughs with audio or longer runtime. Animated GIFs exported from Figma/After Effects are accepted as-is and will play (GIF animation is preserved automatically); prefer MP4 over GIF when the file is >2MB or longer than ~3s. |
+| **Embedded walkthrough (YouTube / Vimeo / Loom)** | Long narrative demos where provider controls, captions, chapters, or host-side analytics matter | A 5-minute product tour on YouTube, a Loom walkthrough recorded for a stakeholder, a Vimeo-hosted case film. Use the `videoEmbed` block (paste the share URL). Prefer uploaded MP4 over embed for short silent loops and anything that grid-mixes with uploaded assets. Prefer embed for long-form content where you want the provider's player (captions, speed, chapters) rather than a bare controls bar. Posters default to YouTube auto-thumb; upload a custom poster for Vimeo/Loom. |
 | **System diagram** | Showing architecture or component relationships | Information architecture, component hierarchy |
 | **Annotated walkthrough** | Replacing "play with it" for internal tools | 3-4 screens connected with arrows, one-sentence annotations |
 

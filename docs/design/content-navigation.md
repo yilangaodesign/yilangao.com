@@ -37,6 +37,22 @@ Labels in ScrollSpy tooltips should be shorter than section headings. The sectio
 
 **UX principle:** Scroll-to navigation is a spatial metaphor. The user expects to "arrive" slightly above the destination, as if they walked up to it and stopped a step before. Landing exactly on it (flush top) feels like teleportation — disorienting because the preceding context is invisible. The offset creates a landing zone that preserves the user's mental map of the page.
 
+### 13.5 ScrollSpy Auto-Contrast Label
+
+**Source:** Session 2026-04-20, FB-155 "can the notch text color change to light when it detects that the background pixel... only the current notch will have the impact"
+
+**Rule:** The currently-active (or drag-targeted) notch's label must remain legible over any backdrop — including dark hero splashes, photographic full-bleed sections, and colored accent blocks. Non-active labels shown on hover retain their token-driven hierarchy.
+
+**Mechanism:** The active label is portaled to `document.body` via `createPortal` and styled with `color: #fff; mix-blend-mode: difference`. This yields `|255 − backdrop|` per channel — automatic inverse-of-backdrop contrast with no JavaScript sampling, no per-section annotation, and no dependence on theme tokens. Black bg → white text, white bg → black text, colored bg → color-inverse text.
+
+**Why portal:** `position: fixed` always creates a new stacking context (regardless of `z-index`), and `mix-blend-mode` only blends against the *parent stacking context's* backdrop. A label rendered inside the fixed rail would blend only against the rail's interior — invisible. Portaling the label to `document.body` places it in the root stacking context, where it blends against all page content rendered below. See the `mix-blend-mode` entry in `design-anti-patterns.md` for the failure mode to avoid.
+
+**Scope:** Only the active/drag-targeted notch's label. Applying difference blend mode to all hover-revealed labels would collapse the depth-by-opacity hierarchy (placeholder / primary / secondary) into a flat layer — the hierarchy exists to communicate sub-section subordination and must survive hover.
+
+**Position sync:** The overlay's `top` / `left` are computed from the active tick's `getBoundingClientRect()` inside a `useIsomorphicLayoutEffect`, re-subscribed to `resize` and capture-phase `scroll` events. Because the rail is viewport-fixed, the tick's coordinates don't change on page scroll — but the listeners handle browser zoom, window resize, and edge cases where an ancestor scroll container might shift the rail.
+
+**Trade-off:** On highly saturated non-neutral backdrops, the inverse is a complementary color (red → cyan, green → magenta, blue → yellow) rather than pure black or white. For a portfolio whose backgrounds are dominantly neutral with occasional photographic accents, this reads as "still readable, occasionally stylistically tinted" — which is aligned with the author's ask ("the inverse of whatever the background color is"). If a future visual identity requires strictly black/white labels regardless of backdrop hue, the implementation would need to switch to pixel sampling + luminance scoring, and the trade-off becomes handling background-images and gradients (which sampling cannot observe).
+
 ### 13.4 Current ScrollSpy Pages (Playground)
 
 | Page | Sections | Notches |

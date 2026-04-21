@@ -120,3 +120,132 @@ For components that live inside grid-influenced regions (next to sidebars, insid
   .card-grid { grid-template-columns: repeat(3, 1fr); }
 }
 ```
+
+### 6.10 Desktop Min-Width Floor — Content Only, Functional Chrome Stays Fluid
+
+**Policy.** On the public portfolio site (`src/app/(frontend)/(site)/**`), at `@media (pointer: fine)` AND viewport < `$elan-bp-sm` (672px):
+
+- **Page content** (`.contentAreaInner`) gets `min-width: 672px` and the parent `.contentArea` becomes an `overflow-x: auto` scroll container. Desktop users who drag the browser narrower see a horizontal scrollbar inside the content region instead of the desktop composition collapsing into the phone layout.
+- **Functional chrome** (Navigation, SiteFooter) stays fluid to the actual viewport width and falls back to its mobile layouts via its own `$elan-mq-sm` media queries. Nav remains usable; the footer collapses to its centred single-column stack (FB-144).
+
+**Why the split.** An earlier version of this policy (FB-147) put the min-width floor on `.siteWrapper`, which pinned the *entire* layout (nav + content + footer) to 672px at narrow viewports. The symptom: at 400px viewport on desktop, the footer rendered in its desktop layout inside a 672px-wide wrapper, even though only 400px of it was visible without horizontal scrolling. The user had to scroll sideways to reach the right side of the footer, which is exactly wrong for functional chrome — the footer contains the contact address and social links, which must be reachable at any width. The split (FB-149) restores that invariant: content can opinionate about its minimum width, chrome must not.
+
+**Scope boundary.** This rule lives in `src/app/(frontend)/(site)/layout.module.scss` and applies only inside the `(site)` route group. Unaffected:
+- Payload admin (`src/app/(payload)/**`)
+- Company login gate (`src/app/(frontend)/for/**`)
+- API routes
+- Playground or ASCII Studio apps
+
+**Why `pointer: fine` instead of `min-device-width`.** `pointer: fine` is the modern signal for "mouse-driven input" and correctly distinguishes desktop from phones and tablets. User-agent sniffing is brittle; `min-device-width` is deprecated. A small laptop with a touchscreen will report `pointer: coarse` on the primary pointer if touch is preferred, which is the right behavior — treat it like a tablet.
+
+**Structural pattern.**
+
+```scss
+.siteWrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  // NO min-width here — chrome must stay viewport-sized
+}
+
+.contentArea {
+  flex: 1;
+  min-width: 0; // allow flex shrink below intrinsic width
+}
+
+@media (pointer: fine) and (max-width: #{$elan-bp-sm - 1px}) {
+  .contentArea {
+    overflow-x: auto; // contain overflow inside this region
+  }
+  .contentAreaInner {
+    min-width: $elan-bp-sm; // 672px floor, applied to inner wrapper
+  }
+}
+```
+
+The inner wrapper is required: if `min-width` is applied directly to `.contentArea`, its parent grows to accommodate it (flex distribution) and nav/footer grow with it — the exact symptom we're trying to avoid.
+
+**Side effect at narrow desktop.** `overflow-x: auto` on `.contentArea` implicitly promotes `overflow-y` to `auto` per the CSS spec. At narrow desktop only, this means the content region scrolls vertically inside itself rather than at the document level. The sticky-bottom footer reveal pattern becomes a "footer always pinned to viewport bottom" pattern. This is the correct behavior for this zone: the user is outside the supported composition, so the chrome being always-visible is a better fallback than the reveal animation. At viewport ≥ 672px, the media query does not fire, so document scroll and sticky reveal work as designed.
+
+**Accessibility caveat.** WCAG 1.4.10 (Reflow) asks that content reflow to 320 CSS pixels without horizontal scroll. Forcing horizontal scroll on desktop content technically relaxes this *for zoomed-in sighted users* (zoom to 200% on a 1280px monitor produces a 640px effective viewport, which hits the floor). We mitigate this by keeping nav and footer fully responsive — the functional tasks (contact, navigate, read bio) are reachable at any width even when a case study forces horizontal scroll.
+
+**Pattern extraction.** When a site has two structurally distinct layouts (phone vs desktop) rather than a single fluid composition, split the responsiveness rules: **content** can opinionate a minimum width and scroll horizontally inside its own region; **functional chrome** (nav, footer, cookie banners, global CTAs) must always be fluid to the viewport. Put the min-width on an inner wrapper and the scroll container on its direct parent — never on a root wrapper that also contains chrome. This gives the brand authority to say "the case study is composed for ≥672px" without sacrificing the "contact is always reachable" promise.
+
+### 6.11 Priority Wrapping: Grid `1/-1` Beats Flex-Wrap
+
+**Problem.** When a multi-column section has a "priority" element that must occupy its own row when the layout gets tight, flex-wrap is the wrong tool. Flex-wrap wraps from the *end* of the row — the last item wraps first. You cannot tell flex-wrap "when things don't fit, move the first item to its own row." The closest flex trick (pseudo-element break, `flex-basis: 100%` + `max-width`) requires either a DOM change or fights the specification.
+
+**Pattern.** Use CSS Grid with `grid-column: 1 / -1` on the priority item. This authoritatively claims the entire row at a given breakpoint, regardless of how the remaining columns sub-divide the row below. Combine with a `max-width` on the priority item to visually cap its content while the grid cell itself spans the full track range.
+
+```scss
+.columns {
+  // Compact zone: priority spans all columns, others auto-fit below
+  @media #{$elan-mq-sm} {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: $portfolio-spacer-5x $portfolio-spacer-8x;
+  }
+
+  // Wide zone: explicit template, priority gets its own track
+  @media #{$elan-mq-md} {
+    grid-template-columns:
+      minmax(260px, 320px)
+      repeat(3, minmax(180px, 240px));
+    justify-content: space-between;
+  }
+}
+
+.priorityColumn {
+  @media #{$elan-mq-sm} {
+    grid-column: 1 / -1;
+    max-width: 360px; // visual cap even though the cell spans the full row
+  }
+  @media #{$elan-mq-md} {
+    grid-column: auto; // defer to the explicit template
+  }
+}
+```
+
+**Two-zone grammar.** The compact zone uses `auto-fit` + `minmax` so the non-priority columns reflow based on available width — you don't hardcode the column count. The wide zone uses an explicit `minmax(a, b) repeat(n, minmax(x, y))` template so every column gets known min/max bounds and `justify-content: space-between` absorbs leftover horizontal slack into the inter-column gaps instead of stretching any single column past its content-width ceiling.
+
+**When to apply:** footers, section headers with a brand block + utility links, form layouts with a label group + paired fields, any composition with one "hero" element and N peer elements. See FB-148 for the portfolio footer implementation.
+
+---
+
+### 6.12 Rigid vs Flexible Columns — Enforce Content Invariants at Both Text and Layout Layers
+
+**Problem.** Some columns contain content with a structural reading rule (e.g. "one row = one job" for an Experience list). If the column's track width drops below what the content needs to render at one line, the text wraps and the reading rule breaks. Relying on grid `minmax(Nmin, Nmax)` alone is fragile: (a) the rule only holds for today's content lengths — tomorrow's CMS edit can violate it, and (b) `minmax` with a min lower than content-width *does* permit wrap when auto-fit assigns the minimum to the track.
+
+**Pattern.** Enforce the invariant at two layers:
+
+1. **Text layer (authoritative):** `white-space: nowrap` on the link/span that must stay one line. The rule now lives in the content's rendering, not in the surrounding layout. No amount of viewport shrinkage can make a nowrap element wrap.
+2. **Layout layer (safety net):** give the column a **fixed track width** matching the content's rendered one-line width — `grid-template-columns: ... Npx ...` (not `minmax`). Nowrap alone without a layout safety net would let content visually overflow the column into adjacent gaps; the fixed track width makes overflow impossible.
+
+Treat columns in the grid as having one of two roles:
+
+- **Rigid** columns (content has a structural one-line rule): fixed track `Npx`. Never `minmax`.
+- **Flexible** columns (content is short and decorative): `minmax(Nmin, Nmax)` range. They absorb horizontal slack.
+
+When viewport shrinks below `sum(rigid) + sum(flexible-min) + gaps`, the auto-fit grid falls back to fewer tracks and the last items in DOM order wrap to the next row. Rigid columns stay at their fixed width; flexible columns get squeezed to their min. This matches the user's mental model: "Experience must never compromise; Links/Contact can adapt."
+
+```scss
+.list a { white-space: nowrap; } // text-layer invariant
+
+.columns {
+  @media #{$elan-mq-sm} {
+    // compact: auto-fit with floor matching the rigid column's needed width
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  }
+  @media #{$footer-wide-mq} {
+    // wide: rigid column gets a fixed track, others stay minmax
+    grid-template-columns:
+      minmax(260px, 320px) // flexible (About bio)
+      240px                // rigid (Experience)
+      repeat(2, minmax(180px, 240px)); // flexible (Links, Contact)
+  }
+}
+```
+
+**When to apply:** any list column where content integrity demands one-line-per-item (company names, product names, dates, monetary values, IDs). Avoid applying to prose columns — bio paragraphs and descriptions *want* to wrap and look wrong as a single line. Rigidity is for list columns, not prose columns.
+
+**Component-local breakpoints are allowed — and sometimes required.** If the rigid column's width calculation pushes the layout's fit threshold past a canonical breakpoint token, define a component-local breakpoint with a comment that derives the number from column widths + gaps + padding. Example: `$footer-wide-mq: '(min-width: 1120px)'` because `260 + 240 + 2×180 + 3×64 + 2×32 = 1116 → 1120`. The token system is for platform categories (phone/tablet/laptop); layout-fit thresholds are component-level concerns. See FB-150.

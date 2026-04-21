@@ -4,7 +4,7 @@
 >
 > **Who reads this:** AI agents before writing or editing portfolio content — scan for relevant anti-patterns.
 > **Who writes this:** AI agents when a content feedback cycle reveals a new anti-pattern.
-> **Last updated:** 2026-03-31 (status markers added, resolved entries compacted)
+> **Last updated:** 2026-04-20 (CAP-031 added: Chronological Case-Study Order)
 
 ## Category Index
 
@@ -13,10 +13,10 @@
 | Narrative Structure | CAP-001, 003, 006, 016, 024 | 5 |
 | Voice & Tone | CAP-017, 022, 023, 027, 028 | 5 |
 | Positioning & Claims | CAP-002, 004, 011, 019, 025, 026 | 6 |
-| Information Architecture | CAP-005, 008, 009, 010, 018 | 5 |
+| Information Architecture | CAP-005, 008, 009, 010, 018, 031 | 6 |
 | Specificity & Evidence | CAP-007, 015, 020, 021 | 4 |
 | UX Microcopy | CAP-012, 013, 014 | 3 |
-| **Total** | | **28** |
+| **Total** | | **31** |
 
 ---
 
@@ -440,6 +440,48 @@ For fields with non-obvious formats, add a help line or placeholder with an exam
 **Correct alternative:** Refuse the parallel structure. Let items emerge from narrative where they are needed. "The first question users asked, every time: why did you flag this row?" introduces explainability through what happened, not through a definition block. If all N items need coverage, vary the beat pattern per item - one gets a full paragraph, another gets two sentences, a third emerges as a surprise in a story about something else. External examples must be earned (the writer was in the room, not reading about it).
 
 **Reference:** CFB-034. ETRO essay Section 2 had four identical blocks (Explainability, Traceability, Reversibility, Observability) each following theory -> external example -> "In the system I built, this looked like..." Collapsed from ~1,200 words to ~450 by introducing each element through what actually happened.
+
+---
+
+## CAP-030: Inline Bold Imported From Source Markdown
+
+**Status: ACTIVE**
+
+**Trigger:** Materializing a user-supplied markdown essay/case-study draft into CMS blocks and preserving the source's `**bold**` spans verbatim. Source markdown (written for Medium/Substack/Notion/Google Docs rendering) commonly uses inline bold as scan-anchor typography - bolded leads, emphasized conclusions, bolded sub-labels like "Per user.", "Scaffolding.", or "What happens next?" When imported raw into `bodyMarkdown` strings, these survive the `markdownToLexical` conversion as FORMAT_BOLD text nodes and render as `<strong>` at body weight 700.
+
+**Why it's wrong:** Two reasons - one hard, one soft.
+
+Hard: `voice-style.md` §13.1 is explicit - "Bold: only for section headings and impact metrics. Never in body text for emphasis." The portfolio design system's typography contract reserves weight jumps for the H2 section heading (semibold at xl size). The contract is the only thing making section rhythm legible.
+
+Soft: the user perceives it as "hierarchy not visually clean" or "I can't see where sections start." Inline bold at body size reads as a visual peer of the semibold H2 one unit up. N bold spans per section create N+1 competing dominant stops, so the H2 loses its role as the top of the section. The complaint will present as a section-separation problem but the fix is inside each paragraph, not in the gaps.
+
+**Correct alternative:** During materialization, strip every `**bold**` from `bodyMarkdown`. Replace according to the bold's function in the source:
+- Scan-anchor label ("Per user.", "Scaffolding.") → colon-prefixed paragraph start ("Per user:", "Scaffolding:")
+- Tonal emphasis of a full sentence → plain prose (the sentence break is its own anchor)
+- Italicized feel → convert to `*italic*` (voice-style bans bold, not italic)
+- Purely typographic habit with no structural role → drop it
+
+Bold survives only on H2/H3 heading blocks (the `heading` block type, not inline `###` in bodyMarkdown) and on impact metrics. Running a `\*\*` regex on every `update-*/route.ts` file is a 2-second parity check - any match is this pattern.
+
+Also do NOT use inline `###` headings inside a richText `bodyMarkdown`. `src/lib/lexical.ts::lexicalToHtml` does not emit heading HTML tags - when a Lexical root has mixed heading+paragraph children, it silently drops the heading entirely. Use separate `heading` blocks (with `level: 'h3'`) or convert to a paragraph with an emphatic lead.
+
+**Reference:** FB-143 / CFB-036. ETRO essay was materialized from source with 36 inline bold spans preserved; user perceived it as "bold abuse" + unclear section hierarchy in a single complaint. Stripping all 36 fixed both perceptions without changing spacing, heading levels, or any structural layout. Other `update-*/route.ts` files (elan, lacework, meteor) had zero bolds - ETRO was the only essay materialized from raw user markdown, which is precisely when this pattern appears.
+
+---
+
+## CAP-031: Chronological Case-Study Order
+
+**Status: ACTIVE**
+
+**Trigger:** The integer `order` on each project in the CMS was set when the project's `src/app/(frontend)/api/update-*/route.ts` was scaffolded, and never revisited. New case studies default to the next available integer instead of being explicitly ranked against the existing set. Over time the home page orders cases by *authoring date* instead of by *narrative priority*, and the strongest piece is not the one the reader sees first.
+
+**Why it's wrong:** The home page case-study grid is a funnel. Most visitors read the first card carefully, the second with less attention, and bounce before the third. Whichever case study holds `order: 1` is doing the load-bearing work of the whole portfolio. Letting that slot be determined by "which project was migrated into the CMS first" is a category error: the sequence in which the author built out the CMS has nothing to do with which project best demonstrates their ceiling to a hiring manager. The consequence is slow — nothing breaks visibly — but the portfolio underperforms because the strongest proof of scale (biggest scope, sole designer, largest team, largest dollar surface) sits behind weaker pieces.
+
+**Correct alternative:** Treat `order` as a narrative-priority decision, not a timestamp. Before shipping any new case study, answer: "If a reader opens only the first case study on my home page, which of my projects gives me the highest chance of earning the next click?" That project takes `order: 1`. The rest descend by impact (scope × rarity × scale × recency). When a new case study is added, the authoring flow MUST explicitly re-rank — either claim a position and shift the others, or take the bottom. Never silently append at the next integer.
+
+Operational check: `rg "order: \d+" src/app/\(frontend\)/api/update-\*/route.ts` lists the current ordering in one command. If the sequence does not reflect the narrative ranking the author would give out loud, the ordering is stale.
+
+**Reference:** CFB-038 / ENG-168. As of Mar 30 – Apr 19 2026, Lacework held `order: 1` (first CMS-migrated case study), Élan `order: 3`, Meteor/Goldman Sachs `order: 3` (tied). Meteor is the highest-scope case study in the portfolio ($79B AUM, sole designer, nine engineers, three time zones) and was buried at position 3 for ~21 days because nobody re-ranked after adding it. Fixed 2026-04-20: Meteor → 1, Lacework → 2, Élan → 3.
 
 ---
 

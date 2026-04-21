@@ -209,3 +209,43 @@ When creating or modifying any element on the portfolio website:
 4. **If using Badge:** Pass `shape="squared"` explicitly.
 5. **If using Button:** Default `shape="default"` is already correct (0px).
 6. **If using a third-party or inherited component:** Override its radius to 0 in the consuming SCSS module.
+
+---
+
+## 8. Navigation Identity Hierarchy
+
+The top-bar navigation on the portfolio site carries two kinds of text, and they have different brand weight. Any flex row that mixes them must express the priority in CSS - not leave it to the browser's default flex behavior.
+
+### 8.1 Rigid vs. Elastic
+
+| Element | Role | Compression behavior |
+|---------|------|---------------------|
+| Logo ("Yilan Gao" + mark) | **Identity anchor** | Rigid. Must never wrap, must never shrink. A broken wordmark reads as the site not knowing its own name. |
+| Tagline ("Designer, AI systems experience...") | **Affiliation / context blurb** | Elastic. Allowed to wrap to a second line. Capped at two lines so it can never open the nav taller than two rows. |
+| Inline nav links | **Navigation** | Rigid. `flex-shrink: 0` semantics - a link that wraps mid-label is a broken affordance. |
+
+Rule of thumb for any future identity row: **if losing a piece of text to clipping would be worse than losing it to wrapping, mark it rigid. If wrapping is acceptable, cap the wrap at a finite number of lines.** Unbounded wrap is never correct for chrome.
+
+### 8.2 Implementation Pattern
+
+Encoded in `src/components/ui/Navigation/Navigation.module.scss`:
+
+```scss
+.logo       { flex-shrink: 0; }              // identity: never yields
+.logoText   { white-space: nowrap; }         // "Yilan Gao" is one line, always
+.links      { min-width: 0; }                // let the right container actually shrink
+.tagline    {
+  min-width: 0;
+  text-align: right;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;                     // up to two rows, then ellipsis
+  overflow: hidden;
+}
+```
+
+`min-width: 0` on the flex container and its elastic child is the non-obvious part: without it, `min-width: auto` (the flex default) prevents shrinking below content width, which forces the browser to break the logo's text to make room. With it, compression is routed to the elastic child as intended.
+
+### 8.3 Extension
+
+Any new identity row on the portfolio (footer brand line, gate-page header, any future chrome element) inherits this pattern. When the design surfaces a new pairing of "rigid identity + elastic metadata," the same three ingredients apply: rigid side gets `flex-shrink: 0` + `white-space: nowrap` on its text; elastic side gets `min-width: 0` plus an explicit line-clamp. See FB-146 for the originating incident.

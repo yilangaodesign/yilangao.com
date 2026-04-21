@@ -4,7 +4,7 @@
 >
 > **Who reads this:** AI agents before making UI changes — scan for relevant anti-patterns.
 > **Who writes this:** AI agents when a feedback cycle reveals a new anti-pattern.
-> **Last updated:** 2026-04-06 (AP-061: Uniform step inversion for atmospheric/decorative colors)
+> **Last updated:** 2026-04-20 (AP-070: framer-motion `x`/`y`/`scale`/`rotate` on an element with a base CSS `transform` — the motion library writes an inline `transform` that silently overwrites the CSS rule. Fix is to split the static and animated transforms across two elements, or use `transformTemplate` to compose them on the same element. Default: split.) Prior: AP-069 (`mix-blend-mode` applied inside a fixed-position or otherwise stacking-context-creating ancestor — blend isolates to that context's interior and never reaches the document backdrop. Fix is to portal to `document.body`.) Prior: AP-068 (Relying on grid track minimum alone to prevent text wrap in a one-line-per-item list).
 
 ---
 
@@ -13,15 +13,15 @@
 | Category | Entries | Count | Active |
 |----------|---------|------:|-------:|
 | CSS Cascade & Build | AP-001, AP-002, AP-003, AP-008, AP-021, AP-038 | 6 | 6 |
-| Spacing & Layout | AP-004, AP-005, AP-006, AP-007, AP-009, AP-018, AP-020, AP-027, AP-045, AP-048† | 10 | 10 |
-| Positioning & Transforms | AP-013, AP-031, AP-033 | 3 | 3 |
+| Spacing & Layout | AP-004, AP-005, AP-006, AP-007, AP-009, AP-018, AP-020, AP-027, AP-045, AP-048†, AP-067, AP-068 | 12 | 12 |
+| Positioning & Transforms | AP-013, AP-031, AP-033, AP-069, AP-070 | 5 | 5 |
 | Theming & Dark Mode | AP-042, AP-043, AP-044, AP-047, AP-061 | 5 | 5 |
 | Interaction & Pointer Behavior | AP-011, AP-012, AP-022, AP-025, AP-035 | 5 | 5 |
-| Navigation & Menus | AP-014, AP-015, AP-016, AP-029, AP-046, AP-049 | 6 | 6 |
+| Navigation & Menus | AP-014, AP-015, AP-016, AP-029, AP-046, AP-049, AP-066 | 7 | 7 |
 | Visual Hierarchy & Affordances | AP-010, AP-017, AP-019, AP-026, AP-030, AP-032, AP-039, AP-040, AP-041, AP-048‡, AP-050, AP-051, AP-052, AP-054, AP-057, AP-060 | 16 | 16 |
 | Form & Input UX | AP-023, AP-024, AP-028, AP-036, AP-064, AP-065 | 6 | 6 |
 | Admin UI Patterns | AP-034, AP-037 | 2 | 2 |
-| **Total** | | **58** | **58** |
+| **Total** | | **63** | **63** |
 
 > **†** AP-048 "Independent Padding Decisions Across Adjacent Panels" (spacing entry)
 > **‡** AP-048 "Incremental State-by-State Implementation Without a Holistic Model" (state modeling entry)
@@ -971,6 +971,37 @@ Use `var(--ds-*, #{$scss-fallback})`. The CSS custom property adapts at runtime;
 
 ---
 
+## AP-066: Unconstrained Flex Compression Breaking Identity Text
+
+**Status: ACTIVE**
+
+**Trigger:** A flex row mixing rigid identity text (logo, wordmark, nav labels) with elastic metadata (tagline, description, timestamp), using flex defaults on all children. At narrow viewports, the browser wraps the identity text at a space to make room for the metadata.
+
+**Why it's wrong:** Default flex behavior treats every child as equally willing to shrink - that is almost never what the brand actually wants. A broken wordmark reads worse than a clipped or ellipsised one: it looks like the site doesn't know its own name. Identity text must be rigid; metadata must be elastic with a finite wrap ceiling. Expressing this only in visual order (logo on the left, tagline on the right) doesn't communicate priority to the layout engine.
+
+Additional failure mode: even with `white-space: nowrap` on the rigid text, it can still be forced to wrap if its flex parent has `min-width: auto` (the flex default), because the elastic sibling's intrinsic content width prevents compression. You have to grant `min-width: 0` to both the elastic container and the elastic child before any line-clamp takes effect.
+
+**Correct alternative:**
+
+```scss
+.rigid        { flex-shrink: 0; }              // never yields to flex pressure
+.rigid-text   { white-space: nowrap; }         // defensive: cannot wrap even if forced
+.elastic-wrap { min-width: 0; }                // allow this container to shrink below content
+.elastic      {
+  min-width: 0;                                // allow this child to shrink below content
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;                       // finite wrap ceiling - never unbounded
+  overflow: hidden;
+}
+```
+
+Rule of thumb: **if losing a piece of text to clipping would be worse than losing it to wrapping, mark it rigid. If wrapping is acceptable, cap the wrap at a finite number of lines.** Unbounded wrap is never correct for chrome.
+
+**Frustration caused:** 1 round - FB-146. Pattern generalized in `docs/design/branding.md` §8 so future identity rows (footer brand line, gate-page headers, other chrome) inherit the rule.
+
+---
+
 ## AP-065: Centered-Align Footer Text Below Left-Aligned Form Elements
 
 **Trigger:** Using `text-align: center` on helper/footer text below a left-aligned input field or form group, where the form and footer share a narrow container.
@@ -1068,3 +1099,155 @@ Use `var(--ds-*, #{$scss-fallback})`. The CSS custom property adapts at runtime;
 **Correct alternative:** Always pair `$portfolio-font-pixel-*` tokens with `$portfolio-weight-medium` (500). Never use `$portfolio-weight-bold`, `$portfolio-weight-semibold`, or any other weight. If heavier visual presence is needed, increase font-size instead of font-weight.
 
 **Frustration caused:** 5 rounds — user reported "it's all filled" / "doesn't look like the lines property" across multiple attempts. Root cause was `font-weight: 700` triggering synthetic bolding; once switched to 500 the line effect appeared immediately.
+
+---
+
+### AP-067: Min-Width Floor on a Root Wrapper That Contains Functional Chrome
+
+**Trigger:** Applying `min-width: $floor` (or any width constraint) to a top-level layout wrapper that holds both scrollable content AND functional chrome (nav, footer, cookie banners, global CTAs) in the same flex/grid tree.
+
+**Why it's wrong:** A min-width on the root pins *everything inside* to that floor, including chrome that was designed to be fluid. At a viewport narrower than the floor, the browser renders the whole root at `$floor` wide and creates horizontal scroll on the document. The user sees the chrome's desktop composition cropped by the viewport — contact email, social links, nav actions, or cookie accept/reject buttons may sit offscreen until the user scrolls sideways. The original intent (force scroll for content that was composed for a wider viewport) collateral-damages the promise that functional chrome is always reachable. Chrome has its own mobile-width rules in its `$elan-mq-sm` block; those rules never fire because the wrapper prevents the chrome from ever seeing a sub-floor width.
+
+**Correct alternative:** Split content vs chrome. Put the min-width on an **inner content wrapper** and make the **outer content region** a scroll container. Chrome (nav, footer) sits as siblings to the outer region and stays fluid to the actual viewport. The outer region contains the overflow so it never grows the document width.
+
+```scss
+.siteWrapper {
+  display: flex;
+  flex-direction: column;
+  // NO min-width here
+}
+.contentArea {
+  flex: 1;
+  min-width: 0; // allow flex shrink
+}
+@media (pointer: fine) and (max-width: #{$floor - 1px}) {
+  .contentArea { overflow-x: auto; }
+  .contentAreaInner { min-width: $floor; }
+}
+```
+
+The inner wrapper is load-bearing: if you put `min-width` directly on `.contentArea`, its parent grows to accommodate it (flex cross-axis) and chrome grows with it. Only the inner wrapper + outer `overflow-x: auto` combination keeps the overflow contained.
+
+Rule of thumb: **content can opinionate minimum width; functional chrome must always be fluid to viewport.** Never constrain both in the same element.
+
+**Frustration caused:** 1 round — FB-149. User observed footer stuck in desktop layout at 400px viewport: "Why is the footer section not responsive for the super narrow web browser experience? Any functional ones like the footer and navigation bar should always be responsive, while the content should have more opinion to take on what is a suitable width and force a scroll when necessary."
+
+---
+
+### AP-068: Relying on Grid Track Minimum Alone to Prevent Text Wrap in a One-Line-Per-Item List
+
+**Trigger:** Using `grid-template-columns: repeat(auto-fit, minmax(Npx, 1fr))` or `minmax(Nmin, Nmax)` to guarantee that list items (company names, product names, dates, IDs) render on one line — relying *only* on the track min being ≥ the longest item's rendered width.
+
+**Why it's wrong:**
+1. **Fragile to content changes.** The track min is calibrated to today's longest item. A CMS edit or a new row with a longer string breaks the invariant silently — no error, no warning, the text just wraps and the row rhythm breaks.
+2. **`minmax` permits wrap at the minimum.** Auto-fit + `minmax(180px, 1fr)` can land tracks at exactly 180px in narrow zones. If content needs 240px at one line, it wraps. Bumping the min to 240 solves *this* content length, but returns us to problem 1.
+3. **The invariant isn't expressed where it lives.** "One line per item" is a *text-level* rule about the content. Expressing it via track width leaves the rule implicit in a SCSS calculation that nobody re-checks when content grows.
+
+**Correct alternative:** Enforce the invariant at both layers.
+
+- **Text layer (authoritative):** `white-space: nowrap` on the element that must stay one line. The rule lives in the content's rendering and holds regardless of viewport, CMS content, or layout.
+- **Layout layer (safety net):** give the rigid column a **fixed** track width (`Npx`, not `minmax`) matching the expected one-line width. This prevents nowrap content from visually overflowing into gaps or adjacent columns.
+
+```scss
+.list a { white-space: nowrap; } // invariant
+.columns {
+  grid-template-columns:
+    minmax(260px, 320px)  // flexible
+    240px                 // rigid (Experience) — fixed, not minmax
+    repeat(2, minmax(180px, 240px)); // flexible (Links, Contact)
+}
+```
+
+Classify each column's role up front: **rigid** columns (structural one-line rule) get fixed tracks; **flexible** columns (short decorative content) get `minmax` ranges. Never mix: a rigid column with a `minmax` range is a bug waiting for the next CMS edit.
+
+**Frustration caused:** 2 rounds — FB-148 raised Experience's track from 180 to 240 min but left it as `minmax`; user observed in FB-150 that at ~800px viewport the auto-fit still dropped tracks to ~203px and company names wrapped. Permanent fix required adding `white-space: nowrap` AND making the Experience track a fixed 240px.
+
+---
+
+### AP-069: `mix-blend-mode` Applied Inside a Fixed-Position (or Otherwise Stacking-Context-Creating) Ancestor
+
+**Status: ACTIVE**
+
+**Trigger:** Applying `mix-blend-mode: difference` (or any non-`normal` blend mode) to an element that lives inside a `position: fixed`, `position: sticky`, `opacity < 1`, `transform`, `filter`, or any other property that creates a new stacking context — and expecting it to blend against the main document's page content.
+
+**Why it's wrong:** `mix-blend-mode` only blends against the backdrop of the element's **parent stacking context**. A new stacking context is an isolation boundary for blending — the element's composite blends against what's inside that context, not against content outside it. In practice: a label with `mix-blend-mode: difference` inside a `position: fixed` rail blends only against the rail's (usually empty) interior and produces no visible effect, or produces a constant non-varying result when the user expects dynamic per-pixel inversion against scrolling page content.
+
+**The hidden trap:** `position: fixed` creates a stacking context *regardless of `z-index`* — removing or zeroing the z-index does not fix the isolation. The same is true of `position: sticky`, `opacity: 0.99`, `transform: translateZ(0)`, `will-change: transform`, `backdrop-filter`, and several others. Any of these on any ancestor breaks the blend chain.
+
+**Correct alternative:** Move the blend-mode element *out* of every stacking-context ancestor on its way up to the root. The canonical escape hatch is `createPortal(node, document.body)` — the portaled node becomes a direct child of `<body>` (root stacking context), and `mix-blend-mode` then blends against all page content below it in DOM order. Position sync (if the portaled element must track a fixed-viewport anchor) is done by reading the anchor's `getBoundingClientRect()` in a layout effect subscribed to `resize` and capture-phase `scroll`.
+
+```tsx
+// ❌ Wrong — label is inside a fixed rail, blend isolated to rail's interior
+<nav style={{ position: "fixed", ... }}>
+  <span style={{ color: "#fff", mixBlendMode: "difference" }}>Section</span>
+</nav>
+
+// ✅ Correct — label portaled to body, position synced to anchor
+const [pos, setPos] = useState(null);
+useLayoutEffect(() => {
+  const sync = () => setPos(anchorRef.current?.getBoundingClientRect() ?? null);
+  sync();
+  window.addEventListener("resize", sync);
+  window.addEventListener("scroll", sync, true);
+  return () => { /* cleanup */ };
+}, []);
+return (
+  <>
+    <nav style={{ position: "fixed", ... }}><button ref={anchorRef} /></nav>
+    {pos && createPortal(
+      <span style={{
+        position: "fixed",
+        top: pos.top,
+        left: pos.left,
+        color: "#fff",
+        mixBlendMode: "difference",
+      }}>Section</span>,
+      document.body,
+    )}
+  </>
+);
+```
+
+**Related constraint:** the portaled element itself can be `position: fixed` — that creates *its own* stacking context, but `mix-blend-mode` blends against the *parent* stacking context, which in this case is still the document root. The rule is about ancestors, not the blend element itself.
+
+**Incident:** FB-155 (2026-04-20) — ScrollSpy active notch label needed auto-inverse contrast against varied case-study section backdrops. Required portaling the label to `document.body` because the ScrollSpy rail is `position: fixed`.
+
+---
+
+### AP-070: framer-motion `x` / `y` / `scale` / `rotate` Animation on an Element with a Base CSS `transform`
+
+**Status: ACTIVE**
+
+**Trigger:** A `motion.*` element has both a base CSS rule like `transform: translate(-100%, -50%)` (or any non-identity `transform`) **and** an `animate={{ x, y, scale, rotate }}` prop. Expecting both to compose — e.g. base `transform` places the element, motion values animate it.
+
+**Why it's wrong:** framer-motion implements `x`, `y`, `scale`, `rotate`, `skewX`, `skewY`, and related motion values by writing a combined inline `transform: translateX(…) translateY(…) scale(…) rotate(…) …` style on the rendered element. Inline style wins over a stylesheet rule for the same property. The moment the animation mounts (even `initial` state), the inline `transform` replaces the CSS `transform` entirely — the base placement silently disappears. The element snaps to wherever `{ x: 0, y: 0 }` lands it, which is typically the origin defined by `top` / `left` / flow — not the intended offset.
+
+**Hidden severity:** the bug is invisible in static screenshots of the *desired* state (when `x: 0, y: 0` happens to align by accident with the intended offset) and only shows when the element is hydrated with a non-identity base transform. It also masks any prior positioning bugs: fixing an anchor calculation has no visible effect because the motion library is still overwriting the final transform.
+
+**Correct alternatives (pick one):**
+
+1. **Split static and animated transforms across two elements.** Wrap the motion element in a plain `div` that owns the CSS `transform`. The motion element inside owns only the animated values. The two transforms apply to different elements and compose cleanly:
+   ```tsx
+   <div style={{ position: "fixed", top, left, transform: "translate(-100%, -50%)" }}>
+     <motion.span initial={{ x: 4, opacity: 0 }} animate={{ x: 0, opacity: 1 }}>
+       {label}
+     </motion.span>
+   </div>
+   ```
+2. **Use `transformTemplate` to merge static and animated transforms on the same element.** framer-motion composes the generated transform with a user-supplied template:
+   ```tsx
+   <motion.span
+     transformTemplate={(_values, generated) =>
+       `translate(-100%, -50%) ${generated}`
+     }
+     animate={{ x: 0, opacity: 1 }}
+   />
+   ```
+   This keeps everything on one element but couples future maintainers to a framer-motion escape hatch.
+3. **Move the static offset into motion values.** Instead of `transform: translate(-100%, -50%)` in CSS, compute the pixel offset from the element's measured width/height and pass it as `initial={{ x: -width, y: -height/2 }}`. Requires measuring the element (ResizeObserver or `useRef` + layout effect), which is more ceremony than option (1).
+
+**Default choice:** option (1). It is self-documenting — "the outer div is the placement, the inner span is the animation" — and does not require future readers to understand framer-motion's transform composition model.
+
+**Detection heuristic:** if a `motion.*` element has both a `className` that includes `transform:` in its CSS and an `animate` prop with any of `x`, `y`, `scale`, `rotate`, `skewX`, `skewY` — the CSS transform is dead code.
+
+**Incident:** FB-156 (2026-04-20) — ScrollSpy portaled highlight label had `transform: translate(-100%, -50%)` in CSS and `animate={{ x, opacity }}` on the same `motion.span`. Label ended up anchored at its top-left corner on the notch (rather than its right edge on the notch's left gutter), extending past the viewport. First-attempt fix (anchor swap only) had no visible effect because the transform was still being overwritten. User reported the same bug twice before the real root cause was identified.

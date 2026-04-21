@@ -4,9 +4,159 @@
 >
 > **Who reads this:** AI agents at session start (scan recent entries for context), and during content feedback processing (check for recurring patterns).
 > **Who writes this:** AI agents after each content feedback cycle.
-> **Last updated:** 2026-04-12 (CFB-034: ETRO voice rewrite — parallel-structure encyclopedia)
+> **Last updated:** 2026-04-20 (CFB-039: Admin-surface labels on video audio settings rewritten to separate capability vocabulary ("Audio off / Audio on", "Expose audio controls to viewers") from default-state vocabulary ("Muted by default / Sound by default", "Starts muted by default"). Embed admin surface lost its audio-default control entirely — the provider iframe owns that language. Cross-category with FB-157 / ENG-170.) Prior: CFB-038: Portfolio home order — Goldman Sachs (Meteor) promoted to top position; Lacework demoted to #2; Élan #3; order reflected portfolio-add sequence instead of narrative priority.
 >
 > **For agent skills:** Read only the first 30 lines of this file (most recent entries) for pattern detection. The full file is a historical audit trail — do not read it in its entirety during normal work.
+
+---
+
+## Session: 2026-04-20 — Video audio settings: vocabulary separates capability from state
+
+#### CFB-039: "You're conflating two different things, and that's very dangerous" — admin labels for audio on video blocks
+
+**Intent:** User rejected yesterday's single "Muted by default / Sound by default" label as the sole audio control on `VideoSettings`. Their distinction: *"'Muted by default' means the user can still have sound. 'Audio on or audio off' means that there is no mute functionality available to users; it just means that there is no audio for this video, so there is no mute/unmute button for the user."* They asked for a two-layer vocabulary: capability first, then (only when enabled) default-state. For external embeds they asked to remove the option entirely because the provider already owns the audio UI.
+
+**Root Cause (content dimension):** The ENG-169 / FB-154 labels on the admin surface read as though they described the *viewer's starting state*. But because the underlying data model (`media.muted`) was actually doubling as a capability flag (silent captures → `muted=true`), any author reasoning from the label alone would misconfigure silent videos. The label promised a default state the data couldn't honor.
+
+Two label genres were tangled:
+
+- **Capability language** (what *exists* on the viewer side): "Audio off / Audio on", "Expose audio controls to viewers", "no audio for this video."
+- **Default-state language** (how existing controls *start*): "Muted by default / Sound by default", "Starts muted by default."
+
+The single-ButtonSelect implementation forced the author to guess which genre the label belonged to for each asset. Worse, because most portfolio videos are silent loop captures, "Sound by default" on those assets would produce a visible-but-useless Unmute button — a broken affordance driven by misleading copy.
+
+**Resolution:**
+
+1. **`VideoSettings` admin copy — split into two surfaces:**
+   - Primary `ButtonSelect` values: `"Audio off"` / `"Audio on"` (capability). Bound to the new `media.audioEnabled` field.
+   - Secondary `ButtonSelect` (rendered only when Audio is on): `"Muted by default"` / `"Sound by default"` (default state). Bound to `media.muted`, which keeps its name but narrows its meaning to default state.
+
+2. **Payload admin field labels (the Payload UI itself):**
+   - `audioEnabled` — label `"Expose audio controls to viewers"`, description: *"Capability axis: does this video carry a usable audio track? When off, no mute/unmute control is rendered to the viewer. Leave off for silent loop captures."*
+   - `muted` — label `"Starts muted by default"`, description: *"Default-state axis: if audio controls are exposed, does playback begin muted? Ignored when audio controls are off."*
+
+   The description strings name the axis explicitly so an author reading the Payload admin can't repeat the conflation even without seeing `VideoSettings.tsx`. "Capability axis" and "Default-state axis" are now shared vocabulary across docs + admin descriptions + inline-edit copy.
+
+3. **`VideoEmbed` admin surface — audio-default control removed entirely.** The paste-URL input is now the only control. The content decision: the provider (YouTube / Vimeo / Loom) owns audio vocabulary for external content. A second control competing with the provider's own mute button would introduce two vocabularies for one behavior and make the configured state unreliable under varying autoplay policies.
+
+**Pattern extracted (new):** Admin-surface labels must be grep-able by axis. When a field governs "does this control exist?" the label uses capability vocabulary (*expose, surface, on/off*). When a field governs "how does the control start?" the label uses default-state vocabulary (*by default, starts muted*). A label that could fit both genres is a sign the field is doing two jobs and must split. This pattern complements the engineering side (schema splits into two fields) but is an independent content rule: even when the data is already split, the labels still have to pick a single genre and stay inside it.
+
+**Voice check:** New strings use plain language, no em dashes, no fluff:
+
+- ✅ "Audio off" / "Audio on" (2 words each, unambiguous)
+- ✅ "Muted by default" / "Sound by default" (parallel structure; "by default" is the axis marker)
+- ✅ "Expose audio controls to viewers" (verb + object; describes what flipping the field changes)
+- ✅ "Starts muted by default" (states the starting condition; ties back to "by default" parallel)
+
+**Cross-reference:** Cross-category with FB-157 (UI tree structure) and ENG-170 (schema + component work). Corrects CFB-037 / FB-154 / ENG-169 vocabulary from the same session.
+
+---
+
+## Session: 2026-04-20 — Portfolio Home Case-Study Order
+
+#### CFB-038: "Why is the current case study order: Lacework, the design system, Goldman Sachs. They should have been Goldman Sachs at the top. I don't know starting from which point it was moved up, and this is just wrong, and I've never said it this way."
+
+**Intent:** User flagged that the home page orders case studies Lacework → Élan → Meteor (Goldman Sachs), and insists Goldman Sachs should lead. They want a trace of when the order was "moved up," a fix, and documentation.
+
+**Trace (answer to "starting from which point"):** Goldman Sachs was never at the top in git history. The order has been stable since the API routes were first committed on `d9bb2d3` (Mar 30 2026, "Mar 30 daytime changes"), which set `update-lacework/route.ts` → `order: 1`, `update-elan/route.ts` → `order: 2`, `update-meteor/route.ts` → `order: 3`. The only subsequent `order` mutation was `e28a1a0` (Apr 6 2026), which bumped Élan from 2 → 3 to make room for ETRO, producing an incidental 3-3 tie until ETRO stabilized at 5 in `b7e9353` (Apr 17). Meteor has been at 3 since inception. What the user perceived as "moved up" was not a move — it was a default baked into the scaffold that nobody challenged.
+
+**Root Cause (content dimension):** The `order` integer on each project encoded *when the case study was added to the portfolio*, not *where it belongs in the portfolio narrative*. Lacework was the first case study migrated into the CMS, so it got `order: 1` by scaffolding convention; every case study added afterward was numbered in arrival sequence. No step in the case-study-authoring or content-iteration skills asks "where does this new piece slot relative to the existing ones?" — authoring materializes content into the CMS at whatever order the route file declares, and nobody goes back to re-rank. The narrative cost: the reader's first impression of the portfolio was framed by a consumption-billing UX redesign (Lacework) rather than by the single largest-scope project (Meteor / Goldman Sachs: $79B AUM, sole designer, nine engineers, three time zones). The strongest proof of scale was buried behind two lighter pieces.
+
+**Resolution:**
+1. `src/app/(frontend)/api/update-meteor/route.ts` — `order: 3` → `order: 1`.
+2. `src/app/(frontend)/api/update-lacework/route.ts` — `order: 1` → `order: 2`.
+3. `src/app/(frontend)/api/update-elan/route.ts` — already `order: 3`, unchanged.
+4. `src/app/(frontend)/api/update-etro/route.ts` — already `order: 5`, unchanged.
+5. `POST /api/update-meteor` → `{"action":"updated","id":2,"slug":"meteor"}`; `POST /api/update-lacework` → `{"action":"updated","id":1,"slug":"lacework"}`. Verified via `GET /api/projects?sort=order`: meteor(1), lacework(2), elan-design-system(3), ascii-studio(4), etro-framework(5), illustrations(6).
+
+**Pattern extracted (new):** The home-page case-study order is a narrative-priority decision, not a chronology. The question to answer before any new case study ships is: "If this reader reads only the first case study, which one is most likely to earn the next click?" That piece takes `order: 1`. The rest descend by impact, not by authoring date. This applies in reverse too: when authoring adds a new case study, the author must explicitly decide its rank, not let it default to the next integer.
+
+**Cross-reference:** Also documented as ENG-168 in `docs/engineering-feedback-log.md` (the data-shape / scaffolding side of the same incident). Anti-pattern promoted to `docs/content-anti-patterns.md` as CAP-029 ("Chronological Case-Study Order").
+
+**Files touched:** `src/app/(frontend)/api/update-meteor/route.ts`, `src/app/(frontend)/api/update-lacework/route.ts`, `docs/content-feedback-log.md`, `docs/content-anti-patterns.md`, `docs/engineering-feedback-log.md`, `docs/engineering-anti-patterns.md`.
+
+---
+
+## Session: 2026-04-17 — ETRO Essay Blurb vs Article Boundary
+
+#### CFB-037: "This part should be moved into the Intro blurb section instead of the official article."
+
+**Intent:** User quoted Section 1 of the ETRO essay (heading `'Your whole approach is wrong.'` plus the 4-paragraph CEO-dismantle narrative) and said it belongs in the intro blurb, not in the article body.
+
+**Root Cause:** During CFB-035 materialization, I treated this as a standard case study and kept the case-study-shaped blurb contract: short 73-word trailer in `introBlurbBody`, narrative begins at content block 0. But this is not a case study - the dossier explicitly documents it as "Essay (not a standard case study), text-majority, no image floor." Essays and case studies have different blurb contracts: a case study trailer TEASES to earn a click (the reader is deciding whether to commit), while an essay blurb IS the lede (the reader has already committed by clicking in; the hook should drop them into the narrative immediately). The CEO scene was the natural lede - dramatic, short, self-contained - but I kept it inside the article body because that's where case study content goes. This produced a sequence with two "openings": the short blurb trailer and then Section 1 (the real lede), which read as redundant and delayed the hook by one scroll.
+
+**Resolution:**
+1. `src/app/(frontend)/api/update-etro/route.ts` - replaced `BLURB_BODY` with the 5-paragraph lede: the CEO's direct quote ("Your whole approach is wrong.") as the opener, followed by the 4 narrative paragraphs that were Section 1's body. The quote moves from being a section heading (single-quoted typographic styling) to being a spoken quote in prose (double-quoted direct speech) - natural register shift from heading to body.
+2. Removed the first content block (`heading: "'Your whole approach is wrong."'`) entirely. Article now starts at "The Success That Almost Wasn't." (backstory section), which flows correctly because the blurb has already established the CEO scene.
+3. Tweaked `SCOPE_STATEMENT`: removed the clause "A Blackstone veteran challenged the approach as overkill, forcing a second axis..." - that exact beat now lives in the blurb one paragraph above. Replaced with "The framework has a second axis: the four elements are always present, but their volume calibrates to stakes, user tenure, and task novelty." Same fact, no recap.
+4. `POST /api/update-etro` → `{"action":"updated","id":6}`. REST verified: block count 13 (hero + 6 × heading/richText, down from 15), blurb has 5 Lexical paragraphs, article first heading is now "The Success That Almost Wasn't.", scope statement no longer contains "Blackstone veteran challenged".
+5. Homepage card unaffected - that surface reads `introBlurbHeadline` + `HOME_CASE_SUBLINE_BY_SLUG['etro-framework']` ("Opinion · AI Trust Architecture"), not `introBlurbBody`. Confirmed in `src/app/(frontend)/(site)/page.tsx`.
+
+**Pattern extracted (new):**
+Case studies and essays have structurally different blurb contracts. In a case study, the blurb body is the TRAILER - a compressed tease whose job is to earn the click. The real opening is Section 1, which the reader sees after committing. In an essay, the blurb body is the LEDE - the hook itself, because the essay has no "committing" moment left to earn; the reader already committed by navigating in. When materializing a piece whose dossier lists `Format: Essay`, do not apply the case-study blurb pattern by default. Look at the first content block's role: if it functions as a dramatic hook or in-medias-res opener (not a "here's what I'll tell you" paragraph), promote it to `introBlurbBody` and drop it from the article body. The article then opens with the backstory section, which is the essay's actual second beat.
+
+Secondary rule: when the blurb absorbs a scene, the `description` (scope statement) must not recap that scene. The reader encounters the blurb first and scope second, a handful of lines apart. Repeating a named beat across both feels like bureaucratic framing. Replace any recap clause in the scope with the underlying fact it was gesturing at.
+
+**Cross-reference:** This is a direct refinement of the CFB-035 materialization. The original plan explicitly said "keeps `introBlurbHeadline` [formatting that matches]" but did not reconsider the blurb-body contract for an essay vs a case study. The dossier already flagged the format difference; I didn't apply it to the blurb/body boundary.
+
+**Files touched:** `src/app/(frontend)/api/update-etro/route.ts`, `docs/content/projects/etro-framework.md`.
+
+---
+
+## Session: 2026-04-17 — ETRO Essay Bold Abuse
+
+#### CFB-036: "The current article abuses bold font. There's also not a clear separation between sections, somehow, or the hierarchy not visually clean."
+
+**Intent:** Two complaints in one message. (1) Too much bold. (2) Section hierarchy not visually clean / sections feel undifferentiated.
+
+**Root Cause:** When materializing the essay in CFB-035, I imported every `**bold**` from the user's source markdown verbatim - 36 bold spans across 7 bodies, used in the source as scan anchors ("Per user.", "Scaffolding.", "What role does trust play here?", etc.). This directly violated `voice-style.md` §13.1: "Bold: only for section headings and impact metrics. Never in body text for emphasis."
+
+The two complaints were one cause. `.sectionHeading` uses `subtitle-1` (xl, semibold). Body uses `body-base` (regular). Inline `<strong>` at body size renders weight 700 - heavy enough to read as a peer of the semibold heading. N bold spans per section = N+1 competing stops, so the reader stops perceiving the H2 as the dominant break. "Can't see section separation" was not actually about the `layout-x-spacious` gap between `.blockWrapper`s - it was about density inside each section eroding the H2's dominance.
+
+**Resolution:**
+1. Stripped every `**bold**` from all 7 bodyMarkdowns in `route.ts`. 36 → 0.
+2. Where the bold was serving as a scan anchor, converted to colon-prefixed paragraph starts: "Per user:", "Per task:", "Scaffolding:", "Structure:", "Migration:". The colon carries the scan-anchor role without a weight jump.
+3. Removed the inline `### The noise reduction...` H3 from Section 4's body - not just because it was over-emphasis, but because `lexicalToHtml` silently drops heading nodes when a richText root has mixed heading+paragraph children. That line was likely not rendering at all.
+4. Removed the final bold thesis question block "**What role does trust play here? Does it have a shelf life? What inherits it?**" - the three question marks are already the typographic emphasis.
+5. Kept italic (`*word*`) intact: voice-style bans bold specifically, not italic.
+6. `POST /api/update-etro` → `{"action":"updated","id":6}`. Verified via REST walk of the Lexical tree: 0 text nodes with FORMAT_BOLD bit set across all 7 richText bodies. All 7 headings and 15 total blocks intact.
+
+**Pattern extracted (new):**
+When importing a user-supplied markdown essay into CMS blocks, do NOT preserve inline `**bold**` verbatim even if the source uses it as scan-anchor typography. The source markdown was likely written for a Medium/Substack/Notion rendering context where inline bold is common and the surrounding typography supports it. The portfolio design system has a specific typography contract: H2 section headings own the dominant-stop role, and bold in body competes with it. When the source has inline bold, convert it to one of:
+- a colon-prefixed paragraph start ("Per user: ...")
+- a paragraph break alone (the sentence ending is its own anchor)
+- an italic if the emphasis is tonal rather than structural
+- drop it if it was purely typographic habit with no structural role
+Never leave raw `**bold**` spans in bodyMarkdown.
+
+**Cross-category note:** Also documented as FB-143 (design feedback log). The user's complaint landed as "hierarchy not visually clean" (Design), but the fix was in content strings, and the rule violated was `voice-style.md` §13.1 (Content). This is the canonical shape of a cross-category issue: Design-perceived, Content-caused, single-file fix.
+
+**Files touched:** `src/app/(frontend)/api/update-etro/route.ts`, `docs/design-feedback-log.md`, `docs/content/projects/etro-framework.md`.
+
+**Follow-up check:** Run a regex sweep on every other `src/app/(frontend)/api/update-*/route.ts` for `\*\*` inside `bodyMarkdown` strings - any matches are the same anti-pattern in other essays/case studies and should be cleaned up before they're noticed.
+
+---
+
+## Session: 2026-04-17 — ETRO Essay Replacement
+
+#### CFB-035: "Replace ETRO essay body with new calibrated-transparency draft"
+
+**Intent:** User delivered a full rewritten draft of the ETRO essay (`Your AI product doesn't need more transparency. It needs the right kind. (5).md`). Asked to replace the current case study body with the new markdown, formatted into the existing case study block system.
+
+**Root Cause:** N/A — user-authored content replacement, not a diagnosis cycle. Treated as a Phase 3 materialization task (skill: case-study-authoring): pre-written essay → CMS blocks.
+
+**Resolution:** Rewrote `src/app/(frontend)/api/update-etro/route.ts`:
+1. Replaced `BLURB_BODY` with a 73-word, two-paragraph trailer that foregrounds the ninety-second CEO dismantle and the "right and also completely wrong" reframe (keeps `introBlurbHeadline` "Trust has a shelf life. Sometimes." — it already matches the essay's closer).
+2. Replaced `SCOPE_STATEMENT` with a 3-sentence credentials paragraph that names ETRO, the calibrated-transparency second axis (stakes × tenure × novelty), and the three opening questions for new engagements.
+3. Expanded `CONTENT_BLOCKS` from 5 to 7 sections matching the essay: ("'Your whole approach is wrong.'", "The Success That Almost Wasn't.", "Present, Past, Future, Always.", "Full Transparency Is Its Own Kind of Noise.", "Trust Is Relational, Not Binary.", "Scaffolding, Structure, or Migration.", "Trust Has a Shelf Life. Sometimes.").
+4. Dropped per-section `imagePlaceholders` (essay format — no image floor; user's draft does not evoke specific diagrams). Kept a single hero placeholder per Phase 3 hero-enforcement rule.
+5. Split every paragraph to the 3-sentence cap. Verified no em dashes (source was clean; used ASCII hyphens throughout). Changed `category` from "Design Strategy · AI Trust Architecture" to "Essay · AI Trust Architecture" to match the draft's frontmatter and the essay format the dossier already documents.
+6. `POST /api/update-etro` returned `{"action":"updated","id":6}`. Verified via REST: 15 blocks (hero + 7× heading/richText), all 7 headings present, distinctive strings "Blackstone" and "FDIC insurance" present in the body.
+7. **Follow-up correction (same session):** User pointed out the case-study page title still read "Trust has a shelf life. Sometimes." — that phrase is the essay's closing section, not its title. Updated `INTRO_HEADLINE_BY_SLUG['etro-framework']` in `src/lib/case-study-intro-headline.ts` to the essay's actual title: "Your AI product doesn't need more transparency. It needs the right kind." Re-pushed via `POST /api/update-etro` (confirmed live in Payload: `introBlurbHeadline` now matches essay title). The closer phrase still functions as Section 7's heading inside the body — it does Deliberate Ambiguity duty there, not as the blurb hook.
+
+**Pattern extracted (new):** When a user-supplied essay draft has `# Title` frontmatter and a distinct closing-section heading, they are NOT interchangeable. `introBlurbHeadline` must be the essay title (hook). Do not promote a closer to the headline even when the closer phrase is more aphoristic. This is a specific variant of the general rule: the hook answers "what is this essay about?"; the closer answers "where did the essay land?". Confusing the two misrepresents the essay on the homepage card and on the case-study page title.
+
+**Pattern (not new, reinforced):** When the user supplies a finished essay draft and asks for block formatting, skip Phase 1–2 checkpoints and drop straight into Phase 3 materialization. Preserve the author's structural choices; the agent's only transformations are (a) paragraph splits to the 3-sentence cap, (b) hyphen/em-dash sanitization, (c) dropping image placeholders for essay format, and (d) hero enforcement. This matches case-study-authoring §Scenario Detection row 3 ("Write up + raw material + existing slug — new material supersedes old").
 
 ---
 

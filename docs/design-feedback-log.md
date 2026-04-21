@@ -4,10 +4,482 @@
 >
 > **Who reads this:** AI agents at session start (scan recent entries for context), and during feedback processing (check for recurring patterns).
 > **Who writes this:** AI agents after each feedback cycle via the `design-iteration` skill.
-> **Last updated:** 2026-04-10 (FB-142: Home case study section — symmetrical top/bottom margin)
+> **Last updated:** 2026-04-20 (FB-158: Case-study block drag handles floated far above their content and disappeared on sub-laptop viewports. The between-section spacing lived as `margin-top` on the inner `.sectionHeading`, which sat inside the flex-item `.sortableContent` BFC — so the margin inflated `.sortableInner`'s top area while the absolute-positioned `.dragHandle` at `top: 2px` anchored to that inflated top, producing a ~48px visible gap. Separately, `.dragHandle { display: none }` until `$elan-mq-md` (1056px) hid the affordance on any window narrower than a standard laptop. Fix: moved the between-section margin from `.sectionHeading` onto the outer `.blockWrapper + .blockWrapper:has(.sectionHeading)` (external spacing, handle now aligns with heading's visible top); below md the handle flips from absolute-gutter to in-flow flex + `margin-right: $portfolio-spacer-0-5x` and stays at `opacity: 0.55`; `@media (hover: none)` also surfaces it at `0.55` so tablet admins aren't dependent on a hover state that never fires. Cross-category with ENG-178.) Prior: FB-157 (Audio controls on `VideoSettings` conflated *capability* with *default state* — a single "Muted / Sound" `ButtonSelect` implied every video had user-operable audio when most are silent captures with no sound track. Replaced with a two-layer tree: primary "Audio off / Audio on" (capability) → revealed-when-on "Muted by default / Sound by default" (default state). On `videoEmbed` blocks, the audio default control was removed entirely because provider iframes own their own audio UI. Cross-category with ENG-170, CFB-039.) Prior: FB-156 (ScrollSpy portaled highlight label landed rightward of the notch and clipped the viewport; two compounding bugs — wrong anchor element + framer-motion `animate={{ x }}` overwriting the base CSS `transform: translate(-100%, -50%)`. Fixed by anchoring to the notch *and* splitting the CSS transform onto a wrapper `div` while the `motion.span` keeps only `x`/`opacity` animation. First-attempt fix shipped silently before user re-reported; AP-070 extracted.) Prior: FB-155 (ScrollSpy's active notch label now auto-contrasts against any backdrop via a `document.body`-portaled span with `mix-blend-mode: difference` + `color: #fff`. Escapes the rail's fixed-position stacking context so the blend reaches page content below. Only the currently-active/drag-targeted notch flips; hover-revealed non-active labels keep their existing token-driven colors.) Prior: FB-154 ("Muted by default" / "Sound by default" promoted from a hidden dropdown item to a primary `ButtonSelect` on the `VideoSettings` overlay, and added for the first time to `videoEmbed` blocks via a new `VideoEmbedSettings` control. Cross-category with ENG-168.)
 >
 > **For agent skills:** Read only the first 30 lines of this file (most recent entries) for pattern detection.
 > **Older entries:** Synthesized in `docs/design-feedback-synthesis.md`. Raw archive in `docs/design-feedback-log-archive.md`.
+
+---
+
+### FB-160: "I cannot delete empty image slots/dropzones. Pls fix"
+
+**Date:** 2026-04-20
+
+**UX Intent:** An empty atomic image slot (a labeled Dropzone) is a first-class piece of content the author placed in the case study. Like every other block in the block list, it should have a discoverable "remove this" affordance. Without one, the slot reads as uneditable scaffolding — the author can fill it or leave it blank, but cannot express "I don't want this slot anymore" without knowing that a hidden outer toolbar exists (and in multi-image rows, it doesn't).
+
+**Root Cause:** Two inherited asymmetries between the filled and empty variants of atomic image blocks:
+
+1. `renderAtomicImageFigure` renders `ImageBlockAdminOverlay` (which carries the trash button) only on the `hasMedia` branch. The empty branch renders a bare `<Dropzone>` with no hover chrome. From the author's point of view, an empty slot advertises upload and nothing else.
+2. For blocks inside a multi-image row (`isMultiImageRow`), the outer `BlockToolbar` (the fallback delete path for non-figure blocks) is suppressed by design — the row delegates sortability to per-member `SortableBlock`s. The per-member wrapper is drag-only. So for an empty slot inside a row, there is no path to delete, period.
+
+The design failure is discoverability parity: the "delete" affordance on filled media is a trash icon that reveals on hover in the top-right corner of the figure. Empty slots need the same visual grammar so authors can apply the same gesture regardless of fill state.
+
+**Resolution:**
+
+1. Added an icon-only trash `Button` (DS `Button` + `Tooltip`) in the top-right corner of every empty atomic image slot's Dropzone wrapper. Positioning mirrors `ImageBlockAdminOverlay` (`top: var(--spacer-1x); right: var(--spacer-1x)`; `background: var(--color-overlay-80)`) so the gesture is identical across filled and empty variants.
+2. The delete button reveals on `:hover` / `:focus-within` on the wrapper and stays visible while focused, matching `ImageBlockAdminOverlay`'s keyboard behavior.
+3. `onClick` stops propagation so clicking the trash doesn't trigger the Dropzone file picker underneath.
+
+**Design decisions:**
+
+- Chose inline overlay over a global "edit mode" toggle because authors already operate in an inline-edit surface; adding another modal gate would fight muscle memory established by `EditableText`, `ImageBlockAdminOverlay`, and `BlockToolbar`.
+- Did not add a "replace" button on empty slots — clicking the Dropzone itself is the replace / upload path, and a redundant overlay button would add chrome without utility.
+- Kept the trash on the `.emptySlotWrapper` so it sits above the Dropzone's dashed border but inside its bounding box; this keeps the affordance visually coupled to the slot, not floating outside.
+
+**Principle extracted -> `docs/design.md` §14:** Empty and filled variants of the same CRUD surface must share affordance parity. If the filled variant has a hover-revealed delete button, the empty variant has one too — in the same location, on the same hover contract. Asymmetry between "you can manage this once it has content" and "you cannot manage this while it's empty" traps authors in the state they didn't want.
+
+**Cross-category note:** Also documented as ENG-180 — the engineering fix (wrap the Dropzone and wire the delete callback) is what delivers the design intent. Parity is the design principle; `confirmDeleteBlock` is the implementation.
+
+---
+
+### FB-158: "Why are the drag handles being so far from the actual block/paragraph/asset? Also, they disappear when the screen is narrow."
+
+**Date:** 2026-04-20
+
+**UX Intent:** The case-study block drag handle should read as an affordance belonging to the block it drags — visually adjacent to the first line of content, and discoverable on any window size an admin might use. Instead, two compounding placement issues made the handle feel detached: (1) on every block that started a new section (`heading` blocks), the handle floated roughly 48px above the heading's visible top, sitting in empty margin space; (2) any viewport narrower than 1056px hid the handle entirely, which includes common laptop-in-split-view and tablet-landscape admin sessions.
+
+**Root Cause:** Two independent bugs in the same SCSS file, both inherited from the earlier ENG-164/175 work that made the outer `SortableBlock` wrapper sortable:
+
+1. **Vertical offset — margin was on the wrong element.** Between-section spacing was declared on `.sectionHeading` via `.blockWrapper + .blockWrapper .sectionHeading { margin-top: $portfolio-spacer-layout-x-spacious }` (48px). `.sortableContent` (the text column inside the sortable wrapper) is a flex item, which establishes a block-formatting context, so the heading's `margin-top` does **not** collapse up through `.sortableContent` → `.sortableInner` → `.blockWrapper`. Instead it lives inside `.sortableContent`'s box, inflating the wrapper's top by 48px. Meanwhile the `.dragHandle` was positioned `absolute; top: 2px` relative to `.sortableInner`, anchoring it to the wrapper's top — **above** the margin space, not aligned with the heading's visible top. The exact 48px gap the user saw in the screenshot is the token.
+2. **Narrow-screen invisibility — defensive breakpoint guard.** `.dragHandle { display: none; @media #{$elan-mq-md} { display: flex } }` hid the handle below 1056px. The intent was safety (`left: -28px` would clip off-screen when the content column filled the viewport and the left gutter shrank to `$portfolio-spacer-1-5x` = 12px), but the implementation threw away the affordance entirely instead of relocating it.
+
+**Resolution:**
+
+1. **Move between-section margin to the outer wrapper via `:has()`.** Replaced `.blockItem + .blockItem .sectionHeading, .blockWrapper + .blockWrapper .sectionHeading { margin-top: ... }` with `.blockItem + .blockItem:has(.sectionHeading), .blockWrapper + .blockWrapper:has(.sectionHeading) { margin-top: ... }`. The 48px now sits as external margin on the outer block wrapper (flex-item spacing inside `.blockList`, which does not suffer from BFC-blocked collapse because it is inter-item gap, not child-to-parent). `.sortableInner` starts flush with the heading's visible top; the `.dragHandle` at `top: 2px` aligns with the first line of the heading as intended. `:has()` is GA in Chrome 105, Safari 15.4, Firefox 121; admins run modern browsers so the graceful degradation (handle back to its old floating position) is acceptable.
+2. **Replace the `display: none` breakpoint guard with a responsive placement flip.** The handle now always has `display: flex`. Below `$elan-mq-md` (1056px), it becomes `position: static` with `margin-right: $portfolio-spacer-0-5x` and `opacity: 0.55` — an in-flow flex item immediately left of `.sortableContent`, visible without hover. Above md, it returns to the gutter (`position: absolute; left: -28px; opacity: 0` with hover/focus-visible opacity reveal). Added `@media (hover: none) { opacity: 0.55 }` so touch admins on tablets don't depend on a hover state that never fires. The 20px + 4px flex width slightly narrows the content column on narrow viewports; acceptable for an admin-only affordance.
+
+**Design decisions:**
+
+- **Why `:has()` instead of adding a className during render.** A JS-side className (e.g. `styles.blockWrapperHeading` when `block.blockType === 'heading'`) would produce the same CSS behavior with broader browser support, but adds a render-time branch in `ProjectClient.tsx` for what is purely a styling concern. `:has()` keeps the rule co-located with the other section-spacing rules and lets future block-type additions (e.g. future `subheading` block) participate by default.
+- **Why two placement modes for the handle instead of always in-flow.** Above md, the two-column layout reserves a left gutter; keeping the handle absolute preserves the "text column stays a fixed width as the window resizes" contract that the rest of the case-study layout depends on. Forcing in-flow placement at all sizes would shift the content column left by 24px on desktop admin views, misaligning with the visitor (non-admin) view.
+- **Why `opacity: 0.55` on narrow + touch, not full opacity.** The handle is admin-only but should not dominate visual weight. 0.55 is the same low-emphasis reveal used elsewhere for secondary admin chrome; full opacity would read as "primary content control" and compete with the block's actual content.
+
+**Cross-reference:** Cross-category with ENG-178 (same fix documented from the CSS-layout-mechanics angle). Related to ENG-164/175 (DnD scoping) — both predecessors built the outer `SortableBlock` wrapper without auditing whether existing block-internal spacing rules made sense against the new wrapper hierarchy.
+
+**Anti-pattern candidate (DAP — to promote into `docs/design-anti-patterns.md` if seen again):** "Absolute-positioned affordance anchored to a wrapper whose top is inflated by a child's collapsed-then-uncollapsed margin." When a child establishes a BFC (flex item, grid item, `overflow: hidden`, etc.), its own top margin no longer collapses through the wrapper, and absolute-positioned siblings that anchor `top: 0` of the wrapper end up above the visible content. Forcing function when designing gutter affordances (handles, labels, annotations): either (a) anchor the affordance to the element whose top actually aligns with visible content, or (b) ensure the spacing lives as external margin on the wrapper, not as internal child margin.
+
+---
+
+### FB-157: "You're conflating two different things, and that's very dangerous" — audio capability vs. default state on video settings
+
+**Date:** 2026-04-20
+
+**UX Intent:** Yesterday's FB-154 / ENG-169 promoted a single "Muted by default / Sound by default" `ButtonSelect` onto `VideoSettings.tsx` (and a parallel one onto the new `VideoEmbed` overlay) so authors could configure default audio on page load. Today the author pushed back that the naming and axis itself were wrong. Their exact wording: *"'Muted by default' means the user can still have sound. 'Audio on or audio off' means that there is no mute functionality available to users; it just means that there is no audio for this video. You're conflating two different things, and that's very dangerous."* They then prescribed the correct model: *"Audio on or off dictates whether or not the muted setting is happening, so audio off should be in the first layer, and then, once it's there, muted by default or sound by default will show up. It's a tree structure."* Embeds: *"Just disable that option. If it's a link, then the provider already has their audio stuff."*
+
+**Root Cause:** The FB-154 implementation folded two orthogonal axes into a single boolean named `muted` on the Media collection:
+
+1. **Capability** — does this video carry a usable audio track at all? Most loop videos on the portfolio are silent screen captures; exposing a mute/unmute toggle on them is meaningless. The correct answer for these is "no audio controls exist at all."
+2. **Default state** — for videos that DO have audio, how does playback start on page load? This is a configuration of the viewer experience, not a statement about the asset.
+
+The original `muted=true` default read fine for silent clips because they're muted regardless, so the conflation stayed invisible until the author tried to reason about the control itself. Worse, the viewer-side `MediaMuteToggle` from FB-152 was always shown whenever the asset was flagged as having audio — which it wasn't, because `muted=true` was the scaffolding default, which meant *every* video looked "has audio but muted" from the control's perspective. This is the kind of bug where the symptom is a naming disagreement but the cause is a missing axis in the data model.
+
+On `videoEmbed` blocks, the conflation was even less defensible: YouTube / Vimeo / Loom iframes carry the provider's own full audio UI, so the "muted by default" toggle was competing with a control the author neither owned nor could style. Disabling the option entirely is the correct scope.
+
+**Resolution:**
+
+1. **Introduced two orthogonal fields on `Media`.** `audioEnabled: boolean` (default `false`, label "Expose audio controls to viewers") declares capability — is there an audio track worth surfacing? `muted: boolean` (default `true`, label "Starts muted by default") keeps its name but narrows its meaning to default state, conditional on `audioEnabled === true`. Both fields are gated on `mimeType.startsWith('video/')`. Admin descriptions on both fields state which axis the field governs so an author reasoning from the Payload admin alone cannot repeat the conflation.
+2. **Rebuilt `VideoSettings.tsx` as a two-layer tree.** First row holds the existing Loop/Player `ButtonSelect` plus a new "Audio off / Audio on" `ButtonSelect` bound to `audioEnabled`. Second row — rendered only when `audioEnabled === true` — holds the "Muted by default / Sound by default" `ButtonSelect` bound to `muted`. `VideoSettings.module.scss` adds a `.secondaryRow` class (`flex: 0 0 100%` + `padding-left: var(--spacer-1x)`) that forces the dependent control onto its own indented line so the tree relationship is visible without any iconography. No accordion, no summary — the revealed row simply doesn't exist when audio is off.
+3. **Removed audio control from embeds entirely.** Deleted `src/components/inline-edit/VideoEmbedSettings.tsx`, removed its exports from `src/components/inline-edit/index.ts`, dropped the `muted` field from the `videoEmbed` block in `Projects.ts`, removed the `projects_blocks_video_embed.muted` ALTER from `push-schema.ts`, reverted `parseVideoEmbedUrl` to its pre-ENG-169 signature (no `opts` arg, no provider mute params), and removed the `VideoEmbedSettings` rendering + `muted` prop threading from `ProjectClient.tsx` and `page.tsx`. The admin overlay for embeds now shows only the paste-URL input, matching the author's principle that the provider already owns the audio UI.
+4. **Updated `MediaRenderer` logic to respect the two-axis model.** `audioOn` (render any audio controls at all) is now derived strictly from `audioEnabled` for loop videos; `initialMuted` reads `muted` only when `audioOn` is true. Player-mode videos keep `audioOn = true` because Player-mode implies a full audio-capable experience. `MediaMuteToggle` therefore only renders when there's something for the viewer to toggle.
+5. **Data migration.** `push-schema.ts` seeds existing rows with `UPDATE "media" SET "audio_enabled" = true WHERE "muted" = false`. Under the old model, only assets explicitly marked not-muted had audio intent; those are exactly the rows that should now carry the capability flag. Everything else defaults to `audio_enabled = false` (silent capture, no viewer controls).
+
+**Design decisions:**
+
+- **Why a revealed second row, not a single three-way select.** A three-state `ButtonSelect` ("No audio / Muted / Sound") compresses both axes into one dimension and loses the parent-child relationship the author articulated. The reveal explicitly models "Muted/Sound is only meaningful inside Audio-on." It also matches the user's own description: "once it's there, muted by default or sound by default will show up."
+- **Why `audioEnabled` defaults to `false`.** Silent captures are the modal case for this portfolio (loop videos of UI demos, no voice-over). Defaulting to `false` means the author explicitly opts in for videos with a sound track, which is the less-common case. This also keeps new `MediaMuteToggle` controls from appearing on every legacy asset — they only appear when the author explicitly flips the new field.
+- **Why `muted` defaults to `true` under the new model.** Autoplay-with-sound is hostile web behavior; every portfolio video with audio should still begin muted with the viewer invited to enable sound via the toggle. The default preserves this even when `audioEnabled` is flipped on.
+- **Why indentation (not an icon or chevron) marks the nested row.** The portfolio's inline-edit UI avoids ornament by default (`docs/design/branding.md` §3). Indentation + "this row only exists when Audio is on" communicates nesting through presence, not through a disclosure chrome.
+- **Why remove the embed control entirely, not gate it behind capability.** The provider iframe is an opaque box we can't override. The only semantically meaningful mute control on an embed is the one baked into the provider's own player. Adding a second control next to it invites the author to configure a field we can't honor reliably (autoplay policies differ by provider and by user-gesture context). Scope-wise, the author explicitly requested removal.
+
+**Cross-reference:** This is a correction to FB-154 and ENG-169. Both are still valid as "audio default needs a primary affordance" but their *axis* was wrong. New anti-pattern extracted (see next paragraph). Cross-category with ENG-170 (schema + component work) and CFB-039 (relabel of the surface from "muted" singular to the two-axis vocabulary).
+
+**Anti-pattern extracted (DAP candidate — to promote into `docs/design-anti-patterns.md`):** "Boolean control that conflates capability with state." A single toggle can look like either axis depending on the author's intent; if the control's label can be read two ways ("is audio off?" vs "is audio off *now*?"), the data model is underspecified. The forcing function: any new boolean on an admin surface must be described in one sentence that answers "what changes in the rendered output when this flips?" If that sentence describes *whether a control exists* OR *how that control starts*, the axes have been conflated and the field must split in two.
+
+---
+
+### FB-156: ScrollSpy portaled highlight label landed rightward of the notch, extending past the viewport
+
+**Date:** 2026-04-20
+
+**UX Intent:** Immediately after FB-155 shipped, the author saw the active label ("Overvi[ew]" in the first screenshot, then again after an attempted fix) positioned to the *right* of the notch — not the left where the in-rail hover labels sit. The label's right edge clipped past the viewport's right edge, and the text appeared ~12px offset from the `.tick` row, stacking above where the hover labels appeared. All four labels (active + three hover-revealed) are meant to share a single right-alignment gutter so hover reveals the stack without any horizontal or vertical shift.
+
+**Root Cause:** Two compounding bugs, the second of which dominated and masked the first:
+
+1. **Wrong anchor element.** The portal compute function read `tick.getBoundingClientRect().left` — the inner tick `<button>` — and translated the label `-100%` from that anchor. But in-rail hover labels are positioned with `right: calc(100% + spacer-1x)` relative to the *notch container*, not the tick. The notch is 28px wide with `justify-content: flex-end`, so the tick (16px depth-0, 10px depth-1) sits 12–18px inside the notch's left edge. On its own this would produce a 12–18px eastward drift.
+
+2. **framer-motion `animate={{ x }}` clobbered the base CSS `transform`.** `.highlightLabel` carried `position: fixed; transform: translate(calc(-100% - spacer), -50%)` in SCSS. The same element was a `motion.span` with `animate={{ x: 0, opacity: 1 }}`. framer-motion writes *all* transform-like motion values (`x`, `y`, `rotate`, `scale`) as an inline `transform: translateX(…) translateY(…) …` style, which wins over the CSS declaration for the same property. The `-100%` horizontal shift and `-50%` vertical centering were therefore silently dropped the moment the label animated in. The label's top-left corner ended up anchored at `{ top: notch.center, left: notch.left }`, and extended *rightward* from the notch — explaining the "Overvi" text dangling past the right viewport edge in both screenshots. Fixing bug (1) alone had no visible effect because bug (2) was still overwriting the transform regardless of which element we anchored to.
+
+**Resolution:**
+
+1. **Anchor to the notch, not the tick.** The portal compute function now reads `[data-notch-index="${highlightIndex}"]` directly (not the inner `button`). `notch.getBoundingClientRect()` returns `left` equal to the notch container's left edge — the same reference point the in-rail `right: calc(100% + spacer-1x)` resolves against. Vertical centering is unaffected (`notch.top + notch.height/2 === tick.top + tick.height/2` since the tick is centered inside the notch via `align-items: center`).
+2. **Split positioning across two elements.** The portaled tree is now `<div class="highlightLabelAnchor"><motion.span class="highlightLabel">…</motion.span></div>`. The outer `div` owns the CSS `position: fixed; transform: translate(calc(-100% - spacer-1x), -50%)` — this is plain CSS on a non-motion element, so nothing overrides it. The inner `motion.span` owns only `animate={{ x, opacity }}` — framer-motion's inline `transform` applies to the inner span, not the outer anchor, so the two systems compose cleanly. The inner `x: 0 → 4` slide-in animation now visibly works again (it was always dormant under a 0→0 no-op before because the base transform was being overwritten).
+3. **Parity updates in both copies.** Identical refactor in `src/components/ui/ScrollSpy/ScrollSpy.tsx` / `.module.scss` (DS source) and `src/components/ScrollSpy.tsx` / `.module.scss` (package mirror).
+
+**Design decisions:**
+
+- **Why split across two elements instead of moving `x` into a `motionValue` transform template.** The alternative is a single element with `style={{ x: motionValue, y: motionValue }}` driving a custom `transformTemplate={(t, generated) => \`translate(calc(-100% - spacer), -50%) ${generated}\`}`. It works, but couples every future maintenance read to a framer-motion escape hatch. A plain nested `<div>` is self-documenting: "the outer div is the position, the inner span is the animation." Two elements is the smaller cognitive footprint.
+- **Why not use `position: fixed` on both layers.** The inner span doesn't need its own fixed positioning — it inherits the anchor's placement by being its only child. Keeping `position: static` on the span means framer-motion's `x` value translates it relative to its flow position inside the anchor, and its own width still drives the anchor's `-100%` calculation because the anchor shrink-wraps its content.
+- **Why the subtle `x: 0 → 4` slide-in remains.** It was always the intended entrance — it just never ran because the transform was being overwritten. Keeping it provides continuity with the in-rail hover label's identical `initial/animate/exit` motion, so when the stack is revealed the active label doesn't sit motionless while its neighbors slide in.
+
+**Anti-pattern extracted → `docs/design-anti-patterns.md` AP-070: framer-motion `x`/`y`/`scale`/`rotate` animation on an element that also relies on a CSS `transform` value.** The two systems write to the same `transform` style property; the motion library wins. Fix is to split the static and animated transforms onto different elements, or encode the static part as a `transformTemplate`.
+
+**Cross-reference:** Extends FB-155 (portal + `mix-blend-mode: difference` implementation). First-attempt resolution (anchor swap only) shipped silently; user repeated the complaint with a second screenshot, which exposed bug (2). Lesson for future iteration loops: when a user reports the same issue twice after a claimed fix, do not assume the prior diagnosis was complete — re-derive from symptoms, not from the diff. "What the hell is this positioning? Please fix" → "It is STILL not fixed" is the canonical two-step signal that the *root cause* was wrong, not that the *fix was partial*.
+
+---
+
+### FB-155: ScrollSpy active notch label must auto-contrast against whatever background pixel it sits over
+
+**Date:** 2026-04-20
+
+**UX Intent:** The ScrollSpy rail is `position: fixed` over case-study pages whose sections have highly varied backgrounds — white body, dark hero splashes, photographic full-bleed sections, colored accent blocks. The active notch's label is currently driven by a single theme token (`--portfolio-text-primary`), which produces invisible labels whenever the current section's background luminance is close to that token (dark label on a dark hero photo; or the reverse in dark mode). The author reported: "only the notch text will flip to the inverse color, like the inverse of whatever the background color is... only the current notch will have the impact; the rest of the notch will not really have it."
+
+**Root Cause:** The label's color was pinned to a single theme token regardless of the section it overlapped. The rail is a viewport-fixed overlay, so its label y-position is orthogonal to whatever section is underneath at any scroll depth — there is no general solution that picks a single token. A sampling or annotation strategy was possible (pixel sampling via `elementsFromPoint` + luminance scoring, or per-section `data-theme="dark|light"` attributes), but both have blind spots: sampling misses background images and gradients; annotation requires every future section author to remember to mark backgrounds. The correct primitive is *automatic inverse of backdrop*, which is what `mix-blend-mode: difference` provides for free — white text + difference blend mode yields `|255 − bg|` per channel, producing black on white, white on black, and inverse color on any backdrop without any JavaScript sampling.
+
+The complication is stacking contexts. `position: fixed` *always* creates a new stacking context (regardless of `z-index`), and `mix-blend-mode` only blends against the backdrop of its element's *parent* stacking context. Applied to `.label` inside the rail, `mix-blend-mode: difference` would blend only against the rail's own (empty) interior — not the page content below the rail. The label must escape the rail's stacking context entirely to blend against document content.
+
+**Resolution:**
+
+1. **Portal the currently-active (or drag-targeted) label to `document.body`** via `createPortal` in `src/components/ui/ScrollSpy/ScrollSpy.tsx` (and the mirror `src/components/ScrollSpy.tsx`). The portaled span becomes a direct child of `<body>`, so its parent stacking context is the root — `mix-blend-mode: difference` now blends against all page content rendered below it in DOM order.
+2. **Position is computed per frame via `getBoundingClientRect()`** on the active tick button, stored in state, and applied as `top` / `left` on the portaled element. A `useIsomorphicLayoutEffect` subscribes to `resize` and capture-phase `scroll` events so the overlay stays locked to the tick's viewport coordinates. The transform `translate(calc(-100% - spacer-1x), -50%)` aligns the label's right edge with the tick's left edge, matching the original in-rail layout.
+3. **The portaled label uses `color: #fff` + `mix-blend-mode: difference`** (new `.highlightLabel` class). White × difference = `|255 − bg|` per channel, so the text appears as the per-channel inverse of whatever pixels sit behind it — regardless of whether the backdrop is a theme token, an image, a gradient, or a photographic section. No sampling, no annotation, no per-section data attributes.
+4. **The in-rail label for the highlight notch is suppressed** when the portal is rendering it (`!isHighlight` guard on the `AnimatePresence` block), so we don't paint the same label twice with two different color strategies. Other labels shown during rail hover retain their existing token-driven colors (`--portfolio-text-placeholder` / `--portfolio-text-primary` / `--portfolio-text-secondary` by depth) — only the current notch flips, exactly as requested.
+5. **SSR safety:** the portal is gated by a `mounted` state flipped in `useEffect`, so server-rendered HTML includes only the in-rail `<nav>`. The overlay mounts on hydration. `useIsomorphicLayoutEffect` avoids the React SSR warning for `useLayoutEffect`.
+6. **Animation:** a single `motion.span` with `initial={false}` + `animate={{ opacity, x }}` handles enter/exit, driven by `highlightVisible && overlayPos`. This avoids the keyed-`AnimatePresence` flicker that would otherwise fade the label on every active-section change during hover — we want a smooth label swap, not a cross-fade.
+
+**Design decisions:**
+
+- **Why `mix-blend-mode: difference` over pixel sampling:** sampling requires a scroll listener, fails on background-images (no `backgroundColor` to sample), and can't anticipate gradients. Difference blend mode is a GPU-accelerated compositing operation with zero runtime cost and handles every backdrop type — including photographic sections — out of the box. The only visual trade-off is that colored (non-grayscale) backdrops produce colored (non-black/white) inverses: red bg → cyan text, green bg → magenta text. On a portfolio whose backgrounds are dominantly neutral with occasional photographic accents, this reads as "still readable, occasionally stylistically tinted" — acceptable. The author's phrasing ("the inverse of whatever the background color is") exactly describes this behavior.
+- **Why portal to `document.body` and not a sibling of the rail:** the rail is `position: fixed` (always a stacking context). Any descendant of the rail is isolated from the document backdrop. The only DOM positions where `mix-blend-mode` blends against the full page are children of stacking contexts that themselves contain the page content — the root stacking context is the simplest such position. `createPortal(..., document.body)` is the canonical escape hatch.
+- **Why only the active notch gets this treatment:** the author asked for it explicitly ("only the current notch will have the impact"), and semantically it's correct: the active label is the "you are here" signal that must be legible above all else; non-active labels shown on hover are secondary affordances whose token-driven hierarchy (placeholder vs. primary vs. secondary) still communicates depth. Applying difference blend mode to all hover-labels would collapse the depth-by-opacity hierarchy into a flat "all visible" layer.
+- **`z-index: var(--portfolio-z-scrollspy)` on the portaled label:** matches the rail's z-index tier so the label always composites above other page overlays (if any) and below any modal dialog that might appear.
+
+**Pattern extracted → `docs/design/content-navigation.md` §13.5: ScrollSpy Auto-Contrast Label**
+**Anti-pattern extracted → `docs/design-anti-patterns.md`: `mix-blend-mode` inside a fixed-position stacking context.**
+
+---
+
+### FB-154: Editor-facing mute default needs to be a primary control with self-documenting labels — not a buried dropdown item
+
+**Date:** 2026-04-20
+
+**UX Intent:** The author asked where the viewer-facing mute button (FB-152) had gone on a case-study video. In reality FB-152 only wired a viewer toggle for *uploaded* videos and only rendered it when the editor explicitly set `muted: false` on the Media doc. The editor-facing *default* — "should this video start muted or with sound when the page loads?" — existed only for uploads and only as a buried item inside the three-dot "More settings" dropdown on `VideoSettings`. There was no editor-facing mute default for external video embeds (YouTube/Vimeo/Loom) at all. The author's frustration traced to an over-hidden primary control, not a missing feature.
+
+**Root Cause:** During ENG-162 the Muted toggle was nested inside `DropdownMenu` alongside poster-frame management to keep `VideoSettings` visually compact. That grouping conflated two axes: **frequent, axis-level configuration** (playback mode, audio default) and **occasional, file-level operations** (change / remove poster). A dropdown is appropriate for the occasional ops, not for an always-relevant configuration. And the parallel configuration for `videoEmbed` blocks was never built — embed audio was left to whatever the provider's iframe defaulted to.
+
+Labeling was the other half of the problem. The dropdown item said "Muted" with a checkmark — readable as "current state is muted" rather than "default on page load is muted." That ambiguity is why, even if the author had found the control, they would have been uncertain whether flipping it affected just *this session* or the *saved configuration*. Semantic intent (§7.7) demands the label communicate the invariant, not the current switch position.
+
+**Resolution:**
+
+1. **Promoted Muted default to a primary `ButtonSelect`** in `VideoSettings.tsx`, placed alongside the existing Loop/Player `ButtonSelect`. Labels are the full phrases "Muted by default" / "Sound by default" — the word "default" is load-bearing (§7.7 semantic intent: the toggle configures the *saved default*, not a transient state). Removed the "Muted" `DropdownMenuItem`; the dropdown now carries only poster-frame actions, matching its "occasional ops" scope.
+2. **New `VideoEmbedSettings` control** at `src/components/inline-edit/VideoEmbedSettings.tsx` for the `videoEmbed` block (YouTube/Vimeo/Loom). Same ButtonSelect pattern, same labels. Reuses the `VideoSettings.module.scss` `.root` (same translucent-chrome overlay, absolute-positioned by the case-study page in `.figPlaybackToggle`). Exported through the inline-edit barrel so consumers don't learn yet another import path.
+3. **Schema** — added `muted` (checkbox, defaultValue: true) to the `videoEmbed` block in `Projects.ts`, parallel to `media.muted` for uploads. Codified in `push-schema.ts` with a defensive `ALTER TABLE "projects_blocks_video_embed" ADD COLUMN "muted" boolean DEFAULT true` wrapped in `DO $$ ... EXCEPTION WHEN undefined_table THEN NULL END $$` so fresh provisions don't fail if Payload has not yet materialized the block table.
+4. **Data pipeline** — `parseVideoEmbedUrl` now accepts an optional `{ muted }` option that injects the provider-specific mute parameter into the *autoplay* URL (YouTube `mute=1`, Vimeo `muted=1`, Loom `muted=true`) — the idle embed URL is untouched because no playback occurs pre-click. `mapContentBlocks` reads `b.muted` (defaulting to `true`) and threads it through to the parsed embed URL and the client-facing block.
+
+**Design decisions:**
+
+- **ButtonSelect over icon-only toggle:** an earlier option was a single speaker icon toggling mute/unmute, visually echoing the viewer-facing `MediaMuteToggle` from FB-152. Rejected because the labels need to carry the word "default" to communicate that this is *persistent configuration*, not *current state*. Icon-only toggles cannot carry that semantic; they always read as "current switch position." Full-word ButtonSelect items eliminate the ambiguity.
+- **Two separate controls, not a unified one:** `VideoSettings` writes to `media.muted` (a row on the Media collection); `VideoEmbedSettings` writes to `projects.content[blockIndex].muted` (a deep block field). Both use identical labels so the author sees the same control semantics across upload and embed, but the underlying write paths diverge because the data shapes are different (see ENG-153 for why Path A was chosen over unifying Media with external URLs). The visual+verbal parity hides the persistence asymmetry.
+- **Labels with "default":** "Mute" / "Sound" would have been two words shorter but would read as *verbs on current audio state*. "Muted by default" / "Sound by default" are read as *adjectives modifying the saved invariant*. The ByteSelect items auto-size, and the overlay's `.root` now has `flex-wrap: wrap` so the control can fold onto a second row on narrow figures.
+- **Rest-state visibility:** the overlay follows the existing `.figPlaybackToggle` positioning (top-left of the figure, always-visible in admin mode). Admins need to see the audio configuration without hovering — hover-reveal is for the viewer surface (`MediaMuteToggle`), not the editor surface.
+- **Unchanged viewer behavior:** the FB-152 viewer toggle (hover-revealed bottom-right mute button) continues to show only when `muted === false` on the Media doc. This is deliberate — it pairs the "capability to hear audio" with "capability to mute it." Video embeds do not get a viewer toggle because the provider iframe owns the playback chrome.
+
+**Cross-category note:** Engineering dimension documented as ENG-168 — schema field addition, parser API extension, and Payload auto-push verification. Content label choice ("Muted by default" / "Sound by default") documented in the content feedback log? No — labels this short aren't content per se, they're design-system verbiage; content-log entry omitted.
+
+---
+
+### FB-153: Empty scaffold slots need an explicit remove affordance, not only a fill affordance
+
+**Date:** 2026-04-19
+
+**UX Intent:** While pruning a `case-study-authoring`-generated image group on `/work/meteor`, the author wanted to drop two of five labeled placeholder slots and keep three. They saw no in-place remove control on the labeled dashed boxes — only the block-level delete in the `BlockToolbar`, which would have destroyed the whole image group. Their expectation: each scaffold slot should be individually deletable where it sits, matching the per-image delete that filled slots already expose through `ImageBlockAdminOverlay`.
+
+**Root Cause:** The placeholder-grid render branch was designed around a single admin operation on empty slots — click-to-upload. The fill affordance was treated as sufficient because "eventually every slot will be filled." In practice, authors also subtract from scaffolds: deciding a "Before / After" pair isn't needed, dropping a placeholder that duplicates a nearby figure, cutting a slot the narrative no longer supports. Without a prune affordance on empty containers, the author's only subtractive options are (a) delete the whole block or (b) leave a ghost slot in the published page.
+
+**Design decision — Pattern:** For every admin-visible empty container whose content was scaffolded (not user-authored from scratch), render the remove affordance in the same visual grammar the filled state uses. In this case that's a small X button in the top-right corner, matching the `ImageBlockAdminOverlay` position on filled figures. It fades in on hover / focus-within so it doesn't compete with the primary fill affordance (click-to-upload), but it's always keyboard-reachable via Tab.
+
+**Resolution:**
+
+1. Small 24 × 24 X button in the top-right of every empty `.labeledPlaceholder` / `.labeledPlaceholderWide`. Zero border-radius (branding §1.1). `opacity: 0` default, `opacity: 1` on slot hover / focus-within. Same corner the filled state's delete occupies, so the mental model transfers.
+2. `stopPropagation` on click and keydown so the slot's own click-to-upload and `Enter`/`Space` handlers don't fire when the X is activated.
+3. Behavior routes through `useBlockManager.removePlaceholderSlot`, which uses an undoable toast (not an AlertDialog). The confirmation model is proportional to the stake — a 1-line label, not a media asset.
+4. Guard: if the slot happens to have a filled image at that index, the X no-ops with a toast nudge; deletion in that case must go through the filled-slot overlay (stakes are higher there).
+
+**Principle extracted -> `docs/design.md` §14 (CRUD contract for inline editing):** Empty containers scaffolded by authoring tooling must expose a remove affordance co-located with the slot, not only a fill affordance. The absence of a prune control is the design-side expression of the engineering "fill-path without remove-path" anti-pattern (ENG-166). Applies to: labeled image placeholders, video-embed URL skeletons, scaffold heading/body pairs, and any future generator output.
+
+**Cross-category note:** Engineering dimension documented as ENG-166. The engineering fix (`removePlaceholderSlot` in `useBlockManager`) is what the X button calls — the design pattern (corner X, hover-reveal, undoable) is what makes it discoverable.
+
+---
+
+### FB-152: Videos with editor-enabled sound need a viewer-facing mute control — new DS primitive `MediaMuteToggle`
+
+**Date:** 2026-04-19
+
+**UX Intent:** On case-study pages, some loop videos have audio (editor toggled `muted: false` via `VideoSettings`). Previously the only mute affordance was the admin `VideoSettings` overlay — visitors had no way to mute a noisy autoplay loop once they landed on the page. The user asked for a clear, icon-only button at the bottom-right corner of the affected video, usable by every viewer.
+
+**Root Cause:** `MediaRenderer` accepted a `muted` prop from the CMS and handed it straight to `<video muted={...}>`, so mute state was static per render and immutable at the viewer layer. Player-mode videos got the browser's native `<video controls>` UI for free, but loop videos (no controls bar) had no viewer affordance at all. The hover-only admin overlay (`VideoSettings`) is gated behind `isAdmin` and anchored to the editing context, not the playback surface.
+
+**Resolution:**
+
+1. **New DS component** `src/components/ui/MediaMuteToggle/` — controlled, icon-only button. Props: `muted`, `onMutedChange`, `size` ("sm" | "md"), `mediaLabel`, plus forwarded native button attributes. Renders an inline volume/volume-off SVG over a translucent dark surface (`rgba(0,0,0,0.55)` → `0.75` on hover), white focus ring, zero border-radius per branding §1.1. Semantic naming per §7.7 — `muted` (intent: "this audio is silenced"), not a visual prop like `off` or `crossed`.
+2. **Consumer wiring in `MediaRenderer`** — added local state `localMuted` seeded from `effectiveMuted` and re-synced via `useEffect` whenever the CMS value changes. The `<video>` element is now driven by `muted={localMuted}` and the toggle flips the state. A new `.muteToggle` class on the wrapper absolute-positions the button at `bottom-1x right-1x` and reveals it on `:hover`/`:focus-within` for low-distraction rest state.
+3. **Visibility rule:** show the toggle only when `isVideo && !isPlayerMode && muted === false` — i.e., loop videos whose editor explicitly opted into sound. Player videos have native controls; silent decorative loops shouldn't get a toggle that implies there's audio to hear. This keeps the rest of the portfolio visually quiet.
+4. **Playground coverage** (Guardrail #24): new page at `playground/src/app/components/media-mute-toggle/` with Basic / Overlay placement / Sizes demos, props table, and source path footer. Sidebar entry added to "Content & Media". Registered in `archive/registry.json` as `shared-ui-media-mute-toggle` with `hasPreview: true`.
+
+**Design decisions:**
+
+- **Overlay placement (bottom-right):** mirrors native HTML5 video control affordance and the YouTube/Vimeo pattern so viewers find it without instruction.
+- **Hover-to-reveal rest state:** the portfolio's loop videos are primarily compositional — an always-visible chip would distract. `opacity: 0` → `1` on hover/focus keeps the media clean but makes the control discoverable on any keyboard-nav pass.
+- **CMS intent, not current state, gates visibility:** using `muted === false` (editor opted in) rather than `localMuted === false` (current runtime state) means that if a viewer mutes the video, the toggle stays visible so they can unmute again. This is obvious in retrospect but worth pinning — visibility should track *capability*, not transient state.
+- **New primitive vs. overload `ToggleButton`/`Button`:** considered composing an existing DS primitive with a translucent variant, but the control has specific requirements (semi-transparent chrome, white-on-media contrast, always-on-dark appearance) that would pollute the general Button API. A dedicated `MediaMuteToggle` keeps the intent narrow and the API self-documenting.
+- **Client-side only mute:** the toggle does not persist viewer mute preferences to the CMS (that's the editor's `VideoSettings` job). Per-viewer mute is session-local — it would be surprising if a visitor toggle affected every other visitor.
+
+**Cross-category note:** No engineering-feedback-log entry (no incident — this was a proactive viewer-experience addition). No content-feedback-log entry (no copy changes; `aria-label` is "Mute {mediaLabel}" / "Unmute {mediaLabel}" — standard accessible pattern).
+
+---
+
+### FB-151: Drag-to-reorder on case-study blocks read as "not enabled" — missing drop indicator + ghost
+
+**Date:** 2026-04-19
+
+**UX Intent:** While reordering case-study blocks (admin), the user expected an obvious "this is where I will land" signal before releasing — a line between blocks or a preview that tracks the cursor. Dragging an image group upward toward a heading/description pair, they got neither, and read the silence as "the drop isn't enabled."
+
+**Root Cause:** The primary functional bug (hero-filter index mismatch — wrong block moved, visible change = none) is logged as ENG-164. On top of that, the dnd-kit reorder relied **only** on `verticalListSortingStrategy`'s slide-to-make-room animation for affordance. That motion is real but small, and in this layout it competes with `BetweenBlockInsert`'s hairlines which are always visible — so the sliding gap reads as "normal layout shift," not "drop target." There was no `DragOverlay`, no accent line on the target edge, and the source's `opacity: 0.5` wasn't low enough to read as "picked up."
+
+**Resolution:**
+
+1. **Accent drop line on the target block** (2px, accent-50, pulsing) — rendered on the *before* edge when the source is below the target, on the *after* edge when above. Pointer-events none.
+2. **Floating ghost via `DragOverlay`** — a compact pill with the 6-dot grip and a human-readable label ("Image group · 3 images", "Heading: The Scope Buffet", etc.). The pill uses the same accent-50 left-border as the drop line so source and target share a visual identity during the interaction.
+3. **Source opacity lowered 0.5 → 0.35** so the in-place card reads unambiguously as "taken out" rather than "dimmed."
+4. `.dropLine` is deliberately distinct from the existing `.dropIndicator` (which is the native HTML5 file-drop affordance, triggered by `isDraggingOver`). Collapsing them would re-conflate the two drag models that ENG-164 had to separate.
+
+**Design decision:** For reorder DnD, slide-to-make-room is necessary but not sufficient. A persistent reorder surface needs **three layers** of affordance: (a) source dim + handle, (b) animated target-edge line, (c) floating ghost. This matches existing DS patterns (FB-053/FB-054 tile reorder) and generalizes to any future drag-to-reorder surface on the site.
+
+**Cross-category note:** Also documented as ENG-164 (engineering) — the filter-index vs source-index bug that made the functional drop silently fail on projects with hero entries in `content`.
+
+---
+
+### FB-150: Experience column must never wrap company names to 2 lines — rigid min-width + nowrap
+
+**Date:** 2026-04-19
+
+**User direction:** "The experience section should have the least flexibility in terms of width. Whenever the width of the window or browser window gets squeezed, if it doesn't fit, it should just not have any width ranges; it should have a minimum width. The reason behind that is that the links themselves, by principle, are not supposed to become like the company links themselves. They are not supposed to have turned into two roles; that's just not how the design works. When the experience column is squeezed, it will just move to the next row, just how it will just never compromise on the width while other ones can potentially."
+
+**UX Intent:** Each row in the Experience column is a single job — company name + arrow + date period — and the eye scans company names vertically down the column. When the column is too narrow, the company name (e.g. "Lacework (acq. Fortinet)") wraps to a second line, which visually breaks the 1-row-per-job rhythm and reads as two separate items. The user's rule is structural: **one company = one line, always**. Width is the dependent variable, not the thing we optimize. When the grid can't give Experience the width it needs at one-line, Experience moves to its own row rather than letting the text wrap.
+
+**Root Cause:** Two places where the Experience track can drop below the ~240px needed for its longest row at body-sm + code-sm:
+
+1. **Compact desktop (`$elan-mq-sm`, 672–1055px)** — the auto-fit grid was `repeat(auto-fit, minmax(180px, 1fr))`. At viewport ~800px (container ~736px), 3 tracks at 180 min fit → each track becomes ~203px. "Lacework (acq. Fortinet) ↗ 2022" needs ~240px at body-sm + code-sm, so the company text wraps inside `.teamLink`.
+2. **Wide desktop (`$elan-mq-md`, 1056+px)** — the 4-col template was `minmax(260px, 320px) repeat(3, minmax(180px, 240px))`. The Experience track (col 2) is 180–240. At viewport 1056 (container 992), the column sum at minimum + gaps = 1052 already overflows, and Experience sits at its 180 min → same 2-line wrap.
+
+Beyond the immediate viewport zones, there's a more fundamental issue: relying on grid track width to prevent text wrap is fragile. The longest company name today is "Lacework (acq. Fortinet)" at ~240px, but the CMS lets editors add longer names in the future. Any grid minimum we pick is only valid until content changes. The invariant needs to live at the text layer, not the layout layer.
+
+**Resolution:**
+- `src/components/SiteFooter/SiteFooter.module.scss`:
+  - **Text layer invariant** — added `white-space: nowrap` to `.teamLink`. Company names now never wrap regardless of column width. If the text is longer than the column, it extends visually — but the new grid mins below ensure that never happens in practice.
+  - **Compact desktop floor** — changed `repeat(auto-fit, minmax(180px, 1fr))` to `repeat(auto-fit, minmax(240px, 1fr))`. Every non-About column now has a 240px floor. At narrow-compact (viewport 672–928), auto-fit falls back to 2 tracks; Contact ends up on its own row 3. Experience never drops below 240.
+  - **Wide desktop fixed track** — changed `repeat(3, minmax(180px, 240px))` to `240px repeat(2, minmax(180px, 240px))`. Experience (col 2) now has a fixed 240px track. Links and Contact retain the 180–240 range (they're flexible — their content fits comfortably at 180).
+  - **Wide breakpoint raised to 1120px** — added a footer-local `$footer-wide-mq: '(min-width: 1120px)'`. At the original `$elan-mq-md` (1056), the new column sum at minimum (260+240+180+180 = 860 + 3×64 gap = 1052) exceeds container width (992 at 1056 viewport with 32px horizontal padding). Between 1056 and 1119, the compact layout carries over, which keeps the one-line-per-job invariant intact. At 1120+ the 4-col layout activates with 4px of container slack — absorbed by `space-between` into the gaps, which is cosmetically fine.
+- No JSX change — the `.teamLink` class is shared across all team rows and the compact/wide grid templates use anonymous track position (col 2 = Experience by DOM order), so no new class was needed.
+- Verified via curl + compiled CSS inspection: `@media (min-width: 1056px)` still applies `.footerInner` padding (unchanged); `@media (min-width: 672px)` compact grid is `repeat(auto-fit, minmax(240px, 1fr))`; `@media (min-width: 1120px)` wide grid is `minmax(260px, 320px) 240px repeat(2, minmax(180px, 240px))`; `.teamLink` has `white-space: nowrap`.
+
+**Pattern extracted → `docs/design/responsive.md` (new §6.12):** For list columns where content has a structural "one row = one item" reading rule, enforce the rule at the text layer (`white-space: nowrap`) AND the layout layer (column min-width ≥ longest item's rendered width). The text layer enforces the invariant regardless of content changes; the layout layer prevents the visual overflow that nowrap alone would cause. Both together let the design rule ("one job per line") be a hard guarantee, not a soft goal that breaks when viewports shrink or CMS content grows.
+
+**Pattern extracted → rigid vs flexible column roles:** In a multi-column layout, not all columns are equal. Identify columns with structural content rules (Experience: 1 line = 1 job) and give them **rigid track widths** (fixed `Npx`, not `minmax`). Columns with flexible content (Links: short labels, Contact: single email) take `minmax(Nmin, Nmax)` ranges. When viewport shrinks below the sum of rigid + flexible minimums, rigid columns stay rigid and flexible columns wrap (or, in auto-fit, the last item in DOM order wraps). This matches the user's mental model of "important stuff doesn't compromise; unimportant stuff can adapt."
+
+**Pattern extracted → footer-local breakpoint vs token system:** When the design language requires a layout-reflow threshold that doesn't match a canonical breakpoint token, define a component-local breakpoint variable with a documented rationale. Here: `$footer-wide-mq: '(min-width: 1120px)'` because the 4-column layout's min sum requires ≥1120 viewport. The token system (`$elan-mq-md` = 1056) is for *platform* breakpoints ("standard laptop"), not *layout composition* breakpoints ("where does my 4-col footer fit?"). Using a local breakpoint with a calculation-based comment makes the threshold auditable and maintainable — any future content change that shifts the column sum will reveal itself in the calculation, not as a silent overflow.
+
+**Files touched:** `src/components/SiteFooter/SiteFooter.module.scss`, `docs/design-feedback-log.md`, `docs/design/responsive.md`, `docs/design-anti-patterns.md`.
+
+---
+
+### FB-149: Desktop min-width floor should apply to content only — nav and footer must stay fluid
+
+**Date:** 2026-04-19
+
+**User direction:** "For the web page on desktop view on super narrow one, I understand that for the rest of the content they're supposed to be horizontal scroll only, but why is the footer not adaptive? Again, the content for everything else should be horizontal scroll, but the footer section itself should still be responsive. I love how currently it's a vertical layout, like what we discussed for mobile experience... Any functional ones like the footer and navigation bar should always be responsive, while the content should have more opinion to take on what is a suitable width and force a scroll when necessary."
+
+**UX Intent:** The desktop min-width floor introduced in FB-147 was doing the right thing for case study content (forcing horizontal scroll instead of collapsing into the phone composition) but the wrong thing for functional chrome. At a 400px viewport on desktop, the whole `.siteWrapper` was pinned to 672px wide, which meant the footer rendered its *desktop* layout inside a 672px wrapper of which only 400px was visible without horizontal scrolling. Consequences: contact email and social links were offscreen until the user scrolled sideways; the nav brand wordmark sat inside a cropped desktop layout instead of the compact mobile stack. The user's rule: **content may opinionate about minimum width; functional chrome (nav, footer) must always be reachable at any viewport**.
+
+**Root Cause:** The FB-147 implementation applied `min-width: $elan-bp-sm` directly to `.siteWrapper` inside `@media (pointer: fine)`. `.siteWrapper` is the root container for the entire `(site)` route group and holds all three top-level regions: `Navigation`, `.contentArea`, `SiteFooter`. When its min-width floor kicks in, it pins *all three* regions to 672px+ — even though only the content region needed that floor. Nav and footer each already have their own `$elan-mq-sm` rules that handle mobile-width viewports correctly (FB-144 footer centred stack, Navigation mobile composition), but those rules never fire because the wrapper prevents the viewport from reaching them.
+
+**Resolution:**
+- `src/app/(frontend)/(site)/layout.module.scss` — move the min-width floor off `.siteWrapper` and onto a new `.contentAreaInner` wrapper, with `.contentArea` becoming an `overflow-x: auto` scroll container at narrow desktop so the overflow stays contained and does not grow the document width. `.contentArea` also gets `min-width: 0` so it can shrink below its flex-intrinsic width and let the scroll container establish itself.
+  ```scss
+  .siteWrapper { /* no min-width */ }
+  .contentArea { flex: 1; min-width: 0; }
+  @media (pointer: fine) and (max-width: #{$elan-bp-sm - 1px}) {
+    .contentArea { overflow-x: auto; }
+    .contentAreaInner { min-width: $elan-bp-sm; }
+  }
+  ```
+- `src/app/(frontend)/(site)/layout.tsx` — wrap `{children}` in a new `.contentAreaInner` div so the min-width lives on the inner wrapper. This separation is load-bearing: if the min-width is on `.contentArea` directly, its parent (the flex column) grows to accommodate it and nav/footer grow with it — the exact symptom we're fixing.
+- Nav and SiteFooter now respond to actual viewport width at narrow desktop. Nav falls back to its compact composition via its own `$elan-mq-sm` rules. Footer falls back to the centred mobile stack from FB-144.
+- Verified via curl + compiled CSS: `.layout_siteWrapper` no longer carries `min-width`; new rule `@media (pointer: fine) and (max-width: 671px) { .layout_contentArea { overflow-x: auto; } .layout_contentAreaInner { min-width: 672px; } }` is present in `/_next/static/css/app/(frontend)/(site)/layout.css`. HTML response contains the new `layout_contentAreaInner__*` class around page children.
+
+**Side effect (documented, accepted):** `overflow-x: auto` with `overflow-y: visible` is computed as `overflow-x: auto; overflow-y: auto` per the CSS spec. At narrow desktop only, this means `.contentArea` becomes a vertical scroll container too, so long pages scroll inside the content region instead of at the document level. The sticky-bottom footer reveal pattern becomes a "footer always pinned to viewport bottom" pattern in this zone. This is correct: at narrow desktop the user is outside the supported composition, so "footer always reachable" beats "footer reveals on document scroll." At viewport ≥ 672px the media query does not fire, so document scroll and sticky reveal continue to work as designed.
+
+**Pattern extracted → `docs/design/responsive.md` §6.10 (rewritten):** Split content vs chrome when applying a min-width floor. **Content** can opinionate a minimum width and scroll horizontally inside its own region; **functional chrome** (nav, footer, cookie banners, global CTAs) must always be fluid to the viewport. Put the min-width on an inner wrapper and the scroll container on its direct parent — never on a root wrapper that also contains chrome. Mechanically: set `overflow-x: auto; min-width: 0` on the outer region, `min-width: $floor` on an inner wrapper; nav and footer sit as siblings to the outer region and never see the floor.
+
+**Pattern extracted → anti-pattern (for `design-anti-patterns.md`):** Applying a min-width constraint to a top-level layout wrapper that contains both functional chrome and scrollable content. Symptom: chrome (nav, footer) renders its desktop layout clipped by the viewport; the user cannot reach CTAs without horizontal scrolling. Fix: push the min-width to an inner content wrapper; keep chrome fluid to viewport.
+
+**Files touched:** `src/app/(frontend)/(site)/layout.module.scss`, `src/app/(frontend)/(site)/layout.tsx`, `docs/design/responsive.md`, `docs/design-feedback-log.md`.
+
+---
+
+### FB-148: Footer wrap pattern — About on row 1, columns wrap below on compact desktop
+
+**Date:** 2026-04-19
+
+**User direction:** "Let's make sure that the footer is still adaptive... the footer ideally does not really change much in width; it has a maximum width but also has a minimum width. When the footer cannot squeeze in enough because there's not enough space, I want it to look like what this website is doing for their footer [Numeric reference]. Essentially, the highest priority one that sits on top is the About section, and the other ones can be stacked as a row until it doesn't fill; then we'll move on to the next row as a section. The About can take up the full width when there's not enough space. Please note that this responsiveness requirement is desktop only."
+
+**UX Intent:** With the new 672px desktop min-width floor (FB-147), the footer no longer has to handle phone-width viewports, but it does still need to handle the band from ~672px up to the `$elan-container-wide` ceiling at 1440px. The prior layout (`grid-template-columns: repeat(4, auto); justify-content: space-between`) worked visually at ≥1200px but produced cramped, stretched sections below that. The user pointed at Numeric's footer as the reference: at wide viewports all sections sit in one row; as space shrinks, the About/logo section wraps to its own row first and the remaining columns flow below, wrapping one at a time as needed. The priority is "About is the identity column — it gets its own row when things are tight; the three list columns are interchangeable and can wrap individually."
+
+**Root Cause:** The prior `.footerColumns` rule at `@media #{$elan-mq-sm}` was a rigid 4-track grid (`repeat(4, auto)` + `justify-content: space-between`). Two things went wrong below ~1200px viewport:
+
+1. `repeat(4, auto)` sizes tracks to content, so a long bio paragraph in About would stretch the About column far past the list columns, making the row feel unbalanced.
+2. `space-between` redistributes leftover width into gaps, which at narrow widths compressed columns against each other (no free space) and at wide widths pushed columns to the far edges (implausible gap).
+
+There was no mechanism to prioritize About over the three list columns. Flex-wrap wouldn't help either — flex-wrap wraps the LAST item in document order first, so Contact would wrap before About.
+
+**Resolution:**
+- `src/components/SiteFooter/SiteFooter.module.scss` — two-zone desktop grid:
+  - **Compact desktop (`$elan-mq-sm`, 672–1055px):** `grid-template-columns: repeat(auto-fit, minmax(180px, 1fr))` so the three list columns naturally wrap based on available width. `.footerColumnAbout` uses `grid-column: 1 / -1; max-width: 360px` — authoritatively claiming the entire row 1 regardless of how many auto-fit tracks the list columns get. The 360px cap prevents the bio from stretching across the full row.
+  - **Wide desktop (`$elan-mq-md`, ≥1056px):** `grid-template-columns: minmax(260px, 320px) repeat(3, minmax(180px, 240px))` — explicit four-column layout. About has a dedicated 260–320px track in column 1; the three list columns share identical 180–240px bounds. `justify-content: space-between` absorbs leftover horizontal slack into gaps rather than stretching any single column. `.footerColumnAbout` resets to `grid-column: auto` so the explicit template takes over.
+- `src/components/SiteFooter/SiteFooter.tsx` — the About section gets an additional class `footerColumnAbout` so the grid item identifier is semantic (priority), not positional (nth-child).
+- Mobile (< 672px) is untouched — the narrow centred stack from FB-144 still applies.
+- Verified via curl + compiled CSS inspection on localhost:4000: all three media blocks (mobile, compact, wide) are present in `/_next/static/css/app/(frontend)/(site)/layout.css` with the expected grid templates.
+
+**Pattern extracted → `design.md` §6 (responsive):** When a multi-column section needs a priority element that always occupies row 1 at a given breakpoint zone, use CSS Grid with `grid-column: 1 / -1` rather than flex-wrap. Flex-wrap wraps from the END of the row (last item first) — it cannot give you "this specific item takes its own row first." Grid's explicit span does exactly that. Combine it with `max-width` on the priority item to keep its content visually constrained even while it spans the full track range. For the remaining "interchangeable" columns below, `repeat(auto-fit, minmax(min, 1fr))` lets the browser make the wrap decisions based on content width. At a second, wider breakpoint, promote to an explicit `minmax(a, b) repeat(n, minmax(x, y))` template so the priority column gets its own dedicated track and nothing stretches past its max.
+
+**Pattern extracted → footer anatomy:** The portfolio footer's four sections split into two tiers. **Tier 1 (priority):** About. **Tier 2 (interchangeable lists):** Experience, Links, Contact. Tier 1 always occupies its own row at compact desktop; Tier 2 sections are peers to one another and wrap as a group. Future additions to the footer should be classified into one of these tiers — avoid adding a third tier, which would require a deeper layout reshape.
+
+**Files touched:** `src/components/SiteFooter/SiteFooter.tsx`, `src/components/SiteFooter/SiteFooter.module.scss`, `docs/design-feedback-log.md`, `docs/design/responsive.md`.
+
+---
+
+### FB-147: Desktop min-width floor — prevent mobile layout at narrow desktop widths
+
+**Date:** 2026-04-19
+
+**User direction:** "I want to restrict the webpage to be squeezed below certain widths. Unless users are on mobile, that breakpoint is only serving the mobile one, but the user can never narrow the browser window below certain breakpoints, just to ensure that there's a consistent experience for desktop... It's essentially the breakpoint that's right after the mobile breakpoint."
+
+**UX Intent:** The portfolio has two structurally distinct layouts — a phone composition (< `$elan-bp-sm` / 672px) composed for touch, and a desktop composition composed for mouse input. They are not the same composition at different scales; they use different aspect ratios (FB-145), different footer widths (FB-144), different navigation priority rules (FB-146). When a desktop user drags their browser narrower than 672px, they end up rendering the phone composition inside desktop chrome — a layout that was never composed for their input modality. The user wants to eliminate that in-between zone: desktop stays at desktop, phone stays at phone, and no one sees the wrong composition for their device.
+
+**Root Cause:** `src/app/(frontend)/(site)/layout.module.scss` had no minimum width on `.siteWrapper`. The responsive layout was fully fluid from 0px upward, which means the `@media (max-width: $elan-bp-sm)` branches of every child component fired whenever the viewport was narrow — whether from a phone or from a desktop user dragging the window. There was no mechanism to say "this composition is touch-only; a mouse-driven browser should never render it."
+
+**Resolution:**
+- `src/app/(frontend)/(site)/layout.module.scss` — added `@media (pointer: fine) { min-width: $elan-bp-sm; }` inside `.siteWrapper`. On mouse-driven devices, the wrapper refuses to shrink below 672px; the browser renders a horizontal scrollbar instead of collapsing. Touch devices (`pointer: coarse`) are unaffected.
+- Threshold chosen: `$elan-bp-sm` (672px) — the boundary where the design system's "phone" tier ends and "large phone landscape / small tablet" begins. User confirmed this maps to their "sweet spot of 800-ish" after seeing the token scale.
+- Scope verified: the rule is inside `.siteWrapper` which is only rendered inside the `(site)` route group. Payload admin, company login gate, API routes, and other apps are unaffected and remain fully responsive.
+- Verified via curl + compiled CSS inspection on localhost:4000: the `/about` route returns HTTP 200 with `.layout_siteWrapper__qDaNc` in the HTML and the compiled CSS contains `@media (pointer: fine) { .layout_siteWrapper__qDaNc { min-width: 672px } }`.
+
+**Pattern extracted → `design.md` §6.10:** When a site has two structurally distinct layouts rather than one fluid composition, use a `min-width` floor scoped to `@media (pointer: fine)` to prevent desktop users from rendering the phone composition. `pointer: fine` is the correct signal — it distinguishes mouse-driven devices from touch (phones, tablets, touchscreen laptops with touch as primary input) without UA sniffing. Place the rule on the route-group wrapper, not on `html`/`body`, so admin and gate surfaces remain responsive. Accept the WCAG Reflow tradeoff for zoomed desktop users in exchange for brand-consistent composition delivery.
+
+**Files touched:** `src/app/(frontend)/(site)/layout.module.scss`, `docs/design/responsive.md`, `docs/design-feedback-log.md`.
+
+---
+
+### FB-146: Nav logo "Yilan Gao" wrapping to two lines under squeeze
+
+**Date:** 2026-04-19
+
+**User direction:** "This should never be collapsed or moved to the next line. It should never compromise; this is a principle. Anything that's logo or navigation, such a core identity line, should never ever be returned to two lines when it's squeezed. The personal identity blurb, which is the 'Designer, AI systems experience...', that line can be squeezed into two lines, two rows."
+
+**UX Intent:** The logo is the site's identity anchor - breaking "Yilan Gao" across two lines reads as a layout failure, not a responsive adaptation. In brand terms, a wrapped wordmark is worse than a clipped one: it looks like the site doesn't know its own name. The user is codifying a priority rule for the nav's flex row - identity (logo) is rigid, affiliation (tagline) is elastic.
+
+**Root Cause:** `.logo` in `src/components/ui/Navigation/Navigation.module.scss` was a default flex item. Under a squeezed viewport with a long tagline on the right, standard flex behavior let both children shrink; because the logo's inner text had no `white-space` hint, the browser broke "Yilan Gao" at the space to avoid overflow. Two independent CSS defaults conspired: (1) flex items can shrink below their content width when siblings also want space, (2) wrap at whitespace is the default for any text without `nowrap`.
+
+Nothing in the nav CSS expressed the user's priority ordering (logo > tagline). The tagline also had no upper bound on wrapping - it was a plain inline `<span>` that, if the viewport got narrow enough, would grow to three or four lines and push the nav height open.
+
+**Resolution:**
+- `src/components/ui/Navigation/Navigation.module.scss`:
+  - `.logo` → `flex-shrink: 0` so the identity anchor never yields to flex pressure.
+  - `.logoText` → `white-space: nowrap` so "Yilan Gao" can never wrap even if some other failure mode tries to force it.
+  - `.links` → `min-width: 0` so the right-side container can shrink below its intrinsic content width; without this, flex children with `min-width: auto` would push the logo first.
+  - `.tagline` → `min-width: 0`, `text-align: right`, and a `-webkit-line-clamp: 2` box so the blurb is allowed to wrap (honoring the user's "two rows is fine"), but capped at two lines with ellipsis so it can never open the nav taller than that.
+
+**Pattern extracted → `design.md` §24 (portfolio) — Navigation priority hierarchy:** In a flex nav row, express element priority in the CSS, not just the DOM order. Rigid elements (logo, identity marks) get `flex-shrink: 0` + `white-space: nowrap` on their text. Elastic elements (taglines, affiliations, metadata) get `min-width: 0` on themselves and their container, plus a line-clamp ceiling so "wrap if you must" never becomes "wrap without limit." The default flex behavior treats all children as equally willing to compress - that is almost never what the brand actually wants.
+
+**Files touched:** `src/components/ui/Navigation/Navigation.module.scss`, `docs/design-feedback-log.md`, `docs/design/branding.md`, `docs/design-anti-patterns.md`.
+
+---
+
+### FB-145: Project hero splash too horizontal on mobile
+
+**Date:** 2026-04-19
+
+**User direction:** "For the hero splash screen for mobile, it should no longer be this proportion. I'd rather crop some parts of the image and have it be more vertical so that it takes up more space. Right now it's mostly horizontal. I want it to be slightly taller. The images are proportionally being enlarged, and I'm okay with it being cropped on the side when it's on mobile."
+
+**UX Intent:** A case study's hero splash is the first visual beat and the dominant weight of the page above the fold. On a ~348px wide phone, a 16:9 container collapses to ~196px tall, so the hero occupies less than a quarter of the viewport while headline + metadata push it further down. The reader starts on a thin horizontal slab rather than an anchoring image. The fix is to trade horizontal breadth (which mobile does not have) for vertical presence (which mobile does have), letting the image crop on the sides instead of compressing vertically.
+
+**Root Cause:** `.heroInner` in `src/app/(frontend)/(site)/work/[slug]/page.module.scss` declared `aspect-ratio: 16 / 9` at the top level of the rule with no mobile override. The ratio was inherited from desktop where it reads as cinematic; on sub-672px viewports the same ratio reads as cramped. `.heroImg` already uses `object-fit: cover`, so any container ratio works without additional image logic, the container just needed a mobile-specific aspect.
+
+**Resolution:**
+- `src/app/(frontend)/(site)/work/[slug]/page.module.scss` — `.heroInner` default `aspect-ratio` changed to `4 / 5` (portrait, slightly taller than wide). `16 / 9` restored inside `@media #{$elan-mq-sm}` (672px+) where horizontal space returns. Inline comment explains the rationale so future agents do not "fix" the mobile override by unifying it.
+- No change needed to `.heroImg` (already `object-fit: cover`, so side cropping is automatic).
+- Ratios considered: 1:1 (too blocky, loses landscape composition entirely), 3:4 (close, but slightly more vertical than "slightly taller"), 4:5 (chosen, meaningfully taller while still showing landscape intent). Instagram-portrait familiarity is a bonus.
+
+**Pattern extracted → `design.md` §6 (responsive):** Aspect-ratio containers that define a visual anchor (heroes, splashes, feature images) should be mobile-first by default, not desktop-first. A 16:9 hero on a 375px phone is not "a smaller 16:9 hero", it is a structurally different composition. The default should be the portrait ratio, with wider ratios unlocked at the `$elan-mq-sm` breakpoint. `object-fit: cover` on the inner image keeps this cheap: one aspect change per breakpoint, no image pipeline changes.
+
+**Files touched:** `src/app/(frontend)/(site)/work/[slug]/page.module.scss`, `docs/design-feedback-log.md`.
+
+---
+
+### FB-144: Site footer — narrow, centred column block on mobile
+
+**Date:** 2026-04-19
+
+**User direction:** "For the mobile version... let's make the footer section way narrower, just so that it floats in the middle of the footer section. Right now, not only are these footer columns and these section contents left-aligned, but the content itself also is very left-aligned. I want the container to be narrower for mobile version only."
+
+**UX Intent:** On the single-column mobile layout (`< $elan-bp-sm`, i.e. 672px) the sticky footer's stacked sections ran nearly edge-to-edge of the viewport — only `$portfolio-spacer-2x` (16px) of horizontal padding separated the body copy from the screen edge. The left-aligned bio paragraph, eyebrow labels, and link list all shared the same flush-left start, which read as default/unhandled rather than composed. The desired feel is a single narrow column floating centred in the footer band; this turns the uniform left edge into a deliberate composition axis and gives the eye a consistent margin on both sides.
+
+**Root Cause:** `.footerColumns` in `src/components/SiteFooter/SiteFooter.module.scss` had no `max-width` constraint at the mobile breakpoint. It inherited the full width of `.footerInner` (which is sized to `$elan-container-wide` and centred), so in practice the stacked column stretched the full content width below 672px. The per-section `.footerColumn { max-width: 240px }` did not save the layout because each column is a grid row whose width is dictated by its parent; `max-width` on a grid item only clamps its visual content, not the row itself — the bio wrapped to the full 323px row regardless.
+
+**Resolution:**
+- `src/components/SiteFooter/SiteFooter.module.scss` — added `max-width: 240px; margin-inline: auto;` to `.footerColumns` in its base (mobile) declaration, matching the per-column cap so the stacked block reads as a 240px-wide centred column. Reset both at `@media #{$elan-mq-sm}` (`max-width: none; margin-inline: 0;`) so the 4-column `space-between` grid on tablet+ keeps spanning the full `.footerInner` width.
+- Follow-up in same session: bumped the base `gap` from `$portfolio-spacer-3x` (24px) → `$portfolio-spacer-4x` (32px) to give the stacked sections one step more vertical breathing room once the narrower centred block made the uniform row rhythm more prominent. The tablet+ override (`$portfolio-spacer-8x` horizontal) is unchanged.
+- Verified: main site dev server on port 4000 responding (gate redirect `307` on `/`, fast response on `/gate`); no SCSS linter errors; change is purely additive in the mobile branch of an existing media query.
+
+**Pattern extracted → `design.md` §6 (Breakpoints / Responsive):** When a stacked single-column layout shares a parent container sized for the multi-column breakpoint, use `max-width` + `margin-inline: auto` on the *stack container* — not on individual children — to give the mobile block a narrower, visually centred reading width. A per-child `max-width` on a grid item does not constrain the row width. Reset both properties at the breakpoint where the layout switches to multi-column so the wider composition isn't clipped.
+
+**Files touched:** `src/components/SiteFooter/SiteFooter.module.scss`, `docs/design-feedback-log.md`.
+
+---
+
+### FB-143: ETRO essay - bold abuse collapsing section hierarchy
+
+**Date:** 2026-04-17
+
+**User direction:** "The current article abuses bold font. There's also not a clear separation between sections, somehow, or the hierarchy not visually clean."
+
+**Root cause:** When I materialized the ETRO essay into CMS blocks (CFB-035), I preserved every `**bold**` from the source markdown - 36 bold inline spans across 7 section bodies, used as scan anchors ("Per user.", "Scaffolding.", "Full ETRO slows adoption.", etc.). This directly violated `voice-style.md` §13.1: "Bold: only for section headings and impact metrics. Never in body text for emphasis."
+
+The user perceived two problems, but they shared one cause. The section heading uses `subtitle-1` (xl, semibold, primary color). Body text uses `body-base` (base, regular, secondary color). When `<strong>` inside body renders as weight 700 at base size, it reads as visually equivalent emphasis to the semibold heading at xl size - the heading stops being the dominant stop on the page. The reader loses the section rhythm because every paragraph has 2-3 bold hits competing with the heading above it.
+
+"Not a clear separation between sections, somehow" was not actually about gaps - `$portfolio-spacer-layout-x-spacious` between `.blockWrapper`s is plenty of whitespace. The separation was being eroded from inside each section by the bold density, not from the gaps between sections. This is cross-category (Design + Content).
+
+**Resolution:**
+- `src/app/(frontend)/api/update-etro/route.ts` - stripped every `**bold**` span from all 7 section bodyMarkdowns. 36 → 0.
+- Converted inline bold scan-anchors to colon-prefixed paragraph starts where structure warranted: "Per user:", "Per task:", "Scaffolding:", "Structure:", "Migration:". The colon creates the same scan anchor without competing with the section heading weight.
+- Removed the inline `### The noise reduction...` H3 subhead inside Section 4's richText body (`lexicalToHtml` does not emit heading tags - it silently drops them when the root has mixed heading+paragraph children).
+- Left italic (`*word*`) intact - voice-style bans bold specifically, not italic.
+- Re-pushed via `POST /api/update-etro`; confirmed via Payload REST: 0 bold text nodes across all richText bodies, all 7 section headings and 15 total blocks intact.
+
+**Pattern extracted:** When a user's perceived complaint is "I can't see the section boundaries," the fix is not always to add more vertical whitespace between sections. Audit the intra-section density first. Bold in body text reads as a visual peer of a semibold heading, so N bold spans per section create N+1 competing stops - the one heading no longer owns the visual hierarchy. Removing the non-heading bolds restores the rhythm without touching spacing. This is the Design-side expression of the Content rule in voice-style §13.1.
+
+**Cross-category note:** Also documented as CFB-036 (content feedback log). The fix happened in a content file (`route.ts` bodyMarkdown strings), but the diagnosis was typographic - which is why it belongs in both logs.
+
+**Files touched:** `src/app/(frontend)/api/update-etro/route.ts`, `docs/content-feedback-log.md`, `docs/content/projects/etro-framework.md`.
 
 ---
 
