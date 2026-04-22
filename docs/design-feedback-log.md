@@ -11,6 +11,56 @@
 
 ---
 
+### FB-169: "In the ultra-wide screen (around 1900px wide), the distance between the art and the action section is still a bit far. For a lot of the breakpoints beyond what we have planned, it just looks a bit inconsistent."
+
+**Date:** 2026-04-22
+
+**UX Intent:** The user is pointing at a real architectural problem that goes beyond "the gap feels wrong at this specific width." Two intertwined complaints:
+
+1. **The composition is inconsistent across breakpoints.** At 768px the layout flips to mobile (canvas hidden). From 769px up to 1120px the inner container fluidly fills the viewport. From 1120px up to 1799px the inner is locked at 1120px. Then at `min-width: 1800px`, the inner *re-expands* to `80vw`. Four distinct behavioral regimes, with a discontinuity at the last boundary: crossing 1800px, the inner snaps from 1120px to 1440px — a ~28% jump — and keeps growing from there (1520px at 1900, 1600px at 2000, 1920px at 2400). That snap is visible on resize and reads as a layout bug.
+
+2. **At ultra-wide specifically, the portrait-to-card gap is too far.** The gap was tuned to 149px on the canonical 1120px inner across FB-166 → FB-167 → FB-168. As the inner grows past 1120px, the `.canvasPane` (flex `0 0 55%`) scales and the halftone canvas fills it — which means the portrait figure *also* scales with the canvas. But `.card` has a fixed `max-width: 380px` that does not scale. So the card's left edge sits at `(canvasPane-width + 16px)` — it gets pushed rightward faster than the portrait's right edge, and the gap grows: 149px at 1120px inner, ~197px at 1520px inner (1900px viewport), ~260px projected at 2000px inner. The user's "still a bit far" matches this exactly.
+
+**Root Cause:** The `@media (min-width: 1800px) { max-width: 80vw }` rule on `.inner` was added in an earlier session under the intuition that "content shouldn't feel lost on big monitors." It's the wrong instinct for this specific composition because the composition mixes a scaling element (canvas pane, whose halftone portrait scales with it) with a fixed-size element (the 380px card). A composition of mixed element types only holds its proportions across the range where both element families look right together; past that range, the scaling children outgrow the fixed ones and the whitespace relationships degrade. FB-166/167/168 tuned the gap precisely at the canonical 1120px inner width. Letting the inner grow past that width re-breaks the thing we just fixed.
+
+The secondary problem is the *discontinuity* at the 1800px breakpoint itself. Even if the grow-back weren't distorting the composition, snapping from 1120 → 1440 (+320px) in one frame is a visible, jarring UX event on any monitor width that straddles 1800 during a browser resize.
+
+**Resolution:**
+
+1. **Removed the `@media (min-width: 1800px) { max-width: 80vw }` rule** from `.inner` in `src/app/(frontend)/for/[company]/login.module.scss`. The inner now stays at `max-width: 1120px` across all desktop viewports (≥ 769px). Below 1120px, the inner fluidly fills the viewport as before. Replaced the rule with a multi-line comment documenting the reasoning so a future agent doesn't restore it on a "big screens feel empty" instinct.
+
+2. **Documented the durable principle as §6.13 in `docs/design/responsive.md`** — "Composition-Scaling Coherence — A Mixed Composition Is Only Valid Across Its Proportional Range." The section covers: why mixing scaling and fixed elements constrains the valid width range; the anti-pattern of re-expansion at ultra-wide breakpoints (two failure modes: discontinuity at the breakpoint, degradation of proportions past it); how to pick the single `max-width`; and the narrow case where ultra-wide re-expansion is correct (pure fluid grids with zero fixed children). Includes the password gate as canonical example and references FB-169.
+
+3. **Related principle threaded into §6.13 — avoid breakpoint discontinuities.** Any rule that causes a layout quantity (container width, font size, gap, column count) to *snap* rather than *flow* at a breakpoint crossing is almost always a design mistake. Prefer "fluid-to-cap-then-hold" (container fills up to a ceiling, then stays put) over "fluid-cap-fluid-again" (fills, holds, re-scales higher up). The latter creates a visible step on every monitor whose width straddles the higher breakpoint during resize.
+
+4. **Updated `docs/design.md` frequency map** — "Responsive breakpoints / cross-app parity" bumped from 3 to 4 with FB-169's composition-scaling rule added as the leading bullet.
+
+**Net effect across viewport widths (after fix):**
+
+| Viewport | Inner width | Portrait-to-card gap | Composition behavior |
+|---|---|---|---|
+| ≤ 768px | 100% of viewport | N/A (canvas hidden) | Mobile single-column, form centered |
+| 769–1119px | 100% of viewport | fluid (107–149px, scales with viewport) | Two-column, composition fluid |
+| 1120px+ | **1120px (held)** | **149px (constant)** | Two-column, composition fixed; outer terra field grows with viewport |
+
+At 1920px viewport the composition now sits centered in a 1120px frame (400px terra gutter on each side of the inner). The portrait-to-card gap is the same 149px the user already approved at 1120px. On 2560px+ ultra-wides, the composition remains intact — the generous terra field around it reads as atmospheric breathing room, which actually complements the moody/editorial quality of the halftone portrait rather than fighting it.
+
+**Principle extracted (belongs in `docs/design/responsive.md` §6.13):** When a composition mixes scaling and fixed-size children, the container's max-width must be bounded by the range where their proportions hold. Do not re-expand the container at ultra-wide breakpoints unless *every* child scales with it. On viewports wider than the cap, the composition centers in a field of its background color — that negative space is a feature, not a bug, for editorial/brand compositions.
+
+**Related principle (reinforced):** Prefer fluid-to-cap-then-hold over fluid-cap-fluid-again. Breakpoint discontinuities are visible UX events on every monitor whose width straddles the re-expansion threshold during resize.
+
+**Session pattern (FB-166 → FB-167 → FB-168 → FB-169):** Four feedbacks on the same composition across one session, each exposing the next layer of the onion:
+1. FB-166: gap too wide (195px) — fix: anchor card to start (→ 137px gap).
+2. FB-167: composition reads left-skewed — fix: widen canvasPane 50%→53% for mathematical centering.
+3. FB-168: mathematical centering fails because portrait is visually heavier — fix: widen to 55% for optical balance.
+4. FB-169 (this): all prior fixes only apply at the canonical 1120px inner; the `80vw` re-expansion rule was silently defeating them at ≥1800px viewports — fix: remove re-expansion.
+
+Each iteration correctly solved the previous complaint in isolation but didn't audit whether the solution survived across the full range of viewports where the layout renders. The general lesson: when tuning a composition, verify the tuning holds at *every* viewport regime the layout passes through — not just the canonical desktop width where you're iterating. The stress test is "drag the browser from 375 to 2560 and watch the gap." If any frame of that drag reveals a snap, a sudden gap growth, or a gutter collapse, the tuning is incomplete.
+
+**Scope:** No engineering or content dimension.
+
+---
+
 ### FB-168: "You shouldn't only think about the actual distance, but also the visual weight that the art piece naturally carries … add even just slightly more space on the left-hand side to make it feel visually balanced"
 
 **Date:** 2026-04-22
