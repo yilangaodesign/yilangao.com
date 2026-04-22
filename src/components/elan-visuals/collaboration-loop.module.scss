@@ -819,7 +819,6 @@
   width: 28px;
   height: 28px;
   border: 1px solid $portfolio-border-neutral-minimal;
-  border-radius: $portfolio-radius-sm;
   background: $portfolio-neutral-00;
   color: $portfolio-text-neutral-regular;
   font-size: $portfolio-type-sm;
@@ -836,9 +835,10 @@
 }
 
 .transportPlayBtn {
+  // Larger size marks the primary action on the strip — the only explicit
+  // reason to break the strip's 28px height contract.
   width: 32px;
   height: 32px;
-  border-radius: $portfolio-radius-full;
   border-color: $portfolio-accent-60;
   color: $portfolio-accent-60;
   font-size: $portfolio-type-xs;
@@ -850,20 +850,19 @@
   color: $portfolio-text-neutral-subtle;
 }
 
-.transportSpeed {
-  display: flex;
+.transportSpeedTrigger {
+  display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: $portfolio-spacer-0-25x;
-}
-
-.transportSpeedBtn {
-  padding: 2px $portfolio-spacer-0-5x;
+  height: 28px;
+  padding: 0 $portfolio-spacer-utility-0-75x;
   border: 1px solid $portfolio-border-neutral-minimal;
-  border-radius: $portfolio-radius-xs;
   background: $portfolio-neutral-00;
+  color: $portfolio-text-neutral-regular;
   font-family: $portfolio-font-mono;
-  font-size: $portfolio-type-3xs;
-  color: $portfolio-text-neutral-subtle;
+  font-size: $portfolio-type-xs;
+  line-height: 1;
   cursor: pointer;
 
   &:hover {
@@ -874,13 +873,26 @@
     outline: 2px solid $portfolio-focus;
     outline-offset: 2px;
   }
+
+  &[data-state="open"] {
+    background: $portfolio-neutral-10;
+    border-color: $portfolio-border-neutral-regular;
+  }
 }
 
-.transportSpeedBtnActive {
-  background: $portfolio-accent-10;
-  border-color: $portfolio-accent-30;
-  color: $portfolio-accent-70;
-  font-weight: $portfolio-weight-semibold;
+.transportSpeedTriggerLabel {
+  font-variant-numeric: tabular-nums;
+}
+
+.transportSpeedCaret {
+  color: $portfolio-text-neutral-subtle;
+  flex-shrink: 0;
+}
+
+.transportSpeedActiveMark {
+  color: $portfolio-accent-60;
+  font-size: $portfolio-type-xs;
+  line-height: 1;
 }
 
 // ── Reduced motion ───────────────────────────────────────────────────────────

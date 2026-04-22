@@ -3,7 +3,7 @@
 .container {
   display: flex;
   flex-direction: column;
-  gap: $portfolio-spacer-2x;
+  gap: $portfolio-spacer-3x;
 }
 
 .controls {
@@ -13,16 +13,17 @@
 }
 
 .toggleGroup {
-  display: flex;
+  display: inline-flex;
+  align-self: flex-start;
   border: 1px solid $portfolio-border-neutral-minimal;
-  border-radius: $portfolio-radius-sm;
   overflow: hidden;
 }
 
 .toggleButton {
-  padding: $portfolio-spacer-0-25x $portfolio-spacer-1x;
-  font-size: $portfolio-type-2xs;
+  padding: $portfolio-spacer-0-5x $portfolio-spacer-1-5x;
+  font-size: $portfolio-type-xs;
   font-weight: $portfolio-weight-medium;
+  line-height: $portfolio-leading-tight;
   background: $portfolio-neutral-00;
   color: $portfolio-text-neutral-subtle;
   border: none;
@@ -66,7 +67,8 @@
   display: flex;
   align-items: flex-end;
   gap: $portfolio-spacer-1x;
-  height: 220px;
+  height: 260px;
+  padding-top: 40px;
   padding-bottom: $portfolio-spacer-0-5x;
   border-bottom: 1px solid $portfolio-border-neutral-minimal;
 }

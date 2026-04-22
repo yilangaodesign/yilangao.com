@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useMemo, useRef } from "react";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/Tabs";
 import { treemap, treemapSquarify, hierarchy } from "d3-hierarchy";
 import styles from "./skill-map.module.scss";
 
@@ -303,18 +302,15 @@ function KnowledgeTreemap() {
 
 export default function SkillMap() {
   return (
-    <Tabs defaultValue="operations" className={styles.container}>
-      <TabsList className={styles.tabList}>
-        <TabsTrigger value="operations">Operations (16 skills)</TabsTrigger>
-        <TabsTrigger value="knowledge">Knowledge (136 anti-patterns)</TabsTrigger>
-      </TabsList>
-
-      <TabsContent value="operations">
+    <div className={styles.container}>
+      <section className={styles.section}>
+        <h3 className={styles.sectionHeader}>Operations (16 skills)</h3>
         <OperationsGrid />
-      </TabsContent>
-      <TabsContent value="knowledge">
+      </section>
+      <section className={styles.section}>
+        <h3 className={styles.sectionHeader}>Knowledge (136 anti-patterns)</h3>
         <KnowledgeTreemap />
-      </TabsContent>
-    </Tabs>
+      </section>
+    </div>
   );
 }

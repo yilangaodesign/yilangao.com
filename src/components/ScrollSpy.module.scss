@@ -79,9 +79,15 @@
 //
 // Positioning is split across two elements so framer-motion's `x` animation
 // on the inner span does not overwrite the base CSS transform (see FB-156).
+// mix-blend-mode lives on the anchor (whose parent is <body> = root stacking
+// context), not the inner span (whose parent is the anchor's own stacking
+// context). Putting the blend on the span isolates it to the anchor's empty
+// interior and produces no inversion. See FB-156 / AP-069.
 .highlightLabelAnchor {
   position: fixed;
   transform: translate(calc(-100% - #{$portfolio-spacing-03}), -50%);
+  color: #fff;
+  mix-blend-mode: difference;
   z-index: 41;
   pointer-events: none;
   will-change: top, left;
@@ -92,8 +98,6 @@
   font-family: $portfolio-font-mono;
   font-size: $portfolio-type-xs;
   line-height: 1;
-  color: #fff;
-  mix-blend-mode: difference;
   font-weight: 500;
   white-space: nowrap;
   will-change: transform, opacity;

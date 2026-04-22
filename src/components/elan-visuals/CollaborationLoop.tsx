@@ -1,6 +1,12 @@
 "use client";
 
 import { Fragment, useState, useEffect, useCallback, useRef } from "react";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "../ui/DropdownMenu/DropdownMenu";
 import styles from "./collaboration-loop.module.scss";
 
 // ── Step metadata ────────────────────────────────────────────────────────────
@@ -368,20 +374,18 @@ const STEP_VISUALS: React.ComponentType[] = [
 
 export default function CollaborationLoop() {
   const [activeStep, setActiveStep] = useState(0);
-  const [playing, setPlaying] = useState(false);
+  // Auto-play by default; the reduced-motion effect below pauses for users
+  // who opt out of motion. The transport button toggles pause/resume.
+  const [playing, setPlaying] = useState(true);
   const [speedIdx, setSpeedIdx] = useState(1);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const trackFillRef = useRef<HTMLDivElement | null>(null);
+  const prevActiveStepRef = useRef(activeStep);
 
   const current = STEPS[activeStep];
-  const fillPercent = STEPS.length > 1 ? (activeStep / (STEPS.length - 1)) * 100 : 0;
+  // Initial fill (also used as the SSR / first-paint width before the
+  // imperative animation effect runs).
+  const initialFillPercent = STEPS.length > 1 ? (activeStep / (STEPS.length - 1)) * 100 : 0;
   const Visual = STEP_VISUALS[activeStep];
-
-  const clearTimer = useCallback(() => {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
-  }, []);
 
   const goNext = useCallback(() => {
     setActiveStep((prev) => (prev < STEPS.length - 1 ? prev + 1 : 0));
@@ -391,13 +395,61 @@ export default function CollaborationLoop() {
     setActiveStep((prev) => (prev > 0 ? prev - 1 : STEPS.length - 1));
   }, []);
 
+  // Progress-bar animation for the track fill between step dots.
+  // The fill smoothly grows from the active step's dot position to the next
+  // step's dot position over the step's display duration, so the bar reads
+  // as a countdown to the next auto-flip. When the progress reaches 1, we
+  // advance the step, which re-runs this effect with the new fillBase /
+  // fillTarget and restarts the RAF cycle.
   useEffect(() => {
-    clearTimer();
-    if (!playing) return;
+    const el = trackFillRef.current;
+    if (!el) return;
+
+    const denom = STEPS.length - 1;
+    const fillBase = (activeStep / denom) * 100;
+    const fillTarget = Math.min(((activeStep + 1) / denom) * 100, 100);
     const ms = SPEED_OPTIONS[speedIdx].ms;
-    intervalRef.current = setInterval(goNext, ms);
-    return clearTimer;
-  }, [playing, speedIdx, clearTimer, goNext]);
+
+    const stepChanged = prevActiveStepRef.current !== activeStep;
+    prevActiveStepRef.current = activeStep;
+
+    if (!playing) {
+      // Pause semantics: if the step changed while paused (dot / prev / next
+      // click), snap to the new step's base. If only `playing` toggled off
+      // mid-step, freeze the bar at its current rendered width.
+      if (stepChanged) {
+        el.style.transition = "";
+        el.style.width = `${fillBase}%`;
+      }
+      return;
+    }
+
+    // Playing: disable the CSS transition (RAF drives each frame directly),
+    // anchor to fillBase, then animate toward fillTarget over `ms`.
+    el.style.transition = "none";
+    el.style.width = `${fillBase}%`;
+
+    let startTime: number | null = null;
+    let rafId = 0;
+
+    const tick = (now: number) => {
+      if (startTime === null) startTime = now;
+      const elapsed = now - startTime;
+      const p = Math.min(elapsed / ms, 1);
+      const fill = fillBase + (fillTarget - fillBase) * p;
+      el.style.width = `${fill}%`;
+      if (p < 1) {
+        rafId = requestAnimationFrame(tick);
+      } else {
+        setActiveStep((prev) => (prev < STEPS.length - 1 ? prev + 1 : 0));
+      }
+    };
+
+    rafId = requestAnimationFrame(tick);
+    return () => {
+      cancelAnimationFrame(rafId);
+    };
+  }, [playing, speedIdx, activeStep]);
 
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -424,7 +476,11 @@ export default function CollaborationLoop() {
       {/* Step dots */}
       <div className={styles.stepNav}>
         <div className={styles.stepTrack} aria-hidden="true">
-          <div className={styles.stepTrackFill} style={{ width: `${fillPercent}%` }} />
+          <div
+            ref={trackFillRef}
+            className={styles.stepTrackFill}
+            style={{ width: `${initialFillPercent}%` }}
+          />
         </div>
         {STEPS.map((s, i) => {
           let cls = styles.stepDot;
@@ -485,18 +541,51 @@ export default function CollaborationLoop() {
           {activeStep + 1} / {STEPS.length}
         </span>
 
-        <div className={styles.transportSpeed}>
-          {SPEED_OPTIONS.map((opt, i) => (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
             <button
-              key={opt.label}
-              className={`${styles.transportSpeedBtn} ${i === speedIdx ? styles.transportSpeedBtnActive : ""}`}
-              onClick={() => setSpeedIdx(i)}
-              aria-label={`Speed ${opt.label}`}
+              className={styles.transportSpeedTrigger}
+              aria-label={`Playback speed: ${SPEED_OPTIONS[speedIdx].label}`}
             >
-              {opt.label}
+              <span className={styles.transportSpeedTriggerLabel}>
+                {SPEED_OPTIONS[speedIdx].label}
+              </span>
+              <svg
+                width="10"
+                height="10"
+                viewBox="0 0 10 10"
+                fill="none"
+                aria-hidden="true"
+                className={styles.transportSpeedCaret}
+              >
+                <path
+                  d="M2 3.5L5 6.5L8 3.5"
+                  stroke="currentColor"
+                  strokeWidth="1.2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
             </button>
-          ))}
-        </div>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" sideOffset={6} size="sm">
+            {SPEED_OPTIONS.map((opt, i) => (
+              <DropdownMenuItem
+                key={opt.label}
+                onSelect={() => setSpeedIdx(i)}
+                trailing={
+                  i === speedIdx ? (
+                    <span className={styles.transportSpeedActiveMark} aria-hidden="true">
+                      {"\u2713"}
+                    </span>
+                  ) : null
+                }
+              >
+                {opt.label}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </div>
   );

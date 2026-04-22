@@ -1473,6 +1473,20 @@ $accent-light: rgba($portfolio-accent-60, 0.06);
   opacity: 0;
   pointer-events: none;
   transition: opacity var(--portfolio-duration-fast) ease;
+
+  // Cross-CSS-module reveal: the admin wrapper lives in
+  // `page.module.scss` (scoped `page_blockWrapper__…`), so a local
+  // `.blockWrapper:hover &` combinator never matches — that's exactly
+  // what caused ENG-190. Mirror the pattern already used by
+  // `.sectionToolbar` above: anchor the reveal to an unscoped
+  // data-attribute (`data-block-admin=""`) set on the wrapping div,
+  // so the rule is portable across any CSS module that owns the
+  // wrapper.
+  [data-block-admin]:hover > &,
+  [data-block-admin]:focus-within > & {
+    opacity: 1;
+    pointer-events: auto;
+  }
 }
 
 .blockToolbarSep {
@@ -1489,15 +1503,13 @@ $accent-light: rgba($portfolio-accent-60, 0.06);
   font-family: $portfolio-font-sans;
 }
 
-.blockWrapper {
-  position: relative;
-
-  &:hover .blockToolbar,
-  &:focus-within .blockToolbar {
-    opacity: 1;
-    pointer-events: auto;
-  }
-}
+// NOTE: `.blockWrapper` used to live here and attempt to reveal
+// `.blockToolbar` on hover, but the actual admin wrapper in
+// `ProjectClient.tsx` consumes its class from `page.module.scss`
+// (scoped `page_blockWrapper__…`) so the selector never matched —
+// see ENG-190. The reveal now lives inside the `.blockToolbar`
+// declaration above via the portable `[data-block-admin]` anchor,
+// matching the `.sectionToolbar` pattern.
 
 .betweenBlockInsert {
   display: flex;

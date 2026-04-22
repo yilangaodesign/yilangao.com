@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useRef } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { LexicalComposer } from '@lexical/react/LexicalComposer'
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
 import { ContentEditable } from '@lexical/react/LexicalContentEditable'
@@ -99,13 +99,25 @@ function SaveOnBlurPlugin({
 }) {
   const [editor] = useLexicalComposerContext()
 
+  // Refs keep target/fieldPath stable across renders so the Lexical
+  // command and DOM listener are registered exactly once per editor.
+  // Re-registering on every render churns Lexical command listeners and,
+  // under React 19 StrictMode + Lexical 0.41, can interleave with pending
+  // updates in ways that surface frozen-selection errors. See ENG-188.
+  const targetRef = useRef(target)
+  const fieldPathRef = useRef(fieldPath)
+  useEffect(() => {
+    targetRef.current = target
+    fieldPathRef.current = fieldPath
+  }, [target, fieldPath])
+
   useEffect(() => {
     return editor.registerCommand(
       BLUR_COMMAND,
       () => {
         const state = dirtyRef.current
         if (state) {
-          save(target, fieldPath, state).catch((err) => {
+          save(targetRef.current, fieldPathRef.current, state).catch((err) => {
             console.error('[LexicalBlockEditor] save failed:', err)
           })
           dirtyRef.current = null
@@ -114,7 +126,7 @@ function SaveOnBlurPlugin({
       },
       COMMAND_PRIORITY_LOW,
     )
-  }, [editor, target, fieldPath, dirtyRef])
+  }, [editor, dirtyRef])
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -122,7 +134,7 @@ function SaveOnBlurPlugin({
         e.preventDefault()
         const state = dirtyRef.current
         if (state) {
-          save(target, fieldPath, state).catch((err) => {
+          save(targetRef.current, fieldPathRef.current, state).catch((err) => {
             console.error('[LexicalBlockEditor] save failed:', err)
           })
           dirtyRef.current = null
@@ -132,7 +144,7 @@ function SaveOnBlurPlugin({
     const root = editor.getRootElement()
     root?.addEventListener('keydown', handleKeyDown)
     return () => root?.removeEventListener('keydown', handleKeyDown)
-  }, [editor, target, fieldPath, dirtyRef])
+  }, [editor, dirtyRef])
 
   return null
 }
@@ -145,6 +157,18 @@ function BlockNavPlugin({
   nav: BlockNavCallbacks
 }) {
   const [editor] = useLexicalComposerContext()
+
+  // Keep nav + blockIndex in refs so the Lexical command registration
+  // runs exactly once per editor instance, regardless of parent-render
+  // churn. Re-registering per-render (previous behavior) can interleave
+  // command teardown with an in-flight update under React 19 StrictMode
+  // + Lexical 0.41 and produce frozen-selection TypeErrors. See ENG-188.
+  const navRef = useRef(nav)
+  const blockIndexRef = useRef(blockIndex)
+  useEffect(() => {
+    navRef.current = nav
+    blockIndexRef.current = blockIndex
+  }, [nav, blockIndex])
 
   useEffect(() => {
     const unregBackspace = editor.registerCommand(
@@ -166,7 +190,7 @@ function BlockNavPlugin({
 
         if (atStart && isEmpty) {
           event?.preventDefault()
-          nav.onBackspaceAtStart(blockIndex, isEmpty)
+          navRef.current.onBackspaceAtStart(blockIndexRef.current, isEmpty)
           return true
         }
         return false
@@ -188,7 +212,7 @@ function BlockNavPlugin({
           if (anchor.key === firstChild.getKey() && anchor.offset === 0) atStart = true
         })
         if (atStart) {
-          nav.onArrowUp(blockIndex)
+          navRef.current.onArrowUp(blockIndexRef.current)
           return true
         }
         return false
@@ -213,7 +237,7 @@ function BlockNavPlugin({
           }
         })
         if (atEnd) {
-          nav.onArrowDown(blockIndex)
+          navRef.current.onArrowDown(blockIndexRef.current)
           return true
         }
         return false
@@ -226,7 +250,7 @@ function BlockNavPlugin({
       unregUp()
       unregDown()
     }
-  }, [editor, blockIndex, nav])
+  }, [editor])
 
   return null
 }
@@ -254,22 +278,24 @@ export default function LexicalBlockEditor({
 }: LexicalBlockEditorProps) {
   const dirtyRef = useRef<EditorState | null>(null)
 
-  const initialConfig = useMemo(
-    () => ({
-      namespace: `block-${fieldPath}`,
-      theme: editorTheme(),
-      nodes: EDITOR_NODES,
-      editorState: initialState
-        ? JSON.stringify(initialState)
-        : undefined,
-      onError: (error: Error) => {
-        console.error('[LexicalBlockEditor]', error)
-      },
-    }),
-    // initialState is static for the lifetime of the editor mount
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [fieldPath],
-  )
+  // useState (not useMemo) for initialConfig: React 19 StrictMode reuses
+  // memoized values across the double-invoked render pass, which makes
+  // LexicalComposer share the SAME config between two mount attempts
+  // and can chaos-ensue inside the editor's internal selection state
+  // (see facebook/lexical#6040 — etrepum's recommendation). useState's
+  // lazy initializer is invoked once per actual mount, so each mount
+  // gets its own config and Lexical's internal useState(() => createEditor())
+  // wires up cleanly. initialState/fieldPath are treated as mount-time
+  // constants; changing them remounts via React key from the parent.
+  const [initialConfig] = useState(() => ({
+    namespace: `block-${fieldPath}`,
+    theme: editorTheme(),
+    nodes: EDITOR_NODES,
+    editorState: initialState ? JSON.stringify(initialState) : undefined,
+    onError: (error: Error) => {
+      console.error('[LexicalBlockEditor]', error)
+    },
+  }))
 
   const handleChange = useCallback(
     (editorState: EditorState) => {

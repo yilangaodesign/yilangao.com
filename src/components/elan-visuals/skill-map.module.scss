@@ -3,13 +3,23 @@
 .container {
   display: flex;
   flex-direction: column;
-  gap: $portfolio-spacer-2x;
+  gap: $portfolio-spacer-3x;
 }
 
-// ── Tab bar ──────────────────────────────────────────────────────────────────
+// ── Section ──────────────────────────────────────────────────────────────────
 
-.tabList {
-  align-self: flex-start;
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: $portfolio-spacer-1x;
+}
+
+.sectionHeader {
+  font-size: $portfolio-type-sm;
+  font-weight: $portfolio-weight-semibold;
+  color: $portfolio-text-neutral-bold;
+  line-height: $portfolio-leading-compact;
+  margin: 0;
 }
 
 // ── Operations column grid (ref: ccunpacked.dev Tool System) ─────────────────

@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useRef } from 'react'
+import { useCallback, useMemo, useRef } from 'react'
 
 export interface BlockNavCallbacks {
   onBackspaceAtStart: (blockIndex: number, isEmpty: boolean) => void
@@ -64,5 +64,13 @@ export default function useBlockKeyboardNav(
     [],
   )
 
-  return { onBackspaceAtStart, onArrowUp, onArrowDown }
+  // Stable object identity — downstream Lexical plugins depend on `nav`
+  // in their useEffect dep arrays; re-creating it each render would
+  // unregister/re-register commands on every parent render, which
+  // interacts badly with React 19 StrictMode + Lexical 0.41 and can
+  // surface frozen-selection errors. See ENG-188.
+  return useMemo(
+    () => ({ onBackspaceAtStart, onArrowUp, onArrowDown }),
+    [onBackspaceAtStart, onArrowUp, onArrowDown],
+  )
 }
