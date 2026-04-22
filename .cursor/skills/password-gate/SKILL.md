@@ -200,9 +200,29 @@ For UI iteration on the login page without clearing cookies, use `?preview=true`
 | Variable | Required | Default | Purpose |
 |----------|----------|---------|---------|
 | `SESSION_SECRET` | Recommended | Falls back to `PAYLOAD_SECRET` | Signs session cookies |
-| `SITE_PASSWORD` | Optional | `preview-2026` | Fallback password for unknown companies |
+| `SITE_PASSWORD` | Optional | `glad you are here` | Fallback password for unknown companies |
 
 Both must be set in the Vercel dashboard for the `yilangao-portfolio` project.
+
+## Password Normalization
+
+`comparePasswords()` in `company-session.ts` normalizes both the user input and stored
+password before comparison. This is a UX decision: the password completes a visible
+greeting sentence ("Welcome, ___"), so matching should be as forgiving as a human
+reading it would be.
+
+Normalization steps (order matters):
+1. Lowercase
+2. Expand common contractions (`you're` -> `you are`, `we're` -> `we are`, etc.)
+3. Strip remaining apostrophes and smart quotes
+4. Strip all spaces, dashes, and underscores
+
+This means `glad you are here`, `Glad You Are Here`, `glad-you-are-here`,
+`gladyouarehere`, and `glad you're here` all match. Abbreviations (`glad u are here`)
+and different words (`happy you are here`) do not.
+
+Normalization applies to ALL passwords (generic and per-company). Per-company passwords
+set in the CMS are also normalized at comparison time.
 
 ## Cross-App Consideration
 
