@@ -92,12 +92,20 @@ $_spy-sub-hover-w: 14px;
 // on the inner span does not overwrite the base CSS transform (see FB-156).
 // Anchor owns `position: fixed` + the -100%/-50% placement; the inner span
 // owns only the subtle slide-in `x` animation + opacity fade.
+// `mix-blend-mode` must sit on the element whose PARENT is the root stacking
+// context (i.e. <body>) — that's the anchor, not the inner span. The span
+// is inside the anchor's stacking context (created by `position: fixed` +
+// `transform`), so putting the blend mode on the span would isolate it to
+// the anchor's empty interior and produce no inversion. Direct recurrence
+// of AP-069 within FB-156's refactor. See FB-156 iteration 3.
 .highlightLabelAnchor {
   position: fixed;
   transform: translate(
     calc(-100% - var(--portfolio-spacer-1x)),
     -50%
   );
+  color: #fff;
+  mix-blend-mode: difference;
   z-index: var(--portfolio-z-scrollspy);
   pointer-events: none;
   will-change: top, left;
@@ -108,8 +116,6 @@ $_spy-sub-hover-w: 14px;
   font-family: var(--portfolio-font-mono);
   font-size: var(--portfolio-type-xs);
   line-height: 1;
-  color: #fff;
-  mix-blend-mode: difference;
   font-weight: 500;
   white-space: nowrap;
   will-change: transform, opacity;

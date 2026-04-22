@@ -46,7 +46,8 @@ $_input-icon-xl: var(--portfolio-spacer-3x); // 24px
   width: 100%;
   transition:
     border-color $portfolio-duration-fast $portfolio-easing-standard,
-    background-color $portfolio-duration-fast $portfolio-easing-standard;
+    background-color $portfolio-duration-fast $portfolio-easing-standard,
+    box-shadow $portfolio-duration-fast $portfolio-easing-standard;
   --_border-offset: 0px;
 }
 
@@ -217,16 +218,30 @@ $_input-icon-xl: var(--portfolio-spacer-3x); // 24px
 .regular {
   .inputContainer {
     background-color: var(--portfolio-surface-neutral-minimal);
-    border: $portfolio-border-width-regular solid var(--portfolio-border-neutral-subtle);
+    border: $portfolio-border-width-thin solid var(--portfolio-border-neutral-subtle);
     border-radius: var(--portfolio-radius-sm);
-    --_border-offset: 1px;
 
+    // Two-axis state grammar (see FB-163 / ENG-187 for the final history).
+    // AP-054 forbids CHANGING `border-width` across states (padding recalc in
+    // calc(py - offset) causes flex-parent jitter) but says nothing about its
+    // absolute value — that's a design decision. With a paint-only weight
+    // channel (`box-shadow`) carrying the engaged-state delta, the base
+    // `border-width` is freed to be 1px, matching the user's mental model.
+    //
+    //   border-width: constant 1px at every state (layout-stable, satisfies AP-054)
+    //   box-shadow:   0 at rest, 1px matching-color ring on hover/focus
+    //                 → engaged renders as a visual 2px solid rim (1px border
+    //                 + 1px same-color outer ring at zero gap reads as continuous)
+    //
+    // `--_border-offset` stays 0px permanently; padding is identical across states.
     &:hover:not(.disabled):not(.readOnly) {
       border-color: var(--portfolio-border-neutral-bold);
+      box-shadow: 0 0 0 1px var(--portfolio-border-neutral-bold);
     }
 
     &:focus-within:not(.disabled) {
       border-color: var(--portfolio-border-neutral-bold);
+      box-shadow: 0 0 0 1px var(--portfolio-border-neutral-bold);
     }
   }
 
@@ -263,16 +278,26 @@ $_input-icon-xl: var(--portfolio-spacer-3x); // 24px
   .inputContainer {
     background-color: transparent;
     border: none;
-    border-bottom: $portfolio-border-width-regular solid var(--portfolio-border-neutral-subtle);
+    border-bottom: $portfolio-border-width-thin solid var(--portfolio-border-neutral-subtle);
     border-radius: 0;
-    --_border-offset: 1px;
 
+    // Same two-axis grammar as .regular (see FB-163 / ENG-187). Minimal is
+    // bottom-only: the engaged-state weight signal is a bottom-directional
+    // `box-shadow` 1px below the 1px border-bottom, reading as a continuous
+    // visual 2px underline. Layout-stable — box-shadow doesn't participate
+    // in the box model.
+    //
+    //   border-bottom-width: constant 1px (AP-054 honored, value is a design choice)
+    //   box-shadow:          0 at rest, `0 1px 0 0 bold` on hover/focus
+    //                        → engaged renders as a visual 2px solid underline
     &:hover:not(.disabled):not(.readOnly) {
       border-bottom-color: var(--portfolio-border-neutral-bold);
+      box-shadow: 0 1px 0 0 var(--portfolio-border-neutral-bold);
     }
 
     &:focus-within:not(.disabled) {
       border-bottom-color: var(--portfolio-border-neutral-bold);
+      box-shadow: 0 1px 0 0 var(--portfolio-border-neutral-bold);
     }
   }
 
@@ -535,12 +560,19 @@ $_input-icon-xl: var(--portfolio-spacer-3x); // 24px
 // STATUS — border + feedback color overrides
 // =============================================================================
 
+// Status `:focus-within` overrides also override `box-shadow` so the engaged
+// ring matches the status color instead of inheriting bold-neutral from the
+// base emphasis rule. See FB-162 / ENG-186. Hover is intentionally left to
+// inherit the base emphasis behavior (bold-neutral ring) — hovering a status
+// input is a pre-focus probe, not the engaged-plus-status state.
+
 .error {
   &.regular .inputContainer {
     border-color: var(--portfolio-border-negative);
 
     &:focus-within {
       border-color: var(--portfolio-border-negative);
+      box-shadow: 0 0 0 1px var(--portfolio-border-negative);
     }
   }
 
@@ -549,6 +581,7 @@ $_input-icon-xl: var(--portfolio-spacer-3x); // 24px
 
     &:focus-within {
       border-bottom-color: var(--portfolio-border-negative);
+      box-shadow: 0 1px 0 0 var(--portfolio-border-negative);
     }
   }
 
@@ -563,6 +596,7 @@ $_input-icon-xl: var(--portfolio-spacer-3x); // 24px
 
     &:focus-within {
       border-color: var(--portfolio-border-positive);
+      box-shadow: 0 0 0 1px var(--portfolio-border-positive);
     }
   }
 
@@ -571,6 +605,7 @@ $_input-icon-xl: var(--portfolio-spacer-3x); // 24px
 
     &:focus-within {
       border-bottom-color: var(--portfolio-border-positive);
+      box-shadow: 0 1px 0 0 var(--portfolio-border-positive);
     }
   }
 
@@ -585,6 +620,7 @@ $_input-icon-xl: var(--portfolio-spacer-3x); // 24px
 
     &:focus-within {
       border-color: var(--portfolio-border-warning);
+      box-shadow: 0 0 0 1px var(--portfolio-border-warning);
     }
   }
 
@@ -593,6 +629,7 @@ $_input-icon-xl: var(--portfolio-spacer-3x); // 24px
 
     &:focus-within {
       border-bottom-color: var(--portfolio-border-warning);
+      box-shadow: 0 1px 0 0 var(--portfolio-border-warning);
     }
   }
 
@@ -607,6 +644,7 @@ $_input-icon-xl: var(--portfolio-spacer-3x); // 24px
 
     &:focus-within {
       border-color: var(--portfolio-border-brand-bold);
+      box-shadow: 0 0 0 1px var(--portfolio-border-brand-bold);
     }
   }
 
@@ -615,6 +653,7 @@ $_input-icon-xl: var(--portfolio-spacer-3x); // 24px
 
     &:focus-within {
       border-bottom-color: var(--portfolio-border-brand-bold);
+      box-shadow: 0 1px 0 0 var(--portfolio-border-brand-bold);
     }
   }
 
