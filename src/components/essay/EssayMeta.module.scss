@@ -1,0 +1,54 @@
+@use '../../styles' as *;
+
+.root {
+  @include body-sm;
+  color: $portfolio-text-secondary;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: $portfolio-spacer-0-5x;
+  margin-top: $portfolio-spacer-1-5x;
+  margin-bottom: $portfolio-spacer-2x;
+}
+
+.item {
+  display: inline-flex;
+  align-items: center;
+  gap: $portfolio-spacer-0-5x;
+  white-space: nowrap;
+}
+
+.separator {
+  color: $portfolio-text-placeholder;
+  user-select: none;
+}
+
+.segment {
+  color: $portfolio-text-secondary;
+}
+
+.mediumLink {
+  @include body-sm;
+  color: $portfolio-text-primary;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: $portfolio-spacer-0-5x;
+  @include transition-fast;
+
+  &:hover {
+    color: $portfolio-text-secondary;
+  }
+}
+
+.mediumIcon {
+  display: inline-block;
+  flex-shrink: 0;
+  color: currentColor;
+}
+
+.externalIndicator {
+  @include caption;
+  opacity: 0.5;
+  margin-left: 1px;
+}

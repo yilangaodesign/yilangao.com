@@ -1,0 +1,20 @@
+@use '../../styles' as *;
+
+.root {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: $portfolio-spacer-3x;
+
+  @media #{$elan-mq-md} {
+    margin-bottom: $portfolio-spacer-4x;
+  }
+}
+
+.eyebrow {
+  color: $portfolio-text-secondary;
+  margin-bottom: $portfolio-spacer-1x;
+}
+
+.headline {
+  margin-bottom: $portfolio-spacer-1x;
+}
