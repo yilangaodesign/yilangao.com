@@ -13,6 +13,7 @@ export default async function Home() {
     slug: string;
     headline: string;
     category: string;
+    contentFormat?: string;
     subline: string;
     thumbnailUrl?: string;
     thumbnailKind?: "image" | "video";
@@ -47,6 +48,7 @@ export default async function Home() {
           slug: doc.slug,
           headline: (doc as Record<string, unknown>).introBlurbHeadline as string,
           category: (doc.category as string) ?? "",
+          contentFormat: (doc as Record<string, unknown>).contentFormat as string | undefined,
           subline: HOME_CASE_SUBLINE_BY_SLUG[doc.slug] ?? "",
           thumbnailUrl: resolved?.url,
           thumbnailKind: resolved?.kind,

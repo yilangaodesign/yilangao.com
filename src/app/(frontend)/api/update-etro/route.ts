@@ -7,9 +7,6 @@ import { INTRO_HEADLINE_BY_SLUG } from '@/lib/case-study-intro-headline'
 const BLURB_BODY =
   '"Your whole approach is wrong."\n\nThe startup CEO across the table had spent fifteen years at Blackstone, and he dismantled the framework I\'d spent a year building in about ninety seconds.\n\nDo you distrust electricity? Credit cards? Self-checkout? Things we once handled with caution, now invisible.\n\nThe trust scaffolding I was so proud of, he said, would go the same way. I nodded through it, but something felt off.\n\nTwo weeks later I realized he was right, and also completely wrong. We were approaching the same coin from opposite sides, and neither of us should ignore the other.'
 
-const SCOPE_STATEMENT =
-  "ETRO - Explainability, Traceability, Reversibility, Observability - distills a year of shipping high-stakes AI trust infrastructure into the four questions every user asks of a machine-made decision. The framework has a second axis: the four elements are always present, but their volume calibrates to stakes, user tenure, and task novelty. I now open every AI product engagement with three questions: what role does trust play, does it have a shelf life, and what inherits it?"
-
 const CONTENT_BLOCKS = createCaseStudyBlocks(
   [
     {
@@ -46,14 +43,17 @@ const CONTENT_BLOCKS = createCaseStudyBlocks(
   {
     heroPlaceholderLabel:
       'Hero - ETRO Framework: four questions of trust mapped against a calibrated-volume axis',
-    scopeStatementMarkdown: SCOPE_STATEMENT,
   },
 )
 
 const ETRO_DATA = {
   title: 'ETRO Framework',
   slug: 'etro-framework',
-  category: 'Essay \u00b7 AI Trust Architecture',
+  category: 'AI Trust Architecture',
+  contentFormat: 'essay',
+  publishedAt: '2025-12-01',
+  readTimeMinutesOverride: null as number | null,
+  mediumUrl: '',
   featured: false,
   order: 5,
   introBlurbHeadline: INTRO_HEADLINE_BY_SLUG['etro-framework'],

@@ -186,6 +186,35 @@ async function pushSchema() {
     `CREATE INDEX IF NOT EXISTS "projects_blocks_image_order_idx" ON "projects_blocks_image" ("_order")`,
     `CREATE INDEX IF NOT EXISTS "projects_blocks_image_path_idx" ON "projects_blocks_image" ("_path")`,
 
+    // Essay content type — discriminant + Medium-style meta fields.
+    // `content_format` selects between the two-column case-study layout and
+    // the single-column essay layout. `published_at`, `read_time_minutes_override`,
+    // and `medium_url` feed the EssayMeta row (date · N min read · Medium link).
+    // See docs/engineering-feedback-log.md (essay content type).
+    `DO $$ BEGIN
+      ALTER TABLE "projects" ADD COLUMN "content_format" varchar DEFAULT 'caseStudy';
+    EXCEPTION
+      WHEN duplicate_column THEN NULL;
+    END $$`,
+    `DO $$ BEGIN
+      ALTER TABLE "projects" ADD COLUMN "published_at" timestamp(3) with time zone;
+    EXCEPTION
+      WHEN duplicate_column THEN NULL;
+    END $$`,
+    `DO $$ BEGIN
+      ALTER TABLE "projects" ADD COLUMN "read_time_minutes_override" numeric;
+    EXCEPTION
+      WHEN duplicate_column THEN NULL;
+    END $$`,
+    `DO $$ BEGIN
+      ALTER TABLE "projects" ADD COLUMN "medium_url" varchar;
+    EXCEPTION
+      WHEN duplicate_column THEN NULL;
+    END $$`,
+    // Backfill legacy rows so the admin dropdown reads 'caseStudy' instead of blank.
+    // DEFAULT only applies to new inserts.
+    `UPDATE "projects" SET "content_format" = 'caseStudy' WHERE "content_format" IS NULL`,
+
   ]
 
   for (const sql of statements) {

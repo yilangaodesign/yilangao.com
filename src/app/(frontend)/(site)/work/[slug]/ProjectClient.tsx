@@ -61,6 +61,7 @@ import { Dropzone } from "@/components/ui/Dropzone";
 import type { EmbedProvider } from "@/lib/parse-video-embed";
 import elanStyles from "@/components/elan-visuals/elan-visuals.module.scss";
 import { siteShellStyles } from "@/components/SiteFooter";
+import { EssayHeader } from "@/components/essay/EssayHeader";
 import styles from "./page.module.scss";
 
 /* ── Block types (shared with page.tsx server component) ── */
@@ -200,6 +201,10 @@ type ProjectData = {
   slug?: string;
   title: string;
   category: string;
+  contentFormat?: "caseStudy" | "essay";
+  publishedAt?: string;
+  readTime?: number;
+  mediumUrl?: string;
   introBlurbHeadline?: string;
   introBlurbBody?: string;
   introBlurbBodyHtml?: string;
@@ -396,22 +401,31 @@ function getImageSizes(layout: string, imageCount: number): string {
   return '100vw';
 }
 
-export default function ProjectClient({
-  project,
-  prevProject,
-  nextProject,
-  isAdmin,
-  interactiveVisuals,
-  companyNote,
-}: {
+type ProjectClientProps = {
   project: ProjectData;
   prevProject?: AdjacentProject;
   nextProject?: AdjacentProject;
   isAdmin?: boolean;
   interactiveVisuals?: Record<string, InteractiveVisualConfig>;
   companyNote?: { companyName: string; note: string };
-}) {
+};
+
+// ProjectClientBody is the body of the case-study page. It is split out from
+// the default export so that `InlineEditProvider` (which mounts
+// `ConfirmProvider` and `InlineToastProvider`) can wrap this component from
+// the OUTSIDE — a prerequisite for `useBlockManager()` below, whose call to
+// `useConfirm()` must resolve against the real context, not the no-op
+// fallback. See ENG-185.
+function ProjectClientBody({
+  project,
+  prevProject,
+  nextProject,
+  isAdmin,
+  interactiveVisuals,
+  companyNote,
+}: ProjectClientProps) {
   const p = project;
+  const isEssay = p.contentFormat === "essay";
   const router = useRouter();
 
   useLayoutEffect(() => {
@@ -1054,8 +1068,9 @@ export default function ProjectClient({
         </section>
       </FadeIn>
 
-      <div className={styles.layout}>
-        {/* ── LEFT SIDEBAR ── */}
+      <div className={isEssay ? styles.layoutEssay : styles.layout}>
+        {/* ── LEFT SIDEBAR (case-study only) ── */}
+        {!isEssay && (
         <aside className={styles.sidebar}>
           <div className={styles.sidebarInner}>
             <FadeIn delay={0.05}>
@@ -1187,7 +1202,7 @@ export default function ProjectClient({
                       </div>
                     )}
                   </div>
-                  {(projectTarget || p.externalLinks.length > 0) && (
+                  {(isAdmin || p.externalLinks.length > 0) && (
                   <div className={styles.metaGroup}>
                     <Eyebrow className={styles.metaLabel}>Links</Eyebrow>
                     {projectTarget ? (
@@ -1221,26 +1236,59 @@ export default function ProjectClient({
             </FadeIn>
           </div>
         </aside>
+        )}
 
         {/* ── RIGHT CONTENT ── */}
-        <main className={styles.content}>
+        <main className={isEssay ? styles.contentEssay : styles.content}>
+          {isEssay && (
+            <FadeIn>
+              <EssayHeader
+                category={p.category}
+                publishedAt={p.publishedAt}
+                readTime={p.readTime ?? 1}
+                mediumUrl={p.mediumUrl}
+                headline={
+                  p.introBlurbHeadline ? (
+                    projectTarget ? (
+                      <EditableText
+                        fieldId={`proj:${p.id}:introBlurbHeadline`}
+                        target={projectTarget}
+                        fieldPath="introBlurbHeadline"
+                        as="h1"
+                        className={styles.introBlurbHeadline}
+                        label="Essay Title"
+                        singleClickEdit
+                      >
+                        {p.introBlurbHeadline}
+                      </EditableText>
+                    ) : (
+                      <h1 className={styles.introBlurbHeadline}>{p.introBlurbHeadline}</h1>
+                    )
+                  ) : null
+                }
+              />
+            </FadeIn>
+          )}
+
           {p.introBlurbHeadline && (
             <FadeIn>
               <div id="intro" className={styles.introBlurb}>
-                {projectTarget ? (
-                  <EditableText
-                    fieldId={`proj:${p.id}:introBlurbHeadline`}
-                    target={projectTarget}
-                    fieldPath="introBlurbHeadline"
-                    as="h1"
-                    className={styles.introBlurbHeadline}
-                    label="Case Study Title"
-                    singleClickEdit
-                  >
-                    {p.introBlurbHeadline}
-                  </EditableText>
-                ) : (
-                  <h1 className={styles.introBlurbHeadline}>{p.introBlurbHeadline}</h1>
+                {!isEssay && (
+                  projectTarget ? (
+                    <EditableText
+                      fieldId={`proj:${p.id}:introBlurbHeadline`}
+                      target={projectTarget}
+                      fieldPath="introBlurbHeadline"
+                      as="h1"
+                      className={styles.introBlurbHeadline}
+                      label="Case Study Title"
+                      singleClickEdit
+                    >
+                      {p.introBlurbHeadline}
+                    </EditableText>
+                  ) : (
+                    <h1 className={styles.introBlurbHeadline}>{p.introBlurbHeadline}</h1>
+                  )
                 )}
                 {p.introBlurbBody && (
                   projectTarget ? (
@@ -1267,7 +1315,7 @@ export default function ProjectClient({
             </FadeIn>
           )}
 
-          {p.introBlurbHeadline && (
+          {p.introBlurbHeadline && !isEssay && (
             <hr className={styles.articleSeparator} />
           )}
 
@@ -1755,6 +1803,15 @@ export default function ProjectClient({
                     role="listitem"
                     tabIndex={isAdmin ? 0 : undefined}
                     data-block-index={blockIndex}
+                    // The BlockToolbar lives inside this wrapper and is
+                    // revealed via `[data-block-admin]:hover > &` in
+                    // `inline-edit.module.scss`. We use a data-attribute
+                    // rather than a CSS-module class because the wrapper
+                    // class itself comes from `page.module.scss` — an
+                    // inline-edit-module `.blockWrapper:hover` selector
+                    // never matches in the compiled CSS. See ENG-190 /
+                    // EAP-115.
+                    {...(isAdmin ? { 'data-block-admin': '' } : {})}
                     onKeyDown={isAdmin ? (e) => {
                       if (e.target !== e.currentTarget) return
                       if (e.altKey && e.key === 'ArrowUp') { e.preventDefault(); blockMgr.moveBlock(cmsIndex, -1); return }
@@ -1938,13 +1995,23 @@ export default function ProjectClient({
     </article>
   );
 
-  if (isAdmin) {
+  return page;
+}
+
+// Top-level wrapper mounts `InlineEditProvider` BEFORE the body renders, so
+// `useBlockManager()` inside the body sees the real `ConfirmProvider` and
+// `InlineToastProvider` contexts. Without this split, `useConfirm()` silently
+// fell back to `NOOP_CONFIRM`, making every `confirmDeleteBlock(...)` resolve
+// to `false` — the trash button in empty atomic-image slots (and every other
+// delete path routed through `blockMgr.confirmDeleteBlock`) appeared to do
+// nothing. See ENG-185.
+export default function ProjectClient(props: ProjectClientProps) {
+  if (props.isAdmin) {
     return (
       <InlineEditProvider isAdmin>
-        {page}
+        <ProjectClientBody {...props} />
       </InlineEditProvider>
     );
   }
-
-  return page;
+  return <ProjectClientBody {...props} />;
 }

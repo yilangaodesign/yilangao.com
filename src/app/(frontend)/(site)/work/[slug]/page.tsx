@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { getPayloadClient } from "@/lib/payload";
 import { extractLexicalText } from "@/lib/lexical";
+import { computeReadTime } from "@/lib/read-time";
 import { convertLexicalToHTML, defaultHTMLConverters } from "@payloadcms/richtext-lexical/html";
 import type { SerializedEditorState } from "lexical";
 import { isAdminAuthenticated } from "@/lib/admin-auth";
@@ -274,6 +275,10 @@ const FALLBACK_PROJECT = {
   slug: "" as string | undefined,
   title: "Project Title",
   category: "Digital toolmaking",
+  contentFormat: "caseStudy" as "caseStudy" | "essay",
+  publishedAt: undefined as string | undefined,
+  readTime: 1 as number,
+  mediumUrl: undefined as string | undefined,
   introBlurbHeadline: undefined as string | undefined,
   introBlurbBody: undefined as string | undefined,
   introBlurbBodyHtml: undefined as string | undefined,
@@ -338,11 +343,26 @@ export default async function ProjectPage({ params }: Props) {
         }
       }
 
+      const rawContentFormat = (doc as Record<string, unknown>).contentFormat;
+      const contentFormat: "caseStudy" | "essay" = rawContentFormat === "essay" ? "essay" : "caseStudy";
+      const publishedAtRaw = (doc as Record<string, unknown>).publishedAt;
+      const publishedAt = typeof publishedAtRaw === "string" && publishedAtRaw ? publishedAtRaw : undefined;
+      const readTimeOverrideRaw = (doc as Record<string, unknown>).readTimeMinutesOverride;
+      const readTimeOverride =
+        typeof readTimeOverrideRaw === "number" && readTimeOverrideRaw > 0 ? readTimeOverrideRaw : null;
+      const mediumUrlRaw = (doc as Record<string, unknown>).mediumUrl;
+      const mediumUrl = typeof mediumUrlRaw === "string" && mediumUrlRaw.trim() ? mediumUrlRaw.trim() : undefined;
+      const readTime = readTimeOverride ?? computeReadTime(contentBlocks, introBlurbBodyPlain, introBlurbHeadline);
+
       project = {
         id: doc.id,
         slug: doc.slug,
         title: doc.title,
         category: doc.category,
+        contentFormat,
+        publishedAt,
+        readTime,
+        mediumUrl,
         introBlurbHeadline: introBlurbHeadline || undefined,
         introBlurbBody: introBlurbBodyPlain,
         introBlurbBodyHtml: introBlurbBodyHtml && introBlurbBodyHtml !== introBlurbBodyPlain ? introBlurbBodyHtml : undefined,

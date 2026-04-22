@@ -64,9 +64,30 @@ export function getSessionCookieConfig(signedValue: string) {
   };
 }
 
+const CONTRACTIONS: [RegExp, string][] = [
+  [/you[\u0027\u2018\u2019\u02BC]?re/g, "you are"],
+  [/we[\u0027\u2018\u2019\u02BC]?re/g, "we are"],
+  [/they[\u0027\u2018\u2019\u02BC]?re/g, "they are"],
+  [/it[\u0027\u2018\u2019\u02BC]?s/g, "it is"],
+  [/i[\u0027\u2018\u2019\u02BC]?m/g, "i am"],
+  [/don[\u0027\u2018\u2019\u02BC]?t/g, "do not"],
+  [/can[\u0027\u2018\u2019\u02BC]?t/g, "can not"],
+  [/won[\u0027\u2018\u2019\u02BC]?t/g, "will not"],
+];
+
+function normalizePassword(raw: string): string {
+  let s = raw.toLowerCase();
+  for (const [pattern, expansion] of CONTRACTIONS) {
+    s = s.replace(pattern, expansion);
+  }
+  s = s.replace(/[\u0027\u2018\u2019\u02BC]/g, "");
+  s = s.replace(/[-_\s]/g, "");
+  return s;
+}
+
 export function comparePasswords(input: string, stored: string): boolean {
-  const a = Buffer.from(input);
-  const b = Buffer.from(stored);
+  const a = Buffer.from(normalizePassword(input));
+  const b = Buffer.from(normalizePassword(stored));
   if (a.length !== b.length) return false;
   try {
     return timingSafeEqual(a, b);

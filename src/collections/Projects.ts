@@ -52,6 +52,19 @@ export const Projects: CollectionConfig = {
       },
     },
     {
+      name: 'contentFormat',
+      type: 'select',
+      defaultValue: 'caseStudy',
+      required: true,
+      options: [
+        { label: 'Case study', value: 'caseStudy' },
+        { label: 'Essay', value: 'essay' },
+      ],
+      admin: {
+        description: 'Layout discriminant. Case studies use the two-column sidebar layout; essays use a single-column Medium-style layout.',
+      },
+    },
+    {
       name: 'featured',
       type: 'checkbox',
       defaultValue: false,
@@ -401,6 +414,30 @@ export const Projects: CollectionConfig = {
         {
           label: 'Meta',
           fields: [
+            {
+              name: 'publishedAt',
+              type: 'date',
+              admin: {
+                description: 'Publication date (essays only). Shown in the meta row above the body.',
+                condition: (data) => (data as Record<string, unknown>)?.contentFormat === 'essay',
+              },
+            },
+            {
+              name: 'readTimeMinutesOverride',
+              type: 'number',
+              admin: {
+                description: 'Optional manual override (minutes). Leave blank to auto-compute from content (225 wpm).',
+                condition: (data) => (data as Record<string, unknown>)?.contentFormat === 'essay',
+              },
+            },
+            {
+              name: 'mediumUrl',
+              type: 'text',
+              admin: {
+                description: 'URL of the cross-posted Medium article. When set, renders an "Also on Medium" link in the meta row.',
+                condition: (data) => (data as Record<string, unknown>)?.contentFormat === 'essay',
+              },
+            },
             {
               name: 'role',
               type: 'text',

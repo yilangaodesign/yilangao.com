@@ -19,7 +19,17 @@
 }
 
 .canvasPane {
-  flex: 0 0 50%;
+  // Portrait pane takes more than half the inner because the halftone carries
+  // significantly more visual weight than the serif text on the right — it's
+  // animated, detail-dense, and high-contrast against the terra background.
+  // Asymmetric/optical balance: a heavier element needs a larger whitespace
+  // gutter on its outer side to feel balanced against a lighter one. The 55%
+  // width shifts the portrait's visual center rightward enough that the
+  // breathing room to the left of the figure exceeds the breathing room to
+  // the right of the card by ~25px on the canonical 1120px container — the
+  // composition reads centered-with-gravitas rather than mathematically even.
+  // See FB-167, FB-168.
+  flex: 0 0 55%;
   height: 100dvh;
   overflow: hidden;
   position: relative;
@@ -48,8 +58,22 @@
   flex: 1;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   padding: $portfolio-spacer-6x;
+  // Tighter left gutter so the card stays close to the portrait on desktop
+  // (preserving the FB-166 distance intent) while the canvasPane's extra
+  // width carries the optical-balance offset. See FB-167, FB-168.
+  padding-left: $portfolio-spacer-2x;
+
+  @media (max-width: 768px) {
+    // Below this breakpoint the canvasPane is hidden and the form is the
+    // only content on screen — the desktop optical-offset (compensating for
+    // the heavier halftone on the left) no longer applies, so reset to
+    // symmetric centered alignment. Matches the original pre-FB-166 mobile
+    // shape. See FB-168.
+    justify-content: center;
+    padding: $portfolio-spacer-6x;
+  }
 }
 
 .card {

@@ -22,6 +22,7 @@ type CaseStudy = {
   slug: string;
   headline: string;
   category: string;
+  contentFormat?: string;
   subline: string;
   thumbnailUrl?: string;
   thumbnailKind?: "image" | "video";
@@ -55,8 +56,8 @@ export default function HomeClient({
           <nav className={styles.caseStudies} aria-label="Case studies">
             <StaggerChildren className={styles.caseStudyList}>
               {caseStudies.map((cs, i) => {
-                const isEssay = cs.category.toLowerCase() === "essay";
-                const prevIsEssay = i > 0 && caseStudies[i - 1].category.toLowerCase() === "essay";
+                const isEssay = cs.contentFormat === "essay";
+                const prevIsEssay = i > 0 && caseStudies[i - 1].contentFormat === "essay";
                 const needsDivider = isEssay && !prevIsEssay && i > 0;
 
                 return (

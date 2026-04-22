@@ -8,7 +8,7 @@ import {
 } from "@/lib/company-session";
 import { getCompanyBySlug, incrementLoginAnalytics } from "@/lib/company-data";
 
-const SITE_PASSWORD = process.env.SITE_PASSWORD || "preview-2026";
+const SITE_PASSWORD = process.env.SITE_PASSWORD || "glad you are here";
 
 export async function validatePassword(
   company: string,

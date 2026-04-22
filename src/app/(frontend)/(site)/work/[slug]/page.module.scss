@@ -32,6 +32,35 @@
   }
 }
 
+// ── ESSAY LAYOUT (single-column, Medium-style) ───────────────────────────────
+// Essays drop the sidebar and centre the content column on a narrow reading
+// measure. Selected by `.contentFormat === 'essay'` in ProjectClient.tsx.
+
+.layoutEssay {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  width: 100%;
+  max-width: calc($elan-container-narrow + $portfolio-spacer-4x * 2);
+  margin: 0 auto;
+  padding: $portfolio-spacer-2x $portfolio-spacer-1-5x;
+
+  @media #{$elan-mq-sm} {
+    padding: $portfolio-spacer-3x $portfolio-spacer-2x;
+  }
+
+  @media #{$elan-mq-md} {
+    padding: $portfolio-spacer-4x;
+  }
+}
+
+.contentEssay {
+  width: 100%;
+  max-width: $elan-container-narrow;
+  margin: 0 auto;
+  min-width: 0;
+}
+
 // ── SIDEBAR (LEFT) ───────────────────────────────────────────────────────────
 // Match sticky offset to site Navigation (see (site)/page.module.scss) so the
 // sidebar clears the nav bar instead of sitting flush under the viewport top.
