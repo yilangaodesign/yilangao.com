@@ -4,7 +4,7 @@
 >
 > **Who reads this:** AI agents before making UI changes — scan for relevant anti-patterns.
 > **Who writes this:** AI agents when a feedback cycle reveals a new anti-pattern.
-> **Last updated:** 2026-04-20 (AP-070: framer-motion `x`/`y`/`scale`/`rotate` on an element with a base CSS `transform` — the motion library writes an inline `transform` that silently overwrites the CSS rule. Fix is to split the static and animated transforms across two elements, or use `transformTemplate` to compose them on the same element. Default: split.) Prior: AP-069 (`mix-blend-mode` applied inside a fixed-position or otherwise stacking-context-creating ancestor — blend isolates to that context's interior and never reaches the document backdrop. Fix is to portal to `document.body`.) Prior: AP-068 (Relying on grid track minimum alone to prevent text wrap in a one-line-per-item list).
+> **Last updated:** 2026-04-21 (AP-054 amended a second time same day — after the fourth same-session complaint (FB-163 / ENG-187) that ENG-186's 2px-base-plus-ring rendered resting inputs as over-heavy 2px borders and engaged inputs as compound 3px rims. Rewrote the Correct Alternative with an explicit "Structural rule vs value choice" block: AP-054 binds CHANGE (no state-to-state `border-width` flip, ever) but not VALUE (the constant is a pure design choice, free within the structural rule). Default base for inputs is now 1px via `$portfolio-border-width-thin` — engaged-state box-shadow ring adds +1px for a solid 2px visual rim. Implementation template updated to use `$portfolio-border-width-thin`. Rejection chronology extended to four failed iterations + one standing: FB-086 gapped ring → FB-088 padding comp → ENG-136 color-only/2px → ENG-186 two-axis/2px → ENG-187 two-axis/1px (current canonical). Frustration count 5 → 6 rounds. This fifth amendment exists because two separate engineering iterations (ENG-136 and ENG-186) misread the rule as binding the base value, so the fix restatement is now explicit on where the rule stops.) Prior: AP-070 (framer-motion `x`/`y`/`scale`/`rotate` on an element with a base CSS `transform` — the motion library writes an inline `transform` that silently overwrites the CSS rule. Fix is to split the static and animated transforms across two elements, or use `transformTemplate` to compose them on the same element. Default: split.) Prior: AP-069 (`mix-blend-mode` applied inside a fixed-position or otherwise stacking-context-creating ancestor — blend isolates to that context's interior and never reaches the document backdrop. Fix is to portal to `document.body`.) Prior: AP-068 (Relying on grid track minimum alone to prevent text wrap in a one-line-per-item list).
 
 ---
 
@@ -867,11 +867,52 @@ Use `var(--ds-*, #{$scss-fallback})`. The CSS custom property adapts at runtime;
 
 **Why it's wrong:** Changing `border-width` on state transitions triggers browser layout reflow. Even with padding compensation (`calc(padding - offset)`), the reflow is visible in flex-centered layouts where the parent recalculates centering. The math may be correct (total height is stable), but the browser's rendering pipeline is not atomic — the reflow frame causes a visible jitter on surrounding elements. This was observed three times: FB-088 (internal content shift), this session (external layout jitter on login page greeting text above the input, inside a `justify-content: center` flex parent).
 
-**Correct alternative:** Never change `border-width` on interactive states. Use a constant border width (e.g., `$portfolio-border-width-regular` / 2px) at all times with permanent padding compensation (`--_border-offset: 1px`). Differentiate states by `border-color` only: resting (subtle), hover (bold), focus (bold). This is zero-layout-shift by construction — no reflow, no centering recalculation, no jitter.
+**Correct alternative:** Never change `border-width` on interactive states. Differentiate states across TWO independent visual channels:
 
-**Previous (insufficient) alternative:** Padding compensation via `--_border-offset` variable flipped from `0px` to `1px` on focus. This fixed internal content shift but still caused external layout jitter in flex-centered containers.
+1. **Color channel (on `border-color`).** Resting uses `--portfolio-border-neutral-subtle`; engaged states (hover, focus, status) swap in the engaged color.
+2. **Weight channel (on `box-shadow`).** Resting has no shadow; engaged states add a 1px shadow in the same color as the engaged border — for full-box emphasis, `box-shadow: 0 0 0 1px <engaged-color>` (outer ring); for bottom-border-only emphasis, `box-shadow: 0 1px 0 0 <engaged-color>` (directional bottom band).
 
-**Frustration caused:** 3 rounds — FB-088 (internal shift), FB-086 (box-shadow rejected, switched to border-width), this session (external jitter still present despite padding compensation).
+`box-shadow` is paint-only and does not participate in the box model — no padding recalc, no flex-parent re-centering, no jitter. The matching-color (engaged color used for both border-color and box-shadow) is load-bearing: it makes `<base>px` border + 1px shadow read as a single `<base+1>px` continuous rim. A CONTRASTING ring color would create the visible-gap double-layer artifact that FB-086 correctly rejected.
+
+### Structural rule vs value choice (read carefully before touching borders)
+
+AP-054 is about CHANGE, not VALUE. Two distinct decisions:
+
+- **Structural (AP-054 binding, not negotiable):** `border-width` and `border-bottom-width` MUST be constant across every state of a given component. No `:hover { border-width: 2px }` or `:focus-within { border-bottom-width: 2px }` anywhere. Ever. This is what causes the jitter.
+- **Value (design choice, fully free within the structural constraint):** Pick the constant. On inputs with a two-axis grammar (color + weight via box-shadow), the correct value is `$portfolio-border-width-thin` (1px) — resting renders as a hairline, the engaged-state box-shadow ring adds 1px for a visual 2px engaged border. This matches the user's cross-session mental model (FB-088 → FB-161 → FB-162 → FB-163). Only if a component cannot express engaged-state weight via a paint-only channel should the constant be raised to 2px (ENG-136 era, pre-box-shadow).
+
+Multiple engineering iterations misread AP-054 as binding the value *and* the structure; both ENG-136 (2px base, color-only) and ENG-186 (2px base, color + shadow) left the base at 2px as if it were load-bearing for jitter avoidance. It isn't. The base value is a pure design call once a paint-only weight channel exists.
+
+**Implementation template (regular emphasis, ENG-187 canonical):**
+
+```scss
+.regular .inputContainer {
+  border: $portfolio-border-width-thin solid var(--portfolio-border-neutral-subtle);
+
+  &:hover:not(.disabled):not(.readOnly),
+  &:focus-within:not(.disabled) {
+    border-color: var(--portfolio-border-neutral-bold);
+    box-shadow: 0 0 0 1px var(--portfolio-border-neutral-bold);
+  }
+}
+
+.error.regular .inputContainer:focus-within {
+  border-color: var(--portfolio-border-negative);
+  box-shadow: 0 0 0 1px var(--portfolio-border-negative); // match — no halo
+}
+```
+
+**Previous (insufficient) alternatives, in order of rejection:**
+
+- **FB-086 attempt:** `box-shadow: 0 0 0 1px white, 0 0 0 3px <ring>` — the white gap between the border and the shadow created a visible double-layer artifact. Rejected for the gap, not for box-shadow as a primitive.
+- **FB-088 attempt:** `border-width: 1px` at rest, `2px` on focus, with `--_border-offset: 0→1px` padding compensation. Fixed internal content shift but the padding recalc still triggered external layout jitter in flex-centered containers (login card, ComponentPreview pane).
+- **ENG-136 attempt:** Raise `$portfolio-border-width-regular` from 1px to 2px so rest and engaged both render 2px; differentiate only by `border-color`. Fixed the jitter but the one-axis grammar proved illegible to users across three sessions (FB-161 → FB-162 chain) — "thickness variation" remained the user's explicit mental model.
+- **ENG-186 attempt:** Two-axis grammar with `border-width: 2px` constant + matching-color `box-shadow` ring on engaged. Fixed the illegibility (engaged visibly thicker) but left the base at 2px, so resting inputs read as over-heavy and engaged inputs compounded to a visual 3px rim — the user's ground truth (FB-163, same session) is rest=1px, engaged=2px, not rest=2px, engaged=3px.
+- **ENG-187 shipped alternative (canonical, current):** Two-axis grammar, base value dropped to `$portfolio-border-width-thin` (1px). Resting hairline, engaged 2px via box-shadow ring. All four complaint axes from the session satisfied: (a) engaged visibly thicker than resting, (b) resting reads as a hairline not a border, (c) engaged reads as 2px not 3px, (d) zero layout shift. See ENG-187 / FB-163.
+
+**Frustration caused:** 6 rounds — FB-088 (internal shift), FB-086 (box-shadow gapped-ring rejected), ENG-136 (external jitter, promoted this anti-pattern), ENG-184 (2026-04-21 — ENG-183 restored FB-088's pattern without re-reading this file), ENG-186 (2026-04-21 — third same-session complaint, added box-shadow ring), ENG-187 (2026-04-21 — fourth same-session complaint, base value dropped from 2px to 1px). See ENG-183/ENG-184/ENG-186/ENG-187, FB-161/FB-162/FB-163, EAP-113.
+
+**Canonical rule (re-emphasized after ENG-187):** On Input, Button, Textarea, and any bordered form control, the resting/hover/focus hierarchy uses **two independent channels**: `border-color` (color) and `box-shadow` with matching color (weight). `border-width`, `border-bottom-width`, `padding-*`, and scoped `--_border-offset` variables MUST NOT flip on state transition. Default base `border-width` for inputs is 1px; pick higher only if the component has no way to express engaged-state weight through a paint-only channel. Any future proposal to add another thickness-affordance mechanism must demonstrate (a) it doesn't cause flex-parent re-centering (measure with a flex-centered test fixture) and (b) it doesn't introduce a visible gap between layers (FB-086's rejection criterion). Burden of proof is on the proposer.
 
 ---
 
@@ -1211,6 +1252,8 @@ return (
 **Related constraint:** the portaled element itself can be `position: fixed` — that creates *its own* stacking context, but `mix-blend-mode` blends against the *parent* stacking context, which in this case is still the document root. The rule is about ancestors, not the blend element itself.
 
 **Incident:** FB-155 (2026-04-20) — ScrollSpy active notch label needed auto-inverse contrast against varied case-study section backdrops. Required portaling the label to `document.body` because the ScrollSpy rail is `position: fixed`.
+
+**Recurrence inside a refactor (FB-156, iteration 3):** When splitting a monolithic `motion.span` with `position: fixed + transform + mix-blend-mode` into a nested wrapper + child (to decouple framer-motion's transform from the CSS transform — see AP-070), it is tempting to keep `mix-blend-mode` on the child. This reintroduces AP-069: the wrapper has `position: fixed` (and likely a non-`none` `transform`), both of which create a stacking context. The child is now inside that stacking context and its blend isolates to the wrapper's empty interior. **Rule:** `mix-blend-mode` must live on whichever layer has the root (or the intended backdrop's) stacking context as its parent — typically the *outermost* layer that still portals to `document.body`, not the innermost styled child. If you split a blended element, the blend moves with the position: fixed ancestor, not with the animated child.
 
 ---
 

@@ -54,21 +54,29 @@ Borrow from journalism. Lead with the conclusion (impact, outcome, key insight),
 
 **Collaborator display:** Each collaborator/stakeholder group renders on its own line. "Product Management", "Engineering", "Customer Success" are distinct entries, not a comma-separated list. This gives the sidebar a clean, scannable structure where the reader can quickly assess cross-functional scope.
 
-#### Essay Sidebar Variant
+#### Essay Layout (replaces the sidebar for essay content type)
 
-When the content type is **essay** (not a case study), the sidebar metadata adapts:
+> **Reconciled 2026-04-21 (FB-164 / ENG-191 / CFB-040).** The earlier "lightened sidebar" proposal on this page has been superseded by the shipped implementation. Essays **replace** the two-column layout with a single-column Medium-style reading layout; there is no essay sidebar.
 
-| Field | Case study | Essay |
-|-------|-----------|-------|
-| Role | Title at the company | Role/authority (e.g., "Practitioner & Author") |
-| Hero metric | Required | Omitted |
-| Collaborators | Named groups | Optional (may be solo) |
-| Duration | Project duration | Timespan (e.g., "2024 - Present") |
-| Tools | Technology stack | Omitted |
-| Links | Product links, press | Related case study link, external references |
-| Format indicator | — | "Essay" (signals content type to the reader) |
+When the content type is **essay** (not a case study — discriminated by the `contentFormat` field on the `projects` collection), the page layout switches entirely:
 
-The essay sidebar is intentionally lighter. It communicates authority and context without the project-scoping metadata that a shipped product needs.
+- **No sidebar.** Role, collaborators, duration, tools, hero metric, and external-link sections are all omitted — an essay has no team, no shipped product, and no project duration to scope.
+- **Single centered column** capped at the "blog post" reading measure (`$elan-container-narrow` in `src/styles/tokens/_spacing.scss`), via `.layoutEssay` + `.contentEssay` classes in `src/app/(frontend)/(site)/work/[slug]/page.module.scss`.
+- **Shared with case studies:** the full-width hero splash, the `companyCallout` block, all body block rendering (Lexical editor, image upload, drag-and-drop), the `articleSeparator` between intro and body, and the `projectNav` prev/next footer.
+
+**`EssayHeader` composition (between the hero splash and the intro blurb body):**
+
+1. **Category eyebrow** — rendered via the existing `<Eyebrow as="span" size="sm">`. The `category` field doubles as the topic tag on essays; authors shouldn't include a format prefix (`"Essay · …"` is retired — the `contentFormat` discriminant carries format; `category` carries topic only).
+2. **H1** — the `introBlurbHeadline` field (inline-editable via the same `EditableText` binding used on case studies). This is the essay's visible title. The internal `title` field (admin short-name, e.g. `"ETRO Framework"`) is intentionally not rendered on essays — rendering both would produce a double-title experience.
+3. **Meta row** — `{publication date} · {N} min read · Also on Medium ↗` (the Medium segment is conditional on a non-empty `mediumUrl`). Typography: `body-sm`, passive segments in `$portfolio-text-secondary`, the Medium link in `$portfolio-text-primary`, separator dots in `$portfolio-text-placeholder`. No border-radius per branding guardrail #9.
+
+**Scope statement:** **not** used on essays. §3.3 below is a case-study convention — it anchors a hiring manager in the company/role/scale before the hero metric fires. Essays have no company being scoped and no role being claimed within a team; the framing work is carried by the H1 and the intro blurb body. Do not add a scope statement to an essay.
+
+**Read time:** auto-computed at 225 wpm from the content blocks + intro blurb (minimum 1 minute). Authors can override via the `readTimeMinutesOverride` field in the Meta tab when the estimator is wrong (e.g. code-heavy essays read slower than prose of the same word count).
+
+**Cross-post link:** when `mediumUrl` is set, the meta row appends `Also on Medium ↗` with an inline Medium "M" glyph. Copy is "Also on Medium" (not "Read on Medium" / "View on Medium") to flag the Medium version as a mirror — the portfolio version remains the primary read.
+
+**Homepage signal:** essays carry an "Essay" badge on their homepage card, driven by `contentFormat === 'essay'` (not by the `category` string — the earlier string-prefix workaround is retired).
 
 ### 3.3 The Scope Statement (Intro Paragraph)
 

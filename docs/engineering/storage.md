@@ -101,6 +101,39 @@ Files uploaded to the `media` bucket are publicly accessible at:
 https://<project-ref>.supabase.co/storage/v1/object/public/media/<filename>
 ```
 
+## 12.4.1 Video codec requirements (browser portability)
+
+Every `.mp4` stored in the `media` bucket MUST be **H.264 (`avc1`) video + AAC audio (or no audio) + `mp42` major brand + fast-start atom layout (`moov` before `mdat`)**. This is a hard invariant of the upload pipeline, not a runtime rendering concern.
+
+**Why this is a guardrail and not a runtime toggle.** macOS native screen recording, QuickTime Player, Screen.Studio, and iOS exports all emit HEVC (H.265) with codec tag `hvc1` inside a QuickTime-branded MP4 container (`major_brand=qt  `, no `mp42`/`isom` compatible brands). That file plays flawlessly in Safari on macOS/iOS (VideoToolbox decodes `hvc1` in hardware) but **does not play in Chromium-family browsers on non-Apple hardware, in Firefox on any OS, or in Edge without the paid Microsoft HEVC extension**. The typical failure mode in Chromium is that the first IDR frame decodes through a software fallback, the `<video>` element ends up with `readyState >= 2` so our `MediaRenderer` clears the skeleton, and then every subsequent frame fails to decode — the visible behavior is a video frozen on the first frame with no error thrown. `MediaRenderer.tsx`, the `<video autoplay muted loop playsinline>` attributes, Supabase's HTTP headers (`accept-ranges: bytes`, correct `content-type`), and the edge CDN are all correct when this fails — the defect lives entirely in the MP4 container. See ENG-192 for the incident that made this a codified rule.
+
+**Author-side normalization command** (run before uploading any `.mp4` to the Payload admin):
+
+```bash
+ffmpeg -i input.mp4 \
+  -c:v libx264 -crf 20 -preset slow -pix_fmt yuv420p \
+  -c:a aac -b:a 128k \
+  -movflags +faststart -brand mp42 \
+  output.mp4
+```
+
+For silent captures (most UI-motion loops in this portfolio), replace the audio pipeline with `-an` to drop the audio stream entirely rather than synthesizing a silent AAC track. For videos that are already H.264 but have the wrong brand or a trailing `moov`, the faster remux path is `ffmpeg -i in.mp4 -c copy -movflags +faststart -brand mp42 out.mp4` — no re-encode, near-instant.
+
+**Pre-upload verification (one-liner):**
+
+```bash
+ffprobe -v error \
+  -show_entries stream=codec_name,codec_tag_string \
+  -show_entries format=major_brand \
+  -of default=noprint_wrappers=0 some.mp4
+```
+
+Must return `codec_name=h264`, `codec_tag_string=avc1`, and `major_brand=mp42`. Any other combination is a blocker — do not upload.
+
+**Why we don't transcode server-side.** Vercel's serverless runtime does not include an ffmpeg binary, and shipping one in the function bundle pushes us into the size/memory constraints that make the serverless-function path fragile. A managed video pipeline (Mux, Cloudflare Stream) is overkill for a ~14-video portfolio. The current strategy is: doc-level guardrail + author-side normalization. If video volume grows materially, the next step is a lightweight codec-sniff in a Payload `beforeChange` hook on the `Media` collection that reads the first ~64 KB of the upload, parses the `ftyp` atom, and rejects uploads with `codec_tag_string=hvc1` or `major_brand=qt  ` — no transcoding, just a soft block at the admin layer.
+
+**Related anti-pattern:** EAP-117 "Uploading macOS-native HEVC (`hvc1`) / QuickTime-branded MP4s without transcoding." Related verification discipline: §12.6 already calls out `curl -sI` checks post-upload; extend that check with the `ffprobe` assertion above whenever a `.mp4` lands in `media`.
+
 ## 12.5 Frontend Asset Preloading
 
 The site uses a progressive preloading pipeline (`src/lib/preload-manager.ts`) that downloads assets before the user needs them. The pipeline follows the visitor's navigation path:

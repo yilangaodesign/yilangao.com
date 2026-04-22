@@ -113,3 +113,36 @@ The collapsed state is the **canonical spacing reference**. The expanded state m
 - Header: `px-4` (16px) horizontal padding, `h-12` (48px) height.
 
 **Why collapsed-first:** The collapsed state has the tightest possible spacing — every pixel is intentional because there's so little room. The expanded state tends to accumulate extra padding (taller rows, deeper indents, bigger section gaps) that isn't deliberate. By locking the vertical rhythm to the collapsed state, toggling between states produces zero vertical shift in tab positions.
+
+### 1.8 Optical Balance — Whitespace Follows Visual Weight
+
+**Mathematical centering of unequal-weight elements reads as imbalanced.** Visual weight is a *perceptual* quantity, not a dimensional one. Two elements of identical bounding-box size can carry very different perceived mass depending on:
+
+- **Density** — how much of the bounding box is filled with marks (dense pattern > sparse text)
+- **Motion** — animated, video, or interactive content pulls the eye more than static content
+- **Contrast** — high foreground/background contrast increases weight vs. the surrounding field
+- **Detail** — fine-grained pattern, texture, or illustration increases weight vs. plain fills
+- **Color saturation** — saturated colors carry more weight than muted/neutral ones
+- **Face/figure presence** — humans register faces/bodies as high-weight regardless of size
+
+**The principle:** When a composition contains two elements of meaningfully different visual weight, the heavier element must have **more** whitespace on its outer side than the lighter element has on its outer side. The goal is to *balance perceived mass*, not to equalize dimensions. A composition where both sides have equal outer whitespace will always read as "heavy side pulling left/up/wherever the heavy element sits" because the viewer's eye disproportionately weights the dense side.
+
+**How to implement (layout-level):**
+
+- Express the offset through the flex ratio or grid-template columns of the two containers, NOT through padding tricks on one child. The ratio is the thing that scales proportionally with viewport — padding tricks break at different viewport widths.
+- Near-equal weight → stay near 50/50.
+- Modestly unequal (e.g., dense illustration vs. simple heading) → 53–55 / 45–47.
+- Strongly unequal (e.g., animated video vs. small text label) → 55–60 / 40–45 or even further.
+- The empty space on the outer side of the heavier element should exceed the empty space on the outer side of the lighter element by approximately the perceptual weight delta — typically 15–40px on canonical (1120px–1440px) containers.
+
+**Canonical example — password gate (`src/app/(frontend)/for/[company]/login.module.scss`):** Animated halftone portrait on the left, static serif text on the right. `.canvasPane` is `flex: 0 0 55%` (not 50%). Empty-left-of-portrait ≈ 133px on 1120px inner; empty-right-of-card ≈ 108px. The ~25px offset favoring the portrait side reads as balanced; mathematical centering (50/50) reads as portrait-heavy. See FB-168.
+
+**Why this is a spacing principle, not a layout principle:** the thing being tuned is *whitespace* — the empty gutters around the elements. The layout (two-column flex) is agnostic to weight; the whitespace distribution is where the weight compensation lives. This belongs here.
+
+**Anti-patterns:**
+
+- Compensating for visual weight via padding on one child instead of the container ratio — padding is a fixed pixel value and does not scale; the ratio is a percentage and does.
+- Treating "centered on the viewport" as the goal when the composition has unequal weight. Centered-on-viewport is a lesser goal than balanced-as-perceived.
+- Applying optical-offset logic to compositions of roughly equal weight — you get a gratuitous skew with no perceptual payoff.
+
+**Paired responsiveness rule:** When optical-offset tuning is active at certain breakpoints but not others (for example, the heavier element is hidden at mobile), the non-offset breakpoints MUST have explicit overrides that reset alignment and padding to the symmetric/centered case. A desktop-tuned alignment that leaks into a context where the heavier element doesn't exist is a regression. The trigger: any media query that sets `display: none` on a layout-structural element demands an audit of every rule written assuming that element's presence. See FB-168.

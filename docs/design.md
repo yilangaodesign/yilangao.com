@@ -4,7 +4,7 @@
 >
 > **Who reads this:** AI agents routed here by `AGENTS.md` Pre-Flight. Read the Section Index first, then open only the spoke file matching your task.
 > **Who writes this:** AI agents after processing user feedback via the `design-iteration` skill.
-> **Last updated:** 2026-04-20 (FB-155: ScrollSpy active label auto-contrast via `mix-blend-mode: difference` on a `document.body`-portaled span. New anti-pattern AP-069 on `mix-blend-mode` inside stacking-context-creating ancestors. Content-navigation frequency bumped to 3.) Prior: 7.10 (Composite components must compose DS primitives).
+> **Last updated:** 2026-04-22 (FB-168: Added §1.8 "Optical Balance — Whitespace Follows Visual Weight" to `docs/design/spacing.md`. New durable principle: when a composition contains two elements of meaningfully different visual weight (density, motion, contrast, detail), mathematical centering reads as imbalanced — the heavier element needs MORE whitespace on its outer side than the lighter one. Implementation: express via container flex ratio, not padding tricks. Canonical example: password gate (`.canvasPane flex: 0 0 55%`). Also documented paired responsiveness rule: when optical-offset tuning is active at certain breakpoints, the breakpoints where it isn't active MUST have explicit resets. Spacing frequency bumped to 16; new "Optical balance" pattern added to the frequency map.) Prior: FB-155: ScrollSpy active label auto-contrast via `mix-blend-mode: difference`.
 
 ---
 
@@ -182,7 +182,7 @@ When a design system primitive exists for a UI role (for example `Avatar`), comp
 
 | Pattern | Times Raised | Priority |
 |---------|-------------|----------|
-| Spacing / Padding / Breathing Room | 15 | Critical |
+| Spacing / Padding / Breathing Room | 16 | Critical — FB-168: Added §1.8 "Optical Balance" — whitespace distribution must compensate for visual weight delta between elements (density, motion, contrast, detail). Mathematical centering of unequal-weight elements reads as imbalanced. |
 | State transition consistency (toggle jump / layout shift / mode coherence) | 8 | Critical |
 | Component state modeling (define all states before coding) | 1 | Critical |
 | Layout integrity (no overlapping, cross-panel alignment) | 5 | Critical |
@@ -211,7 +211,8 @@ When a design system primitive exists for a UI role (for example `Avatar`), comp
 | Admin controls displacing component content (overlay separation) | 2 | High — FB-105: drag handle as invisible flex child indented block list 24px. |
 | Interactive visual scoping (content must match section topic) | 1 | High |
 | False affordances (static elements styled as interactive) | 1 | High |
-| Responsive breakpoints / cross-app parity | 2 | High — FB-144: Mobile footer block narrowed and centred via `max-width` + `margin-inline: auto` on the stack container (not per-child), reset at `$elan-mq-sm`. |
+| Responsive breakpoints / cross-app parity | 3 | High — FB-168: Paired-breakpoint-override rule. When desktop layout tuning (alignment, padding) is meaningful only in a specific breakpoint context (two-column here), there MUST be a matching mobile/other-context override. A `display: none` media query on a layout-structural element requires auditing every rule that assumed that element's presence. Prior FB-144: Mobile footer block narrowed and centred via `max-width` + `margin-inline: auto` on the stack container (not per-child), reset at `$elan-mq-sm`. |
+| Optical balance (visual weight compensation) | 1 | High — FB-168: Two elements of meaningfully different visual weight (animated halftone vs. static serif text) require asymmetric whitespace — the heavier element needs more outer-side breathing room. Implementation via container flex ratio (55/45, not 50/50), not padding tricks. See §1.8 in `docs/design/spacing.md`. |
 | DS compliance (token adoption, mixin usage, brand color) | 2 | High - FB-120: TestimonialCard now composes DS Avatar in visitor + admin paths. |
 | Undocumented patterns (gradient bg, masonry, dark surface alpha) | 1 | Medium |
 | Button component sizing (icon/label proportionality, vertical padding) | 1 | High |
