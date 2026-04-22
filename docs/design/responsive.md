@@ -249,3 +249,30 @@ When viewport shrinks below `sum(rigid) + sum(flexible-min) + gaps`, the auto-fi
 **When to apply:** any list column where content integrity demands one-line-per-item (company names, product names, dates, monetary values, IDs). Avoid applying to prose columns — bio paragraphs and descriptions *want* to wrap and look wrong as a single line. Rigidity is for list columns, not prose columns.
 
 **Component-local breakpoints are allowed — and sometimes required.** If the rigid column's width calculation pushes the layout's fit threshold past a canonical breakpoint token, define a component-local breakpoint with a comment that derives the number from column widths + gaps + padding. Example: `$footer-wide-mq: '(min-width: 1120px)'` because `260 + 240 + 2×180 + 3×64 + 2×32 = 1116 → 1120`. The token system is for platform categories (phone/tablet/laptop); layout-fit thresholds are component-level concerns. See FB-150.
+
+---
+
+### 6.13 Composition-Scaling Coherence — A Mixed Composition Is Only Valid Across Its Proportional Range
+
+**Problem.** When a composition mixes elements that scale with the container (e.g. a flex-ratio column holding a canvas that fills its pane) with elements that have a fixed `max-width` (e.g. a 380px action card), the relationships between them hold only across a specific range of container widths. Let the container grow past that range and the scaling element outgrows the fixed one — gaps, gutters, and visual balance all degrade monotonically. The composition was never designed for those widths; it just happens to still render there.
+
+**Anti-pattern: re-expansion at ultra-wide breakpoints.** A common instinct is to cap a container at (say) `1120px` on normal desktops, then at `@media (min-width: 1800px)` bump it back to `80vw` so "the content doesn't feel lost on big monitors." This is almost always wrong when the composition contains any fixed-width element, because:
+
+1. **It creates a breakpoint discontinuity.** At the ultra-wide breakpoint, the container snaps from `1120px` to `1440px` (or whatever `80vw` evaluates to at that width). The composition visibly inflates in one frame — a ~28% jump — which reads as broken.
+2. **It breaks the fixed-element's proportions.** Past the cap, the scaling column keeps widening and the fixed card stays the same size. The gap between them grows without bound — 149px at 1120px inner, 197px at 1520px, ~260px at 2000px. The gap that was tuned to feel right at the canonical width becomes progressively wrong at every wider viewport.
+3. **The "wasted space" framing is wrong.** Negative space on ultra-wide monitors is not a bug — it's atmospheric breathing room that benefits editorial and brand-led compositions. Ultra-wide stretch only pays off when *every* element of the composition scales together (pure fluid grid with no fixed children); otherwise it's just smeared-out content.
+
+**The principle:** pick a single `max-width` for the container — the width at which the composition's proportions look correct — and let the container stay at that value at every viewport equal to or wider than it. Do not re-expand the container at ultra-wide breakpoints unless all children scale with it. On viewports wider than the cap, the composition centers in a field of its background color and reads as a deliberate "object in space."
+
+**How to pick the cap:**
+
+1. Render the composition at candidate widths (1056, 1120, 1280, 1440).
+2. Measure the gap between the fixed element and the scaling element at each. Pick the narrowest width where the gap still reads as intentional breathing room rather than compression.
+3. Set that as the `max-width`. Do not add an `@media (min-width: ...)` rule that overrides it upward.
+4. If the composition still feels "small" on genuinely ultra-wide displays, the fix is to increase *type sizes*, *illustration density*, or the *fixed element's cap* — not to stretch the container.
+
+**Canonical example — password gate.** The layout has a scaling `.canvasPane` (flex `0 0 55%`, halftone canvas fills the pane and its figure scales with the pane) and a fixed action card (`max-width: 380px`). The inner is capped at `1120px` across all desktop viewports. An earlier version re-expanded to `80vw` at `min-width: 1800px`; this widened the portrait-to-card gap from 149px (tuned) to ~197px at 1900px viewports and created the 1800→1800px snap. Removed the re-expansion; composition now holds its proportions at every viewport ≥ 1120px and sits in a generous terra-colored field at ultra-wide. See FB-169.
+
+**Related anti-pattern:** breakpoint discontinuity in any dimension. If a rule causes any layout quantity (container width, font size, gap, column count) to *snap* rather than *flow* at a breakpoint crossing, that's almost always a design mistake. Prefer fluid-to-cap-then-hold (the container fills the viewport up to a ceiling, then stays there) over fluid-to-cap-then-fluid-again (fills, then holds, then re-scales at a higher breakpoint). The latter forces a step change that is visible on every monitor whose width straddles the second breakpoint during a resize.
+
+**When re-expansion IS correct:** only when every element in the composition scales proportionally with the container. A pure fluid-grid editorial page with no fixed-width primitives (no `max-width: 380px` cards, no fixed-width logos, no pinned panels) can safely stretch to `80vw` or beyond. The rule is not "never stretch past the cap" but "only stretch past the cap if stretching preserves all relationships."

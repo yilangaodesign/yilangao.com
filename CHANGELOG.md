@@ -4,6 +4,19 @@ All notable changes to the Élan design system are documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.11.1] — 2026-04-22
+
+Patch release: login page layout fix shipped alongside yilangao.com 1.3.1 and ASCII Art Studio 0.6.3.
+
+### Fixed
+
+- **yilangao.com**: Removed 80vw ultra-wide breakpoint (≥1800px) from `/for/[company]` login page `.inner` container — the fixed-element gap between the halftone portrait and login card grew without bound on 2K+ displays, breaking composition proportions. Inner now caps at 1120px on all viewports; the terra field grows instead, complementing the atmospheric quality of the halftone.
+
+### Released with this checkpoint
+
+- **yilangao.com** 1.3.1 — login page ultra-wide layout fix
+- **ASCII Art Studio** 0.6.3 — release sync only (no app code changes)
+
 ## [2.10.0] — 2026-04-21
 
 Minor release: three new DS primitives (AlertDialog, MediaMuteToggle, VideoEmbed), major inline-edit expansion with video embeds and destructive confirmations, and CMS schema additions for video and image-group migration shipped alongside yilangao.com 1.2.0 and ASCII Art Studio 0.6.1.
