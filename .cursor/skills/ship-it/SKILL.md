@@ -244,11 +244,11 @@ user with the final summary.
 
 > Accumulated lessons from past ship-it runs. Scan before each release.
 > Escalation: 3+ occurrences → promote to procedure change or guardrail.
-> Last updated: 2026-04-11 (7 pitfalls from REL-001, REL-004, REL-009)
+> Last updated: 2026-04-22 (7 pitfalls from REL-001, REL-004, REL-009, REL-012)
 
 ### REL-AP-001: Version sync targets left uncommitted before branch switch
 
-**Occurrences:** 1 (REL-001)
+**Occurrences:** 2 (REL-001, REL-012)
 
 **Trigger:** `npm run version:release` auto-syncs files listed in the
 checkpoint skill's Registered Apps table (`playground/src/lib/elan.ts`,
@@ -260,7 +260,7 @@ overwritten by checkout."
 
 **Fix:** The release commit must include all sync targets:
 ```bash
-git add elan.json ascii-studio.json playground/src/lib/elan.ts ascii-tool/src/lib/version.ts
+git add elan.json ascii-studio.json website.json playground/src/lib/elan.ts ascii-tool/src/lib/version.ts src/lib/website-version.ts
 ```
 
 ### REL-AP-002: New playground pages with wrong component preview APIs
