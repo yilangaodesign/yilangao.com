@@ -8,14 +8,21 @@
 }
 
 .inner {
+  // Hard cap — no ultra-wide re-expansion. Previously this bumped to 80vw at
+  // 1800px+, which (a) created a discontinuity at the breakpoint (inner
+  // snapped from 1120 to 1440) and (b) broke the composition's proportions:
+  // canvasPane scales with inner and the halftone portrait scales with the
+  // canvas, but .card has a fixed 380px max — so a wider inner grew the
+  // portrait-to-card gap without bound (149px at 1120 → 197px at 1520 →
+  // 260px+ on 2K+ displays). The composition is only valid at the range
+  // where the fixed-element gap stays in the 137–149px sweet spot. Beyond
+  // 1120 the inner stays put and the terra field around it grows, which
+  // complements the atmospheric quality of the halftone rather than
+  // diluting it. See FB-166 / FB-167 / FB-168 / FB-169.
   display: flex;
   width: 100%;
   max-width: 1120px;
   min-height: 100dvh;
-
-  @media (min-width: 1800px) {
-    max-width: 80vw;
-  }
 }
 
 .canvasPane {
