@@ -33,15 +33,16 @@
 }
 
 // ── ESSAY LAYOUT (single-column, Medium-style) ───────────────────────────────
-// Essays drop the sidebar and centre the content column on a narrow reading
-// measure. Selected by `.contentFormat === 'essay'` in ProjectClient.tsx.
+// Essays drop the sidebar and centre the content column on a reading measure
+// aligned with $elan-container-content (same max as case-study prose column).
+// Selected by `.contentFormat === 'essay'` in ProjectClient.tsx.
 
 .layoutEssay {
   display: flex;
   flex-direction: column;
   flex: 1;
   width: 100%;
-  max-width: calc($elan-container-narrow + $portfolio-spacer-4x * 2);
+  max-width: calc($elan-container-content + $portfolio-spacer-4x * 2);
   margin: 0 auto;
   padding: $portfolio-spacer-2x $portfolio-spacer-1-5x;
 
@@ -56,7 +57,7 @@
 
 .contentEssay {
   width: 100%;
-  max-width: $elan-container-narrow;
+  max-width: $elan-container-content;
   margin: 0 auto;
   min-width: 0;
 }
