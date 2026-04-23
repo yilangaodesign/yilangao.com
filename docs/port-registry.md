@@ -23,7 +23,7 @@
 
 | Service | Default Port | Current Port | Status | PID | Notes |
 |---|---|---|---|---|---|
-| Main site (`yilangao.com`) | 4000 | 4000 | running | 79976 | `npm run dev` (webpack mode) |
+| Main site (`yilangao.com`) | 4000 | 4000 | running | 75275 | `npm run dev` (webpack mode) |
 | Playground | 4001 | 4001 | running | 79900 | `npm run playground` (`--webpack`; see ENG-150) |
 | ASCII Art Studio | 4002 | 4002 | running | 81721 | `npm run ascii-tool` (`--webpack`; see ENG-150) |
 
