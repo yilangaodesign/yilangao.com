@@ -781,20 +781,20 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: $portfolio-spacer-0-5x 0;
+  padding: $portfolio-spacer-1x $portfolio-spacer-0-5x;
   border-top: 1px solid $portfolio-border-neutral-minimal;
 }
 
 .transportLeft {
   display: flex;
   align-items: center;
-  gap: $portfolio-spacer-0-5x;
+  gap: $portfolio-spacer-1x;
 }
 
 .transportRight {
   display: flex;
   align-items: center;
-  gap: $portfolio-spacer-0-25x;
+  gap: $portfolio-spacer-1x;
 }
 
 .transportBtn {
@@ -839,9 +839,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: $portfolio-spacer-0-25x;
+  gap: $portfolio-spacer-0-5x;
   height: 28px;
-  padding: 0 $portfolio-spacer-utility-0-75x;
+  padding: 0 $portfolio-spacer-1x;
   border: 1px solid $portfolio-border-neutral-minimal;
   background: $portfolio-neutral-00;
   color: $portfolio-text-neutral-regular;
