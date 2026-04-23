@@ -4,6 +4,21 @@ All notable changes to the Élan design system are documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.11.3] — 2026-04-23
+
+Patch release: Lexical cross-block navigation fix, elan-visuals style refinements, and homepage essay badge feature flag.
+
+### Fixed
+
+- **Inline edit**: `useBlockKeyboardNav` now blurs the active Lexical editor via `getNearestEditorFromDOMNode` + `queueMicrotask` before cross-block `focus()`, closing the remaining frozen-`Point` TypeError (ENG-194, same family as ENG-188/ENG-189).
+- **Elan visuals**: `MaturityTimeline` toggle buttons bumped from `$portfolio-type-xs` to `$portfolio-type-sm` with larger padding for readability (FB-171). `CollaborationLoop` refactored; `SkillMap` dead styles removed.
+- **yilangao.com**: Essay format badge on the homepage hidden behind `SHOW_ESSAY_FORMAT_BADGE_ON_HOME` flag (FB-172).
+
+### Released with this checkpoint
+
+- **yilangao.com** 1.3.3 — Lexical fix, elan-visuals refinements, essay badge flag
+- **ASCII Art Studio** 0.6.5 — release sync only (no app code changes)
+
 ## [2.11.2] — 2026-04-22
 
 Patch release: essay project pages use the same prose column cap as case studies. Élan and ASCII Art Studio manifests bumped in sync; no design-system component or playground code changes in this checkpoint.
