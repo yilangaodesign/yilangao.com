@@ -14,6 +14,7 @@ import type { RangeSelection, TextFormatType } from 'lexical'
 import { $setBlocksType } from '@lexical/selection'
 import { $createHeadingNode, $isHeadingNode } from '@lexical/rich-text'
 import { TOGGLE_LINK_COMMAND, $isLinkNode } from '@lexical/link'
+import type { LinkNode } from '@lexical/link'
 import { $findMatchingParent } from '@lexical/utils'
 import { ButtonSelect, ButtonSelectItem } from '@/components/ui/ButtonSelect'
 import { Tooltip } from '@/components/ui/Tooltip'
@@ -54,6 +55,15 @@ function getBlockState(selection: RangeSelection): BlockState {
     if (tag === 'h3') return 'h3'
   }
   return 'paragraph'
+}
+
+function findLinkNode(selection: RangeSelection): LinkNode | null {
+  const node = selection.anchor.getNode()
+  if ($isLinkNode(node)) return node
+  const parent = node.getParent()
+  if ($isLinkNode(parent)) return parent
+  const match = $findMatchingParent(node, $isLinkNode)
+  return match as LinkNode | null
 }
 
 function FormatButton({
@@ -99,6 +109,11 @@ export default function LexicalToolbar() {
   })
   const [blockType, setBlockType] = useState<BlockState>('paragraph')
   const [isLink, setIsLink] = useState(false)
+  const [linkUrl, setLinkUrl] = useState('')
+  const [linkPopoverOpen, setLinkPopoverOpen] = useState(false)
+  const [linkEditMode, setLinkEditMode] = useState(false)
+  const [linkEditValue, setLinkEditValue] = useState('')
+  const linkInputRef = useRef<HTMLInputElement>(null)
   const [isVisible, setIsVisible] = useState(false)
   const [position, setPosition] = useState({ top: 0, left: 0 })
 
@@ -118,9 +133,9 @@ export default function LexicalToolbar() {
       setFormat(getFormatState(selection))
       setBlockType(getBlockState(selection))
 
-      const node = selection.anchor.getNode()
-      const parent = node.getParent()
-      setIsLink($isLinkNode(parent) || $isLinkNode(node) || !!$findMatchingParent(node, $isLinkNode))
+      const link = findLinkNode(selection)
+      setIsLink(!!link)
+      setLinkUrl(link ? link.getURL() : '')
 
       setIsVisible(true)
     })
@@ -198,16 +213,52 @@ export default function LexicalToolbar() {
     [editor],
   )
 
-  const toggleLink = useCallback(() => {
+  const handleLinkClick = useCallback(() => {
     if (isLink) {
-      editor.dispatchCommand(TOGGLE_LINK_COMMAND, null)
+      setLinkEditValue(linkUrl)
+      setLinkEditMode(false)
+      setLinkPopoverOpen((prev) => !prev)
     } else {
-      const url = window.prompt('Enter URL')
-      if (url) {
-        editor.dispatchCommand(TOGGLE_LINK_COMMAND, { url, target: '_blank', rel: 'noopener noreferrer' })
-      }
+      setLinkEditValue('')
+      setLinkEditMode(true)
+      setLinkPopoverOpen(true)
     }
-  }, [editor, isLink])
+  }, [isLink, linkUrl])
+
+  const commitLinkEdit = useCallback(() => {
+    const trimmed = linkEditValue.trim()
+    if (trimmed) {
+      editor.dispatchCommand(TOGGLE_LINK_COMMAND, {
+        url: trimmed,
+        target: '_blank',
+        rel: 'noopener noreferrer',
+      })
+    }
+    setLinkPopoverOpen(false)
+    setLinkEditMode(false)
+  }, [editor, linkEditValue])
+
+  const removeLink = useCallback(() => {
+    editor.dispatchCommand(TOGGLE_LINK_COMMAND, null)
+    setLinkPopoverOpen(false)
+    setLinkEditMode(false)
+  }, [editor])
+
+  useEffect(() => {
+    if (linkEditMode && linkPopoverOpen) {
+      const id = setTimeout(() => linkInputRef.current?.focus(), 0)
+      return () => clearTimeout(id)
+    }
+  }, [linkEditMode, linkPopoverOpen])
+
+  const prevVisibleRef = useRef(isVisible)
+  useEffect(() => {
+    if (prevVisibleRef.current && !isVisible) {
+      setLinkPopoverOpen(false)
+      setLinkEditMode(false)
+    }
+    prevVisibleRef.current = isVisible
+  }, [isVisible])
 
   const applyColor = useCallback(
     (hex: string) => {
@@ -279,11 +330,101 @@ export default function LexicalToolbar() {
       <FormatButton label="Code" active={format.code} onClick={() => applyFormat('code')}>
         <code>&lt;/&gt;</code>
       </FormatButton>
-      <FormatButton label="Link" active={isLink} onClick={toggleLink}>
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-          <path d="M6 8l2-2m-1.5-1.5L8.25 2.75a1.77 1.77 0 012.5 0l.5.5a1.77 1.77 0 010 2.5L9.5 7.5M4.5 6.5L2.75 8.25a1.77 1.77 0 000 2.5l.5.5a1.77 1.77 0 002.5 0L7.5 9.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      </FormatButton>
+      <span className={styles.lexToolbarLinkWrap}>
+        <FormatButton label="Link" active={isLink || linkPopoverOpen} onClick={handleLinkClick}>
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+            <path d="M6 8l2-2m-1.5-1.5L8.25 2.75a1.77 1.77 0 012.5 0l.5.5a1.77 1.77 0 010 2.5L9.5 7.5M4.5 6.5L2.75 8.25a1.77 1.77 0 000 2.5l.5.5a1.77 1.77 0 002.5 0L7.5 9.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </FormatButton>
+
+        {linkPopoverOpen && (
+          <div
+            className={styles.lexLinkPopover}
+            onMouseDown={(e) => e.preventDefault()}
+          >
+            {linkEditMode ? (
+              <form
+                className={styles.lexLinkEditRow}
+                onSubmit={(e) => {
+                  e.preventDefault()
+                  commitLinkEdit()
+                }}
+              >
+                <input
+                  ref={linkInputRef}
+                  className={styles.lexLinkInput}
+                  type="url"
+                  placeholder="https://..."
+                  value={linkEditValue}
+                  onChange={(e) => setLinkEditValue(e.target.value)}
+                />
+                <button
+                  type="submit"
+                  className={styles.lexLinkConfirmBtn}
+                  aria-label="Apply link"
+                >
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                    <path d="M2.5 7.5l3 3 6-7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </button>
+              </form>
+            ) : (
+              <div className={styles.lexLinkPreviewRow}>
+                <a
+                  className={styles.lexLinkPreviewUrl}
+                  href={linkUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title={linkUrl}
+                >
+                  {linkUrl}
+                </a>
+                <Tooltip content="Edit URL">
+                  <button
+                    type="button"
+                    className={styles.lexLinkActionBtn}
+                    aria-label="Edit URL"
+                    onClick={() => {
+                      setLinkEditValue(linkUrl)
+                      setLinkEditMode(true)
+                    }}
+                  >
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                      <path d="M8.5 1.5l2 2M1 11l.7-2.8L8.5 1.5l2 2-6.8 6.7L1 11z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </button>
+                </Tooltip>
+                <Tooltip content="Open link">
+                  <a
+                    className={styles.lexLinkActionBtn}
+                    href={linkUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Open link in new tab"
+                  >
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                      <path d="M5 2H2.5A1.5 1.5 0 001 3.5v6A1.5 1.5 0 002.5 11h6A1.5 1.5 0 0010 9.5V7M7 1h4v4M11 1L5.5 6.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </a>
+                </Tooltip>
+                <Tooltip content="Remove link">
+                  <button
+                    type="button"
+                    className={[styles.lexLinkActionBtn, styles.lexLinkActionBtnDanger].join(' ')}
+                    aria-label="Remove link"
+                    onClick={removeLink}
+                  >
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                      <path d="M6 8l2-2m-1.5-1.5L8.25 2.75a1.77 1.77 0 012.5 0M4.5 6.5L2.75 8.25a1.77 1.77 0 000 2.5l.5.5a1.77 1.77 0 002.5 0L7.5 9.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                      <path d="M1 1l10 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                    </svg>
+                  </button>
+                </Tooltip>
+              </div>
+            )}
+          </div>
+        )}
+      </span>
 
       <span className={styles.lexToolbarSep} aria-hidden />
 

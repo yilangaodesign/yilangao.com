@@ -1467,8 +1467,9 @@ $accent-light: rgba($portfolio-accent-60, 0.06);
   border: 1px solid var(--portfolio-border-subtle);
   border-radius: $portfolio-radius-sm;
   position: absolute;
-  top: -#{$portfolio-spacer-2x};
-  left: 0;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -100%);
   z-index: var(--portfolio-z-dropdown);
   opacity: 0;
   pointer-events: none;
@@ -1583,6 +1584,7 @@ $accent-light: rgba($portfolio-accent-60, 0.06);
     color: var(--portfolio-text-primary);
     text-decoration: none;
     white-space: nowrap;
+    cursor: text;
     @include transition-fast;
 
     &::after {
@@ -1621,6 +1623,7 @@ $accent-light: rgba($portfolio-accent-60, 0.06);
   color: var(--portfolio-text-primary);
   text-decoration: none;
   white-space: nowrap;
+  cursor: text;
   @include transition-fast;
 
   &::after {
@@ -1737,6 +1740,126 @@ $accent-light: rgba($portfolio-accent-60, 0.06);
   width: 16px;
   height: 16px;
   border-radius: 50%;
+}
+
+/* ── Lexical Link Popover ── */
+
+.lexToolbarLinkWrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.lexLinkPopover {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--portfolio-surface-primary);
+  border: 1px solid var(--portfolio-border-subtle);
+  box-shadow: var(--portfolio-shadow-lg);
+  padding: $portfolio-spacer-utility-0-5x;
+  min-width: 260px;
+  max-width: 380px;
+  z-index: calc(var(--portfolio-z-dropdown) + 1);
+  animation: formatBarIn 120ms ease-out;
+}
+
+.lexLinkPreviewRow {
+  display: flex;
+  align-items: center;
+  gap: $portfolio-spacer-utility-0-5x;
+  padding: 2px;
+}
+
+.lexLinkPreviewUrl {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-geist-mono, monospace);
+  font-size: $portfolio-type-2xs;
+  color: var(--portfolio-text-secondary);
+  text-decoration: none;
+  padding: 2px 6px;
+  transition: color var(--portfolio-duration-fast) ease;
+
+  &:hover {
+    color: $accent;
+  }
+}
+
+.lexLinkActionBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: transparent;
+  color: var(--portfolio-text-tertiary);
+  cursor: pointer;
+  transition: background var(--portfolio-duration-fast) ease, color var(--portfolio-duration-fast) ease;
+  text-decoration: none;
+
+  &:hover {
+    background: var(--portfolio-surface-secondary);
+    color: var(--portfolio-text-primary);
+  }
+}
+
+.lexLinkActionBtnDanger {
+  &:hover {
+    background: var(--portfolio-surface-negative-subtle);
+    color: var(--portfolio-text-error);
+  }
+}
+
+.lexLinkEditRow {
+  display: flex;
+  align-items: center;
+  gap: $portfolio-spacer-utility-0-5x;
+  padding: 2px;
+}
+
+.lexLinkInput {
+  flex: 1;
+  min-width: 0;
+  padding: 4px 8px;
+  border: 1px solid var(--portfolio-border-subtle);
+  background: var(--portfolio-surface-primary);
+  color: var(--portfolio-text-primary);
+  font-family: var(--font-geist-mono, monospace);
+  font-size: $portfolio-type-2xs;
+  outline: none;
+  transition: border-color var(--portfolio-duration-fast) ease;
+
+  &:focus {
+    border-color: $accent;
+  }
+
+  &::placeholder {
+    color: var(--portfolio-text-placeholder);
+  }
+}
+
+.lexLinkConfirmBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border: none;
+  background: $accent;
+  color: var(--portfolio-text-always-light-bold);
+  cursor: pointer;
+  transition: background var(--portfolio-duration-fast) ease;
+
+  &:hover {
+    background: $portfolio-accent-70;
+  }
 }
 
 /* ── Toast surface (inline-edit) ── */

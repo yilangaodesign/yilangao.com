@@ -9,6 +9,7 @@ import { ListNode, ListItemNode } from '@lexical/list'
 import { LinkNode, AutoLinkNode } from '@lexical/link'
 import { $getRoot } from 'lexical'
 import type { SerializedEditorState } from 'lexical'
+import { normalizePayloadLinks, denormalizePayloadLinks } from './normalize-lexical-links'
 
 const EDITOR_NODES = [HeadingNode, QuoteNode, ListNode, ListItemNode, LinkNode, AutoLinkNode]
 
@@ -29,7 +30,7 @@ export function markdownToLexical(md: string): SerializedEditorState {
     },
     { discrete: true },
   )
-  return editor.getEditorState().toJSON()
+  return normalizePayloadLinks(editor.getEditorState().toJSON())
 }
 
 /**
@@ -42,7 +43,8 @@ export function lexicalToMarkdown(json: unknown): string {
   const editor = headlessEditor()
   try {
     const data = 'root' in json ? json : { root: json }
-    const state = editor.parseEditorState(data as SerializedEditorState)
+    const normalized = denormalizePayloadLinks(data as SerializedEditorState)
+    const state = editor.parseEditorState(normalized)
     return state.read(() => $convertToMarkdownString(TRANSFORMERS))
   } catch {
     return ''

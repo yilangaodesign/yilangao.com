@@ -13,7 +13,6 @@ import { HeadingNode, QuoteNode } from '@lexical/rich-text'
 import { ListNode, ListItemNode } from '@lexical/list'
 import { LinkNode, AutoLinkNode } from '@lexical/link'
 import { LinkPlugin } from '@lexical/react/LexicalLinkPlugin'
-import { ClickableLinkPlugin } from '@lexical/react/LexicalClickableLinkPlugin'
 import { CodeNode } from '@lexical/code'
 import {
   BLUR_COMMAND,
@@ -28,6 +27,7 @@ import {
 import type { EditorState, SerializedEditorState } from 'lexical'
 import type { BlockNavCallbacks } from './useBlockKeyboardNav'
 import { updateCollectionField } from './api'
+import { normalizePayloadLinks, denormalizePayloadLinks } from '@/lib/normalize-lexical-links'
 import type { ApiTarget } from './types'
 import LexicalToolbar from './LexicalToolbar'
 import styles from './inline-edit.module.scss'
@@ -66,7 +66,7 @@ function AutoFocusPlugin({ shouldFocus }: { shouldFocus: boolean }) {
 
 async function save(target: ApiTarget, fieldPath: string, state: EditorState) {
   if (target.type !== 'collection') return
-  const json = state.toJSON()
+  const json = normalizePayloadLinks(state.toJSON())
 
   const arrayMatch = fieldPath.match(/^(\w+)\.(\d+)\.(.+)$/)
   if (arrayMatch) {
@@ -291,7 +291,7 @@ export default function LexicalBlockEditor({
     namespace: `block-${fieldPath}`,
     theme: editorTheme(),
     nodes: EDITOR_NODES,
-    editorState: initialState ? JSON.stringify(initialState) : undefined,
+    editorState: initialState ? JSON.stringify(denormalizePayloadLinks(initialState)) : undefined,
     onError: (error: Error) => {
       console.error('[LexicalBlockEditor]', error)
     },
@@ -321,7 +321,6 @@ export default function LexicalBlockEditor({
           ErrorBoundary={LexicalErrorBoundary}
         />
         <LinkPlugin />
-        <ClickableLinkPlugin />
         <HistoryPlugin />
         <OnChangePlugin onChange={handleChange} />
         <MarkdownShortcutsPlugin />
