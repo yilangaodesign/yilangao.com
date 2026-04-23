@@ -11,6 +11,32 @@
 
 ---
 
+### FB-172: Hide homepage "Essay" format badge (temporary)
+
+**Date:** 2026-04-23
+
+**Issue:** User asked to hide the neutral minimal `Essay` badge on the home case-study list for now.
+
+**Decision:** Introduced `SHOW_ESSAY_FORMAT_BADGE_ON_HOME` (currently `false`) in `HomeClient.tsx`. Section dividers for essay entries (`needsDivider`) unchanged. Set flag to `true` to restore the badge without re-adding markup.
+
+**Files:** `src/app/(frontend)/(site)/HomeClient.tsx`
+
+**No cross-category note.**
+
+---
+
+### FB-171: MaturityTimeline toggle buttons too small to read
+
+**Date:** 2026-04-23
+
+**Issue:** "By severity" / "By domain" toggle buttons were illegible at `$portfolio-type-xs` with `$portfolio-spacer-0-5x $portfolio-spacer-1-5x` padding — too small to read during on-screen navigation.
+
+**Decision:** Bumped font-size to `$portfolio-type-sm` and padding to `$portfolio-spacer-1x $portfolio-spacer-2x` in `maturity-timeline.module.scss`. No structural changes.
+
+**No cross-category note.**
+
+---
+
 ### FB-170: ETRO essay page - widen single-column content measure
 
 **Date:** 2026-04-22
