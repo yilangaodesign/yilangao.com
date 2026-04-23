@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useMemo, useRef } from 'react'
+import { getNearestEditorFromDOMNode } from 'lexical'
 
 export interface BlockNavCallbacks {
   onBackspaceAtStart: (blockIndex: number, isEmpty: boolean) => void
@@ -8,25 +9,43 @@ export interface BlockNavCallbacks {
   onArrowDown: (blockIndex: number) => void
 }
 
+/**
+ * Lexical freezes committed RangeSelection anchor/focus Points (`Object.freeze`).
+ * If we manipulate `window.getSelection()` while the previous editor is still
+ * reconciling selection (e.g. immediately after a Lexical command returns true),
+ * Lexical can try to write into those frozen Points → `Cannot assign to read only
+ * property 'key' of object '#<Point>'`. Blur the Lexical surface first, deferred
+ * past the current stack so the outgoing editor finishes its update. See ENG-194.
+ */
+function blurActiveLexicalSurface(): void {
+  const el = document.activeElement
+  if (!el || !(el instanceof HTMLElement)) return
+  const editor = getNearestEditorFromDOMNode(el)
+  editor?.blur()
+}
+
 function focusBlock(index: number, position: 'start' | 'end' = 'start') {
-  requestAnimationFrame(() => {
-    const wrapper = document.querySelector(`[data-block-index="${index}"]`)
-    if (!wrapper) return
+  queueMicrotask(() => {
+    blurActiveLexicalSurface()
+    requestAnimationFrame(() => {
+      const wrapper = document.querySelector(`[data-block-index="${index}"]`)
+      if (!wrapper) return
 
-    const editable =
-      wrapper.querySelector<HTMLElement>('[contenteditable="true"]') ??
-      wrapper.querySelector<HTMLElement>('[tabindex]')
+      const editable =
+        wrapper.querySelector<HTMLElement>('[contenteditable="true"]') ??
+        wrapper.querySelector<HTMLElement>('[tabindex]')
 
-    if (editable) {
-      editable.focus()
-      if (position === 'end' && editable.isContentEditable) {
-        const sel = window.getSelection()
-        if (sel) {
-          sel.selectAllChildren(editable)
-          sel.collapseToEnd()
+      if (editable) {
+        editable.focus()
+        if (position === 'end' && editable.isContentEditable) {
+          const sel = window.getSelection()
+          if (sel) {
+            sel.selectAllChildren(editable)
+            sel.collapseToEnd()
+          }
         }
       }
-    }
+    })
   })
 }
 

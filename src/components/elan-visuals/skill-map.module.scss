@@ -30,7 +30,6 @@
   gap: $portfolio-spacer-1-5x;
   padding: $portfolio-spacer-2x;
   background: $portfolio-surface-neutral-subtle;
-  border-radius: $portfolio-radius-lg;
   border: 1px solid $portfolio-border-neutral-minimal;
   overflow-x: auto;
 }
@@ -69,7 +68,6 @@
   padding: $portfolio-spacer-0-5x $portfolio-spacer-0-5x;
   background: $portfolio-neutral-00;
   border: 1px solid $portfolio-border-neutral-minimal;
-  border-radius: $portfolio-radius-sm;
   cursor: pointer;
   transition:
     border-color $portfolio-duration-fast $portfolio-easing-standard,
@@ -121,7 +119,6 @@
   position: relative;
   width: 100%;
   aspect-ratio: 16 / 9;
-  border-radius: $portfolio-radius-md;
   overflow: hidden;
   border: 1px solid $portfolio-border-neutral-minimal;
   background: $portfolio-neutral-10;
@@ -180,7 +177,6 @@
   padding: $portfolio-spacer-0-5x $portfolio-spacer-1x;
   background: $portfolio-surface-inverse-bold;
   color: $portfolio-text-inverse-bold;
-  border-radius: $portfolio-radius-sm;
   font-size: $portfolio-type-2xs;
   line-height: $portfolio-leading-normal;
   pointer-events: none;
@@ -239,7 +235,6 @@
 .legendDot {
   width: 10px;
   height: 10px;
-  border-radius: $portfolio-radius-xs;
 }
 
 .legendDotDesign {

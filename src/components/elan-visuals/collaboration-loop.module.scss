@@ -8,7 +8,6 @@
   gap: $portfolio-spacer-1-5x;
   padding: $portfolio-spacer-2x $portfolio-spacer-3x;
   background: $portfolio-surface-neutral-subtle;
-  border-radius: $portfolio-radius-lg;
   border: 1px solid $portfolio-border-neutral-minimal;
 }
 
@@ -113,7 +112,6 @@
   gap: $portfolio-spacer-1x;
   padding: $portfolio-spacer-2x;
   background: $portfolio-neutral-00;
-  border-radius: $portfolio-radius-md;
   border: 1px solid $portfolio-border-neutral-minimal;
 }
 
@@ -157,7 +155,6 @@
   color: $portfolio-accent-70;
   background: $portfolio-accent-10;
   padding: 2px $portfolio-spacer-0-5x;
-  border-radius: $portfolio-radius-sm;
   white-space: nowrap;
 }
 
@@ -179,7 +176,6 @@
 .vizArea {
   padding: $portfolio-spacer-1-5x;
   background: $portfolio-neutral-10;
-  border-radius: $portfolio-radius-md;
   border: 1px solid $portfolio-border-neutral-minimal;
   min-height: 160px;
   display: flex;
@@ -226,7 +222,6 @@
   color: $portfolio-text-neutral-regular;
   background: $portfolio-neutral-00;
   border: 1px solid $portfolio-border-neutral-minimal;
-  border-radius: $portfolio-radius-sm;
   padding: $portfolio-spacer-0-5x $portfolio-spacer-1x;
 }
 
@@ -261,7 +256,6 @@
   font-family: $portfolio-font-mono;
   color: $portfolio-text-neutral-minimal;
   padding: 3px $portfolio-spacer-0-5x;
-  border-radius: $portfolio-radius-xs;
   background: $portfolio-neutral-00;
   border: 1px solid transparent;
 }
@@ -294,7 +288,6 @@
   padding: $portfolio-spacer-0-5x $portfolio-spacer-1x;
   background: $portfolio-accent-10;
   border: 1px solid $portfolio-accent-30;
-  border-radius: $portfolio-radius-sm;
   flex-shrink: 0;
 }
 
@@ -327,7 +320,6 @@
   color: $portfolio-text-neutral-subtle;
   padding: $portfolio-spacer-0-25x $portfolio-spacer-0-5x;
   background: $portfolio-neutral-20;
-  border-radius: $portfolio-radius-sm $portfolio-radius-sm 0 0;
 }
 
 .vizDocCount {
@@ -343,7 +335,6 @@
   background: $portfolio-neutral-00;
   border: 1px solid $portfolio-border-neutral-minimal;
   border-top: none;
-  border-radius: 0 0 $portfolio-radius-sm $portfolio-radius-sm;
   overflow: hidden;
 }
 
@@ -400,7 +391,6 @@
   color: $portfolio-orange-70;
   background: $portfolio-orange-20;
   padding: 1px 6px;
-  border-radius: $portfolio-radius-xs;
   flex-shrink: 0;
 }
 
@@ -428,7 +418,6 @@
   padding: $portfolio-spacer-0-5x $portfolio-spacer-0-25x;
   background: $portfolio-neutral-00;
   border: 1px solid $portfolio-border-neutral-minimal;
-  border-radius: $portfolio-radius-sm;
 }
 
 .vizRoundsItemFinal {
@@ -495,7 +484,6 @@
   padding: $portfolio-spacer-0-25x $portfolio-spacer-1x;
   background: $portfolio-orange-10;
   border: 1px solid $portfolio-orange-30;
-  border-radius: $portfolio-radius-sm;
 }
 
 // ── Viz 5: State table ───────────────────────────────────────────────────────
@@ -512,7 +500,6 @@
   color: $portfolio-text-neutral-subtle;
   padding: $portfolio-spacer-0-25x $portfolio-spacer-0-5x;
   background: $portfolio-neutral-20;
-  border-radius: $portfolio-radius-sm $portfolio-radius-sm 0 0;
 }
 
 .vizStateGrid {
@@ -521,7 +508,6 @@
   background: $portfolio-neutral-00;
   border: 1px solid $portfolio-border-neutral-minimal;
   border-top: none;
-  border-radius: 0 0 $portfolio-radius-sm $portfolio-radius-sm;
   overflow: hidden;
 }
 
@@ -567,7 +553,6 @@
   color: $portfolio-text-neutral-subtle;
   padding: $portfolio-spacer-0-25x $portfolio-spacer-0-5x;
   background: $portfolio-neutral-20;
-  border-radius: $portfolio-radius-sm $portfolio-radius-sm 0 0;
 }
 
 .vizLogBody {
@@ -577,7 +562,6 @@
   background: $portfolio-neutral-00;
   border: 1px solid $portfolio-border-neutral-minimal;
   border-top: none;
-  border-radius: 0 0 $portfolio-radius-sm $portfolio-radius-sm;
   overflow: hidden;
 }
 
@@ -625,7 +609,6 @@
   color: $portfolio-accent-70;
   background: $portfolio-accent-20;
   padding: 1px 6px;
-  border-radius: $portfolio-radius-xs;
   flex-shrink: 0;
 }
 
@@ -646,7 +629,6 @@
   padding: $portfolio-spacer-0-5x $portfolio-spacer-1x;
   background: $portfolio-neutral-00;
   border: 1px solid $portfolio-accent-30;
-  border-radius: $portfolio-radius-sm;
 }
 
 .vizDualAPHeader {
@@ -668,7 +650,6 @@
   color: $portfolio-text-neutral-subtle;
   background: $portfolio-neutral-10;
   padding: 1px 6px;
-  border-radius: $portfolio-radius-xs;
 }
 
 .vizDualAPName {
@@ -696,7 +677,6 @@
   padding: 1px 6px;
   background: $portfolio-neutral-10;
   border: 1px solid $portfolio-border-neutral-minimal;
-  border-radius: $portfolio-radius-xs;
   color: $portfolio-text-neutral-regular;
 }
 
@@ -780,7 +760,6 @@
   background: $portfolio-neutral-00;
   border: 1px solid $portfolio-accent-30;
   border-left: 3px solid $portfolio-accent-60;
-  border-radius: $portfolio-radius-sm;
 }
 
 .vizGuardrailRuleHeader {
@@ -806,7 +785,13 @@
   border-top: 1px solid $portfolio-border-neutral-minimal;
 }
 
-.transportControls {
+.transportLeft {
+  display: flex;
+  align-items: center;
+  gap: $portfolio-spacer-0-5x;
+}
+
+.transportRight {
   display: flex;
   align-items: center;
   gap: $portfolio-spacer-0-25x;

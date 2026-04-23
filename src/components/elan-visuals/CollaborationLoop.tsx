@@ -525,8 +525,7 @@ export default function CollaborationLoop() {
 
       {/* Transport bar */}
       <div className={styles.transport}>
-        <div className={styles.transportControls}>
-          <button className={styles.transportBtn} onClick={handlePrev} aria-label="Previous step">{"\u2039"}</button>
+        <div className={styles.transportLeft}>
           <button
             className={`${styles.transportBtn} ${styles.transportPlayBtn}`}
             onClick={() => setPlaying((p) => !p)}
@@ -534,58 +533,61 @@ export default function CollaborationLoop() {
           >
             {playing ? "\u275A\u275A" : "\u25B6"}
           </button>
-          <button className={styles.transportBtn} onClick={handleNext} aria-label="Next step">{"\u203A"}</button>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                className={styles.transportSpeedTrigger}
+                aria-label={`Playback speed: ${SPEED_OPTIONS[speedIdx].label}`}
+              >
+                <span className={styles.transportSpeedTriggerLabel}>
+                  {SPEED_OPTIONS[speedIdx].label}
+                </span>
+                <svg
+                  width="10"
+                  height="10"
+                  viewBox="0 0 10 10"
+                  fill="none"
+                  aria-hidden="true"
+                  className={styles.transportSpeedCaret}
+                >
+                  <path
+                    d="M2 3.5L5 6.5L8 3.5"
+                    stroke="currentColor"
+                    strokeWidth="1.2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" sideOffset={6} size="sm">
+              {SPEED_OPTIONS.map((opt, i) => (
+                <DropdownMenuItem
+                  key={opt.label}
+                  onSelect={() => setSpeedIdx(i)}
+                  trailing={
+                    i === speedIdx ? (
+                      <span className={styles.transportSpeedActiveMark} aria-hidden="true">
+                        {"\u2713"}
+                      </span>
+                    ) : null
+                  }
+                >
+                  {opt.label}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
-        <span className={styles.transportCounter}>
-          {activeStep + 1} / {STEPS.length}
-        </span>
-
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button
-              className={styles.transportSpeedTrigger}
-              aria-label={`Playback speed: ${SPEED_OPTIONS[speedIdx].label}`}
-            >
-              <span className={styles.transportSpeedTriggerLabel}>
-                {SPEED_OPTIONS[speedIdx].label}
-              </span>
-              <svg
-                width="10"
-                height="10"
-                viewBox="0 0 10 10"
-                fill="none"
-                aria-hidden="true"
-                className={styles.transportSpeedCaret}
-              >
-                <path
-                  d="M2 3.5L5 6.5L8 3.5"
-                  stroke="currentColor"
-                  strokeWidth="1.2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" sideOffset={6} size="sm">
-            {SPEED_OPTIONS.map((opt, i) => (
-              <DropdownMenuItem
-                key={opt.label}
-                onSelect={() => setSpeedIdx(i)}
-                trailing={
-                  i === speedIdx ? (
-                    <span className={styles.transportSpeedActiveMark} aria-hidden="true">
-                      {"\u2713"}
-                    </span>
-                  ) : null
-                }
-              >
-                {opt.label}
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className={styles.transportRight}>
+          <button className={styles.transportBtn} onClick={handlePrev} aria-label="Previous step">{"\u2039"}</button>
+          <span className={styles.transportCounter}>
+            {activeStep + 1} / {STEPS.length}
+          </span>
+          <button className={styles.transportBtn} onClick={handleNext} aria-label="Next step">{"\u203A"}</button>
+        </div>
       </div>
     </div>
   );
