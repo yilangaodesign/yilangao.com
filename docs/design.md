@@ -199,7 +199,7 @@ When a design system primitive exists for a UI role (for example `Avatar`), comp
 | Interaction proximity (response near trigger) | 1 | High |
 | Interaction friction (click vs. hover for exploration) | 1 | High |
 | Corner radius too large | 1 | High |
-| Color philosophy / palette governance | 1 | High |
+| Color philosophy / palette governance | 2 | High — FB-178: CollaborationLoop overused Lumen accent for decorative elements. 22 usages neutralized; accent preserved only on status tags and interactive controls. Lumen Scarcity Principle applies to embedded visuals, not just page chrome. |
 | Content navigation policy (ScrollSpy threshold, scroll offset, auto-contrast label) | 3 | High — FB-155: ScrollSpy active label portaled to `document.body` with `mix-blend-mode: difference` + `color: #fff` so it auto-inverts against any backdrop (dark hero, photographic section, colored block). See AP-069. |
 | Portfolio grid density / scannability | 1 | High |
 | Homepage IA / nav consistency / mobile density | 1 | High |

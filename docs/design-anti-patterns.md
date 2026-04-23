@@ -4,7 +4,7 @@
 >
 > **Who reads this:** AI agents before making UI changes — scan for relevant anti-patterns.
 > **Who writes this:** AI agents when a feedback cycle reveals a new anti-pattern.
-> **Last updated:** 2026-04-21 (AP-054 amended a second time same day — after the fourth same-session complaint (FB-163 / ENG-187) that ENG-186's 2px-base-plus-ring rendered resting inputs as over-heavy 2px borders and engaged inputs as compound 3px rims. Rewrote the Correct Alternative with an explicit "Structural rule vs value choice" block: AP-054 binds CHANGE (no state-to-state `border-width` flip, ever) but not VALUE (the constant is a pure design choice, free within the structural rule). Default base for inputs is now 1px via `$portfolio-border-width-thin` — engaged-state box-shadow ring adds +1px for a solid 2px visual rim. Implementation template updated to use `$portfolio-border-width-thin`. Rejection chronology extended to four failed iterations + one standing: FB-086 gapped ring → FB-088 padding comp → ENG-136 color-only/2px → ENG-186 two-axis/2px → ENG-187 two-axis/1px (current canonical). Frustration count 5 → 6 rounds. This fifth amendment exists because two separate engineering iterations (ENG-136 and ENG-186) misread the rule as binding the base value, so the fix restatement is now explicit on where the rule stops.) Prior: AP-070 (framer-motion `x`/`y`/`scale`/`rotate` on an element with a base CSS `transform` — the motion library writes an inline `transform` that silently overwrites the CSS rule. Fix is to split the static and animated transforms across two elements, or use `transformTemplate` to compose them on the same element. Default: split.) Prior: AP-069 (`mix-blend-mode` applied inside a fixed-position or otherwise stacking-context-creating ancestor — blend isolates to that context's interior and never reaches the document backdrop. Fix is to portal to `document.body`.) Prior: AP-068 (Relying on grid track minimum alone to prevent text wrap in a one-line-per-item list).
+> **Last updated:** 2026-04-23 (AP-071: Brand accent as general-purpose highlight in embedded visuals — using `$portfolio-accent-*` for decorative differentiation in component visualizations dilutes Lumen's scarcity signal. Neutral weight hierarchy is the correct tool for structural emphasis. FB-178.) Prior: 2026-04-21 (AP-054 amended a second time same day — after the fourth same-session complaint (FB-163 / ENG-187) that ENG-186's 2px-base-plus-ring rendered resting inputs as over-heavy 2px borders and engaged inputs as compound 3px rims. Rewrote the Correct Alternative with an explicit "Structural rule vs value choice" block: AP-054 binds CHANGE (no state-to-state `border-width` flip, ever) but not VALUE (the constant is a pure design choice, free within the structural rule). Default base for inputs is now 1px via `$portfolio-border-width-thin` — engaged-state box-shadow ring adds +1px for a solid 2px visual rim. Implementation template updated to use `$portfolio-border-width-thin`. Rejection chronology extended to four failed iterations + one standing: FB-086 gapped ring → FB-088 padding comp → ENG-136 color-only/2px → ENG-186 two-axis/2px → ENG-187 two-axis/1px (current canonical). Frustration count 5 → 6 rounds. This fifth amendment exists because two separate engineering iterations (ENG-136 and ENG-186) misread the rule as binding the base value, so the fix restatement is now explicit on where the rule stops.) Prior: AP-070 (framer-motion `x`/`y`/`scale`/`rotate` on an element with a base CSS `transform` — the motion library writes an inline `transform` that silently overwrites the CSS rule. Fix is to split the static and animated transforms across two elements, or use `transformTemplate` to compose them on the same element. Default: split.) Prior: AP-069 (`mix-blend-mode` applied inside a fixed-position or otherwise stacking-context-creating ancestor — blend isolates to that context's interior and never reaches the document backdrop. Fix is to portal to `document.body`.) Prior: AP-068 (Relying on grid track minimum alone to prevent text wrap in a one-line-per-item list).
 
 ---
 
@@ -18,10 +18,10 @@
 | Theming & Dark Mode | AP-042, AP-043, AP-044, AP-047, AP-061 | 5 | 5 |
 | Interaction & Pointer Behavior | AP-011, AP-012, AP-022, AP-025, AP-035 | 5 | 5 |
 | Navigation & Menus | AP-014, AP-015, AP-016, AP-029, AP-046, AP-049, AP-066 | 7 | 7 |
-| Visual Hierarchy & Affordances | AP-010, AP-017, AP-019, AP-026, AP-030, AP-032, AP-039, AP-040, AP-041, AP-048‡, AP-050, AP-051, AP-052, AP-054, AP-057, AP-060 | 16 | 16 |
+| Visual Hierarchy & Affordances | AP-010, AP-017, AP-019, AP-026, AP-030, AP-032, AP-039, AP-040, AP-041, AP-048‡, AP-050, AP-051, AP-052, AP-054, AP-057, AP-060, AP-071 | 17 | 17 |
 | Form & Input UX | AP-023, AP-024, AP-028, AP-036, AP-064, AP-065 | 6 | 6 |
 | Admin UI Patterns | AP-034, AP-037 | 2 | 2 |
-| **Total** | | **63** | **63** |
+| **Total** | | **64** | **64** |
 
 > **†** AP-048 "Independent Padding Decisions Across Adjacent Panels" (spacing entry)
 > **‡** AP-048 "Incremental State-by-State Implementation Without a Holistic Model" (state modeling entry)
@@ -1294,3 +1294,27 @@ return (
 **Detection heuristic:** if a `motion.*` element has both a `className` that includes `transform:` in its CSS and an `animate` prop with any of `x`, `y`, `scale`, `rotate`, `skewX`, `skewY` — the CSS transform is dead code.
 
 **Incident:** FB-156 (2026-04-20) — ScrollSpy portaled highlight label had `transform: translate(-100%, -50%)` in CSS and `animate={{ x, opacity }}` on the same `motion.span`. Label ended up anchored at its top-left corner on the notch (rather than its right edge on the notch's left gutter), extending past the viewport. First-attempt fix (anchor swap only) had no visible effect because the transform was still being overwritten. User reported the same bug twice before the real root cause was identified.
+
+---
+
+### AP-071: Brand Accent as General-Purpose Highlight in Embedded Visuals
+
+**Status: ACTIVE**
+
+**Trigger:** A component or embedded visualization uses `$portfolio-accent-*` tokens for decorative differentiation (progress tracks, completed-state dots, file tags, card borders, section headers, timeline highlights) rather than limiting accent to interactive affordances and status indicators.
+
+**Why it's wrong:** The Lumen brand accent (blue-violet) is scoped to exactly two roles on the portfolio: the `yg` logo mark and interactive affordances (buttons, focus rings, form controls). Using it as a generic "make this stand out" color dilutes its signal. When every structural element in a visualization is blue, nothing reads as interactive or brand-significant - the accent becomes wallpaper. This violates the Lumen Scarcity Principle (branding.md §9.4): Lumen carries weight precisely because it's rare.
+
+**Correct alternative:** Use the neutral weight hierarchy for decorative differentiation in embedded visuals:
+- **Active/current state:** `$portfolio-neutral-80` bg + `$portfolio-neutral-00` text (high-contrast neutral)
+- **Completed state:** `$portfolio-neutral-50` border + `$portfolio-neutral-10` bg + `$portfolio-neutral-70` text
+- **Tinted backgrounds:** `$portfolio-neutral-10` (not `$portfolio-accent-10`)
+- **Structural borders:** `$portfolio-neutral-30` or `$portfolio-border-neutral-minimal`
+- **Emphasized text:** `$portfolio-text-neutral-bold` (not `$portfolio-accent-70`)
+- **Decorative lines/arrows:** `$portfolio-neutral-50`/`$portfolio-neutral-60`
+
+Reserve `$portfolio-accent-*` in embedded visuals for: status badges ("NEW", "UPDATED"), interactive transport controls (play/pause, speed picker), and genuinely clickable affordances.
+
+**Frustration caused:** 1 round. User flagged the entire CollaborationLoop section as "abusing the brand color."
+
+**Incident:** FB-178 (2026-04-23) — CollaborationLoop component had 26 `$portfolio-accent-*` usages across step dots, track fills, file tags, routing items, timeline cards, guardrail meters, and rule borders. 22 converted to neutral; 4 preserved on status tags and interactive controls.

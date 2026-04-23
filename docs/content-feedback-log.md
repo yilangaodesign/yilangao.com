@@ -1297,6 +1297,20 @@ Applied T11/T13/T15 techniques mechanically. Over-indexed on "clever contrarian"
 
 ---
 
+#### CF-025: "The wording should be like 'how I built that system'"
+
+**Intent:** User wants the Cognition company callout note to accurately represent their relationship to the work - they built a similar system, not the Cognition system itself.
+
+**Root Cause:** The original note said "This case study is about building that system" which implies the author rebuilt Cognition's system. The author built a parallel/similar system (the Elan agent knowledge framework), not a direct replica.
+
+**Resolution:** Changed "This case study is about building that system" to "This case study is about how I built a similar system" in the Cognition company record's `caseStudyNotes` for the `elan-design-system` project (updated via Payload API, company id 4).
+
+**Cross-category note:** Also documented as FB-087 (design) for a padding fix on the same callout element.
+
+**Pattern extracted:** When writing company-specific relevance notes, be precise about the relationship between the author's work and the target company's problem. "I built that system" = direct. "I built a similar system" = parallel. "I solved the same problem" = convergent. Getting this wrong undermines credibility with the very audience the note is tailored for.
+
+---
+
 ## Entry Template
 
 ```markdown
