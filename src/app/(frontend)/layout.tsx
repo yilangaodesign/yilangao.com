@@ -33,6 +33,9 @@ export const metadata: Metadata = {
   title: "Yilan Gao — UX Designer",
   description: "Portfolio of Yilan Gao, UX Designer crafting thoughtful digital experiences.",
   generator: `${website.name} ${website.release.version} (${elan.name} ${elan.release.version})`,
+  icons: {
+    icon: "/icon.svg",
+  },
 };
 
 const fontVariables = [
