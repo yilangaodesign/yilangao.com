@@ -4,7 +4,26 @@
 >
 > **Who reads this:** AI agents when the `ship-it` skill is activated — scan recent entries for recurring pitfalls before starting a new release.
 > **Who writes this:** AI agents after each ship-it run via the Post-Release Audit protocol in `ship-it/SKILL.md`.
-> **Last updated:** 2026-04-23 (REL-017: Élan 2.11.5, yilangao.com 1.3.5, ASCII Art Studio 0.6.7)
+> **Last updated:** 2026-04-23 (REL-018: Élan 2.11.6, yilangao.com 1.3.6, ASCII Art Studio 0.6.8)
+
+---
+
+## REL-018 — Élan 2.11.6, yilangao.com 1.3.6, ASCII Art Studio 0.6.8 (2026-04-23)
+
+**Scope:** 23 files across 3 dependency-ordered layer commits (L0 config ×4, L1 docs ×12, L8 frontend ×7) + 1 release commit + 1 dev-patch-bump commit. Layers 2-7, 9-10 empty.
+**Semver:** Patch for all three apps. Élan 2.11.6: personalization badge on home page, Élan headline rewrite, fallback route rename (unknown → welcome), session re-auth fix. yilangao.com 1.3.6: same feature set. ASCII Art Studio 0.6.8: manifest sync only.
+**Previous release:** Élan 2.11.5, yilangao.com 1.3.5, ASCII Art Studio 0.6.7
+
+**Incidents during release:** None. Clean run — all three build gates passed on first attempt.
+
+**Build gate:** Playground ~27s (including token sync prebuild), main site ~60s, ASCII tool ~15s.
+
+**Post-deploy verification:** `vercel ls --prod` (default linked project `yilangao-design-system`) showed latest production deployment Ready within 4m of the `main` push. Portfolio project (`yilangao-portfolio`) deploys from the same GitHub `main` integration.
+
+**Layer classification notes:**
+- L0: Agent skills (`boot-up`, `password-gate`), `architecture.md`, `deployment.md` — all renaming `unknown` → `welcome`.
+- L1: Content feedback (CFB-042 Élan headline rewrite), design feedback (FB-176/177 personalization badge + Lumen scarcity), engineering feedback (ENG-202/203 session identity), branding §9, portfolio coherence manifest, personal-voice T10 broadening.
+- L8: `HomeClient.tsx` (personalization badge replaces dead essay badge), `page.module.scss` (renamed class), `page.tsx` (server-side personalization data fetch), `actions.ts` + `page.tsx` (session slug rename), `case-study-intro-headline.ts` (Élan headline), `proxy.ts` (fallback route rename).
 
 ---
 
