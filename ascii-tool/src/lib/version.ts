@@ -4,7 +4,7 @@
  */
 export const asciiStudio = {
   name: "ASCII Art Studio",
-  version: "0.6.6",
+  version: "0.6.7",
   release: {
     version: "0.6.6",
     name: "ASCII Art Studio 0.6.6",
