@@ -4,7 +4,26 @@
 >
 > **Who reads this:** AI agents when the `ship-it` skill is activated — scan recent entries for recurring pitfalls before starting a new release.
 > **Who writes this:** AI agents after each ship-it run via the Post-Release Audit protocol in `ship-it/SKILL.md`.
-> **Last updated:** 2026-04-23 (REL-016: Élan 2.11.4, yilangao.com 1.3.4, ASCII Art Studio 0.6.6)
+> **Last updated:** 2026-04-23 (REL-017: Élan 2.11.5, yilangao.com 1.3.5, ASCII Art Studio 0.6.7)
+
+---
+
+## REL-017 — Élan 2.11.5, yilangao.com 1.3.5, ASCII Art Studio 0.6.7 (2026-04-23)
+
+**Scope:** 9 files across 3 dependency-ordered layer commits (L1 docs ×2, L7 site components ×2, L8 frontend pages ×5) + 1 release commit + 1 dev-patch-bump commit. Layers 0, 2-6, 9-10 empty.
+**Semver:** Patch for all three apps. Élan 2.11.5: CollaborationLoop transport strip spacing (FB-175), SkillMap min-width overflow fix. yilangao.com 1.3.5: brand favicon SVG replaces default Vercel favicon.ico, explicit icons metadata in layout. ASCII Art Studio 0.6.7: manifest sync only.
+**Previous release:** Élan 2.11.4, yilangao.com 1.3.4, ASCII Art Studio 0.6.6
+
+**Incidents during release:** None. Clean run — all three build gates passed on first attempt.
+
+**Build gate:** Playground ~33s (including token sync prebuild), main site ~41s, ASCII tool ~23s.
+
+**Post-deploy verification:** `vercel ls --prod` (default linked project `yilangao-design-system`) showed latest production deployment Ready within 3m of the `main` push. Portfolio project (`yilangao-portfolio`) deploys from the same GitHub `main` integration.
+
+**Layer classification notes:**
+- L1: `docs/design-feedback-log.md` (FB-175), `docs/engineering-feedback-log.md` (ENG-198).
+- L7: `collaboration-loop.module.scss` (transport gaps widened to `1x`), `skill-map.module.scss` (`min-width: 120px` → `min-width: 0`).
+- L8: `favicon.ico` ×2 (deleted), `icon.svg` ×2 (new brand SVG), `layout.tsx` (icons metadata).
 
 ---
 
