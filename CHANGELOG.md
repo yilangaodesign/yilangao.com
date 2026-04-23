@@ -4,6 +4,28 @@ All notable changes to the Élan design system are documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.11.6] — 2026-04-23
+
+Patch release: "for {Company}" personalization badge on home page, Élan headline rewrite, fallback route rename, and session re-auth fix.
+
+### Added
+
+- **yilangao.com**: "for {Company}" personalization badge on home page case study list — shows when the visitor has an authenticated company session with notes for that project (FB-176/177).
+
+### Changed
+
+- **yilangao.com**: Élan case study headline changed from "You're looking at the wrong part" to "Harnessed my code production - 40 sessions in." (CFB-042).
+- **yilangao.com**: Fallback login route renamed from `/for/unknown` to `/for/welcome` across proxy, actions, and login page.
+
+### Fixed
+
+- **yilangao.com**: Login page session redirect now checks identity match (`existingSession === company`) instead of just presence, allowing re-auth when the session is for a different company (ENG-203 / EAP-118).
+
+### Released with this checkpoint
+
+- **yilangao.com** 1.3.6 — personalization badge, headline rewrite, route rename, session fix
+- **ASCII Art Studio** 0.6.8 — release sync only (no app code changes)
+
 ## [2.11.5] — 2026-04-23
 
 Patch release: CollaborationLoop transport spacing, SkillMap overflow fix, and brand favicon replacement.
