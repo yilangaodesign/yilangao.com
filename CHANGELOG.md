@@ -4,6 +4,21 @@ All notable changes to the Élan design system are documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.11.5] — 2026-04-23
+
+Patch release: CollaborationLoop transport spacing, SkillMap overflow fix, and brand favicon replacement.
+
+### Fixed
+
+- **elan-visuals**: CollaborationLoop transport strip gaps widened from sub-`0.5x` to `1x` between controls for better breathing room (FB-175).
+- **elan-visuals**: SkillMap category column `min-width: 120px` replaced with `min-width: 0` to prevent horizontal overflow in narrow containers.
+- **yilangao.com**: Default Vercel `favicon.ico` replaced with brand quotation mark `icon.svg` at both root and frontend route group levels; explicit `icons` metadata added to frontend layout.
+
+### Released with this checkpoint
+
+- **yilangao.com** 1.3.5 — favicon replacement, layout icons metadata
+- **ASCII Art Studio** 0.6.7 — release sync only (no app code changes)
+
 ## [2.11.4] — 2026-04-23
 
 Patch release: Lexical link toolbar popover, block toolbar positioning fix, bidirectional Lexical-Payload link normalization, and resume URL update.
