@@ -508,7 +508,6 @@ export default function CollaborationLoop() {
       <div className={styles.detailPanel} role="status" aria-live="polite">
         <div className={styles.detailHeader}>
           <div className={styles.detailHeaderLeft}>
-            <span className={styles.detailStepNum}>{current.step}</span>
             <span className={styles.detailTitle}>{current.label}</span>
           </div>
           <span className={styles.detailFile}>{current.file}</span>

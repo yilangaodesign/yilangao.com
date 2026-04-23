@@ -19,14 +19,14 @@
   justify-content: center;
   gap: 0;
   position: relative;
-  padding: 0 $portfolio-spacer-1x;
+  padding: 0;
 }
 
 .stepTrack {
   position: absolute;
   top: 16px;
-  left: 40px;
-  right: 40px;
+  left: 32px;
+  right: 32px;
   height: 2px;
   background: $portfolio-neutral-20;
   z-index: 0;
@@ -34,7 +34,7 @@
 
 .stepTrackFill {
   height: 100%;
-  background: $portfolio-accent-60;
+  background: $portfolio-neutral-60;
   transition: width 300ms $portfolio-easing-standard;
 }
 
@@ -77,26 +77,29 @@
 }
 
 .stepDotCompleted {
-  border-color: $portfolio-accent-60;
-  background: $portfolio-accent-10;
-  color: $portfolio-accent-70;
+  border-color: $portfolio-neutral-50;
+  background: $portfolio-neutral-10;
+  color: $portfolio-neutral-70;
 }
 
 .stepDotActive {
-  border-color: $portfolio-accent-60;
-  background: $portfolio-accent-60;
+  border-color: $portfolio-neutral-80;
+  background: $portfolio-neutral-80;
   color: $portfolio-neutral-00;
 }
 
 .stepDotLabel {
-  margin-top: 4px;
+  margin-top: $portfolio-spacer-1x;
   font-size: $portfolio-type-3xs;
   color: $portfolio-text-neutral-minimal;
   text-align: center;
-  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: $portfolio-tracking-wider;
+  line-height: $portfolio-leading-tight;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
   overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 72px;
 }
 
 .stepDotLabelActive {
@@ -128,21 +131,6 @@
   gap: $portfolio-spacer-0-5x;
 }
 
-.detailStepNum {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  border-radius: $portfolio-radius-full;
-  background: $portfolio-accent-60;
-  color: $portfolio-neutral-00;
-  font-family: $portfolio-font-mono;
-  font-size: $portfolio-type-2xs;
-  font-weight: $portfolio-weight-semibold;
-  flex-shrink: 0;
-}
-
 .detailTitle {
   font-size: $portfolio-type-base;
   font-weight: $portfolio-weight-semibold;
@@ -152,8 +140,8 @@
 .detailFile {
   font-family: $portfolio-font-mono;
   font-size: $portfolio-type-2xs;
-  color: $portfolio-accent-70;
-  background: $portfolio-accent-10;
+  color: $portfolio-text-neutral-regular;
+  background: $portfolio-neutral-10;
   padding: 2px $portfolio-spacer-0-5x;
   white-space: nowrap;
 }
@@ -261,22 +249,22 @@
 }
 
 .vizRoutingMatch {
-  color: $portfolio-accent-70;
-  background: $portfolio-accent-10;
-  border-color: $portfolio-accent-30;
+  color: $portfolio-text-neutral-bold;
+  background: $portfolio-neutral-10;
+  border-color: $portfolio-neutral-30;
   font-weight: $portfolio-weight-semibold;
 }
 
 .vizRoutingCheck {
   width: 14px;
   font-size: $portfolio-type-2xs;
-  color: $portfolio-accent-60;
+  color: $portfolio-neutral-60;
   text-align: center;
 }
 
 .vizRoutingArrow {
   font-size: $portfolio-type-lg;
-  color: $portfolio-accent-60;
+  color: $portfolio-neutral-50;
   flex-shrink: 0;
 }
 
@@ -286,8 +274,8 @@
   align-items: center;
   gap: 2px;
   padding: $portfolio-spacer-0-5x $portfolio-spacer-1x;
-  background: $portfolio-accent-10;
-  border: 1px solid $portfolio-accent-30;
+  background: $portfolio-neutral-10;
+  border: 1px solid $portfolio-neutral-30;
   flex-shrink: 0;
 }
 
@@ -295,12 +283,12 @@
   font-family: $portfolio-font-mono;
   font-size: $portfolio-type-xs;
   font-weight: $portfolio-weight-semibold;
-  color: $portfolio-accent-70;
+  color: $portfolio-text-neutral-bold;
 }
 
 .vizRoutingTargetSub {
   font-size: $portfolio-type-3xs;
-  color: $portfolio-accent-60;
+  color: $portfolio-text-neutral-subtle;
 }
 
 // ── Viz 3: Document card ─────────────────────────────────────────────────────
@@ -353,7 +341,7 @@
 }
 
 .vizDocRowMatch {
-  background: $portfolio-accent-10;
+  background: $portfolio-neutral-10;
   color: $portfolio-text-neutral-bold;
   font-weight: $portfolio-weight-medium;
 }
@@ -421,8 +409,8 @@
 }
 
 .vizRoundsItemFinal {
-  border-color: $portfolio-accent-30;
-  background: $portfolio-accent-10;
+  border-color: $portfolio-neutral-40;
+  background: $portfolio-neutral-10;
 }
 
 .vizRoundsNum {
@@ -439,7 +427,7 @@
   color: $portfolio-text-neutral-regular;
 
   .vizRoundsItemFinal & {
-    background: $portfolio-accent-60;
+    background: $portfolio-neutral-80;
     color: $portfolio-neutral-00;
   }
 }
@@ -473,7 +461,7 @@
 .vizRoundsInsight {
   font-size: $portfolio-type-3xs;
   font-weight: $portfolio-weight-semibold;
-  color: $portfolio-accent-70;
+  color: $portfolio-text-neutral-bold;
 }
 
 .vizRoundsVerdict {
@@ -585,7 +573,7 @@
 
 .vizLogRowNew {
   color: $portfolio-text-neutral-bold;
-  background: $portfolio-accent-10;
+  background: $portfolio-neutral-10;
   font-weight: $portfolio-weight-medium;
 }
 
@@ -628,7 +616,7 @@
   gap: $portfolio-spacer-0-25x;
   padding: $portfolio-spacer-0-5x $portfolio-spacer-1x;
   background: $portfolio-neutral-00;
-  border: 1px solid $portfolio-accent-30;
+  border: 1px solid $portfolio-border-neutral-minimal;
 }
 
 .vizDualAPHeader {
@@ -641,7 +629,7 @@
   font-family: $portfolio-font-mono;
   font-size: $portfolio-type-xs;
   font-weight: $portfolio-weight-semibold;
-  color: $portfolio-accent-70;
+  color: $portfolio-text-neutral-bold;
 }
 
 .vizDualAPBadge {
@@ -711,7 +699,7 @@
 .vizGuardrailTrackFill {
   height: 100%;
   width: 100%;
-  background: $portfolio-accent-60;
+  background: $portfolio-neutral-60;
 }
 
 .vizGuardrailTier {
@@ -737,8 +725,8 @@
 }
 
 .vizGuardrailDotActive {
-  border-color: $portfolio-accent-60;
-  background: $portfolio-accent-60;
+  border-color: $portfolio-neutral-80;
+  background: $portfolio-neutral-80;
   color: $portfolio-neutral-00;
 }
 
@@ -758,15 +746,15 @@
   gap: 4px;
   padding: $portfolio-spacer-0-5x $portfolio-spacer-1x;
   background: $portfolio-neutral-00;
-  border: 1px solid $portfolio-accent-30;
-  border-left: 3px solid $portfolio-accent-60;
+  border: 1px solid $portfolio-border-neutral-minimal;
+  border-left: 3px solid $portfolio-neutral-60;
 }
 
 .vizGuardrailRuleHeader {
   font-family: $portfolio-font-mono;
   font-size: $portfolio-type-2xs;
   font-weight: $portfolio-weight-semibold;
-  color: $portfolio-accent-70;
+  color: $portfolio-text-neutral-bold;
 }
 
 .vizGuardrailRuleText {
@@ -782,7 +770,6 @@
   align-items: center;
   justify-content: space-between;
   padding: $portfolio-spacer-1x $portfolio-spacer-0-5x;
-  border-top: 1px solid $portfolio-border-neutral-minimal;
 }
 
 .transportLeft {
@@ -803,14 +790,14 @@
   justify-content: center;
   width: 28px;
   height: 28px;
-  border: 1px solid $portfolio-border-neutral-minimal;
-  background: $portfolio-neutral-00;
-  color: $portfolio-text-neutral-regular;
+  border: none;
+  background: transparent;
+  color: $portfolio-text-neutral-subtle;
   font-size: $portfolio-type-sm;
   cursor: pointer;
 
   &:hover {
-    background: $portfolio-neutral-10;
+    color: $portfolio-text-neutral-bold;
   }
 
   &:focus-visible {

@@ -16,9 +16,6 @@ const CONTENT_BLOCKS = createCaseStudyBlocks(
       heading: 'Not the Components',
       bodyMarkdown:
         "The tokens, components, and playground are real and they work. But every hour I spent on the collaboration architecture was an hour not spent polishing what's on screen. That trade-off shows. Below is what it bought: one correction traced from my feedback to permanent rule.",
-      imagePlaceholders: [
-        'Before and after: the same design task handled in session 1 vs. session 40',
-      ],
     },
     {
       heading: 'The System Behind the System',
