@@ -28,6 +28,9 @@ type CaseStudy = {
   thumbnailKind?: "image" | "video";
 };
 
+/** Homepage case-study list: surface `contentFormat === "essay"` with a badge. Off until needed again. */
+const SHOW_ESSAY_FORMAT_BADGE_ON_HOME = false;
+
 export default function HomeClient({
   caseStudies,
   assetManifest,
@@ -65,7 +68,7 @@ export default function HomeClient({
                     {needsDivider && <Divider className={styles.sectionDivider} />}
                     <StaggerItem>
                       <Link href={`/work/${cs.slug}`} className={styles.caseStudyLink} onClick={savePosition} {...getBlockHandlers(i)}>
-                        {isEssay && (
+                        {SHOW_ESSAY_FORMAT_BADGE_ON_HOME && isEssay && (
                           <Badge appearance="neutral" emphasis="minimal" size="sm" shape="squared" className={styles.essayBadge}>
                             Essay
                           </Badge>
