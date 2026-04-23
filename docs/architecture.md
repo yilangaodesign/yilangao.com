@@ -372,7 +372,7 @@ proxy.ts (runs before every request)
 ├── /for/* , /admin/* , /api/* , static assets  → Allow through
 └── Everything else  → Check portfolio_session cookie
     ├── Valid signed cookie  → Allow through, set x-company header
-    └── Missing or invalid   → Redirect to /for/unknown
+    └── Missing or invalid   → Redirect to /for/welcome
 ```
 
 **Company data storage:** Company passwords, themes, and case study notes are stored

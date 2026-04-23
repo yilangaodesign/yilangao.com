@@ -42,7 +42,7 @@ A record `76.76.21.21`), and add `yilangao.com` as a domain in the Vercel projec
 | `S3_ENDPOINT` | Supabase Dashboard → Settings → Storage → S3 Connection | |
 | `S3_REGION` | Supabase Dashboard → Settings → Storage → S3 Connection | |
 | `SESSION_SECRET` | Random hex string (`openssl rand -hex 32`) | Signs the password gate session cookie. Falls back to `PAYLOAD_SECRET` if not set, but a separate secret is recommended. |
-| `SITE_PASSWORD` | Chosen password string | Fallback password for `/for/unknown` (generic login with no company branding). Defaults to `glad you are here` if not set. Password comparison is normalized (case-insensitive, separator-agnostic, contraction-expanded) - see `company-session.ts`. |
+| `SITE_PASSWORD` | Chosen password string | Fallback password for `/for/welcome` (generic login with no company branding). Defaults to `glad you are here` if not set. Password comparison is normalized (case-insensitive, separator-agnostic, contraction-expanded) - see `company-session.ts`. |
 
 Do NOT set `PAYLOAD_ADMIN_EMAIL` or `PAYLOAD_ADMIN_PASSWORD` in production — those
 enable auto-login and are for local development only.

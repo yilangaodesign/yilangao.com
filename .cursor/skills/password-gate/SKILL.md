@@ -6,7 +6,7 @@
 ## System Overview
 
 The main site is behind a server-side password gate. All unauthenticated requests
-are intercepted by `src/proxy.ts` and redirected to `/for/unknown` (or `/for/[company]`
+are intercepted by `src/proxy.ts` and redirected to `/for/welcome` (or `/for/[company]`
 if the visitor has a company-specific URL).
 
 **This is a security boundary.** Incorrect changes can expose the site publicly or
@@ -117,7 +117,7 @@ In development (`NODE_ENV === "development"`), appending `?preview=true` to any 
 page URL bypasses the session redirect. This lets authenticated users view and iterate
 on the login UI without clearing cookies.
 
-- Generic: `http://localhost:4000/for/unknown?preview=true`
+- Generic: `http://localhost:4000/for/welcome?preview=true`
 - Company-themed: `http://localhost:4000/for/{slug}?preview=true`
 
 The bypass is implemented in `src/app/(frontend)/for/[company]/page.tsx` — the server
@@ -184,7 +184,7 @@ The plan supports live AI generation of case study notes. To implement:
 After any change to the password gate system:
 
 1. **Clear cookies** for the site domain
-2. **Visit `/`** — should redirect to `/for/unknown`
+2. **Visit `/`** — should redirect to `/for/welcome`
 3. **Visit `/for/google`** — should show themed login page with Google accent color
 4. **Enter wrong password** — should show error, not redirect
 5. **Enter correct password** — should redirect to `/`, site should render normally
@@ -193,7 +193,7 @@ After any change to the password gate system:
 8. **Check `/admin/companies-dashboard`** — should show the management dashboard
 
 For UI iteration on the login page without clearing cookies, use `?preview=true`
-(dev only): `http://localhost:4000/for/unknown?preview=true`
+(dev only): `http://localhost:4000/for/welcome?preview=true`
 
 ## Env Vars
 

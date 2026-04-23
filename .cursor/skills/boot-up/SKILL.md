@@ -38,7 +38,7 @@ description: >-
 
 | Page | URL | Notes |
 |------|-----|-------|
-| Login page (generic) | `http://localhost:4000/for/unknown?preview=true` | `?preview=true` bypasses session redirect in dev — without it, authenticated users get redirected to `/` |
+| Login page (generic) | `http://localhost:4000/for/welcome?preview=true` | `?preview=true` bypasses session redirect in dev — without it, authenticated users get redirected to `/` |
 | Login page (company-themed) | `http://localhost:4000/for/{slug}?preview=true` | Replace `{slug}` with any company slug from the Companies collection |
 
 The login page is a route on the main site, not a separate server. It requires the
@@ -108,7 +108,7 @@ Tell the user which apps are now running and give clickable localhost URLs.
 If any app failed to start, explain why.
 
 **Always include the login page URL** when the main site is in scope:
-- Generic: `http://localhost:4000/for/unknown?preview=true`
+- Generic: `http://localhost:4000/for/welcome?preview=true`
 - Company-themed: `http://localhost:4000/for/{slug}?preview=true`
 
 The login page doesn't need its own startup — it's a route on the main site.
