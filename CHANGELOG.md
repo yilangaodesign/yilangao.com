@@ -4,6 +4,19 @@ All notable changes to the Élan design system are documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.11.2] — 2026-04-22
+
+Patch release: essay project pages use the same prose column cap as case studies. Élan and ASCII Art Studio manifests bumped in sync; no design-system component or playground code changes in this checkpoint.
+
+### Changed
+
+- **yilangao.com**: `.layoutEssay` / `.contentEssay` on `/work/[slug]` now cap at `$elan-container-content` (720px) instead of `$elan-container-narrow` (672px), matching the case-study `.content` measure. Documented as FB-170 in `docs/design-feedback-log.md`; `docs/content/case-study.md` §3.2 updated accordingly.
+
+### Released with this checkpoint
+
+- **yilangao.com** 1.3.2 — essay single-column width alignment
+- **ASCII Art Studio** 0.6.4 — release sync only (no app code changes)
+
 ## [2.11.1] — 2026-04-22
 
 Patch release: login page layout fix shipped alongside yilangao.com 1.3.1 and ASCII Art Studio 0.6.3.
