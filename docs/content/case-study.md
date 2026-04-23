@@ -61,7 +61,7 @@ Borrow from journalism. Lead with the conclusion (impact, outcome, key insight),
 When the content type is **essay** (not a case study — discriminated by the `contentFormat` field on the `projects` collection), the page layout switches entirely:
 
 - **No sidebar.** Role, collaborators, duration, tools, hero metric, and external-link sections are all omitted — an essay has no team, no shipped product, and no project duration to scope.
-- **Single centered column** capped at the "blog post" reading measure (`$elan-container-narrow` in `src/styles/tokens/_spacing.scss`), via `.layoutEssay` + `.contentEssay` classes in `src/app/(frontend)/(site)/work/[slug]/page.module.scss`.
+- **Single centered column** capped at the same prose measure as case-study body copy (`$elan-container-content` in `src/styles/tokens/_spacing.scss`; widened from `$elan-container-narrow` in FB-170), via `.layoutEssay` + `.contentEssay` classes in `src/app/(frontend)/(site)/work/[slug]/page.module.scss`.
 - **Shared with case studies:** the full-width hero splash, the `companyCallout` block, all body block rendering (Lexical editor, image upload, drag-and-drop), the `articleSeparator` between intro and body, and the `projectNav` prev/next footer.
 
 **`EssayHeader` composition (between the hero splash and the intro blurb body):**
