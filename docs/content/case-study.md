@@ -232,6 +232,14 @@ the intro blurb.
 | **Headline** | 6-10 words | Tension, friction, the moment of itch. NOT an outcome statement. |
 | **Body** | 4-6 sentences, ≤80 words | Stakes, empathy, structural tease, outcome flash in the closer. Hides the *how*. |
 
+**Headline voice (first-person perspective, not first-person pronoun):** The headline
+must feel like a single person speaking from lived experience. "I" is one way to do
+this, but not the only way. First-person possessives ("my"), verb-first openings that
+drop the pronoun ("Harnessed my code production"), and direct "you" address all
+establish the interpersonal, conversational register. The test: would a real person
+say this to a colleague over coffee? If yes, it passes. If it reads like a tagline,
+a billboard, or a YouTube thumbnail, it fails.
+
 **Headline vs. body distinction (critical):** The headline hooks through *situation
 tension* — it must NOT state the outcome. The body closer flashes the outcome as a
 fact ("cut 12,000 lines to 560"). This separation makes the blurb simultaneously
@@ -345,6 +353,18 @@ test: remove "I [verb]ed" - does the remainder describe a difficult situation? "
 page my own team gave up on" = yes. Source: Lacework case study. Technique 10 from
 `personal-voice.md`.
 
+**Gold Standard 3 (verb-first with grounding fragment):**
+
+**Headline:** Harnessed my code production - 40 sessions in.
+
+Works because the verb-first opening ("Harnessed") states a claim without the
+pronoun, then "my" establishes first-person ownership without "I." The dash and
+"40 sessions in" land as a grounding punchline that contextualizes the claim in
+real effort. "40 sessions in" implies the process is ongoing - it doesn't overclaim
+completion. The specificity of the number feels lived, not composed. 8 words.
+Source: Élan Design System case study. Technique 8 (Verdict-as-Headline) with
+Staccato Authority modifier from `personal-voice.md`.
+
 #### Headline Technique Cross-References
 
 Blurb headlines and section titles use overlapping but distinct technique subsets
@@ -352,7 +372,9 @@ from `personal-voice.md`:
 
 - **Blurb headlines (6-10 words):** Protagonist Framing (Technique 10) is the
   primary blurb technique - first-person dramatic casting with resistance. Verdict-as-
-  Headline (Technique 8) works when combined with a longer resolver clause.
+  Headline (Technique 8) works when combined with a grounding clause or resolver.
+  Verb-first openings that drop the pronoun are valid when a possessive ("my")
+  carries the first-person perspective.
 - **Section titles (2-5 words):** Object Substitution (Technique 6), Framework
   Inversion (Technique 7), and Verdict-as-Headline (Technique 8) are the primary
   section title techniques. See §3.4 for the three title archetypes.

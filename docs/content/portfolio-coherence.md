@@ -28,7 +28,7 @@ The manifest tracks seven dimensions per case study:
 |---|---|---|---|---|
 | **Content format** | Case study | Case study | Case study | Essay |
 | **Narrative shape** | Contrarian Discovery | Rescue Arc | Translation Arc | Accumulation Arc |
-| **Headline technique** | Protagonist Framing (T10) | Protagonist Framing (T10) | Framework Inversion (T7) | Deliberate Ambiguity (T9) |
+| **Headline technique** | Protagonist Framing (T10) | Protagonist Framing (T10) | Verdict + Staccato Authority (T8) | Deliberate Ambiguity (T9) |
 | **Technique emphasis** | T3+T4 (Survival Frame, Escalation) | T10+T8 (Protagonist, Verdict) | T11+T13+T15 (Identification, Anti-Sell, Closed-Loop) | T13+T14 (Anti-Sell, Emotional Deflation) |
 | **Metric type** | Absolute reduction (12K to 560) | Percentage improvement (58%) | Behavioral/maturity-based absolute (15 → 3) | N/A |
 | **Evidence method** | Behavioral observation ("stopped verifying line by line") | Task-based evaluation with internal users | Interactive demo (3 Tier 3 components) | Argument coherence |
@@ -40,7 +40,7 @@ The manifest tracks seven dimensions per case study:
 
 - **Content formats:** 3 case studies + 1 essay (good). Format diversity established.
 - **Narrative shapes:** 4 different shapes across 4 entries (good). Accumulation Arc (ETRO) is distinct from all case study shapes.
-- **Headline techniques:** 2 of 4 use Protagonist Framing. Elan uses Framework Inversion (T7). ETRO uses Deliberate Ambiguity (T9). Any new entry (5th+) should avoid T10 (already at 2/4).
+- **Headline techniques:** 4 distinct techniques across 4 entries (good). Meteor and Lacework use T10, Elan uses T8 (Verdict + Staccato Authority), ETRO uses T9. Any new entry (5th+) should avoid T10 (already at 2/4).
 - **Technique emphasis:** 4 distinct technique pairs across 4 entries (good). No two entries share a primary technique. ETRO's T13+T14 pair is unique.
 - **Metric types:** 3 different types across case studies + N/A for ETRO (good). For dimensions marked N/A, the diversity gate skips the repetition check. N/A vs N/A is not a repetition.
 - **Evidence methods:** 3 different methods across case studies + "Argument coherence" for ETRO (good). ETRO's evidence method is structural rather than empirical.

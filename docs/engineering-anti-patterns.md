@@ -1639,7 +1639,7 @@ The parent layout always sees a constant box. Any content that exceeds the heigh
 
 **Trigger:** A new directory is created under `public/` (e.g., `/videos/`) and referenced by a page that unauthenticated users see (e.g., the login page), but the directory path is not added to the proxy's static asset passthrough list in `src/proxy.ts`.
 
-**Why it's wrong:** The password gate proxy (`src/proxy.ts`) redirects all unauthenticated requests to `/for/unknown` unless the path is in the allowlist. Static assets in `/_next/`, `/images/`, `/media/` are allowlisted, but new directories are not. The asset request receives a 307 redirect to an HTML login page instead of the actual file. For video/media assets consumed by JavaScript (WebGL textures, `<video>` elements), this fails silently — the element receives HTML content, can't parse it, and renders nothing. No error is thrown in the console.
+**Why it's wrong:** The password gate proxy (`src/proxy.ts`) redirects all unauthenticated requests to `/for/welcome` unless the path is in the allowlist. Static assets in `/_next/`, `/images/`, `/media/` are allowlisted, but new directories are not. The asset request receives a 307 redirect to an HTML login page instead of the actual file. For video/media assets consumed by JavaScript (WebGL textures, `<video>` elements), this fails silently — the element receives HTML content, can't parse it, and renders nothing. No error is thrown in the console.
 
 **Correct approach:** Whenever adding a new `public/` directory:
 1. Add `pathname.startsWith("/your-directory/")` to the proxy allowlist in `src/proxy.ts`
@@ -2407,3 +2407,22 @@ Concrete canonical shape in this codebase: `ProjectClient.tsx` DnD after the ato
 **Incident:** ENG-179 (2026-04-20) — User tested ENG-176 per-image DnD on `/work/meteor` and reported that individual image reorder worked but "form rows by dragging" and "break rows by dragging" both silently no-op'd. Root cause was all three failures compounding: `handleDragOver`/`handleDragEnd` read only `over.id`; `reorderBlockRange` + `normalizeImageRowBreaks` had no demote path for merge; `SortableBlock.dropPosition` was `'before' | 'after' | null` with no vertical-line vocabulary. Fix landed the intent capture + `applyImageDropIntent` transform + `reorderImageWithDropIntent` server primitive + expanded `DropEdge = 'before' | 'after' | 'left' | 'right' | null` with a vertical `.dropLineVertical` accent bar at the merge-side gutter. Verified on localhost: merge forms shared rows, split pulls images out, pure reorder still works.
 
 **Principle:** Drag-and-drop on a 2-D layout must read a 2-D pointer signal. `rectSortingStrategy` gives you `active.rect` and `over.rect`; collapsing them to a single list index at drop time throws away the dimension that distinguishes adjacency-within-container (merge / nest) from adjacency-between-containers (split / peer). Intent capture lives in `handleDragOver` so the visual hint can reflect it live; transform primitives set the relationship bit atomically with the splice; the `dropPosition` vocabulary must be rich enough to distinguish each intent visually. When the data model has a relationship bit and the layout is 2-D, "reorder" is always a subset of the valid operations — never the whole contract.
+
+---
+
+### EAP-118: Session-existence check without identity match on re-auth pages
+
+**Status:** Active
+**Category:** Auth / Session Management
+**First observed:** ENG-203 (2026-04-23)
+**Occurrences:** 1
+
+**Pattern:** A login or re-authentication page checks `if (existingSession)` to skip the login form, but doesn't compare the session identity against the target resource (the company slug in the URL). Any prior session - even one for a different identity - causes the page to redirect away, silently preventing the user from authenticating as the intended identity.
+
+**Why it fails:** The check conflates "has a session" with "has the right session." In a multi-identity system (visitor → unknown → cognition), a prior "unknown" session is truthy but doesn't authorize access to company-specific features. The redirect fires before the user sees the login form, so from their perspective the feature simply doesn't work.
+
+**Correct alternative:** Compare the session identity against the page's target: `if (existingSession && existingSession === targetIdentity)`. Only skip the login form when the session already matches what the page would set. For mismatched sessions, show the form so the user can upgrade their session.
+
+**Detection:** Search for `redirect("/")` or `redirect(...)` in login/auth page server components where the guard is a bare truthy check on a session value without comparing it to the route parameter.
+
+**Incident:** ENG-203 — User visited `/for/cognition` with a prior "unknown" session cookie. The login page server component checked `if (existingSession)` → truthy → redirected to `/`. User never saw the login form, never entered the password, cookie stayed "unknown", home page showed no personalization badge. Fixed to `if (existingSession && existingSession === company)`.

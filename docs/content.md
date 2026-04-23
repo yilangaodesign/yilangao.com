@@ -84,6 +84,8 @@
 | Employment classification signal (diminishing labels in portfolio text) - CAP-026 | 1 | High |
 | Inline bold imported from source markdown - CAP-030 | 1 | High |
 | Case-study blurb contract applied to essay format (lede treated as trailer) | 1 | High |
+| Headline keyword positioning (intrigue vs. communicating value prop at scan speed) | 1 | High |
+| Headline opening word prescriptivism ("I"/"you" only — possessives and verb-first are valid) | 1 | Medium |
 
 ---
 

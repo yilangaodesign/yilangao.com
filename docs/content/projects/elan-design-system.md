@@ -41,8 +41,12 @@
   Names a real pattern (bolting AI-readability onto human-designed systems) without
   attacking practitioners. A hiring manager who built an MCP server should feel
   provoked into thinking, not attacked.
-- [Type B] "You're looking at the wrong part" headline approved. T7 (Framework
-  Inversion). Standalone Test: PASS - "then what should I be looking at?"
+- [Type B] "Harnessed my code production - 40 sessions in." headline approved
+  (2026-04-23). T8 (Verdict) + Staccato Authority. Verb-first drops pronoun,
+  "my" carries first-person perspective, "40 sessions in" grounds the claim in
+  real effort. Replaces "You're looking at the wrong part" (T7) which lacked
+  the "harness" positioning keyword. Standalone Test: PASS - "how? what happened
+  in those 40 sessions?"
 - [Type B] ccunpacked.dev visualization patterns approved as design references for
   Tier 3 interactive components. Sequential step-through, categorized card grid,
   proportional block/treemap, side-panel document explorer.
@@ -191,6 +195,12 @@ energy while tightening grammar and thesis coherence.
 - 2026-04-06: Voice framework tone pass (CF-023). Applied T11+T13+T15 technique
   emphasis after voice framework upgrade. Over-indexed on clever contrarian
   positioning - result was condescending. Reverted in CF-024.
+- 2026-04-23: Headline change (CFB-TBD). "You're looking at the wrong part" (T7)
+  replaced with "Harnessed my code production - 40 sessions in" (T8 + Staccato
+  Authority). Motivated by: (1) "harness" is a top positioning keyword, (2) the
+  previous headline didn't communicate the project's core value prop to scanners,
+  (3) user preference for verb-first opening without "I" pronoun. Content strategy
+  rule updated: first-person perspective includes possessives ("my"), not just "I"/"you."
 - 2026-04-06: Tone rewrite v2 (CF-024). Rewrote all prose to match reference
   sample register (humble, real, process-first). Removed horseless carriage metaphor
   and all industry-positioning. Blurb now honest process narrative. Section bodies
@@ -201,7 +211,7 @@ energy while tightening grammar and thesis coherence.
 ## Portfolio Coherence Manifest Entry
 
 - **Narrative shape:** Translation Arc
-- **Headline technique:** T7 Framework Inversion ("You're looking at the wrong part.")
+- **Headline technique:** T8 Verdict + Staccato Authority ("Harnessed my code production - 40 sessions in.")
 - **Voice register:** Conversational-irreverent
 - **Metric type:** Behavioral/maturity-based absolute (15 -> 3)
 - **Evidence method:** Interactive demo (3 Tier 3 components)

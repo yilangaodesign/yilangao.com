@@ -168,7 +168,7 @@ The visual system implements the brand identity through a small number of delibe
 |---------|---------------|-----------|
 | Surface system | Terra warm amber as chrome/sidebar, pure white as reading body. Two surfaces, no middle ground. | `color.md` section 9.3b |
 | Typography pairing | Geist Sans (all interface text: headings, body, labels, captions). IBM Plex Serif scoped to: case study intro titles (`heading-case-study-intro`), pull quotes, block quotes, testimonial text, epigraphs. Serif scope is restricted - it does NOT extend to body prose. | `typography.md` section 18.1 |
-| Brand accent: Lumen | Blue-violet at ~270deg hue. Grade 60 (#3336FF) is the immovable anchor. Scoped to interactive elements, links, and the `yg` logo mark. | `color.md` section 9.3 |
+| Brand accent: Lumen | Blue-violet at ~270deg hue. Grade 60 (#3336FF) is the immovable anchor. Scoped to the `yg` logo mark and select interactive affordances (buttons, form focus rings). NOT a blanket link color - most links on the portfolio use neutral text colors to preserve the editorial tone. Lumen appears rarely and carries weight precisely because of that scarcity. | `color.md` section 9.3 |
 | Brand accent: Terra | Warm amber at 70deg hue. Provides the warm earthy surface that distinguishes the site. | `color.md` section 9.3b |
 | Shape | Zero corner radius across the entire site. The only curves are structural exceptions (avatars, progress bars, toggle switches, spinners) and the two semicircular cutouts inside the logo mark. See section 1 above. | This file, section 1 |
 | Interaction signature | Cursor-thumbnail on desktop (hover reveals project preview) / inline reveal on mobile. One hover gesture per element. | `navigation.md` |
@@ -249,3 +249,42 @@ Encoded in `src/components/ui/Navigation/Navigation.module.scss`:
 ### 8.3 Extension
 
 Any new identity row on the portfolio (footer brand line, gate-page header, any future chrome element) inherits this pattern. When the design surfaces a new pairing of "rigid identity + elastic metadata," the same three ingredients apply: rigid side gets `flex-shrink: 0` + `white-space: nowrap` on its text; elastic side gets `min-width: 0` plus an explicit line-clamp. See FB-146 for the originating incident.
+
+---
+
+## 9. Personalization Badge — Design Rationale
+
+The home page displays a small "for {Company}" badge above case study headlines when a visitor is authenticated through the password gate and the company record has a note for that project. This badge is the only visitor-facing personalization signal on the site.
+
+### 9.1 Chosen Style
+
+`Badge appearance="neutral" emphasis="minimal" size="sm" shape="squared"`
+
+Renders as: neutral gray fill, dark text, no border, zero radius. Sits on the Terra paper surface with low contrast separation.
+
+### 9.2 Why Neutral, Not Accent
+
+The badge text says "for Cognition" (or whichever company). It addresses the visitor about their company. Coloring it in Lumen (the portfolio's brand accent) would wrap the visitor's identity in the author's brand color - a small contradiction. Lumen means "this is Yilan's identity" or "this is interactive." The personalization badge is neither.
+
+Neutral keeps the badge inside the page's existing typographic system. It reads as content - an editorial annotation - rather than a UI element or a branded tag. The visitor notices it because it's text in an unexpected place, not because of color. This aligns with the brand principle of "craft invisible in service of content."
+
+### 9.3 Why Quiet Is Correct
+
+The badge is deliberately low-contrast against the Terra surface. Alternatives considered and rejected:
+
+| Option | Props | Rejected because |
+|--------|-------|-----------------|
+| Accent tinted fill | `highlight` / `subtle` | Expands Lumen's scope from "interactive + identity" to "things to notice." Every new Lumen use dilutes its signal. |
+| Accent text on gray | `highlight` / `minimal` | Colored text above large serif headlines creates hierarchy inversion - the small colored element pulls the eye before the headline. |
+| White fill with border | `neutral` / `regular` | The border makes it look structural and interactive (a chip, a filter). Implies clickability. |
+| Dark fill, white text | `neutral` / `bold` | Maximum contrast reads as a system notification or alert. Too loud for a quiet personalization signal. |
+
+The quiet treatment is intentional. A hiring manager from Cognition who notices it thinks "oh, they know who I am" - a confident, understated signal. One who notices it because it's visually loud thinks "they're pitching me" - which reframes the portfolio as a sales deck. The badge should feel like a handwritten margin note, not a highlighted callout.
+
+### 9.4 Lumen Scarcity Principle
+
+Lumen appears in exactly two places on the portfolio: the `yg` logo mark and select interactive affordances. Most links use neutral text colors. This scarcity is load-bearing - when Lumen appears, it carries weight precisely because it's rare. Adding Lumen to non-interactive elements (badges, labels, decorative accents) erodes this. Before using Lumen on any new element, ask: is this interactive, or is this the author's identity mark? If neither, use neutral.
+
+### 9.5 Badge Density Rule
+
+One badge per case study, maximum. Currently the only badge type is personalization. If future badge types are introduced (e.g., "New", "Featured"), they compete for the same visual slot and attention budget. The personalization badge should be the only occupant - it exists to say something specific to the visitor, not to decorate the listing.

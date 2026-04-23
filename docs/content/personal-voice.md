@@ -49,6 +49,16 @@ not self-congratulatory. The emphasis lands on the situation (abandoned page),
 not the achievement (saving it). 10 words, upper limit of blurb headline
 range. Source: Lacework case study (2026-04-04).
 
+**Sample 3b (blurb headline - verb-first with grounding fragment):**
+
+> "Harnessed my code production - 40 sessions in."
+
+What makes it work: Verb-first drops the "I" pronoun while "my" carries
+first-person ownership. The claim is assertive but immediately grounded by
+"40 sessions in" - which reads as a progress report, not a boast. The dash
+creates a rhythmic break that makes the second half land as a punchline.
+8 words. Source: Élan Design System case study (2026-04-23).
+
 **Sample 4 (section title - object substitution):**
 
 > "Five Matryoshkas Deep"
@@ -240,22 +250,29 @@ Applied on top of Techniques 6-8, not standalone.
 
 ### Technique 10: Protagonist Framing
 
-"I [verb]ed" as dramatic casting with personal stakes against resistance.
-The writer becomes a character in a story with an uncertain outcome.
+First-person perspective as dramatic casting with personal stakes against
+resistance. The writer becomes a character in a story with an uncertain outcome.
 
 "I saved the page my own team gave up on."
+"Harnessed my code production - 40 sessions in."
+
+First-person perspective does not require the pronoun "I." Possessives ("my"),
+verb-first openings that drop the pronoun, and direct "you" address all establish
+the interpersonal register. The test: would a real person say this to a colleague?
 
 - **Use:** When the blurb needs to establish personal ownership and stakes.
   The verb must describe action-against-resistance, not achievement. The
-  second half of the headline must supply the resistance or tension.
+  second half of the headline must supply the resistance, tension, or grounding.
 - **Applies to:** Blurb headlines only (6-10 words). Too long for section
   titles. Too first-person for the restrained register of Zone 3.
-- **Luxury guardrail:** Remove "I [verb]ed" from the headline. Does the
-  remainder describe a difficult situation? If yes, it passes luxury. If the
-  remainder describes an accomplishment or just names a deliverable, it is
-  credential listing and fails luxury.
+- **Luxury guardrail:** Remove the protagonist signal ("I [verb]ed" or the
+  verb-first claim) from the headline. Does the remainder describe a difficult
+  situation or grounding effort? If yes, it passes luxury. If the remainder
+  describes an accomplishment or just names a deliverable, it is credential
+  listing and fails luxury.
   - "the page my own team gave up on" = difficult situation (PASS)
   - "the billing dashboard" = just a thing (FAIL)
+  - "my code production - 40 sessions in" = grounding effort (PASS)
   - "a migration nobody thought would work" = difficulty (PASS)
   - "the most beautiful navigation ever" = self-congratulation (FAIL)
 - See `case-study.md` section 3.8 for the full Luxury Positioning Principle.
