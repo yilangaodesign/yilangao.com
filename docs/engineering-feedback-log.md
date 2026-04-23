@@ -2707,3 +2707,15 @@ The browser HTTP cache is the correct persistence layer — it's already there, 
 **Principle:** When two libraries use the same node type name (`link`) with incompatible serialization contracts, the integration layer needs bidirectional transforms — one for each direction of data flow. A write-path transform (EAP-119/ENG-195) without a corresponding read-path transform is half a bridge. Extends EAP-119.
 
 ---
+
+### ENG-198: Favicon showing default Vercel icon instead of quotation logo
+
+**Issue:** The production site at `new.yilangao.com` displayed the default Vercel/Next.js favicon instead of the quotation mark logo (`yg-logo.svg`).
+
+**Root cause:** The project was created from a Next.js scaffold and the default `favicon.ico` files (25KB, 4-icon MS Windows ICO) were never replaced. Both `src/app/favicon.ico` and `src/app/(frontend)/favicon.ico` contained the default Vercel icon. No explicit `icons` metadata was set in the layout, and the brand logo SVG only existed at `public/images/yg-logo.svg` for CSS mask-image use in the navigation.
+
+**Resolution:** Deleted both default `favicon.ico` files. Placed the brand quotation mark SVG as `icon.svg` at both `src/app/icon.svg` (root, covers admin) and `src/app/(frontend)/icon.svg` (frontend route group) using Next.js file-based metadata convention. Added explicit `icons: { icon: "/icon.svg" }` to the frontend layout metadata. Confirmed `<link rel="icon" href="/icon.svg"/>` renders in the HTML head.
+
+**Principle:** Scaffolded assets (favicon, OG image, robots.txt) are invisible until they're wrong. Include brand asset replacement in the project setup checklist, not as a deferred task.
+
+---
