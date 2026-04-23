@@ -8,7 +8,7 @@ const BLURB_BODY =
   "I built a design system for vibe coding. You've probably heard this story before. You may have built your own, or at least thought about it.\n\nThis isn't about that. Everyone's excited about making design systems readable to agents. I want to show you what happened when I documented the failures instead - each correction became a rule the agent couldn't break next time. After forty sessions, the corrections nearly disappeared. Not because the work got easier."
 
 const SCOPE_STATEMENT =
-  "Élan spans three Next.js apps with tokens, components, and a playground, published as an npm package. I'm the sole designer and engineer. The visual layer took effort, but it's not where most of the time went. Underneath: 16 skills routing my corrections into documentation, 130+ anti-patterns encoding what not to repeat, and an escalation protocol deciding when a rule stops being optional. Over 40+ sessions, corrections dropped from 15 fundamental issues per session to 3 refinement-level ones."
+  "[Élan](https://yilangao-design-system.vercel.app) spans three Next.js apps with tokens, components, and a playground, published as an npm package. I'm the sole designer and engineer. The visual layer took effort, but it's not where most of the time went. Underneath: 16 skills routing my corrections into documentation, 130+ anti-patterns encoding what not to repeat, and an escalation protocol deciding when a rule stops being optional. Over 40+ sessions, corrections dropped from 15 fundamental issues per session to 3 refinement-level ones."
 
 const CONTENT_BLOCKS = createCaseStudyBlocks(
   [

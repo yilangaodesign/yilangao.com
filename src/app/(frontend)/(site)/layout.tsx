@@ -16,7 +16,7 @@ const FOOTER_LINK_DEFAULTS_BY_LABEL: Record<
     external: true,
   },
   Resume: {
-    href: "https://drive.google.com/file/d/1IMSeearuPglNJV8MH20Z-BCnhi2idITz/view?usp=sharing",
+    href: "https://drive.google.com/file/d/1q2mTu7UlnfcgI8S99nETxWVPz02ViFBO/view?usp=sharing",
     external: true,
   },
   Linkedin: {
