@@ -4,6 +4,21 @@ All notable changes to the Élan design system are documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.11.8] — 2026-04-23
+
+Patch release: personalize skill and main site favicon.
+
+### Added
+
+- **Élan**: `personalize` agent skill for end-to-end company visitor setup (research, relevance analysis, CMS record creation, note writing, badge verification).
+- **yilangao.com**: Favicon added to the main site frontend.
+
+### Released with this checkpoint
+
+- **Élan** 2.11.8
+- **yilangao.com** 1.3.8
+- **ASCII Art Studio** 0.6.10
+
 ## [2.11.6] — 2026-04-23
 
 Patch release: "for {Company}" personalization badge on home page, Élan headline rewrite, fallback route rename, and session re-auth fix.
