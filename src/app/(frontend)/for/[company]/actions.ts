@@ -27,7 +27,7 @@ export async function validatePassword(
     return { success: false, error: "Incorrect password" };
   }
 
-  const slug = config ? company : "unknown";
+  const slug = config ? company : "welcome";
   const signed = createSignedValue(slug);
   const cookieConfig = getSessionCookieConfig(signed);
 

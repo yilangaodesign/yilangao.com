@@ -21,7 +21,7 @@ export default async function LoginPage({ params, searchParams }: Props) {
 
   if (!isDevPreview) {
     const existingSession = await getCompanyFromSession();
-    if (existingSession) {
+    if (existingSession && existingSession === company) {
       redirect("/");
     }
   }

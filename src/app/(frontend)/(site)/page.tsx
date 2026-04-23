@@ -1,5 +1,7 @@
 import { getPayloadClient } from "@/lib/payload";
 import { isAdminAuthenticated } from "@/lib/admin-auth";
+import { getCompanyFromSession } from "@/lib/company-session";
+import { getCompanyBySlug } from "@/lib/company-data";
 import { RefreshRouteOnSave } from "@/components/RefreshRouteOnSave";
 import { HOME_CASE_SUBLINE_BY_SLUG } from "@/lib/home-case-subline";
 import { isVisibleOnHome } from "@/lib/project-filters";
@@ -13,13 +15,30 @@ export default async function Home() {
     slug: string;
     headline: string;
     category: string;
-    contentFormat?: string;
     subline: string;
     thumbnailUrl?: string;
     thumbnailKind?: "image" | "video";
   }[] = [];
   let assetManifest: AssetManifest = [];
   const isAdmin = await isAdminAuthenticated();
+
+  let personalization: { name: string; slugs: string[] } | undefined;
+  try {
+    const companySlug = await getCompanyFromSession();
+    if (companySlug && companySlug !== "welcome") {
+      const company = await getCompanyBySlug(companySlug);
+      if (company) {
+        const slugs = company.caseStudyNotes
+          .filter((n) => n.note?.trim())
+          .map((n) => n.projectSlug);
+        if (slugs.length > 0) {
+          personalization = { name: company.name, slugs };
+        }
+      }
+    }
+  } catch {
+    // Company lookup failure — degrade to no badges
+  }
 
   try {
     const payload = await getPayloadClient();
@@ -48,7 +67,6 @@ export default async function Home() {
           slug: doc.slug,
           headline: (doc as Record<string, unknown>).introBlurbHeadline as string,
           category: (doc.category as string) ?? "",
-          contentFormat: (doc as Record<string, unknown>).contentFormat as string | undefined,
           subline: HOME_CASE_SUBLINE_BY_SLUG[doc.slug] ?? "",
           thumbnailUrl: resolved?.url,
           thumbnailKind: resolved?.kind,
@@ -72,6 +90,7 @@ export default async function Home() {
         caseStudies={caseStudies}
         assetManifest={assetManifest}
         isAdmin={isAdmin}
+        personalization={personalization}
       />
     </>
   );

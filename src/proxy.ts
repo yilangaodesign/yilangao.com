@@ -30,12 +30,12 @@ export function proxy(request: NextRequest) {
 
   const sessionCookie = request.cookies.get(COOKIE_NAME)?.value;
   if (!sessionCookie) {
-    return NextResponse.redirect(new URL("/for/unknown", request.url));
+    return NextResponse.redirect(new URL("/for/welcome", request.url));
   }
 
   const company = verifySessionValue(sessionCookie);
   if (!company) {
-    return NextResponse.redirect(new URL("/for/unknown", request.url));
+    return NextResponse.redirect(new URL("/for/welcome", request.url));
   }
 
   // Valid session — pass company identity downstream via header

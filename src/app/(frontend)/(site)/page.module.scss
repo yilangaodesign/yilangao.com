@@ -95,18 +95,8 @@
   transition: color 0.2s ease;
 }
 
-// ── SECTION DIVIDER ─────────────────────────────────────────────────────────
+// ── PERSONALIZATION BADGE ────────────────────────────────────────────────────
 
-.sectionDivider {
-  margin: $portfolio-spacer-4x 0;
-
-  @media #{$elan-mq-md} {
-    margin: $portfolio-spacer-6x 0;
-  }
-}
-
-// ── ESSAY BADGE ─────────────────────────────────────────────────────────────
-
-.essayBadge {
+.personalizationBadge {
   margin-bottom: $portfolio-spacer-1-5x;
 }
