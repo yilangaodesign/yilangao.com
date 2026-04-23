@@ -4,6 +4,24 @@ All notable changes to the Élan design system are documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.11.4] — 2026-04-23
+
+Patch release: Lexical link toolbar popover, block toolbar positioning fix, bidirectional Lexical-Payload link normalization, and resume URL update.
+
+### Fixed
+
+- **Inline edit**: Link toolbar button replaced with a popover that shows URL preview, edit, open-in-new-tab, and remove actions instead of immediately toggling the link off (FB-174 / ENG-198).
+- **Inline edit**: Block toolbar repositioned from `left: 0` (overlapping content) to centered above the block via `translate(-50%, -100%)` (FB-173).
+- **Inline edit**: Bidirectional Lexical-Payload link normalization (`normalizePayloadLinks` / `denormalizePayloadLinks`) wired into save, load, seed, and markdown conversion paths to bridge `@lexical/link` and Payload's incompatible `LinkNode` serialization (EAP-119 / ENG-195–197).
+- **Inline edit**: Removed `ClickableLinkPlugin` (conflicted with the new link popover workflow).
+- **yilangao.com**: Resume Google Drive link updated across site layout, seed route, and seed script.
+- **yilangao.com**: Élan case study scope statement now hyperlinks to the playground URL.
+
+### Released with this checkpoint
+
+- **yilangao.com** 1.3.4 — link toolbar popover, block toolbar fix, resume URL, Élan hyperlink
+- **ASCII Art Studio** 0.6.6 — release sync only (no app code changes)
+
 ## [2.11.3] — 2026-04-23
 
 Patch release: Lexical cross-block navigation fix, elan-visuals style refinements, and homepage essay badge feature flag.
