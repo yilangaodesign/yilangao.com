@@ -4,6 +4,23 @@ All notable changes to the Élan design system are documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.11.9] — 2026-04-24
+
+Patch release: documentation updates and Textarea SCSS cleanup.
+
+### Changed
+
+- **Élan**: Cleared `Textarea.module.scss` styles (component reset).
+- **Docs**: Added Chalk personalization content feedback entries (CF-026 through CF-028).
+- **Docs**: Added ENG-205 zombie boot-up incident entry and updated frequency map.
+- **Docs**: Updated port registry with current PIDs and restart log.
+
+### Released with this checkpoint
+
+- **Élan** 2.11.9
+- **yilangao.com** 1.3.9
+- **ASCII Art Studio** 0.6.11
+
 ## [2.11.8] — 2026-04-23
 
 Patch release: personalize skill and main site favicon.
