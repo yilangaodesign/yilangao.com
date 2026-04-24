@@ -37,7 +37,14 @@ export const Companies: CollectionConfig = {
       type: 'text',
       required: true,
       admin: {
-        description: 'The password shared with the hiring manager',
+        description: 'The primary password shared with the hiring manager',
+      },
+    },
+    {
+      name: 'altPasswords',
+      type: 'text',
+      admin: {
+        description: 'Comma-separated alternate passwords that also grant access',
       },
     },
     {

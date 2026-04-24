@@ -71,6 +71,13 @@ async function pushSchema() {
       WHEN duplicate_column THEN NULL;
     END $$`,
 
+    // Add alt_passwords column to companies
+    `DO $$ BEGIN
+      ALTER TABLE "companies" ADD COLUMN "alt_passwords" varchar;
+    EXCEPTION
+      WHEN duplicate_column THEN NULL;
+    END $$`,
+
     // Add layout column to projects_sections
     `DO $$ BEGIN
       ALTER TABLE "projects_sections" ADD COLUMN "layout" varchar DEFAULT 'auto';

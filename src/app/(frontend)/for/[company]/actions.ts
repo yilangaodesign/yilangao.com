@@ -21,7 +21,13 @@ export async function validatePassword(
   }
 
   const storedPassword = config?.password ?? SITE_PASSWORD;
-  const isValid = comparePasswords(password, storedPassword);
+  const altPasswords = (config?.altPasswords ?? "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  const isValid =
+    comparePasswords(password, storedPassword) ||
+    altPasswords.some((alt) => comparePasswords(password, alt));
 
   if (!isValid) {
     return { success: false, error: "Incorrect password" };
