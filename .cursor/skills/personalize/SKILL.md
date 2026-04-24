@@ -178,6 +178,9 @@ Create the record with:
 - `active: true`
 - `accent` -- hex color from the company's brand
 - `greeting` -- **always `"Welcome."`**. See Greeting Contract below.
+- `altPasswords` -- if the user mentions having already shared a different
+  password (e.g. on a resume or in a prior message), add the distributed
+  password as an alt password entry: `altPasswords: [{ value: "the-password" }]`
 
 ### 4b: Write Notes
 
@@ -218,6 +221,7 @@ available in the environment (falls back to `PAYLOAD_SECRET`, then
 | Stale threshold | **12 weeks** (3 months) |
 | Greeting | **Always `"Welcome."`** -- never `"Hi, {Company} team"` or any variant |
 | Password | Human-sounding, completes the greeting -- never `slug-preview-year` patterns |
+| Alt passwords | Optional, set when multiple passwords may have been distributed (e.g. on a resume) |
 | Dev server | Must be running on port 4000 before Step 5 |
 | Payload auth | `payload-token` cookie required for all CMS API calls |
 
