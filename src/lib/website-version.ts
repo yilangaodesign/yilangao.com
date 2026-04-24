@@ -4,7 +4,7 @@
  */
 export const website = {
   name: "yilangao.com",
-  version: "1.3.10",
+  version: "1.3.11",
   release: {
     version: "1.3.10",
     name: "yilangao.com 1.3.10",
