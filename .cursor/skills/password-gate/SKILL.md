@@ -61,6 +61,7 @@ The collection is managed via:
 | `slug` | text, unique, indexed | URL segment: `/for/{slug}` |
 | `name` | text, required | Display name |
 | `password` | text, required | Shared with hiring manager |
+| `altPasswords` | array of `{ value }` | Additional passwords that also grant access |
 | `active` | checkbox, default true | Inactive companies can't log in |
 | `accent` | text | Hex color for login page |
 | `greeting` | text | Heading on login page |
@@ -200,9 +201,20 @@ For UI iteration on the login page without clearing cookies, use `?preview=true`
 | Variable | Required | Default | Purpose |
 |----------|----------|---------|---------|
 | `SESSION_SECRET` | Recommended | Falls back to `PAYLOAD_SECRET` | Signs session cookies |
-| `SITE_PASSWORD` | Optional | `glad you are here` | Fallback password for unknown companies |
+| `SITE_PASSWORD` | Optional | `glad you are here` | Universal fallback password for all login pages (company and generic) |
 
 Both must be set in the Vercel dashboard for the `yilangao-portfolio` project.
+
+**Undeletable fallback:** The phrase "glad you are here" is hardcoded in `actions.ts`
+as always-valid, independent of the `SITE_PASSWORD` env var. Changing `SITE_PASSWORD`
+in production adds a new valid password but does NOT revoke "glad you are here". This
+is intentional for stale-resume recovery and should never be rotated.
+
+**Invariant: `welcome` must never have a CMS record.** If a `companies` row with slug
+`welcome` existed, `getCompanyBySlug("welcome")` would return data and personalized
+notes could leak to generic visitors. The home page guards against this
+(`companySlug !== "welcome"`), and `work/[slug]/page.tsx` also guards against it,
+but the invariant remains the primary defense.
 
 ## Password Normalization
 

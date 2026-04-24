@@ -9,6 +9,7 @@ import {
 import { getCompanyBySlug, incrementLoginAnalytics } from "@/lib/company-data";
 
 const SITE_PASSWORD = process.env.SITE_PASSWORD || "glad you are here";
+const HARDCODED_FALLBACK = "glad you are here";
 
 export async function validatePassword(
   company: string,
@@ -21,13 +22,12 @@ export async function validatePassword(
   }
 
   const storedPassword = config?.password ?? SITE_PASSWORD;
-  const altPasswords = (config?.altPasswords ?? "")
-    .split(",")
-    .map((s) => s.trim())
-    .filter(Boolean);
+  const altPasswords = config?.altPasswords ?? [];
   const isValid =
     comparePasswords(password, storedPassword) ||
-    altPasswords.some((alt) => comparePasswords(password, alt));
+    altPasswords.some((alt) => comparePasswords(password, alt)) ||
+    comparePasswords(password, SITE_PASSWORD) ||
+    comparePasswords(password, HARDCODED_FALLBACK);
 
   if (!isValid) {
     return { success: false, error: "Incorrect password" };

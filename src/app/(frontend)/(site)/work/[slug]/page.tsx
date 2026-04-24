@@ -413,7 +413,7 @@ export default async function ProjectPage({ params }: Props) {
 
   let companyNote: { companyName: string; note: string } | undefined;
   const companySess = await getCompanyFromSession();
-  if (companySess) {
+  if (companySess && companySess !== "welcome") {
     const companyConfig = await getCompanyBySlug(companySess);
     if (companyConfig) {
       const noteEntry = companyConfig.caseStudyNotes.find((n) => n.projectSlug === slug);

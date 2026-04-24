@@ -4,7 +4,25 @@
 >
 > **Who reads this:** AI agents when the `ship-it` skill is activated — scan recent entries for recurring pitfalls before starting a new release.
 > **Who writes this:** AI agents after each ship-it run via the Post-Release Audit protocol in `ship-it/SKILL.md`.
-> **Last updated:** 2026-04-24 (REL-021: Élan 2.11.9, yilangao.com 1.3.9, ASCII Art Studio 0.6.11)
+> **Last updated:** 2026-04-24 (REL-022: Élan 2.11.10, yilangao.com 1.3.10, ASCII Art Studio 0.6.12)
+
+---
+
+## REL-022 — Élan 2.11.10, yilangao.com 1.3.10, ASCII Art Studio 0.6.12 (2026-04-24)
+
+**Scope:** 8 files across 2 dependency-ordered layer commits (L1 docs x4, L8 frontend/CMS x4) + 1 release commit + 1 dev-patch-bump commit. Layers 0, 2-7, 9-10 empty.
+**Semver:** Patch for all three apps. yilangao.com 1.3.10: alt passwords feature for company gate. Élan 2.11.10: manifest sync only. ASCII Art Studio 0.6.12: manifest sync only.
+**Previous release:** Élan 2.11.9, yilangao.com 1.3.9, ASCII Art Studio 0.6.11
+
+**Incidents during release:** None. Clean pass through all phases.
+
+**Build gate:** Playground ~22s compile + ~10s TS, main site ~36s compile + ~14s TS, ASCII tool ~10s compile + ~5s TS. All passed first attempt.
+
+**Post-deploy verification:** `vercel ls --prod` (default linked project `yilangao-design-system`) showed latest production deployment Ready (1m build) within 3m of the `main` push.
+
+**Layer classification notes:**
+- L1: `docs/engineering-feedback-log.md` (ENG-199 alt passwords), `docs/engineering-anti-patterns.md` (ENG-206 appended to EAP-076), `docs/engineering.md` (frequency map bump), `docs/port-registry.md` (PID update + restart log entry).
+- L8: `src/collections/Companies.ts` (new `altPasswords` field), `src/app/(frontend)/for/[company]/actions.ts` (multi-password validation), `src/lib/company-data.ts` (type + data fetch), `src/scripts/push-schema.ts` (ALTER TABLE for alt_passwords column).
 
 ---
 
@@ -306,22 +324,4 @@ REL-AP-005 (dead `src/lib/utils.ts` with missing `tailwind-merge` dependency) ha
 
 ---
 
-## REL-007 — Élan 2.6.0, ASCII Art Studio 0.5.1 (2026-04-07)
-
-**Scope:** 66 files across 10 layer commits + release commit + dev patch bump
-**Semver:** Minor — new MediaRenderer component, 3 elan-visuals (CollaborationLoop, MaturityTimeline, SkillMap), halftone portrait login, new dependencies (d3-hierarchy, three, culori)
-**Previous release:** Élan 2.5.0, ASCII Art Studio 0.5.0
-
-**Incidents during release:** None. All 3 build gates passed on first attempt.
-
-**Layer classification notes:**
-- Phase 2 caught 6 tracked macOS duplicate files (e.g., `file 2.svg`, `renovate 2.json`) — these were pre-existing tracked junk, not from this session.
-- `public/videos/portrait.mp4` (4.4MB) committed as a static asset for the halftone portrait effect. Acceptable size but worth monitoring if more videos are added.
-- ASCII Art Studio released as 0.5.1 (patch) with no new changes — just the dev patch counter from REL-006.
-- Layer 7 (site components) was the largest code addition: 6 new elan-visual files totaling ~2,400 lines.
-- All new files passed the REL-AP-005 dead code check (imports verified for MediaRenderer, elan-visuals, HalftonePortrait, useInteractionVelocity).
-- 2 Sass deprecation warnings in main site build (`darken()` in ProjectEditModal.module.scss) — non-blocking, tracked for future cleanup.
-
----
-
-> **Archived entries:** REL-001 through REL-006 moved to `docs/release-log-archive.md` (2026-04-24, cap enforcement).
+> **Archived entries:** REL-001 through REL-007 moved to `docs/release-log-archive.md` (2026-04-24, cap enforcement).

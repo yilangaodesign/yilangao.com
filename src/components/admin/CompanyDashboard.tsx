@@ -8,6 +8,7 @@ type Company = {
   name: string
   slug: string
   password: string
+  altPasswords: string[]
   active: boolean
   accent: string
   greeting: string
@@ -21,6 +22,7 @@ type FormData = {
   name: string
   slug: string
   password: string
+  altPasswords: string[]
   active: boolean
   accent: string
   greeting: string
@@ -32,6 +34,7 @@ const EMPTY_FORM: FormData = {
   name: '',
   slug: '',
   password: '',
+  altPasswords: [],
   active: true,
   accent: '#888888',
   greeting: 'Welcome.',
@@ -88,6 +91,7 @@ export default function CompanyDashboard() {
           name: doc.name,
           slug: doc.slug,
           password: doc.password,
+          altPasswords: (doc.altPasswords as Array<{ value: string }> || []).map((p) => p.value),
           active: doc.active ?? true,
           accent: doc.accent || '#888888',
           greeting: doc.greeting || 'Welcome.',
@@ -145,6 +149,7 @@ export default function CompanyDashboard() {
       name: form.name,
       slug: form.slug,
       password: form.password,
+      altPasswords: form.altPasswords.filter(Boolean).map((v) => ({ value: v })),
       active: form.active,
       accent: form.accent,
       greeting: form.greeting,
@@ -182,6 +187,7 @@ export default function CompanyDashboard() {
       name: company.name,
       slug: company.slug,
       password: company.password,
+      altPasswords: company.altPasswords,
       active: company.active,
       accent: company.accent,
       greeting: company.greeting,
@@ -321,6 +327,21 @@ export default function CompanyDashboard() {
                     Generate
                   </button>
                 </div>
+              </label>
+
+              <label className={styles.field}>
+                <span>Alt Passwords</span>
+                <textarea
+                  value={form.altPasswords.join('\n')}
+                  onChange={(e) =>
+                    setForm((prev) => ({
+                      ...prev,
+                      altPasswords: e.target.value.split('\n'),
+                    }))
+                  }
+                  rows={2}
+                  placeholder="One per line (optional)"
+                />
               </label>
 
               <label className={styles.field}>
