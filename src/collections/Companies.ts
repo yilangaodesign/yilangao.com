@@ -42,10 +42,17 @@ export const Companies: CollectionConfig = {
     },
     {
       name: 'altPasswords',
-      type: 'text',
+      type: 'array',
       admin: {
-        description: 'Comma-separated alternate passwords that also grant access',
+        description: 'Additional passwords that also grant access',
       },
+      fields: [
+        {
+          name: 'value',
+          type: 'text',
+          required: true,
+        },
+      ],
     },
     {
       name: 'active',

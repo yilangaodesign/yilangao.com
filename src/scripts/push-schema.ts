@@ -38,7 +38,7 @@ async function pushSchema() {
       "password" varchar NOT NULL,
       "active" boolean DEFAULT true,
       "accent" varchar DEFAULT '#888888',
-      "greeting" varchar DEFAULT 'Welcome',
+      "greeting" varchar DEFAULT 'Welcome.',
       "logo_id" integer REFERENCES "media"("id") ON DELETE SET NULL,
       "background_image_id" integer REFERENCES "media"("id") ON DELETE SET NULL,
       "layout_variant" varchar DEFAULT 'centered',
@@ -71,11 +71,21 @@ async function pushSchema() {
       WHEN duplicate_column THEN NULL;
     END $$`,
 
-    // Add alt_passwords column to companies
+    // Create companies alt passwords array table (replaces old alt_passwords varchar column)
+    `CREATE TABLE IF NOT EXISTS "companies_alt_passwords" (
+      "id" serial PRIMARY KEY,
+      "_order" integer NOT NULL,
+      "_parent_id" integer NOT NULL REFERENCES "companies"("id") ON DELETE CASCADE,
+      "value" varchar
+    )`,
+    `CREATE INDEX IF NOT EXISTS "companies_alt_passwords_parent_idx" ON "companies_alt_passwords" ("_parent_id")`,
+    `CREATE INDEX IF NOT EXISTS "companies_alt_passwords_order_idx" ON "companies_alt_passwords" ("_order")`,
+
+    // Drop the old varchar column idempotently
     `DO $$ BEGIN
-      ALTER TABLE "companies" ADD COLUMN "alt_passwords" varchar;
+      ALTER TABLE "companies" DROP COLUMN "alt_passwords";
     EXCEPTION
-      WHEN duplicate_column THEN NULL;
+      WHEN undefined_column THEN NULL;
     END $$`,
 
     // Add layout column to projects_sections
