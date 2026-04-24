@@ -4,7 +4,25 @@
 >
 > **Who reads this:** AI agents when the `ship-it` skill is activated — scan recent entries for recurring pitfalls before starting a new release.
 > **Who writes this:** AI agents after each ship-it run via the Post-Release Audit protocol in `ship-it/SKILL.md`.
-> **Last updated:** 2026-04-23 (REL-020: Élan 2.11.8, yilangao.com 1.3.8, ASCII Art Studio 0.6.10)
+> **Last updated:** 2026-04-24 (REL-021: Élan 2.11.9, yilangao.com 1.3.9, ASCII Art Studio 0.6.11)
+
+---
+
+## REL-021 — Élan 2.11.9, yilangao.com 1.3.9, ASCII Art Studio 0.6.11 (2026-04-24)
+
+**Scope:** 5 files across 2 dependency-ordered layer commits (L1 docs x4, L6 component update x1) + 1 release commit + 1 dev-patch-bump commit. Layers 0, 2-5, 7-10 empty.
+**Semver:** Patch for all three apps. Élan 2.11.9: Textarea SCSS cleared. yilangao.com 1.3.9: docs only. ASCII Art Studio 0.6.11: manifest sync only.
+**Previous release:** Élan 2.11.8, yilangao.com 1.3.8, ASCII Art Studio 0.6.10
+
+**Incidents during release:** None. Clean pass through all phases.
+
+**Build gate:** Playground ~29s, main site ~44s, ASCII tool ~18s. All passed first attempt.
+
+**Post-deploy verification:** `vercel ls --prod` (default linked project `yilangao-design-system`) showed latest production deployment Ready (58s build) within 4m of the `main` push.
+
+**Layer classification notes:**
+- L1: `docs/content-feedback-log.md` (CF-026 through CF-028, Chalk personalization), `docs/engineering-feedback-log.md` (ENG-205), `docs/engineering.md` (frequency map), `docs/port-registry.md` (PIDs + restart log).
+- L6: `src/components/ui/Textarea/Textarea.module.scss` (file emptied — styles cleared).
 
 ---
 
@@ -306,32 +324,4 @@ REL-AP-005 (dead `src/lib/utils.ts` with missing `tailwind-merge` dependency) ha
 
 ---
 
-## REL-006 — Élan 2.5.0, ASCII Art Studio 0.5.0 (2026-04-06)
-
-**Scope:** 104 files across 9 layer commits + release commit + 2 build-gate fix commits + dev patch bump
-**Semver:** Minor — new Tooltip subsystem (InfoTooltip, TooltipProvider), block editor for inline editing, Etro API route, expanded content framework
-**Previous release:** Élan 2.4.1, ASCII Art Studio 0.4.1
-
-**Incidents during release:**
-
-1. **Build gate failure #1 — type predicate on destructured binding** (TypeScript error)
-   `ProjectClient.tsx` used `.filter(({ block }): block is ...` which TypeScript rejects — type predicates cannot reference destructured elements. Fixed by rewriting as `.filter((item): item is ...`.
-
-2. **Build gate failure #2 — wrong pretext API** (TypeScript error)
-   `TestimonialCard.tsx` called `pretext.layoutNextLineRange()` and `pretext.materializeLineRange()`, which don't exist on the main export (`layout.d.ts`). The correct API is `pretext.layoutNextLine()` which returns a `LayoutLine` with `.text` directly. Fixed by consolidating to `layoutNextLine`.
-
-3. **REL-AP-005 triggered — dead `src/lib/utils.ts`** (caught in Phase 1)
-   Same file from REL-004 was re-created — imports `tailwind-merge` (not installed), not imported by anything. Caught during Phase 1 classification per the pitfall check. Deleted before committing.
-
-**Layer classification notes:**
-- Largest release to date: 104 files across 9 layers (no empty layers except 4 and 10).
-- Layer 1 (Docs) had 33 files — the content framework expansion (14 new doc files).
-- Layer 5 applied REL-AP-003 (component family rule) for Tooltip directory.
-- Layer 7 (Site components) had 18 files — the block editor subsystem is the largest single feature.
-- 8 macOS duplicate junk files cleaned in Phase 2 (same `* 2.*` pattern as REL-004).
-
-**Outcome:** All 3 builds passed after 2 fix commits. Fast-forward merge to main. Playground deployed Ready in 53s. Main site responding 200 at `https://new.yilangao.com`.
-
----
-
-> **Archived entries:** REL-001 through REL-005 moved to `docs/release-log-archive.md` (2026-04-23, cap enforcement).
+> **Archived entries:** REL-001 through REL-006 moved to `docs/release-log-archive.md` (2026-04-24, cap enforcement).
