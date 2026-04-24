@@ -191,7 +191,7 @@ Violating this produces a silent no-op: the menu inserts the block into `content
 | Verification gap (reporting done without browser check) | 4 | **Critical — promoted to Hard Guardrail #10 (ENG-020). curl ≠ verification. ENG-189: 4th occurrence. ENG-188 closed with "browser verification deferred to next live session" — the next live session was the user re-reporting the identical bug 10 minutes later, because the 12h23m-old Webpack dev server had never delivered the structural React hook-shape changes. "Deferred verification" is a documented shortcut around Hard Guardrail #10, not a mitigation. EAP-115 now bans the phrase "deferred to next live session" as a closeout and mandates clean dev-server restart + compiled-chunk grep for any client-component hook-shape change.** |
 | Process automation gaps | 1 | High |
 | Documentation procedure skips | 3 | **Critical — promoted to Hard Guardrail #1 (ENG-012)** |
-| Zombie server processes | 2 | **High — ENG-116. TCP listen ≠ HTTP health. Servers ran for hours/days, accepted TCP connections but never responded to HTTP. Boot-up probe must use `curl --max-time 5` not `lsof`/`nc`. See EAP-068.** |
+| Zombie server processes | 3 | **High — ENG-116, ENG-205. TCP listen ≠ HTTP health. Servers ran for hours/days, accepted TCP connections but never responded to HTTP. Boot-up probe must use `curl --max-time` not `lsof`/`nc`. See EAP-068.** |
 | External service placeholder configs | 1 | High |
 | Node.js version / CLI tool compat | 1 | High — Node 25 breaks Payload CLI (ENG-015); use Node 22 LTS if CLI needed |
 | Git branching / session safety | 1 | Critical |

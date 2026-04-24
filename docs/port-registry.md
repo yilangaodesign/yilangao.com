@@ -23,9 +23,9 @@
 
 | Service | Default Port | Current Port | Status | PID | Notes |
 |---|---|---|---|---|---|
-| Main site (`yilangao.com`) | 4000 | 4000 | running | 34506 | `npm run dev` (webpack mode) |
-| Playground | 4001 | 4001 | running | 64704 | `npm run playground` (`--webpack`; see ENG-150) |
-| ASCII Art Studio | 4002 | 4002 | running | 37096 | `npm run ascii-tool` (`--webpack`; see ENG-150) |
+| Main site (`yilangao.com`) | 4000 | 4000 | running | 92481 | `npm run dev` (webpack mode) |
+| Playground | 4001 | 4001 | running | 92517 | `npm run playground` (`--webpack`; see ENG-150) |
+| ASCII Art Studio | 4002 | 4002 | running | 94130 | `npm run ascii-tool` (`--webpack`; see ENG-150) |
 
 ## Key Pages (on main site, no separate server)
 
@@ -38,6 +38,7 @@
 
 | Timestamp (UTC) | Service | Action | Port | Reason |
 |---|---|---|---|---|
+| 2026-04-24 14:56 | Main site, Playground, ASCII Art Studio | restarted | 4000–4002 | User boot up — 4000/4001 accepted TCP but `curl` timed out (zombie `next-server`); 4002 later hung the same way. SIGKILL listeners on 4000/4001/4002; `rm -rf` `.next`, `playground/.next`, `ascii-tool/.next`; fresh `npm run dev`, `npm run playground`, `npm run ascii-tool`. Verified `-L` on `/` → 200, `/for/welcome?preview=true` → 200, playground `/` → 200, ASCII `/` → 200. LISTEN PIDs: 92481 (4000), 92517 (4001), 94130 (4002). |
 | 2026-04-23 15:04 | Main site, ASCII Art Studio | restarted | 4000, 4002 | User boot up — HTTP 500 on main site (followed `/` after redirect) and login preview; HTTP 500 then hung first-byte on ASCII `/` after stale listeners. Identified `next-server` PIDs on 4000/4002, SIGKILL, `rm -rf` root `.next` and `ascii-tool/.next`, fresh `npm run dev` and ASCII `next dev --port 4002 --webpack`. Playground on 4001 already HTTP 200 (left running). Verified HTTP 200 on `/` (redirect chain), `/for/unknown?preview=true`, playground `/`, ASCII `/` (first `/` can block until initial webpack compile completes after Ready). LISTEN PIDs: 34506 (4000), 64704 (4001), 37096 (4002). |
 | 2026-04-21 14:20 | Playground | restarted | 4001 | User boot up — playground zombie (PID 81689 accepting TCP but no HTTP response); killed all stale `next dev --port 4001` processes; `rm -rf node_modules && npm install` resolved silent hang during Next.js init; fresh `npm run playground` healthy (HTTP 200). Main site (4000) and ASCII Art Studio (4002) already healthy. |
 | 2026-04-20 20:55 | All services | restarted | 4000–4002 | `ERR_EMPTY_RESPONSE` on `/for/test?preview=true` — traced to missing `routes-manifest.json` (ENG-117/EAP-069 recurrence). Webpack accepted connections but returned 0 bytes; ENOENT visible in dev log. Clearing `.next` alone did not fix — `rm -rf node_modules && npm install` resolved it (ENG-134 pattern). Post-reinstall: first request 26s (cold compile + Payload schema pull), repeat requests ~300–500ms, `routes-manifest.json` confirmed present. |
