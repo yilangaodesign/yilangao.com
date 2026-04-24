@@ -4,7 +4,26 @@
 >
 > **Who reads this:** AI agents when the `ship-it` skill is activated — scan recent entries for recurring pitfalls before starting a new release.
 > **Who writes this:** AI agents after each ship-it run via the Post-Release Audit protocol in `ship-it/SKILL.md`.
-> **Last updated:** 2026-04-24 (REL-022: Élan 2.11.10, yilangao.com 1.3.10, ASCII Art Studio 0.6.12)
+> **Last updated:** 2026-04-24 (REL-023: Élan 2.11.11, yilangao.com 1.3.11, ASCII Art Studio 0.6.13)
+
+---
+
+## REL-023 — Élan 2.11.11, yilangao.com 1.3.11, ASCII Art Studio 0.6.13 (2026-04-24)
+
+**Scope:** 9 files across 3 dependency-ordered layer commits (L0 config x2, L1 docs x1, L8 frontend/CMS x6) + 1 release commit + 1 dev-patch-bump commit. Layers 2-7, 9-10 empty.
+**Semver:** Patch for all three apps. yilangao.com 1.3.11: alt passwords migrated from text to array field, universal fallback, welcome-slug guard, dashboard UI. Élan 2.11.11: manifest sync only. ASCII Art Studio 0.6.13: manifest sync only.
+**Previous release:** Élan 2.11.10, yilangao.com 1.3.10, ASCII Art Studio 0.6.12
+
+**Incidents during release:** Playground build gate failed on first attempt with `Module not found: Can't resolve 'cmdk'` — the package was listed in `playground/package.json` and present in `node_modules`, but a stale `.next` Turbopack cache caused resolution failure. Fixed by `rm -rf playground/.next` and re-running. No code changes needed.
+
+**Build gate:** Playground ~17s compile + ~9s TS (after cache clear), main site ~25s compile + ~13s TS, ASCII tool ~9s compile + ~5s TS. All passed on second attempt (playground) / first attempt (main + ASCII).
+
+**Post-deploy verification:** `vercel ls --prod` (default linked project `yilangao-design-system`) showed latest production deployment Ready (1m build) within 1m of the `main` push.
+
+**Layer classification notes:**
+- L0: `.cursor/skills/password-gate/SKILL.md` (altPasswords array docs, fallback invariants), `.cursor/skills/personalize/SKILL.md` (altPasswords field guidance).
+- L1: `docs/engineering-feedback-log.md` (ENG-206 alt password architecture migration).
+- L8: `src/collections/Companies.ts` (text to array migration), `src/app/(frontend)/for/[company]/actions.ts` (universal fallback + simplified validation), `src/lib/company-data.ts` (type + mapper), `src/scripts/push-schema.ts` (create array table, drop varchar column, fix greeting default), `src/components/admin/CompanyDashboard.tsx` (alt passwords UI), `src/app/(frontend)/(site)/work/[slug]/page.tsx` (welcome guard).
 
 ---
 
@@ -304,24 +323,4 @@ REL-AP-005 (dead `src/lib/utils.ts` with missing `tailwind-merge` dependency) ha
 
 ---
 
-## REL-008 — Élan 2.7.0, ASCII Art Studio 0.5.2 (2026-04-08)
-
-**Scope:** 46 files merged to `main` (39 working-tree changes plus release artifacts): 8 dependency-ordered layer commits, 1 release commit, 1 dev patch bump on `dev` after merge
-**Semver:** Minor — `version:auto` promoted Élan 2.6.1 → 2.7.0 (new `MediaRenderer.module.scss` in a tracked component family); typography token/mixin expansion; DropdownMenu and portfolio/project surface updates
-**Previous release:** Élan 2.6.0, ASCII Art Studio 0.5.1
-
-**Incidents during release:**
-- **Shell commit-message substitution:** `git commit -m "release: Élan $(node -p \"require('./elan.json')...\")"` failed in `bash` (bad escaping). **Resolution:** amended both the release commit and the post-merge dev-bump commit with literal version strings in the message.
-- **Vercel post-deploy poll:** `vercel ls --prod` from repo root targets **yilangao-design-system** (playground) per `.vercel/project.json`; newest production deployment was **Queued** at poll time (~2m after push). **Resolution:** treat as in-flight; re-check dashboard if needed. Main site project (`yilangao-portfolio`) is not shown by default from this working directory.
-
-**Build gate:** All three apps passed (`playground`, root main site, `ascii-tool`) on first attempt. Same non-blocking Sass `darken()` deprecation warnings in `ProjectEditModal.module.scss` as REL-007.
-
-**Layer classification notes:**
-- Phase 2 removed untracked macOS duplicate tree `src/styles 2/` (`* 2.*` junk); not merged.
-- `npm run sync-tokens` run before ship commits; playground `prebuild` also runs sync-tokens — working tree stayed clean after builds.
-- `MediaRenderer` new `.module.scss` grouped with `MediaRenderer.tsx` in one commit (REL-AP-003).
-- `CHANGELOG.md` updated for 2.7.0; ASCII 0.5.2 noted as release sync without new app code in this batch.
-
----
-
-> **Archived entries:** REL-001 through REL-007 moved to `docs/release-log-archive.md` (2026-04-24, cap enforcement).
+> **Archived entries:** REL-001 through REL-008 moved to `docs/release-log-archive.md` (2026-04-24, cap enforcement).
