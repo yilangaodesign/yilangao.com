@@ -1311,6 +1311,42 @@ Applied T11/T13/T15 techniques mechanically. Over-indexed on "clever contrarian"
 
 ---
 
+#### CF-026: Personalize for Chalk (ML data platform, founding designer role)
+
+**Intent:** Set up a tailored visitor experience for Chalk, a real-time ML data platform ($50M Series A, $500M valuation). Interviewer is David Zhao, their current product designer. The role is an early design team member working with engineers and founders on web/CLI tools for data scientists and ML practitioners.
+
+**Root Cause:** New company setup - no prior Chalk record existed.
+
+**Resolution:** Created Chalk company record (slug: `chalk`, password: `David`, accent: `#3336FF` portfolio blue). 1 badge on Meteor. Note connects Chalk's core domain (real-time data for fraud detection, identity, lending) to Meteor's exception-review workflow (12,000 rows compressed to 560 flags). Note avoids mentioning "founding designer" since Chalk already has at least one designer (David Zhao) plus brand/creative roles. The user corrected stale JD language that implied this was the first design hire.
+
+**Pattern extracted:** When the JD says "founding" but the user has insider knowledge that the team already has members in that role, defer to the user's knowledge. JDs go stale. Avoid mentioning team size or hire sequence in notes unless the user confirms it.
+
+---
+
+#### CF-027: "The notes is wrong - it's not '12,000 rows of exception data'"
+
+**Intent:** The note mischaracterized Meteor's data reduction. The 12,000 rows are the full dataset, not "exception data." The 560 rows are the exceptions that users actually need to review.
+
+**Root Cause:** Agent compressed the metric into "12,000 rows of exception data compressed into 560 actionable flags" which reverses the meaning. The 12,000 is the noise; the 560 is the signal.
+
+**Resolution:** Changed to "instead of reviewing 12,000 rows, users review only the 560 flagged as exceptions." This correctly frames the before (full dataset) and after (exception subset).
+
+**Pattern extracted:** When paraphrasing a metric from a case study, preserve the direction of the reduction. "X compressed into Y" is ambiguous about what X is. "Instead of X, only Y" is unambiguous. Always name the before state as the undifferentiated mass and the after state as the filtered result.
+
+---
+
+#### CF-028: "The intro blurb already covers the 12000 -> 560. Won't that be repetitive?"
+
+**Intent:** The company note was restating the hero metric that appears directly above it in the page layout. The note should add new context, not echo the headline.
+
+**Root Cause:** Agent defaulted to the case study's most prominent metric as the anchor for the note. But the note sits visually below the intro blurb, which already contains that metric. Repeating it reads as lazy copy-paste, not personalization.
+
+**Resolution:** Rewrote the note to focus on the design approach (exception-driven workflows, progressive disclosure, interface shaped by judgment not schema) and the structural parallel to Chalk's domain. Zero overlap with the intro blurb above.
+
+**Pattern extracted:** Company notes must be written with awareness of their visual position on the page. The intro blurb and hero metric are always visible above. Never restate what's already on screen. The note's job is to add a connection the reader wouldn't make on their own - why this work matters to *their* specific problem.
+
+---
+
 ## Entry Template
 
 ```markdown

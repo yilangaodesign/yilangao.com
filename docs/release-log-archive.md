@@ -2,7 +2,27 @@
 
 > **What this file is:** Archived release log entries that exceeded the 15-entry cap in `docs/release-log.md`. Kept for historical reference.
 >
-> **Last updated:** 2026-04-23 (archived REL-001 through REL-004)
+> **Last updated:** 2026-04-23 (archived REL-001 through REL-005)
+
+---
+
+## REL-005 — Élan 2.4.1, ASCII Art Studio 0.4.1 (2026-04-03)
+
+**Scope:** 15 files across 5 layer commits + release commit
+**Semver:** Patch — accent token chroma optimization, rich text paragraph break fix, debug logging cleanup
+**Previous release:** Élan 2.4.0, ASCII Art Studio 0.4.0
+
+**Incidents during release:**
+
+1. **ASCII tool build ENOTEMPTY** (transient, not a pitfall)
+   `rm -rf ascii-tool/.next` and retry resolved it. Stale `.next/server` directory from a previous build couldn't be cleaned by Next.js.
+
+**Layer classification notes:**
+- No new files, no deletions — all 15 files were modifications (M).
+- Clean 5-layer split: docs (5), tokens (1), site components (3), frontend pages (4), playground (2).
+- No ambiguous classifications this release.
+
+**Outcome:** All 3 builds passed (ASCII tool on second attempt after cache clear). Fast-forward merge to main. Playground deployed Ready in 53s. Main site responding 200 at `https://new.yilangao.com`.
 
 ---
 

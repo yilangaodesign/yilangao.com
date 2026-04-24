@@ -4,7 +4,28 @@
 >
 > **Who reads this:** AI agents when the `ship-it` skill is activated — scan recent entries for recurring pitfalls before starting a new release.
 > **Who writes this:** AI agents after each ship-it run via the Post-Release Audit protocol in `ship-it/SKILL.md`.
-> **Last updated:** 2026-04-23 (REL-019: Élan 2.11.7, yilangao.com 1.3.7, ASCII Art Studio 0.6.9)
+> **Last updated:** 2026-04-23 (REL-020: Élan 2.11.8, yilangao.com 1.3.8, ASCII Art Studio 0.6.10)
+
+---
+
+## REL-020 — Élan 2.11.8, yilangao.com 1.3.8, ASCII Art Studio 0.6.10 (2026-04-23)
+
+**Scope:** 2 files across 2 dependency-ordered layer commits (L0 config ×1, L8 frontend ×1) + 1 release commit + 1 dev-patch-bump commit. Layers 1-7, 9-10 empty.
+**Semver:** Patch for all three apps. Élan 2.11.8: new `personalize` agent skill. yilangao.com 1.3.8: favicon added. ASCII Art Studio 0.6.10: manifest sync only.
+**Previous release:** Élan 2.11.7, yilangao.com 1.3.7, ASCII Art Studio 0.6.9
+
+**Incidents during release:**
+- Git orphaned branch: local `dev` had no commits (orphaned from `origin/dev`). Required `git reset --soft origin/dev` to re-attach, then `git reset HEAD` to rebuild the index. Root cause: unknown (likely a prior interrupted operation). Not a recurring pitfall - one-time recovery.
+- Phantom `M` files in `git status`: multiple files showed as modified with zero content diff (stat-cache mismatches). Did not affect commits. Known macOS behavior.
+- 16 macOS duplicate files (`* 2.*` pattern) found and deleted in Phase 2.
+
+**Build gate:** Playground ~42s, main site ~65s, ASCII tool ~39s. All passed first attempt.
+
+**Post-deploy verification:** `vercel ls --prod` (default linked project `yilangao-design-system`) showed latest production deployment Ready within 3m of the `main` push.
+
+**Layer classification notes:**
+- L0: `.cursor/skills/personalize/SKILL.md` (new agent skill for company visitor personalization pipeline).
+- L8: `src/app/(frontend)/favicon.ico` (new static asset).
 
 ---
 
@@ -313,24 +334,4 @@ REL-AP-005 (dead `src/lib/utils.ts` with missing `tailwind-merge` dependency) ha
 
 ---
 
-## REL-005 — Élan 2.4.1, ASCII Art Studio 0.4.1 (2026-04-03)
-
-**Scope:** 15 files across 5 layer commits + release commit
-**Semver:** Patch — accent token chroma optimization, rich text paragraph break fix, debug logging cleanup
-**Previous release:** Élan 2.4.0, ASCII Art Studio 0.4.0
-
-**Incidents during release:**
-
-1. **ASCII tool build ENOTEMPTY** (transient, not a pitfall)
-   `rm -rf ascii-tool/.next` and retry resolved it. Stale `.next/server` directory from a previous build couldn't be cleaned by Next.js.
-
-**Layer classification notes:**
-- No new files, no deletions — all 15 files were modifications (M).
-- Clean 5-layer split: docs (5), tokens (1), site components (3), frontend pages (4), playground (2).
-- No ambiguous classifications this release.
-
-**Outcome:** All 3 builds passed (ASCII tool on second attempt after cache clear). Fast-forward merge to main. Playground deployed Ready in 53s. Main site responding 200 at `https://new.yilangao.com`.
-
----
-
-> **Archived entries:** REL-001 through REL-004 moved to `docs/release-log-archive.md` (2026-04-23, cap enforcement).
+> **Archived entries:** REL-001 through REL-005 moved to `docs/release-log-archive.md` (2026-04-23, cap enforcement).
