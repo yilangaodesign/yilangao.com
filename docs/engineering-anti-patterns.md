@@ -1562,7 +1562,7 @@ Webpack generates the routes manifest correctly. Monitor Next.js releases for a 
 3. Never clear `.next` more than twice for the same error. The second clear is already redundant; a third is wasted time.
 4. Next.js's "Ready in Xms" only means the HTTP listener is bound. It does NOT mean the bundler is functional. Always verify with an actual page request.
 
-**Incident:** ENG-134 (2026-04-08) — Four `.next` clears and two bundler mode switches before identifying corrupted node_modules as the root cause.
+**Incident:** ENG-134 (2026-04-08) — Four `.next` clears and two bundler mode switches before identifying corrupted node_modules as the root cause. ENG-206 (2026-04-24) — Boot up; main site HTTP 500 with webpack ENOENT on manifests and `layout.js` chunks; `.next` wipe + restart did not recover; `rm -rf node_modules .next` + `npm install` did.
 
 ---
 

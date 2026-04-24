@@ -2770,3 +2770,17 @@ The browser HTTP cache is the correct persistence layer — it's already there, 
 **Principle:** Scaffolded assets (favicon, OG image, robots.txt) are invisible until they're wrong. Include brand asset replacement in the project setup checklist, not as a deferred task.
 
 ---
+
+### ENG-199: Support multiple passwords per company
+
+**Issue:** User accidentally put "chalk" as the password on their resume but the CMS record was set to "David". The system only supports one password per company, so one of them would fail.
+
+**Root cause:** The Companies collection schema had a single `password` text field. No mechanism for alternate passwords.
+
+**Resolution:** Added `altPasswords` text field (comma-separated) to the Companies collection schema. Updated `validatePassword()` in `actions.ts` to split and check each alt password via `comparePasswords()`. Updated `CompanyRecord` type and data fetch in `company-data.ts`. Pushed schema via `push-schema.ts` (added `ALTER TABLE companies ADD COLUMN alt_passwords varchar`). Restarted dev server.
+
+**Files modified:** `src/collections/Companies.ts`, `src/app/(frontend)/for/[company]/actions.ts`, `src/lib/company-data.ts`, `src/scripts/push-schema.ts`
+
+**Principle:** Password fields in access-gated systems should anticipate the need for aliases from day one. Resumes, emails, and shared links create distributed references to credentials that can't be recalled.
+
+---
