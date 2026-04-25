@@ -41,17 +41,17 @@ const INTERACTIVE_VISUALS: Record<string, Record<string, { component: string; pl
     "Not the Components": {
       component: "CollaborationLoop",
       playgroundUrl: "https://yilangao-design-system.vercel.app",
-      playgroundLabel: "Explore the full design system \u2192",
+      playgroundLabel: "Explore the full design system",
     },
     "The System Behind the System": {
       component: "SkillMap",
       playgroundUrl: "https://yilangao-design-system.vercel.app",
-      playgroundLabel: "Explore the full design system \u2192",
+      playgroundLabel: "Explore the full design system",
     },
     "The Rising Floor": {
       component: "MaturityTimeline",
       playgroundUrl: "https://yilangao-design-system.vercel.app",
-      playgroundLabel: "Explore the full design system \u2192",
+      playgroundLabel: "Explore the full design system",
     },
   },
 };

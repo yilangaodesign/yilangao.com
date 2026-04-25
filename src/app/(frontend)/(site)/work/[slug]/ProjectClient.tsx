@@ -295,6 +295,7 @@ function InteractiveVisual({ config }: { config: InteractiveVisualConfig }) {
         })}
       >
         {config.playgroundLabel}
+        <span className={elanStyles.playgroundLinkArrow} aria-hidden="true">&#8599;</span>
       </a>
     </div>
   );
