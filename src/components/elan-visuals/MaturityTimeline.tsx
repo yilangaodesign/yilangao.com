@@ -126,12 +126,12 @@ export default function MaturityTimeline() {
     );
   }, [days]);
 
-  const segClasses =
+  const segClasses: Record<string, string> =
     mode === "severity"
       ? { fundamental: styles.accentDark, structural: styles.accentMid, refinement: styles.accentLight }
       : { engineering: styles.domainEngineering, design: styles.domainDesign, content: styles.domainContent };
 
-  const legendClasses =
+  const legendClasses: Record<string, string> =
     mode === "severity"
       ? { fundamental: styles.legendAccentDark, structural: styles.legendAccentMid, refinement: styles.legendAccentLight }
       : { engineering: styles.legendEngineering, design: styles.legendDesign, content: styles.legendContent };
@@ -324,7 +324,7 @@ export default function MaturityTimeline() {
                           return (
                             <div
                               key={key}
-                              className={`${styles.daySegment} ${(segClasses as Record<string, string>)[key] ?? ""} ${isDimmed ? styles.segmentDimmed : ""}`}
+                              className={`${styles.daySegment} ${segClasses[key] ?? ""} ${isDimmed ? styles.segmentDimmed : ""}`}
                               style={{ height: `${segPct}%` }}
                             />
                           );
@@ -441,7 +441,7 @@ export default function MaturityTimeline() {
                           return (
                             <span key={key} className={styles.tooltipRow}>
                               <span
-                                className={`${styles.tooltipDot} ${(segClasses as Record<string, string>)[key] ?? ""}`}
+                                className={`${styles.tooltipDot} ${segClasses[key] ?? ""}`}
                               />
                               {labels[key]}: {value}
                             </span>
@@ -487,7 +487,7 @@ export default function MaturityTimeline() {
                 onClick={() => setActiveFilter(isActive ? null : key)}
               >
                 <span
-                  className={`${styles.legendDot} ${(legendClasses as Record<string, string>)[key] ?? ""}`}
+                  className={`${styles.legendDot} ${legendClasses[key] ?? ""}`}
                 />
                 <span className={styles.legendFilterLabel} data-label={labels[key]}>
                   {labels[key]}
