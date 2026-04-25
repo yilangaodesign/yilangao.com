@@ -51,6 +51,7 @@ Hub docs:
 - `docs/design.md`
 - `docs/engineering.md`
 - `docs/content.md`
+- `docs/analytics.md`
 - `docs/architecture.md`
 - `docs/port-registry.md`
 - `docs/magic-words.md`

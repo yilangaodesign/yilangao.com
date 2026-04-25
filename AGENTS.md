@@ -66,6 +66,7 @@ dispatched by the orchestrator. Follow these rules:
 23. **NEVER** modify `src/proxy.ts`, `src/collections/Companies.ts`, `src/lib/company-session.ts`, or `src/lib/company-data.ts` without first reading `.cursor/skills/password-gate/SKILL.md`. These files form the visitor access boundary — incorrect changes can expose the site publicly or lock out all visitors.
 24. **ALWAYS** update the playground page when adding a new variant, prop, or visual state to any DS component in `src/components/ui/`. Before writing: (1) read the existing playground page (`playground/src/app/components/<name>/page.tsx`) to understand structure, section ordering, and conventions; (2) add a `ComponentPreview` for the new variant in the logical position; (3) update the `PropsTable`; (4) update Notes if the variant has usage guidance. A variant that exists in code but not in the playground is invisible to consumers. See EAP-082.
 25. **ALWAYS** call the content seeding endpoint after modifying any `src/app/(frontend)/api/update-*/route.ts` file. These files are content *definitions*, not content *deployments* — the CMS database is unchanged until the POST endpoint is called. After every edit: (1) `curl -X POST http://localhost:4000/api/update-{slug}` and confirm `action: "updated"` in the response, (2) verify via `curl` or Payload REST API that the new content is present in the CMS, (3) only then report the content edit as done. A saved file with uncalled endpoint is an incomplete task. See EAP-087.
+26. **ALWAYS** update the event registry in `docs/analytics.md` when adding or removing a Mixpanel `track()` call. Registry row format: `| Event Name (Title Case) | Properties (snake_case) | Firing condition | Source file |`. The static parity check in `npm run audit-docs` will flag drift.
 
 # Pre-Flight: Conditional Reading
 
@@ -175,6 +176,11 @@ skill assignment, and gate identification internally.
     → The branding reference contains brand identity (position, personality, edges), taste and tradition, atmospheric dials, visual identity rules (zero corner radius, Badge shape overrides, etc.), and the proof map.
     → This route is **mandatory** for all portfolio work. It is **additive to** Route 3 (content routing) and Route 1 (design routing) — read `branding.md` in addition to your category-specific docs, not instead of them.
 
+17. **Am I touching site analytics, Mixpanel, visitor tracking, or event instrumentation?**
+    → Read `docs/analytics.md` first (event registry, config summary, data flow).
+    → Then follow to `docs/engineering/analytics-instrumentation.md` for instrumentation work, or `docs/content/analytics-measurement.md` for measurement strategy.
+    → For server-side login analytics (`incrementLoginAnalytics`, `loginCount`), see `docs/architecture.md` §4.1 instead.
+
 Do NOT read docs that don't match your task. Do NOT read full doc files when only one section is relevant. The Section Index exists so you can target-read.
 
 # Self-Audit Protocol
@@ -192,19 +198,19 @@ Do NOT read docs that don't match your task. Do NOT read full doc files when onl
 > Workflow 3 requires write access; if in a read-only mode, note the
 > requirement and let the user/system handle the transition.
 
-17. **Is the user asking me to adversarially audit a plan or proposal?**
+18. **Is the user asking me to adversarially audit a plan or proposal?**
     (triggers: "pressure test plan")
     → Activate `plan-audit` skill at `.cursor/skills/plan-audit/SKILL.md`.
     → Prerequisite: a plan, proposal, or set of proposed changes exists in context.
     → Mode: any (read-only skill).
 
-18. **Is the user asking me to check a plan's structure and sequencing?**
+19. **Is the user asking me to check a plan's structure and sequencing?**
     (triggers: "meta audit plan")
     → Activate `plan-structure` skill at `.cursor/skills/plan-structure/SKILL.md`.
     → Prerequisite: a plan or proposal exists and its logical content is finalized.
     → Mode: any (read-only skill).
 
-19. **Is the user asking me to stress-test existing content?**
+20. **Is the user asking me to stress-test existing content?**
     (triggers: "content stress test", "fresh eyes", "recheck portfolio")
     → Activate `stress-test` skill at `.cursor/skills/stress-test/SKILL.md`.
     → Mode: requires write access (modifies files, pushes to CMS).

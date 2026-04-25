@@ -519,6 +519,80 @@ function printReport() {
   }
 }
 
+// 9. Analytics event registry parity
+function checkAnalyticsEventRegistryParity() {
+  const registryPath = resolve(ROOT, 'docs/analytics.md');
+  if (!existsSync(registryPath)) {
+    report('WARN', 'analytics-parity', null, 'docs/analytics.md not found — skipping event registry parity check.');
+    return;
+  }
+
+  const registryContent = readFileSync(registryPath, 'utf-8');
+
+  // Extract only the Event Registry section, then parse event names from it.
+  const sectionMatch = registryContent.match(/## Event Registry\n([\s\S]*?)(?=\n## |\n---\s*$|$)/);
+  if (!sectionMatch) {
+    report('WARN', 'analytics-parity', registryPath, 'Could not find "## Event Registry" section in docs/analytics.md.');
+    return;
+  }
+  const registrySection = sectionMatch[1];
+
+  const registryEvents = new Set();
+  const tableRowRegex = /^\|\s*\*\*(.+?)\*\*\s*\|/gm;
+  let match;
+  while ((match = tableRowRegex.exec(registrySection)) !== null) {
+    const name = match[1].trim();
+    if (name !== 'Event Name' && name !== '---') {
+      registryEvents.add(name);
+    }
+  }
+
+  if (registryEvents.size === 0) {
+    report('WARN', 'analytics-parity', registryPath, 'Could not parse any event names from the Event Registry table.');
+    return;
+  }
+
+  // Grep src/ for track() calls, excluding tests, stories, and node_modules.
+  const srcDir = resolve(ROOT, 'src');
+  const codeEvents = new Set();
+  const trackRegex = /track\s*\(\s*["']([^"']+)["']/g;
+
+  function scanDir(dir) {
+    if (!existsSync(dir)) return;
+    const entries = readdirSyncSafe(dir);
+    for (const entry of entries) {
+      if (entry === 'node_modules') continue;
+      const full = join(dir, entry);
+      const stat = statSync(full);
+      if (stat.isDirectory()) {
+        scanDir(full);
+      } else if (/\.(ts|tsx|js|jsx)$/.test(entry) && !/\.(test|stories|spec)\./.test(entry)) {
+        const content = readFileSync(full, 'utf-8');
+        let m;
+        while ((m = trackRegex.exec(content)) !== null) {
+          codeEvents.add(m[1]);
+        }
+        trackRegex.lastIndex = 0;
+      }
+    }
+  }
+
+  scanDir(srcDir);
+
+  // Bidirectional set diff
+  for (const event of codeEvents) {
+    if (!registryEvents.has(event)) {
+      report('ERROR', 'analytics-parity', registryPath, `Event "${event}" found in code but missing from the event registry in docs/analytics.md.`);
+    }
+  }
+
+  for (const event of registryEvents) {
+    if (!codeEvents.has(event)) {
+      report('ERROR', 'analytics-parity', registryPath, `Event "${event}" listed in registry but no matching track() call found in src/.`);
+    }
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Main
 // ---------------------------------------------------------------------------
@@ -541,6 +615,7 @@ async function main() {
   checkOrphans(files);
   checkDuplicates(files);
   checkStaleMarkers(files);
+  checkAnalyticsEventRegistryParity();
 
   printReport();
 }
