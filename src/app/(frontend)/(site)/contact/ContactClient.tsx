@@ -82,6 +82,11 @@ export default function ContactClient({ testimonials, clients, isAdmin }: Contac
       setFormState({ firstName: "", lastName: "", email: "", subject: "", message: "" });
     } catch {
       track("Contact Form Submitted", { success: false });
+      track("Error", {
+        error_type: "network",
+        error_message: "Contact form submission failed",
+        page_url: "/contact",
+      });
       setError("Something went wrong. Please try again.");
     } finally {
       setSubmitting(false);

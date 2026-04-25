@@ -27,6 +27,8 @@ export function initMixpanel(opts?: { disable?: boolean }) {
   mixpanel.init(token, {
     track_pageview: false,
     persistence: "localStorage",
+    autocapture: true,
+    record_sessions_percent: 100,
   });
 
   initialized = true;
@@ -49,4 +51,13 @@ export function identifyCompany(companySlug: string) {
 export function track(event: string, properties?: EventProperties) {
   if (!initialized || disabled) return;
   mixpanel.track(event, properties);
+}
+
+/**
+ * Register super properties that auto-attach to all subsequent events.
+ * No-ops when Mixpanel is disabled (admin or missing token).
+ */
+export function registerSuperProps(props: Record<string, string | number | boolean>) {
+  if (!initialized || disabled) return;
+  mixpanel.register(props);
 }

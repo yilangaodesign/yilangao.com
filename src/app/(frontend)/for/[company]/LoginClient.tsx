@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { validatePassword } from "./actions";
+import { track } from "@/lib/analytics/mixpanel";
 import { Input } from "@/components/ui/Input";
 import styles from "./login.module.scss";
 
@@ -49,8 +50,18 @@ export default function LoginClient({ company, accent, greeting }: Props) {
     startTransition(async () => {
       const result = await validatePassword(company, password);
       if (result.success) {
+        track("Sign In", {
+          login_method: "password",
+          success: true,
+          company,
+        });
         router.push("/");
       } else {
+        track("Sign In", {
+          login_method: "password",
+          success: false,
+          company,
+        });
         setError(result.error || "Something went wrong");
         setPassword("");
       }
