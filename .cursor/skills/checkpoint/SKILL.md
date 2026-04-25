@@ -55,7 +55,10 @@ npm run ascii-tool:version:release  # skip if no changes
 
 # IMPORTANT: release scripts auto-sync version files — commit ALL of them
 git add elan.json ascii-studio.json website.json playground/src/lib/elan.ts ascii-tool/src/lib/version.ts src/lib/website-version.ts
-git commit -m "release: Élan $(node -p \"require('./elan.json').release.version\"), ASCII Art Studio $(node -p \"require('./ascii-studio.json').release.version\")"
+# Capture versions before commit to avoid bash substitution failures (REL-AP-008)
+ELAN_VER=$(node -p "require('./elan.json').release.version")
+ASCII_VER=$(node -p "require('./ascii-studio.json').release.version")
+git commit -m "release: Élan $ELAN_VER, ASCII Art Studio $ASCII_VER"
 
 # 3. BUILD GATE — verify all apps build before merging (mandatory)
 #    If any build fails, STOP. Do not merge to main. Fix the error first.
