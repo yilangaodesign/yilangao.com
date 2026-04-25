@@ -2,7 +2,27 @@
 
 > **What this file is:** Archived release log entries that exceeded the 15-entry cap in `docs/release-log.md`. Kept for historical reference.
 >
-> **Last updated:** 2026-04-24 (archived REL-001 through REL-007)
+> **Last updated:** 2026-04-24 (archived REL-001 through REL-008)
+
+---
+
+## REL-008 — Élan 2.7.0, ASCII Art Studio 0.5.2 (2026-04-08)
+
+**Scope:** 46 files merged to `main` (39 working-tree changes plus release artifacts): 8 dependency-ordered layer commits, 1 release commit, 1 dev patch bump on `dev` after merge
+**Semver:** Minor — `version:auto` promoted Élan 2.6.1 → 2.7.0 (new `MediaRenderer.module.scss` in a tracked component family); typography token/mixin expansion; DropdownMenu and portfolio/project surface updates
+**Previous release:** Élan 2.6.0, ASCII Art Studio 0.5.1
+
+**Incidents during release:**
+- **Shell commit-message substitution:** `git commit -m "release: Élan $(node -p \"require('./elan.json')...\")"` failed in `bash` (bad escaping). **Resolution:** amended both the release commit and the post-merge dev-bump commit with literal version strings in the message.
+- **Vercel post-deploy poll:** `vercel ls --prod` from repo root targets **yilangao-design-system** (playground) per `.vercel/project.json`; newest production deployment was **Queued** at poll time (~2m after push). **Resolution:** treat as in-flight; re-check dashboard if needed. Main site project (`yilangao-portfolio`) is not shown by default from this working directory.
+
+**Build gate:** All three apps passed (`playground`, root main site, `ascii-tool`) on first attempt. Same non-blocking Sass `darken()` deprecation warnings in `ProjectEditModal.module.scss` as REL-007.
+
+**Layer classification notes:**
+- Phase 2 removed untracked macOS duplicate tree `src/styles 2/` (`* 2.*` junk); not merged.
+- `npm run sync-tokens` run before ship commits; playground `prebuild` also runs sync-tokens — working tree stayed clean after builds.
+- `MediaRenderer` new `.module.scss` grouped with `MediaRenderer.tsx` in one commit (REL-AP-003).
+- `CHANGELOG.md` updated for 2.7.0; ASCII 0.5.2 noted as release sync without new app code in this batch.
 
 ---
 

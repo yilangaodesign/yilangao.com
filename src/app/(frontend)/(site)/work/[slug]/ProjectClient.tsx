@@ -59,6 +59,7 @@ import MediaRenderer from "@/components/ui/MediaRenderer/MediaRenderer";
 import { VideoEmbed } from "@/components/ui/VideoEmbed";
 import { Dropzone } from "@/components/ui/Dropzone";
 import type { EmbedProvider } from "@/lib/parse-video-embed";
+import { track } from "@/lib/analytics/mixpanel";
 import elanStyles from "@/components/elan-visuals/elan-visuals.module.scss";
 import { siteShellStyles } from "@/components/SiteFooter";
 import { EssayHeader } from "@/components/essay/EssayHeader";
@@ -287,6 +288,11 @@ function InteractiveVisual({ config }: { config: InteractiveVisualConfig }) {
         target="_blank"
         rel="noopener noreferrer"
         className={elanStyles.playgroundLink}
+        onClick={() => track("External Link Clicked", {
+          destination_url: config.playgroundUrl,
+          link_label: config.playgroundLabel,
+          context: "case_study_interactive",
+        })}
       >
         {config.playgroundLabel}
       </a>
@@ -557,6 +563,44 @@ function ProjectClientBody({
     ],
     [contentBlocks],
   );
+
+  useEffect(() => {
+    track("Case Study Viewed", {
+      study_slug: p.slug,
+      has_personalization: !!companyNote,
+    });
+  }, [p.slug, companyNote]);
+
+  const firedSections = useRef(new Set<string>());
+  useEffect(() => {
+    firedSections.current.clear();
+    const elements = spySections
+      .map((s) => document.getElementById(s.id))
+      .filter(Boolean) as HTMLElement[];
+    if (elements.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          const el = entry.target as HTMLElement;
+          const section = spySections.find((s) => s.id === el.id);
+          if (section && !firedSections.current.has(section.id)) {
+            firedSections.current.add(section.id);
+            track("Section Reached", {
+              study_slug: p.slug,
+              section_id: section.id,
+              section_label: section.label,
+            });
+          }
+        }
+      },
+      { rootMargin: "-20% 0px -60% 0px", threshold: 0 },
+    );
+
+    elements.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, [spySections, p.slug]);
 
   const blockMgr = useBlockManager(projectTarget)
   // Keyboard nav targets `[data-block-index="${displayIndex}"]` wrappers, so
@@ -1215,7 +1259,13 @@ function ProjectClientBody({
                         label="Links"
                         className={styles.metaLinks}
                         renderItem={(link, i) => (
-                          <a key={i} href={link.href} target="_blank" rel="noopener noreferrer" className={styles.metaLink}>
+                          <a key={i} href={link.href} target="_blank" rel="noopener noreferrer" className={styles.metaLink}
+                            onClick={() => track("External Link Clicked", {
+                              destination_url: link.href,
+                              link_label: link.label,
+                              context: "case_study_sidebar",
+                            })}
+                          >
                             {link.label}<span className={styles.arrow}>&#8599;</span>
                           </a>
                         )}
@@ -1223,7 +1273,13 @@ function ProjectClientBody({
                     ) : (
                       <div className={styles.metaLinks}>
                         {p.externalLinks.map((link, i) => (
-                          <a key={i} href={link.href} target="_blank" rel="noopener noreferrer" className={styles.metaLink}>
+                          <a key={i} href={link.href} target="_blank" rel="noopener noreferrer" className={styles.metaLink}
+                            onClick={() => track("External Link Clicked", {
+                              destination_url: link.href,
+                              link_label: link.label,
+                              context: "case_study_sidebar",
+                            })}
+                          >
                             {link.label}<span className={styles.arrow}>&#8599;</span>
                           </a>
                         ))}

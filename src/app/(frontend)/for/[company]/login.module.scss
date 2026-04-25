@@ -12,7 +12,7 @@
   // 1800px+, which (a) created a discontinuity at the breakpoint (inner
   // snapped from 1120 to 1440) and (b) broke the composition's proportions:
   // canvasPane scales with inner and the halftone portrait scales with the
-  // canvas, but .card has a fixed 380px max — so a wider inner grew the
+  // canvas, but .card has a fixed 440px max — so a wider inner grew the
   // portrait-to-card gap without bound (149px at 1120 → 197px at 1520 →
   // 260px+ on 2K+ displays). The composition is only valid at the range
   // where the fixed-element gap stays in the 137–149px sweet spot. Beyond
@@ -85,7 +85,7 @@
 
 .card {
   width: 100%;
-  max-width: 380px;
+  max-width: 440px;
   display: flex;
   flex-direction: column;
   gap: 0;
@@ -113,7 +113,6 @@
   position: relative;
   height: 100px;
   overflow: visible;
-  max-width: 360px;
 }
 
 .placeholder {
@@ -135,12 +134,8 @@
   z-index: 1;
 }
 
-.placeholderTruncated {
-  width: calc(100% - 50px);
-}
-
 .passwordInput {
-  max-width: 360px;
+  width: 100%;
 }
 
 .passwordInput input {
@@ -148,12 +143,16 @@
   font-size: 2.75rem;
   font-weight: 400;
   letter-spacing: $portfolio-tracking-tight;
-  color: transparent;
+  color: transparent !important;
   line-height: 1;
   caret-color: var(--portfolio-text-neutral-bold);
 
   &::selection {
     color: transparent;
+  }
+
+  &:disabled {
+    caret-color: transparent;
   }
 }
 

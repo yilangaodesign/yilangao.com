@@ -9,10 +9,14 @@ import {
   GeistPixelLine,
 } from "geist/font/pixel";
 import { IBM_Plex_Sans, IBM_Plex_Serif } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import "../globals.scss";
 import website from "../../../website.json";
 import elan from "../../../elan.json";
 import { TooltipProvider } from "@/components/ui/Tooltip";
+import { cookies } from "next/headers";
+import { AnalyticsProvider } from "@/components/AnalyticsProvider";
+import { getCompanyFromSession } from "@/lib/company-session";
 
 const ibmPlexSans = IBM_Plex_Sans({
   subsets: ["latin"],
@@ -50,17 +54,33 @@ const fontVariables = [
   ibmPlexSerif.variable,
 ].join(" ");
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const companySlug = await getCompanyFromSession();
+
+  // For analytics exclusion, only check the real payload-token cookie.
+  // The dev auto-login fallback (isAdminAuthenticated) always returns true
+  // when PAYLOAD_ADMIN_EMAIL is set, which would disable Mixpanel in dev.
+  let isAdminForAnalytics = false;
+  try {
+    const cookieStore = await cookies();
+    isAdminForAnalytics = !!cookieStore.get("payload-token")?.value;
+  } catch {
+    // cookies() unavailable
+  }
+
   return (
     <html lang="en" data-theme="light" className={fontVariables}>
       <body>
           <TooltipProvider>
-            {children}
+            <AnalyticsProvider companySlug={companySlug} isAdmin={isAdminForAnalytics}>
+              {children}
+            </AnalyticsProvider>
           </TooltipProvider>
+          <Analytics />
         </body>
     </html>
   );

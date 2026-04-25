@@ -14,6 +14,7 @@ import {
 } from "@/components/inline-edit";
 import type { ApiTarget, FieldDefinition } from "@/components/inline-edit";
 import { Eyebrow } from "@/components/ui/Eyebrow";
+import { track } from "@/lib/analytics/mixpanel";
 import styles from "./page.module.scss";
 
 interface Testimonial {
@@ -77,8 +78,10 @@ export default function ContactClient({ testimonials, clients, isAdmin }: Contac
         body: JSON.stringify(formState),
       });
       if (!res.ok) throw new Error("Failed to send");
+      track("Contact Form Submitted", { success: true });
       setFormState({ firstName: "", lastName: "", email: "", subject: "", message: "" });
     } catch {
+      track("Contact Form Submitted", { success: false });
       setError("Something went wrong. Please try again.");
     } finally {
       setSubmitting(false);

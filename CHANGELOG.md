@@ -4,6 +4,30 @@ All notable changes to the Élan design system are documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.12.0] — 2026-04-24
+
+Minor release: Mixpanel + Vercel Analytics integration for portfolio traffic and conversion tracking.
+
+### Added
+
+- **yilangao.com**: Mixpanel analytics wrapper (`src/lib/analytics/mixpanel.ts`) with init, track, identify helpers and admin exclusion guard.
+- **yilangao.com**: `AnalyticsProvider` client component wired into root layout for automatic `Page Viewed` tracking on route changes and company visitor identification via super properties.
+- **yilangao.com**: `Case Study Clicked` event on homepage case study links.
+- **yilangao.com**: `Case Study Viewed`, `Section Reached` (via IntersectionObserver), and `External Link Clicked` events on case study detail pages.
+- **yilangao.com**: `Contact Form Submitted` event (success/failure) on contact page.
+- **yilangao.com**: `External Link Clicked` tracking on SiteFooter team and social links.
+- **yilangao.com**: Vercel Web Analytics (`@vercel/analytics/next`) for ambient pageview and referrer data.
+
+### Dependencies
+
+- Added `@vercel/analytics`, `mixpanel-browser`, `@types/mixpanel-browser`.
+
+### Released with this checkpoint
+
+- **Élan** 2.12.0
+- **yilangao.com** 1.4.0
+- **ASCII Art Studio** 0.6.14
+
 ## [2.11.9] — 2026-04-24
 
 Patch release: documentation updates and Textarea SCSS cleanup.
