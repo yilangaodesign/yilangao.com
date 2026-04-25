@@ -80,7 +80,7 @@ export function useEngagementTracker(
       if (engagedSlugs.size >= 2 && !deepExplorerFired) {
         deepExplorerFired = true;
         track("Deep Explorer", {
-          case_studies_engaged: Array.from(engagedSlugs),
+          case_studies_engaged: Array.from(engagedSlugs).join(","),
           total_count: engagedSlugs.size,
         });
       }
