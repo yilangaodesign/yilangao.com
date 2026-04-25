@@ -4,6 +4,24 @@ All notable changes to the Élan design system are documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.13.1] — 2026-04-25
+
+Patch release: analytics instrumentation for engagement depth, session tracking, and event enrichment.
+
+### Added
+
+- **yilangao.com**: `useEngagementTracker` hook - case study engagement depth (5s dwell + scroll past intro), cross-study exploration detection ("Deep Explorer"), and dwell time tracking on unmount.
+- **yilangao.com**: `useSessionTracker` hook - per-company session counting with iOS Safari dedup, repeat session identification after qualifying action (3s dwell or navigation).
+- **yilangao.com**: `registerSuperProps` utility in Mixpanel module for persistent super properties across events.
+- **yilangao.com**: Login tracking on company password gate (success/failure with company context).
+- **yilangao.com**: Error event tracking on contact form submission failure.
+
+### Changed
+
+- **yilangao.com**: Enabled Mixpanel autocapture and 100% session recording in `initMixpanel`.
+- **yilangao.com**: `AnalyticsProvider` now registers `is_owner` super property and initializes session tracking.
+- **yilangao.com**: Project detail page now uses `useEngagementTracker` for case study engagement measurement.
+
 ## [2.13.0] — 2026-04-25
 
 Minor release: overhauled Élan case study interactive visuals and added server-side API routes for live data visualization.
