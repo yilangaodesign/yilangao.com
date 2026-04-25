@@ -4,7 +4,7 @@
 >
 > **Who reads this:** AI agents before making UI changes — scan for relevant anti-patterns.
 > **Who writes this:** AI agents when a feedback cycle reveals a new anti-pattern.
-> **Last updated:** 2026-04-23 (AP-071: Brand accent as general-purpose highlight in embedded visuals — using `$portfolio-accent-*` for decorative differentiation in component visualizations dilutes Lumen's scarcity signal. Neutral weight hierarchy is the correct tool for structural emphasis. FB-178.) Prior: 2026-04-21 (AP-054 amended a second time same day — after the fourth same-session complaint (FB-163 / ENG-187) that ENG-186's 2px-base-plus-ring rendered resting inputs as over-heavy 2px borders and engaged inputs as compound 3px rims. Rewrote the Correct Alternative with an explicit "Structural rule vs value choice" block: AP-054 binds CHANGE (no state-to-state `border-width` flip, ever) but not VALUE (the constant is a pure design choice, free within the structural rule). Default base for inputs is now 1px via `$portfolio-border-width-thin` — engaged-state box-shadow ring adds +1px for a solid 2px visual rim. Implementation template updated to use `$portfolio-border-width-thin`. Rejection chronology extended to four failed iterations + one standing: FB-086 gapped ring → FB-088 padding comp → ENG-136 color-only/2px → ENG-186 two-axis/2px → ENG-187 two-axis/1px (current canonical). Frustration count 5 → 6 rounds. This fifth amendment exists because two separate engineering iterations (ENG-136 and ENG-186) misread the rule as binding the base value, so the fix restatement is now explicit on where the rule stops.) Prior: AP-070 (framer-motion `x`/`y`/`scale`/`rotate` on an element with a base CSS `transform` — the motion library writes an inline `transform` that silently overwrites the CSS rule. Fix is to split the static and animated transforms across two elements, or use `transformTemplate` to compose them on the same element. Default: split.) Prior: AP-069 (`mix-blend-mode` applied inside a fixed-position or otherwise stacking-context-creating ancestor — blend isolates to that context's interior and never reaches the document backdrop. Fix is to portal to `document.body`.) Prior: AP-068 (Relying on grid track minimum alone to prevent text wrap in a one-line-per-item list).
+> **Last updated:** 2026-04-24 (AP-072 amended: micro mode abolished — row mode must use normal `type-xs`, not `type-3xs`. Silent width lowered to 20px. FB-192.) Prior: AP-071: Brand accent as general-purpose highlight in embedded visuals — using `$portfolio-accent-*` for decorative differentiation in component visualizations dilutes Lumen's scarcity signal. Neutral weight hierarchy is the correct tool for structural emphasis. FB-178.) Prior: 2026-04-21 (AP-054 amended a second time same day — after the fourth same-session complaint (FB-163 / ENG-187) that ENG-186's 2px-base-plus-ring rendered resting inputs as over-heavy 2px borders and engaged inputs as compound 3px rims. Rewrote the Correct Alternative with an explicit "Structural rule vs value choice" block: AP-054 binds CHANGE (no state-to-state `border-width` flip, ever) but not VALUE (the constant is a pure design choice, free within the structural rule). Default base for inputs is now 1px via `$portfolio-border-width-thin` — engaged-state box-shadow ring adds +1px for a solid 2px visual rim. Implementation template updated to use `$portfolio-border-width-thin`. Rejection chronology extended to four failed iterations + one standing: FB-086 gapped ring → FB-088 padding comp → ENG-136 color-only/2px → ENG-186 two-axis/2px → ENG-187 two-axis/1px (current canonical). Frustration count 5 → 6 rounds. This fifth amendment exists because two separate engineering iterations (ENG-136 and ENG-186) misread the rule as binding the base value, so the fix restatement is now explicit on where the rule stops.) Prior: AP-070 (framer-motion `x`/`y`/`scale`/`rotate` on an element with a base CSS `transform` — the motion library writes an inline `transform` that silently overwrites the CSS rule. Fix is to split the static and animated transforms across two elements, or use `transformTemplate` to compose them on the same element. Default: split.) Prior: AP-069 (`mix-blend-mode` applied inside a fixed-position or otherwise stacking-context-creating ancestor — blend isolates to that context's interior and never reaches the document backdrop. Fix is to portal to `document.body`.) Prior: AP-068 (Relying on grid track minimum alone to prevent text wrap in a one-line-per-item list).
 
 ---
 
@@ -18,10 +18,10 @@
 | Theming & Dark Mode | AP-042, AP-043, AP-044, AP-047, AP-061 | 5 | 5 |
 | Interaction & Pointer Behavior | AP-011, AP-012, AP-022, AP-025, AP-035 | 5 | 5 |
 | Navigation & Menus | AP-014, AP-015, AP-016, AP-029, AP-046, AP-049, AP-066 | 7 | 7 |
-| Visual Hierarchy & Affordances | AP-010, AP-017, AP-019, AP-026, AP-030, AP-032, AP-039, AP-040, AP-041, AP-048‡, AP-050, AP-051, AP-052, AP-054, AP-057, AP-060, AP-071 | 17 | 17 |
+| Visual Hierarchy & Affordances | AP-010, AP-017, AP-019, AP-026, AP-030, AP-032, AP-039, AP-040, AP-041, AP-048‡, AP-050, AP-051, AP-052, AP-054, AP-057, AP-060, AP-071, AP-072 | 18 | 18 |
 | Form & Input UX | AP-023, AP-024, AP-028, AP-036, AP-064, AP-065 | 6 | 6 |
 | Admin UI Patterns | AP-034, AP-037 | 2 | 2 |
-| **Total** | | **64** | **64** |
+| **Total** | | **65** | **65** |
 
 > **†** AP-048 "Independent Padding Decisions Across Adjacent Panels" (spacing entry)
 > **‡** AP-048 "Incremental State-by-State Implementation Without a Holistic Model" (state modeling entry)
@@ -1294,6 +1294,41 @@ return (
 **Detection heuristic:** if a `motion.*` element has both a `className` that includes `transform:` in its CSS and an `animate` prop with any of `x`, `y`, `scale`, `rotate`, `skewX`, `skewY` — the CSS transform is dead code.
 
 **Incident:** FB-156 (2026-04-20) — ScrollSpy portaled highlight label had `transform: translate(-100%, -50%)` in CSS and `animate={{ x, opacity }}` on the same `motion.span`. Label ended up anchored at its top-left corner on the notch (rather than its right edge on the notch's left gutter), extending past the viewport. First-attempt fix (anchor swap only) had no visible effect because the transform was still being overwritten. User reported the same bug twice before the real root cause was identified.
+
+---
+
+### AP-072: Orientation-Blind Content Layout in Variable-Size Containers
+
+**Status: ACTIVE**
+
+**Trigger:** A component renders text (label on top, count below, or vice versa) using a vertical `flex-column` layout inside tiles or containers whose dimensions are determined by an external algorithm (d3 treemap, CSS grid, dynamic resize). The container produces a "vertical sliver" — a tile that is much taller than it is wide. The stacked text in the sliver is either completely hidden, partially clipped, or requires the user to read sideways.
+
+**Why it's wrong:** Text readability depends on the axis of information flow matching the available space axis. A vertical sliver has usable space only on the vertical axis, but stacked Latin text reads horizontally. The result is that either the label is truncated to a few characters, the count is pushed below the visible area, or both elements are present but illegible due to line breaks against a wall. The layout is communicating "column" but the space says "row." This is a content accessibility failure — it truncates meaningful data that has no other representation on the page.
+
+**Correct alternative:** Classify every dynamically-sized tile before rendering its content. Use measured pixel dimensions (via `ResizeObserver`) to determine the tile's orientation, then match the layout direction to the space:
+
+1. **Normal tile** (`pxH / pxW ≤ 1.5` AND `pxH ≥ 38px`): column layout — label top-left (`type-xs`, semibold), count bottom-right (`type-2xs`, regular, opacity 0.6). Suppress count when `pxH < 38px`.
+2. **Vertical sliver** (`pxH / pxW > 1.5` OR `pxH < 38px`, but `pxH ≥ 16px` AND `pxW ≥ 20px`): row layout — label only on a single horizontal line. Use the **same `type-xs` font as column mode** — never downscale to a smaller font in row mode. Count is suppressed (accessible via tooltip). Label truncates with ellipsis; a 31px tile showing "Adm..." is correct; a blank 31px tile is wrong.
+3. **Silent** (`pxH < 16px` OR `pxW < 20px`): colour-only. No text.
+
+**Critical rule (FB-192):** Never use a sub-normal font size in row/sliver mode. The instinct to "fit more characters" by shrinking the font produces illegible text on coloured surfaces. Ellipsis at normal size is always preferable. Proportional accuracy of the tile is a secondary concern — users do not measure with a ruler; they cannot read 8px text on teal.
+
+**Implementation constants (as of FB-192):**
+- `TILE_MIN_LINE_PX = 16` — minimum height for one line of type-xs + minimal padding
+- `TILE_SILENT_W_PX = 20` — minimum width before silent (covers slivers as narrow as 21px)
+- `TILE_MIN_TWO_LINE_PX = 38` — minimum height for column mode with both label + count
+- `TILE_SLIVER_RATIO = 1.5` — height/width ratio above which row mode is used
+
+**Implementation note:** Thresholds must be pixel-based, not percentage-based. Use a `ResizeObserver` on the container to track `contentRect.width/height`. Re-classify tiles on every resize.
+
+**Core principle extracted (to `docs/design.md`):** When information is rendered inside variable-size containers, layout direction must follow physical orientation. Width-dominant space → horizontal flow. Height-dominant space → vertical flow. An agent must audit the content-to-space ratio before choosing a flex direction, and the space axis always wins over the design template axis.
+
+**Frustration caused:** 3 rounds (FB-185, FB-190, FB-192). Initial fix introduced micro mode with `type-3xs` fonts; micro mode was later abolished as illegible.
+
+**Incidents:**
+- FB-185 (2026-04-24) — `KnowledgeTreemap` fixed `flex-column` caused vertical slivers. Fix: `classifyTile()` + row/column/silent modes.
+- FB-190 (2026-04-24) — Silent threshold (64px wide) left too many tiles blank. Fix: added micro mode for 32-64px.
+- FB-192 (2026-04-24) — Micro mode abolished. `type-3xs` (8px) on a coloured surface is not legible regardless of width. Fix: removed micro mode; row mode uses `type-xs`; silent width lowered to 20px so 31px-wide tiles show a truncated label rather than blank.
 
 ---
 

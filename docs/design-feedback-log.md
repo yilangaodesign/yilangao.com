@@ -4,10 +4,338 @@
 >
 > **Who reads this:** AI agents at session start (scan recent entries for context), and during feedback processing (check for recurring patterns).
 > **Who writes this:** AI agents after each feedback cycle via the `design-iteration` skill.
-> **Last updated:** 2026-04-23 (FB-179: CollaborationLoop step dots misaligned with detail panel — removed `.stepNav` horizontal padding so dots span full content width; removed transport bar `border-top` divider between content and controls. Prior: FB-178: CollaborationLoop overuses Lumen accent — 22 decorative `$portfolio-accent-*` usages converted to neutral palette, preserving accent on only 4 elements: two "NEW" status badges and two interactive transport controls. Reinforces Lumen Scarcity Principle from branding.md §9.4 — embedded case study visuals follow the same accent restraint as page chrome. Prior: FB-177: Personalization badge style decision — stayed with `neutral/minimal` over `highlight/minimal` (accent text). Lumen scoping corrected in branding doc: most links use neutral colors, not Lumen. Full rationale documented in `branding.md` §9 including Lumen Scarcity Principle. Prior: FB-176: Company-personalized "for {Company}" badge on home page — repurposed the disabled essay badge slot for a lowercase "for {Company}" tag above case study titles, visible only to authenticated company visitors with non-empty caseStudyNotes. Essay badge logic fully removed. Cross-category with ENG-202. Prior: FB-175: CollaborationLoop transport bar — pager (‹ N / M ›) and play/speed clusters used 2px inter-control gaps and a vertically thin bar; bumped to `$portfolio-spacer-1x` gaps, `$portfolio-spacer-1x` vertical bar padding, and speed trigger horizontal padding to `$portfolio-spacer-1x` with 0.5x internal icon gap. Prior: FB-174: Link toolbar button conflates inspect and destroy actions — replaced binary toggle with a link popover showing URL preview + edit/open/remove actions. Cross-category with ENG-198. Prior: FB-170: Essay layout content column widened from `$elan-container-narrow` (672px) to `$elan-container-content` (720px) in `work/[slug]/page.module.scss` for `.layoutEssay` / `.contentEssay` so the ETRO essay matches the same prose max-width as the case-study body column, about page, and reading page. Prior: FB-168: Password gate composition tuned for OPTICAL balance rather than mathematical balance, per the design principle that dense/animated/high-contrast elements carry more perceived visual weight than sparse/static/low-contrast elements and therefore need MORE surrounding whitespace on their outer side to feel balanced against the lighter element. FB-167 had achieved mathematical centering (~4px off inner center); user pointed out the animated halftone portrait carries significantly more visual weight than the simple serif text on the right and needs a larger outer-side breathing gutter. Widened `.canvasPane` from `flex: 0 0 53%` to `flex: 0 0 55%`, which shifts the portrait's visual center rightward enough that the empty space to the left of the portrait figure (~133px on 1120px canonical) now exceeds the empty space to the right of the card (~108px) by ~25px — an intentional asymmetry favoring the heavier element. Same `.formPane` padding (`$portfolio-spacer-6x` with `padding-left: $portfolio-spacer-2x` override). Portrait-to-card gap widens by ~12px (137 → 149) as the cost of the optical rebalance — acceptable because (a) the user's original too-far gap was 195px, so 149 is still a 23% improvement, and (b) gap preservation and optical balance are in tension at the current card max-width. SEPARATELY: caught and fixed a mobile regression introduced by FB-166 — on viewports ≤768px the canvasPane is hidden and the form becomes the only content on screen, but the desktop `justify-content: flex-start` + asymmetric left padding was still firing, pinning the form to the left of the mobile viewport. Added mobile override resetting to `justify-content: center` and symmetric `$portfolio-spacer-6x` padding. New design principle extracted (candidate for `docs/design/spacing.md`): optical balance — when two elements in a composition have meaningfully different visual weight (density, motion, contrast, detail), mathematical centering reads as imbalanced; the heavier element needs more surrounding whitespace on its outer side to feel balanced. This is an explicit architectural principle, not a case-by-case judgement. Responsiveness principle reinforced: whenever a layout uses alignment or padding tuning for a specific breakpoint context (two-column here), there MUST be a corresponding breakpoint override for when that context disappears (mobile single-column here) — otherwise the desktop tuning bleeds into other contexts as a regression.) Prior: FB-167: Password gate composition re-centered on the viewport. After FB-166 pulled the action card close to the portrait by anchoring it to the start of its pane, the overall composition read left-skewed — the 50/50 column split left ~43px more empty space on the card side than on the portrait side. Fixed by widening `.canvasPane` from `flex: 0 0 50%` to `flex: 0 0 53%` (shifts the portrait's visual center rightward by ~17px on the canonical 1120px container) and tightening `.formPane` left padding from `$portfolio-spacer-4x` to `$portfolio-spacer-2x` so the portrait-to-card distance the user just approved in FB-166 is preserved exactly (~137px). Switched `.formPane` padding declaration from a 4-value shorthand to `padding: 6x` + `padding-left: 2x` override for readability. Composition center is now ~4px of inner center versus ~22px before. Design principle extracted: when one half of a two-column composition has its content centered within its pane and the other has content anchored to the start of its pane, a 50/50 split is inherently imbalanced — widen the centered-content pane slightly so its content's visual center offsets the opposing half's start-anchor offset. No engineering/content dimension.) Prior: FB-166: Password gate two-column layout — reduced the perceived distance between the halftone portrait (left 50%) and the action card (right 50%) by anchoring the form card to the start of its pane. Changed `.formPane` `justify-content: center` → `flex-start` and switched padding from symmetric `$portfolio-spacer-6x` to asymmetric `6x 6x 6x 4x`, pulling the card's left edge ~58px closer to the center divider on the 1120px canonical width while leaving the portrait position, responsive mobile hide breakpoint, and card max-width (380px) unchanged. Portfolio branding guardrail #9 (zero border-radius) respected — no radius added. All values remain on the `$portfolio-spacer-*` 8px primitive scale per §1.) Prior: FB-165: Password gate interaction design documented as a unified concept - the "Welcome, ___" sentence completion with visible-text password, fuzzy normalization as UX requirement, hierarchy-conscious phrase selection. Password changed from `preview-2026` to `glad you are here`. Cross-category with ENG-193 and CFB-041.) Prior: FB-164: Introduced an `essay` content format alongside the existing `caseStudy` layout in the `projects` collection. Essays switch from the two-column (sidebar + content) layout to a single-column Medium-style reading layout capped at `$elan-container-narrow`. Between the H1 and the blurb body, a new `EssayHeader` renders a three-line vertical stack: category eyebrow (reusing `<Eyebrow size="sm">`) → H1 (inline-editable `introBlurbHeadline`) → `EssayMeta` row (publication date · N min read · optional "Also on Medium" link). Design decisions: (1) the header is hoisted OUTSIDE the pre-existing `.introBlurb` `{headline && (...)}` guard so the meta row never disappears when the headline is blank — on essays the `.introBlurb` wrapper renders only the body and the H1 is emitted exactly once by `EssayHeader`; (2) the Medium cross-post link replaces the originally-proposed like/reaction count because a visible engagement signal on a portfolio primarily read by interviewers is socially off-key (user's reversal captured in CFB-040); (3) separators between meta segments use `$portfolio-text-placeholder` dots, passive segments use `$portfolio-text-secondary` at `body-sm`, and the Medium link uses `$portfolio-text-primary` for recognizability without borrowing the brand's cyan accent; (4) the Medium logo is a hand-authored inline SVG sized at `1em` — decorative, `aria-hidden="true"` — under branding guardrail #7's icon/logo exception, and the link itself opens in a new tab with a trailing `↗` affordance consistent with other external links; (5) zero border-radius across all new surfaces per branding guardrail #9; (6) the homepage "Essay" badge detection was moved from a fragile `category.toLowerCase() === 'essay'` string match to the explicit `contentFormat === 'essay'` discriminant, closing a latent bug where ETRO's `"Essay · …"` category never actually matched. Cross-category with ENG-191 (discriminant schema + hybrid read-time + homepage projection fix) and CFB-040 (cross-post link rationale, dropped scope statement, category doubling as topic eyebrow, `title` intentionally unrendered on essays). `docs/content/case-study.md` §3.2 "Essay Sidebar Variant" reconciled: the sidebar is *replaced* by a single-column layout, not lightened.) Prior: FB-163: Fourth complaint on DS `Input` border-thickness in one session — Design Hard Guardrail #4 tripped a second time within the same sequence. The FB-162 two-axis grammar was structurally right but left the base `border-width` at 2px, so resting inputs read as over-heavy and engaged inputs compounded to a visual 3px rim. User's ground truth (consistent across FB-088 → FB-161 → FB-162 → FB-163): rest = 1px hairline, engaged = 2px border. Fix drops `.regular` base border and `.minimal` base `border-bottom` from 2px to 1px; the ENG-186 engaged-state rings are left untouched and now compose on a 1px base for a solid 2px visual rim on hover/focus. All status variants (`error`/`success`/`warning`/`brand`) inherit the same composition — resting 1px status-color, engaged 2px status-color. Extracted principle: when a component has a paint-only weight channel (box-shadow, outline), the base `border-width` is a pure design choice — pick the value that matches the component's resting character (1px hairline for inputs), not the value that makes engaged states convenient. AP-054 amended to separate the structural rule (change is forbidden) from the value choice (free within the constraint). Rejection chronology now four rejected + one standing: FB-086 gapped ring → FB-088 padding comp → ENG-136 color-only / 2px → ENG-186 two-axis / 2px → ENG-187 two-axis / 1px (current). Cross-category with ENG-187.) Prior: FB-162: Third complaint on DS `Input` border-thickness in one session — architectural-complaint threshold hit per the Design guardrail. After FB-161 → ENG-184's constant-2px / color-only fix, the user still reads "engaged" as a thickness change, not a color change. The one-axis state-affordance grammar was structurally insufficient. Shipped a two-axis grammar: axis A (color channel on `border-color`) unchanged from ENG-184; axis B (weight channel on `box-shadow`) new — resting has no shadow, engaged adds a 1px matching-color ring (full-box for `.regular`, directional bottom band for `.minimal`). Layout-invariant because `box-shadow` does not participate in the box model — `border-width`, `border-bottom-width`, `padding`, `--_border-offset` all identical at every state. Status `:focus-within` overrides extended with matching-color rings so the engaged rim never mismatches the status border. Ring color matches border color on purpose — FB-086 correctly rejected the earlier "contrasting ring with white gap" pattern as a double-layer artifact; same-color at zero gap reads as a single continuous 3px rim, not a halo. AP-054 in `docs/design-anti-patterns.md` amended with the two-axis correct-alternative and the full rejection chronology (FB-086 gapped ring → FB-088 padding comp → ENG-136 color-only → ENG-186 two-axis). Note: ENG-184 and FB-161 cite this anti-pattern as AP-057 — citation typo; AP-057 is about bypassing DS components with custom-styled natives. The correct reference is AP-054. Cross-category with ENG-186.) Prior: FB-161: DS `Input` border-thickness state grammar was silently broken by a token-renaming refactor (`fde660a`, 2026-04-11) which dropped `border-width: 2px` from `:focus-within` and pinned `--_border-offset: 1px` unconditionally — collapsing resting/hover/focus to identical 1px rendering. Two-iteration fix within one session: (1) reverted the refactor's deletions to restore FB-088's tri-state grammar (rest 1px gray, hover 1px black, focus 2px black); (2) user re-reported "still no thickness variation" because FB-088's hover was color-only, and the user's mental model treats thickness as the primary engaged-state signal. Extended the 2px border-width + padding-compensation to hover on both `.regular` and `.minimal` emphases. Revised two-state grammar: resting 1px subtle, engaged (hover OR focus) 2px bold. Supersedes FB-088 on the thickness-axis decision; preserves its padding-compensation mechanism. Cross-category with ENG-183. See also EAP-112 / AP-075.) Prior: FB-158: Case-study block drag handles floated far above their content and disappeared on sub-laptop viewports. The between-section spacing lived as `margin-top` on the inner `.sectionHeading`, which sat inside the flex-item `.sortableContent` BFC — so the margin inflated `.sortableInner`'s top area while the absolute-positioned `.dragHandle` at `top: 2px` anchored to that inflated top, producing a ~48px visible gap. Separately, `.dragHandle { display: none }` until `$elan-mq-md` (1056px) hid the affordance on any window narrower than a standard laptop. Fix: moved the between-section margin from `.sectionHeading` onto the outer `.blockWrapper + .blockWrapper:has(.sectionHeading)` (external spacing, handle now aligns with heading's visible top); below md the handle flips from absolute-gutter to in-flow flex + `margin-right: $portfolio-spacer-0-5x` and stays at `opacity: 0.55`; `@media (hover: none)` also surfaces it at `0.55` so tablet admins aren't dependent on a hover state that never fires. Cross-category with ENG-178.) Prior: FB-157 (Audio controls on `VideoSettings` conflated *capability* with *default state* — a single "Muted / Sound" `ButtonSelect` implied every video had user-operable audio when most are silent captures with no sound track. Replaced with a two-layer tree: primary "Audio off / Audio on" (capability) → revealed-when-on "Muted by default / Sound by default" (default state). On `videoEmbed` blocks, the audio default control was removed entirely because provider iframes own their own audio UI. Cross-category with ENG-170, CFB-039.) Prior: FB-156 (ScrollSpy portaled highlight label — three-iteration bug cycle: (1) wrong anchor element (tick vs notch), (2) framer-motion `animate={{ x }}` overwriting the base CSS `transform`, (3) after splitting the tree to fix (2), `mix-blend-mode: difference` stayed on the inner span whose parent was now the anchor's own stacking context — direct recurrence of AP-069 inside the fix. Final shape: outer `div` owns `position:fixed` + transform + `color:#fff` + `mix-blend-mode:difference`; inner `motion.span` owns only the `x`/`opacity` entrance animation. AP-070 extracted.) Prior: FB-155 (ScrollSpy's active notch label now auto-contrasts against any backdrop via a `document.body`-portaled span with `mix-blend-mode: difference` + `color: #fff`. Escapes the rail's fixed-position stacking context so the blend reaches page content below. Only the currently-active/drag-targeted notch flips; hover-revealed non-active labels keep their existing token-driven colors.) Prior: FB-154 ("Muted by default" / "Sound by default" promoted from a hidden dropdown item to a primary `ButtonSelect` on the `VideoSettings` overlay, and added for the first time to `videoEmbed` blocks via a new `VideoEmbedSettings` control. Cross-category with ENG-168.)
+> **Last updated:** 2026-04-25 (FB-207: MaturityTimeline combined VWAP-style chart — merged separate stacked-bar and trend-band charts into a single visualization with per-build-day bars, grayscale DS tokens, and rolling-median trend overlay. Cross-category with ENG-217.) Prior: 2026-04-24 (FB-195: Treemap white gaps from height:auto — row-mode tiles collapsed to text height leaving blank D3-allocated space. Fix: revert to height:${h}% for all tiles; row mode now pins label to top-left corner while domain colour fills the full block. Prior: FB-194: Treemap tooltip height should animate — grow up / shrink down anchored at cursor bottom. Fix: always-mounted tooltip with CSS `transition: height + opacity`; rAF-deferred `scrollHeight` measurement ensures browser paints the "before" state so the transition has a from-value. Prior: FB-193: Row-mode tiles still rendered as tall narrow rectangles — `flex-direction: row` only reordered content inside the block; the block's own height was still the D3-allocated %. Fix: row-mode tiles get `height: auto` so the block physically collapses to label line-height. Prior: FB-192: Micro mode abolished — `type-3xs` (8px) in row/sliver mode is not legible on coloured surfaces regardless of tile width. Removed micro mode entirely; row mode now uses the same `type-xs` as column mode. Silent width lowered from 32 to 20px so 31px-wide slivers show a truncated label rather than blank. AP-072 updated. Prior: FB-191: Treemap count font too small — `type-3xs` (8px) on a saturated coloured surface with `weight-regular` is below the legibility floor. Bumped to `type-2xs` (10px); hierarchy still holds via weight (semibold vs regular) + opacity (1.0 vs 0.6). Prior: FB-190: Silent threshold 64px too aggressive — 3 tiles 36–64px wide showed as blank rectangles. Added "micro" layout mode (32–64px wide): label only at type-3xs/semibold, 2px padding, no count. Truly silent threshold lowered to 32px. A blank tile is always worse than a truncated one when a tooltip exists. Prior: FB-189: KnowledgeTreemap tooltip structure — header label "Top examples" added at top to explain the bullet list; list gap increased to `$portfolio-spacer-0-5x`; domain + count moved to footer row (bottom, `space-between`). Prior: FB-188: KnowledgeTreemap column-mode height blind spot — count visible without label on short tiles. `justify-content: space-between` places count at bottom edge even when pxH < label font height, making the label invisible while the count floats. Fix: `pxH < 20px` → silent; column mode suppresses count when `pxH < 35px`. Prior: FB-187: AP-072 thresholds too permissive — tiles 36-64px wide were classified as text-showing and produced illegible "De…" labels; tiles with h/w 1.5-2.5 stayed in column mode and showed stacked text in vertical-feeling rectangles. Fixed: `TILE_MIN_TEXT_PX` 36→64, `TILE_SLIVER_RATIO` 2.5→1.5. Prior: FB-186: KnowledgeTreemap block visual hierarchy inverted — label was `type-2xs`/semibold while count was `type-sm`/semibold, making the count visually dominant over the more-informative label. Fixed: label → `type-xs`/semibold (hero), count → `type-3xs`/normal/opacity-0.55 (supporting metadata). Prior: FB-185: KnowledgeTreemap vertical-sliver tiles — orientation-blind `flex-column` layout made narrow tiles illegible. Fix: ResizeObserver + `classifyTile()` produces three modes: column (normal), row (vertical sliver, height/width > 2.5), silent (width < 36px). Extracted as core design principle AP-072. Prior: FB-184: KnowledgeTreemap block IA redesign — label top-left, count bottom-right, tooltip shows DOMAIN allcaps + top-3 most recent AP titles + count; API enhanced to parse AP IDs and look up titles. Prior: FB-183: CollaborationLoop transport — play/pause was 32×32 while prev/next were 28×28 and speed trigger 28px tall; unified hit targets to 32px (`transportBtn` base + `min-width`/`min-height`, speed trigger `height`/`min-height` 32px, removed duplicate sizing from `transportPlayBtn` while keeping accent color/font). Prior: FB-182: MaturityTimeline used `border-radius` on bar stack, milestone chip, legend dots, and popover — conflicts with portfolio zero-radius identity (`branding.md` / Design Hard Guardrail #9). Removed all four; tooltip repositioned to segment right edge per ENG-210. Prior: FB-181: Elan SkillMap vs MaturityTimeline legend rhythm — Maturity used outer `.container` `gap: 3x` between chart and legend while SkillMap used `1x` margin; introduced shared `.visualizationWithLegend` flex stack (`gap: $portfolio-spacer-1x`) in both SCSS modules, wrapped treemap and timeline chart+legend, removed SkillMap `.legend` margin-top. Prior: FB-180: SkillMap Knowledge treemap legend sat flush under the treemap with no vertical separation; added `margin-top: $portfolio-spacer-1x` on `.legend` to match `.section` header-to-content rhythm. Prior: FB-179: CollaborationLoop step dots misaligned with detail panel — removed `.stepNav` horizontal padding so dots span full content width; removed transport bar `border-top` divider between content and controls. Prior: FB-178: CollaborationLoop overuses Lumen accent — 22 decorative `$portfolio-accent-*` usages converted to neutral palette, preserving accent on only 4 elements: two "NEW" status badges and two interactive transport controls. Reinforces Lumen Scarcity Principle from branding.md §9.4 — embedded case study visuals follow the same accent restraint as page chrome. Prior: FB-177: Personalization badge style decision — stayed with `neutral/minimal` over `highlight/minimal` (accent text). Lumen scoping corrected in branding doc: most links use neutral colors, not Lumen. Full rationale documented in `branding.md` §9 including Lumen Scarcity Principle. Prior: FB-176: Company-personalized "for {Company}" badge on home page — repurposed the disabled essay badge slot for a lowercase "for {Company}" tag above case study titles, visible only to authenticated company visitors with non-empty caseStudyNotes. Essay badge logic fully removed. Cross-category with ENG-202. Prior: FB-175: CollaborationLoop transport bar — pager (‹ N / M ›) and play/speed clusters used 2px inter-control gaps and a vertically thin bar; bumped to `$portfolio-spacer-1x` gaps, `$portfolio-spacer-1x` vertical bar padding, and speed trigger horizontal padding to `$portfolio-spacer-1x` with 0.5x internal icon gap. Prior: FB-174: Link toolbar button conflates inspect and destroy actions — replaced binary toggle with a link popover showing URL preview + edit/open/remove actions. Cross-category with ENG-198. Prior: FB-170: Essay layout content column widened from `$elan-container-narrow` (672px) to `$elan-container-content` (720px) in `work/[slug]/page.module.scss` for `.layoutEssay` / `.contentEssay` so the ETRO essay matches the same prose max-width as the case-study body column, about page, and reading page. Prior: FB-168: Password gate composition tuned for OPTICAL balance rather than mathematical balance, per the design principle that dense/animated/high-contrast elements carry more perceived visual weight than sparse/static/low-contrast elements and therefore need MORE surrounding whitespace on their outer side to feel balanced against the lighter element. FB-167 had achieved mathematical centering (~4px off inner center); user pointed out the animated halftone portrait carries significantly more visual weight than the simple serif text on the right and needs a larger outer-side breathing gutter. Widened `.canvasPane` from `flex: 0 0 53%` to `flex: 0 0 55%`, which shifts the portrait's visual center rightward enough that the empty space to the left of the portrait figure (~133px on 1120px canonical) now exceeds the empty space to the right of the card (~108px) by ~25px — an intentional asymmetry favoring the heavier element. Same `.formPane` padding (`$portfolio-spacer-6x` with `padding-left: $portfolio-spacer-2x` override). Portrait-to-card gap widens by ~12px (137 → 149) as the cost of the optical rebalance — acceptable because (a) the user's original too-far gap was 195px, so 149 is still a 23% improvement, and (b) gap preservation and optical balance are in tension at the current card max-width. SEPARATELY: caught and fixed a mobile regression introduced by FB-166 — on viewports ≤768px the canvasPane is hidden and the form becomes the only content on screen, but the desktop `justify-content: flex-start` + asymmetric left padding was still firing, pinning the form to the left of the mobile viewport. Added mobile override resetting to `justify-content: center` and symmetric `$portfolio-spacer-6x` padding. New design principle extracted (candidate for `docs/design/spacing.md`): optical balance — when two elements in a composition have meaningfully different visual weight (density, motion, contrast, detail), mathematical centering reads as imbalanced; the heavier element needs more surrounding whitespace on its outer side to feel balanced. This is an explicit architectural principle, not a case-by-case judgement. Responsiveness principle reinforced: whenever a layout uses alignment or padding tuning for a specific breakpoint context (two-column here), there MUST be a corresponding breakpoint override for when that context disappears (mobile single-column here) — otherwise the desktop tuning bleeds into other contexts as a regression.) Prior: FB-167: Password gate composition re-centered on the viewport. After FB-166 pulled the action card close to the portrait by anchoring it to the start of its pane, the overall composition read left-skewed — the 50/50 column split left ~43px more empty space on the card side than on the portrait side. Fixed by widening `.canvasPane` from `flex: 0 0 50%` to `flex: 0 0 53%` (shifts the portrait's visual center rightward by ~17px on the canonical 1120px container) and tightening `.formPane` left padding from `$portfolio-spacer-4x` to `$portfolio-spacer-2x` so the portrait-to-card distance the user just approved in FB-166 is preserved exactly (~137px). Switched `.formPane` padding declaration from a 4-value shorthand to `padding: 6x` + `padding-left: 2x` override for readability. Composition center is now ~4px of inner center versus ~22px before. Design principle extracted: when one half of a two-column composition has its content centered within its pane and the other has content anchored to the start of its pane, a 50/50 split is inherently imbalanced — widen the centered-content pane slightly so its content's visual center offsets the opposing half's start-anchor offset. No engineering/content dimension.) Prior: FB-166: Password gate two-column layout — reduced the perceived distance between the halftone portrait (left 50%) and the action card (right 50%) by anchoring the form card to the start of its pane. Changed `.formPane` `justify-content: center` → `flex-start` and switched padding from symmetric `$portfolio-spacer-6x` to asymmetric `6x 6x 6x 4x`, pulling the card's left edge ~58px closer to the center divider on the 1120px canonical width while leaving the portrait position, responsive mobile hide breakpoint, and card max-width (380px) unchanged. Portfolio branding guardrail #9 (zero border-radius) respected — no radius added. All values remain on the `$portfolio-spacer-*` 8px primitive scale per §1.) Prior: FB-165: Password gate interaction design documented as a unified concept - the "Welcome, ___" sentence completion with visible-text password, fuzzy normalization as UX requirement, hierarchy-conscious phrase selection. Password changed from `preview-2026` to `glad you are here`. Cross-category with ENG-193 and CFB-041.) Prior: FB-164: Introduced an `essay` content format alongside the existing `caseStudy` layout in the `projects` collection. Essays switch from the two-column (sidebar + content) layout to a single-column Medium-style reading layout capped at `$elan-container-narrow`. Between the H1 and the blurb body, a new `EssayHeader` renders a three-line vertical stack: category eyebrow (reusing `<Eyebrow size="sm">`) → H1 (inline-editable `introBlurbHeadline`) → `EssayMeta` row (publication date · N min read · optional "Also on Medium" link). Design decisions: (1) the header is hoisted OUTSIDE the pre-existing `.introBlurb` `{headline && (...)}` guard so the meta row never disappears when the headline is blank — on essays the `.introBlurb` wrapper renders only the body and the H1 is emitted exactly once by `EssayHeader`; (2) the Medium cross-post link replaces the originally-proposed like/reaction count because a visible engagement signal on a portfolio primarily read by interviewers is socially off-key (user's reversal captured in CFB-040); (3) separators between meta segments use `$portfolio-text-placeholder` dots, passive segments use `$portfolio-text-secondary` at `body-sm`, and the Medium link uses `$portfolio-text-primary` for recognizability without borrowing the brand's cyan accent; (4) the Medium logo is a hand-authored inline SVG sized at `1em` — decorative, `aria-hidden="true"` — under branding guardrail #7's icon/logo exception, and the link itself opens in a new tab with a trailing `↗` affordance consistent with other external links; (5) zero border-radius across all new surfaces per branding guardrail #9; (6) the homepage "Essay" badge detection was moved from a fragile `category.toLowerCase() === 'essay'` string match to the explicit `contentFormat === 'essay'` discriminant, closing a latent bug where ETRO's `"Essay · …"` category never actually matched. Cross-category with ENG-191 (discriminant schema + hybrid read-time + homepage projection fix) and CFB-040 (cross-post link rationale, dropped scope statement, category doubling as topic eyebrow, `title` intentionally unrendered on essays). `docs/content/case-study.md` §3.2 "Essay Sidebar Variant" reconciled: the sidebar is *replaced* by a single-column layout, not lightened.) Prior: FB-163: Fourth complaint on DS `Input` border-thickness in one session — Design Hard Guardrail #4 tripped a second time within the same sequence. The FB-162 two-axis grammar was structurally right but left the base `border-width` at 2px, so resting inputs read as over-heavy and engaged inputs compounded to a visual 3px rim. User's ground truth (consistent across FB-088 → FB-161 → FB-162 → FB-163): rest = 1px hairline, engaged = 2px border. Fix drops `.regular` base border and `.minimal` base `border-bottom` from 2px to 1px; the ENG-186 engaged-state rings are left untouched and now compose on a 1px base for a solid 2px visual rim on hover/focus. All status variants (`error`/`success`/`warning`/`brand`) inherit the same composition — resting 1px status-color, engaged 2px status-color. Extracted principle: when a component has a paint-only weight channel (box-shadow, outline), the base `border-width` is a pure design choice — pick the value that matches the component's resting character (1px hairline for inputs), not the value that makes engaged states convenient. AP-054 amended to separate the structural rule (change is forbidden) from the value choice (free within the constraint). Rejection chronology now four rejected + one standing: FB-086 gapped ring → FB-088 padding comp → ENG-136 color-only / 2px → ENG-186 two-axis / 2px → ENG-187 two-axis / 1px (current). Cross-category with ENG-187.) Prior: FB-162: Third complaint on DS `Input` border-thickness in one session — architectural-complaint threshold hit per the Design guardrail. After FB-161 → ENG-184's constant-2px / color-only fix, the user still reads "engaged" as a thickness change, not a color change. The one-axis state-affordance grammar was structurally insufficient. Shipped a two-axis grammar: axis A (color channel on `border-color`) unchanged from ENG-184; axis B (weight channel on `box-shadow`) new — resting has no shadow, engaged adds a 1px matching-color ring (full-box for `.regular`, directional bottom band for `.minimal`). Layout-invariant because `box-shadow` does not participate in the box model — `border-width`, `border-bottom-width`, `padding`, `--_border-offset` all identical at every state. Status `:focus-within` overrides extended with matching-color rings so the engaged rim never mismatches the status border. Ring color matches border color on purpose — FB-086 correctly rejected the earlier "contrasting ring with white gap" pattern as a double-layer artifact; same-color at zero gap reads as a single continuous 3px rim, not a halo. AP-054 in `docs/design-anti-patterns.md` amended with the two-axis correct-alternative and the full rejection chronology (FB-086 gapped ring → FB-088 padding comp → ENG-136 color-only → ENG-186 two-axis). Note: ENG-184 and FB-161 cite this anti-pattern as AP-057 — citation typo; AP-057 is about bypassing DS components with custom-styled natives. The correct reference is AP-054. Cross-category with ENG-186.) Prior: FB-161: DS `Input` border-thickness state grammar was silently broken by a token-renaming refactor (`fde660a`, 2026-04-11) which dropped `border-width: 2px` from `:focus-within` and pinned `--_border-offset: 1px` unconditionally — collapsing resting/hover/focus to identical 1px rendering. Two-iteration fix within one session: (1) reverted the refactor's deletions to restore FB-088's tri-state grammar (rest 1px gray, hover 1px black, focus 2px black); (2) user re-reported "still no thickness variation" because FB-088's hover was color-only, and the user's mental model treats thickness as the primary engaged-state signal. Extended the 2px border-width + padding-compensation to hover on both `.regular` and `.minimal` emphases. Revised two-state grammar: resting 1px subtle, engaged (hover OR focus) 2px bold. Supersedes FB-088 on the thickness-axis decision; preserves its padding-compensation mechanism. Cross-category with ENG-183. See also EAP-112 / AP-075.) Prior: FB-158: Case-study block drag handles floated far above their content and disappeared on sub-laptop viewports. The between-section spacing lived as `margin-top` on the inner `.sectionHeading`, which sat inside the flex-item `.sortableContent` BFC — so the margin inflated `.sortableInner`'s top area while the absolute-positioned `.dragHandle` at `top: 2px` anchored to that inflated top, producing a ~48px visible gap. Separately, `.dragHandle { display: none }` until `$elan-mq-md` (1056px) hid the affordance on any window narrower than a standard laptop. Fix: moved the between-section margin from `.sectionHeading` onto the outer `.blockWrapper + .blockWrapper:has(.sectionHeading)` (external spacing, handle now aligns with heading's visible top); below md the handle flips from absolute-gutter to in-flow flex + `margin-right: $portfolio-spacer-0-5x` and stays at `opacity: 0.55`; `@media (hover: none)` also surfaces it at `0.55` so tablet admins aren't dependent on a hover state that never fires. Cross-category with ENG-178.) Prior: FB-157 (Audio controls on `VideoSettings` conflated *capability* with *default state* — a single "Muted / Sound" `ButtonSelect` implied every video had user-operable audio when most are silent captures with no sound track. Replaced with a two-layer tree: primary "Audio off / Audio on" (capability) → revealed-when-on "Muted by default / Sound by default" (default state). On `videoEmbed` blocks, the audio default control was removed entirely because provider iframes own their own audio UI. Cross-category with ENG-170, CFB-039.) Prior: FB-156 (ScrollSpy portaled highlight label — three-iteration bug cycle: (1) wrong anchor element (tick vs notch), (2) framer-motion `animate={{ x }}` overwriting the base CSS `transform`, (3) after splitting the tree to fix (2), `mix-blend-mode: difference` stayed on the inner span whose parent was now the anchor's own stacking context — direct recurrence of AP-069 inside the fix. Final shape: outer `div` owns `position:fixed` + transform + `color:#fff` + `mix-blend-mode:difference`; inner `motion.span` owns only the `x`/`opacity` entrance animation. AP-070 extracted.) Prior: FB-155 (ScrollSpy's active notch label now auto-contrasts against any backdrop via a `document.body`-portaled span with `mix-blend-mode: difference` + `color: #fff`. Escapes the rail's fixed-position stacking context so the blend reaches page content below. Only the currently-active/drag-targeted notch flips; hover-revealed non-active labels keep their existing token-driven colors.) Prior: FB-154 ("Muted by default" / "Sound by default" promoted from a hidden dropdown item to a primary `ButtonSelect` on the `VideoSettings` overlay, and added for the first time to `videoEmbed` blocks via a new `VideoEmbedSettings` control. Cross-category with ENG-168.)
 >
 > **For agent skills:** Read only the first 30 lines of this file (most recent entries) for pattern detection.
 > **Older entries:** Synthesized in `docs/design-feedback-synthesis.md`. Raw archive in `docs/design-feedback-log-archive.md`.
+
+---
+
+### FB-207: MaturityTimeline combined chart — VWAP-style stacked bars + trend overlay
+
+**Date:** 2026-04-25
+
+**What happened:** User requested merging the separate stacked-bar chart and band/trend chart into a single combined visualization, inspired by a VWAP fill-band chart reference. Each build day should be a distinct stacked bar (showing severity or domain breakdown), with a rolling-median trend line overlaid as the darkest/boldest element. Grayscale DS tokens replace the previous colored palette.
+
+**Root cause:** Two separate charts (composition bar chart + trend band chart) forced the viewer to context-switch between "what kind of corrections" and "did the rate improve." A combined chart tells both stories simultaneously — the bar heights convey volume, the stacked segments convey composition, and the trend line conveys trajectory.
+
+**Resolution:**
+- Rewrote `MaturityTimeline.tsx` from a grouped-period stacked bar + separate band chart into a single combined chart with one bar per build day
+- Each bar is a stacked column (column-reverse for bottom-to-top: darkest segment at bottom, lightest at top)
+- Rolling median line (25% window) rendered as SVG polyline overlay with `stroke: $portfolio-neutral-00` (2.5px) — the boldest element on the chart
+- Grayscale segment palette: `$portfolio-neutral-30` (dark), `$portfolio-neutral-50` (mid), `$portfolio-neutral-70` (light) — maps to fundamental/design (darkest), structural/engineering (mid), refinement/content (lightest)
+- Toggle between severity and domain views preserved
+- Tooltip on hover shows day number + per-category breakdown + total
+- Legend includes segment colors + trend-line indicator
+- X-axis shows day numbers (every 5th day when > 20 days)
+
+**Design principle:** When composition and trend serve the same narrative (how correction patterns evolved over time), combine them into a single chart rather than splitting into companion views. The reference VWAP fill-band pattern works because the stacked segments double as both breakdown and volume encoding — the bar height IS the rate, the segments ARE the composition.
+
+---
+
+### FB-206: SkillMap category header — count and divider line removed
+
+**Date:** 2026-04-25
+
+**What happened:** Each SkillMap column header showed the skill count ("INPUT 5") and a `1px` bottom border divider. Both were flagged as noise — the count doesn't communicate meaningful relative scale in a small set, and the divider added visual weight without aiding hierarchy.
+
+**Root cause:** Count was added as a data-completeness signal; divider was added to separate header from cards. Neither survived a "does this help the reader?" test in the actual rendered context.
+
+**Resolution:**
+- Removed `{phase.skills.length}` count span from JSX entirely.
+- Removed `border-bottom`, `padding-bottom` from `.categoryHeader` SCSS.
+- Removed `display: flex` / `align-items: baseline` / `gap` from `.categoryHeader` (only needed to position the now-removed count inline).
+- `.categoryCount` dead class left in SCSS (zero cost).
+
+**Design principle:** Count metadata on column headers is only worth the space it occupies when the numbers carry comparative meaning (e.g., a large enough set where distribution matters). In a 4-column layout with 3-6 items each, the count is noise — it invites readers to mentally tally rather than read. See also CAP-032.
+
+---
+
+### FB-205: CollaborationLoop speed trigger width mismatch + static chevron
+
+**Date:** 2026-04-25
+
+**What happened:** The speed trigger button (36px wide) was narrower than the dropdown panel it opened (56px wide). The caret SVG also didn't rotate when the menu was open — it stayed pointing down regardless of state.
+
+**Root cause:** The trigger had no explicit `min-width`, so it sized to its content ("1x" + gap + 10px caret = ~36px). The dropdown panel auto-sized to its content ("0.5x ✓", "1x ✓", "2x") which is wider. The caret had no `transition` or `transform` rule tied to `[data-state="open"]`.
+
+**Resolution:**
+- Added `min-width: $portfolio-spacer-7x` (56px) to `.transportSpeedTrigger` — matches the menu's natural content width.
+- Added `style={{ minWidth: "var(--radix-dropdown-menu-trigger-width)" }}` to `DropdownMenuContent` — Radix injects the trigger's rendered width as a CSS custom property on the portal; this floors the menu to the trigger width, keeping both in sync as a unit.
+- Added `transition: transform` on `.transportSpeedCaret` + `transform: rotate(180deg)` scoped to `.transportSpeedTrigger[data-state="open"] &` — the caret now flips up when the panel is open and returns to down when closed.
+
+**Design principle:** A dropdown trigger and its panel should be treated as one interactive unit — matching widths signal their relationship. Always rotate directional chevrons to reflect open/closed state.
+
+---
+
+### FB-204: CollaborationLoop track line disappears after the active step
+
+**Date:** 2026-04-25
+
+**What happened:** The connecting track line between dots 7 and 8 (and between 6 and 7) was invisible — users saw circles with no line connecting them past the active step.
+
+**Root cause:** The unfilled track rail used `$portfolio-neutral-20` (#E0E0E0) as its background, which has a contrast ratio of ~1.3:1 against the `$portfolio-neutral-00` (white) container — effectively invisible. The filled portion used `$portfolio-neutral-60` which is clearly readable. Because the fill only covers up to the active step, everything after the active step showed only the near-white rail. This was compounded by the fact that future step dots also use `border: 2px solid $portfolio-neutral-20` — the same color as the track — so there was no distinct track segment to distinguish from the white background.
+
+**Resolution:** Bumped track background from `$portfolio-neutral-20` to `$portfolio-neutral-30` (#C6C6C6). This gives the unfilled rail sufficient contrast (~1.8:1 against white) to read as a distinct line without competing with the darker fill (neutral-60 = #525252) on completed steps.
+
+**Design principle:** Track rails, dividers, and separators must use at least `$portfolio-neutral-30` when placed on `$portfolio-neutral-00` backgrounds. `$portfolio-neutral-20` (#E0E0E0) only has sufficient contrast against neutral-10 or darker surfaces — it disappears on white.
+
+---
+
+### FB-201: SkillMap card borders removed, fill darkened, trigger text made legible
+
+**Date:** 2026-04-25
+
+**What happened (design):** Cards in the `operationsGrid` used `border: 1px solid $portfolio-border-neutral-minimal` with a `$portfolio-neutral-00` fill — same background as the grid itself after the previous session's change. Visually: invisible cards on a white grid.
+
+**What happened (content):** Category headers displayed `{count} skills` (e.g., "3 skills") under a column label that already named the category (e.g., "ITERATION"). The noun "skills" was pure redundancy.
+
+**Root cause (design):** Grid background was updated to `$portfolio-neutral-00` but the card fill and text colors were not recalibrated. The prior fill (`$portfolio-neutral-00`) collapsed onto the white grid; the prior text (`neutral-minimal` at `type-3xs`) became illegible without the gray grid behind it.
+
+**Root cause (content):** The count was authored as "N skills" without checking whether the parent heading already named the category. Classic redundant-noun pattern (see CAP-032).
+
+**Resolution:**
+- `.skillCard`: removed `border`, changed `background` from `$portfolio-neutral-00` to `$portfolio-neutral-10`. Hover and expanded states updated accordingly (no more `border-color` transitions).
+- `.skillTrigger`: font size `type-3xs` → `type-2xs`, color `neutral-minimal` → `neutral-subtle`.
+- `{cat.skills.length} skills` → `{cat.skills.length}` in JSX.
+
+**Design principle documented:** §7.11 "Fill-vs-Border Card Boundary and Contrast Re-Calibration" in `docs/design.md`.
+
+**Content principle documented:** CAP-032 "Redundant Noun in Labelled Count" in `docs/content-anti-patterns.md`.
+
+---
+
+### FB-200: KnowledgeTreemap tooltip information hierarchy inverted
+
+**Date:** 2026-04-25
+
+**What happened:** The tooltip header "Top examples" used `type-3xs` / `opacity: 0.5` — smaller and more faded than the bullet items it introduced (`type-2xs`, inherited opacity). The footer (domain + count) used `type-3xs` / `opacity: 0.55`, nearly identical to the header. Result: header and footer competed at the bottom of the hierarchy while the bullet body dominated, making the header read as a footnote rather than a frame.
+
+**Root cause:** Initial styles applied "subdued = label, larger = content" logic without distinguishing between the semantic roles of header, body, and footer. The header was treated as metadata rather than as the primary framing element.
+
+**Resolution:**
+- Header ("Top examples"): upgraded to `font-size: $portfolio-type-2xs`, `font-weight: $portfolio-weight-semibold`, `color: $portfolio-neutral-00` (explicit white), opacity 1. Same size as bullets — weight difference carries the hierarchy signal.
+- Bullet items: kept at `type-2xs` / `font-weight: $portfolio-weight-regular`, added `opacity: 0.8` to subordinate them slightly to the bold header.
+- Footer (domain + count): kept at `type-3xs`, dropped opacity from 0.55 to 0.45 for clearer subordination.
+
+**Design principle documented:** §7.11 "Three-Tier Tooltip (and Card) Information Hierarchy" — topic label > content body > footer metadata. Weight is the primary differentiator between Tier 1 and Tier 2; size and opacity differentiate Tier 3 from both.
+
+---
+
+### FB-199: CollaborationLoop step dots — uneven spacing and line artefact (two-iteration fix)
+
+**Date:** 2026-04-25
+
+**What happened:** After an initial fix attempt (align-items overrides on first/last stepDotWrap), the user reported a visible track line sticking out to the left of dot 1 AND a huge gap between dots 7 and 8.
+
+**Root cause (initial fix was mathematically wrong):** With `flex: 1` equal-width columns (W = container/8) and first/last dots edge-aligned inside their columns, the outer gaps became `1.5W − 16px` while inner gaps were `W`. For W≈80px this produced outer gaps of ~104px versus inner gaps of ~80px — visually obvious. The track at `left: 16px` also appeared to protrude relative to the dot position when the first dot was shifted left.
+
+**Resolution (second pass):**
+- Switched `.stepNav` to `justify-content: space-between`.
+- Changed each `.stepDotWrap` from `flex: 1` to `flex: 0 0 32px` (fixed to the dot width). `space-between` now distributes the remaining space evenly across 7 gaps, giving dot-center spacing of exactly `(container − 32) / 7` — all gaps equal.
+- First dot left edge at x=0, last dot right edge at x=container_right ✓
+- Track stays at `left: 16px; right: 16px` (dot center of first and last item) ✓
+- Labels overflow the 32px column via negative margin: default `margin-left: −20px` centers a 72px label over each dot. First child overrides to `margin-left: 0` (left-aligned); last child to `margin-left: −40px` (right-aligned with dot right edge).
+- Removed the now-unnecessary first/last-child `align-items` overrides on `.stepDotWrap`.
+
+**Design principle:** In a stepper with fixed-size nodes, the label width must NOT drive the column width — that produces uneven spacing when labels vary. Fix the column to the node size and let labels overflow via negative margin. Use `justify-content: space-between` (not `flex: 1`) to get equal spacing with edge alignment simultaneously.
+
+---
+
+### FB-198: CollaborationLoop transport bar padding
+
+**Date:** 2026-04-25
+
+**What happened:** User reported `.transport` had uneven padding (more vertical than horizontal) and wanted no padding on that row so controls wrap tightly.
+
+**Resolution:** `padding: $portfolio-spacer-1x $portfolio-spacer-0-5x` → `padding: 0` on `.transport`. Outer page rhythm remains from `.container` padding.
+
+---
+
+### FB-197: CollaborationLoop `.vizArea` border removed
+
+**Date:** 2026-04-25
+
+**What happened:** User asked to remove the border around the interactive visualization well (`.vizArea`).
+
+**Resolution:** Dropped `border: 1px solid $portfolio-border-neutral-minimal` from `.vizArea` — the section still has `$portfolio-neutral-10` fill and fixed `200px` height; only the outline was removed.
+
+---
+
+### FB-196: CollaborationLoop transport control hierarchy inverted
+
+**Date:** 2026-04-25
+
+**What happened:** In the transport row, the speed selector looked more prominent than play/pause because speed used a bordered control while play/pause did not. The user requested the inverse hierarchy: play/pause should carry regular emphasis; speed should be lower emphasis.
+
+**Root cause:** Emphasis assignment followed implementation convenience (speed was a dropdown trigger) instead of action priority. In this control group, play/pause is the primary local action; speed and step navigation are secondary adjustments.
+
+**Resolution:**
+1. `transportPlayBtn` now uses regular bordered emphasis (`border: 1px`, neutral background, stronger text color, subtle hover background).
+2. `transportSpeedTrigger` is now borderless minimal emphasis (`border: none`, transparent background, text-only hover emphasis).
+3. Added principle to `docs/design.md` §7.8: in grouped controls, bordered emphasis belongs to the highest-priority local action only.
+
+---
+
+### FB-192: Micro mode abolished — `type-3xs` in row/sliver tiles is not legible
+
+**Date:** 2026-04-24
+
+**What happened:** The user identified 4 problem tiles in the `KnowledgeTreemap`. Three (33×87px, 31×87px, 52×79px) were showing either blank or `type-3xs`-rendered text from the "micro" mode introduced in FB-190. One (127×11px) was correctly silent but confirmed so. The user stated: "Don't use micro fonts — that's just bad. Normal font size for the type."
+
+**Root cause:** The `micro` mode introduced in FB-190 (for tiles 32-64px wide) used `type-3xs` (8px) to try to show more characters in a constrained width. This created a new class of illegible tiles: on saturated teal/purple backgrounds, 8px semibold text is not readable regardless of width. The anti-pattern is using font size to solve a layout problem — the correct tool is ellipsis at a legible font size.
+
+**Resolution:**
+1. Removed `micro` mode entirely from `TileMode`, `classifyTile()`, and SCSS.
+2. Row mode now uses the same `type-xs` (12px) as column mode — no font downscaling in slivers.
+3. `TILE_SILENT_W_PX` lowered from 32px → 20px so the 31px-wide tile enters row mode instead of silence.
+4. Count suppressed in row mode (label-only for slivers; count in tooltip).
+5. `TILE_MIN_TWO_LINE_PX` updated to 38px (recalculated for `type-xs` label + `type-2xs` count).
+6. Removed `.treemapBlockMicro` and `.treemapLabelMicro` from SCSS.
+7. AP-072 updated with final classification thresholds and the principle that micro-fonts are never acceptable.
+
+**New principle:** Ellipsis at normal font size is always preferable to legible-ish text at a smaller font. An "A..." label at `type-xs` communicates "there is a category name here, hover to see it." A label at `type-3xs` on a saturated surface communicates nothing.
+
+---
+
+### FB-191: Treemap count font too small — `type-3xs` (8px) on a coloured surface is not legible
+
+**Date:** 2026-04-24
+
+**What happened:** User reported the count number in treemap blocks was "so small it's not legible because it's thin too." Font size contrast between label (`type-xs`) and count (`type-3xs`) was too steep given that weight (`semibold` vs `regular`) and opacity (`1.0` vs `0.55`) already establish the hierarchy.
+
+**Root cause:** Three hierarchy signals (size, weight, opacity) all applied simultaneously created a 4px font size gap (12px vs 8px) on top of a weight change and opacity change. The count fell below the practical legibility floor on a saturated colour surface.
+
+**Resolution:** `type-3xs` → `type-2xs` (10px) for `.treemapCount`. Opacity nudged from 0.55 → 0.6. Size gap closes from 4px to 2px; weight + opacity still signal "this is secondary metadata."
+
+---
+
+### FB-187: AP-072 tile-classification thresholds under-calibrated — illegible text still showing
+
+**Date:** 2026-04-24
+
+**What happened:** After the AP-072 three-mode tile classification was shipped, the user observed two problems still present: (1) vertical-sliver tiles still appearing with stacked text, (2) some tiles showing truncated labels so short they were completely unreadable ("De…", "Med…").
+
+**Root cause:** Two threshold values were set too permissively on the first pass:
+- `TILE_MIN_TEXT_PX = 36px` — At 36–64px width with `type-xs` (~13px / ~7px per char), a tile only shows 4–6 characters before truncation, producing meaningless fragments. The correct minimum is the width at which ~8 characters can render (the shortest identifiable category name snippet), which at this font size is ~64px.
+- `TILE_SLIVER_RATIO = 2.5` — Tiles with height/width between 1.5 and 2.5 (e.g. 40px wide × 61px tall, ratio 1.53) stayed in column mode. Stacking a label above a count in a 40×61px rectangle still reads as a vertical visual block.
+
+**Resolution:** Raised `TILE_MIN_TEXT_PX` from 36 to 64 and lowered `TILE_SLIVER_RATIO` from 2.5 to 1.5. Any tile narrower than 64px is now silent (colour only). Any tile ≥ 64px wide whose height is 1.5× its width or more switches to row mode. Row-mode label font dropped from `type-2xs` to `type-3xs` so narrow-but-text-showing tiles display more characters before truncation.
+
+**AP-072 amendment:** Updated threshold documentation in `docs/design-anti-patterns.md` to reflect calibrated values.
+
+---
+
+### FB-186: KnowledgeTreemap block visual hierarchy inverted — count dominated label
+
+**Date:** 2026-04-24
+
+**What happened:** User observed that the anti-pattern type label had a smaller, visually weaker appearance than the count number in each treemap tile. The label was at `type-2xs` semibold; the count was at `type-sm` semibold. The count — a single supporting integer — read more prominently than the category name, which is the primary information on the tile.
+
+**Root cause:** When the count display was introduced, `type-sm` was chosen for visual impact to make the number feel "numeric and bold." This inverted the information hierarchy: the count became the eye anchor, and the label became a caption underneath it.
+
+**Resolution:** Established explicit hero vs. supporting metadata sizing:
+- **Label (hero):** `type-xs` + `weight-semibold` — one size step up from `type-2xs`, making the category name the first thing the eye lands on.
+- **Count (metadata):** `type-3xs` + `weight-regular` + `opacity: 0.55` — two size steps down, regular weight, and lower opacity. It is readable but visually subordinate.
+- Row mode label adjusted from `type-3xs` to `type-2xs` to maintain proportional hierarchy on single-line tiles.
+
+**Design principle:** When a tile (or any container) shows a label paired with a supporting metric, the label is always the visual hero unless the metric is explicitly the purpose of the view (e.g., a KPI dashboard cell). "The number is not the hero" — use it to count, not to anchor.
+
+---
+
+### FB-185: KnowledgeTreemap orientation-blind layout — vertical sliver tiles illegible
+
+**Date:** 2026-04-24
+
+**What happened:** User identified a treemap tile ("Data Migration", Engineering domain) rendered as a vertical sliver — approximately 20px wide × 73px tall. The existing `flex-column` layout stacked the label above the count, but the sliver was far too narrow to show more than 2 characters of the label, and the count was pushed into invisible overflow.
+
+**Root cause:** The treemap used a fixed `flex-column` layout for all tiles, regardless of tile shape. The d3 squarify algorithm occasionally produces tiles with extreme aspect ratios (height >> width) when a small category is packed into a remaining strip. No measurement of actual pixel dimensions was performed — the component used percentage thresholds (`w > 5 && h > 5`) that were meaningless for detecting orientation problems.
+
+**Resolution:** Added `ResizeObserver` to track the container's pixel dimensions. For each tile, compute `pxW` and `pxH` from d3's percentage coordinates × container dimensions. Classify each tile into one of three modes via `classifyTile()`:
+- **column** (normal): label top-left, count bottom-right — `pxW ≥ 36px` and `pxH/pxW ≤ 2.5`
+- **row** (vertical sliver): label left, count right on one line — `pxH/pxW > 2.5` and `pxW ≥ 36px`
+- **silent** (too narrow): color only, no text — `pxW < 36px`
+
+Added `.treemapBlockRow` SCSS modifier that flips `flex-direction: row`, centers items, and applies `type-3xs` sizing on label and count. Label gets `flex: 1 min-width: 0` so it truncates cleanly rather than wrapping or overflowing. Count gets `flex-shrink: 0` so it is always fully visible.
+
+**Design principle extracted:** AP-072 — orientation-blind content layout in variable-size containers. Layout direction must match the physical orientation of the available space. See `docs/design-anti-patterns.md`.
+
+---
+
+### FB-184: KnowledgeTreemap block and tooltip information architecture redesign
+
+**Date:** 2026-04-24
+
+**What happened:** User requested a full IA redesign of each treemap block's content and its hover tooltip. The block previously showed a center-aligned label + "N anti-patterns" stacked text. The tooltip repeated the category name and showed "Engineering / 6 anti-patterns" as a meta line.
+
+**Root cause:** The original block layout surfaced the count redundantly ("6 anti-patterns") and didn't use the available tile corners for clear hierarchy. The tooltip failed to leverage the live AP data the API was already returning — it showed only the count, not the actual anti-pattern titles.
+
+**Resolution:**
+- Block (no hover): label anchored **top-left**, pure count number anchored **bottom-right** (via `justify-content: space-between` + `align-self: flex-end`). "anti-patterns" suffix removed from block view — the number alone is sufficient at a glance.
+- Tooltip: **DOMAIN** (allcaps, monospace, subdued) as first line with a bottom separator; **top-3 most recent anti-patterns** as a bulleted list (identified by highest ID number from the Category Index, looked up against `## PREFIX-NNN: Title` headings); **"N anti-patterns"** count as the footer with a top separator.
+- API route (`/api/antipatterns`) enhanced: now parses each category's ID column (handling abbreviated CAP-style format like `CAP-001, 003, 006`), sorts by trailing number descending, looks up titles, and returns `topThree: string[]` per category.
+
+**Design principle:** Treemap tiles have two natural anchors for progressive disclosure — the corner positions (always visible at any tile size) and the hover state. Corners should hold the minimum identity (what it is + how big it is). Hover should reveal specifics that wouldn't fit in the tile. Never repeat the same text in both places.
+
+---
+
+### FB-183: CollaborationLoop transport play vs step controls mismatched size
+
+**Date:** 2026-04-24
+
+**Issue:** The play/pause control rendered at 32×32 while the previous/next step buttons used 28×28 and the speed menu trigger used a 28px-tall strip, so the transport bar read as uneven control sizing.
+
+**Root Cause:** `.transportPlayBtn` intentionally overrode width/height to 32px (documented as “primary action”) while `.transportBtn` defined 28px for the pager arrows.
+
+**Resolution:** Raised the shared `.transportBtn` contract to 32×32 with `min-width` / `min-height` so prev/next match play. Removed the redundant 32px rules from `.transportPlayBtn` (accent `color` / `border-color` / `font-size` only). Set `.transportSpeedTrigger` to `height: 32px` and `min-height: 32px` so the left cluster aligns vertically.
+
+**Files:** `src/components/elan-visuals/collaboration-loop.module.scss`
+
+---
+
+### FB-182: MaturityTimeline chart used corner radius (portfolio identity violation)
+
+**Date:** 2026-04-24
+
+**Issue:** User flagged rounded corners on the maturity bar chart (stack tops) and related chrome; portfolio policy is zero corner radius on the main site except structural exceptions (avatars, progress bars, toggles, spinners).
+
+**Root Cause:** `maturity-timeline.module.scss` carried decorative `$portfolio-radius-*` on `.barStack`, `.milestoneMarker`, `.legendDot`, and `.popover`, inherited from a generic chart polish pass without checking `docs/design/branding.md`.
+
+**Resolution:** Removed all four `border-radius` declarations so bars, milestone tags, legend swatches, and the hover popover read square-edged like the rest of the case study. Milestone and popover keep border + fill for hierarchy; legend dots remain 10×10 squares.
+
+**Files:** `src/components/elan-visuals/maturity-timeline.module.scss`
+
+**Cross-category note:** ENG-210 (engineering) shipped the tooltip interaction fix in the same module in the same pass.
+
+---
+
+### FB-181: Elan Tier-3 viz legends — align SkillMap and MaturityTimeline spacing
+
+**Date:** 2026-04-24
+
+**Issue:** After FB-180, SkillMap’s treemap legend used `$portfolio-spacer-1x` below the treemap, but MaturityTimeline’s legend was still separated from the chart by the parent `.container` flex `gap: $portfolio-spacer-3x` (third flex child), so the two Elan visuals read as different spacing systems.
+
+**Root Cause:** SkillMap isolated treemap+legend in an unstyled wrapper with legend `margin-top`; MaturityTimeline treated legend as a peer of `.chart` at the `.container` level, inheriting section-scale `3x` gaps.
+
+**Resolution:** Added identical `.visualizationWithLegend` blocks in `skill-map.module.scss` and `maturity-timeline.module.scss` (`flex-direction: column`, `gap: $portfolio-spacer-1x`). Wrapped KnowledgeTreemap output and (chart + legend) in MaturityTimeline with that class; removed `margin-top` from SkillMap `.legend`. Controls-to-chart spacing stays `3x` via `.container`; chart-to-legend is now `1x` in both components.
+
+**Files:** `src/components/elan-visuals/skill-map.module.scss`, `SkillMap.tsx`, `maturity-timeline.module.scss`, `MaturityTimeline.tsx`
+
+**Cross-category note:** Supersedes the margin-only approach in FB-180 for SkillMap; FB-180 intent (breathing room) preserved with flex gap for parity.
+
+---
+
+### FB-180: SkillMap treemap legend too tight to visualization
+
+**Date:** 2026-04-24
+
+**Issue:** The domain legend ("Design Engineering Content") sat directly under the squarified treemap with no vertical gap, so it read as glued to the chart.
+
+**Root Cause:** `.legend` had horizontal `gap` for items but no `margin-top` separating the legend row from `.treemapContainer`.
+
+**Resolution:** Added `margin-top: $portfolio-spacer-1x` to `.legend` in `skill-map.module.scss`, aligned with the same file’s `.section` `gap: $portfolio-spacer-1x` between section header and body.
+
+**Files:** `src/components/elan-visuals/skill-map.module.scss`
 
 ---
 
@@ -3720,4 +4048,20 @@ Max/min perceptual distance ratio improved from **1.48x → 1.33x**. Range narro
 **Cross-category note:** Also documented as CF-025 (content) for a wording fix in the same callout.
 
 **Design principle:** Padding should be proportional to content density. Callout-style asides with minimal content (label + short paragraph) need less padding than full-width sections. When in doubt, start tighter and expand.
+
+## Session: 2026-04-25 — CollaborationLoop VisualGuardrail checklist redesign
+
+**Component:** `CollaborationLoop` — `VisualGuardrail` sub-visual (Step 8, viz area)
+
+**Feedback:** The step-dot meter (numbered circles 1-2-3 connected by a track) made no sense as a viz for the post-flight documentation pattern. The content represents completed documentation outputs, which are naturally a checklist, not a sequential loop progression. The design.md rule excerpt was floating below as a separate block misaligned with its parent item.
+
+**Root cause:** Original viz reused the global step-dot visual language inside the viz area, creating a visual paradox - a mini step-tracker inside a step-tracker. The rule excerpt (design.md section content) was rendered as a sibling block to the whole meter, rather than as sub-content indented under its owning check item.
+
+**Resolution:**
+- Replaced horizontal centered dot-meter with a vertical left-aligned checklist
+- Each item has a squared checkbox icon with three semantic states: `checked` (✓ filled dark), `feedback` (dot indicator, in-progress), `locked` (dimmed empty box)
+- Sub-content (file tag + rule text) appears under "Design principle" with `margin-left: calc(checkboxWidth + gap)` so it aligns with the label text, not the checkbox
+- A left-border accent on the sub-content block creates visual attachment to the parent item without reusing structural patterns
+
+**Design principle learned:** Sub-content attached to a list item should indent to align with the item's label text, not its leading icon/marker. Aligning with the marker creates ambiguity about whether the sub-content belongs to the item or stands independently.
 

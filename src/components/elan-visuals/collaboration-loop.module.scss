@@ -2,33 +2,55 @@
 
 // ── Container ────────────────────────────────────────────────────────────────
 
+// Outer shell: border + background only — no padding or gap.
+// Inner rhythm is owned by each child block independently.
 .container {
   display: flex;
   flex-direction: column;
-  gap: $portfolio-spacer-1-5x;
-  padding: $portfolio-spacer-2x $portfolio-spacer-3x;
-  background: $portfolio-surface-neutral-subtle;
+  background: $portfolio-neutral-00;
   border: 1px solid $portfolio-border-neutral-minimal;
+}
+
+// Content block: step navigation + detail panel.
+// Owns its own padding and vertical gap between the two sections.
+.contentBlock {
+  display: flex;
+  flex-direction: column;
+  gap: $portfolio-spacer-1-5x;
+  padding: $portfolio-spacer-3x $portfolio-spacer-2x;
 }
 
 // ── Step nav (dots + labels) ─────────────────────────────────────────────────
 
 .stepNav {
+  // Full-width row — inner wrap is centered inside it.
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 0;
+}
+
+// Inner wrapper: sized to exactly the dot cluster width.
+// Centering the wrap (not the individual dots) keeps the track anchored
+// to the actual dots regardless of the container width.
+.stepTrackWrap {
   display: flex;
   align-items: flex-start;
-  justify-content: center;
-  gap: 0;
+  gap: $portfolio-spacer-1x;
   position: relative;
-  padding: 0;
 }
 
 .stepTrack {
   position: absolute;
-  top: 16px;
-  left: 32px;
-  right: 32px;
+  // 14px = half the 28px dot width — track runs from center-of-first-dot
+  // to center-of-last-dot within the fit-content stepTrackWrap.
+  top: 14px;
+  left: 14px;
+  right: 14px;
   height: 2px;
-  background: $portfolio-neutral-20;
+  // neutral-30 (#C6C6C6) gives sufficient contrast against the neutral-00
+  // (white) container. neutral-20 (#E0E0E0) was effectively invisible.
+  background: $portfolio-neutral-30;
   z-index: 0;
 }
 
@@ -42,8 +64,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  flex: 1;
-  min-width: 0;
+  flex: 0 0 28px;
   z-index: 1;
 }
 
@@ -51,8 +72,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   border-radius: $portfolio-radius-full;
   border: 2px solid $portfolio-neutral-20;
   background: $portfolio-neutral-00;
@@ -67,7 +88,7 @@
     color 200ms $portfolio-easing-standard;
 
   &:hover {
-    border-color: $portfolio-neutral-40;
+    background: $portfolio-neutral-20;
   }
 
   &:focus-visible {
@@ -77,35 +98,29 @@
 }
 
 .stepDotCompleted {
-  border-color: $portfolio-neutral-50;
-  background: $portfolio-neutral-10;
-  color: $portfolio-neutral-70;
+  border-color: $portfolio-neutral-60;
+  background: $portfolio-neutral-60;
+  color: $portfolio-neutral-00;
+
+  &:hover {
+    border-color: $portfolio-neutral-50;
+    background: $portfolio-neutral-50;
+  }
 }
 
 .stepDotActive {
   border-color: $portfolio-neutral-80;
   background: $portfolio-neutral-80;
   color: $portfolio-neutral-00;
+
+  &:hover {
+    border-color: $portfolio-neutral-70;
+    background: $portfolio-neutral-70;
+  }
 }
 
-.stepDotLabel {
-  margin-top: $portfolio-spacer-1x;
-  font-size: $portfolio-type-3xs;
-  color: $portfolio-text-neutral-minimal;
-  text-align: center;
-  text-transform: uppercase;
-  letter-spacing: $portfolio-tracking-wider;
-  line-height: $portfolio-leading-tight;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  overflow: hidden;
-}
-
-.stepDotLabelActive {
-  color: $portfolio-text-neutral-bold;
-  font-weight: $portfolio-weight-semibold;
-}
+// .stepDotLabel and .stepDotLabelActive are retained as dead classes in case
+// labels are re-introduced, but no elements render them currently.
 
 // ── Detail panel ─────────────────────────────────────────────────────────────
 
@@ -115,7 +130,6 @@
   gap: $portfolio-spacer-1x;
   padding: $portfolio-spacer-2x;
   background: $portfolio-neutral-00;
-  border: 1px solid $portfolio-border-neutral-minimal;
 }
 
 .detailHeader {
@@ -164,8 +178,8 @@
 .vizArea {
   padding: $portfolio-spacer-1-5x;
   background: $portfolio-neutral-10;
-  border: 1px solid $portfolio-border-neutral-minimal;
-  min-height: 160px;
+  height: 200px;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -668,96 +682,67 @@
   color: $portfolio-text-neutral-regular;
 }
 
-// ── Viz 8: Guardrail ─────────────────────────────────────────────────────────
+// ── Viz 8: Checklist ─────────────────────────────────────────────────────────
 
-.vizGuardrail {
+// DS Checkbox sm: 16px box, $portfolio-spacer-utility-0-5x (4px) internal gap.
+// These values mirror Checkbox.module.scss so sub-content aligns with label text.
+$_check-sm: 16px;
+$_check-row-gap: $portfolio-spacer-1x;
+
+.vizChecklist {
   display: flex;
   flex-direction: column;
-  gap: $portfolio-spacer-1-5x;
+  gap: $portfolio-spacer-1x;
   width: 100%;
   max-width: 400px;
+  align-self: flex-start;
 }
 
-.vizGuardrailMeter {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  position: relative;
-  padding: 0 $portfolio-spacer-1x;
-}
-
-.vizGuardrailTrack {
-  position: absolute;
-  top: 14px;
-  left: 28px;
-  right: 28px;
-  height: 3px;
-  background: $portfolio-neutral-20;
-  z-index: 0;
-}
-
-.vizGuardrailTrackFill {
-  height: 100%;
-  width: 100%;
-  background: $portfolio-neutral-60;
-}
-
-.vizGuardrailTier {
+.vizChecklistItem {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  z-index: 1;
+  gap: $portfolio-spacer-0-5x;
 }
 
-.vizGuardrailDot {
-  width: 28px;
-  height: 28px;
-  border-radius: $portfolio-radius-full;
-  border: 2px solid $portfolio-neutral-30;
-  background: $portfolio-neutral-00;
+.vizChecklistRow {
   display: flex;
   align-items: center;
-  justify-content: center;
-  font-family: $portfolio-font-mono;
-  font-size: $portfolio-type-2xs;
-  color: $portfolio-text-neutral-minimal;
+  gap: $_check-row-gap;
 }
 
-.vizGuardrailDotActive {
-  border-color: $portfolio-neutral-80;
-  background: $portfolio-neutral-80;
-  color: $portfolio-neutral-00;
+.vizChecklistLabel {
+  font-size: $portfolio-type-xs;
+  color: $portfolio-text-neutral-regular;
 }
 
-.vizGuardrailTierLabel {
-  font-size: $portfolio-type-3xs;
-  color: $portfolio-text-neutral-minimal;
-}
-
-.vizGuardrailTierLabelActive {
+.vizChecklistLabelChecked {
   color: $portfolio-text-neutral-bold;
-  font-weight: $portfolio-weight-semibold;
+  font-weight: $portfolio-weight-medium;
 }
 
-.vizGuardrailRule {
+.vizChecklistLabelLocked {
+  color: $portfolio-text-neutral-minimal;
+}
+
+// Sub-content (file tag + rule text) indented to align with the label text,
+// not with the checkbox. Left offset = DS Checkbox sm width (16px) + row gap.
+.vizChecklistSub {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  margin-left: calc(#{$_check-sm} + #{$_check-row-gap});
   padding: $portfolio-spacer-0-5x $portfolio-spacer-1x;
-  background: $portfolio-neutral-00;
-  border: 1px solid $portfolio-border-neutral-minimal;
-  border-left: 3px solid $portfolio-neutral-60;
+  border-left: 2px solid $portfolio-neutral-20;
 }
 
-.vizGuardrailRuleHeader {
+.vizChecklistSubFile {
   font-family: $portfolio-font-mono;
-  font-size: $portfolio-type-2xs;
+  font-size: $portfolio-type-3xs;
   font-weight: $portfolio-weight-semibold;
-  color: $portfolio-text-neutral-bold;
+  color: $portfolio-text-neutral-subtle;
 }
 
-.vizGuardrailRuleText {
+.vizChecklistSubText {
   font-size: $portfolio-type-2xs;
   color: $portfolio-text-neutral-regular;
   line-height: $portfolio-leading-relaxed;
@@ -765,11 +750,14 @@
 
 // ── Transport bar ────────────────────────────────────────────────────────────
 
+// Controls block: owns its own padding to match the content block's horizontal inset.
+// `border-top` provides the visual separator between the two sibling blocks.
 .transport {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: $portfolio-spacer-1x $portfolio-spacer-0-5x;
+  padding: $portfolio-spacer-1-5x $portfolio-spacer-2x;
+  border-top: 1px solid $portfolio-border-neutral-minimal;
 }
 
 .transportLeft {
@@ -788,8 +776,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  min-height: 32px;
   border: none;
   background: transparent;
   color: $portfolio-text-neutral-subtle;
@@ -807,13 +797,15 @@
 }
 
 .transportPlayBtn {
-  // Larger size marks the primary action on the strip — the only explicit
-  // reason to break the strip's 28px height contract.
-  width: 32px;
-  height: 32px;
-  border-color: $portfolio-accent-60;
-  color: $portfolio-accent-60;
+  border: 1px solid $portfolio-border-neutral-minimal;
+  background: $portfolio-neutral-00;
+  color: $portfolio-text-neutral-bold;
   font-size: $portfolio-type-xs;
+
+  &:hover {
+    border-color: $portfolio-border-neutral-regular;
+    background: $portfolio-neutral-10;
+  }
 }
 
 .transportCounter {
@@ -827,10 +819,14 @@
   align-items: center;
   justify-content: center;
   gap: $portfolio-spacer-0-5x;
-  height: 28px;
-  padding: 0 $portfolio-spacer-1x;
-  border: 1px solid $portfolio-border-neutral-minimal;
-  background: $portfolio-neutral-00;
+  // Fixed width matches the menu's content width so button and panel are
+  // the same size — the menu gets min-width from --radix-dropdown-menu-trigger-width.
+  min-width: $portfolio-spacer-7x;
+  min-height: 32px;
+  height: 32px;
+  padding: 0 $portfolio-spacer-0-5x;
+  border: none;
+  background: transparent;
   color: $portfolio-text-neutral-regular;
   font-family: $portfolio-font-mono;
   font-size: $portfolio-type-xs;
@@ -838,7 +834,7 @@
   cursor: pointer;
 
   &:hover {
-    background: $portfolio-neutral-10;
+    color: $portfolio-text-neutral-bold;
   }
 
   &:focus-visible {
@@ -847,8 +843,8 @@
   }
 
   &[data-state="open"] {
-    background: $portfolio-neutral-10;
-    border-color: $portfolio-border-neutral-regular;
+    background: transparent;
+    color: $portfolio-text-neutral-bold;
   }
 }
 
@@ -859,6 +855,15 @@
 .transportSpeedCaret {
   color: $portfolio-text-neutral-subtle;
   flex-shrink: 0;
+  transition: transform $portfolio-duration-fast $portfolio-easing-standard;
+
+  .transportSpeedTrigger[data-state="open"] & {
+    transform: rotate(180deg);
+  }
+}
+
+.transportSpeedDropdown {
+  min-width: var(--radix-dropdown-menu-trigger-width);
 }
 
 .transportSpeedActiveMark {

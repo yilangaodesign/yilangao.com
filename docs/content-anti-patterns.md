@@ -4,7 +4,7 @@
 >
 > **Who reads this:** AI agents before writing or editing portfolio content — scan for relevant anti-patterns.
 > **Who writes this:** AI agents when a content feedback cycle reveals a new anti-pattern.
-> **Last updated:** 2026-04-20 (CAP-031 added: Chronological Case-Study Order)
+> **Last updated:** 2026-04-25 (CAP-032 added: Redundant Noun in Labelled Count)
 
 ## Category Index
 
@@ -15,7 +15,7 @@
 | Positioning & Claims | CAP-002, 004, 011, 019, 025, 026 | 6 |
 | Information Architecture | CAP-005, 008, 009, 010, 018, 031 | 6 |
 | Specificity & Evidence | CAP-007, 015, 020, 021 | 4 |
-| UX Microcopy | CAP-012, 013, 014 | 3 |
+| UX Microcopy | CAP-012, 013, 014, 032 | 4 |
 | **Total** | | **31** |
 
 ---
@@ -482,6 +482,31 @@ Also do NOT use inline `###` headings inside a richText `bodyMarkdown`. `src/lib
 Operational check: `rg "order: \d+" src/app/\(frontend\)/api/update-\*/route.ts` lists the current ordering in one command. If the sequence does not reflect the narrative ranking the author would give out loud, the ordering is stale.
 
 **Reference:** CFB-038 / ENG-168. As of Mar 30 – Apr 19 2026, Lacework held `order: 1` (first CMS-migrated case study), Élan `order: 3`, Meteor/Goldman Sachs `order: 3` (tied). Meteor is the highest-scope case study in the portfolio ($79B AUM, sole designer, nine engineers, three time zones) and was buried at position 3 for ~21 days because nobody re-ranked after adding it. Fixed 2026-04-20: Meteor → 1, Lacework → 2, Élan → 3.
+
+---
+
+## CAP-032: Redundant Noun in Labelled Count
+
+**Status: ACTIVE**
+
+**Category:** UX Microcopy
+
+**Trigger:** A count badge or metadata label repeats the noun that the section heading already provides. Common forms: "6 skills" under a "SKILLS" heading, "3 items" inside a list labeled "Items", "12 results" when the container is already titled "Search results."
+
+**Why it's wrong:** The count exists to quantify. The noun exists to categorize. When the heading already names the category, the noun in the count is pure redundancy — it adds character count and reading weight without adding information. The reader must parse "6 skills" as "6 [of the things already named above]" — the bracketed clause does real cognitive work, and the visible word "skills" does none of it. In dense UI surfaces (tables, filter chips, stat rows, card headers), redundant nouns are a leading cause of visual noise.
+
+**Correct alternative:** Strip the noun. Let the count be a bare number. The heading supplies the category; the number supplies the quantity. Together they are complete. Separately they carry their own weight.
+
+- Bad: `ITERATION  3 skills` (column header followed by count with noun)
+- Good: `ITERATION  3` (column header, bare count)
+- Bad: `16 results found` under a "Search results" heading
+- Good: `16` in a results-count badge next to the heading
+
+**When a noun IS appropriate:** When the count is displayed without a labeling heading — in isolation, in a sentence, or in a cross-category summary (e.g. "3 design skills, 2 engineering skills"). In that case the noun is necessary for disambiguation, not redundancy.
+
+**Applies to:** All count badges, stat chips, column headers, section subtitles, and filter counts in the main site, playground, and ASCII Studio. When authoring any new design that shows a numeric count, ask: "Does a parent label already name the thing being counted?" If yes, drop the noun.
+
+**Reference:** FB-201 (2026-04-25). Élan SkillMap `categoryCount` displayed `{count} skills` inside a column header already labeled "ITERATION / QUALITY / OPERATIONS". Stripped to bare `{count}`.
 
 ---
 

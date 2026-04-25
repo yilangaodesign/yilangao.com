@@ -4,7 +4,30 @@
 >
 > **Who reads this:** AI agents when the `ship-it` skill is activated — scan recent entries for recurring pitfalls before starting a new release.
 > **Who writes this:** AI agents after each ship-it run via the Post-Release Audit protocol in `ship-it/SKILL.md`.
-> **Last updated:** 2026-04-24 (REL-023: Élan 2.11.11, yilangao.com 1.3.11, ASCII Art Studio 0.6.13)
+> **Last updated:** 2026-04-25 (REL-024: Élan 2.12.0, yilangao.com 1.4.0, ASCII Art Studio 0.6.14)
+
+---
+
+## REL-024 — Élan 2.12.0, yilangao.com 1.4.0, ASCII Art Studio 0.6.14 (2026-04-25)
+
+**Scope:** 13 files across 5 dependency-ordered layer commits (L1 docs x2, L3 deps x2, L5 new components x2, L7 site components x1, L8 frontend pages x6) + 1 release commit + 1 dev-patch-bump commit. Layers 0, 2, 4, 6, 9-10 empty.
+**Semver:** Minor for Élan (new component: AnalyticsProvider) and yilangao.com (new feature: Mixpanel + Vercel Analytics). Patch for ASCII Art Studio (manifest sync only).
+**Previous release:** Élan 2.11.11, yilangao.com 1.3.11, ASCII Art Studio 0.6.13
+
+**Incidents during release:** None. All three build gates passed on first attempt. Playground ~18s compile + ~6s TS, main site ~21s compile + ~9s TS, ASCII tool ~10s compile + ~4s TS.
+
+**Build gate:** All three apps passed on first attempt.
+
+**Post-deploy verification:** `vercel ls --prod` (default linked project `yilangao-design-system`) showed latest production deployment Ready (1m build) within 3m of the `main` push. Portfolio project (`yilangao-portfolio`) deploys from the same GitHub `main` integration.
+
+**Env var note:** `NEXT_PUBLIC_MIXPANEL_TOKEN` was added to the playground Vercel project via CLI. The main site (`yilangao-portfolio`) needs the same env var added via the Vercel dashboard since CLI targets the playground by default.
+
+**Layer classification notes:**
+- L1: `docs/engineering-feedback-log.md`, `docs/port-registry.md`.
+- L3: `package.json`, `package-lock.json` (added `@vercel/analytics`, `mixpanel-browser`, `@types/mixpanel-browser`).
+- L5: `src/lib/analytics/mixpanel.ts` (new), `src/components/AnalyticsProvider.tsx` (new).
+- L7: `src/components/SiteFooter/SiteFooter.tsx` (External Link Clicked tracking).
+- L8: `src/app/(frontend)/layout.tsx` (AnalyticsProvider + Vercel Analytics wiring), `HomeClient.tsx` (Case Study Clicked), `ContactClient.tsx` (Contact Form Submitted), `ProjectClient.tsx` (Case Study Viewed + Section Reached + External Link Clicked), `LoginClient.tsx` + `login.module.scss` (minor styling fixes, pre-existing).
 
 ---
 
@@ -301,26 +324,4 @@ REL-AP-005 (dead `src/lib/utils.ts` with missing `tailwind-merge` dependency) ha
 
 ---
 
-## REL-009 — Élan 2.8.0, yilangao.com 1.1.0, ASCII Art Studio 0.5.3 (2026-04-11)
-
-**Scope:** 112 files merged to `main` via fast-forward: 11 dependency-ordered layer commits, 1 build-fix commit, 1 release commit, 1 dev patch bump on `dev` after merge
-**Semver:** Minor for Élan (2.7.0 → 2.8.0: new CursorThumbnail, SiteFooter components + UI updates). Minor for yilangao.com (1.0.0 → 1.1.0: (site) route group migration, new page utilities). Patch for ASCII Art Studio (0.5.2 → 0.5.3: release sync, no new app code).
-**Previous release:** Élan 2.7.0, ASCII Art Studio 0.5.2
-
-**Incidents during release:**
-- **Build gate: 3 TypeScript errors.** (1) Archived `archive/homepage-v1/` was not excluded from `tsconfig.json`, causing stale type errors from old `SiteFooter` props. **Resolution:** Added `archive` to tsconfig `exclude` array. (2) New `(site)/work/[slug]/page.tsx` used `slug` property not in `FALLBACK_PROJECT` type. **Resolution:** Added `slug` to fallback object. (3) `use-cursor-thumbnail.ts` had `clearTimeout(leaveTimerRef.current)` where TypeScript couldn't narrow past the null check through a ref. **Resolution:** Added non-null assertion `!` after the guard.
-- **Website version:auto false positive.** `version:auto` detected page renames (`(frontend)/about → (frontend)/(site)/about`) as URL breaking changes and recommended Major (1.0.0 → 2.0.0). Route groups don't affect URLs in Next.js. **Resolution:** Manually corrected to Minor (1.1.0). This is a gap in the auto-analyzer's understanding of Next.js route groups.
-- **Vercel post-deploy poll:** `vercel ls --prod` from repo root shows playground (Queued at poll time). Main site project not visible from repo root CLI context per REL-008.
-
-**Build gate:** All three apps passed after fix commit. Same non-blocking Sass `darken()` deprecation warnings as REL-007/008.
-
-**Layer classification notes:**
-- 11 commits across 8 populated layers (L0 Config, L1 Docs, L2 Tokens, L3 Deps, L5 New Components, L6 UI Updates, L7 Site Components, L8 Frontend Pages split into 3 commits, L9 Playground).
-- L8 split into route group migration (51 files), API routes + password gate (9 files), and homepage v1 archive (3 files) to keep commits focused.
-- Git detected most `(site)` moves as renames — clean history.
-- New lib files verified against REL-AP-005 (all imported by new pages, no third-party dep issues).
-- No macOS duplicates or debug logs found in Phase 2 clean.
-
----
-
-> **Archived entries:** REL-001 through REL-008 moved to `docs/release-log-archive.md` (2026-04-24, cap enforcement).
+> **Archived entries:** REL-001 through REL-009 moved to `docs/release-log-archive.md` (2026-04-25, cap enforcement).

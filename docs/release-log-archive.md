@@ -2,7 +2,22 @@
 
 > **What this file is:** Archived release log entries that exceeded the 15-entry cap in `docs/release-log.md`. Kept for historical reference.
 >
-> **Last updated:** 2026-04-24 (archived REL-001 through REL-008)
+> **Last updated:** 2026-04-25 (archived REL-001 through REL-009)
+
+---
+
+## REL-009 — Élan 2.8.0, yilangao.com 1.1.0, ASCII Art Studio 0.5.3 (2026-04-11)
+
+**Scope:** 112 files merged to `main` via fast-forward: 11 dependency-ordered layer commits, 1 build-fix commit, 1 release commit, 1 dev patch bump on `dev` after merge
+**Semver:** Minor for Élan (2.7.0 -> 2.8.0: new CursorThumbnail, SiteFooter components + UI updates). Minor for yilangao.com (1.0.0 -> 1.1.0: (site) route group migration, new page utilities). Patch for ASCII Art Studio (0.5.2 -> 0.5.3: release sync, no new app code).
+**Previous release:** Élan 2.7.0, ASCII Art Studio 0.5.2
+
+**Incidents during release:**
+- Build gate: 3 TypeScript errors (archived tsconfig exclude, missing fallback prop, ref null narrowing). All fixed with single commit.
+- Website version:auto false positive on route group renames (REL-AP-007).
+- Vercel post-deploy poll: playground Queued at poll time; main site not visible from repo root CLI.
+
+**Build gate:** All three apps passed after fix commit.
 
 ---
 

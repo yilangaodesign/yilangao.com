@@ -1412,19 +1412,26 @@
 
 // ── PLAYGROUND LINK ─────────────────────────────────────────────────────────
 
+// Matches `.metaLink` in `page.module.scss` — same mixin, same token usage.
+// Uses `body-sm` (type-sm / regular / sans) not a custom font stack.
 .playgroundLink {
+  @include body-sm;
   display: inline-flex;
   align-items: center;
-  gap: var(--portfolio-spacer-0-5x);
-  font-family: var(--portfolio-font-sans);
-  font-size: var(--portfolio-type-xs);
-  font-weight: var(--portfolio-weight-medium);
-  color: var(--portfolio-text-primary);
+  gap: $portfolio-spacer-0-5x;
+  color: $portfolio-text-primary;
   text-decoration: none;
   @include transition-fast;
-  margin-top: var(--portfolio-spacer-1x);
+  margin-top: $portfolio-spacer-1x;
 
   &:hover {
-    color: var(--portfolio-text-secondary);
+    color: $portfolio-text-secondary;
   }
+}
+
+// Superscript-style upper-right arrow — matches `.arrow` in SiteFooter and
+// `.externalIndicator` in EssayMeta. Decorative (aria-hidden on the span).
+.playgroundLinkArrow {
+  @include caption;
+  opacity: 0.5;
 }

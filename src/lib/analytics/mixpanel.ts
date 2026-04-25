@@ -37,7 +37,7 @@ export function initMixpanel(opts?: { disable?: boolean }) {
  * so it auto-attaches to all subsequent events.
  */
 export function identifyCompany(companySlug: string) {
-  if (disabled) return;
+  if (!initialized || disabled) return;
   mixpanel.identify(companySlug);
   mixpanel.people.set({ company: companySlug });
   mixpanel.register({ company: companySlug });
@@ -47,6 +47,6 @@ export function identifyCompany(companySlug: string) {
  * Track an event. No-ops when Mixpanel is disabled (admin or missing token).
  */
 export function track(event: string, properties?: EventProperties) {
-  if (disabled) return;
+  if (!initialized || disabled) return;
   mixpanel.track(event, properties);
 }

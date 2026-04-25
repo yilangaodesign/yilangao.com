@@ -18,9 +18,13 @@ export function AnalyticsProvider({
   const pathname = usePathname();
   const prevPathname = useRef(pathname);
 
-  useEffect(() => {
+  // Init during client render (not only in useEffect) so nested components' passive
+  // effects never call track() before init — React runs child useEffects before parent.
+  if (typeof window !== "undefined") {
     initMixpanel({ disable: isAdmin });
+  }
 
+  useEffect(() => {
     if (!isAdmin && companySlug && companySlug !== "welcome") {
       identifyCompany(companySlug);
     }
