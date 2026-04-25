@@ -496,6 +496,7 @@ yilangao.com/
 │   │   ├── ui/                   # Foundational UI primitives (Button, Card, etc.)
 │   │   ├── CursorThumbnail/      # Cursor-following thumbnail on homepage hover
 │   │   ├── SiteFooter/           # Site-wide footer with bio, teams, links
+│   │   ├── AnalyticsProvider.tsx  # Render-time Mixpanel init; see docs/analytics.md
 │   │   └── admin/                # Payload admin customizations + CompanyDashboard
 │   ├── hooks/                    # Custom React hooks
 │   │   └── use-cursor-thumbnail.ts  # Pointer tracking, lerp animation, preload delegation
@@ -503,6 +504,7 @@ yilangao.com/
 │   │   ├── tokens/               # Local token files
 │   │   └── mixins/               # Local mixins
 │   ├── lib/                      # Shared utilities
+│   │   ├── analytics/            # Client analytics (Mixpanel hooks); see docs/analytics.md
 │   │   ├── company-session.ts    # Password gate session cookie utilities
 │   │   ├── company-data.ts       # Company Payload queries (getCompanyBySlug, analytics)
 │   │   ├── preload-manager.ts    # Progressive asset preloading singleton (ENG-115)
@@ -534,6 +536,7 @@ yilangao.com/
 │   ├── design.md                 # Design knowledge hub → docs/design/*.md spokes
 │   ├── engineering.md            # Engineering knowledge hub → docs/engineering/*.md spokes
 │   ├── content.md                # Content strategy hub → docs/content/*.md spokes
+│   ├── analytics.md              # Client analytics reference (Mixpanel + Vercel Analytics)
 │   ├── design/                   # Design spoke files (color, spacing, navigation, etc.)
 │   ├── engineering/              # Engineering spoke files (storage, port-mgmt, debugging, etc.)
 │   ├── content/                  # Content spoke files (case-study, homepage, etc.)

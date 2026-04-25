@@ -59,3 +59,4 @@ These phrases aren't triggers you need to memorize. The agent detects them autom
 - Touching `src/` components → Cross-app parity check (automatic)
 - Touching playground files → Playground skill (automatic)
 - Generating portfolio UI (main site) → Branding reference check (automatic, route 16)
+- Touching analytics code → Analytics reference + engineering spoke (automatic, route 17)

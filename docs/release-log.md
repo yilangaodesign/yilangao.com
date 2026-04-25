@@ -10,6 +10,8 @@
 
 ## REL-026 — Élan 2.13.1, yilangao.com 1.5.1, ASCII Art Studio 0.6.16 (2026-04-25)
 
+> For current analytics architecture, see `docs/analytics.md`.
+
 **Scope:** 7 files in 1 layer commit (L8 frontend pages/analytics x7) + 1 build-gate fix commit + 1 release commit + 1 dev-patch-bump commit. Layers 0-7, 9-10 empty.
 **Semver:** Patch for all three apps (analytics instrumentation only, no UI/API changes).
 **Previous release:** Élan 2.13.0, yilangao.com 1.5.0, ASCII Art Studio 0.6.15
@@ -29,6 +31,8 @@
 ---
 
 ## REL-025 — Élan 2.13.0, yilangao.com 1.5.0, ASCII Art Studio 0.6.15 (2026-04-25)
+
+> For current analytics architecture, see `docs/analytics.md`.
 
 **Scope:** 22 files across 3 dependency-ordered layer commits (L1 docs x8, L7 site components x7, L8 frontend pages x7) + 2 build-gate fix commits + 1 release commit + 1 dev-patch-bump commit. Layers 0, 2-6, 9-10 empty.
 **Semver:** Minor for Élan (overhauled interactive visuals) and yilangao.com (new API routes for live data visualization). Patch for ASCII Art Studio (manifest sync only).
@@ -52,6 +56,8 @@
 ---
 
 ## REL-024 — Élan 2.12.0, yilangao.com 1.4.0, ASCII Art Studio 0.6.14 (2026-04-25)
+
+> For current analytics architecture, see `docs/analytics.md`.
 
 **Scope:** 13 files across 5 dependency-ordered layer commits (L1 docs x2, L3 deps x2, L5 new components x2, L7 site components x1, L8 frontend pages x6) + 1 release commit + 1 dev-patch-bump commit. Layers 0, 2, 4, 6, 9-10 empty.
 **Semver:** Minor for Élan (new component: AnalyticsProvider) and yilangao.com (new feature: Mixpanel + Vercel Analytics). Patch for ASCII Art Studio (manifest sync only).

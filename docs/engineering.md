@@ -28,6 +28,7 @@
 | §13 | Deployment Verification | `docs/engineering/deployment.md` | Deploying, checking Vercel, build failures |
 | §14 | Inline-Edit CRUD Contract | *(this file)* | Any inline-edit primitive (text, array, Lexical, toolbar, managers) |
 | §15 | External Video Embeds | `docs/engineering/media-embeds.md` | Adding/modifying YouTube/Vimeo/Loom embed support, `videoEmbed` block, parser, poster policy |
+| §16 | Analytics Instrumentation | `docs/engineering/analytics-instrumentation.md` | Adding/modifying Mixpanel events, debugging tracking, touching AnalyticsProvider |
 | App. | Frequency Map | *(this file)* | Checking recurring patterns |
 
 ---

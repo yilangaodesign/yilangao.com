@@ -31,6 +31,7 @@
 | §16 | Technical Vocabulary Strategy | [`docs/content/technical-framing.md`](content/technical-framing.md) | Writing or editing any case study, especially for technical/startup audiences |
 | §17 | Personal Voice & Techniques | [`docs/content/personal-voice.md`](content/personal-voice.md) | Writing any case study text (universal) |
 | §18 | Portfolio Coherence Manifest | [`docs/content/portfolio-coherence.md`](content/portfolio-coherence.md) | Authoring (diversity gate), reviewing (Check 18), iterating (when edits might break diversity) |
+| §19 | Analytics Measurement | [`docs/content/analytics-measurement.md`](content/analytics-measurement.md) | Interpreting Mixpanel data for portfolio decisions, deciding what to instrument next |
 | App. A | Reference Portfolios | [`docs/content/reference-portfolios.md`](content/reference-portfolios.md) | Competitive benchmarks |
 | App. B | Feedback Frequency Map | *(this file)* | Checking recurring patterns |
 
