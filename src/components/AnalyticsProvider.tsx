@@ -21,20 +21,23 @@ export function AnalyticsProvider({
 
   // Init during client render (not only in useEffect) so nested components' passive
   // effects never call track() before init — React runs child useEffects before parent.
+  // Company identification also runs here so the super property is set before any
+  // track() calls in effects.
   if (typeof window !== "undefined") {
     initMixpanel({ disable: isAdmin });
     if (localStorage.getItem("yg_owner")) {
       registerSuperProps({ is_owner: true });
     }
+    if (!isAdmin && companySlug) {
+      if (companySlug === "welcome") {
+        registerSuperProps({ company: "welcome" });
+      } else {
+        identifyCompany(companySlug);
+      }
+    }
   }
 
   useSessionTracker(companySlug);
-
-  useEffect(() => {
-    if (!isAdmin && companySlug && companySlug !== "welcome") {
-      identifyCompany(companySlug);
-    }
-  }, [isAdmin, companySlug]);
 
   useEffect(() => {
     if (prevPathname.current !== pathname) {
