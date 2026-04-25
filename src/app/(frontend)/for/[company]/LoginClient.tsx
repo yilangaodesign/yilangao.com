@@ -78,7 +78,7 @@ export default function LoginClient({ company, accent, greeting }: Props) {
               <div className={styles.inputArea}>
                 {!password ? (
                   <span
-                    className={`${styles.placeholder}${error ? ` ${styles.placeholderTruncated}` : ""}`}
+                    className={styles.placeholder}
                     aria-hidden="true"
                   >
                     (what I told you)
@@ -94,7 +94,10 @@ export default function LoginClient({ company, accent, greeting }: Props) {
                   emphasis="minimal"
                   size="lg"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    if (error) setError("");
+                  }}
                   autoFocus
                   autoComplete="off"
                   disabled={isPending}
