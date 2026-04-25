@@ -862,6 +862,10 @@ $_check-row-gap: $portfolio-spacer-1x;
   }
 }
 
+.transportSpeedDropdown {
+  min-width: var(--radix-dropdown-menu-trigger-width);
+}
+
 .transportSpeedActiveMark {
   color: $portfolio-accent-60;
   font-size: $portfolio-type-xs;

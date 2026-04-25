@@ -585,7 +585,7 @@ export default function CollaborationLoop() {
               align="start"
               sideOffset={6}
               size="sm"
-              style={{ minWidth: "var(--radix-dropdown-menu-trigger-width)" }}
+              className={styles.transportSpeedDropdown}
             >
               {SPEED_OPTIONS.map((opt, i) => (
                 <DropdownMenuItem
