@@ -118,6 +118,18 @@ Every prop name, CSS class name, variant value, and token name must communicate 
 
 **Why this exists:** The Eyebrow component initially exposed a `mono` boolean prop. `mono` describes the implementation (switches to monospace font) but not the intent (labels a metric/statistic). An agent encountering `mono` has to reason through a two-step chain — "Is this a data context? → If yes, mono is appropriate." Renaming to `metric` collapses that to one step: "Am I placing this above a number/KPI? → Yes, use `metric`."
 
+### 7.8 Control Emphasis Must Follow Action Priority
+
+In a grouped control surface (transport bars, media controls, toolbars), visual emphasis maps to action priority, not to implementation convenience. The highest-priority action in the local group gets regular control emphasis (bordered button). Secondary actions use minimal emphasis (borderless text/icon button).
+
+**Why this exists:** In `CollaborationLoop`, the speed selector had a bordered button while play/pause did not. This inverted hierarchy made a configuration action read as the primary call-to-action. The correct hierarchy is: play/pause = primary local action (bordered regular emphasis), speed/step controls = secondary adjustments (borderless minimal emphasis).
+
+**The rule:**
+1. Identify the local action hierarchy for the control group.
+2. Apply bordered regular emphasis to the highest-priority action only.
+3. Keep adjacent secondary controls borderless unless they are destructive or state-critical.
+4. Never let a lower-priority control visually outweigh the primary action beside it.
+
 **The protocol:**
 1. When adding a prop, CSS class, or token, ask: "Does this name tell the consumer *when* to use it, or only *what* it does?"
 2. If it only describes the CSS effect (font, color, border-radius, opacity), rename it to describe the **use-case context** that triggers that effect.
@@ -175,6 +187,34 @@ When a design system primitive exists for a UI role (for example `Avatar`), comp
 **Why this exists:** `TestimonialCard` implemented its own avatar fallback, sizing, and styling while a DS `Avatar` primitive already existed. The local version drifted to neutral colors and a different typography treatment, creating visible inconsistency inside the same design system. The fix was to compose `Avatar` in both visitor and admin upload paths and remove duplicated avatar styles.
 
 **Applies to:** All `src/components/ui/*` composites and site-level components that render core primitive roles (avatar, badge, button, input, etc.).
+
+### 7.11 Fill-vs-Border Card Boundary and Contrast Re-Calibration
+
+When a card grid sits on a container with its own border (e.g., a bordered `.operationsGrid`), individual cards inside should use **fill** for their boundary, not a repeated border. A border on each card doubles the visual frame at every grid edge, producing dense line noise. A filled background (e.g., `$portfolio-neutral-10` on a `$portfolio-neutral-00` grid) defines the card shape with a single tonal step instead of a line.
+
+**The contrast obligation:** When the grid's own background changes (lighter or darker), the card fill AND the text colors inside must be recalibrated together. A fill that created good contrast on a gray grid may be invisible on a white one. Whenever the container background changes, ask:
+
+1. Does the card fill still separate from the grid background at a perceptible tonal step?
+2. Does the secondary text (descriptions, magic words, trigger labels) still meet legibility requirements against the new background? If the text was already at `neutral-minimal`, the grid shift probably makes it too faint — step it up to `neutral-subtle` or `neutral-regular`.
+3. Is the font size still appropriate? Very small text (below `type-2xs`) on a higher-contrast surface reads fine; on a lower-contrast surface the same size becomes illegible and needs a bump.
+
+**Canonical example:** Élan SkillMap `operationsGrid` — grid background changed from `$portfolio-surface-neutral-subtle` (light gray) to `$portfolio-neutral-00` (white). Cards changed from `border: 1px solid` to `background: $portfolio-neutral-10` (borderless fill). `.skillTrigger` text bumped from `type-3xs` / `neutral-minimal` to `type-2xs` / `neutral-subtle` to maintain legibility (FB-201).
+
+**Applies to:** Any card grid where the container has its own enclosing border or background. Also applies when revisiting component density — if a component looks fine in isolation but wrong inside a system, check whether the container background has drifted.
+
+### 7.12 Three-Tier Tooltip (and Card) Information Hierarchy
+
+Any tooltip or compact card that has a **topic label**, a **content body**, and **footer metadata** must follow a strict three-tier visual hierarchy. The tiers are ordered by how much the reader needs each layer:
+
+1. **Tier 1 — Topic label** (header): Most prominent. It frames what the content represents. Use `font-weight: semibold` at the same font size as the body, plus the strongest text color available (`$portfolio-neutral-00` on inverse surfaces). Full opacity. A topic label that is smaller or more muted than the body it introduces is inverted — it signals "this is a footnote" rather than "this is the frame."
+
+2. **Tier 2 — Content body** (bullets, list items): The substantive information. Regular weight at the same font size as the header. Slightly muted opacity (0.8–0.85) keeps it visually subordinate to the bold header without feeling weak. The boldness delta between header and body is the signal; the opacity delta is the reinforcement.
+
+3. **Tier 3 — Footer metadata** (category, counts, timestamps): Supporting context. Smaller font size (`type-3xs`) and lower opacity (0.4–0.5) so it reads as a caption, not a competing label. The footer must never read at the same or higher visual weight as either the header or the body.
+
+**The anti-pattern:** Header and footer at the same visual weight — same size, similar opacity — means the tooltip has TWO weak anchors competing for the bottom of the hierarchy while the body dominates. This makes the header feel like a footnote to the bullets rather than a title above them.
+
+**Applies to:** `KnowledgeTreemap` tooltip, any future tooltip or card that uses a header-body-footer structure on an inverse (dark) surface.
 
 ---
 
