@@ -2,7 +2,8 @@
 
 import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
-import { initMixpanel, identifyCompany, track } from "@/lib/analytics/mixpanel";
+import { initMixpanel, identifyCompany, track, registerSuperProps } from "@/lib/analytics/mixpanel";
+import { useSessionTracker } from "@/lib/analytics/use-session-tracker";
 
 type AnalyticsProviderProps = {
   companySlug: string | null;
@@ -22,7 +23,12 @@ export function AnalyticsProvider({
   // effects never call track() before init — React runs child useEffects before parent.
   if (typeof window !== "undefined") {
     initMixpanel({ disable: isAdmin });
+    if (localStorage.getItem("yg_owner")) {
+      registerSuperProps({ is_owner: true });
+    }
   }
+
+  useSessionTracker(companySlug);
 
   useEffect(() => {
     if (!isAdmin && companySlug && companySlug !== "welcome") {

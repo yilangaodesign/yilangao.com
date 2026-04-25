@@ -2,7 +2,15 @@
 
 > **What this file is:** Archived release log entries that exceeded the 15-entry cap in `docs/release-log.md`. Kept for historical reference.
 >
-> **Last updated:** 2026-04-25 (archived REL-001 through REL-009)
+> **Last updated:** 2026-04-25 (archived REL-001 through REL-010)
+
+---
+
+## REL-010 — Élan 2.9.0, yilangao.com 1.1.1, ASCII Art Studio 0.6.0 (2026-04-17)
+
+**Scope:** 38 working-tree files across 7 dependency-ordered layer commits, 1 release commit, 1 dev patch bump on `dev` after merge (48 files shown in fast-forward diff including release artifacts)
+**Semver:** Minor for Élan (2.8.1 → 2.9.0). Patch for yilangao.com (1.1.0 → 1.1.1). Minor for ASCII Art Studio (0.5.4 → 0.6.0).
+**Incidents:** REL-AP-005 triggered 3rd time (dead `src/lib/utils.ts`). 13 macOS duplicate junk files cleaned. Build gate passed on first attempt.
 
 ---
 

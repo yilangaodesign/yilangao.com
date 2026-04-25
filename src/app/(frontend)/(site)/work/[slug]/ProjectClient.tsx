@@ -60,6 +60,7 @@ import { VideoEmbed } from "@/components/ui/VideoEmbed";
 import { Dropzone } from "@/components/ui/Dropzone";
 import type { EmbedProvider } from "@/lib/parse-video-embed";
 import { track } from "@/lib/analytics/mixpanel";
+import { useEngagementTracker } from "@/lib/analytics/use-engagement-tracker";
 import elanStyles from "@/components/elan-visuals/elan-visuals.module.scss";
 import { siteShellStyles } from "@/components/SiteFooter";
 import { EssayHeader } from "@/components/essay/EssayHeader";
@@ -602,6 +603,8 @@ function ProjectClientBody({
     elements.forEach((el) => observer.observe(el));
     return () => observer.disconnect();
   }, [spySections, p.slug]);
+
+  useEngagementTracker(p.slug ?? "", p.contentFormat ?? "caseStudy");
 
   const blockMgr = useBlockManager(projectTarget)
   // Keyboard nav targets `[data-block-index="${displayIndex}"]` wrappers, so
