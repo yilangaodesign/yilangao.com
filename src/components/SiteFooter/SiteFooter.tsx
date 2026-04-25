@@ -4,6 +4,7 @@ import Link from "next/link";
 import { EditableText, EditableArray } from "@/components/inline-edit";
 import type { ApiTarget, FieldDefinition } from "@/components/inline-edit";
 import { Eyebrow } from "@/components/ui/Eyebrow";
+import { track } from "@/lib/analytics/mixpanel";
 import styles from "./SiteFooter.module.scss";
 
 export const SITE_CONFIG_FOOTER_TARGET: ApiTarget = { type: "global", slug: "site-config" };
@@ -90,7 +91,13 @@ export function SiteFooter({ siteConfig }: { siteConfig: SiteFooterConfig }) {
                 renderItem={(team, i) => (
                   <li key={i} className={styles.teamItem}>
                     {team.url && team.url !== '#' ? (
-                      <a href={team.url} target="_blank" rel="noopener noreferrer" className={styles.teamLink}>
+                      <a href={team.url} target="_blank" rel="noopener noreferrer" className={styles.teamLink}
+                        onClick={() => track("External Link Clicked", {
+                          destination_url: team.url,
+                          link_label: team.name,
+                          context: "footer",
+                        })}
+                      >
                         {team.name}<span className={styles.arrow}>&#8599;</span>
                       </a>
                     ) : (
@@ -128,11 +135,23 @@ export function SiteFooter({ siteConfig }: { siteConfig: SiteFooterConfig }) {
                 renderItem={(link) => (
                   <li key={link.label} className={styles.linkItem}>
                     {link.external ? (
-                      <a href={link.href} target="_blank" rel="noopener noreferrer" className={styles.externalLink}>
+                      <a href={link.href} target="_blank" rel="noopener noreferrer" className={styles.externalLink}
+                        onClick={() => track("External Link Clicked", {
+                          destination_url: link.href,
+                          link_label: link.label,
+                          context: "footer",
+                        })}
+                      >
                         {link.label}<span className={styles.arrow}>&#8599;</span>
                       </a>
                     ) : (
-                      <Link href={link.href} className={styles.externalLink}>
+                      <Link href={link.href} className={styles.externalLink}
+                        onClick={() => track("External Link Clicked", {
+                          destination_url: link.href,
+                          link_label: link.label,
+                          context: "footer",
+                        })}
+                      >
                         {link.label}<span className={styles.arrow}>&#8599;</span>
                       </Link>
                     )}
