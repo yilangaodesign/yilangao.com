@@ -4,6 +4,8 @@
   display: flex;
   flex-direction: column;
   gap: $portfolio-spacer-3x;
+  border: 1px solid $portfolio-border-neutral-minimal;
+  padding: $portfolio-spacer-2x;
 }
 
 .controls {
@@ -55,127 +57,268 @@
   }
 }
 
-// ── Chart ────────────────────────────────────────────────────────────────────
-
-.chart {
+.visualizationWithLegend {
   display: flex;
   flex-direction: column;
-  gap: $portfolio-spacer-0-5x;
+  gap: $portfolio-spacer-1x;
 }
 
-.chartArea {
+// ── Loading ──────────────────────────────────────────────────────────────────
+
+.chartLoading {
+  height: 220px;
+  background: $portfolio-neutral-10;
+  border: 1px solid $portfolio-border-neutral-minimal;
+}
+
+// ── Chart with Y-axis ───────────────────────────────────────────────────────
+
+.chartWithAxis {
+  display: grid;
+  grid-template-columns: 24px 1fr;
+  grid-template-rows: auto auto;
+  gap: 0 $portfolio-spacer-0-5x;
+}
+
+.yAxis {
+  grid-column: 1;
+  grid-row: 1;
   display: flex;
-  align-items: flex-end;
-  gap: $portfolio-spacer-1x;
-  height: 260px;
-  padding-top: 40px;
-  padding-bottom: $portfolio-spacer-0-5x;
+  flex-direction: column;
+  justify-content: flex-end;
+  position: relative;
+}
+
+.yLabel {
+  position: absolute;
+  right: 0;
+  transform: translateY(50%);
+  font-family: $portfolio-font-mono;
+  font-size: $portfolio-type-3xs;
+  color: $portfolio-text-neutral-minimal;
+  line-height: 1;
+}
+
+.yGridLine {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 0;
+  border-top: 1px solid $portfolio-neutral-10;
+  pointer-events: none;
+  z-index: 0;
+}
+
+// ── Combined chart ──────────────────────────────────────────────────────────
+
+.combinedChart {
+  grid-column: 2;
+  grid-row: 1;
+  position: relative;
   border-bottom: 1px solid $portfolio-border-neutral-minimal;
 }
 
-.barColumn {
+.barsLayer {
+  position: absolute;
+  top: 20px; // matches trendPadTop in the component
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: flex-end;
+  gap: 1px;
+  transition: opacity $portfolio-duration-fast $portfolio-easing-standard;
+}
+
+.dayColumn {
   flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: $portfolio-spacer-0-25x;
+  align-items: stretch;
+  justify-content: flex-end;
   height: 100%;
   position: relative;
+  cursor: default;
 }
 
-.barStack {
+.barsLayerDimmed {
+  opacity: 0.35;
+}
+
+.dayBar {
   display: flex;
   flex-direction: column-reverse;
   width: 100%;
-  max-width: 72px;
-  border-radius: $portfolio-radius-xs $portfolio-radius-xs 0 0;
-  overflow: hidden;
-  margin-top: auto;
-}
-
-.barSegment {
-  width: 100%;
-  min-height: 2px;
-  position: relative;
-  cursor: default;
   transition: opacity $portfolio-duration-fast $portfolio-easing-standard;
-
-  &:hover {
-    opacity: 0.85;
-  }
 }
 
-// ── Severity colors ──────────────────────────────────────────────────────────
-
-.severityFundamental {
-  background: $portfolio-red-20;
-  border-bottom: 1px solid $portfolio-red-40;
+.daySegment {
+  width: 100%;
+  min-height: 1px;
+  transition: opacity $portfolio-duration-fast $portfolio-easing-standard;
 }
 
-.severityStructural {
-  background: $portfolio-orange-20;
-  border-bottom: 1px solid $portfolio-orange-40;
+.segmentDimmed {
+  opacity: 0.15;
 }
 
-.severityRefinement {
-  background: $portfolio-green-20;
-  border-bottom: 1px solid $portfolio-green-40;
+// Domain segment tones — cool families, desaturated with wide brightness spread
+.domainEngineering {
+  background: $portfolio-accent-40;
 }
-
-// ── Domain colors (same as SkillMap) ─────────────────────────────────────────
 
 .domainDesign {
-  background: $portfolio-purple-20;
-  border-bottom: 1px solid $portfolio-purple-40;
-}
-
-.domainEngineering {
-  background: $portfolio-teal-20;
-  border-bottom: 1px solid $portfolio-teal-40;
+  background: $portfolio-cyan-30;
 }
 
 .domainContent {
-  background: $portfolio-cyan-20;
-  border-bottom: 1px solid $portfolio-cyan-40;
+  background: $portfolio-green-20;
 }
 
-// ── Labels ───────────────────────────────────────────────────────────────────
-
-.barLabel {
-  font-size: $portfolio-type-2xs;
-  color: $portfolio-text-neutral-subtle;
-  text-align: center;
-  white-space: nowrap;
+// Lumen accent segment tones — severity view (darkest → lightest)
+.accentDark {
+  background: $portfolio-accent-50;
 }
 
-.barCount {
+.accentMid {
+  background: $portfolio-accent-40;
+}
+
+.accentLight {
+  background: $portfolio-accent-20;
+}
+
+// ── Trend line overlay ──────────────────────────────────────────────────────
+
+.trendOverlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.trendHitTarget {
+  stroke: transparent;
+  stroke-width: 16px;
+  pointer-events: stroke;
+  cursor: crosshair;
+}
+
+.trendLine {
+  stroke: $portfolio-neutral-90;
+  stroke-width: 2.5px;
+  pointer-events: none;
+}
+
+// ── Hover crosshair ─────────────────────────────────────────────────────────
+
+.crosshairLine {
+  stroke: $portfolio-neutral-30;
+  stroke-width: 1px;
+  stroke-dasharray: 3 2;
+}
+
+.crosshairDot {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: $portfolio-neutral-90;
+  border: 1px solid $portfolio-neutral-00;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 3;
+}
+
+.crosshairLabel {
+  position: absolute;
+  transform: translateX(-50%);
   font-family: $portfolio-font-mono;
+  font-size: $portfolio-type-sm;
+  font-weight: $portfolio-weight-semibold;
+  color: $portfolio-neutral-90;
+  pointer-events: none;
+  z-index: 3;
+}
+
+// ── Tooltip ─────────────────────────────────────────────────────────────────
+
+.tooltipAnchor {
+  position: absolute;
+  z-index: 20;
+  pointer-events: none;
+  transform: translate(-50%, -100%);
+  margin-top: -10px;
+}
+
+.tooltip {
+  width: 150px;
+  overflow: hidden;
+  transition:
+    height 200ms cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 200ms ease,
+    transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  background: $portfolio-surface-inverse-bold;
+  color: $portfolio-text-inverse-bold;
   font-size: $portfolio-type-2xs;
-  color: $portfolio-text-neutral-regular;
-  position: absolute;
-  top: -18px;
-  left: 50%;
-  transform: translateX(-50%);
+  line-height: $portfolio-leading-normal;
+  box-shadow: $portfolio-shadow-lg;
+  pointer-events: none;
 }
 
-// ── Milestones ───────────────────────────────────────────────────────────────
-
-.milestoneMarker {
-  position: absolute;
-  top: -32px;
-  left: 50%;
-  transform: translateX(-50%);
+.tooltipInner {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: $portfolio-spacer-0-5x $portfolio-spacer-1x;
   white-space: nowrap;
-  font-size: $portfolio-type-3xs;
-  font-weight: $portfolio-weight-medium;
-  color: $portfolio-accent-70;
-  background: $portfolio-accent-10;
-  padding: 1px $portfolio-spacer-0-5x;
-  border-radius: $portfolio-radius-sm;
-  border: 1px solid $portfolio-accent-20;
 }
 
-// ── Legend ────────────────────────────────────────────────────────────────────
+.tooltipTitle {
+  font-weight: $portfolio-weight-regular;
+  font-family: $portfolio-font-mono;
+}
+
+.tooltipRow {
+  display: flex;
+  align-items: center;
+  gap: $portfolio-spacer-0-5x;
+}
+
+.tooltipDot {
+  width: 10px;
+  height: 10px;
+  flex-shrink: 0;
+}
+
+.tooltipTotal {
+  font-weight: $portfolio-weight-semibold;
+  padding-top: 2px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  margin-top: 2px;
+}
+
+// ── X-axis ──────────────────────────────────────────────────────────────────
+
+.xAxis {
+  grid-column: 2;
+  grid-row: 2;
+  display: flex;
+  gap: 1px;
+}
+
+.xLabel {
+  flex: 1;
+  text-align: center;
+  font-family: $portfolio-font-mono;
+  font-size: $portfolio-type-3xs;
+  color: $portfolio-text-neutral-subtle;
+  min-height: 1em;
+}
+
+// ── Legend ───────────────────────────────────────────────────────────────────
 
 .legend {
   display: flex;
@@ -187,60 +330,91 @@
 .legendItem {
   display: flex;
   align-items: center;
-  gap: $portfolio-spacer-0-25x;
+  gap: $portfolio-spacer-0-5x;
+}
+
+.legendFilter {
+  display: inline-flex;
+  align-items: center;
+  gap: $portfolio-spacer-0-5x;
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  transition: opacity $portfolio-duration-fast $portfolio-easing-standard;
+
+  &:hover {
+    color: $portfolio-text-neutral-regular;
+  }
+}
+
+.legendFilterLabel {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+
+  // Reserve the bold width so layout never shifts on activation
+  &::after {
+    content: attr(data-label);
+    font-weight: $portfolio-weight-semibold;
+    height: 0;
+    overflow: hidden;
+    visibility: hidden;
+    pointer-events: none;
+  }
+}
+
+.legendFilterActive .legendFilterLabel {
+  font-weight: $portfolio-weight-semibold;
+}
+
+.legendFilterActive {
+  color: $portfolio-text-neutral-bold;
+}
+
+.legendFilterDimmed {
+  opacity: 0.4;
 }
 
 .legendDot {
   width: 10px;
   height: 10px;
-  border-radius: $portfolio-radius-xs;
-}
-
-.legendFundamental {
-  background: $portfolio-red-30;
-}
-
-.legendStructural {
-  background: $portfolio-orange-30;
-}
-
-.legendRefinement {
-  background: $portfolio-green-30;
-}
-
-.legendDesign {
-  background: $portfolio-purple-30;
 }
 
 .legendEngineering {
-  background: $portfolio-teal-30;
+  background: $portfolio-accent-40;
 }
 
-.legendContent {
+.legendDesign {
   background: $portfolio-cyan-30;
 }
 
-// ── Popover ──────────────────────────────────────────────────────────────────
+.legendContent {
+  background: $portfolio-green-20;
+}
 
-.popover {
-  position: absolute;
-  z-index: 10;
-  bottom: calc(100% + 8px);
-  left: 50%;
-  transform: translateX(-50%);
-  padding: $portfolio-spacer-0-5x $portfolio-spacer-1x;
-  background: $portfolio-surface-inverse-bold;
-  color: $portfolio-text-inverse-bold;
-  border-radius: $portfolio-radius-sm;
-  font-size: $portfolio-type-2xs;
-  line-height: $portfolio-leading-normal;
-  white-space: nowrap;
-  pointer-events: none;
-  box-shadow: $portfolio-shadow-md;
+.legendAccentDark {
+  background: $portfolio-accent-50;
+}
+
+.legendAccentMid {
+  background: $portfolio-accent-40;
+}
+
+.legendAccentLight {
+  background: $portfolio-accent-20;
+}
+
+.legendTrendLine {
+  width: 16px;
+  height: 2.5px;
+  background: $portfolio-neutral-90;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .barSegment,
+  .dayBar,
   .toggleButton {
     transition: none;
   }

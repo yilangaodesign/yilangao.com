@@ -1,48 +1,36 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import styles from "./maturity-timeline.module.scss";
+import type {
+  MaturityData,
+  DayBreakdown,
+} from "@/app/(frontend)/api/maturity/route";
 
-// ── Data ─────────────────────────────────────────────────────────────────────
+// ── Tooltip helpers ──────────────────────────────────────────────────────────
 
-type SeverityData = {
-  period: string;
-  fundamental: number;
-  structural: number;
-  refinement: number;
-  milestone?: string;
-};
+type TooltipState = {
+  x: number;
+  dayIndex: number;
+} | null;
 
-type DomainData = {
-  period: string;
-  design: number;
-  engineering: number;
-  content: number;
-  milestone?: string;
-};
+const TOOLTIP_HALF_PX = 75;
 
-const SEVERITY_DATA: SeverityData[] = [
-  { period: "Sessions 1-5", fundamental: 12, structural: 2, refinement: 1 },
-  { period: "Sessions 6-10", fundamental: 8, structural: 3, refinement: 1, milestone: "Escalation protocol introduced" },
-  { period: "Sessions 11-15", fundamental: 5, structural: 3, refinement: 2 },
-  { period: "Sessions 16-20", fundamental: 3, structural: 3, refinement: 2 },
-  { period: "Sessions 21-30", fundamental: 1, structural: 2, refinement: 3, milestone: "First zero-fundamental session" },
-  { period: "Sessions 31-40+", fundamental: 0, structural: 1, refinement: 2 },
-];
+function clampTooltipX(x: number, containerWidthPx: number): number {
+  const edge = 8;
+  const half = TOOLTIP_HALF_PX;
+  const minX = edge + half;
+  const maxX = containerWidthPx - edge - half;
+  if (maxX <= minX) return containerWidthPx / 2;
+  return Math.min(Math.max(x, minX), maxX);
+}
 
-const DOMAIN_DATA: DomainData[] = [
-  { period: "Sessions 1-5", design: 8, engineering: 5, content: 2 },
-  { period: "Sessions 6-10", design: 5, engineering: 4, content: 3, milestone: "Escalation protocol introduced" },
-  { period: "Sessions 11-15", design: 4, engineering: 4, content: 2 },
-  { period: "Sessions 16-20", design: 3, engineering: 3, content: 2 },
-  { period: "Sessions 21-30", design: 2, engineering: 2, content: 2, milestone: "First zero-fundamental session" },
-  { period: "Sessions 31-40+", design: 1, engineering: 1, content: 1 },
-];
+// ── View mode ─────────────────────────────────────────────────────────────────
 
 type ViewMode = "severity" | "domain";
 
 const SEVERITY_KEYS = ["fundamental", "structural", "refinement"] as const;
-const DOMAIN_KEYS = ["design", "engineering", "content"] as const;
+const DOMAIN_KEYS = ["engineering", "design", "content"] as const;
 
 const SEVERITY_LABELS: Record<string, string> = {
   fundamental: "Fundamental",
@@ -56,49 +44,180 @@ const DOMAIN_LABELS: Record<string, string> = {
   content: "Content",
 };
 
-const SEVERITY_STYLES: Record<string, { segment: string; legend: string }> = {
-  fundamental: { segment: styles.severityFundamental, legend: styles.legendFundamental },
-  structural: { segment: styles.severityStructural, legend: styles.legendStructural },
-  refinement: { segment: styles.severityRefinement, legend: styles.legendRefinement },
-};
+// ── Helpers ───────────────────────────────────────────────────────────────────
 
-const DOMAIN_STYLES: Record<string, { segment: string; legend: string }> = {
-  design: { segment: styles.domainDesign, legend: styles.legendDesign },
-  engineering: { segment: styles.domainEngineering, legend: styles.legendEngineering },
-  content: { segment: styles.domainContent, legend: styles.legendContent },
-};
+function rollingMedian(values: number[], window: number): number[] {
+  const result: number[] = [];
+  const half = Math.floor(window / 2);
+  for (let i = 0; i < values.length; i++) {
+    const start = Math.max(0, i - half);
+    const end = Math.min(values.length - 1, i + half);
+    const slice = values.slice(start, end + 1).sort((a, b) => a - b);
+    const mid = Math.floor(slice.length / 2);
+    result.push(
+      slice.length % 2 === 0
+        ? (slice[mid - 1] + slice[mid]) / 2
+        : slice[mid]
+    );
+  }
+  return result;
+}
 
 // ── Component ────────────────────────────────────────────────────────────────
 
 export default function MaturityTimeline() {
   const [mode, setMode] = useState<ViewMode>("severity");
-  const [hoveredSegment, setHoveredSegment] = useState<{
-    barIndex: number;
-    key: string;
-  } | null>(null);
+  const [hoveredDay, setHoveredDay] = useState<number | null>(null);
+  const [trendHovered, setTrendHovered] = useState(false);
+  const [activeFilter, setActiveFilter] = useState<string | null>(null);
+  const [liveData, setLiveData] = useState<MaturityData | null>(null);
+  const chartRef = useRef<HTMLDivElement | null>(null);
 
-  const data = mode === "severity" ? SEVERITY_DATA : DOMAIN_DATA;
+  // Always-mounted tooltip: animate height/opacity/scale instead of mount/unmount
+  const [tooltip, setTooltip] = useState<TooltipState>(null);
+  const tooltipContentRef = useRef<HTMLDivElement>(null);
+  const [tooltipH, setTooltipH] = useState(0);
+  const lastTooltipXRef = useRef(0);
+  const [tooltipOrigin, setTooltipOrigin] = useState("50% 100%");
+
+  useEffect(() => {
+    const el = tooltipContentRef.current;
+    if (!el) return;
+    if (!tooltip) {
+      setTooltipH(0);
+      return;
+    }
+    const raf = requestAnimationFrame(() => {
+      setTooltipH(el.scrollHeight);
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [tooltip]);
+
+  if (tooltip) {
+    lastTooltipXRef.current = tooltip.x;
+  }
+
+  useEffect(() => {
+    fetch("/api/maturity")
+      .then((r) => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json() as Promise<MaturityData>;
+      })
+      .then((d) => setLiveData(d))
+      .catch(() => {});
+  }, []);
+
+  const days: DayBreakdown[] = liveData?.days ?? [];
+
   const keys = mode === "severity" ? SEVERITY_KEYS : DOMAIN_KEYS;
   const labels = mode === "severity" ? SEVERITY_LABELS : DOMAIN_LABELS;
-  const segStyles = mode === "severity" ? SEVERITY_STYLES : DOMAIN_STYLES;
 
-  const maxTotal = Math.max(
-    ...data.map((d) =>
-      keys.reduce((sum, k) => sum + ((d as any)[k] as number), 0)
-    )
+  const maxTotal = useMemo(
+    () => (days.length === 0 ? 1 : Math.max(...days.map((d) => d.total))),
+    [days]
   );
+
+  const medianLine = useMemo(() => {
+    if (days.length < 2) return [];
+    const windowSize = Math.max(3, Math.round(days.length * 0.25));
+    return rollingMedian(
+      days.map((d) => d.total),
+      windowSize
+    );
+  }, [days]);
+
+  const segClasses =
+    mode === "severity"
+      ? { fundamental: styles.accentDark, structural: styles.accentMid, refinement: styles.accentLight }
+      : { engineering: styles.domainEngineering, design: styles.domainDesign, content: styles.domainContent };
+
+  const legendClasses =
+    mode === "severity"
+      ? { fundamental: styles.legendAccentDark, structural: styles.legendAccentMid, refinement: styles.legendAccentLight }
+      : { engineering: styles.legendEngineering, design: styles.legendDesign, content: styles.legendContent };
+
+  const buildDayLabel = liveData
+    ? `${liveData.totalBuildDays} build days`
+    : "build days";
+
+  // SVG geometry for the trend line
+  const chartHeight = 220;
+  const trendPadTop = 20;
+  const trendPadBottom = 0;
+  const usableH = chartHeight - trendPadTop - trendPadBottom;
+
+  // Y-axis scale: round up to a nice ceiling, compute gridline positions
+  const yCeiling = useMemo(() => {
+    if (maxTotal <= 5) return 5;
+    return Math.ceil(maxTotal / 5) * 5;
+  }, [maxTotal]);
+
+  const yGridLines = useMemo(() => {
+    const step = yCeiling <= 15 ? 5 : 10;
+    const lines: number[] = [];
+    for (let v = step; v <= yCeiling; v += step) lines.push(v);
+    return lines;
+  }, [yCeiling]);
+
+  function yFromVal(val: number): number {
+    if (yCeiling === 0) return chartHeight;
+    return trendPadTop + usableH * (1 - val / yCeiling);
+  }
+
+  // X-axis ceiling: next multiple of 5 above actual day count
+  const xCeiling = useMemo(() => {
+    if (days.length === 0) return 5;
+    return Math.ceil(days.length / 5) * 5;
+  }, [days]);
+
+  const trendPoints = medianLine
+    .map((val, i) => {
+      const x = ((i + 0.5) / xCeiling) * 100;
+      const y = yFromVal(val);
+      return `${x},${y}`;
+    })
+    .join(" ");
+
+  // Resolve pointer clientX to the nearest day index within the chart
+  const resolveDayFromPointer = useCallback(
+    (clientX: number) => {
+      const el = chartRef.current;
+      if (!el || xCeiling === 0) return null;
+      const rect = el.getBoundingClientRect();
+      const relX = clientX - rect.left;
+      const pct = relX / rect.width;
+      const idx = Math.round(pct * xCeiling - 0.5);
+      if (idx < 0 || idx >= days.length) return null;
+      return idx;
+    },
+    [xCeiling, days.length]
+  );
+
+  // Hovered day's median trend value and position (for the crosshair dot)
+  const hoveredMedian = hoveredDay !== null && medianLine.length > hoveredDay
+    ? medianLine[hoveredDay]
+    : null;
+  const hoveredX = hoveredDay !== null && xCeiling > 0
+    ? ((hoveredDay + 0.5) / xCeiling) * 100
+    : null;
+  const hoveredY = hoveredMedian !== null ? yFromVal(hoveredMedian) : null;
 
   return (
     <div
       className={styles.container}
       role="region"
-      aria-label="Correction maturity timeline showing decreasing corrections over sessions"
+      aria-label={`Correction maturity timeline — ${buildDayLabel}, showing trend by ${mode}`}
+      onClick={(e) => {
+        if (activeFilter && (e.target as HTMLElement).closest(`.${styles.legendFilter}`) === null) {
+          setActiveFilter(null);
+        }
+      }}
     >
       <div className={styles.controls}>
         <div className={styles.toggleGroup} role="radiogroup" aria-label="View mode">
           <button
             className={`${styles.toggleButton} ${mode === "severity" ? styles.toggleButtonActive : ""}`}
-            onClick={() => setMode("severity")}
+            onClick={() => { setMode("severity"); setActiveFilter(null); }}
             role="radio"
             aria-checked={mode === "severity"}
           >
@@ -106,7 +225,7 @@ export default function MaturityTimeline() {
           </button>
           <button
             className={`${styles.toggleButton} ${mode === "domain" ? styles.toggleButtonActive : ""}`}
-            onClick={() => setMode("domain")}
+            onClick={() => { setMode("domain"); setActiveFilter(null); }}
             role="radio"
             aria-checked={mode === "domain"}
           >
@@ -115,75 +234,272 @@ export default function MaturityTimeline() {
         </div>
       </div>
 
-      <div className={styles.chart}>
-        <div className={styles.chartArea}>
-          {data.map((bar, bi) => {
-            const total = keys.reduce(
-              (sum, k) => sum + ((bar as any)[k] as number),
-              0
-            );
-            const barHeightPct = maxTotal > 0 ? (total / maxTotal) * 100 : 0;
+      <div className={styles.visualizationWithLegend}>
+        {liveData === null && (
+          <div className={styles.chartLoading} aria-label="Loading maturity data" />
+        )}
 
-            return (
-              <div key={bar.period} className={styles.barColumn}>
-                {bar.milestone && (
-                  <span className={styles.milestoneMarker}>
-                    {bar.milestone}
-                  </span>
-                )}
+        <div className={styles.chartWithAxis} style={liveData === null ? { display: "none" } : undefined}>
+          {/* Y-axis labels */}
+          <div className={styles.yAxis} style={{ height: chartHeight }}>
+            {yGridLines.map((v) => (
+              <span
+                key={v}
+                className={styles.yLabel}
+                style={{ bottom: `${(v / yCeiling) * (usableH / chartHeight) * 100}%` }}
+              >
+                {v}
+              </span>
+            ))}
+            <span className={styles.yLabel} style={{ bottom: 0 }}>0</span>
+          </div>
 
-                <span className={styles.barCount}>{total}</span>
+          <div
+            ref={chartRef}
+            className={styles.combinedChart}
+            style={{ height: chartHeight }}
+            onMouseLeave={(e) => {
+              const rect = chartRef.current?.getBoundingClientRect();
+              if (rect) {
+                const xFrac = (e.clientX - rect.left) / rect.width;
+                setTooltipOrigin(`${xFrac < 0.5 ? "0%" : "100%"} 100%`);
+              }
+              setTooltip(null);
+              setHoveredDay(null);
+              setTrendHovered(false);
+            }}
+          >
+            {/* Y-axis gridlines (HTML, faint horizontal lines) */}
+            {yGridLines.map((v) => (
+              <div
+                key={v}
+                className={styles.yGridLine}
+                style={{ top: yFromVal(v) }}
+              />
+            ))}
+            <div className={styles.yGridLine} style={{ top: yFromVal(0) }} />
 
-                <div
-                  className={styles.barStack}
-                  style={{ height: `${barHeightPct}%` }}
-                >
-                  {keys.map((key) => {
-                    const value = (bar as any)[key] as number;
-                    if (value === 0) return null;
-                    const segPct = total > 0 ? (value / total) * 100 : 0;
-                    const isHovered =
-                      hoveredSegment?.barIndex === bi &&
-                      hoveredSegment?.key === key;
+            {/* Stacked bars — one per slot (real days + empty future slots) */}
+            <div className={`${styles.barsLayer} ${trendHovered ? styles.barsLayerDimmed : ""}`}>
+              {Array.from({ length: xCeiling }, (_, i) => {
+                const day = i < days.length ? days[i] : null;
+                const barH = day && yCeiling > 0 ? (day.total / yCeiling) * 100 : 0;
 
-                    return (
-                      <div
-                        key={key}
-                        className={`${styles.barSegment} ${segStyles[key]?.segment ?? ""}`}
-                        style={{ height: `${segPct}%` }}
-                        onMouseEnter={() =>
-                          setHoveredSegment({ barIndex: bi, key })
-                        }
-                        onMouseLeave={() => setHoveredSegment(null)}
-                      >
-                        {isHovered && (
-                          <div className={styles.popover}>
-                            {labels[key]}: {value}
-                          </div>
-                        )}
+                return (
+                  <div
+                    key={i}
+                    className={styles.dayColumn}
+                    onPointerEnter={(e) => {
+                      if (!day) return;
+                      setHoveredDay(i);
+                      setTooltipOrigin("50% 100%");
+                      const rect = chartRef.current?.getBoundingClientRect();
+                      if (!rect) return;
+                      setTooltip({
+                        x: clampTooltipX(e.clientX - rect.left, rect.width),
+                        dayIndex: i,
+                      });
+                    }}
+                    onPointerMove={(e) => {
+                      if (!day) return;
+                      const rect = chartRef.current?.getBoundingClientRect();
+                      if (!rect) return;
+                      setTooltip((prev) =>
+                        prev
+                          ? { ...prev, x: clampTooltipX(e.clientX - rect.left, rect.width), dayIndex: i }
+                          : null
+                      );
+                    }}
+                    onPointerLeave={() => {
+                      setHoveredDay(null);
+                    }}
+                  >
+                    {day && (
+                      <div className={styles.dayBar} style={{ height: `${barH}%` }}>
+                        {keys.map((key) => {
+                          const value = (day as Record<string, unknown>)[key] as number;
+                          if (value === 0) return null;
+                          const segPct = day.total > 0 ? (value / day.total) * 100 : 0;
+                          const isDimmed = activeFilter !== null && activeFilter !== key;
+                          return (
+                            <div
+                              key={key}
+                              className={`${styles.daySegment} ${(segClasses as Record<string, string>)[key] ?? ""} ${isDimmed ? styles.segmentDimmed : ""}`}
+                              style={{ height: `${segPct}%` }}
+                            />
+                          );
+                        })}
                       </div>
-                    );
-                  })}
-                </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
 
-                <span className={styles.barLabel}>
-                  {bar.period.replace("Sessions ", "")}
-                </span>
+            {/* SVG overlay: trend line + hover crosshair */}
+            {medianLine.length > 1 && (
+              <svg
+                className={styles.trendOverlay}
+                viewBox={`0 0 100 ${chartHeight}`}
+                preserveAspectRatio="none"
+                aria-hidden="true"
+              >
+                {/* Invisible wide hit target for the trend line */}
+                <polyline
+                  className={styles.trendHitTarget}
+                  points={trendPoints}
+                  fill="none"
+                  vectorEffect="non-scaling-stroke"
+                  onPointerEnter={(e) => {
+                    setTrendHovered(true);
+                    const idx = resolveDayFromPointer(e.clientX);
+                    setHoveredDay(idx);
+                    setTooltipOrigin("50% 100%");
+                    const rect = chartRef.current?.getBoundingClientRect();
+                    if (!rect || idx === null) return;
+                    setTooltip({
+                      x: clampTooltipX(e.clientX - rect.left, rect.width),
+                      dayIndex: idx,
+                    });
+                  }}
+                  onPointerMove={(e) => {
+                    const idx = resolveDayFromPointer(e.clientX);
+                    setHoveredDay(idx);
+                    const rect = chartRef.current?.getBoundingClientRect();
+                    if (!rect || idx === null) return;
+                    setTooltip((prev) =>
+                      prev
+                        ? { ...prev, x: clampTooltipX(e.clientX - rect.left, rect.width), dayIndex: idx }
+                        : null
+                    );
+                  }}
+                  onPointerLeave={() => {
+                    setTrendHovered(false);
+                    setHoveredDay(null);
+                  }}
+                />
+                <polyline
+                  className={styles.trendLine}
+                  points={trendPoints}
+                  fill="none"
+                  vectorEffect="non-scaling-stroke"
+                />
+                {hoveredX !== null && (
+                  <line
+                    className={styles.crosshairLine}
+                    x1={hoveredX}
+                    y1={trendPadTop}
+                    x2={hoveredX}
+                    y2={chartHeight}
+                    vectorEffect="non-scaling-stroke"
+                  />
+                )}
+              </svg>
+            )}
+
+            {/* Hover crosshair dot + median value (HTML to avoid SVG non-uniform scaling) */}
+            {hoveredX !== null && hoveredY !== null && (
+              <div
+                className={styles.crosshairDot}
+                style={{ left: `${hoveredX}%`, top: hoveredY }}
+              />
+            )}
+            {trendHovered && hoveredX !== null && hoveredY !== null && hoveredMedian !== null && (
+              <span
+                className={styles.crosshairLabel}
+                style={{ left: `${hoveredX}%`, top: hoveredY - 28 }}
+              >
+                {Math.round(hoveredMedian * 10) / 10}
+              </span>
+            )}
+
+            {/* Always-mounted tooltip: anchor + animated visual */}
+            <div
+              className={styles.tooltipAnchor}
+              style={{
+                left: tooltip ? tooltip.x : lastTooltipXRef.current,
+                top: trendPadTop,
+              }}
+            >
+              <div
+                className={styles.tooltip}
+                style={{
+                  height: tooltipH,
+                  opacity: tooltip ? 1 : 0,
+                  transform: `scale(${tooltip ? 1 : 0})`,
+                  transformOrigin: tooltipOrigin,
+                }}
+              >
+                <div ref={tooltipContentRef} className={styles.tooltipInner}>
+                  {tooltip && tooltip.dayIndex < days.length && (() => {
+                    const day = days[tooltip.dayIndex];
+                    return (
+                      <>
+                        <span className={styles.tooltipTitle}>Day {day.day}</span>
+                        {keys.map((key) => {
+                          const value = (day as Record<string, unknown>)[key] as number;
+                          return (
+                            <span key={key} className={styles.tooltipRow}>
+                              <span
+                                className={`${styles.tooltipDot} ${(segClasses as Record<string, string>)[key] ?? ""}`}
+                              />
+                              {labels[key]}: {value}
+                            </span>
+                          );
+                        })}
+                        <span className={styles.tooltipTotal}>Total: {day.total}</span>
+                      </>
+                    );
+                  })()}
+                </div>
               </div>
+            </div>
+          </div>
+
+          {/* X-axis: day numbers (extends to xCeiling), aligned under the chart area */}
+          {days.length > 0 && (
+            <div className={styles.xAxis}>
+              {Array.from({ length: xCeiling }, (_, i) => {
+                const dayNum = i + 1;
+                const showLabel =
+                  xCeiling <= 20 ||
+                  i === 0 ||
+                  dayNum % 5 === 0;
+                return (
+                  <span key={dayNum} className={styles.xLabel}>
+                    {showLabel ? dayNum : ""}
+                  </span>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* Legend (clickable filters) */}
+        <div className={styles.legend}>
+          {keys.map((key) => {
+            const isActive = activeFilter === key;
+            const isDimmed = activeFilter !== null && !isActive;
+            return (
+              <button
+                key={key}
+                className={`${styles.legendFilter} ${isActive ? styles.legendFilterActive : ""} ${isDimmed ? styles.legendFilterDimmed : ""}`}
+                onClick={() => setActiveFilter(isActive ? null : key)}
+              >
+                <span
+                  className={`${styles.legendDot} ${(legendClasses as Record<string, string>)[key] ?? ""}`}
+                />
+                <span className={styles.legendFilterLabel} data-label={labels[key]}>
+                  {labels[key]}
+                </span>
+              </button>
             );
           })}
-        </div>
-      </div>
-
-      <div className={styles.legend}>
-        {keys.map((key) => (
-          <span key={key} className={styles.legendItem}>
-            <span
-              className={`${styles.legendDot} ${segStyles[key]?.legend ?? ""}`}
-            />
-            {labels[key]}
+          <span className={styles.legendItem}>
+            <span className={styles.legendTrendLine} />
+            Median trend
           </span>
-        ))}
+        </div>
       </div>
     </div>
   );

@@ -7,6 +7,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "../ui/DropdownMenu/DropdownMenu";
+import { Checkbox } from "../ui/Checkbox/Checkbox";
 import styles from "./collaboration-loop.module.scss";
 
 // ── Step metadata ────────────────────────────────────────────────────────────
@@ -324,37 +325,53 @@ function VisualCounter() {
   );
 }
 
+type CheckState = "checked" | "feedback" | "locked";
+
+type CheckTier = {
+  label: string;
+  state: CheckState;
+  sub?: { file: string; text: string } | null;
+};
+
+function CheckMark({ state }: { state: CheckState }) {
+  if (state === "checked")
+    return <Checkbox size="sm" appearance="neutral" checked={true} />;
+  if (state === "feedback")
+    return <Checkbox size="sm" appearance="neutral" checked="indeterminate" />;
+  return <Checkbox size="sm" appearance="neutral" checked={false} disabled />;
+}
+
 function VisualGuardrail() {
-  const tiers = [
-    { label: "Feedback logged", active: true },
-    { label: "Anti-patterns created", active: true },
-    { label: "Design principle", active: true },
+  const tiers: CheckTier[] = [
+    { label: "Feedback logged", state: "checked" },
+    { label: "Anti-patterns created", state: "checked" },
+    {
+      label: "Design principle",
+      state: "checked",
+      sub: {
+        file: "design.md — Section 7.4",
+        text: "Model All States Before Writing Any Code. Before implementing any interactive component, enumerate every visual state and define the full property set for each.",
+      },
+    },
   ];
   return (
-    <div className={styles.vizGuardrail}>
-      <div className={styles.vizGuardrailMeter}>
-        {tiers.map((t, i) => (
-          <div key={t.label} className={styles.vizGuardrailTier}>
-            <div className={`${styles.vizGuardrailDot} ${t.active ? styles.vizGuardrailDotActive : ""}`}>
-              {i + 1}
-            </div>
-            <span className={`${styles.vizGuardrailTierLabel} ${t.active ? styles.vizGuardrailTierLabelActive : ""}`}>
-              {t.label}
+    <div className={styles.vizChecklist}>
+      {tiers.map((tier) => (
+        <div key={tier.label} className={styles.vizChecklistItem}>
+          <div className={styles.vizChecklistRow}>
+            <CheckMark state={tier.state} />
+            <span className={`${styles.vizChecklistLabel} ${tier.state === "checked" ? styles.vizChecklistLabelChecked : tier.state === "locked" ? styles.vizChecklistLabelLocked : ""}`}>
+              {tier.label}
             </span>
           </div>
-        ))}
-        <div className={styles.vizGuardrailTrack}>
-          <div className={styles.vizGuardrailTrackFill} />
+          {tier.sub && (
+            <div className={styles.vizChecklistSub}>
+              <span className={styles.vizChecklistSubFile}>{tier.sub.file}</span>
+              <span className={styles.vizChecklistSubText}>{tier.sub.text}</span>
+            </div>
+          )}
         </div>
-      </div>
-      <div className={styles.vizGuardrailRule}>
-        <div className={styles.vizGuardrailRuleHeader}>design.md - Section 7.4</div>
-        <div className={styles.vizGuardrailRuleText}>
-          Model All States Before Writing Any Code. Before implementing any
-          interactive component, enumerate every visual state and define the
-          full property set for each.
-        </div>
-      </div>
+      ))}
     </div>
   );
 }
@@ -473,35 +490,37 @@ export default function CollaborationLoop() {
 
   return (
     <div className={styles.container} role="region" aria-label="Correction lifecycle walkthrough">
-      {/* Step dots */}
+      {/* Content block: step navigation + detail panel */}
+      <div className={styles.contentBlock}>
+
+      {/* Step dots — inner wrap is width:fit-content so track anchors to dots, not container edges */}
       <div className={styles.stepNav}>
-        <div className={styles.stepTrack} aria-hidden="true">
-          <div
-            ref={trackFillRef}
-            className={styles.stepTrackFill}
-            style={{ width: `${initialFillPercent}%` }}
-          />
+        <div className={styles.stepTrackWrap}>
+          <div className={styles.stepTrack} aria-hidden="true">
+            <div
+              ref={trackFillRef}
+              className={styles.stepTrackFill}
+              style={{ width: `${initialFillPercent}%` }}
+            />
+          </div>
+          {STEPS.map((s, i) => {
+            let cls = styles.stepDot;
+            if (i < activeStep) cls += ` ${styles.stepDotCompleted}`;
+            if (i === activeStep) cls += ` ${styles.stepDotActive}`;
+            return (
+              <div key={s.step} className={styles.stepDotWrap}>
+                <button
+                  className={cls}
+                  onClick={() => handleDotClick(i)}
+                  aria-label={`Step ${s.step}: ${s.label}`}
+                  aria-pressed={i === activeStep}
+                >
+                  {s.step}
+                </button>
+              </div>
+            );
+          })}
         </div>
-        {STEPS.map((s, i) => {
-          let cls = styles.stepDot;
-          if (i < activeStep) cls += ` ${styles.stepDotCompleted}`;
-          if (i === activeStep) cls += ` ${styles.stepDotActive}`;
-          return (
-            <div key={s.step} className={styles.stepDotWrap}>
-              <button
-                className={cls}
-                onClick={() => handleDotClick(i)}
-                aria-label={`Step ${s.step}: ${s.label}`}
-                aria-pressed={i === activeStep}
-              >
-                {s.step}
-              </button>
-              <span className={`${styles.stepDotLabel} ${i === activeStep ? styles.stepDotLabelActive : ""}`}>
-                {s.label}
-              </span>
-            </div>
-          );
-        })}
       </div>
 
       {/* Detail panel */}
@@ -522,7 +541,9 @@ export default function CollaborationLoop() {
         <p className={styles.detailFooter}>{current.footer}</p>
       </div>
 
-      {/* Transport bar */}
+      </div>{/* end contentBlock */}
+
+      {/* Controls block: playback transport */}
       <div className={styles.transport}>
         <div className={styles.transportLeft}>
           <button
@@ -560,7 +581,12 @@ export default function CollaborationLoop() {
                 </svg>
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" sideOffset={6} size="sm">
+            <DropdownMenuContent
+              align="start"
+              sideOffset={6}
+              size="sm"
+              style={{ minWidth: "var(--radix-dropdown-menu-trigger-width)" }}
+            >
               {SPEED_OPTIONS.map((opt, i) => (
                 <DropdownMenuItem
                   key={opt.label}

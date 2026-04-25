@@ -25,11 +25,11 @@
 // ── Operations column grid (ref: ccunpacked.dev Tool System) ─────────────────
 
 .operationsGrid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  display: flex;
+  align-items: flex-start;
   gap: $portfolio-spacer-1-5x;
   padding: $portfolio-spacer-2x;
-  background: $portfolio-surface-neutral-subtle;
+  background: $portfolio-neutral-00;
   border: 1px solid $portfolio-border-neutral-minimal;
   overflow-x: auto;
 }
@@ -38,20 +38,26 @@
   display: flex;
   flex-direction: column;
   gap: $portfolio-spacer-0-5x;
+  flex: 1;
   min-width: 0;
 }
 
+// Directional arrow between workflow phases. Vertically aligns with the
+// category header row (approx. the header's cap-height midpoint).
+.phaseConnector {
+  flex: 0 0 auto;
+  font-size: $portfolio-type-2xs;
+  color: $portfolio-text-neutral-minimal;
+  padding-top: 2px; // nudge to align with header cap-height
+  user-select: none;
+}
+
 .categoryHeader {
-  display: flex;
-  align-items: baseline;
-  gap: $portfolio-spacer-0-5x;
   font-size: $portfolio-type-2xs;
   font-weight: $portfolio-weight-semibold;
   text-transform: uppercase;
   letter-spacing: $portfolio-tracking-wider;
   color: $portfolio-text-neutral-subtle;
-  padding-bottom: $portfolio-spacer-0-25x;
-  border-bottom: 1px solid $portfolio-border-neutral-minimal;
   margin-bottom: $portfolio-spacer-0-25x;
 }
 
@@ -65,18 +71,17 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
-  padding: $portfolio-spacer-0-5x $portfolio-spacer-0-5x;
-  background: $portfolio-neutral-00;
-  border: 1px solid $portfolio-border-neutral-minimal;
+  padding: $portfolio-spacer-1x;
+  // Filled gray background, no border — on white grid, the fill creates the
+  // card boundary. Border would double-frame every card against the grid border.
+  background: $portfolio-neutral-10;
+  border: none;
   cursor: pointer;
-  transition:
-    border-color $portfolio-duration-fast $portfolio-easing-standard,
-    background $portfolio-duration-fast $portfolio-easing-standard;
+  transition: background $portfolio-duration-fast $portfolio-easing-standard;
   text-align: left;
 
   &:hover {
-    border-color: $portfolio-border-neutral-subtle;
-    background: $portfolio-neutral-10;
+    background: $portfolio-neutral-20;
   }
 
   &:focus-visible {
@@ -86,8 +91,7 @@
 }
 
 .skillCardExpanded {
-  background: $portfolio-neutral-00;
-  border-color: $portfolio-accent-60;
+  background: $portfolio-neutral-20;
 }
 
 .skillName {
@@ -99,8 +103,11 @@
 }
 
 .skillTrigger {
-  font-size: $portfolio-type-3xs;
-  color: $portfolio-text-neutral-minimal;
+  // Upgraded from type-3xs (8px) to type-2xs (10px) for legibility.
+  // Darkened from neutral-minimal to neutral-subtle — white grid bg
+  // drops contrast, so the text token must compensate.
+  font-size: $portfolio-type-2xs;
+  color: $portfolio-text-neutral-subtle;
   line-height: $portfolio-leading-compact;
 }
 
@@ -108,20 +115,38 @@
   margin-top: $portfolio-spacer-0-25x;
   padding-top: $portfolio-spacer-0-25x;
   border-top: 1px solid $portfolio-border-neutral-minimal;
-  font-size: $portfolio-type-3xs;
+  // type-xs ≈ 12px — minimum accessible size for explanatory body copy.
+  // type-3xs (8px) is below every accessibility baseline.
+  font-size: $portfolio-type-xs;
   line-height: $portfolio-leading-relaxed;
   color: $portfolio-text-neutral-regular;
 }
 
 // ── Knowledge treemap ────────────────────────────────────────────────────────
+// `.visualizationWithLegend` rhythm matches `maturity-timeline.module.scss` (Elan Tier-3 pair).
+
+.visualizationWithLegend {
+  display: flex;
+  flex-direction: column;
+  gap: $portfolio-spacer-1x;
+  overflow: visible;
+}
 
 .treemapContainer {
   position: relative;
   width: 100%;
   aspect-ratio: 16 / 9;
-  overflow: hidden;
-  border: 1px solid $portfolio-border-neutral-minimal;
+  // `visible` so hover tooltips (absolute, translate -50%) are not clipped at chart edges.
+  // Treemap tiles are %-positioned and do not rely on hidden overflow for layout.
+  overflow: visible;
   background: $portfolio-neutral-10;
+}
+
+.treemapLoading {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: $portfolio-neutral-10;
+  border: 1px solid $portfolio-border-neutral-minimal;
 }
 
 .treemapBlock {
@@ -129,8 +154,9 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  justify-content: flex-start;
-  padding: $portfolio-spacer-0-5x $portfolio-spacer-0-5x;
+  // space-between pushes the label to top-left and count to bottom-right
+  justify-content: space-between;
+  padding: $portfolio-spacer-0-5x;
   border: 1px solid rgba(0, 0, 0, 0.06);
   overflow: hidden;
   cursor: default;
@@ -151,70 +177,182 @@
   opacity: 0.55;
 }
 
+/**
+ * Row mode (AP-072): narrow/sliver tiles keep their full D3-allocated height
+ * so the treemap has no gaps. Label is pinned to the top-left with a single
+ * truncated line; the rest of the block is domain-coloured fill. The tile
+ * fills its proportional area; the label is readable from the top corner.
+ */
+.treemapBlockRow {
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+// Top-left: category name (column mode) / left-aligned (row mode).
+// Label is the hero — it carries the most informative content, so it gets
+// the larger size and stronger weight. The count is subordinate metadata.
 .treemapLabel {
-  font-size: $portfolio-type-2xs;
+  font-size: $portfolio-type-xs;
   font-weight: $portfolio-weight-semibold;
   line-height: $portfolio-leading-compact;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   max-width: 100%;
+
+  // In row mode: same font, just constrained to one line at the top-left corner.
+  // No special overrides needed — the parent's align-items: flex-start handles positioning.
+  .treemapBlockRow & {
+    max-width: 100%;
+  }
 }
 
+// Bottom-right: pure numeric count (column mode) / right-aligned (row mode).
+// Count is supporting metadata — visually quieter than the label via weight
+// (regular vs semibold) and opacity (0.6 vs 1.0). Font size is one step
+// below the label (type-2xs = 10px vs type-xs = 12px) — a 2px gap is
+// sufficient when weight and opacity already signal hierarchy. Dropping
+// below 10px on a saturated colour surface crosses the legibility floor.
 .treemapCount {
+  align-self: flex-end;
   font-family: $portfolio-font-mono;
-  font-size: $portfolio-type-3xs;
-  line-height: $portfolio-leading-compact;
-  opacity: 0.7;
+  font-size: $portfolio-type-2xs;
+  font-weight: $portfolio-weight-regular;
+  line-height: 1;
+  opacity: 0.6;
+  flex-shrink: 0;
+
+  .treemapBlockRow & {
+    align-self: center;
+    font-size: $portfolio-type-2xs;
+    margin-left: 2px;
+  }
 }
 
-.treemapTooltip {
+// ── Tooltip ──────────────────────────────────────────────────────────────────
+
+// Anchor: handles absolute positioning + translate(-50%,-100%).
+// Kept separate from the visual element so that changing transform-origin
+// on the visual (for the corner-retract scale) never disturbs the translate.
+.treemapTooltipAnchor {
   position: absolute;
-  z-index: 10;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: $portfolio-spacer-0-5x $portfolio-spacer-1x;
-  background: $portfolio-surface-inverse-bold;
-  color: $portfolio-text-inverse-bold;
-  font-size: $portfolio-type-2xs;
-  line-height: $portfolio-leading-normal;
+  z-index: 20;
   pointer-events: none;
-  white-space: nowrap;
-  box-shadow: $portfolio-shadow-lg;
   transform: translate(-50%, -100%);
   margin-top: -10px;
 }
 
-.treemapTooltipName {
-  font-weight: $portfolio-weight-semibold;
-  font-size: $portfolio-type-xs;
+.treemapTooltip {
+  width: 240px;
+  // `overflow: hidden` + explicit `height` (set inline) lets CSS animate
+  // the height between content sizes. The inner div is unconstrained so
+  // `scrollHeight` always reflects the true content height.
+  overflow: hidden;
+  // `transform` (scale) and `transform-origin` are set inline — the scale
+  // retracts toward the container exit corner on dismiss and grows from the
+  // cursor on appear. Transition covers height, opacity, and scale together.
+  transition:
+    height 200ms cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 200ms ease,
+    transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  background: $portfolio-surface-inverse-bold;
+  color: $portfolio-text-inverse-bold;
+  font-size: $portfolio-type-2xs;
+  line-height: $portfolio-leading-normal;
+  box-shadow: $portfolio-shadow-lg;
 }
 
-.treemapTooltipMeta {
-  opacity: 0.7;
+// Inner wrapper — unconstrained height so `scrollHeight` measures the full
+// natural content size. Padding lives here so it's included in scrollHeight.
+.treemapTooltipInner {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: $portfolio-spacer-0-5x $portfolio-spacer-1x;
+  white-space: normal;
+  word-wrap: break-word;
+}
+
+// Tier 1 — Topic label: most prominent. Explains what the bullets below represent.
+// Semibold weight at the same size as bullets signals "topic > content" without
+// relying on size alone. Full-opacity white is the strongest text available on
+// the inverse surface.
+.treemapTooltipHeader {
+  font-size: $portfolio-type-2xs;
+  font-weight: $portfolio-weight-semibold;
+  color: $portfolio-neutral-00;
+  letter-spacing: 0.01em;
+  padding-bottom: $portfolio-spacer-0-5x;
+  margin-bottom: $portfolio-spacer-0-5x;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+// Tier 2 — Content body: the substantive examples. Regular weight at the same
+// size as the header, slightly muted, so the header's boldness reads first.
+.treemapTooltipList {
+  list-style: none;
+  margin: 0 0 $portfolio-spacer-0-5x;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: $portfolio-spacer-1x;
+}
+
+.treemapTooltipItem {
+  font-size: $portfolio-type-2xs;
+  font-weight: $portfolio-weight-regular;
+  line-height: $portfolio-leading-compact;
+  opacity: 0.8;
+
+  &::before {
+    content: '–  ';
+    opacity: 0.5;
+  }
+}
+
+// Tier 3 — Footer metadata: category + count. Smallest size and lowest opacity
+// so it reads as supporting context, not competing with the header or bullets.
+.treemapTooltipFooter {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: $portfolio-spacer-1x;
+  padding-top: $portfolio-spacer-0-5x;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.treemapTooltipDomain {
   font-family: $portfolio-font-mono;
   font-size: $portfolio-type-3xs;
+  letter-spacing: 0.06em;
+  opacity: 0.45;
+}
+
+.treemapTooltipCount {
+  font-family: $portfolio-font-mono;
+  font-size: $portfolio-type-3xs;
+  opacity: 0.45;
+  white-space: nowrap;
 }
 
 // ── Domain colors ────────────────────────────────────────────────────────────
 
 .domainDesign {
-  background: $portfolio-purple-20;
-  color: $portfolio-purple-70;
-  border-color: $portfolio-purple-30;
-}
-
-.domainEngineering {
-  background: $portfolio-teal-20;
-  color: $portfolio-teal-70;
-  border-color: $portfolio-teal-30;
-}
-
-.domainContent {
   background: $portfolio-cyan-20;
   color: $portfolio-cyan-70;
   border-color: $portfolio-cyan-30;
+}
+
+.domainEngineering {
+  background: $portfolio-accent-20;
+  color: $portfolio-accent-70;
+  border-color: $portfolio-accent-30;
+}
+
+.domainContent {
+  background: $portfolio-green-10;
+  color: $portfolio-green-60;
+  border-color: $portfolio-green-20;
 }
 
 // ── Legend ────────────────────────────────────────────────────────────────────
@@ -238,15 +376,15 @@
 }
 
 .legendDotDesign {
-  background: $portfolio-purple-40;
+  background: $portfolio-cyan-30;
 }
 
 .legendDotEngineering {
-  background: $portfolio-teal-40;
+  background: $portfolio-accent-40;
 }
 
 .legendDotContent {
-  background: $portfolio-cyan-40;
+  background: $portfolio-green-20;
 }
 
 @media (prefers-reduced-motion: reduce) {
