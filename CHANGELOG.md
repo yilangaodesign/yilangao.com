@@ -4,6 +4,37 @@ All notable changes to the Élan design system are documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.13.0] — 2026-04-25
+
+Minor release: overhauled Élan case study interactive visuals and added server-side API routes for live data visualization.
+
+### Added
+
+- **yilangao.com**: API route `/api/skills` - parses `.cursor/skills/` directory to serve live skill inventory by workflow phase.
+- **yilangao.com**: API route `/api/maturity` - parses feedback logs to compute correction maturity timeline with severity and domain breakdowns.
+- **yilangao.com**: API route `/api/antipatterns` - parses anti-pattern docs to serve category index with counts and top-3 recent entries per domain.
+
+### Changed
+
+- **Élan**: Major overhaul of `SkillMap` - rebuilt as data-driven HTML/CSS grid with live API fetch, phase-grouped layout, severity indicators, and responsive design. Removed all SVG rendering.
+- **Élan**: Major overhaul of `MaturityTimeline` - rebuilt as data-driven stacked bar chart with live API fetch, dual-lens toggle (severity vs domain), sparkline daily view, milestone markers, and responsive design. Removed all SVG rendering.
+- **Élan**: Overhaul of `CollaborationLoop` - refined layout, improved accessibility, reduced CSS complexity.
+- **Élan**: Updated shared `elan-visuals.module.scss` for new component architecture.
+- **yilangao.com**: Refined `AnalyticsProvider` and `mixpanel.ts` analytics utilities.
+- **yilangao.com**: Updated project detail page (`ProjectClient.tsx`, `page.tsx`) for improved data fetching.
+
+### Docs
+
+- Updated design, engineering, and content feedback logs with session entries.
+- Expanded design, engineering, and content anti-pattern catalogs.
+- Updated `design.md` and `engineering.md` with new principles.
+
+### Released with this checkpoint
+
+- **Élan** 2.13.0
+- **yilangao.com** 1.5.0
+- **ASCII Art Studio** 0.6.15
+
 ## [2.12.0] — 2026-04-24
 
 Minor release: Mixpanel + Vercel Analytics integration for portfolio traffic and conversion tracking.
