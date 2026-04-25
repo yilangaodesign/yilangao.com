@@ -204,3 +204,13 @@
 **Outcome:** All 3 builds passed after fixes. Fast-forward merge to main. Vercel deploy status: Ready in ~2 minutes.
 
 ---
+
+## REL-011 — Élan 2.10.0, yilangao.com 1.2.0, ASCII Art Studio 0.6.1 (2026-04-21)
+
+**Scope:** ~88 working-tree files across 8 dependency-ordered layer commits. Minor for Élan (3 new DS primitives), Minor for yilangao.com (video embed, inline-edit expansion), Patch for ASCII Art Studio (sync only).
+
+**Incidents:** Corrupt playground node_modules (REL-AP-008), TypeScript non-null narrowing failure, concurrent IDE edits mid-release, ASCII tool build pipe hang.
+
+**Outcome:** All 3 builds passed after fixes. Merge to main. Vercel deploys Ready.
+
+---
