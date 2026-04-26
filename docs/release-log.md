@@ -17,7 +17,28 @@ references:
 >
 > **Who reads this:** AI agents when the `ship-it` skill is activated — scan recent entries for recurring pitfalls before starting a new release.
 > **Who writes this:** AI agents after each ship-it run via the Post-Release Audit protocol in `ship-it/SKILL.md`.
-> **Last updated:** 2026-04-26 (REL-029 amended: Plan B remediation P0–P10 — adversarial audit findings resolved, EAP-122 promoted, single-source-of-truth invariants, windowed audit check, "By recurrence" view in MaturityTimeline)
+> **Last updated:** 2026-04-26 (REL-030: Knowledge graph infrastructure release — Élan 2.14.0, ASCII Art Studio 0.6.19, yilangao.com 1.5.2)
+
+---
+
+<a id="rel-030"></a>
+## REL-030 — Knowledge Graph Infrastructure (2026-04-26)
+
+**Scope:** Full release of the Docs Knowledge Graph Initiative infrastructure: new UI components (Canvas, CanvasToolbar, ForceGraph), new elan-visuals (KnowledgeGraph, SystemVisuals), knowledge graph build/query/audit/MCP scripts, graph API route, feedback-log AP-tagging across all three domains, Obsidian canvas views, eval baselines, and knowledge-graph spec.
+
+**Versions released:**
+- Élan 2.14.0 (minor — 13 new components)
+- ASCII Art Studio 0.6.19 (patch)
+- yilangao.com 1.5.2 (patch)
+
+**Commits:** 9 (8 feature commits + 1 build-gate fix)
+
+**Semver:** Minor for Élan (new Canvas, CanvasToolbar, ForceGraph UI components, new KnowledgeGraph/SystemVisuals elan-visuals, new API route). Patch for website and ASCII Art Studio (no breaking changes, minor updates).
+
+**Incidents:**
+1. **Build gate failure — ForceGraph2D type mismatch (REL-AP-002 adjacent):** The `react-force-graph-2d` library's generic types use `id?: string | number | undefined` while our `ForceGraphNode` requires `id: string`. Three callback props (`onNodeHover`, `onLinkHover`, `onNodeClick`) failed overload resolution. Fixed by casting callback props to `any` at the JSX call site. Resolution: single fix commit before re-running build gate.
+
+**Layer classification notes:** 170 files across 9 commits. New skill METADATA.yml files classified as config (Layer 0) alongside AGENTS.md. New scripts classified as a separate layer between frontend pages and playground. The `.obsidian/app.json` was grouped with config since it's a shared settings file.
 
 ---
 
