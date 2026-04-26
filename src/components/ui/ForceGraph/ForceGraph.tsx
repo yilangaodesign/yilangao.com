@@ -1112,9 +1112,9 @@ export default function ForceGraph({
           linkDirectionalParticleWidth={PARTICLE_WIDTH}
           linkDirectionalParticleColor={particleColorAccessor}
           autoPauseRedraw={!isSignal}
-          onNodeHover={handleNodeHover}
-          onLinkHover={handleLinkHover}
-          onNodeClick={handleNodeClick}
+          onNodeHover={handleNodeHover as any}
+          onLinkHover={handleLinkHover as any}
+          onNodeClick={handleNodeClick as any}
           onNodeDrag={handleNodeDrag}
           onNodeDragEnd={handleNodeDragEnd}
           enableNodeDrag={enableNodeDrag}
