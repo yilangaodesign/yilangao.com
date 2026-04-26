@@ -1,3 +1,15 @@
+<!-- graph metadata for docs knowledge graph (see docs/knowledge-graph.md) -->
+---
+type: spoke
+id: content-technical-framing
+topics:
+  - content
+  - engineering
+  - voice
+derivedFrom:
+  - content.md
+---
+
 # §16. Technical Vocabulary Strategy
 
 > **Last reviewed:** 2026-04-04

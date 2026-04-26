@@ -1,3 +1,14 @@
+<!-- graph metadata for docs knowledge graph (see docs/knowledge-graph.md) -->
+---
+type: spoke
+id: design-theming
+topics:
+  - design
+  - dark-mode
+derivedFrom:
+  - design.md
+---
+
 # Theming
 
 > Spoke file for `docs/design.md`. Return to the [hub](../design.md) for the Section Index.

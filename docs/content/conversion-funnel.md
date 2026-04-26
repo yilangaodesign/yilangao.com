@@ -1,3 +1,14 @@
+<!-- graph metadata for docs knowledge graph (see docs/knowledge-graph.md) -->
+---
+type: spoke
+id: content-conversion-funnel
+topics:
+  - content
+  - analytics
+derivedFrom:
+  - content.md
+---
+
 # §1. Conversion Funnel & Hiring Manager Mental Model
 
 **Source:** `portfolio-hiring-manager-mental-model.md` (v2, RARRA + lifecycle model) + competitive analysis, 2026-03-29.

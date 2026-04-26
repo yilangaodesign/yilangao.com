@@ -1,10 +1,23 @@
+<!-- graph metadata for docs knowledge graph (see docs/knowledge-graph.md) -->
+---
+type: anti-pattern
+id: engineering-anti-patterns
+topics:
+  - engineering
+  - guardrail
+enforces:
+  - engineering.md
+references:
+  - engineering-feedback-log.md
+---
+
 # Engineering Anti-Patterns
 
 > **What this file is:** A catalog of engineering mistakes that caused incidents or wasted time, documented so they are never repeated. Each anti-pattern includes the trigger, why it's wrong, and the correct alternative.
 >
 > **Who reads this:** AI agents before making code changes — scan for relevant anti-patterns.
 > **Who writes this:** AI agents when an incident reveals a new anti-pattern.
-> **Last updated:** 2026-04-24 (EAP-121 updated: absolute popovers on stacked charts must not sit under a parent `overflow: hidden` (ENG-211); add a hover bridge or `overflow: visible` + verify paint order. Prior: EAP-121: Stacked chart tooltips — per-segment `onMouseLeave` + popover anchored above thin hit targets clears hover as soon as the pointer moves toward the label or tooltip (`pointer-events: none` does not bridge the gap). Fix: `onPointerMove` / `onPointerLeave` on the parent stack with Y-based segment resolution (heights sum to stack pixel height) and side-anchored popover. ENG-210. Prior: EAP-120: Client analytics `init` only in parent `useEffect` while children call `track` in `useEffect` — passive effects run child-before-parent on mount; Mixpanel threw on `before_track` before `init`. Fix: render-time `init` in provider + `initialized` guards on wrappers. ENG-209. Prior: EAP-119 updated: added read-path counterpart `denormalizePayloadLinks()` — CMS data in Payload link format (`{ fields: { url } }`) must be converted back to `@lexical/link` format (`{ url }`) before passing to `LexicalComposer`'s `editorState`, otherwise `LinkNode.__url` is undefined and `MarkdownShortcutsPlugin` crashes with "Cannot read properties of undefined (reading 'match')". ENG-197. Prior: EAP-119 original: `markdownToLexical()` produces `@lexical/link` `LinkNode` serialization (`{ type: "link", url }`) which is incompatible with Payload's `convertLexicalToHTML` `LinkHTMLConverter` that reads `node.fields.url`. Fix: `normalizePayloadLinks()` post-conversion transform inside `markdownToLexical()`. ENG-195. Prior: EAP-118: Programmatic cross-block focus in a multi-`LexicalComposer` page without blurring the outgoing Lexical editor before native `window.getSelection()` calls — overlaps Lexical's frozen committed `Point`s and throws `Cannot assign to read only property 'key' of object '#<Point>'`. Fix: `queueMicrotask` + `getNearestEditorFromDOMNode(activeElement)?.blur()` + `requestAnimationFrame` + target `focus()`. ENG-194. Prior: EAP-117: Uploading macOS-native HEVC (`hvc1`) / QuickTime-branded MP4s without transcoding — macOS screen capture / QuickTime Player / Screen.Studio / iOS exports all emit H.265 with codec tag `hvc1` inside a `major_brand=qt  ` container. Safari on macOS/iOS decodes `hvc1` natively via VideoToolbox, so the author sees the video play fine on their machine. **Every other browser stack (Chrome/Edge on non-Apple hardware, Firefox on every OS, Edge without the paid HEVC extension) cannot decode `hvc1`.** In Chromium the typical failure mode is that the first IDR frame decodes via a software fallback — so `<video>.readyState >= 2` fires and our `MediaRenderer` skeleton clears — and then every subsequent frame fails to decode with no error thrown. The visible symptom is "frozen on the first frame." The entire runtime stack (video element attributes, MediaRenderer component, Supabase `content-type` / `accept-ranges` / CDN headers) is correct in this failure; the defect lives in the MP4 container itself. ENG-192 surfaced this on every case-study video — 14/14 files in the `media` bucket were `hevc|hvc1|qt  ` with `moov` at the end of the file. Correct alternative: every `.mp4` uploaded to the `media` bucket MUST be H.264 (`avc1`) + AAC (or `-an`) + `mp42` major brand + fast-start (`moov` before `mdat`). Author-side normalization: `ffmpeg -i in.mp4 -c:v libx264 -crf 20 -preset slow -pix_fmt yuv420p -c:a aac -b:a 128k -movflags +faststart -brand mp42 out.mp4`. Pre-upload verification: `ffprobe -v error -show_entries stream=codec_name,codec_tag_string -show_entries format=major_brand some.mp4` must return `h264 / avc1 / mp42`. Local "plays fine" verification is a false positive when the author is on macOS and every downstream viewer is not — media verification must include a non-Apple browser path or an `ffprobe codec_tag` assertion. Server-side transcoding deliberately not adopted: Vercel serverless lacks ffmpeg; managed video (Mux / Cloudflare Stream) is overkill for a ~14-video portfolio; current guardrail is doc-level (`docs/engineering/storage.md` §12.4.1). Follow-up if video volume grows: Payload `beforeChange` hook on the `Media` collection that parses the first ~64 KB of the upload, reads the `ftyp` atom, and rejects `codec_tag_string=hvc1` or `major_brand=qt  ` — no transcoding, soft block at the admin layer. Media & Asset Delivery category 3 → 4.) Prior: EAP-116: Hover-reveal rule scoped to a CSS Module that doesn't own the triggering class — a selector written in module A references `.foo` (hoping to match an element whose `className` comes from module B) and compiles to `.A_foo__HASH_A:hover .A_target__HASH`, which matches nothing in the DOM. No lint or compile warning fires because Sass sees valid identifiers; CSS Modules hash each source file's class names independently; the mismatch between "selector" and "element class" is only observable at render-time by absence of effect. `BlockToolbar` was permanently invisible and non-interactive on every case-study page because its hover-reveal lived in `inline-edit.module.scss` but the wrapper carried `styles.blockWrapper` from `page.module.scss`. The correct pattern — already used by the sibling `.sectionToolbar` in the same file — anchors the reveal to an unscoped data-attribute (`[data-block-admin]:hover > &, [data-block-admin]:focus-within > &`) which survives CSS-Module hashing by construction. Whenever a CSS-Module-scoped toolbar / overlay / menu must reveal on hover/focus of a wrapper whose class is owned by a different module, the reveal selector MUST be anchored to an HTML data-attribute, not to a class name. The data-attribute is the portable anchor; the class name is not. Selector-side mirror of EAP-102 (class-name-from-the-wrong-module silent bug — `styles.foo` resolves to `undefined` when the imported module doesn't export `foo`): EAP-102 covers "element receives no class"; EAP-116 covers "element receives a class but is targeted by a selector in a module that hashes its identifier differently." ENG-190. Build / Toolchain / CSS category 14 → 15.) Prior: EAP-115: Fix verification deferred to "next live session" under Webpack HMR staleness — when a fix touches structural React patterns inside a client component (hook shape changes like `useMemo` → `useState`, added refs, restructured `useEffect` dep arrays, reordered imports from `react`), Next.js 16 Webpack HMR silently fails to deliver the new module graph to the running browser. If the dev-server process is older than the fix, and the fix closeout defers browser verification to "next live session" while relying on HTTP 200 + server logs, the user perceives the fix as not working because the runtime never received it. Safeguard: any fix that changes React hook shape inside a client component MUST force a clean dev-server restart (kill the process, `rm -rf .next`, re-start) and MUST verify the fix markers are present in the compiled chunk (grep for a distinctive string from the edit inside `.next/dev/static/chunks/...`) before the fix is marked resolved. ENG-189, strengthens EAP-042 (Turbopack/playground equivalent) and EAP-113 (grep-for-rule without behavioral check). ENG-188's TypeErrors recurred verbatim because the main-site dev server had been running 12h23m — it booted before the ENG-188 edits landed, and Webpack HMR never delivered the structural changes. Fresh restart + bundle-content grep confirmed the fix IS live. Verification Discipline category 1 → 2.) Prior: EAP-114: Lexical `initialConfig` with `useMemo` + Lexical plugin commands registered on non-stable effect deps — React 19 StrictMode double-invokes the first render pass and reuses `useMemo` results across both mounts, making two mount attempts share the same `LexicalEditor` config; separately, plugin `useEffect`s that call `editor.registerCommand(...)` and include props/callbacks with fresh-each-render identity tear down and re-register commands on every parent render, which interleaves with in-flight updates and transforms against Lexical 0.41's frozen committed selection, producing `Cannot assign to read only property '_cachedNodes' of object '#<RangeSelection>'` and `Cannot assign to read only property 'key' of object '#<Point>'`. Caught by `LexicalErrorBoundary`, so editors keep working — but loud console noise that indicates a real timing hazard on markdown shortcuts and undo/redo. Canonical fix per Lexical maintainer etrepum (facebook/lexical#6040): use `useState(() => config)` for `initialConfig`, not `useMemo`; and route all non-editor deps through refs so command-registration effects depend only on `[editor]`. Payload 3.80–3.83 pin Lexical 0.41.0 in `dependencies`, so upgrading Lexical in isolation would duplicate the package — the anti-pattern must be addressed on the integration side. ENG-188. CMS / Inline Edit category 8 → 9.) Prior: EAP-113: Verification by grep-for-expected-rule without behavioral check — a same-day fix can ship a false positive when the verification step confirms the intended CSS rule is present in the compiled bundle but never reloads the page to confirm the rule produces the intended behavior. ENG-183's verification grep-extracted `border-width: 2px` inside `:focus-within` and declared success; it did not notice that the surrounding token (`$portfolio-border-width-regular`) had silently become `2px` since the fix was originally designed, rendering the override a no-op AND the adjacent `--_border-offset: 0 → 1` flip an active jitter source. ENG-184 paid the cost hours later. Safeguard: any CSS-behavior fix must be verified by loading the page and observing the behavior, not by grep-extracting the rule. A rule's rendered effect depends on every token it references, every cascade that follows it, and the current DOM state hierarchy — none of which a grep can see. Also: EAP-112 strengthened — a revert of a refactor regression must re-read the matching anti-pattern file (if one was promoted) before authoring the new code; the anti-pattern may explicitly forbid what the revert is about to restore, as happened with AP-057 and ENG-183.) Prior: EAP-112: Token-renaming refactor silently drops companion state-override declarations — when a sweep converts literal CSS values to token references (e.g. `border: 1px solid` → `border: $portfolio-border-width-regular solid`) adjacent lines that encode state-specific overrides (`border-width: 2px` on `:focus-within`) or scoped CSS custom properties (`--_border-offset: 1px` inside `:focus-within`) can read as redundant and get pruned. These are behavioral overrides, not duplicate declarations. Safeguard: for any component whose recent feedback log entries describe a state-specific value change, a refactor PR must show the state override is still present or explain why it was removed. Failure shape: a one-file minor diff that silently removes a behavioral override shortly after a documented fix for that exact behavior — here, `fde660a` dropped FB-088's `border-width: 2px` and mis-scoped `--_border-offset: 1px` from both `.regular` and `.minimal` `:focus-within` blocks, collapsing the Input's resting/hover/focus hierarchy to identical 1px borders and permanently shrinking padding by 1px on all four sides. Prevention: pair-review the pre-refactor test expectations, not just the post-refactor tokenization. ENG-183.) Prior: EAP-110: Reorder-only DnD on a 2-D layout — DnD handlers read only `over.id` and call a pure-reorder primitive, so any operation that needs to change a *relationship* between dragged and target (join a row, split a row, nest, re-parent) silently no-ops. Fires whenever the data model has a relationship bit (row/column/parent pointer) and the layout is 2-D. Fix requires three coordinated changes: (1) intent capture in `handleDragOver` reading `dx`/`dy` between `active.rect` and `over.rect` centers, (2) an atomic transform primitive that does splice + bit flip in one patch, not splice + post-hoc normalize, (3) expanded `dropPosition` vocabulary (`'before' | 'after' | 'left' | 'right'`) so the visual hint can reflect the intent on the axis that matches the layout. ENG-179.) Prior: EAP-108: Gated todo never re-probed after the gate clears — a task blocked on an operational condition (dev server down, data not yet migrated, external quota) gets marked `pending`/`blocked` and the work moves on. When the gating condition later resolves, nothing automatically re-probes; the gated todo sits indefinitely and the feature it gates ships as "done from the code side" while the runtime is still broken. ENG-176 landed a per-image DnD refactor that required the imageGroup → atomic migration to have run; the `run-migration` todo was gated on the EAP-042 dev-server instability and never re-probed when the server recovered. Result: the user tested on live imageGroup data and saw zero DnD change because none of the atomic-image render branches were reachable. Prevention: when declaring a feature complete, re-check every gated todo that mentions the feature's runtime dependencies; a gated todo is feature-incomplete, not workstream-complete. ENG-177. EAP-109: Flat-model migration drops empty slots from a union-ish source model — when moving from (container with N filled children + M scaffold slots) to (flat sequence of atoms), picking `N if N > 0 else M` silently drops the scaffold slots the moment any child is filled. The migration looks clean on empty and fully filled containers but deletes author-declared slot intent on partially filled ones — exactly the most common live state. Fix: iterate `max(N, M)`; emit filled slots with media and empty slots with their label. Prevention: before a union-to-flat migration ships, write out the transform against (a) empty, (b) partially filled, (c) fully filled, (d) over-scaffolded (more labels than images) — and verify each case individually. ENG-177.) Prior: EAP-107: Sortable unit locked to the visual unit rather than the data unit — after the atomic-image migration, `displayIds` and `handleDragEnd` in `ProjectClient.tsx` emitted one id per display-item (one per row-of-N-images) even though the data atom was a single `image` block. Drag worked mechanically but users could not move individual images inside a row, pull one out to split, or reorder within. Three iterations (ENG-171 merge heuristic → ENG-174 revert → ENG-175 optimistic state) all validated block-level DnD against the wrong target. Fix: flattened `displayIds` to one id per `contentBlocks` entry; added `blockIdToCmsIndex`; rewrote `handleDragEnd` as a single-block move; wrapped each image inside a multi-image row in its own `<SortableBlock>`; switched to `rectSortingStrategy`; added `normalizeImageRowBreaks` helper invoked from both reorder primitives in `useBlockManager`. Lesson: at DnD design time, the sortable id list must be flat at the data-atom level. If the data atom is smaller than the visual container, locking the sortable to the container permanently splits what should be a single affordance into a drag + parallel surface (buttons, heuristics). Grouping is a rendering concern; sortability is a data concern. ENG-176.) Prior: EAP-106: Heuristic whose discriminating signal is invariant across the dominant data distribution — ENG-171 shipped a merge-on-drop heuristic that compared horizontal centers of the dragging row and the over row, with the assumption that side-drops would show a different horizontal offset than above/below-drops. After the atomic-image migration, every image block defaults to `rowBreak: true` so every row renders at full page width, giving every pair of rows identical horizontal centers. The heuristic fired on 100% of drops, silently rerouting every reorder into a merge. Fix: reverted the merge branch in `handleDragEnd`; drag is reorder-only. `mergeImageRangeIntoRow` retained in `useBlockManager` for a future explicit merge UI. Lesson: before shipping a heuristic, write down its discriminating signal's variance on the dominant data distribution — when variance is near zero, switch to explicit UI rather than stacking defensive gates. ENG-174.) Prior: EAP-105: Integer scaffolding values carried forward without re-ranking — the `order` field on every project's `update-*/route.ts` was set once at scaffold time and never revisited. New projects claimed the next free integer; old projects kept their original rank. Result: the home page's case-study order encoded CMS-migration sequence rather than portfolio narrative priority for ~21 days. Any integer-ranking field that lives across N files MUST be re-validated against the full set whenever any one file changes. ENG-168 / CFB-038 / CAP-031.) Prior: EAP-102 (class-name-from-the-wrong-module silent bug — `styles.foo` resolves to `undefined` when the imported CSS Module doesn't export `foo`. Browser and compiler stay silent; the rule looks right, the DOM looks unstyled. EAP-103: hand-rolled `<button>` / `<div onClick>` in admin or CMS overlay surfaces — every destructive or state-mutating control inside an inline-edit overlay must compose `@ds/Button`, `@ds/DropdownMenu`, `@ds/Tooltip`, and the destructive path must go through §14 (`useConfirm` + `toast.undoable`); ENG-162.) Prior: EAP-101 (sparse-array PATCH bodies from `setNested({}, fieldPath, value)` on array-indexed paths serialize with leading `null`s and crash Payload with HTTP 500; ENG-165.)
+> **Last updated:** 2026-04-26 (EAP-123: Missing `prose-paragraph-spacing` on HTML prose container — CSS resets strip `<p>` margins, so Lexical richText containers render paragraphs flush unless the container class explicitly includes `@include prose-paragraph-spacing`. Mixin created in `src/styles/mixins/_layout.scss`, applied to `.introBlurbBody`, `.sectionBody`, `.sliderText`. Orphaned `.legacyDescriptionText` deleted. ENG-202, ENG-203. Prior: EAP-122: Audit invariants and their enforcer constants drifting silently — spec doc and enforcer script re-declare the same threshold, the enforcer is softened in-place when reality bites, but the spec is never updated. Both halves continue passing their own self-checks because the enforcer evaluates against itself, not the doc. Fix: single source of truth (enforcer reads doc at runtime); fallback policy (round actual down to nearest 5%, update spec, never soften the constant in place); empirical-floor formulas tested before being locked. ENG-230. Prior: 2026-04-24 (EAP-121 updated: absolute popovers on stacked charts must not sit under a parent `overflow: hidden` (ENG-211); add a hover bridge or `overflow: visible` + verify paint order. Prior: EAP-121: Stacked chart tooltips — per-segment `onMouseLeave` + popover anchored above thin hit targets clears hover as soon as the pointer moves toward the label or tooltip (`pointer-events: none` does not bridge the gap). Fix: `onPointerMove` / `onPointerLeave` on the parent stack with Y-based segment resolution (heights sum to stack pixel height) and side-anchored popover. ENG-210. Prior: EAP-120: Client analytics `init` only in parent `useEffect` while children call `track` in `useEffect` — passive effects run child-before-parent on mount; Mixpanel threw on `before_track` before `init`. Fix: render-time `init` in provider + `initialized` guards on wrappers. ENG-209. Prior: EAP-119 updated: added read-path counterpart `denormalizePayloadLinks()` — CMS data in Payload link format (`{ fields: { url } }`) must be converted back to `@lexical/link` format (`{ url }`) before passing to `LexicalComposer`'s `editorState`, otherwise `LinkNode.__url` is undefined and `MarkdownShortcutsPlugin` crashes with "Cannot read properties of undefined (reading 'match')". ENG-197. Prior: EAP-119 original: `markdownToLexical()` produces `@lexical/link` `LinkNode` serialization (`{ type: "link", url }`) which is incompatible with Payload's `convertLexicalToHTML` `LinkHTMLConverter` that reads `node.fields.url`. Fix: `normalizePayloadLinks()` post-conversion transform inside `markdownToLexical()`. ENG-195. Prior: EAP-118: Programmatic cross-block focus in a multi-`LexicalComposer` page without blurring the outgoing Lexical editor before native `window.getSelection()` calls — overlaps Lexical's frozen committed `Point`s and throws `Cannot assign to read only property 'key' of object '#<Point>'`. Fix: `queueMicrotask` + `getNearestEditorFromDOMNode(activeElement)?.blur()` + `requestAnimationFrame` + target `focus()`. ENG-194. Prior: EAP-117: Uploading macOS-native HEVC (`hvc1`) / QuickTime-branded MP4s without transcoding — macOS screen capture / QuickTime Player / Screen.Studio / iOS exports all emit H.265 with codec tag `hvc1` inside a `major_brand=qt  ` container. Safari on macOS/iOS decodes `hvc1` natively via VideoToolbox, so the author sees the video play fine on their machine. **Every other browser stack (Chrome/Edge on non-Apple hardware, Firefox on every OS, Edge without the paid HEVC extension) cannot decode `hvc1`.** In Chromium the typical failure mode is that the first IDR frame decodes via a software fallback — so `<video>.readyState >= 2` fires and our `MediaRenderer` skeleton clears — and then every subsequent frame fails to decode with no error thrown. The visible symptom is "frozen on the first frame." The entire runtime stack (video element attributes, MediaRenderer component, Supabase `content-type` / `accept-ranges` / CDN headers) is correct in this failure; the defect lives in the MP4 container itself. ENG-192 surfaced this on every case-study video — 14/14 files in the `media` bucket were `hevc|hvc1|qt  ` with `moov` at the end of the file. Correct alternative: every `.mp4` uploaded to the `media` bucket MUST be H.264 (`avc1`) + AAC (or `-an`) + `mp42` major brand + fast-start (`moov` before `mdat`). Author-side normalization: `ffmpeg -i in.mp4 -c:v libx264 -crf 20 -preset slow -pix_fmt yuv420p -c:a aac -b:a 128k -movflags +faststart -brand mp42 out.mp4`. Pre-upload verification: `ffprobe -v error -show_entries stream=codec_name,codec_tag_string -show_entries format=major_brand some.mp4` must return `h264 / avc1 / mp42`. Local "plays fine" verification is a false positive when the author is on macOS and every downstream viewer is not — media verification must include a non-Apple browser path or an `ffprobe codec_tag` assertion. Server-side transcoding deliberately not adopted: Vercel serverless lacks ffmpeg; managed video (Mux / Cloudflare Stream) is overkill for a ~14-video portfolio; current guardrail is doc-level (`docs/engineering/storage.md` §12.4.1). Follow-up if video volume grows: Payload `beforeChange` hook on the `Media` collection that parses the first ~64 KB of the upload, reads the `ftyp` atom, and rejects `codec_tag_string=hvc1` or `major_brand=qt  ` — no transcoding, soft block at the admin layer. Media & Asset Delivery category 3 → 4.) Prior: EAP-116: Hover-reveal rule scoped to a CSS Module that doesn't own the triggering class — a selector written in module A references `.foo` (hoping to match an element whose `className` comes from module B) and compiles to `.A_foo__HASH_A:hover .A_target__HASH`, which matches nothing in the DOM. No lint or compile warning fires because Sass sees valid identifiers; CSS Modules hash each source file's class names independently; the mismatch between "selector" and "element class" is only observable at render-time by absence of effect. `BlockToolbar` was permanently invisible and non-interactive on every case-study page because its hover-reveal lived in `inline-edit.module.scss` but the wrapper carried `styles.blockWrapper` from `page.module.scss`. The correct pattern — already used by the sibling `.sectionToolbar` in the same file — anchors the reveal to an unscoped data-attribute (`[data-block-admin]:hover > &, [data-block-admin]:focus-within > &`) which survives CSS-Module hashing by construction. Whenever a CSS-Module-scoped toolbar / overlay / menu must reveal on hover/focus of a wrapper whose class is owned by a different module, the reveal selector MUST be anchored to an HTML data-attribute, not to a class name. The data-attribute is the portable anchor; the class name is not. Selector-side mirror of EAP-102 (class-name-from-the-wrong-module silent bug — `styles.foo` resolves to `undefined` when the imported module doesn't export `foo`): EAP-102 covers "element receives no class"; EAP-116 covers "element receives a class but is targeted by a selector in a module that hashes its identifier differently." ENG-190. Build / Toolchain / CSS category 14 → 15.) Prior: EAP-115: Fix verification deferred to "next live session" under Webpack HMR staleness — when a fix touches structural React patterns inside a client component (hook shape changes like `useMemo` → `useState`, added refs, restructured `useEffect` dep arrays, reordered imports from `react`), Next.js 16 Webpack HMR silently fails to deliver the new module graph to the running browser. If the dev-server process is older than the fix, and the fix closeout defers browser verification to "next live session" while relying on HTTP 200 + server logs, the user perceives the fix as not working because the runtime never received it. Safeguard: any fix that changes React hook shape inside a client component MUST force a clean dev-server restart (kill the process, `rm -rf .next`, re-start) and MUST verify the fix markers are present in the compiled chunk (grep for a distinctive string from the edit inside `.next/dev/static/chunks/...`) before the fix is marked resolved. ENG-189, strengthens EAP-042 (Turbopack/playground equivalent) and EAP-113 (grep-for-rule without behavioral check). ENG-188's TypeErrors recurred verbatim because the main-site dev server had been running 12h23m — it booted before the ENG-188 edits landed, and Webpack HMR never delivered the structural changes. Fresh restart + bundle-content grep confirmed the fix IS live. Verification Discipline category 1 → 2.) Prior: EAP-114: Lexical `initialConfig` with `useMemo` + Lexical plugin commands registered on non-stable effect deps — React 19 StrictMode double-invokes the first render pass and reuses `useMemo` results across both mounts, making two mount attempts share the same `LexicalEditor` config; separately, plugin `useEffect`s that call `editor.registerCommand(...)` and include props/callbacks with fresh-each-render identity tear down and re-register commands on every parent render, which interleaves with in-flight updates and transforms against Lexical 0.41's frozen committed selection, producing `Cannot assign to read only property '_cachedNodes' of object '#<RangeSelection>'` and `Cannot assign to read only property 'key' of object '#<Point>'`. Caught by `LexicalErrorBoundary`, so editors keep working — but loud console noise that indicates a real timing hazard on markdown shortcuts and undo/redo. Canonical fix per Lexical maintainer etrepum (facebook/lexical#6040): use `useState(() => config)` for `initialConfig`, not `useMemo`; and route all non-editor deps through refs so command-registration effects depend only on `[editor]`. Payload 3.80–3.83 pin Lexical 0.41.0 in `dependencies`, so upgrading Lexical in isolation would duplicate the package — the anti-pattern must be addressed on the integration side. ENG-188. CMS / Inline Edit category 8 → 9.) Prior: EAP-113: Verification by grep-for-expected-rule without behavioral check — a same-day fix can ship a false positive when the verification step confirms the intended CSS rule is present in the compiled bundle but never reloads the page to confirm the rule produces the intended behavior. ENG-183's verification grep-extracted `border-width: 2px` inside `:focus-within` and declared success; it did not notice that the surrounding token (`$portfolio-border-width-regular`) had silently become `2px` since the fix was originally designed, rendering the override a no-op AND the adjacent `--_border-offset: 0 → 1` flip an active jitter source. ENG-184 paid the cost hours later. Safeguard: any CSS-behavior fix must be verified by loading the page and observing the behavior, not by grep-extracting the rule. A rule's rendered effect depends on every token it references, every cascade that follows it, and the current DOM state hierarchy — none of which a grep can see. Also: EAP-112 strengthened — a revert of a refactor regression must re-read the matching anti-pattern file (if one was promoted) before authoring the new code; the anti-pattern may explicitly forbid what the revert is about to restore, as happened with AP-057 and ENG-183.) Prior: EAP-112: Token-renaming refactor silently drops companion state-override declarations — when a sweep converts literal CSS values to token references (e.g. `border: 1px solid` → `border: $portfolio-border-width-regular solid`) adjacent lines that encode state-specific overrides (`border-width: 2px` on `:focus-within`) or scoped CSS custom properties (`--_border-offset: 1px` inside `:focus-within`) can read as redundant and get pruned. These are behavioral overrides, not duplicate declarations. Safeguard: for any component whose recent feedback log entries describe a state-specific value change, a refactor PR must show the state override is still present or explain why it was removed. Failure shape: a one-file minor diff that silently removes a behavioral override shortly after a documented fix for that exact behavior — here, `fde660a` dropped FB-088's `border-width: 2px` and mis-scoped `--_border-offset: 1px` from both `.regular` and `.minimal` `:focus-within` blocks, collapsing the Input's resting/hover/focus hierarchy to identical 1px borders and permanently shrinking padding by 1px on all four sides. Prevention: pair-review the pre-refactor test expectations, not just the post-refactor tokenization. ENG-183.) Prior: EAP-110: Reorder-only DnD on a 2-D layout — DnD handlers read only `over.id` and call a pure-reorder primitive, so any operation that needs to change a *relationship* between dragged and target (join a row, split a row, nest, re-parent) silently no-ops. Fires whenever the data model has a relationship bit (row/column/parent pointer) and the layout is 2-D. Fix requires three coordinated changes: (1) intent capture in `handleDragOver` reading `dx`/`dy` between `active.rect` and `over.rect` centers, (2) an atomic transform primitive that does splice + bit flip in one patch, not splice + post-hoc normalize, (3) expanded `dropPosition` vocabulary (`'before' | 'after' | 'left' | 'right'`) so the visual hint can reflect the intent on the axis that matches the layout. ENG-179.) Prior: EAP-108: Gated todo never re-probed after the gate clears — a task blocked on an operational condition (dev server down, data not yet migrated, external quota) gets marked `pending`/`blocked` and the work moves on. When the gating condition later resolves, nothing automatically re-probes; the gated todo sits indefinitely and the feature it gates ships as "done from the code side" while the runtime is still broken. ENG-176 landed a per-image DnD refactor that required the imageGroup → atomic migration to have run; the `run-migration` todo was gated on the EAP-042 dev-server instability and never re-probed when the server recovered. Result: the user tested on live imageGroup data and saw zero DnD change because none of the atomic-image render branches were reachable. Prevention: when declaring a feature complete, re-check every gated todo that mentions the feature's runtime dependencies; a gated todo is feature-incomplete, not workstream-complete. ENG-177. EAP-109: Flat-model migration drops empty slots from a union-ish source model — when moving from (container with N filled children + M scaffold slots) to (flat sequence of atoms), picking `N if N > 0 else M` silently drops the scaffold slots the moment any child is filled. The migration looks clean on empty and fully filled containers but deletes author-declared slot intent on partially filled ones — exactly the most common live state. Fix: iterate `max(N, M)`; emit filled slots with media and empty slots with their label. Prevention: before a union-to-flat migration ships, write out the transform against (a) empty, (b) partially filled, (c) fully filled, (d) over-scaffolded (more labels than images) — and verify each case individually. ENG-177.) Prior: EAP-107: Sortable unit locked to the visual unit rather than the data unit — after the atomic-image migration, `displayIds` and `handleDragEnd` in `ProjectClient.tsx` emitted one id per display-item (one per row-of-N-images) even though the data atom was a single `image` block. Drag worked mechanically but users could not move individual images inside a row, pull one out to split, or reorder within. Three iterations (ENG-171 merge heuristic → ENG-174 revert → ENG-175 optimistic state) all validated block-level DnD against the wrong target. Fix: flattened `displayIds` to one id per `contentBlocks` entry; added `blockIdToCmsIndex`; rewrote `handleDragEnd` as a single-block move; wrapped each image inside a multi-image row in its own `<SortableBlock>`; switched to `rectSortingStrategy`; added `normalizeImageRowBreaks` helper invoked from both reorder primitives in `useBlockManager`. Lesson: at DnD design time, the sortable id list must be flat at the data-atom level. If the data atom is smaller than the visual container, locking the sortable to the container permanently splits what should be a single affordance into a drag + parallel surface (buttons, heuristics). Grouping is a rendering concern; sortability is a data concern. ENG-176.) Prior: EAP-106: Heuristic whose discriminating signal is invariant across the dominant data distribution — ENG-171 shipped a merge-on-drop heuristic that compared horizontal centers of the dragging row and the over row, with the assumption that side-drops would show a different horizontal offset than above/below-drops. After the atomic-image migration, every image block defaults to `rowBreak: true` so every row renders at full page width, giving every pair of rows identical horizontal centers. The heuristic fired on 100% of drops, silently rerouting every reorder into a merge. Fix: reverted the merge branch in `handleDragEnd`; drag is reorder-only. `mergeImageRangeIntoRow` retained in `useBlockManager` for a future explicit merge UI. Lesson: before shipping a heuristic, write down its discriminating signal's variance on the dominant data distribution — when variance is near zero, switch to explicit UI rather than stacking defensive gates. ENG-174.) Prior: EAP-105: Integer scaffolding values carried forward without re-ranking — the `order` field on every project's `update-*/route.ts` was set once at scaffold time and never revisited. New projects claimed the next free integer; old projects kept their original rank. Result: the home page's case-study order encoded CMS-migration sequence rather than portfolio narrative priority for ~21 days. Any integer-ranking field that lives across N files MUST be re-validated against the full set whenever any one file changes. ENG-168 / CFB-038 / CAP-031.) Prior: EAP-102 (class-name-from-the-wrong-module silent bug — `styles.foo` resolves to `undefined` when the imported CSS Module doesn't export `foo`. Browser and compiler stay silent; the rule looks right, the DOM looks unstyled. EAP-103: hand-rolled `<button>` / `<div onClick>` in admin or CMS overlay surfaces — every destructive or state-mutating control inside an inline-edit overlay must compose `@ds/Button`, `@ds/DropdownMenu`, `@ds/Tooltip`, and the destructive path must go through §14 (`useConfirm` + `toast.undoable`); ENG-162.) Prior: EAP-101 (sparse-array PATCH bodies from `setNested({}, fieldPath, value)` on array-indexed paths serialize with leading `null`s and crash Payload with HTTP 500; ENG-165.)
 
 ## Category Index
 
@@ -16,20 +29,38 @@
 | CMS / Inline Edit | EAP-016, EAP-023, EAP-029, EAP-091, EAP-092, EAP-093, EAP-102, EAP-103, EAP-114, EAP-118 | 10 active | 10 |
 | Save Flow / Error Handling | EAP-017, EAP-018, EAP-020, EAP-024, EAP-101 | 5 active | 5 |
 | Hydration / SSR / React State | EAP-013, EAP-014, EAP-022, EAP-054, EAP-056, EAP-120 | 6 active | 6 |
-| Build / Toolchain / CSS | EAP-011, EAP-012, EAP-031, EAP-035, EAP-038‡, EAP-039, EAP-040, EAP-069, EAP-072, EAP-077, EAP-078, EAP-080, EAP-088, EAP-112, EAP-116 | 15 active | 15 |
-| Verification Discipline | EAP-113, EAP-115 | 2 active | 2 |
+| Build / Toolchain / CSS | EAP-011, EAP-012, EAP-031, EAP-035, EAP-038‡, EAP-039, EAP-040, EAP-069, EAP-072, EAP-077, EAP-078, EAP-080, EAP-088, EAP-112, EAP-116, EAP-123 | 16 active | 16 |
+| Verification Discipline | EAP-113, EAP-115, EAP-122 | 3 active | 3 |
 | Documentation Process | EAP-008, EAP-010, EAP-027, EAP-032, EAP-094 | 5 active | 5 |
 | Dev Workflow | EAP-002, EAP-003, EAP-009, EAP-068, EAP-073, EAP-108 | 6 active | 6 |
 | Interaction / DOM | EAP-025, EAP-036, EAP-053, EAP-106, EAP-107, EAP-110, EAP-121 | 7 active | 7 |
 | Deployment / CI Build | EAP-060, EAP-061, EAP-079 | 3 active | 3 |
 | Media & Asset Delivery | EAP-098, EAP-099, EAP-100, EAP-117 | 4 active | 4 |
 | Data Migration | EAP-109 | 1 active | 1 |
-| **Total** | | **76 active · 1 resolved** | **77** |
+| **Total** | | **77 active · 1 resolved** | **78** |
 
 > † EAP-038 "One-Way Playground Experiment" · ‡ EAP-038 "SCSS Modules with `@use` Under Turbopack" — duplicate ID, two distinct entries.
 
 ---
 
+<a id="eap-123"></a>
+## EAP-123: Missing `prose-paragraph-spacing` on HTML prose container
+
+**Status: ACTIVE**
+
+**Trigger:** Creating a new CSS class that wraps `dangerouslySetInnerHTML={{ __html: ...Html }}` from a Payload Lexical field or any other HTML-rendered prose.
+
+**Why it's wrong:** The site's CSS resets strip browser-default paragraph margins. Lexical richText emits separate `<p>` elements for each paragraph, but without explicit `p + p` spacing on the container, they render flush - paragraphs are semantically separate but visually merged into a wall of text. This was caught on `.introBlurbBody` (ENG-202) and fixed inline, but the same bug existed on `.sectionBody` and `.sliderText`.
+
+**Correct alternative:** Add `@include prose-paragraph-spacing;` to the class. The mixin lives in `src/styles/mixins/_layout.scss` and defaults to `$portfolio-spacer-3x` (24px). Pass a smaller `$gap` for smaller text sizes (e.g., `$portfolio-spacer-2x` for `body-sm`).
+
+**Note:** Components using CSS custom properties (e.g. `TestimonialCard` via the design system package) cannot import this SCSS mixin. They must handle `p` spacing locally.
+
+**Incident:** ENG-202 (2026-04-26, intro blurb). ENG-203 (2026-04-26, systematic fix across all containers).
+
+---
+
+<a id="eap-120"></a>
 ## EAP-120: Client analytics `init` only in a parent `useEffect` while children `track` in `useEffect`
 
 **Status: ACTIVE**
@@ -44,6 +75,7 @@
 
 ---
 
+<a id="eap-121"></a>
 ## EAP-121: Stacked-segment `mouseLeave` + tooltip anchored outside the hit target
 
 **Status: ACTIVE**
@@ -58,6 +90,36 @@
 
 ---
 
+<a id="eap-122"></a>
+## EAP-122: Audit invariants and their enforcer constants drifting silently
+
+**Status: ACTIVE**
+
+**Trigger:** A spec doc (e.g. `docs/knowledge-graph.md` §17) declares a quality target as a hardcoded number ("75% raw tagging rate"), and a separate enforcer script (`scripts/audit-docs.mjs`) re-declares the same number as a hardcoded constant (`MIN_RAW_RATE = 0.75`). Over time, the two values drift — the script is softened in-place when the target proves unachievable, but the spec doc is never updated. Both halves continue to "pass" their own self-checks: the spec reads as authoritative, the enforcer reports green, and no failure surface exposes the gap.
+
+**Why it's wrong:** The spec and the enforcer encode the same invariant in two places without a shared source. When reality forces one side to change, the other side does not change in lockstep — and there is no mechanism to detect the drift. In Plan B the enforcer was softened from 0.75 → 0.35 to make the audit pass at 43.3%, but the spec still claimed 75%. Anyone reading the spec saw a strict standard; anyone reading the audit output saw a passing system; both readers were misled. The drift was invisible because the enforcer evaluated against itself, not against the doc. This is a class of bug that survives every individual audit run because both halves are internally consistent.
+
+**Correct alternative:**
+
+1. **Single source of truth.** The spec doc is the authority. The enforcer reads thresholds from the doc at runtime — never re-declares them. In `audit-docs.mjs` this is `loadTaggingInvariants()` parsing the §17 invariants table.
+
+2. **Fallback policy when reality forces a softening.** If the empirical floor is unachievable:
+   - Round the *actual achieved rate* down to the nearest 5%.
+   - Update the **spec** to that floor, with a dated note explaining why.
+   - The enforcer automatically picks up the new floor on the next run.
+   - Never soften the constant in place. Never let the spec say one thing and the enforcer enforce another.
+
+3. **Drift detection.** If a value must be hardcoded in both places (e.g. for performance), add a startup assertion that compares the two and fails loudly on mismatch. Better: structure the system so duplication is impossible.
+
+4. **Empirical-floor formulas should be tested before being locked.** Plan B's original 75% target came from a formula that assumed full forward-matching coverage; in practice, only ~40% of feedback entries have a defensible AP citation. Before locking a target, sample the workload and confirm the formula's output is achievable.
+
+**Incident:** ENG-230 (2026-04-26, Plan B remediation). The enforcer constant `MIN_RAW_RATE = 0.35` had drifted from the spec's locked 75% target by 40 percentage points. The audit had been "passing" at 43.3% achieved rate for weeks. Adversarial audit caught the gap; resolution sourced thresholds from the doc, applied the fallback policy to set the floor at 40%, and added the empirical-formula bug as a documented note in §17.
+
+**Cross-reference:** Strengthens **EAP-027** (mandatory documentation after every fix) — when a fix softens a threshold, the spec doc MUST be updated in the same commit. Reinforces **EAP-115** (verification by grep without behavioral check) — an audit that evaluates against itself is a structural variant of grep-checking the rule's presence without exercising the rule's intent.
+
+---
+
+<a id="eap-119"></a>
 ## EAP-119: Using `@lexical/link` `LinkNode` for Content Rendered by Payload's `convertLexicalToHTML`
 
 **Status: ACTIVE**
@@ -77,6 +139,7 @@ Both transforms are idempotent, pure functions with no Lexical runtime dependenc
 
 ---
 
+<a id="eap-117"></a>
 ## EAP-117: Uploading macOS-Native HEVC (`hvc1`) / QuickTime-Branded MP4s Without Transcoding
 
 **Status: ACTIVE**
@@ -152,6 +215,7 @@ curl -s "http://localhost:4000/api/media?limit=200" | \
 
 ---
 
+<a id="eap-116"></a>
 ## EAP-116: Hover-Reveal Rule Scoped to a CSS Module That Doesn't Own the Triggering Class
 
 **Status: ACTIVE**
@@ -189,6 +253,7 @@ curl -s "http://localhost:4000/api/media?limit=200" | \
 
 ---
 
+<a id="eap-115"></a>
 ## EAP-115: Fix Verification Deferred to "Next Live Session" Under Webpack HMR Staleness
 
 **Status: ACTIVE**
@@ -231,6 +296,7 @@ Manifests as: the exact same bug re-reported by the user in a subsequent session
 
 ---
 
+<a id="eap-114"></a>
 ## EAP-114: Lexical `initialConfig` via `useMemo` + Plugin Commands Registered on Non-Stable Effect Deps (React 19 StrictMode Frozen-Selection Errors)
 
 **Status: ACTIVE**
@@ -266,6 +332,7 @@ The errors fire from inside Lexical internals (`setCachedNodes`, `Point.set`, `g
 
 **Incident:** ENG-188 (2026-04-21).
 
+<a id="eap-118"></a>
 ## EAP-118: Native `Selection` moves across Lexical editors without blurring the outgoing surface
 
 **Status: ACTIVE**
@@ -282,6 +349,7 @@ The errors fire from inside Lexical internals (`setCachedNodes`, `Point.set`, `g
 
 ---
 
+<a id="eap-112"></a>
 ## EAP-112: Token-Renaming Refactor Silently Drops Companion State Overrides
 
 **Status: ACTIVE**
@@ -305,6 +373,7 @@ The errors fire from inside Lexical internals (`setCachedNodes`, `Point.set`, `g
 
 ---
 
+<a id="eap-113"></a>
 ## EAP-113: Verification by Grep-for-Expected-Rule Without Behavioral Check
 
 **Status: ACTIVE**
@@ -335,6 +404,7 @@ All four present — declared verified. Not checked: the *base* `.Input_regular_
 
 ---
 
+<a id="eap-001"></a>
 ## EAP-001: Manual Data Duplication Without Sync
 
 **Status: ACTIVE**
@@ -349,6 +419,7 @@ All four present — declared verified. Not checked: the *base* `.Input_regular_
 
 ---
 
+<a id="eap-002"></a>
 ## EAP-002: Killing Ports Without Checking What's Running
 
 **Status: ACTIVE**
@@ -365,6 +436,7 @@ All four present — declared verified. Not checked: the *base* `.Input_regular_
 
 ---
 
+<a id="eap-003"></a>
 ## EAP-003: Assuming Dev Servers Persist Across Sessions
 
 **Status: ACTIVE**
@@ -381,6 +453,7 @@ If no server is running on the expected port, start it before making changes.
 
 ---
 
+<a id="eap-004"></a>
 ## EAP-004: Modifying Source of Truth Without Updating Consumers
 
 **Status: ACTIVE**
@@ -402,6 +475,7 @@ After modifying any source, run its sync mechanism and verify each consumer.
 
 ---
 
+<a id="eap-005"></a>
 ## EAP-005: Adding Infrastructure to One App Without Propagating to Co-Deployed Apps
 
 **Status: ACTIVE**
@@ -421,6 +495,7 @@ After modifying any source, run its sync mechanism and verify each consumer.
 
 ---
 
+<a id="eap-006"></a>
 ## EAP-006: Hardcoded Inline Font Overrides in Component Previews
 
 **Status: ACTIVE**
@@ -437,6 +512,7 @@ After modifying any source, run its sync mechanism and verify each consumer.
 
 ---
 
+<a id="eap-008"></a>
 ## EAP-008: Documenting Recurring Fixes in Docs Instead of Promoting to Rules
 
 **Status: ACTIVE**
@@ -455,6 +531,7 @@ After modifying any source, run its sync mechanism and verify each consumer.
 
 ---
 
+<a id="eap-007"></a>
 ## EAP-007: Adding Components to Main Site Without Playground Preview
 
 **Status: ACTIVE**
@@ -475,6 +552,7 @@ After modifying any source, run its sync mechanism and verify each consumer.
 
 ---
 
+<a id="eap-009"></a>
 ## EAP-009: Working Directly on `main`
 
 **Status: ACTIVE**
@@ -504,6 +582,7 @@ git stash pop
 
 ---
 
+<a id="eap-010"></a>
 ## EAP-010: Fixing Incidents Without Following Documentation Procedures
 
 **Status: ACTIVE**
@@ -525,6 +604,7 @@ Context-switching does not exempt the agent from documentation procedures.
 
 ---
 
+<a id="eap-011"></a>
 ## EAP-011: Node.js Built-in Imports in next.config.ts (Next.js 16)
 
 **Status: ACTIVE**
@@ -545,6 +625,7 @@ Context-switching does not exempt the agent from documentation procedures.
 
 ---
 
+<a id="eap-012"></a>
 ## EAP-012: Installing Alternate Node Versions via Brew Without Checking Shared Library Impact
 
 **Status: ACTIVE**
@@ -562,6 +643,7 @@ Context-switching does not exempt the agent from documentation procedures.
 
 ---
 
+<a id="eap-013"></a>
 ## EAP-013: Script Tags in React 19 / Next.js 16 Component Trees
 
 **Status: ACTIVE**
@@ -586,6 +668,7 @@ If a blocking script is truly required (analytics, third-party SDK), use `next/s
 
 ---
 
+<a id="eap-014"></a>
 ## EAP-014: Server/Client Branch Causing Hydration Mismatch
 
 **Status: ACTIVE**
@@ -608,6 +691,7 @@ The initial render matches the server (false). After mount, `useEffect` updates 
 
 ---
 
+<a id="eap-015"></a>
 ## EAP-015: Bare `src/` Paths in Payload Admin Config
 
 **Status: ACTIVE**
@@ -622,6 +706,7 @@ The initial render matches the server (false). After mount, `useEffect` updates 
 
 ---
 
+<a id="eap-016"></a>
 ## EAP-016: Conditional Rendering That Hides Inline-Editable Empty State
 
 **Status: ACTIVE**
@@ -636,6 +721,7 @@ The initial render matches the server (false). After mount, `useEffect` updates 
 
 ---
 
+<a id="eap-017"></a>
 ## EAP-017: Panel "Done" That Only Stages Without Saving
 
 **Status: ACTIVE**
@@ -650,6 +736,7 @@ The initial render matches the server (false). After mount, `useEffect` updates 
 
 ---
 
+<a id="eap-018"></a>
 ## EAP-018: React `useCallback` Save That Reads Stale `dirtyFields` Closure
 
 **Status: ACTIVE**
@@ -664,6 +751,7 @@ The initial render matches the server (false). After mount, `useEffect` updates 
 
 ---
 
+<a id="eap-019"></a>
 ## EAP-019: Single-Layer CMS Field Changes
 
 **Status: ACTIVE**
@@ -683,6 +771,7 @@ This class of bug is especially dangerous because there are no error messages �
 
 ---
 
+<a id="eap-020"></a>
 ## EAP-020: Raw API Response Bodies as User-Facing Error Messages
 
 **Status: ACTIVE**
@@ -699,6 +788,7 @@ This class of bug is especially dangerous because there are no error messages �
 
 ---
 
+<a id="eap-021"></a>
 ## EAP-021: Over-Zealous Required Constraints That Block Partial Saves
 
 **Status: ACTIVE**
@@ -715,6 +805,7 @@ This class of bug is especially dangerous because there are no error messages �
 
 ---
 
+<a id="eap-022"></a>
 ## EAP-022: Index-as-Key on Draggable Lists Breaks Re-Grab
 
 **Status: ACTIVE**
@@ -729,6 +820,7 @@ This class of bug is especially dangerous because there are no error messages �
 
 ---
 
+<a id="eap-023"></a>
 ## EAP-023: Payload `type: 'email'` with contentEditable Inline Editing
 
 **Status: ACTIVE**
@@ -743,6 +835,7 @@ This class of bug is especially dangerous because there are no error messages �
 
 ---
 
+<a id="eap-024"></a>
 ## EAP-024: Error-Swallowing Save Functions
 
 **Status: ACTIVE**
@@ -755,6 +848,7 @@ This class of bug is especially dangerous because there are no error messages �
 
 **Incident:** ENG-038 (2026-03-29) — EditableArray panel closed even when save failed.
 
+<a id="eap-025"></a>
 ## EAP-025: Nested Anchor Elements
 
 **Status: ACTIVE**
@@ -769,6 +863,7 @@ This class of bug is especially dangerous because there are no error messages �
 
 ---
 
+<a id="eap-026"></a>
 ## EAP-026: Cookie-Based Auth Check When Auth Mechanism Doesn't Set Cookies
 
 **Status: ACTIVE**
@@ -786,6 +881,7 @@ This class of bug is especially dangerous because there are no error messages �
 
 ---
 
+<a id="eap-027"></a>
 ## EAP-027: Documentation Skips During Rapid-Fire Debugging
 
 **Status: ACTIVE**
@@ -820,6 +916,7 @@ All three rationalizations produce identical outcomes: zero documentation. The c
 
 ---
 
+<a id="eap-028"></a>
 ## EAP-028: Partial Cross-App Sync on Shared Components
 
 **Status: ACTIVE**
@@ -832,6 +929,7 @@ All three rationalizations produce identical outcomes: zero documentation. The c
 
 **Incident:** ENG-042 (2026-03-30) — ScrollSpy had 6 discrepancies across 3 codebases after 2 sessions of partial updates.
 
+<a id="eap-029"></a>
 ## EAP-029: New Components Rendering CMS Data Without Inline Edit Wiring
 
 **Status: ACTIVE**
@@ -868,6 +966,7 @@ The failure mode is especially insidious because the component *looks correct* t
 
 ---
 
+<a id="eap-030"></a>
 ## EAP-030: Filtering on Newly-Added Fields That Have No Data Yet
 
 **Status: ACTIVE**
@@ -887,6 +986,7 @@ This is especially insidious because: (a) no errors are thrown, (b) the page sti
 
 ---
 
+<a id="eap-031"></a>
 ## EAP-031: Bare `*` Selector in CSS Modules
 
 **Status: ACTIVE**
@@ -910,6 +1010,7 @@ This is especially insidious because: (a) no errors are thrown, (b) the page sti
 
 ---
 
+<a id="eap-053"></a>
 ## EAP-053: DnD Listeners on Child Element Inside a Link Wrapper
 
 **Status: ACTIVE**
@@ -940,6 +1041,7 @@ This is especially insidious because: (a) no errors are thrown, (b) the page sti
 
 ---
 
+<a id="eap-054"></a>
 ## EAP-054: Client Mutation Without router.refresh() in App Router
 
 **Status: ACTIVE**
@@ -972,6 +1074,7 @@ const display = hasPendingSave ? optimisticData : serverProp;
 
 ---
 
+<a id="eap-032"></a>
 ## EAP-032: Architectural Changes Without engineering.md Update
 
 **Status: ACTIVE**
@@ -992,6 +1095,7 @@ This is a variant of EAP-027 (documentation skips during rapid-fire debugging), 
 
 ---
 
+<a id="eap-033"></a>
 ## EAP-033: Schema Type Change Without Immediate Server Restart
 
 **Status: ACTIVE**
@@ -1006,12 +1110,14 @@ This is a variant of EAP-027 (documentation skips during rapid-fire debugging), 
 
 ---
 
+<a id="eap-034"></a>
 ## EAP-034: S3-Compatible Storage Without Filename Sanitization — RESOLVED
 
 **Status: RESOLVED** — `beforeChange` hook added to all upload collections to sanitize filenames (strip brackets, replace special chars, collapse hyphens) before S3 upload. See ENG-060.
 
 ---
 
+<a id="eap-035"></a>
 ## EAP-035: Stale Turbopack Cache After Component Removal
 
 **Status: ACTIVE**
@@ -1032,6 +1138,7 @@ A simple server restart is not sufficient — Turbopack may rebuild from its cac
 
 ---
 
+<a id="eap-036"></a>
 ## EAP-036: Scroll Hijack on Embedded Canvas via onWheel Handler
 
 **Status: ACTIVE**
@@ -1046,6 +1153,7 @@ A simple server restart is not sufficient — Turbopack may rebuild from its cac
 
 ---
 
+<a id="eap-038"></a>
 ## EAP-038: One-Way Playground Experiment
 
 **Status: ACTIVE**
@@ -1060,6 +1168,7 @@ A simple server restart is not sufficient — Turbopack may rebuild from its cac
 
 ---
 
+<a id="eap-055"></a>
 ## EAP-055: Hardcoded Pixels/Hex in Playground Tailwind When Token CSS Vars Exist
 
 **Status: ACTIVE**
@@ -1074,6 +1183,7 @@ A simple server restart is not sufficient — Turbopack may rebuild from its cac
 
 ---
 
+<a id="eap-037"></a>
 ## EAP-037: Re-implementing Production Components in Playground Tailwind
 
 **Status: ACTIVE**
@@ -1100,6 +1210,7 @@ Supporting layers: File-scoped rule (`.cursor/rules/playground-components.md`), 
 
 ---
 
+<a id="eap-038-b"></a>
 ## EAP-038: SCSS Modules with `@use` Imports Under Turbopack
 
 **Status: ACTIVE**
@@ -1114,6 +1225,7 @@ Supporting layers: File-scoped rule (`.cursor/rules/playground-components.md`), 
 
 ---
 
+<a id="eap-056"></a>
 ## EAP-056: Barrel Imports from Large Packages in Turbopack SSR Components
 
 **Status: ACTIVE**
@@ -1151,6 +1263,8 @@ declare module "lucide-react/dist/esm/icons/*" {
 ## Entry Template
 
 ```markdown
+
+<a id="eap-039"></a>
 ## EAP-039: SCSS Compile-Time Tokens as Sole Color Source in Themeable Components
 
 **Status: ACTIVE**
@@ -1169,6 +1283,7 @@ The `--ds-*` custom property adapts at runtime; the SCSS interpolation `#{$scss-
 
 ---
 
+<a id="eap-040"></a>
 ## EAP-040: Using SCSS Primitives Where Semantic Tokens Exist
 
 **Trigger:** Writing `$portfolio-neutral-20` (a primitive) for a border instead of `var(--portfolio-border-subtle)` (a semantic token), or using `$portfolio-neutral-00` for a surface instead of `var(--portfolio-surface-primary)`.
@@ -1181,6 +1296,7 @@ The `--ds-*` custom property adapts at runtime; the SCSS interpolation `#{$scss-
 
 ---
 
+<a id="eap-041"></a>
 ## EAP-041: Manually Duplicating Design System Token Variables in Consumer Apps
 
 **Trigger:** Creating a separate set of CSS custom properties (e.g., `--ds-*`, `--palette-*`) in a consumer app's stylesheet that mirrors the design system's source tokens, instead of importing from the single source.
@@ -1193,6 +1309,7 @@ The `--ds-*` custom property adapts at runtime; the SCSS interpolation `#{$scss-
 
 ---
 
+<a id="eap-042"></a>
 ## EAP-042: Reporting Playground Changes as Done Without Flushing Cache and Restarting
 
 **Status: ACTIVE — ESCALATED (6+ violations)**
@@ -1228,6 +1345,7 @@ Do NOT skip any step. Do NOT try HMR first. Do NOT tell the user to "hard refres
 
 ---
 
+<a id="eap-057"></a>
 ## EAP-057: Placeholder `href="#"` on Static Component Demos
 
 **Trigger:** Playground or docs pages render link-styled components with `href="#"` (or `href=""`) so "something is focusable," but the demo must not navigate.
@@ -1240,6 +1358,7 @@ Do NOT skip any step. Do NOT try HMR first. Do NOT tell the user to "hard refres
 
 ---
 
+<a id="eap-058"></a>
 ## EAP-058: Embedding Fixed-Position Layout Components in Preview Containers
 
 **Trigger:** Creating a playground demo page that renders a full-page layout component (`position: fixed`, `createPortal(document.body)`) inside a bounded preview `<div>`.
@@ -1252,6 +1371,7 @@ Do NOT skip any step. Do NOT try HMR first. Do NOT tell the user to "hard refres
 
 ---
 
+<a id="eap-058-b"></a>
 ## EAP-058: Assuming spacer-NNx exists without utility- prefix
 
 **Trigger:** Writing `$portfolio-spacer-0-75x` or other sub-grid spacer values without the `utility-` prefix.
@@ -1264,6 +1384,7 @@ Do NOT skip any step. Do NOT try HMR first. Do NOT tell the user to "hard refres
 
 ---
 
+<a id="eap-059"></a>
 ## EAP-059: Using SCSS variables in Payload admin SCSS files
 
 **Trigger:** Bulk-replacing CSS values with `$portfolio-*` SCSS variables in files under `src/components/admin/`.
@@ -1276,6 +1397,7 @@ Do NOT skip any step. Do NOT try HMR first. Do NOT tell the user to "hard refres
 
 ---
 
+<a id="eap-060"></a>
 ## EAP-060: Gitignored Files That the Build Depends On
 
 **Trigger:** A framework or tool generates a file locally during development (e.g., Payload's `importMap.js`), and that file is in `.gitignore`. The local build works because the file exists, but CI/CD (Vercel) fails because the clean checkout doesn't have it.
@@ -1290,6 +1412,7 @@ Do NOT skip any step. Do NOT try HMR first. Do NOT tell the user to "hard refres
 
 ---
 
+<a id="eap-061"></a>
 ## EAP-061: File Conventions Leak Across Monorepo Apps via turbopack.root
 
 **Trigger:** Adding a Next.js 16 file convention (e.g., `proxy.ts`, `layout.tsx`) to one app in a monorepo where another app uses `turbopack: { root: monorepoRoot }` in its `next.config.ts`.
@@ -1302,6 +1425,7 @@ Do NOT skip any step. Do NOT try HMR first. Do NOT tell the user to "hard refres
 
 ---
 
+<a id="eap-062"></a>
 ## EAP-062: Adding a Payload Collection Without Manual Schema Push
 
 **Trigger:** Adding a new collection to `payload.config.ts` and expecting the database to auto-update on dev server restart.
@@ -1321,6 +1445,7 @@ Since dev and production share the same Supabase database, one push covers both 
 
 ---
 
+<a id="eap-063"></a>
 ## EAP-063: Deleting a Payload Admin Component Without Cleaning the Import Map
 
 **Trigger:** Removing a component from `payload.config.ts` admin components (e.g., deleting `afterNavLinks: ['@/components/admin/ViewSiteLink']`) but not updating the generated `importMap.js`.
@@ -1339,6 +1464,7 @@ Since dev and production share the same Supabase database, one push covers both 
 
 ---
 
+<a id="eap-064"></a>
 ## EAP-064: `transition: all` on Interactive Controls with Conditional DOM Children
 
 **Trigger:** Using `transition: all` (or a mixin that expands to it) on an element whose children are conditionally mounted/unmounted by a headless UI library (Radix, Headless UI, etc.).
@@ -1351,6 +1477,7 @@ Since dev and production share the same Supabase database, one push covers both 
 
 ---
 
+<a id="eap-065"></a>
 ## EAP-065: `EditableText isRichText` Without `htmlContent` Prop
 
 **Trigger:** Adding `isRichText` and `multiline` to an `EditableText` instance but only passing `extractLexicalText()` as `children`, without computing and passing `lexicalToHtml()` as `htmlContent`.
@@ -1368,6 +1495,7 @@ Also update the non-admin rendering fallback to use `dangerouslySetInnerHTML` wh
 
 ---
 
+<a id="eap-073"></a>
 ## EAP-073: `EditableText` without `inlineTypography` while applying inline HTML formatting on a Payload `text` field
 
 **Trigger:** Using default `EditableText` on a `text` field while the admin can apply bold, font weight, or font family via `contenteditable` (keyboard shortcuts or token toolbar), expecting the change to persist.
@@ -1380,6 +1508,7 @@ Also update the non-admin rendering fallback to use `dangerouslySetInnerHTML` wh
 
 ---
 
+<a id="eap-063-b"></a>
 ## EAP-063: Element-level inline style on contentEditable root for per-word formatting
 
 **Trigger:** Setting `el.style.fontWeight`, `el.style.fontStyle`, or similar CSS properties directly on a `contentEditable` element to toggle formatting (bold, italic, etc.).
@@ -1392,6 +1521,7 @@ Also update the non-admin rendering fallback to use `dangerouslySetInnerHTML` wh
 
 ---
 
+<a id="eap-063-c"></a>
 ## EAP-063: Payload column type change without manual USING clause
 
 **Trigger:** Changing a Payload collection field type from `text` to `richText` (varchar → jsonb) without running a manual ALTER TABLE with `USING` clause.
@@ -1404,6 +1534,7 @@ Also update the non-admin rendering fallback to use `dangerouslySetInnerHTML` wh
 
 ---
 
+<a id="eap-066"></a>
 ## EAP-066: contentEditable + document.execCommand for Rich Text Editing
 
 **Trigger:** Building or maintaining a rich text editing surface using the browser's native `contentEditable` attribute and `document.execCommand()` API.
@@ -1416,6 +1547,7 @@ Also update the non-admin rendering fallback to use `dangerouslySetInnerHTML` wh
 
 ---
 
+<a id="eap-067"></a>
 ## EAP-067: Rich Text HTML Inside Phrasing Elements (`<p>`, `<span>`)
 
 **Trigger:** Using `as="p"` or `as="span"` on `EditableText` with `isRichText`/`htmlContent`, or wrapping CMS-generated HTML in `<p dangerouslySetInnerHTML>`.
@@ -1428,6 +1560,7 @@ Also update the non-admin rendering fallback to use `dangerouslySetInnerHTML` wh
 
 ---
 
+<a id="eap-068"></a>
 ## EAP-068: Treating TCP Listen as a Health Check for Dev Servers
 
 **Status: ACTIVE**
@@ -1446,6 +1579,7 @@ If the response is not `200` or `3xx` within 5 seconds, the server is dead regar
 
 ---
 
+<a id="eap-069"></a>
 ## EAP-069: Running Next.js 16.2.x Dev Server with Turbopack (Default)
 
 **Status: ACTIVE (temporary — remove when Turbopack fix ships)**
@@ -1464,6 +1598,7 @@ Webpack generates the routes manifest correctly. Monitor Next.js releases for a 
 
 ---
 
+<a id="eap-070"></a>
 ## EAP-070: Uploading media with original filenames (collision on unique constraint)
 
 **Status: RESOLVED**
@@ -1478,6 +1613,7 @@ Webpack generates the routes manifest correctly. Monitor Next.js releases for a 
 
 ---
 
+<a id="eap-071"></a>
 ## EAP-071: Writing to legacy fields when content blocks have replaced them
 
 **Status: ACTIVE**
@@ -1520,6 +1656,7 @@ Webpack generates the routes manifest correctly. Monitor Next.js releases for a 
 
 ---
 
+<a id="eap-072"></a>
 ## EAP-072: SVG fill="currentColor" stale after client-side navigation
 
 **Status: ACTIVE**
@@ -1546,6 +1683,7 @@ Webpack generates the routes manifest correctly. Monitor Next.js releases for a 
 
 ---
 
+<a id="eap-073-b"></a>
 ## EAP-073: Implementing Before Diagnosing Visual Bugs
 
 **Trigger:** A user reports a visual bug (e.g., "the image doesn't fill the slot"). The agent writes a CSS fix immediately.
@@ -1563,6 +1701,7 @@ Webpack generates the routes manifest correctly. Monitor Next.js releases for a 
 
 ---
 
+<a id="eap-075"></a>
 ## EAP-075: Payload Schema Drift Hanging Non-Interactive Dev Server
 
 **Trigger:** A field is removed from a Payload collection schema in code, but the corresponding database column is not dropped. The dev server is started in a non-interactive shell (background process, CI, agent-controlled terminal).
@@ -1578,6 +1717,7 @@ Webpack generates the routes manifest correctly. Monitor Next.js releases for a 
 
 ---
 
+<a id="eap-076"></a>
 ## EAP-076: Repeated `.next` Cache Clears When node_modules Is Corrupted
 
 **Trigger:** The webpack dev server returns 500 on every page. The agent clears `.next` and restarts, gets the same error, clears `.next` again, tries Turbopack, gets the same error — repeatedly escalating cache clears without addressing the actual corruption source.
@@ -1594,6 +1734,7 @@ Webpack generates the routes manifest correctly. Monitor Next.js releases for a 
 
 ---
 
+<a id="eap-074"></a>
 ## EAP-074: Deleting Capacity Metadata on First Content Mutation / Multi-Layer Data Stripping
 
 **Trigger:** A data structure has both "capacity" metadata (e.g., `placeholderLabels` defining how many slots exist) and "content" data (e.g., `images` array). The metadata is stripped at multiple independent layers: a mutation function deletes it, a server-side mapping conditionally excludes it, and the client renders a binary all-or-nothing view.
@@ -1609,6 +1750,7 @@ Webpack generates the routes manifest correctly. Monitor Next.js releases for a 
 
 **Incident:** ENG-132 (2026-04-07) — Three independent layers stripped `placeholderLabels`: CMS mutation (`delete`), server mapping (conditional `undefined`), client rendering (binary conditional). Fixing only the first layer appeared to have no effect.
 
+<a id="eap-073-c"></a>
 ## EAP-073: Progressive Enhancement That Strips Content Formatting
 
 **Trigger:** A component has an HTML-native rendering path (e.g., `dangerouslySetInnerHTML` with rich HTML) and a JS-enhanced rendering path (e.g., a text-wrapping library that operates on plain text). The JS path activates after mount and replaces the HTML path, stripping formatting in the process.
@@ -1622,6 +1764,7 @@ Webpack generates the routes manifest correctly. Monitor Next.js releases for a 
 
 **Incident:** ENG-104 (2026-04-08) — `@chenglou/pretext` text-wrapping replaced `dangerouslySetInnerHTML` with bold and paragraph markup, stripping both on the deployed site. Local dev showed formatting because pretext didn't activate.
 
+<a id="eap-077"></a>
 ## EAP-077: Assuming CSS Can Fix `<input>` Native Text Clipping for Oversized Serif Fonts
 
 **Trigger:** A serif font at display scale (2rem+) is used inside a native `<input>` element. Glyphs with negative left side-bearing (serif hooks, tittles) appear clipped at the leftmost pixel.
@@ -1646,6 +1789,7 @@ This was confirmed through 6+ iterative attempts in a single session. The failur
 
 **Incident:** ENG-139 (2026-04-08) — IBM Plex Serif "j" at 2.75rem clipped in login password input. Six CSS-only fix attempts failed before the text overlay pattern resolved it.
 
+<a id="eap-078"></a>
 ## EAP-078: Using `min-height` to Reserve Space for Conditional Content in Flex-Centered Layouts
 
 **Trigger:** A container inside a flex-centered parent uses `min-height` to "reserve space" for conditionally rendered content (error messages, tooltips, expanding sections).
@@ -1663,6 +1807,7 @@ The parent layout always sees a constant box. Any content that exceeds the heigh
 
 **Incident:** ENG-137 (2026-04-08) — Login page `inputArea` with `min-height: 90px` grew to ~94px when error text appeared, shifting the vertically centered card up/down. Changed to `height: 100px; overflow: visible`.
 
+<a id="eap-079"></a>
 ## EAP-079: Adding a Public Asset Directory Without Updating the Proxy Allowlist
 
 **Trigger:** A new directory is created under `public/` (e.g., `/videos/`) and referenced by a page that unauthenticated users see (e.g., the login page), but the directory path is not added to the proxy's static asset passthrough list in `src/proxy.ts`.
@@ -1676,6 +1821,7 @@ The parent layout always sees a constant box. Any content that exceeds the heigh
 
 **Incident:** ENG-140 (2026-04-09) — `/videos/portrait.mp4` returned 307 in incognito, leaving the halftone portrait canvas blank.
 
+<a id="eap-080"></a>
 ## EAP-080: Adding `overflow: hidden` to Display-Scale Serif Text Without Glyph Padding
 
 **Trigger:** Adding `overflow: hidden` (for any reason — truncation, width constraint, scroll containment) to an element that renders serif text at display scale (2rem+).
@@ -1689,6 +1835,7 @@ The parent layout always sees a constant box. Any content that exceeds the heigh
 
 **Incident:** ENG-141 (2026-04-09) — `.typedText` given `overflow: hidden` for long-password truncation, immediately clipping the "j" tittle that FB-129/ENG-139 had just fixed.
 
+<a id="eap-081"></a>
 ## EAP-081: Relocating a CMS-Rendered Element by Copying SCSS Class Values Instead of Rendered Output
 
 **Trigger:** Moving an element that uses `EditableText` (or any CMS-backed component) with `htmlContent`, `inlineTypography`, or rich text props from one component to another.
@@ -1709,6 +1856,7 @@ The parent layout always sees a constant box. Any content that exceeds the heigh
 
 **Incident:** ENG-105 (2026-04-09) — Name moved from sidebar to nav; `.name` class had `sans/bold` but CMS rendered `serif/regular` via `htmlContent` + `inlineTypography`. Three correction rounds needed.
 
+<a id="eap-082"></a>
 ## EAP-082: Adding a Variant/Prop to a DS Component Without Updating the Playground Page
 
 **Trigger:** Adding a new variant, prop, or visual state to any component in `src/components/ui/`.
@@ -1729,6 +1877,7 @@ The parent layout always sees a constant box. Any content that exceeds the heigh
 
 **Incident:** ENG-106 (2026-04-09) — `solid` appearance variant added to Navigation, playground page not updated until user prompted.
 
+<a id="eap-083"></a>
 ## EAP-083: Overriding a Pressure-Tested Architectural Decision Without Checking History
 
 **Trigger:** An agent replaces a rendering/infrastructure approach (buffer strategy, compositing method, UV mapping, state management pattern) with a "better" alternative without searching the project history for why the current approach was chosen.
@@ -1743,6 +1892,7 @@ The parent layout always sees a constant box. Any content that exceeds the heigh
 
 **Incident:** ENG-108 (2026-04-09) — Replaced the pressure-tested fixed square buffer + `object-fit: cover` with ResizeObserver + dynamic sizing + getVideoUV remapping. This was the exact approach rejected in the original halftone portrait audit (finding #2). Caused severe portrait distortion.
 
+<a id="eap-084"></a>
 ## EAP-084: Portalling Directly to `document.body`
 
 **Trigger:** Using `createPortal(element, document.body)` to render an element outside the React tree.
@@ -1753,6 +1903,7 @@ The parent layout always sees a constant box. Any content that exceeds the heigh
 
 **Incident:** ENG-111 (2026-04-10) — `CursorThumbnail` used `createPortal(el, document.body)` and threw `removeChild` TypeError on HMR/unmount.
 
+<a id="eap-085"></a>
 ## EAP-085: Using `transform: translate()` with CSS Individual `scale` Property
 
 **Trigger:** Positioning an element with `el.style.transform = "translate(x, y)"` while also animating the CSS individual `scale` property (e.g., `scale: 0` → `scale: 1`).
@@ -1763,6 +1914,7 @@ The parent layout always sees a constant box. Any content that exceeds the heigh
 
 **Incident:** ENG-113 (2026-04-10) — Cursor thumbnail flew from top-left viewport corner instead of growing from cursor position. Three fix attempts (React timing, pre-positioning, stable wrapper div) all failed because the root cause was CSS composition order, not DOM lifecycle.
 
+<a id="eap-087"></a>
 ## EAP-087: Modifying a Content Seeding Route Without Calling the Endpoint
 
 **Trigger:** Editing any `src/app/(frontend)/api/update-*/route.ts` file (content constants, block structure, blurb, scope, section headings) without calling the corresponding POST endpoint to push the changes to the CMS database.
@@ -1775,6 +1927,7 @@ The parent layout always sees a constant box. Any content that exceeds the heigh
 
 **Incident:** ENG-149 (2026-04-12) — Entire ETRO essay rewrite (9 tasks, 5 sections, blurb, scope) completed without ever calling the endpoint. User saw unchanged content on the live page.
 
+<a id="eap-086"></a>
 ## EAP-086: Per-Frame Collision Detection Feeding Variable Offsets into a Fixed-Range Lerp
 
 **Trigger:** Running `getBoundingClientRect()` collision checks every frame in a RAF loop and using the result to modify an offset that's smoothed by a lerp designed for small, binary flips.
@@ -1787,6 +1940,7 @@ The parent layout always sees a constant box. Any content that exceeds the heigh
 
 **Update (2026-04-11, ENG-116):** Approach (3) was itself superseded by a deterministic "horizontal rail" model. When the element's vertical position is fully determined by another element's rect (not the cursor), the correct approach is to compute position as a single formula (`headlineRect.bottom + RAIL_GAP`) rather than adding avoidance layers. The nudge system, text-rect collection, and cursor y lerp were all removed. The anti-pattern remains valid for cases where the positioned element genuinely tracks the cursor in both axes — but for cursor-following UI where one axis is anchor-determined, prefer deterministic positioning over collision avoidance.
 
+<a id="eap-088"></a>
 ## EAP-088: Archiving a Page by Copying Instead of Deleting the Original
 
 **Trigger:** When a page is "archived" (e.g., copied to `archive/<feature>/pages/`), the originals under `src/app/.../page.tsx` and its co-located `*Client.tsx` are left in place and marked as untracked in git.
@@ -1802,6 +1956,7 @@ The parent layout always sees a constant box. Any content that exceeds the heigh
 
 ---
 
+<a id="eap-089"></a>
 ## EAP-089: Gating Admin-Only UI on a Plumbing Prop That Happens to Be Truthy
 
 **Trigger:** A UI section that should only render for admins (or only render when it has data, for visitors) is wrapped in `{(someTargetProp || value) && (...)}` where `someTargetProp` is a plumbing object like `editTarget`, `projectTarget`, `cmsId` — something whose truthiness mostly tracks "we have enough info to save this field," not "the current viewer is an admin."
@@ -1816,6 +1971,7 @@ The parent layout always sees a constant box. Any content that exceeds the heigh
 
 ---
 
+<a id="eap-090"></a>
 ## EAP-090: Parallel Content Pipelines on a Block-Editor Page
 
 **Trigger:** A page that already has a typed block array (`content[]`) with full inline-edit chrome (insert above/below, move, delete, change type) *also* renders a user-content paragraph from a separate top-level field, via its own dedicated render path. Common shapes: a "legacy" or "predecessor" field (`description`, `excerpt`, `intro`, `sections`) that shipped before the block system landed, kept "for now" as a fast render path, never reconciled. Another shape: a "canonical" field whose author thought it was too important to express as just another block.
@@ -1833,6 +1989,7 @@ The parent layout always sees a constant box. Any content that exceeds the heigh
 
 ---
 
+<a id="eap-094"></a>
 ## EAP-094: Trusting a Continuation Summary Over the Filesystem
 
 **Trigger:** A session resumes or compacts context, producing a summary that describes past work as "completed." The agent then proceeds to the next step (verification, response, new task) without actually reading the files the summary claims were edited. The summary is treated as ground truth about the state of the filesystem.
@@ -1852,6 +2009,7 @@ The parent layout always sees a constant box. Any content that exceeds the heigh
 
 ---
 
+<a id="eap-091"></a>
 ## EAP-091: Using `window.confirm` (or Hand-Rolled Portals) in Inline-Edit Paths
 
 **Trigger:** A destructive inline-edit action (delete block / section / image / array item / row) falls back to `window.confirm("…")`, a hand-rolled `createPortal` dialog, or an ad-hoc confirmation state per component.
@@ -1864,6 +2022,7 @@ The parent layout always sees a constant box. Any content that exceeds the heigh
 
 ---
 
+<a id="eap-092"></a>
 ## EAP-092: Building Parallel Modal Systems Instead of Reusing `@ds/Dialog` + `@ds/AlertDialog`
 
 **Trigger:** A feature needs a modal (edit panel, picker, confirmation). Instead of reaching for the DS dialog primitives, the agent builds a new overlay: a fixed-position `<div>` with a manual backdrop, its own open state, its own escape-key handling, and its own focus management.
@@ -1876,6 +2035,7 @@ The parent layout always sees a constant box. Any content that exceeds the heigh
 
 ---
 
+<a id="eap-093"></a>
 ## EAP-093: Building a Second Toast / Announcement System Inside a Feature
 
 **Trigger:** A feature needs to announce a success, an error, an undoable action, or a long-running state. Instead of using the shared toast surface, it invents a local pattern: a `setError` state rendered as a `<span>` next to the control, a `#live-region` `aria-live` div, or a per-component banner.
@@ -1886,6 +2046,7 @@ The parent layout always sees a constant box. Any content that exceeds the heigh
 
 **Incident:** ENG-155 (2026-04-19) — `useBlockManager`, `SectionManager`, `ImageManager`, `ImageUploadZone`, and `CollectionActions.AddItemCard` each had a local `error` state rendered inline, plus a parallel `#block-live-region` div for screen readers. Added `InlineToastProvider` + `useToast()` on `@radix-ui/react-toast`, mounted inside `InlineEditProvider` (wraps `ConfirmProvider`). Replaced every `setError` call with a `toast.error()`, deleted `#block-live-region`, and added `toast.undoable` for Lexical paragraph deletes (`ParagraphRowPlugin` snapshots the editor state before delete and replays it on undo). Every structural error now flows through one announced, accessible, dismissable surface.
 
+<a id="eap-098"></a>
 ## EAP-098: Serving Supabase Storage Uploads Through Payload's `/api/media/file/*` Proxy
 
 **Status: ACTIVE**
@@ -1938,6 +2099,7 @@ curl -sI "$(video_src_from_DOM)" | rg 'accept-ranges: bytes'
 
 **Principle:** Static binary delivery must take the shortest, most cacheable path from origin to browser. Routing every media read through the app server is a regression in the best case and a hard 404 in the worst case. If the storage provider exposes a public URL, `url` must resolve to that public URL — never to any endpoint under the app's own domain.
 
+<a id="eap-101"></a>
 ## EAP-101: Sparse-Array PATCH from `setNested` on Indexed FieldPaths
 
 **Status: ACTIVE**
@@ -2006,6 +2168,7 @@ grep -E 'PATCH /api/projects/[0-9]+ 500' <dev-server-log>
 
 ---
 
+<a id="eap-100"></a>
 ## EAP-100: Passing a Pre-Shrunk CMS Derivative as the Source of `<Image fill sizes="100vw">`
 
 **Status: ACTIVE**
@@ -2045,6 +2208,7 @@ grep -E 'is not rendered at full viewport width' <dev-server-log>
 
 **Principle:** Do not pre-optimize for `next/image`. `<Image fill sizes="…">` asks Next.js to generate the responsive ladder; the correct source for that ladder is the **highest-resolution available original**, not a CMS-side derivative. Picking a derivative short-circuits the optimizer and forces an upscale. Derivatives are for fixed-size render paths (admin thumbnails, email), not for `fill` layouts.
 
+<a id="eap-095"></a>
 ## EAP-095: Dropping `width` / `height` on the Data Path That Feeds `<Image fill>`
 
 **Status: ACTIVE**
@@ -2079,6 +2243,7 @@ curl -s <page-url> | rg -oE 'style="aspect-ratio:[^"]+"' | sort -u
 
 **Principle:** Dimensions are load-bearing metadata for `<Image fill>`, not decoration. Any component that renders with `fill` must treat `width` / `height` as a required data contract, and every boundary those values cross — Payload schema, server fetch, normalization, client types, component props — must preserve them. The "height value of 0" warning is a data-flow bug, not a CSS bug: do not reach for `min-height` or a fixed wrapper height to paper over it; fix the missing dimensions at the layer that dropped them.
 
+<a id="eap-099"></a>
 ## EAP-099: Gating on JSX `onLoad` / `onLoadedData` for an SSR'd Media Element
 
 **Status: ACTIVE**
@@ -2144,6 +2309,7 @@ rg -nP 'onLoad(edData)?=\s*\{' src/components --type tsx -l | \
 
 **Principle:** In a hydrated app, any state derived from a DOM event on an SSR'd native element must also be derivable from the element's readiness properties at mount time. If the only way to reach a given UI state is via an event that the element fires at its own discretion, the UI is at the mercy of a race between HTML parsing and JS hydration — and on a good network, the element wins every time.
 
+<a id="eap-102"></a>
 ## EAP-102: Class-Name-From-The-Wrong-Module Silent Bug
 
 **Status: ACTIVE**
@@ -2182,6 +2348,7 @@ rg -nP "^\\.[A-Za-z0-9_]+" src/app/\(frontend\)/\(site\)/work/\[slug\]/page.modu
 
 **Principle:** A CSS Module object is a strict keyspace. `styles.foo` being `undefined` is not "the rule isn't applying" — it is "the key isn't in this module." When an admin surface looks like the browser default, the first hypothesis is `className=undefined`, and the first file to open is the import statement, not the stylesheet the rules appear to live in.
 
+<a id="eap-103"></a>
 ## EAP-103: Hand-Rolled Native Buttons in Admin / CMS Overlay Surfaces
 
 **Status: ACTIVE**
@@ -2223,6 +2390,7 @@ rg -L "from '@/components/ui/(Button|DropdownMenu|Tooltip|ButtonSelect|Dropzone)
 
 **Principle:** Inline-edit and CMS overlays are first-class DS consumers, not escape hatches from the DS. Every clickable element inside one must compose a DS primitive — `Button`, `ButtonSelect`, `DropdownMenu`, `Tooltip`, `Dropzone` — and every destructive action must honor §14 (`useConfirm` + `toast.undoable`). A raw `<button>` in an admin overlay is presumptively a bug: it's breaking branding, accessibility, and the CRUD contract simultaneously, by construction.
 
+<a id="eap-105"></a>
 ## EAP-105: Integer Scaffolding Values Carried Forward Without Re-Ranking
 
 **Status: ACTIVE**
@@ -2264,6 +2432,7 @@ If the printed order does not match the author's narrative priority when read al
 
 ---
 
+<a id="eap-106"></a>
 ## EAP-106: Heuristic Whose Discriminating Signal Is Invariant Across the Dominant Data Distribution
 
 **Status: ACTIVE**
@@ -2298,6 +2467,7 @@ The bug is not in the formula. The formula is correct in the abstract. The bug i
 
 ---
 
+<a id="eap-107"></a>
 ## EAP-107: Sortable Unit Locked to the Visual Unit Rather Than the Data Unit
 
 **Status: ACTIVE**
@@ -2332,6 +2502,7 @@ Concrete canonical shape in this codebase: after the atomic-image migration, eac
 
 ---
 
+<a id="eap-108"></a>
 ## EAP-108: Gated Todo Never Re-Probed After the Gate Clears
 
 **Status: ACTIVE**
@@ -2364,6 +2535,7 @@ Concrete canonical shape in this codebase: the atomic-image migration had three 
 
 ---
 
+<a id="eap-109"></a>
 ## EAP-109: Flat-Model Migration Drops Empty Slots From a Union-ish Source Model
 
 **Status: ACTIVE**
@@ -2397,6 +2569,7 @@ Concrete canonical shape in this codebase: the `imageGroup` block had two parall
 
 ---
 
+<a id="eap-110"></a>
 ## EAP-110: Reorder-Only DnD on a 2-D Layout
 
 **Status: ACTIVE**
@@ -2438,6 +2611,7 @@ Concrete canonical shape in this codebase: `ProjectClient.tsx` DnD after the ato
 
 ---
 
+<a id="eap-118-b"></a>
 ### EAP-118: Session-existence check without identity match on re-auth pages
 
 **Status:** Active
@@ -2457,6 +2631,7 @@ Concrete canonical shape in this codebase: `ProjectClient.tsx` DnD after the ato
 
 ---
 
+<a id="eap-119-b"></a>
 ### EAP-119: Single-layer client-side storage for cross-session identity tagging
 
 **Status:** Active
@@ -2473,3 +2648,23 @@ Concrete canonical shape in this codebase: `ProjectClient.tsx` DnD after the ato
 **Detection:** Search for `localStorage.setItem` or `localStorage.getItem` used as the sole mechanism for tagging identity properties that must persist across browser modes.
 
 **Incident:** ENG-202 — Owner device activity polluted Mixpanel reports because `localStorage.getItem("yg_owner")` was the only check. Failed on iPhone incognito and MacBook incognito. Fixed with four-layer detection (admin password, server cookie URL, known device ID, Payload admin).
+
+---
+
+<a id="eap-124"></a>
+### EAP-124: Multiple instances of a mutation-in-place canvas library sharing the same data arrays
+
+**Status:** Active
+**Category:** Data Visualization / React Integration
+**First observed:** ENG-234 (2026-04-26)
+**Occurrences:** 1
+
+**Pattern:** Passing the same node/link arrays to multiple ForceGraph (or similar d3-force-based) component instances on the same page. Libraries like `force-graph` and `d3-force` mutate data objects in-place (adding `x`, `y`, `fx`, `fy`, `__indexColor`, `__photons`, etc.). When multiple instances share the same objects, one instance's cleanup (`delete link.__photons`) destroys another instance's state. The bug is invisible in single-instance testing and manifests as features (particles, pinning, labels) silently not working.
+
+**Why it fails:** The kapsule's `updDataPhotons` function runs on every `graphData` setter call. For instances with `linkDirectionalParticles=0`, it deletes `__photons` from every link. Since all instances reference the same link objects, this deletion affects ALL instances. Additionally, `react-kapsule` only exposes methods listed in `methodNames` (not `graphData`), so `graphRef.current.graphData()` returns undefined - breaking any imperative workaround.
+
+**Correct alternative:** Deep-clone nodes and links inside the component: `useMemo(() => ({ nodes: nodes.map(n => ({...n})), links: links.map(l => ({...l})) }), [nodes, links])`. Each instance gets its own objects. Use the cloned arrays (not the original props) for any callback that needs hydrated data (pinAllNodes, emitParticle burst).
+
+**Detection:** Multiple `<ForceGraph>` (or `<ForceGraph2D>`, `<ForceGraph3D>`) instances on the same page receiving the same `nodes`/`links` array references. Also: any `graphRef.current.graphData()` call (method not on ref).
+
+**Incident:** ENG-234 — Signal view particles were invisible across 6+ debugging attempts. The Mesh instance's `linkDirectionalParticles=0` kept deleting `__photons` from shared link objects before the Signal instance could render them.

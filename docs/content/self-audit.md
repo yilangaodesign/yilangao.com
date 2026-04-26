@@ -1,3 +1,14 @@
+<!-- graph metadata for docs knowledge graph (see docs/knowledge-graph.md) -->
+---
+type: spoke
+id: content-self-audit
+topics:
+  - content
+  - audit
+derivedFrom:
+  - content.md
+---
+
 # §11. Self-Audit Framework
 
 **Source:** `portfolio-hiring-manager-mental-model.md` v2, §7.1 — layered audit, 2026-03-29.

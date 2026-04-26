@@ -1,3 +1,14 @@
+<!-- graph metadata for docs knowledge graph (see docs/knowledge-graph.md) -->
+---
+type: spoke
+id: content-homepage
+topics:
+  - content
+  - portfolio
+derivedFrom:
+  - content.md
+---
+
 # §2. Homepage / Hero Strategy
 
 ## 2.1 The 10-Second Clarity Test (Designing the Aha Moment)

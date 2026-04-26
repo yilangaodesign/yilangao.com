@@ -12,6 +12,7 @@
 
 ## Session: 2026-04-23 — Élan headline rewrite + content strategy rule update
 
+<a id="cfb-042"></a>
 #### CFB-042: "A small consideration for the case study title...I want to keep the 'Harness Code Production' three words"
 
 **Intent:** The Élan headline "You're looking at the wrong part" (T7 Framework Inversion) didn't communicate the "harness" positioning keyword to scanners on the home page. The user needed the headline to include "harness code production" while maintaining the conversational, interpersonal register of the other case study headlines. Additionally, the headline didn't need to start with "I" or "you" - first-person perspective can be carried by possessives like "my."
@@ -27,6 +28,7 @@
 
 ## Session: 2026-04-22 — Password phrase selection: "glad you are here"
 
+<a id="cfb-041"></a>
 #### CFB-041: Default site password changed from `preview-2026` to `glad you are here`
 
 **Intent:** The portfolio password is shared by recruiters with hiring managers and team leads. It needs to read as a natural greeting when typed into the "Welcome, ___" sentence on the login page, be memorable enough to share verbally ("the password is glad you are here"), and avoid hierarchy tension across audiences (recruiters, peer designers, design directors, C-suite).
@@ -46,6 +48,7 @@
 
 ## Session: 2026-04-21 — Essay content format: category eyebrow, cross-post link, dropped scope statement
 
+<a id="cfb-040"></a>
 #### CFB-040: Essay content type — reader-facing orientation metadata settled for essays, scope-statement convention retired, like-counter rejected in favor of cross-post link
 
 **Intent:** Establish the content conventions for the newly-introduced `essay` content format (distinct from UX case studies) on `/work/[slug]`. User's session-opening instruction framed the need concretely against the ETRO Framework essay: the existing two-column case-study layout is actively misleading for an essay (no team, no duration, no hero metric), and the orientation signals readers actually want between the title and the body — publication date, read time, topic tag, and a cross-post link — have no home in the current shell. User also explicitly reversed an earlier proposal for a like-counter mid-session, requesting a Medium cross-post link instead.
@@ -86,6 +89,7 @@
 
 ## Session: 2026-04-20 — Video audio settings: vocabulary separates capability from state
 
+<a id="cfb-039"></a>
 #### CFB-039: "You're conflating two different things, and that's very dangerous" — admin labels for audio on video blocks
 
 **Intent:** User rejected yesterday's single "Muted by default / Sound by default" label as the sole audio control on `VideoSettings`. Their distinction: *"'Muted by default' means the user can still have sound. 'Audio on or audio off' means that there is no mute functionality available to users; it just means that there is no audio for this video, so there is no mute/unmute button for the user."* They asked for a two-layer vocabulary: capability first, then (only when enabled) default-state. For external embeds they asked to remove the option entirely because the provider already owns the audio UI.
@@ -128,6 +132,7 @@ The single-ButtonSelect implementation forced the author to guess which genre th
 
 ## Session: 2026-04-20 — Portfolio Home Case-Study Order
 
+<a id="cfb-038"></a>
 #### CFB-038: "Why is the current case study order: Lacework, the design system, Goldman Sachs. They should have been Goldman Sachs at the top. I don't know starting from which point it was moved up, and this is just wrong, and I've never said it this way."
 
 **Intent:** User flagged that the home page orders case studies Lacework → Élan → Meteor (Goldman Sachs), and insists Goldman Sachs should lead. They want a trace of when the order was "moved up," a fix, and documentation.
@@ -149,10 +154,13 @@ The single-ButtonSelect implementation forced the author to guess which genre th
 
 **Files touched:** `src/app/(frontend)/api/update-meteor/route.ts`, `src/app/(frontend)/api/update-lacework/route.ts`, `docs/content-feedback-log.md`, `docs/content-anti-patterns.md`, `docs/engineering-feedback-log.md`, `docs/engineering-anti-patterns.md`.
 
+**Anti-pattern:** See CAP-031.
+
 ---
 
 ## Session: 2026-04-17 — ETRO Essay Blurb vs Article Boundary
 
+<a id="cfb-037"></a>
 #### CFB-037: "This part should be moved into the Intro blurb section instead of the official article."
 
 **Intent:** User quoted Section 1 of the ETRO essay (heading `'Your whole approach is wrong.'` plus the 4-paragraph CEO-dismantle narrative) and said it belongs in the intro blurb, not in the article body.
@@ -175,10 +183,13 @@ Secondary rule: when the blurb absorbs a scene, the `description` (scope stateme
 
 **Files touched:** `src/app/(frontend)/api/update-etro/route.ts`, `docs/content/projects/etro-framework.md`.
 
+**Loose match:** Related: CAP-006.
+
 ---
 
 ## Session: 2026-04-17 — ETRO Essay Bold Abuse
 
+<a id="cfb-036"></a>
 #### CFB-036: "The current article abuses bold font. There's also not a clear separation between sections, somehow, or the hierarchy not visually clean."
 
 **Intent:** Two complaints in one message. (1) Too much bold. (2) Section hierarchy not visually clean / sections feel undifferentiated.
@@ -209,10 +220,13 @@ Never leave raw `**bold**` spans in bodyMarkdown.
 
 **Follow-up check:** Run a regex sweep on every other `src/app/(frontend)/api/update-*/route.ts` for `\*\*` inside `bodyMarkdown` strings - any matches are the same anti-pattern in other essays/case studies and should be cleaned up before they're noticed.
 
+**Anti-pattern:** See CAP-030.
+
 ---
 
 ## Session: 2026-04-17 — ETRO Essay Replacement
 
+<a id="cfb-035"></a>
 #### CFB-035: "Replace ETRO essay body with new calibrated-transparency draft"
 
 **Intent:** User delivered a full rewritten draft of the ETRO essay (`Your AI product doesn't need more transparency. It needs the right kind. (5).md`). Asked to replace the current case study body with the new markdown, formatted into the existing case study block system.
@@ -236,6 +250,7 @@ Never leave raw `**bold**` spans in bodyMarkdown.
 
 ## Session: 2026-04-12 — ETRO Voice Rewrite
 
+<a id="cfb-034"></a>
 #### CFB-034: "ETRO essay doesn't read like a human wrote it - machine-compiled literature review voice"
 
 **Intent:** User said the ETRO essay reads like "a bunch of machine spit out some summary chunks" with "no logic, no storyline, just jumping around." Requested rewrite to match the approved voice from Meteor, Lacework, and Elan case studies.
@@ -246,10 +261,13 @@ Never leave raw `**bold**` spans in bodyMarkdown.
 
 **Extracted Pattern:** The "parallel-structure encyclopedia" is a distinct AI writing failure mode - when asked to cover N items, the default output is N identical mini-essays with the same beat pattern. The fix is not to rewrite each mini-essay but to refuse the parallel structure entirely and let items emerge from narrative. Related to CAP-017 (AI voice tells) but a structural variant, not a vocabulary one.
 
+**Anti-pattern:** See CAP-029.
+
 ---
 
 ## Session: 2026-04-10 — Site Nav Tagline
 
+<a id="cfb-033"></a>
 #### CFB-033: "ETRO framework rewrite - theoretical grounding, multi-voice challenge, temporal framing"
 
 **Intent:** Rebuild the ETRO essay from "case study dressed as a framework" into "a real framework illustrated by a case study." User wanted: (1) the CEO challenge foregrounded as the blurb's hook, (2) theoretical grounding under each ETRO element, (3) cross-domain validation from multiple CEO conversations, (4) framework claims separated from Meteor examples.
@@ -269,6 +287,7 @@ Never leave raw `**bold**` spans in bodyMarkdown.
 
 ---
 
+<a id="cfb-032"></a>
 #### CFB-032: Top navigation tagline text update
 
 **Intent:** Replace the identity line shown next to the site name in the main nav with a clearer formulation of role and employer.
@@ -279,6 +298,7 @@ Never leave raw `**bold**` spans in bodyMarkdown.
 
 ## Session: 2026-04-08 — Login Page Placeholder Copy
 
+<a id="cfb-031"></a>
 #### CFB-031: Login page placeholder — "(what I told you)"
 
 **Intent:** With the password-as-name concept (password is visible text, not dots), the placeholder/ghost text needed to serve two masters: (1) tell users to type their password, and (2) not break the "Welcome, ___" greeting sentence visually or tonally.
@@ -298,6 +318,7 @@ Never leave raw `**bold**` spans in bodyMarkdown.
 
 ## Session: 2026-04-06 — ETRO Framework Article Revision (External Editorial Critique Integration)
 
+<a id="cfb-030"></a>
 #### CFB-030: "Two external editors critiqued the ETRO article - integrate feedback"
 
 **Intent:** User received two detailed editorial critiques from experienced column editors. Both editors diagnosed real structural and rhetorical weaknesses but prescribed fixes optimized for standalone column publication, not portfolio artifacts. User requested adversarial analysis of the critiques, then a revision plan integrating the feedback.
@@ -320,6 +341,7 @@ All 12 editorial recommendations were assessed as "partially adopt and adapt." K
 
 ## Session: 2026-04-06 — ETRO Framework Article (New Format: Deep Article)
 
+<a id="cfb-029"></a>
 #### CFB-029: "The ETRO Framework will not be a case study but a deep article"
 
 **Intent:** Transform a raw, messy ~5,500-word framework document into a polished ~1,800-word column-style article for the portfolio. Same personality and writing style as case studies but in article format - longer than a case study, shorter than a Medium deep-dive. All startup names redacted. Logic restructured around a narrative arc rather than textbook pillar-by-pillar definitions.
@@ -342,6 +364,7 @@ All 12 editorial recommendations were assessed as "partially adopt and adapt." K
 
 ## Session: 2026-04-05 — External Review Triage & Evidence Anchoring Framework
 
+<a id="cfb-028"></a>
 #### CFB-028: "Two external reviewers evaluated case study writing quality"
 
 **Intent:** Two independent reviewers assessed the Meteor and Lacework case studies. The goal was to identify genuine content gaps versus suggestions that would weaken top-of-funnel conversion if followed. Evaluation focused on writing quality and persuasiveness for a UX portfolio, not general copywriting.
@@ -372,10 +395,13 @@ All 12 editorial recommendations were assessed as "partially adopt and adapt." K
 - **Named Narrative Shapes:** Five named arc patterns added to narrative-arc.md for diversity classification.
 - **Interview Defense Notes:** New Phase 3b in the authoring skill. Produces companion files with metric defense, role scope precision, and prepared responses for strategic omissions.
 
+**Anti-patterns:** See CAP-025. See CAP-026.
+
 ---
 
 ## Session: 2026-04-05 — Meteor Case Study Full Rebuild
 
+<a id="cfb-027"></a>
 #### CFB-027: "Write up the case study for Goldman Sachs Meteor - treat as brand new, strip away existing"
 
 **Intent:** Full rebuild of the Meteor case study. User dissatisfied with v1 skeleton (ETRO framework thesis). Source material: Rengo AI R3 interview transcript where user presented the case study, with wording tailored to an AI startup's needs. Goal: demonstrate founding designer judgment and relevant experience for a general portfolio audience.
@@ -400,6 +426,7 @@ All 12 editorial recommendations were assessed as "partially adopt and adapt." K
 
 ## Session: 2026-04-04 — Title Semantic Redefinition
 
+<a id="cfb-026"></a>
 #### CFB-026: "Sidebar title should be app name; intro blurb headline is the official case study title"
 
 **Intent:** Promote `introBlurbHeadline` to the official case study title. The homepage masonry card should show the creative tension headline, not the app name. The `category` line and thumbnail provide domain context.
@@ -422,6 +449,7 @@ All 12 editorial recommendations were assessed as "partially adopt and adapt." K
 
 ## Session: 2026-04-04 — Voice Calibration System
 
+<a id="cfb-025"></a>
 #### CFB-025: "Rework the Lacework case study based on interview transcript material"
 
 **Intent:** Full rebuild of Lacework case study using new raw material (Norm AI interview transcript where the user presented the project). User wanted the case study rewritten with all content skills now in place, using the transcript as the primary source.
@@ -438,6 +466,7 @@ All 12 editorial recommendations were assessed as "partially adopt and adapt." K
 
 ---
 
+<a id="cfb-024"></a>
 #### CFB-024: Prompt system optimized for constraint compliance over voice production
 
 **Intent:** The user observed that their handwritten draft for the Elan case study was significantly more vivid than anything the system generated, despite the system following all content rules correctly. The gap between the user's natural voice and the system's output indicated a structural deficit in the prompt architecture - the rules describe what NOT to write but provide no model of what TO write.
@@ -455,10 +484,13 @@ All 12 editorial recommendations were assessed as "partially adopt and adapt." K
 
 **Pattern extracted -> `content.md` Section 17 + `voice-style.md` 13.2: The prompt system must encode positive voice targets (what TO write), not just negative constraints (what NOT to write). One unified voice across all case studies, calibrated warmer than clinical. When the user provides raw draft text, the refinement protocol distinguishes Tier 1 constraints (always enforce) from Tier 2 constraints (yield to user voice).**
 
+**Loose match:** Related: CAP-023.
+
 ---
 
 ## Session: 2026-04-04 — Voice register pivot for Élan case study
 
+<a id="cfb-023"></a>
 #### CFB-023: User draft established conversational, culturally sharp voice register
 
 **Intent:** The user provided their own draft for the Élan intro blurb with a fundamentally different voice register than the agent's initial version. The agent's version was formal, structured, and impersonal ("How do you maintain design consistency..."). The user's version was conversational, first-person, irreverent, and culturally specific ("Teaching Einstein...", "Afraid of that default Tailwind blue-violet? Me too.", "AI design slop").
@@ -473,10 +505,13 @@ All 12 editorial recommendations were assessed as "partially adopt and adapt." K
 
 **Pattern extracted: The default "luxury positioning" voice is not universally correct. Case studies targeting technical audiences (designers, engineers, vibe coders) benefit from a culturally sharp, first-person voice that signals shared experience. The voice register should match the audience, not the format.**
 
+**Loose match:** Related: CAP-023.
+
 ---
 
 ## Session: 2026-04-04 — Em dash violation in Élan case study
 
+<a id="cfb-022"></a>
 #### CFB-022: "You use em dashes. This is an anti-pattern. You're never supposed to do that."
 
 **Intent:** The user identified that the agent used em dashes (U+2014) throughout the Élan case study content despite an explicit rule in `docs/content/voice-style.md` line 73: "Em dashes: never. Use a regular dash - like this. Max one per section." This is a recurring behavioral failure, not a knowledge gap. The rule existed and the agent did not follow it.
@@ -490,10 +525,13 @@ All 12 editorial recommendations were assessed as "partially adopt and adapt." K
 
 **Pattern extracted: Em dash usage is an AI voice tell (extends CAP-017). The agent must check `voice-style.md` line 73 as a hard constraint during every content writing task, not just during review.**
 
+**Anti-pattern:** See CAP-022.
+
 ---
 
 ## Session: 2026-04-04 — Élan Design System Case Study Full Rebuild
 
+<a id="cfb-021"></a>
 #### CFB-021: Thesis pivot from "AI-native design system" to "compounding design knowledge"
 
 **Intent:** The user requested a complete rewrite of the Élan Design System case study. Three specific corrections emerged:
@@ -518,10 +556,13 @@ All 12 editorial recommendations were assessed as "partially adopt and adapt." K
 - User wants "fake A/B test" comparing early vs. late session design quality. Requires chronological analysis of design feedback log.
 - User suggested comparing with generic designer skills for framing inspiration.
 
+**Anti-pattern:** See CAP-021.
+
 ---
 
 ## Session: 2026-03-30 — Token Architecture Information Hierarchy
 
+<a id="cfb-020"></a>
 #### CFB-020: "You don't really need an extended palette tab and a neutral tab"
 
 **Intent:** The user identified that separate tabs for Extended Palette and Neutral colors were disconnected from the token naming system — they displayed raw color swatches without tying them to semantic meaning. Consolidating all colors into a single dropdown within the token builder creates a tighter information architecture: every color is immediately contextualized by the role it maps to (Accent → brand, Red → negative, etc.).
@@ -539,6 +580,7 @@ All 12 editorial recommendations were assessed as "partially adopt and adapt." K
 
 ---
 
+<a id="cfb-019"></a>
 #### CFB-019: "The information architecture here is just wrong — architecture first, rationale second"
 
 **Intent:** The content hierarchy within the Token Architecture interactive visual was inverted. It started with "Why semantic naming" (the rationale and comparison table) before showing the actual architecture (the naming formula and dimension pills). The user's principle: always show the result/outcome first, then explain the reasoning behind it. This is the inverted pyramid applied at the component level — the same principle as CAP-006 (Burying the Lede), but inside an interactive widget rather than a case study section.
@@ -557,10 +599,13 @@ Additionally, the section-level blurb ("A token naming convention designed for m
 
 **Pattern extracted → `content.md` §3 / §12: The inverted pyramid doesn't only apply to case study sections — it applies to every content block, including interactive visuals. If a widget has explanatory text and a structural diagram, the diagram must come first. Rationale is supporting evidence, not the headline.**
 
+**Loose match:** Related: CAP-006.
+
 ---
 
 ## Session: 2026-03-30 — Media Upload Integration
 
+<a id="cfb-018"></a>
 #### CFB-018: "Links should let me upload files instead of just typing URLs"
 
 **Intent:** When adding a social link that points to a resume or portfolio PDF, the user shouldn't have to navigate to a separate media library, upload the file, copy the URL, return to the link editor, and paste. The flow should be: click upload → select file → done. The URL is an implementation detail the system should handle.
@@ -573,10 +618,13 @@ Additionally, the section-level blurb ("A token naming convention designed for m
 
 **Pattern extracted -> `content.md` §6: Field labels should describe what the user provides ("URL or File"), not just the underlying data type ("URL"). When a field can accept multiple content types, the label should communicate the full range of options.**
 
+**Loose match:** Related: CAP-012.
+
 ---
 
 ## Session: 2026-03-30 — Media Upload Form Microcopy
 
+<a id="cfb-017"></a>
 #### CFB-017: "What the hell is the alt input field about? What is caption?"
 
 **Intent:** Field labels on CMS forms must communicate their purpose to a non-technical user without requiring prior knowledge of web standards. "Alt" means nothing to someone who isn't a web developer. "Caption" is slightly better but still lacks context for what it does on this specific site.
@@ -589,10 +637,13 @@ Additionally, the section-level blurb ("A token naming convention designed for m
 
 **Pattern extracted → `content.md` §6 (existing): Every CMS field label must be a natural-language phrase that answers "what does this field do?" without requiring domain knowledge. Technical names (alt, slug, href, mime) must be either replaced or supplemented with plain-language descriptions.**
 
+**Loose match:** Related: CAP-012.
+
 ---
 
 ## Session: 2026-03-30 — Goldman Sachs Meteor Case Study
 
+<a id="cfb-016"></a>
 #### CFB-016: "Create a content strategy for the Goldman Sachs Meteor case study"
 
 **Intent:** Create and implement a full case study for Meteor — an ETF basket management platform the user designed as the sole founding designer at Goldman Sachs. The content strategy was derived from: (1) a 92-slide presentation deck, (2) a 35-page interview transcript from a Rengo AI interview, (3) all content.md principles, (4) existing Lacework and Élan case study structures, and (5) Joseph Zhang / Ryo Lu reference patterns. The case study needed to frame Meteor's "human trust in machine-processed data" problem as directly relevant to current AI/data review workflows.
@@ -630,6 +681,7 @@ Additionally, the section-level blurb ("A token naming convention designed for m
 
 ## Session: 2026-03-30 — Copy Verbosity (Recurring Pattern)
 
+<a id="cfb-015"></a>
 #### CFB-015: "You're stacking facts over facts — section blurbs are too lengthy, too many words"
 
 **Intent:** The scope statement and every section body in the Élan case study were too long — violating §3.3 (2-4 sentences), §3.4 (1-3 sentences per section), and §5.2 ("section text serves as a label, not an explanation"). The scope statement stacked metrics ("47 engineering incidents", "33 design anti-patterns") as disconnected facts instead of expressing the design philosophy. Section bodies were 5-7 sentences each, re-explaining what the interactive visuals already demonstrate. The references (Joseph Zhang, Ryo Lu) use 1-2 sentences per section — text as labels for images, not mini-essays.
@@ -647,10 +699,13 @@ Additionally, the section-level blurb ("A token naming convention designed for m
 
 **Pattern extracted → `content.md` §5.2: reinforced — section text is a LABEL for the visual, not a parallel explanation. If an interactive visual already demonstrates something (comparison grid, DAG, timeline), the body text must not restate it.**
 
+**Loose match:** Related: CAP-018.
+
 ---
 
 ## Session: 2026-03-30 — Élan Case Study Content Strategy Overhaul
 
+<a id="cfb-014"></a>
 #### CFB-014: "Token examples don't follow convention, missing rationale, section hierarchy wrong, DAG missing"
 
 **Intent:** The Élan design system case study has multiple content strategy failures:
@@ -681,10 +736,13 @@ Additionally, the section-level blurb ("A token naming convention designed for m
 
 **New anti-pattern → `content-anti-patterns.md` CAP-016: Feature-List Case Study (showing WHAT without WHY)**
 
+**Anti-pattern:** See CAP-016.
+
 ---
 
 ## Session: 2026-03-30 — Case Study Interactive Visual Scoping
 
+<a id="cfb-013"></a>
 #### CFB-013: "Spacing and radius is irrelevant — section is about color, token naming was missing"
 
 **Intent:** The "Lumen — A Custom Color Identity" section in the Élan case study should exclusively showcase color-related content. The interactive TokenGrid had Spacing and Radius tabs that are completely off-topic for a color identity narrative. Additionally, the token naming convention (`property.role.emphasis`) — a key design decision inspired by Goldman Sachs One GS — was absent from the interactive visual, despite being central to the color architecture story and having existed in the section's content scope previously.
@@ -699,6 +757,8 @@ Additionally, the section-level blurb ("A token naming convention designed for m
 **Cross-category note:** Also documented as FB-056 (design) — the visual implementation changes.
 
 **Pattern extracted → `content.md` §3.4: Interactive visuals embedded in case study sections must be scoped to the section topic. A general-purpose widget that shows "everything in the design system" in a section about color identity is a content anti-pattern — it fails the "does this support the narrative?" test.**
+
+**Loose match:** Related: CAP-003.
 
 ---
 
@@ -1004,6 +1064,7 @@ This session was not a single piece of feedback — it was the foundational anal
 
 ---
 
+<a id="cfb-010"></a>
 #### CFB-010: "Case studies should begin with strong visuals showing end results — time to value"
 
 **Intent:** Every case study must open with a hero image that shows the final design outcome. This is a UX time-to-value principle applied to portfolio content: the visitor should understand what was built in under 2 seconds of landing, before reading any text. Starting with text forces sequential processing; starting with a screenshot enables parallel evaluation (visual quality, product domain, design sensibility) in a single glance.
@@ -1016,8 +1077,11 @@ This session was not a single piece of feedback — it was the foundational anal
 
 **Pattern extracted → `content.md` §3.2: Recommended Anatomy** (reinforces existing hero-first anatomy) | New principle: **Time-to-Value Hero — case studies must lead with the finished design, not with text. The hero image is not decorative; it is the single most important content element on the page.**
 
+**Loose match:** Related: CAP-006.
+
 ---
 
+<a id="cfb-011"></a>
 #### CFB-011: "All Projects back link adds confusion — portfolio is only one layer deep"
 
 **Intent:** The back link on case study detail pages previously read "All Projects." The user observed this is misleading: the portfolio has no dedicated "all projects" listing page — the home page *is* the project grid. Labeling the link "All Projects" implies a separate archive or index page that doesn't exist, creating false expectations. For a shallow two-layer navigation structure (home → case study), the correct affordance is simply "Back."
@@ -1030,6 +1094,7 @@ This session was not a single piece of feedback — it was the foundational anal
 
 ---
 
+<a id="cfb-012"></a>
 #### CFB-012: "Portfolio as Product shouldn't be in the Élan case study"
 
 **Intent:** The user identified that the "Portfolio as Product" section — which reveals the hiring manager conversion funnel, P(Alive) decay, and magic number strategy — exposes strategic competitive advantage that shouldn't be public. It's the *portfolio's* secret sauce, not the *design system's* story. The user proposed replacing it with interaction design work (navigation patterns, ScrollSpy gesture discrimination) and the Lumen accent color story, which better demonstrate design system craft.
@@ -1045,6 +1110,8 @@ This session was not a single piece of feedback — it was the foundational anal
 **Pattern extracted → `content-anti-patterns.md` CAP-015 (new): Strategic Transparency Leak** — content that reveals meta-strategy (how you position yourself) rather than craft (what you built and why). Case studies should demonstrate capability, not expose competitive positioning frameworks. Also → `content.md` §3.3: case study section selection should pass the "does this showcase what I *built*?" filter, not "does this showcase what I *know*?"
 
 **Cross-category note:** Also involves design work (new InteractionShowcase component, enhanced TokenGrid) documented implicitly — no design feedback log entry needed as this is content-driven restructuring.
+
+**Anti-pattern:** See CAP-015.
 
 ---
 
@@ -1344,6 +1411,42 @@ Applied T11/T13/T15 techniques mechanically. Over-indexed on "clever contrarian"
 **Resolution:** Rewrote the note to focus on the design approach (exception-driven workflows, progressive disclosure, interface shaped by judgment not schema) and the structural parallel to Chalk's domain. Zero overlap with the intro blurb above.
 
 **Pattern extracted:** Company notes must be written with awareness of their visual position on the page. The intro blurb and hero metric are always visible above. Never restate what's already on screen. The note's job is to add a connection the reader wouldn't make on their own - why this work matters to *their* specific problem.
+
+---
+
+#### CF-029: "Learn from Edra's marketing language for Elan headline"
+
+**Intent:** The user noticed that Edra's product messaging (living playbooks, executable knowledge, continuous learning from real work) describes the same architecture as the Elan case study. The current headline ("Harnessed my code production - 40 sessions in.") was vague and undersold the work. The user wanted to apply Edra's language principles to reframe the intro.
+
+**Root Cause:** Three problems compounded. (1) The headline verb "harnessed" was abstract with no concrete object. (2) "Code production" framed the achievement as output volume, not architectural insight. (3) "40 sessions in" was a timestamp without consequence. The blurb body buried the strongest line ("each correction became a rule") behind 22 words of throat-clearing ("I built a design system for vibe coding. You've probably heard this story before."). The scope statement contained a defensive aside ("The visual layer took effort, but it's not where most of the time went") that read like an apology for the visual craft.
+
+**Resolution:** Headline changed to "I built an agent's memory out of my own mistakes." - plain verb, front-loaded "agent" at word 4, vulnerable "mistakes" carries the weight. Scope statement trimmed to remove the defensive aside, replacing with "Underneath the visual layer:" which acknowledges without apologizing. Subline updated from "Self-Improving AI Generation" to "Self-Improving AI Collaboration" to match the correction-loop thesis. The blurb body was initially restructured to lead with mechanism, but the user preferred the original version's conversational setup ("I built a design system for vibe coding. You've probably heard this story before.") - reverted. The original blurb's "you may have built your own" creates a peer-level hook that the mechanism-first version lost. CMS seeded and verified.
+
+**Pattern extracted:** When a company's product messaging describes the same architecture as a case study, their language is a diagnostic tool. Compare verb choices (theirs lead with mechanism and consequence; ours led with meta-commentary), identify where the strongest line is buried, and restructure so the mechanism leads. This applies to any personalization-driven content review, not just Edra. The company's language reveals what matters to them, and if the case study describes the same thing, their framing shows how to surface it.
+
+---
+
+#### CF-030: "I hate the ending - 'Not because the work got easier' sounds like a half-sentence"
+
+**Intent:** The blurb closer "Not because the work got easier" was T14 (Emotional Deflation) but read as an incomplete thought - it implies "not because of X, but because of Y" and then withholds the Y entirely. The user wanted an ending that delivers actual insight rather than trailing off.
+
+**Root Cause:** The deflation technique requires the reader to infer the implied contrast. In isolation, "not because the work got easier" has no referent - the reader doesn't know what DID cause the improvement, so the sentence collapses into vagueness. The technique works when the reader has enough context to infer; here they don't yet (they haven't read the case study).
+
+**Resolution:** Full blurb rewrite across multiple iterations. Final blurb opens with a first date metaphor → Severance-style collaboration setup → "intelligence was never the bottleneck, context is" as the insight peak → "So I built the memory it never had" as the pivot → "The agent didn't get smarter. It just stopped forgetting." as the closer. The closer closes the memory loop (the whole problem was forgetting; the solution was remembering), echoes the insight from the body, and delivers a complete causal statement in 9 words. Also documented in CF-029 (which covers the broader blurb reframe session).
+
+**Pattern extracted:** "Not because X" as a closer only works when the reader can infer X's counterpart from surrounding context. In a blurb, the reader has no prior context - the blurb IS the context. Deflation closers in blurbs need to either complete the contrast ("not because X, but because Y") or reframe using a closed-loop callback rather than an open-ended negation.
+
+---
+
+#### CF-031: "You never learn to insert empty lines between paragraphs"
+
+**Intent:** The user has had to manually correct missing paragraph whitespace across many sessions. Paragraph breaks in narrative/storytelling content (blurbs, case study sections, essays) require a blank line between each paragraph for visual breathing room. The agent repeatedly skips this, requiring repeated manual correction.
+
+**Root Cause:** The AGENTS.md rule "whitespace between paragraphs is mandatory" is scoped as a length constraint ("no paragraph exceeds 3 sentences") rather than a formatting behavior rule. The agent treats it as a cap on density, not as a standing instruction to emit blank lines between every narrative paragraph. In seeding routes, `\n\n` is sometimes used correctly, but inconsistently. In chat draft presentations, blockquoted paragraphs are often run together without blank lines.
+
+**Resolution:** Created CAP-034 (Missing Paragraph Whitespace in Narrative Content) to make the rule explicit and behavioral. The rule now covers both source strings (`\n\n` in seeding routes) and chat presentation (blank lines in blockquotes). Exception: two sentences forming one continuous thought may be treated as a single paragraph unit.
+
+**Pattern extracted:** Formatting rules that say "X is mandatory" without specifying the implementation trigger are not reliably followed. The rule needs to specify the mechanism: "use `\n\n` between paragraphs in source strings; use blank lines between paragraphs in chat blockquotes." Abstract mandatory rules get overridden by local context; concrete authoring instructions do not.
 
 ---
 

@@ -1,3 +1,14 @@
+<!-- graph metadata for docs knowledge graph (see docs/knowledge-graph.md) -->
+---
+type: spoke
+id: engineering-storage
+topics:
+  - engineering
+  - storage
+derivedFrom:
+  - engineering.md
+---
+
 # Media & File Storage (Supabase Storage)
 
 > Spoke file for `docs/engineering.md`. Return to the [hub](../engineering.md) for the Section Index.

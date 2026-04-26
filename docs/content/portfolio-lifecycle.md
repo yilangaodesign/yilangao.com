@@ -1,3 +1,17 @@
+<!-- graph metadata for docs knowledge graph (see docs/knowledge-graph.md) -->
+---
+type: spoke
+id: content-portfolio-lifecycle
+topics:
+  - content
+  - port-registry
+  - portfolio
+  - branding
+  - release
+derivedFrom:
+  - content.md
+---
+
 # §10. Portfolio Lifecycle & Intervention Matrix
 
 **Source:** `portfolio-hiring-manager-mental-model.md` v2, §6 — lifecycle mapping, 2026-03-29.

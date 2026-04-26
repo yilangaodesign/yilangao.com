@@ -1,3 +1,14 @@
+<!-- graph metadata for docs knowledge graph (see docs/knowledge-graph.md) -->
+---
+type: spoke
+id: engineering-port-management
+topics:
+  - engineering
+  - port-registry
+derivedFrom:
+  - engineering.md
+---
+
 # Port Management
 
 > Spoke file for `docs/engineering.md`. Return to the [hub](../engineering.md) for the Section Index.

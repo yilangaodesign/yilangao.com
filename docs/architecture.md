@@ -1,3 +1,17 @@
+<!-- graph metadata for docs knowledge graph (see docs/knowledge-graph.md) -->
+---
+type: cross-cutting
+id: architecture
+topics:
+  - engineering
+  - system-architecture
+  - parity
+references:
+  - engineering.md
+  - engineering/multi-app-architecture.md
+  - engineering/deployment.md
+---
+
 # Architecture
 
 > **What this file is:** The authoritative map of how the design system, main site,

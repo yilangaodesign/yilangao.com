@@ -1,3 +1,14 @@
+<!-- graph metadata for docs knowledge graph (see docs/knowledge-graph.md) -->
+---
+type: spoke
+id: content-about-page
+topics:
+  - content
+  - portfolio
+derivedFrom:
+  - content.md
+---
+
 # §9. About Page & Supporting Content
 
 ### 9.1 Purpose

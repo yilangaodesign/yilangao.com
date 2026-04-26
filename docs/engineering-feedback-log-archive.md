@@ -9,6 +9,7 @@
 
 ## Session: 2026-03-30 — Inline Edit Guardrail for New Components
 
+<a id="eng-049"></a>
 #### ENG-049: "Every time you add a new component, you are not making it editable in inline edit"
 
 **Issue:** TestimonialCard was created rendering CMS data (text, name, role) as plain `<p>` and `<span>` elements without `EditableText` wrappers, `id` prop, or `EditButton`. Admin users could see testimonial text on the homepage but couldn't edit it inline. This is the same class of failure that could recur with any new component.
@@ -26,8 +27,11 @@
 
 ---
 
+**Anti-pattern:** See EAP-029.
+
 ## Session: 2026-03-30 — TestimonialCard Component & CMS Integration
 
+<a id="eng-048"></a>
 #### ENG-048: "Build a testimonial card to mix in with the waterfall gallery"
 
 **Issue:** User requested a new TestimonialCard component that integrates into the homepage masonry grid alongside project cards. Required CMS schema changes, data flow wiring, and a new component.
@@ -56,6 +60,7 @@
 
 ## Session: 2026-03-30 — Turbopack Cache Corruption
 
+<a id="eng-047"></a>
 #### ENG-047: "isAdminAuthenticated is not a function — Runtime TypeError in ProjectPage"
 
 **Issue:** Navigating to `/work/lacework` throws a runtime TypeError: `(0, ...isAdminAuthenticated) is not a function`. The error originates in the Turbopack-compiled RSC chunk for `page.tsx`, even though `admin-auth.ts` correctly exports `isAdminAuthenticated` as a named async function and all import sites use the correct named import.
@@ -70,6 +75,7 @@
 
 ## Session: 2026-03-29 — Payload Admin IA Improvements
 
+<a id="eng-046"></a>
 #### ENG-046: "When I click, it just opens my website on localhost, but there is no admin added to view"
 
 **Issue:** Clicking page tiles on the admin dashboard opens the live site, but no admin bar, no inline editing, no edit buttons appear. The site renders as if the user is a public visitor.
@@ -86,6 +92,9 @@
 
 ---
 
+**Anti-patterns:** See EAP-026. See EAP-027.
+
+<a id="eng-045"></a>
 #### ENG-045: Hydration mismatch — server rendered `<a>`, client rendered `<div>`
 
 **Issue:** After HMR-updating DashboardPages from `<a>` card wrappers to `<div>` card wrappers, the admin panel threw a hydration error: server HTML had `<a>` elements, client JS expected `<div>` elements.
@@ -98,6 +107,9 @@
 
 ---
 
+**Anti-pattern:** See EAP-027.
+
+<a id="eng-044"></a>
 #### ENG-044: "It doesn't open the visual inline edit when I click on that tile"
 
 **Issue:** Clicking a page tile on the admin DashboardPages component did not navigate to the live site. Click appeared to do nothing.
@@ -110,6 +122,9 @@
 
 ---
 
+**Anti-patterns:** See EAP-025. See EAP-027.
+
+<a id="eng-043"></a>
 #### ENG-043: "How do I open this view? I don't see it. Where is it?"
 
 **Issue:** After adding NavPages to the admin sidebar (ENG-042), user still couldn't find the visual editing entry points. The sidebar was collapsed by default, hiding the Pages section entirely. User explicitly said: "I actually prefer the live preview and inline edit front and center."
@@ -130,6 +145,7 @@
 
 ---
 
+<a id="eng-042"></a>
 #### ENG-042: "How do I open the edit view for the page where I can visually do the CMS?"
 
 **Issue:** The Payload admin UI had no clear navigation to the visual editing experience. The sidebar showed a flat, ungrouped list of collections with no mapping to pages. The only site link was labeled "Visual Editor" (misleading — it just opened the homepage, not an editor). User forgot the editing flow entirely, proving the IA was undiscoverable.
@@ -152,11 +168,14 @@
 
 ---
 
+**Anti-pattern:** See EAP-028.
+
 ## Session: 2026-03-29 — Case Study Detail Page Fixes
 
 **Chat:** Current session
 **Scope:** `src/app/(frontend)/work/[slug]/ProjectClient.tsx`, `src/app/(frontend)/work/[slug]/page.module.scss`, `src/app/(frontend)/api/update-lacework/route.ts`, `src/collections/Projects.ts`
 
+<a id="eng-041"></a>
 #### ENG-041: "Collaborators are all stacked into one line"
 
 **Issue:** Multiple collaborator stakeholders (Product Management, Engineering, Customer Success) rendered on a single line instead of separate lines in the case study sidebar.
@@ -176,6 +195,7 @@
 **Chat:** Current session
 **Scope:** `next.config.ts`, `@yilangaodesign/design-system/package.json`
 
+<a id="eng-040"></a>
 #### ENG-040: ScrollSpy design system migration — infrastructure changes
 
 **User observed:** ScrollSpy alignment was broken; user directed that the fix be applied upstream in the design system, not at the portfolio level.
@@ -197,6 +217,7 @@
 **Chat:** Current session
 **Scope:** `src/components/inline-edit/`, `src/globals/SiteConfig.ts`, `src/app/(frontend)/HomeClient.tsx`, `src/payload.config.ts`
 
+<a id="eng-039"></a>
 #### ENG-039: "Payload admin tabs not synced with visual edit sections"
 
 **Issue:** CMS admin had 6 tabs (Identity, Teams, Links, Labels & Footer, Clients, Experience) that didn't map clearly to the visual edit sections on the frontend. Two tabs were labeled "Experience" after the rename. The "Labels & Footer" tab grouped unrelated fields (aboutLabel, teamsLabel, linksLabel, footerCta) together instead of colocating them with their respective data.
@@ -209,6 +230,7 @@
 
 **Cross-category note:** Also documented as FB-049 (design) — the missing navigation path from CMS admin to visual editor.
 
+<a id="eng-038"></a>
 #### ENG-038: "save() catches errors internally, EditableArray never knows save failed"
 
 **Issue:** When saving via `EditableArray.commitPanel()`, the panel always closed after `await ctx.save()`, even if the save had failed. The user thought their edits were saved when they weren't.
@@ -219,6 +241,9 @@
 
 **Principle extracted -> `engineering-anti-patterns.md`: Error-swallowing saves create silent data loss.**
 
+**Anti-pattern:** See EAP-024.
+
+<a id="eng-037"></a>
 #### ENG-037: "editing the email in the footer, when I hit save, it doesn't really save"
 
 **Issue:** Editing the email field in the footer via inline edit and saving appeared to silently fail — the value would revert after save.
@@ -233,11 +258,14 @@
 
 ---
 
+**Anti-pattern:** See EAP-023.
+
 ## Session: 2026-03-29 — Drag-and-Reorder Re-Grab Bug
 
 **Chat:** Current session
 **Scope:** `src/components/inline-edit/EditableArray.tsx`
 
+<a id="eng-036"></a>
 #### ENG-036: "bug on the re-grabbing and drag and reorder interaction where, once I have put something somewhere"
 
 **Issue:** After successfully dragging an item to a new position in the `EditableArray` panel, any item that was moved to a different position could no longer be grabbed and dragged again. The drag handle appeared visually correct but was non-functional.
@@ -250,11 +278,14 @@
 
 ---
 
+**Anti-pattern:** See EAP-022.
+
 ## Session: 2026-03-29 — Required Field Blocking Save + Client Validation
 
 **Chat:** Current session
 **Scope:** `src/globals/SiteConfig.ts`, `src/app/(frontend)/HomeClient.tsx`, `src/components/inline-edit/EditableArray.tsx`, `src/components/inline-edit/inline-edit.module.scss`
 
+<a id="eng-035"></a>
 #### ENG-035: "why is URL required?... it's blocking users from completing the user flow"
 
 **Issue (schema):** `socialLinks[].href` was `required: true` in both Payload schema and frontend field definition. This meant users couldn't save a link with just a label (e.g. "Resume" as a placeholder) without also providing a URL. The required constraint blocked the save flow entirely, frustrating users who wanted to save partial progress.
@@ -289,6 +320,7 @@
 **Chat:** Current session
 **Scope:** `src/components/inline-edit/inline-edit.module.scss`
 
+<a id="eng-034"></a>
 #### ENG-034: "why is this in such a bad height... content flexbox is in such a bad shape"
 
 **Issue:** After the flex column refactor (ENG-032) to fix sticky header/footer, the Edit Teams panel collapsed to just header + footer with the body area at near-zero height. Items existed but were invisible.
@@ -308,6 +340,7 @@
 **Chat:** Current session
 **Scope:** `src/components/inline-edit/api.ts`, `src/components/inline-edit/InlineEditBar.tsx`, `src/components/inline-edit/inline-edit.module.scss`
 
+<a id="eng-033"></a>
 #### ENG-033: "Failed to update global:site-config: 400 — {raw JSON}"
 
 **Issue:** When Payload CMS rejects a save due to validation (e.g. a required `href` field is empty), the error thrown by `saveFields` included the full raw JSON response body, producing an unreadable error message like `Failed to update global:site-config: 400 — {"errors":[{"name":"ValidationError",...}]}`.
@@ -330,6 +363,7 @@
 **Chat:** Current session
 **Scope:** `src/components/inline-edit/EditableArray.tsx`, `src/components/inline-edit/inline-edit.module.scss`
 
+<a id="eng-032"></a>
 #### ENG-032: "the CTA for Save and Close is not always visible... why multiple clicks"
 
 **Issue:** Two UX problems with the EditableArray panel: (1) Save & Close button scrolled off-screen with long lists, (2) up/down arrow buttons for reordering were high-friction compared to drag-and-drop.
@@ -353,6 +387,7 @@
 **Chat:** Current session
 **Scope:** `AGENTS.md`, `src/globals/SiteConfig.ts`, `src/app/(frontend)/contact/page.tsx`, `src/app/(frontend)/contact/ContactClient.tsx`
 
+<a id="eng-031"></a>
 #### ENG-031: "I don't think the actual configuration dashboard is reflecting the additions"
 
 **Issue:** The user reported that fields added to the frontend inline editing UI (like the `period` field on Teams) were not reflected in the Payload admin dashboard. The user identified this as a dangerous architectural discrepancy: changes to one side don't automatically propagate to the other, creating silent data drift.
@@ -376,11 +411,14 @@ Full audit revealed one concrete discrepancy: `clients[].url` existed in the CMS
 
 ---
 
+**Anti-pattern:** See EAP-019.
+
 ## Session: 2026-03-29 — EditableArray Save Flow Bugs
 
 **Chat:** Current session
 **Scope:** `src/components/inline-edit/EditableArray.tsx`, `src/components/inline-edit/InlineEditProvider.tsx`, `src/components/inline-edit/inline-edit.module.scss`
 
+<a id="eng-030"></a>
 #### ENG-030: "My entry for present is never documented or saved"
 
 **Issue:** The user edited Teams in the array panel (added Goldman Sachs URL, set period to "Present"), clicked "Done", but:
@@ -407,11 +445,14 @@ Full audit revealed one concrete discrepancy: `clients[].url` existed in the CMS
 
 ---
 
+**Anti-patterns:** See EAP-017. See EAP-018.
+
 ## Session: 2026-03-29 — EditableArray UX and Teams Schema
 
 **Chat:** Current session
 **Scope:** `src/components/inline-edit/EditableArray.tsx`, `src/components/inline-edit/inline-edit.module.scss`, `src/globals/SiteConfig.ts`, `src/app/(frontend)/HomeClient.tsx`, `src/app/(frontend)/page.tsx`
 
+<a id="eng-029"></a>
 #### ENG-029: "It's really unclear about what the second field is"
 
 **Issue:** The EditableArray panel for Teams was confusing in three ways:
@@ -438,6 +479,7 @@ Full audit revealed one concrete discrepancy: `clients[].url` existed in the CMS
 **Chat:** Current session
 **Scope:** `src/globals/SiteConfig.ts`, `src/app/(frontend)/page.tsx`, `src/app/(frontend)/HomeClient.tsx`
 
+<a id="eng-028"></a>
 #### ENG-028: "I still cannot edit the section header and also the About section"
 
 **Issue:** Three categories of content on the home page were not editable via inline editing:
@@ -461,11 +503,14 @@ Full audit revealed one concrete discrepancy: `clients[].url` existed in the CMS
 
 ---
 
+**Anti-pattern:** See EAP-016.
+
 ## Session: 2026-03-29 — Inline CMS Editing System
 
 **Chat:** Current session
 **Scope:** `src/components/inline-edit/` (new), all `*Client.tsx` pages, `page.tsx` data layers
 
+<a id="eng-027"></a>
 #### ENG-027: Inline CMS editing — Figma-like hover/edit/save on frontend
 
 **Issue:** Content editing required navigating to the Payload admin panel — no way to edit text directly on the live site.
@@ -492,6 +537,7 @@ Integrated across all 6 page types: Home, About, Contact, Experiments, Reading, 
 **Chat:** Current session
 **Scope:** `src/payload.config.ts`, `src/collections/Users.ts`, `src/components/admin/EnableAutocomplete.tsx`, `src/app/(payload)/custom.scss`, `.env`
 
+<a id="eng-026"></a>
 #### ENG-026: Payload admin login friction — no autocomplete, short sessions, no auto-login
 
 **Issue:** Every dev session required manually typing credentials into the Payload admin login page. Browser autocomplete was not offering saved credentials, and sessions expired after 2 hours (Payload default).
@@ -513,6 +559,7 @@ Integrated across all 6 page types: Home, About, Contact, Experiments, Reading, 
 **Chat:** Current session
 **Scope:** `src/lib/lexical.ts`, `src/app/(frontend)/work/[slug]/page.tsx`, `src/app/(frontend)/work/[slug]/ProjectClient.tsx`, `src/app/(frontend)/api/update-lacework/route.ts`
 
+<a id="eng-025"></a>
 #### ENG-025: Lexical richText silently dropped by string type check
 
 **Issue:** The `page.tsx` project page mapped Payload CMS data using `typeof doc.description === "string" ? doc.description : "Project description."`. Since Payload's `richText` field stores Lexical JSON (an object, not a string), all CMS-authored body text was silently replaced with placeholder strings. This meant any content entered through the admin UI would never display.
@@ -535,6 +582,7 @@ Integrated across all 6 page types: Home, About, Contact, Experiments, Reading, 
 
 **Chat:** Current session
 
+<a id="eng-024"></a>
 #### ENG-024: `<a>` cannot be a descendant of `<a>` — EditButton inside ProjectCard Link
 
 **Issue:** Browser console showed hydration error: `In HTML, <a> cannot be a descendant of <a>`. The `EditButton` component rendered an `<a>` tag, and it was placed inside `ProjectCard` which is wrapped in a Next.js `<Link>` (also an `<a>`).
@@ -552,6 +600,7 @@ Integrated across all 6 page types: Home, About, Contact, Experiments, Reading, 
 **Chat:** Current session
 **Scope:** `src/components/AdminBar.tsx`, `src/components/EditButton.tsx`, `src/lib/admin-auth.ts`, all pages
 
+<a id="eng-023"></a>
 #### ENG-023: Browse-and-Edit Admin Experience
 
 **Issue:** User wanted to browse the actual live site and click edit buttons directly on content, rather than using the admin panel's preview iframe. More intuitive for CMS beginners.
@@ -585,6 +634,7 @@ Integrated across all 6 page types: Home, About, Contact, Experiments, Reading, 
 **Chat:** Current session
 **Scope:** `src/payload.config.ts`, `src/components/RefreshRouteOnSave.tsx`, all server pages
 
+<a id="eng-022"></a>
 #### ENG-022: Live Preview for CMS Admin Panel
 
 **Issue:** User wanted to see a preview of the site while editing content in the admin panel, and ideally click elements to edit them directly.
@@ -612,6 +662,7 @@ Integrated across all 6 page types: Home, About, Contact, Experiments, Reading, 
 **Chat:** Current session
 **Scope:** `src/collections/`, `src/globals/SiteConfig.ts`, `src/payload.config.ts`, seed infrastructure
 
+<a id="eng-021"></a>
 #### ENG-021: "Admin view doesn't reflect the website structure"
 
 **Issue:** The user opened the Payload admin panel and saw only 4 collections (Users, Media, Projects, Books) + 1 global (SiteConfig), but the frontend website has 10+ pages. Several pages (Contact, Experiments) had 100% hardcoded content with no CMS representation. Even CMS-connected pages showed placeholder data because collections were empty.
@@ -631,11 +682,14 @@ Integrated across all 6 page types: Home, About, Contact, Experiments, Reading, 
 
 ---
 
+**Anti-pattern:** See EAP-054.
+
 ## Session: 2026-03-29 — Verification Gap Escalation
 
 **Chat:** Current session
 **Scope:** `AGENTS.md`, process discipline
 
+<a id="eng-020"></a>
 #### ENG-020: "Why are there so many constant-like errors that I have to tell you?"
 
 **Issue:** The user had to manually copy-paste three consecutive console errors (ENG-017 script tag, ENG-018 script tag again, ENG-019 script tag + hydration mismatch) because the agent reported each fix as complete without checking the browser console. Every one of these errors was immediately visible on page load — the user shouldn't have had to report any of them.
@@ -654,11 +708,14 @@ Guardrail #10 ("ALWAYS verify changes on localhost after implementation") was to
 
 ---
 
+**Anti-pattern:** See EAP-053.
+
 ## Session: 2026-03-29 — React 19 Script Tag & Hydration Mismatch (Third Attempt)
 
 **Chat:** Current session
 **Scope:** `playground/src/app/layout.tsx`, `playground/src/components/shell.tsx`
 
+<a id="eng-019"></a>
 #### ENG-019: "Console Error — script tag warning persists with next/script; hydration mismatch in DesignSystemFootnote"
 
 **Issue:** Two console errors:
@@ -681,11 +738,14 @@ Guardrail #10 ("ALWAYS verify changes on localhost after implementation") was to
 
 ---
 
+**Anti-patterns:** See EAP-013. See EAP-014. See EAP-015.
+
 ## Session: 2026-03-29 — React 19 Script Tag Warning (ENG-018, Follow-up to ENG-017)
 
 **Chat:** Current session
 **Scope:** `playground/src/app/layout.tsx`
 
+<a id="eng-018"></a>
 #### ENG-018: "Console Error — script tag in layout.tsx:38 after dangerouslySetInnerHTML fix"
 
 **Issue:** ENG-017's fix moved the script to layout `<head>` with `dangerouslySetInnerHTML`. React 19 still warned.
@@ -696,11 +756,14 @@ Guardrail #10 ("ALWAYS verify changes on localhost after implementation") was to
 
 ---
 
+**Anti-pattern:** See EAP-013.
+
 ## Session: 2026-03-29 — React 19 Script Tag Warning (next-themes)
 
 **Chat:** Current session
 **Scope:** Playground ThemeProvider, React 19 compatibility
 
+<a id="eng-017"></a>
 #### ENG-017: "Console Error — Encountered a script tag while rendering React component"
 
 **Issue:** The playground console logged a React 19 warning: "Encountered a script tag while rendering React component. Scripts inside React components are never executed when rendering on the client. Consider using template tag instead." The error originated from `next-themes`'s `ThemeProvider`, which injects an inline `<script>` tag to prevent flash of incorrect theme (FOUC). React 19 warns about `<script>` tags in client components because they won't execute during client-side rendering.
@@ -719,11 +782,14 @@ Guardrail #10 ("ALWAYS verify changes on localhost after implementation") was to
 
 ---
 
+**Anti-pattern:** See EAP-013.
+
 ## Session: 2026-03-29 — Node.js 25 + Payload CLI Incompatibility
 
 **Chat:** Current session
 **Scope:** Payload CMS import map generation, Node.js 25, tsx
 
+<a id="eng-015"></a>
 ### ENG-015: `payload generate:importmap` Fails on Node.js 25
 
 **Trigger:** Admin panel showed console error: `PayloadComponent not found in importMap` for `@payloadcms/next/rsc#CollectionCards`. The `importMap.js` file was empty (`export const importMap = {}`).
@@ -750,11 +816,14 @@ Guardrail #10 ("ALWAYS verify changes on localhost after implementation") was to
 
 ---
 
+**Anti-pattern:** See EAP-012.
+
 ## Session: 2026-03-29 — URL Namespace Architecture Feedback
 
 **Chat:** Current session
 **Scope:** `docs/engineering.md` §9
 
+<a id="eng-014"></a>
 ### ENG-014: CMS Admin Sharing URL Namespace with Public Site
 
 **Trigger:** User asked: "Why is the admin part using the same localhost as the playground? You might not want to use the same kind of URL for both the CMS and the design system."
@@ -774,6 +843,7 @@ Guardrail #10 ("ALWAYS verify changes on localhost after implementation") was to
 **Chat:** Current session
 **Scope:** `.env`, `src/payload.config.ts`, `src/lib/payload.ts`
 
+<a id="eng-013"></a>
 ### ENG-013: Supabase Direct Connection IPv6 Failure
 
 **Trigger:** Connected real Supabase DATABASE_URL (direct connection, port 5432). Payload failed with `EHOSTUNREACH` — DNS resolved to an IPv6 address the local network couldn't reach.
@@ -796,6 +866,7 @@ Guardrail #10 ("ALWAYS verify changes on localhost after implementation") was to
 
 ---
 
+<a id="eng-009"></a>
 #### ENG-009: "Console Error — undefined — unhandledRejection"
 
 **Issue:** Three console errors (`undefined`, `unhandledRejection: undefined`) appeared in the browser on every page load of the main site. The errors pointed to the `Home` server component.
@@ -812,6 +883,7 @@ Guardrail #10 ("ALWAYS verify changes on localhost after implementation") was to
 
 ---
 
+<a id="eng-010"></a>
 #### ENG-010: "Hey, this localhost is not running" / "Please fix. I can't see either Playground or my portfolio website"
 
 **Issue:** User ran `npm run dev` in their terminal and got `EADDRINUSE: address already in use :::4000`. Neither the portfolio site nor the playground was accessible in the browser despite processes occupying both ports.
@@ -828,6 +900,7 @@ Guardrail #10 ("ALWAYS verify changes on localhost after implementation") was to
 
 ---
 
+<a id="eng-011"></a>
 #### ENG-011: "It's not loading. Playground"
 
 **Issue:** User reported the playground wasn't loading. The playground was in fact running and responding on port 4001, but the user expected it at `localhost:4000` or `localhost:4000/playground`.
@@ -840,6 +913,7 @@ Guardrail #10 ("ALWAYS verify changes on localhost after implementation") was to
 
 ---
 
+<a id="eng-012"></a>
 #### ENG-012: "You need to document things. Why are you not following it? Check the root cause and fix it."
 
 **Issue:** User identified that ENG-009, ENG-010, and ENG-011 were all fixed without any documentation — no engineering feedback log entries, no anti-pattern updates, no frequency map changes. This is the 3rd time in this session the user has called out the documentation skip pattern (after ENG-008).
@@ -857,6 +931,8 @@ Guardrail #10 ("ALWAYS verify changes on localhost after implementation") was to
 
 ---
 
+**Anti-patterns:** See EAP-010. See EAP-027.
+
 ## Session: 2026-03-29 — next.config.ts Build Failure & Procedural Skip
 
 **Chat:** Current session
@@ -867,6 +943,7 @@ Guardrail #10 ("ALWAYS verify changes on localhost after implementation") was to
 
 ---
 
+<a id="eng-007"></a>
 #### ENG-007: "Hey, this localhost is not running. What's going on?"
 
 **Issue:** Main site dev server crashed immediately after startup with `ReferenceError: exports is not defined in ES module scope` from `next.config.compiled.js:2:23`. Playground was also not running. User discovered this from the terminal, not from any automated check.
@@ -886,6 +963,9 @@ The `sassOptions.includePaths` pointing to `node_modules` was unnecessary — mo
 
 ---
 
+**Anti-pattern:** See EAP-011.
+
+<a id="eng-008"></a>
 #### ENG-008: "Why did you not document that in your engineering record?"
 
 **Issue:** After fixing ENG-007 (next.config.ts build failure), the agent did not follow the engineering-iteration skill's Step 5 (Close the Loop). No entry was added to the engineering feedback log, no anti-pattern was documented, no engineering.md update was made. The agent treated a build failure as a quick fix rather than an engineering incident requiring full documentation.
@@ -903,6 +983,8 @@ The `sassOptions.includePaths` pointing to `node_modules` was unnecessary — mo
 
 ---
 
+**Anti-patterns:** See EAP-010. See EAP-027.
+
 ## Session: 2026-03-29 — Rules Layer Enforcement Gap (Meta-Fix)
 
 **Chat:** Current session
@@ -913,6 +995,7 @@ The `sassOptions.includePaths` pointing to `node_modules` was unnecessary — mo
 
 ---
 
+<a id="eng-005"></a>
 #### ENG-005: "From the meta prompt layer, you did not instruct the agent to check every context first"
 
 **Issue:** User identified that the root cause of the recurring cross-app parity failures (ENG-002, ENG-003, ENG-004) was not missing knowledge but missing enforcement. The principles were documented in `docs/engineering.md` §6, but the always-on rules did not force the agent to internalize and execute the cross-app parity checklist before considering a task complete.
@@ -934,6 +1017,8 @@ The `sassOptions.includePaths` pointing to `node_modules` was unnecessary — mo
 
 ---
 
+**Anti-pattern:** See EAP-008.
+
 ## Session: 2026-03-29 — ScrollSpy Component Missing from Playground
 
 **Chat:** Current session
@@ -944,6 +1029,7 @@ The `sassOptions.includePaths` pointing to `node_modules` was unnecessary — mo
 
 ---
 
+<a id="eng-004"></a>
 #### ENG-004: "Why did you not update that in the playground library?"
 
 **Issue:** ScrollSpy component was created in `src/components/ScrollSpy.tsx` and integrated into two main site pages (AboutClient, ProjectClient) but was not added to the playground's component preview section. The playground — the design system documentation UI — had no preview page, no sidebar entry, and no searchable reference for the new component.
@@ -965,6 +1051,8 @@ The `sassOptions.includePaths` pointing to `node_modules` was unnecessary — mo
 
 ---
 
+**Anti-pattern:** See EAP-007.
+
 ## Session: 2026-03-29 — Geist Font Override Eradication (Escalation)
 
 **Chat:** [Geist font recurring complaint](81f0bd8d-0345-426b-b268-0b64bc062e6f)
@@ -975,6 +1063,7 @@ The `sassOptions.includePaths` pointing to `node_modules` was unnecessary — mo
 
 ---
 
+<a id="eng-003"></a>
 #### ENG-003: "Where is Vercel's Geist font in the playground UI? I have said multiple times this is a recurring issue"
 
 **Issue:** User reported for the 3rd time across separate sessions that Geist fonts were not showing in the playground UI. Previous fix (ENG-002) had correctly wired font loading in the layout, globals CSS, and typography page — but inline `fontFamily: "system-ui"` overrides in 5 component preview files were silently overriding Geist on every component page. Additionally, Geist Pixel variants (5 display fonts) were never added to the playground despite being available in the main app.
@@ -999,6 +1088,8 @@ The `sassOptions.includePaths` pointing to `node_modules` was unnecessary — mo
 
 ---
 
+**Anti-pattern:** See EAP-006.
+
 ## Session: 2026-03-29 — Playground Font Loading Gap
 
 **Chat:** [Vercel typography missing in playground](493d75d5-2a50-4c5f-82e9-c74c48209057)
@@ -1009,6 +1100,7 @@ The `sassOptions.includePaths` pointing to `node_modules` was unnecessary — mo
 
 ---
 
+<a id="eng-002"></a>
 #### ENG-002: "I asked to have the Vercel typography installed, and I don't see it in the playground"
 
 **Issue:** Geist (Vercel) fonts were installed and fully wired in the main app (`src/app/layout.tsx` imports `geist/font/sans`, `geist/font/mono`, injects CSS variables via `className`), but the playground showed generic system fonts. The typography token page previewed fonts using hardcoded `system-ui` fallbacks instead of the actual Geist faces.
@@ -1037,6 +1129,8 @@ The `sassOptions.includePaths` pointing to `node_modules` was unnecessary — mo
 
 ---
 
+**Anti-pattern:** See EAP-005.
+
 ## Session: 2026-03-29 — Playground Token Drift
 
 **Chat:** [Carbon color expansion & playground sync](current-session)
@@ -1047,6 +1141,7 @@ The `sassOptions.includePaths` pointing to `node_modules` was unnecessary — mo
 
 ---
 
+<a id="eng-001"></a>
 #### ENG-001: "Why do I not see any of those new colors being rendered in my Playground UI?"
 
 **Issue:** After expanding the color palette in `_colors.scss` with 9 new color families (90 values) and 11 new semantic tokens, the playground's Colors page showed only the original accent, neutral, and 2 support colors. None of the new colors were visible.
@@ -1077,6 +1172,9 @@ Additionally, a third file (`playground/src/app/globals.css`) contains yet anoth
 
 ---
 
+**Anti-pattern:** See EAP-001.
+
+<a id="eng-006"></a>
 #### ENG-006: "When I want to merge this into main, what should I do?"
 
 **Issue:** All work for the foundational UI component set (15 components, Radix dependencies, architecture docs, playground changes) was done directly on `main` without creating a feature branch. The user identified this as a process gap that would be dangerous with concurrent agent sessions.
@@ -1095,6 +1193,9 @@ Additionally, a third file (`playground/src/app/globals.css`) contains yet anoth
 
 ---
 
+**Anti-pattern:** See EAP-009.
+
+<a id="eng-016"></a>
 #### ENG-016: "Let's start doing version control for the design system"
 
 **Issue:** The design system had no versioning. There was no way to know what version was deployed on Vercel, when it was last released, or what changed between deployments. The `package.json` version fields (`0.1.0`) were placeholder values with no operational meaning.
@@ -1119,6 +1220,7 @@ Additionally, a third file (`playground/src/app/globals.css`) contains yet anoth
 
 ---
 
+<a id="eng-019-occ2"></a>
 #### ENG-019: "Module not found: Can't resolve 'src/components/admin/EnableAutocomplete'"
 
 **Issue:** Build error — Turbopack cannot resolve the bare path `src/components/admin/EnableAutocomplete` in the Payload-generated `importMap.js`. The admin panel and any SSR page that touches the import map fail to compile.
@@ -1133,6 +1235,9 @@ Additionally, a third file (`playground/src/app/globals.css`) contains yet anoth
 
 ---
 
+**Anti-patterns:** See EAP-013. See EAP-014. See EAP-015.
+
+<a id="eng-020-occ2"></a>
 #### ENG-020: "Hydration failed because the server rendered text didn't match the client"
 
 **Issue:** Recoverable hydration mismatch error on the homepage when logged in as admin. The `EditableText` component rendered different HTML attributes on server vs client — the server produced plain elements (no `data-editable`, no inline-edit class) while the client produced admin-enhanced elements. Additionally, `new Date().toLocaleDateString()` in the footer generated time-dependent output that could differ between server and client.
@@ -1151,6 +1256,9 @@ Additionally, a third file (`playground/src/app/globals.css`) contains yet anoth
 
 ---
 
+**Anti-pattern:** See EAP-053.
+
+<a id="eng-021-occ2"></a>
 #### ENG-021: "Admin bar blocks navigation buttons, bad practice to overlay content"
 
 **Issue:** The admin bar (`AdminBar`) used `position: fixed; top: 0` which removed it from document flow. Every client page compensated with `style={{ paddingTop: 44 }}` (inline) or `&[data-admin] { padding-top: 44px }` (SCSS). This is fragile: the hardcoded 44px must match the bar's height exactly, the inline style violates AP-003, and if the bar height ever changes, all 6+ pages break silently. The bar also blocked navigation buttons and other interactive elements in the header area.
@@ -1168,6 +1276,9 @@ Additionally, a third file (`playground/src/app/globals.css`) contains yet anoth
 
 ---
 
+**Anti-pattern:** See EAP-054.
+
+<a id="eng-042-occ2"></a>
 #### ENG-042: "Design system code updates not reflective of playground in real time"
 
 **Issue:** The user discovered that changes to the main site's `ScrollSpy` component were not being reflected in the playground's version, and vice versa. A full audit revealed multi-directional drift across three codebases: (1) main site `src/components/ScrollSpy.tsx`, (2) playground reusable `playground/src/components/scroll-spy.tsx`, (3) playground demo `playground/src/app/components/scroll-spy/page.tsx`. The playground had correct behavioral patterns (closest-element detection, click/drag dead zone) that were never ported to the main site. The main site had correct visual updates (label color/weight pairing, track gap) that were partially ported to the playground component but not the demo. The playground component also had an AP-031 violation (CSS transform centering on FM-animated label) that the main site had already fixed.
@@ -1183,6 +1294,9 @@ Additionally, a third file (`playground/src/app/globals.css`) contains yet anoth
 
 ---
 
+**Anti-pattern:** See EAP-028.
+
+<a id="eng-016-occ2"></a>
 #### ENG-016: ASCII Art Tool — Standalone App Scaffold
 
 **Issue:** Proactive build — user requested rebuilding the Portrait Halftone ASCII video tool as a standalone Next.js app within the monorepo, following the playground pattern.
@@ -1197,6 +1311,7 @@ Additionally, a third file (`playground/src/app/globals.css`) contains yet anoth
 
 ---
 
+<a id="eng-017-occ2"></a>
 #### ENG-017: Undocumented App — Architecture Gap
 
 **Issue:** User feedback — "whenever there is a new app being spun up or added to the repo, this should be documented in the architecture." The ASCII Art Studio was scaffolded without a corresponding entry in `AGENTS.md`'s architecture section, without its own version control manifest, and without a formal onboarding process.
@@ -1209,6 +1324,9 @@ Additionally, a third file (`playground/src/app/globals.css`) contains yet anoth
 
 ---
 
+**Anti-pattern:** See EAP-013.
+
+<a id="eng-018-occ2"></a>
 #### ENG-018: Masonry layout — CSS column-count replaced with JS column distribution
 
 **Issue:** User feedback — masonry tiles were all the same height (forced aspect-ratio), cover images were cropped, and testimonial/project ordering didn't match expectations. CSS `column-count` fills top-to-bottom per column, making "row N, column M" positioning unintuitive for content curation.
@@ -1223,6 +1341,9 @@ Additionally, a third file (`playground/src/app/globals.css`) contains yet anoth
 
 ---
 
+**Anti-pattern:** See EAP-013.
+
+<a id="eng-019-occ3"></a>
 #### ENG-019: Drag-and-drop tile reordering for homepage masonry grid
 
 **Issue:** User request — need to drag tiles to reorder them in the inline edit view, with changes persisting to the backend.
@@ -1237,6 +1358,9 @@ Additionally, a third file (`playground/src/app/globals.css`) contains yet anoth
 
 ---
 
+**Anti-patterns:** See EAP-013. See EAP-014. See EAP-015.
+
+<a id="eng-020-occ3"></a>
 #### ENG-020: "I cannot drag things still" — DnD listeners on child swallowed by Link
 
 **Issue:** User reported drag-and-drop tiles could not be dragged after the reorder feature (ENG-019) shipped. Clicking the "Reorder tiles" button entered reorder mode, but attempting to drag any tile did nothing.
@@ -1251,6 +1375,9 @@ Additionally, a third file (`playground/src/app/globals.css`) contains yet anoth
 
 ---
 
+**Anti-pattern:** See EAP-053.
+
+<a id="eng-021-occ3"></a>
 #### ENG-021: "Drag mode is working, but it doesn't save the actual dragged order"
 
 **Issue:** User dragged tiles into a new order and clicked "Save order." The save appeared to succeed (button showed "Saving…" then the mode exited), but the grid immediately reverted to the pre-drag order. On page reload, the old order was still shown.
@@ -1263,9 +1390,12 @@ Additionally, a third file (`playground/src/app/globals.css`) contains yet anoth
 
 ---
 
+**Anti-pattern:** See EAP-054.
+
 ## Entry Template
 
 ```markdown
+<a id="eng-053"></a>
 #### ENG-053: "How do I store assets? Where are thumbnails and resumes stored?"
 
 **Issue:** User discovered that all uploaded media (thumbnails, hero images, avatars) were stored on local disk (`./media/` directory) despite the database being cloud-hosted on Supabase Postgres. This meant files would be lost on redeploy. Additionally, the Media collection only accepted `image/*` MIME types, preventing document uploads (PDFs, resumes).
@@ -1278,6 +1408,9 @@ Additionally, a third file (`playground/src/app/globals.css`) contains yet anoth
 
 ---
 
+**Anti-pattern:** See EAP-032.
+
+<a id="eng-054"></a>
 #### ENG-054: "Cannot add links to LinkedIn icon button on testimonial cards"
 
 **Issue:** User could not edit the LinkedIn URL on testimonial cards via inline editing. The LinkedIn icon was always visible but its URL could only be changed through the Payload admin panel, not the inline editing UI.
@@ -1290,6 +1423,7 @@ Additionally, a third file (`playground/src/app/globals.css`) contains yet anoth
 
 ---
 
+<a id="eng-055"></a>
 #### ENG-055: "Cannot upload images for testimonial card avatars inline"
 
 **Issue:** User wanted to upload avatar photos for testimonial cards directly from the inline edit view. The avatar field existed in the CMS schema (`type: 'upload', relationTo: 'media'`) and uploads route to Supabase S3, but there was no inline upload UI.
@@ -1302,6 +1436,7 @@ Additionally, a third file (`playground/src/app/globals.css`) contains yet anoth
 
 ---
 
+<a id="eng-056"></a>
 #### ENG-056: "Audit all current portfolio and playground parity"
 
 **Issue:** User requested a full audit of whether all main-site components are reflected in the playground design system UI.
@@ -1314,6 +1449,7 @@ Additionally, a third file (`playground/src/app/globals.css`) contains yet anoth
 
 ---
 
+<a id="eng-057"></a>
 #### ENG-057: "I need the ability to make only certain words bold"
 
 **Issue:** User reported three issues: (1) ⌘B bolds the entire text element, not selected words — no partial bold support. (2) TextFormatBar doesn't reflect selection-level formatting state. (3) Quotation mark on testimonial cards is not editable (can't click it to start editing the quote).
@@ -1326,6 +1462,7 @@ Additionally, a third file (`playground/src/app/globals.css`) contains yet anoth
 
 ---
 
+<a id="eng-058"></a>
 #### ENG-058: "Raw Lexical JSON displayed in testimonial card after bolding"
 
 **Issue:** After the user bolded words ("product sense", "judgment") in a testimonial quote via inline edit, the card displayed the raw Lexical JSON string `{"root":{"type":"root","format":"","indent":0,...}` instead of the formatted text.
@@ -1338,6 +1475,9 @@ Additionally, a third file (`playground/src/app/globals.css`) contains yet anoth
 
 ---
 
+**Anti-pattern:** See EAP-033.
+
+<a id="eng-059"></a>
 #### ENG-059: "Conflicting routes at /api/contact build error"
 
 **Issue:** Next.js 16.2.1 build failed with: `Conflicting routes at /api/contact: route at /api/contact/route and route at /(frontend)/api/contact/route`. The app could not start.
@@ -1350,6 +1490,7 @@ Additionally, a third file (`playground/src/app/globals.css`) contains yet anoth
 
 ---
 
+<a id="eng-060"></a>
 #### ENG-060: Spacing token system migration to One GS multiplier-based naming
 
 **Issue:** Spacing tokens used opaque numeric indices (`$portfolio-spacing-01` through `$portfolio-spacing-13`) that required a lookup table for value resolution. The scale had gaps (no 20px, 56px, 72px steps), forcing magic numbers in components like the sidebar (6px padding). Layout tokens (`layout-01..07`) carried no semantic density information. The naming convention was optimized for human designers using Figma panels, not for AI agents reading source code.
@@ -1369,6 +1510,9 @@ Additionally, a third file (`playground/src/app/globals.css`) contains yet anoth
 
 ---
 
+**Anti-pattern:** See EAP-034.
+
+<a id="eng-061"></a>
 #### ENG-061: "Doing all this on the button and making sure"
 
 **Issue:** Button component used hardcoded pixel values (e.g., `px-[14px]`, `h-[44px]`) instead of referencing the established three-tier spacing token system. Several values (30px, 44px, 52px heights; 3px, 5px, 11px, 14px padding) didn't land on any token in the grid.
@@ -1388,6 +1532,7 @@ Additionally, a third file (`playground/src/app/globals.css`) contains yet anoth
 
 ---
 
+<a id="eng-042-occ3"></a>
 #### ENG-042: "DS compliance audit — token and mixin adoption across portfolio"
 
 **Issue:** Design system tokens and mixins existed but weren't adopted across the portfolio site. Brand color drift (`#6c63ff` vs `$portfolio-accent-60`), raw px values for spacing/breakpoints/typography, missing container tokens for 720px width pattern.
@@ -1404,6 +1549,9 @@ Additionally, a third file (`playground/src/app/globals.css`) contains yet anoth
 
 ---
 
+**Anti-pattern:** See EAP-028.
+
+<a id="eng-073"></a>
 #### ENG-073: "Playground experiments not propagated to production across sessions"
 
 **Issue:** Three design experiments (Button two-axis model, three-tier spacing tokens, semantic typography mixins) were conducted in the playground across multiple sessions but never propagated to production. Production code continued using the old `variant=` Button API, legacy `$portfolio-spacing-NN` token names, and raw `font-size:` declarations while the playground already demonstrated the new patterns. User discovered the drift during a comprehensive audit.
@@ -1425,6 +1573,9 @@ Additionally, a third file (`playground/src/app/globals.css`) contains yet anoth
 
 ---
 
+**Anti-patterns:** See EAP-037. See EAP-038.
+
+<a id="eng-074"></a>
 #### ENG-074: "Do not hard code anything. Use the primitives in the system"
 
 **Issue:** User found that the playground DemoButton component used hardcoded pixel values (`h-[48px]`, `px-[16px]`) and non-system colors (Tailwind's `bg-emerald-600`, `bg-red-600`, `hover:opacity-90`) instead of referencing the design system's CSS custom properties. The production Button.module.scss also had raw `rgba()` values instead of overlay tokens for inverse/always-dark/always-light hover states.
@@ -1448,6 +1599,9 @@ Additionally, a third file (`playground/src/app/globals.css`) contains yet anoth
 
 ---
 
+**Anti-pattern:** See EAP-055.
+
+<a id="eng-075"></a>
 #### ENG-075: "Do a quick audit on the current playground pages and see if any component"
 
 **Issue:** User requested a comprehensive audit of all playground pages to identify components that are hardcoded or re-implemented instead of being imported from the design system source code. Audit found 16 violations across three severity levels: 3 critical (badge, tabs, dialog re-implemented entirely), 5 high (non-ui components like TestimonialCard, ScrollSpy with CSS/inline-style approximations instead of real imports), 5 medium (motion components using CSS @keyframes demos instead of real framer-motion components), 3 low (raw `<button>` elements instead of `@ds/Button`). No deterministic enforcement architecture existed to prevent future violations.
@@ -1472,6 +1626,9 @@ Additionally, a third file (`playground/src/app/globals.css`) contains yet anoth
 
 ---
 
+**Anti-pattern:** See EAP-037.
+
+<a id="eng-076"></a>
 #### ENG-076: "Playground Code Enforcement Architecture v3 — three-stage pipeline implementation"
 
 **Issue:** ENG-075 established three layers of enforcement (file-scoped rule, skill, AGENTS.md guardrail) but the agent could still bypass the system via design-iteration or engineering-iteration skill paths. The playground skill also lacked a post-implementation self-check, and ESLint had no hard-coded rules for playground-specific violations.
@@ -1505,8 +1662,11 @@ Additionally, a third file (`playground/src/app/globals.css`) contains yet anoth
 
 ---
 
+**Anti-pattern:** See EAP-037.
+
 ## Session: 2026-04-03 — Input component rebuilt without playground page update
 
+<a id="eng-101"></a>
 ### ENG-101: "Where is it? I don't see it in the playground shell."
 
 **Date:** 2026-04-03
@@ -1523,8 +1683,11 @@ Additionally, a third file (`playground/src/app/globals.css`) contains yet anoth
 
 ---
 
+**Anti-pattern:** See EAP-007.
+
 ## Session: 2026-04-02 — Payload schema push failure for new collection
 
+<a id="eng-099"></a>
 #### ENG-099: "Admin returns 500 — `column payload_locked_documents__rels.companies_id does not exist`"
 
 **Issue:** After adding the `companies` collection to `payload.config.ts`, the admin panel returned 500. Payload generated SQL referencing `companies_id` in `payload_locked_documents_rels`, but that column didn't exist in the database.
@@ -1537,8 +1700,11 @@ Additionally, a third file (`playground/src/app/globals.css`) contains yet anoth
 
 ---
 
+**Anti-pattern:** See EAP-062.
+
 ## Session: 2026-04-02 — Company management dashboard
 
+<a id="eng-098"></a>
 #### ENG-098: "Migrated password gate data from static JSON to Payload CMS collection + built management dashboard"
 
 **Issue:** Company passwords, themes, and case study notes were stored in a static `src/config/companies.json` file. No UI to manage them — required code changes to add/edit companies. No analytics on login usage.
@@ -1551,6 +1717,7 @@ Additionally, a third file (`playground/src/app/globals.css`) contains yet anoth
 
 ## Session: 2026-04-01 — Playground NavItem demo links scroll to top
 
+<a id="eng-088"></a>
 #### ENG-088: "Clicking every NavItem on the component page jumps to the top — it's only a visual demo"
 
 **Issue:** On `/components/nav-item`, every demo `NavItem` was wired with `href="#"`. The browser treats `#` as same-document navigation to an empty fragment, which scrolls the viewport to the top. The user expected static previews with hover/focus styling only, not navigation.
@@ -1563,8 +1730,11 @@ Additionally, a third file (`playground/src/app/globals.css`) contains yet anoth
 
 ---
 
+**Anti-pattern:** See EAP-057.
+
 ## Session: 2026-04-01 — Playground sidebar icon hydration mismatch (Turbopack barrel imports)
 
+<a id="eng-087"></a>
 #### ENG-087: "Hydration failed — sidebar icon SVG differs between server and client (lucide-react barrel import)"
 
 **Issue:** Console hydration error on every playground page: "Hydration failed because the server rendered HTML didn't match the client." The diff showed the server rendering `lucide-compass` SVG where the client expected `lucide-bell` SVG at the same sidebar nav position. The React component tree correctly showed `<Compass>` at position 4 (nav-layout category), but the server-rendered SVG content was the Bell icon.
@@ -1591,8 +1761,11 @@ This was confirmed by curling the server HTML and comparing icon classes: indice
 
 ---
 
+**Anti-pattern:** See EAP-056.
+
 ## Session: 2026-04-01 — Playground sidebar hydration mismatch (className)
 
+<a id="eng-086"></a>
 #### ENG-086: "Hydration mismatch — sidebar nav className differs between server and client"
 
 **Issue:** Console error on every playground page: "A tree hydrated but some attributes of the server rendered HTML didn't match the client properties." All sidebar nav items (`<a>`, `<button>`) show className attribute mismatches between server-rendered HTML and client properties.
@@ -1607,6 +1780,7 @@ This was confirmed by curling the server HTML and comparing icon classes: indice
 
 ## Session: 2026-04-01 — Playground HMR Verification Failure (Recurring)
 
+<a id="eng-085"></a>
 #### ENG-085: "I don't see the changes... you keep telling me stale cache... this is frustrating"
 
 **Issue:** After editing `playground/src/app/components/button/page.tsx` (changing `space-y-2` to `space-y-3`), the user could not see the change in the browser. This is a recurring pattern across multiple sessions: (1) agent edits a playground file, (2) agent reports the change as done, (3) user sees stale content, (4) agent diagnoses stale cache, kills the server, clears `.next`, restarts, (5) user can finally see the change. The user has been through this cycle multiple times and is rightfully frustrated.
@@ -1629,8 +1803,11 @@ This was confirmed by curling the server HTML and comparing icon classes: indice
 
 ---
 
+**Anti-pattern:** See EAP-042.
+
 ## Session: 2026-04-01 — Playground Token Architecture Fix
 
+<a id="eng-084"></a>
 #### ENG-084: "Playground components blank after SCSS→CSS custom property migration"
 
 **Issue:** After Phase 3 of the One GS Parity Roadmap migrated ~40 component SCSS modules from `$portfolio-*` SCSS variables to `var(--portfolio-*)` CSS custom properties, the playground app (port 4001) rendered components with blank/missing colors. Buttons, badges, inputs — all semantic colors disappeared. Dark mode toggle also had no visible effect on component colors.
@@ -1648,8 +1825,11 @@ This was confirmed by curling the server HTML and comparing icon classes: indice
 
 ---
 
+**Anti-pattern:** See EAP-041.
+
 ## Session: 2026-04-01 — Design System Runtime Theming API
 
+<a id="eng-083"></a>
 #### ENG-083: "Token Architecture — One GS Parity Roadmap (4-phase migration)"
 
 **Issue:** Design system lacked dark mode support, missing foundation tokens (borders, opacity, paragraph spacing, decomposed elevation, action states), and had no CSS custom property intermediary layer. Components consumed `$portfolio-*` SCSS variables directly — compile-time values that can't respond to theme changes.
@@ -1682,6 +1862,9 @@ This was confirmed by curling the server HTML and comparing icon classes: indice
 
 ---
 
+**Anti-pattern:** See EAP-040.
+
+<a id="eng-082"></a>
 #### ENG-082: "DS components don't adapt to dark mode — SCSS tokens compile to hardcoded hex values"
 
 **Issue:** Design system SCSS component modules (Card, Input, Table) use Sass variables (`$portfolio-surface-primary`, etc.) that compile to static CSS hex values. When rendered in the playground's `.dark` mode, these components retain light-mode backgrounds, borders, and text colors — creating unreadable contrast mismatches.
@@ -1699,8 +1882,11 @@ This was confirmed by curling the server HTML and comparing icon classes: indice
 
 ---
 
+**Anti-pattern:** See EAP-039.
+
 ## Session: 2026-04-01 — Playground sidebar hydration mismatch
 
+<a id="eng-081"></a>
 #### ENG-081: "Hydration mismatch — SCSS module class names differ between server and client"
 
 **Issue:** The playground sidebar section labels ("Foundations", "Components") caused a hydration mismatch. Server HTML had Tailwind utility classes (`text-xs font-medium tracking-wider uppercase text-sidebar-muted-foreground/...`) while the client rendered CSS module hashes (`sidebar-module-scss-module__sbl2ta__sectionLabel`).
@@ -1713,8 +1899,11 @@ This was confirmed by curling the server HTML and comparing icon classes: indice
 
 ---
 
+**Anti-pattern:** See EAP-038.
+
 ## Session: 2026-04-01 — Vercel deployment failure after checkpoint
 
+<a id="eng-080"></a>
 #### ENG-080: "Vercel deployment failed — Module not found for all @ds/* component imports"
 
 **Issue:** After the Élan 2.0.0 checkpoint merge to main, the Vercel deployment failed with `Command "npm run build" exited with 1`. Build logs showed `Module not found: Can't resolve 'next-themes'`, `framer-motion`, and multiple Radix UI packages — all from files in `src/components/ui/` imported via the `@ds/*` alias.
@@ -1736,6 +1925,7 @@ This was confirmed by curling the server HTML and comparing icon classes: indice
 
 ## Session: 2026-04-01 — Version mismatch and checkpoint release
 
+<a id="eng-078"></a>
 #### ENG-078: "Playground footer shows 1.1.0 but suggests major — should be 2.0.0"
 
 **Issue:** The playground footer displayed version `1.1.0` alongside a "suggests major" badge. Under semver, a major bump from release `1.0.0` should yield `2.0.0`, not `1.1.0`. The user correctly identified the inconsistency.
@@ -1746,6 +1936,7 @@ This was confirmed by curling the server HTML and comparing icon classes: indice
 
 **Lesson:** When the version-analyze system flags a mismatch, it should be resolved before committing further work. Consider making `version:auto --apply` part of the pre-commit or pre-checkpoint workflow rather than a manual opt-in step.
 
+<a id="eng-079"></a>
 #### ENG-079: Checkpoint release Élan 2.0.0, ASCII Art Studio 0.1.0
 
 **Issue:** 130 uncommitted files spanning agent docs, new components, playground infrastructure, and build config needed to be committed and deployed.
@@ -1758,6 +1949,7 @@ This was confirmed by curling the server HTML and comparing icon classes: indice
 
 ## Session: 2026-04-01 — Local dev not loading; playground HTTP 500
 
+<a id="eng-077"></a>
 #### ENG-077: "Playground UI, website UI, and Payload UI not loading on localhost"
 
 **Issue:** No processes were listening on ports 4000 or 4001 — `curl` to both failed. After starting `npm run dev` and `npm run playground`, the main site and `/admin` returned HTTP 200, but the playground root returned 500. Turbopack/Sass reported undefined variables: `$portfolio-text-tertiary` and `$portfolio-overlay-black-40` in multiple `src/components/ui/**/*.module.scss` files (imported via the playground sidebar’s barrel import).
@@ -1772,6 +1964,7 @@ This was confirmed by curling the server HTML and comparing icon classes: indice
 
 ## Session: 2026-03-30 — Playground Cross-App Import Architecture
 
+<a id="eng-073-occ2"></a>
 #### ENG-073: "Playground should derive component demos from production source, not re-implement them"
 
 **Issue:** All 19 component demo pages in the playground contained `Demo*` functions that re-implemented production components in Tailwind — parallel implementations of the same component with the same prop API but different styling systems (SCSS Modules vs Tailwind). When a component changed in `src/components/ui/`, the playground's `Demo*` version had to be manually updated, creating systematic drift.
@@ -1792,8 +1985,11 @@ This was confirmed by curling the server HTML and comparing icon classes: indice
 
 ---
 
+**Anti-patterns:** See EAP-037. See EAP-038.
+
 ## Session: 2026-03-30 — DAG Canvas Scroll Hijack
 
+<a id="eng-072"></a>
 #### ENG-072: "The canvas in the harness architecture should not be scrolling when the parent scrolls"
 
 **Issue:** The Architecture DAG (pannable canvas in `EscalationTimeline.tsx`) had an `onWheel` handler that captured all wheel events. Regular scroll (no modifier keys) panned the canvas instead of scrolling the page. When a user scrolled through the case study and their mouse happened to be over the DAG viewport, the page stopped scrolling and the canvas panned instead. This is a scroll hijack — a fundamental UX violation for embedded canvases.
@@ -1809,8 +2005,11 @@ This was confirmed by curling the server HTML and comparing icon classes: indice
 
 ---
 
+**Anti-pattern:** See EAP-036.
+
 ## Session: 2026-03-30 — Checkbox indeterminate icon
 
+<a id="eng-071"></a>
 #### ENG-071: "Production Checkbox indeterminate should show dash; align with Radix state"
 
 **Issue:** The shared `Checkbox` had a `MinusIcon` branch and root SCSS for `data-state='indeterminate'`, but the indicator chose check vs dash using the React `checked` prop. For uncontrolled usage (`checked` undefined) with `defaultChecked="indeterminate"`, Radix sets internal state and `data-state` on the trigger/indicator while the prop stays undefined — the UI incorrectly rendered the checkmark.
@@ -1823,6 +2022,7 @@ This was confirmed by curling the server HTML and comparing icon classes: indice
 
 ## Session: 2026-03-30 — Breakpoint System Unification
 
+<a id="eng-070"></a>
 #### ENG-070: "Audit breakpoints — cross-app inconsistency between SCSS tokens and Tailwind defaults"
 
 **Issue:** The three apps in this monorepo use three different breakpoint systems. Main site SCSS uses Carbon values (320/672/1056/1312/1584). Playground and ASCII Tool use Tailwind v4 defaults (640/768/1024/1280/1536) because `globals.css` never overrides `--breakpoint-*`. Additionally, hardcoded values appear in AdminBar (640px), experiments page (768px), and typography comments (768/1200). Every Tailwind responsive utility (`sm:`, `md:`, `lg:`) in the Playground resolves to different pixel values than the same-named SCSS tokens in the main site.
@@ -1843,6 +2043,7 @@ This was confirmed by curling the server HTML and comparing icon classes: indice
 
 ## Session: 2026-03-30 — Version Infrastructure
 
+<a id="eng-069"></a>
 #### ENG-069: "Footer last updated date is stale; version doesn't auto-detect change scope"
 
 **Issue:** Two related problems: (1) The playground footer's "Last updated" date only reflected the static `release.releasedAt` from `elan.json`, which doesn't update during local development — even though active edits are happening, the date stays frozen at the last deploy date. (2) Version bumps (patch/minor/major) are entirely manual — there's no mechanism to analyze the scope of changes and recommend or apply the appropriate bump level.
@@ -1863,6 +2064,7 @@ This was confirmed by curling the server HTML and comparing icon classes: indice
 
 ## Session: 2026-03-30 — HeroUploadZone Hydration Fix
 
+<a id="eng-068"></a>
 #### ENG-068: "This modal's height has the same exact issue — adjust viewport"
 
 **Issue:** ProjectEditModal rendered with collapsed height — all content squeezed into a tiny area. The modal had `max-height: 90vh` but no `min-height` or `min-width`, violating the established modal sizing pattern.
@@ -1877,6 +2079,7 @@ This was confirmed by curling the server HTML and comparing icon classes: indice
 
 ---
 
+<a id="eng-067"></a>
 #### ENG-067: "Hydration failed — HeroUploadZone server/client mismatch"
 
 **Issue:** React hydration error on the home page: "Hydration failed because the server rendered HTML didn't match the client." The diff showed `HeroUploadZone`'s inner `<div>` present on the client but absent from the server-rendered DOM.
@@ -1889,6 +2092,9 @@ This was confirmed by curling the server HTML and comparing icon classes: indice
 
 ---
 
+**Anti-pattern:** See EAP-035.
+
+<a id="eng-066"></a>
 #### ENG-066: "Hover upload blocks navigation; edit button should open modal"
 
 **Issue:** The HeroUploadZone hover overlay on project tiles (1) didn't respond to clicks (file input never triggered), (2) blocked the underlying `<Link>` so users couldn't navigate to the detail page, and (3) the Edit button navigated to the Payload dashboard in a new tab instead of allowing inline editing.
@@ -1903,6 +2109,9 @@ This was confirmed by curling the server HTML and comparing icon classes: indice
 
 ---
 
+**Anti-pattern:** See EAP-035.
+
+<a id="eng-065"></a>
 #### ENG-065: "The footer yilangao@gmail.com doesn't really allow people to click on that"
 
 **Issue:** The footer email address rendered as an `<a>` tag but had no `href` attribute, making it non-clickable. Visitors could not click to open their email client.
@@ -1917,6 +2126,7 @@ This was confirmed by curling the server HTML and comparing icon classes: indice
 
 ## Session: 2026-03-30 — Spacing Token Tier Separation Audit
 
+<a id="eng-064"></a>
 #### ENG-064: Spacing token audit — primitive/utility tier separation and layout mixin consistency
 
 **Issue:** Audit revealed 5 structural inconsistencies in the spacing token system that reduced agent parseability: (1) oddball fractional multipliers in Tier 1, (2) layout mixins using Tier 1 instead of Tier 2 tokens, (3) incomplete utility documentation, (4) utility tokens back-referencing nonexistent primitives, (5) dead `sass:map` import.
@@ -1941,6 +2151,7 @@ This was confirmed by curling the server HTML and comparing icon classes: indice
 
 ## Session: 2026-03-30 — Media Upload Integration (Inline Edit + Masonry Tiles)
 
+<a id="eng-062"></a>
 #### ENG-062: "Masonry tiles have no image upload — cover images are hardcoded"
 
 **Issue:** Homepage project tile cover images were driven by a hardcoded `COVER_IMAGES` map in `page.tsx` (only one slug mapped). The CMS `heroImage` field on Projects was unused for the homepage. Admin users had no way to upload or change cover images from the homepage.
@@ -1955,6 +2166,7 @@ This was confirmed by curling the server HTML and comparing icon classes: indice
 
 ---
 
+<a id="eng-063"></a>
 #### ENG-063: "Inline edit link modals only accept typed URLs — no file upload"
 
 **Issue:** When editing social links or project external links via the `EditableArray` modal, the URL field was a plain `<input type="url">`. Users couldn't upload a file (like a resume PDF) and have the URL auto-populated — they had to upload separately in the Payload admin, copy the URL, then paste it.
@@ -1971,6 +2183,7 @@ This was confirmed by curling the server HTML and comparing icon classes: indice
 
 ## Session: 2026-03-30 — Supabase Storage S3 Rejects Filenames with Special Characters
 
+<a id="eng-060-occ2"></a>
 #### ENG-060: "Cannot upload [Gao_Yilan] Resume_2026.pdf — Something went wrong"
 
 **Issue:** Uploading a PDF via the Payload admin Media collection fails with "Something went wrong." The file never reaches Supabase Storage.
@@ -1983,6 +2196,9 @@ This was confirmed by curling the server HTML and comparing icon classes: indice
 
 ---
 
+**Anti-pattern:** See EAP-034.
+
+<a id="eng-061-occ2"></a>
 #### ENG-061: "Upload screen has no validation — same UX feedback pattern"
 
 **Issue:** The Media upload form uses technical field names without explanations ("Alt", "Caption"), provides no validation feedback when filenames contain invalid characters, and shows only a generic "Something went wrong" toast on S3 rejection. The user flagged this as a recurring pattern of poor CMS admin form UX.
@@ -1999,6 +2215,7 @@ This was confirmed by curling the server HTML and comparing icon classes: indice
 
 ## Session: 2026-03-30 — Turbopack Cache Corruption Causes Phantom Route Conflicts
 
+<a id="eng-056-occ2"></a>
 #### ENG-056: "/work/elan-design-system HTTP ERROR 404"
 
 **Issue:** All `/work/*` routes returned 404. Server logs showed "Conflicting routes" and "You cannot have two parallel pages that resolve to the same path" errors for every `(frontend)` page route (`about`, `blog`, `contact`, `experiments`, `reading`, `work`). The errors claimed routes existed at bare paths (`/about`, `/work`) outside the `(frontend)` route group, but no such files existed on disk. Other routes (`/`, `/about`, `/contact`) intermittently worked while `/work/*` consistently 404'd.
@@ -2015,6 +2232,7 @@ This was confirmed by curling the server HTML and comparing icon classes: indice
 
 ## Session: 2026-03-30 — TestimonialCard Hydration Mismatch
 
+<a id="eng-055-occ2"></a>
 #### ENG-055: "Hydration failed — AvatarUpload server/client mismatch"
 
 **Issue:** Hydration failed on the home page. Server rendered `<span className="avatarInitials">` (non-admin path) but the client rendered `<div className="avatarUploadWrap">` (admin AvatarUpload component). The `canEdit` flag — derived from `isAdmin && id != null` — evaluated differently during SSR vs client hydration, causing the avatar section of `TestimonialCard` to produce structurally different DOM trees.
@@ -2036,6 +2254,7 @@ The brief flash of non-admin content is imperceptible since admin features appea
 
 ## Session: 2026-03-30 — Élan Case Study CMS Data Sync
 
+<a id="eng-054-occ2"></a>
 #### ENG-054: "I don't see the DAG at all here — what's going on? Check the bugs."
 
 **Issue:** The Agent Harness Architecture (DAG) and Systemic Pattern Map visuals were completely invisible on the Élan case study page. The user expected to see the interactive DAG from a previous conversation but it wasn't rendering at all.
@@ -2056,6 +2275,7 @@ The brief flash of non-admin content is imperceptible since admin features appea
 
 ## Session: 2026-03-30 — Collection CRUD for Inline Edit
 
+<a id="eng-052"></a>
 #### ENG-052: DAG rebuild — CSS module purity constraint and reduced-motion scoping
 
 **Issue:** After rebuilding the ArchitectureDag as a pannable canvas and adding `prefers-reduced-motion` to the SCSS module, Turbopack rejected the CSS: `Selector "*" is not pure. Pure selectors must contain at least one local class or id.` The `*` wildcard in `@media (prefers-reduced-motion: reduce) { * { transition-duration: 0s !important; } }` violated CSS Modules' purity requirement.
@@ -2077,6 +2297,9 @@ The brief flash of non-admin content is imperceptible since admin features appea
 
 ---
 
+**Anti-pattern:** See EAP-031.
+
+<a id="eng-051"></a>
 #### ENG-051: "I don't have the ability to remove, delete, or add extra case studies or testimonials in the inline edit view"
 
 **Issue:** The inline edit system supported editing fields on existing documents and managing array fields on globals (teams, social links, clients via `EditableArray`), but there was no way to create or delete entire collection documents (projects, testimonials) from the frontend inline edit view. Admin users had to navigate to the Payload CMS admin panel for any add/remove operations.
@@ -2099,6 +2322,7 @@ The brief flash of non-admin content is imperceptible since admin features appea
 
 ## Session: 2026-03-30 — Testimonial Inline Edit Still Broken (Data Flow)
 
+<a id="eng-050"></a>
 #### ENG-050: "I still cannot edit in the inline visual edit mode for the user testimonial card"
 
 **Issue:** Despite adding `EditableText` wrappers, `id`, and `isAdmin` props to TestimonialCard (ENG-049), the user still cannot edit testimonials inline on the homepage. The cards render as plain non-editable text.
@@ -2113,8 +2337,11 @@ This is an instance of EAP-016 (conditional rendering hiding inline-editable emp
 
 ---
 
+**Anti-pattern:** See EAP-030.
+
 ## Session: 2026-04-02 — NavItem Visual Breakage from href Removal
 
+<a id="eng-089"></a>
 #### ENG-089: "All the navigation bar items are fucked up — spacing between icon and label is broken"
 
 **Issue:** Every NavItem on the playground nav-item page had broken internal layout — the spacing between the icon and label was wrong across all sections (Sizes, States, With Badge, etc.).
@@ -2127,8 +2354,11 @@ This is an instance of EAP-016 (conditional rendering hiding inline-editable emp
 
 ---
 
+**Anti-pattern:** See EAP-057.
+
 ## Session: 2026-04-02 — NavItem Playground: preventDefault + Visual Spacing
 
+<a id="eng-090"></a>
 #### ENG-090: "I don't want clicking NavItem in the playground to navigate anywhere"
 
 **Issue:** After restoring `href="#"` (ENG-089), clicking any NavItem in the playground triggered fragment navigation — scrolling the page to the top. The user wanted non-navigating demos that still render as `<a>` (for correct SCSS styling).
@@ -2143,6 +2373,7 @@ This is an instance of EAP-016 (conditional rendering hiding inline-editable emp
 
 ## Session: 2026-04-02 — VerticalNav Component & Motion Token Addition
 
+<a id="eng-091"></a>
 #### ENG-091: VerticalNav compound component creation with new motion tokens
 
 **Issue:** The playground sidebar was a monolithic ~1000-line Tailwind implementation that couldn't be reused. Need a design system component that mirrors its exact structure, spacing, and interaction model using only DS tokens.
@@ -2162,6 +2393,7 @@ This is an instance of EAP-016 (conditional rendering hiding inline-editable emp
 
 ## Session: 2026-04-02 — VerticalNav Playground Demo Portal Escape
 
+<a id="eng-092"></a>
 #### ENG-092: "The hover-to-reveal sliver is covering the whole page — it's showing up in the actual playground shell's sidebar"
 
 **Issue:** The VerticalNav playground demo page embedded the full `VerticalNav` component (which uses `position: fixed` + `createPortal(document.body)`) inside a 400px preview container. When hovering a category, the `SliverPortal` portaled to `<body>` with `position: fixed; top: 0; left: 200px; height: 100vh`, escaping the demo container and covering the real playground shell sidebar. The `VerticalNav` root `<aside>` also used `position: fixed`, breaking out of the preview div.
@@ -2174,8 +2406,11 @@ This is an instance of EAP-016 (conditional rendering hiding inline-editable emp
 
 ---
 
+**Loose match:** Related: EAP-058.
+
 ## Session: 2026-04-02 — NavItem Tiered Architecture Refactor
 
+<a id="eng-093"></a>
 #### ENG-093: VerticalNavCategory shadow implementation elimination via NavItem composition
 
 **Issue:** VerticalNavCategory was a parallel implementation of NavItem — raw `<button>` with 11 dedicated SCSS classes that duplicated ~80% of NavItem's visual DNA. NavItem lacked the `expanded` visual state, forcing VerticalNav to build it independently as `.categoryExpanded`. No parent/children tier existed at the primitive level.
@@ -2197,6 +2432,7 @@ This is an instance of EAP-016 (conditional rendering hiding inline-editable emp
 
 ## Session: 2026-04-02 — NavItemTrigger Badge Support + Trailing Spacing Fix
 
+<a id="eng-094"></a>
 #### ENG-094: "Trailing slot right-alignment inconsistent with badge slot — NavItemTrigger missing badge prop"
 
 **Issue:** Three issues reported: (1) "Expanded" state demo showed no chevron indicator. (2) NavItemTrigger had no `badge` prop — expandable items couldn't carry badges. (3) Spacing between icon/label/chevron was inconsistent with badge section because `.trailing` lacked `margin-inline-start: auto`.
@@ -2214,8 +2450,11 @@ This is an instance of EAP-016 (conditional rendering hiding inline-editable emp
 
 ---
 
+**Anti-pattern:** See EAP-042.
+
 ## Session: 2026-04-02 — Playground Flush-and-Restart Protocol Escalation
 
+<a id="eng-095"></a>
 #### ENG-095: "I have to ask you multiple times to redo this, and you don't seem to have learned the lesson"
 
 **Issue:** After implementing NavItem playground fixes (expanded chevron, badge section, spacing), the agent reported the task as done without flushing the Turbopack cache and restarting the playground server. The user could not see any changes. This is the 6th+ occurrence of this pattern.
@@ -2229,6 +2468,9 @@ This is an instance of EAP-016 (conditional rendering hiding inline-editable emp
 
 ---
 
+**Anti-patterns:** See EAP-058. See EAP-059.
+
+<a id="eng-095-occ2"></a>
 ### ENG-095: DS Parity Remediation — token sync, build verification, dependency cleanup
 
 **Issue:** Site SCSS used hardcoded px/rgba/z-index values instead of DS tokens, creating maintenance drift. Dead `src/styles 2/` directory and unused `tailwind-merge`/`clsx` deps were present.
@@ -2249,6 +2491,9 @@ This is an instance of EAP-016 (conditional rendering hiding inline-editable emp
 
 ---
 
+**Anti-patterns:** See EAP-058. See EAP-059.
+
+<a id="eng-096"></a>
 ### ENG-096: Vercel build failures on first production deploy of main site
 
 **Issue:** First deploy of the main site to Vercel (`yilangao-portfolio`) failed with three `Module not found` errors for `../importMap` in Payload admin files, and one `Module not found` for `resend` in the contact API route.
@@ -2266,6 +2511,9 @@ This is an instance of EAP-016 (conditional rendering hiding inline-editable emp
 
 ---
 
+**Anti-pattern:** See EAP-060.
+
+<a id="eng-097"></a>
 ### ENG-097: Playground build failure — parent proxy.ts collision via turbopack.root
 
 **Issue:** After adding `src/proxy.ts` (password gate) to the main site, the playground's Vercel build failed with `Module not found: Can't resolve '@/lib/company-session'` in `./src/proxy.ts`. The playground was detecting and trying to build the main site's proxy file.
@@ -2278,6 +2526,9 @@ This is an instance of EAP-016 (conditional rendering hiding inline-editable emp
 
 ---
 
+**Anti-pattern:** See EAP-061.
+
+<a id="eng-098-occ2"></a>
 ### ENG-098: Password gate migrated from static JSON to Payload CMS Companies collection
 
 **Date:** 2026-04-02
@@ -2290,6 +2541,7 @@ This is an instance of EAP-016 (conditional rendering hiding inline-editable emp
 
 ---
 
+<a id="eng-099-occ2"></a>
 ### ENG-099: Payload 3 schema push doesn't auto-execute for new collections
 
 **Date:** 2026-04-02
@@ -2302,6 +2554,9 @@ This is an instance of EAP-016 (conditional rendering hiding inline-editable emp
 
 ---
 
+**Anti-pattern:** See EAP-062.
+
+<a id="eng-100"></a>
 ### ENG-100: Payload admin IA restructured — consolidated groups, simplified navigation
 
 **Date:** 2026-04-02
@@ -2321,6 +2576,9 @@ This is an instance of EAP-016 (conditional rendering hiding inline-editable emp
 
 ---
 
+**Loose match:** Related: EAP-063.
+
+<a id="eng-108"></a>
 ### ENG-108: Image management and section layout controls for inline editor
 
 **Date:** 2026-04-03
@@ -2340,6 +2598,9 @@ This is an instance of EAP-016 (conditional rendering hiding inline-editable emp
 
 ---
 
+**Anti-pattern:** See EAP-083.
+
+<a id="eng-109"></a>
 ### ENG-109: Payload crash on startup — testimonials.text column type mismatch kills inline editing
 
 **Date:** 2026-04-03
@@ -2360,6 +2621,9 @@ Secondary issue: the Sass `darken()` function was deprecated, producing warnings
 
 ---
 
+**Anti-pattern:** See EAP-063.
+
+<a id="eng-110"></a>
 ### ENG-110: Block editor redesign — section model to content blocks architecture
 
 **Date:** 2026-04-04
@@ -2383,6 +2647,9 @@ Secondary issue: the Sass `darken()` function was deprecated, producing warnings
 
 ---
 
+**Anti-pattern:** See EAP-027.
+
+<a id="eng-104"></a>
 #### ENG-104: "Intro blurb CMS fields + frontend rendering + inline edit support"
 
 **Issue:** Adding two new top-level fields (`introBlurbHeadline`, `introBlurbBody`) to the Projects CMS collection and wiring them through the full data pipeline: Payload schema → server-side extraction → client rendering → inline edit support.
@@ -2401,7 +2668,10 @@ Secondary issue: the Sass `darken()` function was deprecated, producing warnings
 
 ---
 
-### Block Editor Enhancement — Per-Block Lexical + Markdown Adapter
+**Anti-patterns:** See EAP-064. See EAP-073.
+
+<a id="eng-220"></a>
+### ENG-220: Block Editor Enhancement — Per-Block Lexical + Markdown Adapter
 
 **Date:** 2026-04-04
 
@@ -2428,7 +2698,8 @@ Secondary issue: the Sass `darken()` function was deprecated, producing warnings
 
 ---
 
-### Hero Image Skeleton — Mandatory First Block for All Case Studies
+<a id="eng-221"></a>
+### ENG-221: Hero Image Skeleton — Mandatory First Block for All Case Studies
 
 **Date:** 2026-04-04
 
@@ -2448,7 +2719,8 @@ Secondary issue: the Sass `darken()` function was deprecated, producing warnings
 
 ---
 
-### Grid Reorder Disconnected from Case Study Navigation Order
+<a id="eng-222"></a>
+### ENG-222: Grid Reorder Disconnected from Case Study Navigation Order
 
 **Date:** 2026-04-05
 
@@ -2462,7 +2734,8 @@ Secondary issue: the Sass `darken()` function was deprecated, producing warnings
 
 ---
 
-### TestimonialCard pretext API mismatch
+<a id="eng-223"></a>
+### ENG-223: TestimonialCard pretext API mismatch
 
 **Date:** 2026-04-05
 
@@ -2476,7 +2749,8 @@ Secondary issue: the Sass `darken()` function was deprecated, producing warnings
 
 ---
 
-### Login page inaccessible during UI iteration
+<a id="eng-224"></a>
+### ENG-224: Login page inaccessible during UI iteration
 
 **Date:** 2026-04-06
 
@@ -2490,7 +2764,8 @@ Secondary issue: the Sass `darken()` function was deprecated, producing warnings
 
 ---
 
-### Login page rebuilt components instead of using DS
+<a id="eng-225"></a>
+### ENG-225: Login page rebuilt components instead of using DS
 
 **Date:** 2026-04-06
 
@@ -2504,7 +2779,8 @@ Secondary issue: the Sass `darken()` function was deprecated, producing warnings
 
 ---
 
-### Halftone portrait component ported to login page
+<a id="eng-226"></a>
+### ENG-226: Halftone portrait component ported to login page
 
 **Date:** 2026-04-06
 
@@ -2531,7 +2807,8 @@ Secondary issue: the Sass `darken()` function was deprecated, producing warnings
 
 ---
 
-### Image upload to slotted placeholder grid wipes sibling slots + alt text lost
+<a id="eng-227"></a>
+### ENG-227: Image upload to slotted placeholder grid wipes sibling slots + alt text lost
 
 **Date:** 2026-04-07
 
@@ -2557,7 +2834,8 @@ Secondary issue: the Sass `darken()` function was deprecated, producing warnings
 
 ---
 
-### Illustrations case study scaffold never populated
+<a id="eng-228"></a>
+### ENG-228: Illustrations case study scaffold never populated
 
 **Date:** 2026-04-08
 
@@ -2575,7 +2853,8 @@ Secondary issue: the Sass `darken()` function was deprecated, producing warnings
 
 ---
 
-### Case study sidebar shows empty "Links" section when no links exist
+<a id="eng-229"></a>
+### ENG-229: Case study sidebar shows empty "Links" section when no links exist
 
 **Date:** 2026-04-08
 

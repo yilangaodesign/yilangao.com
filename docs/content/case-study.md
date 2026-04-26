@@ -1,3 +1,14 @@
+<!-- graph metadata for docs knowledge graph (see docs/knowledge-graph.md) -->
+---
+type: spoke
+id: content-case-study
+topics:
+  - content
+  - case-study
+derivedFrom:
+  - content.md
+---
+
 # §3. Case Study Structure
 
 ### 3.1 The Inverted Pyramid

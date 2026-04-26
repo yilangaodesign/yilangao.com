@@ -1,3 +1,14 @@
+<!-- graph metadata for docs knowledge graph (see docs/knowledge-graph.md) -->
+---
+type: spoke
+id: content-analytics-measurement
+topics:
+  - content
+  - analytics
+derivedFrom:
+  - content.md
+---
+
 # Analytics Measurement Strategy
 
 > **What this file is:** Content spoke for interpreting client analytics data and deciding what to measure next. Maps Mixpanel events to portfolio optimization questions.

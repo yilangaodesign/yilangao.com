@@ -1,3 +1,15 @@
+<!-- graph metadata for docs knowledge graph (see docs/knowledge-graph.md) -->
+---
+type: spoke
+id: content-lacework-interview
+topics:
+  - content
+  - projects
+  - case-study
+derivedFrom:
+  - content.md
+---
+
 # Lacework - Interview Defense Notes
 
 > **WARNING:** This file contains information deliberately omitted from the portfolio.

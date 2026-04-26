@@ -1,3 +1,14 @@
+<!-- graph metadata for docs knowledge graph (see docs/knowledge-graph.md) -->
+---
+type: spoke
+id: content-narrative-arc
+topics:
+  - content
+  - case-study
+derivedFrom:
+  - content.md
+---
+
 # Section 12 — Narrative Arc
 
 > A **thinking framework** for case study creation, not a page template.

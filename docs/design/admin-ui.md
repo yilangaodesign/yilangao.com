@@ -1,3 +1,14 @@
+<!-- graph metadata for docs knowledge graph (see docs/knowledge-graph.md) -->
+---
+type: spoke
+id: design-admin-ui
+topics:
+  - design
+  - cms
+derivedFrom:
+  - design.md
+---
+
 # Admin UI, Button Adoption & Undocumented Patterns
 
 > Spoke file for `docs/design.md`. Return to the [hub](../design.md) for the Section Index.

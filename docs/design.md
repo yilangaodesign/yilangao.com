@@ -1,3 +1,33 @@
+<!-- graph metadata for docs knowledge graph (see docs/knowledge-graph.md) -->
+---
+type: hub
+id: design
+topics: [design, layout, color, dark-mode, branding]
+documents:
+  - design/spacing.md
+  - design/layout.md
+  - design/css-framework.md
+  - design/navigation.md
+  - design/theming.md
+  - design/responsive.md
+  - design/corner-radius.md
+  - design/color.md
+  - design/interactive-controls.md
+  - design/information-architecture.md
+  - design/content-navigation.md
+  - design/playground-consistency.md
+  - design/homepage.md
+  - design/accessibility.md
+  - design/typography.md
+  - design/admin-ui.md
+  - design/button-sizing.md
+  - design/tooltip.md
+  - design/branding.md
+references:
+  - design-anti-patterns.md
+  - design-feedback-log.md
+---
+
 # Design System — Accumulated Knowledge
 
 > **What this file is:** The hub file for the design knowledge base. Detailed section content lives in spoke files under `docs/design/`. This file contains the Section Index for routing, the Design Posture (read every time), Process Principles, and the Feedback Frequency Map.

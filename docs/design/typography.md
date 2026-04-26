@@ -1,3 +1,14 @@
+<!-- graph metadata for docs knowledge graph (see docs/knowledge-graph.md) -->
+---
+type: spoke
+id: design-typography
+topics:
+  - design
+  - typography
+derivedFrom:
+  - design.md
+---
+
 # Typography System
 
 > Spoke file for `docs/design.md`. Return to the [hub](../design.md) for the Section Index.

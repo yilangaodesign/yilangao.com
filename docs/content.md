@@ -1,3 +1,24 @@
+<!-- graph metadata for docs knowledge graph (see docs/knowledge-graph.md) -->
+---
+type: hub
+id: content
+topics: [content, copy, case-study, branding]
+documents:
+  - content/conversion-funnel.md
+  - content/homepage.md
+  - content/case-study.md
+  - content/visual-economy.md
+  - content/language-patterns.md
+  - content/seniority-signals.md
+  - content/internal-tools.md
+  - content/project-selection.md
+  - content/about-page.md
+  - content/portfolio-lifecycle.md
+references:
+  - content-anti-patterns.md
+  - content-feedback-log.md
+---
+
 # Content Strategy — Accumulated Knowledge
 
 > **What this file is:** The hub file for the content strategy knowledge base. Detailed section content lives in spoke files under `docs/content/`. This file contains the Section Index for routing, the Content Posture (read every time), and the Feedback Frequency Map.

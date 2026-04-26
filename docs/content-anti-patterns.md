@@ -1,3 +1,16 @@
+<!-- graph metadata for docs knowledge graph (see docs/knowledge-graph.md) -->
+---
+type: anti-pattern
+id: content-anti-patterns
+topics:
+  - content
+  - guardrail
+enforces:
+  - content.md
+references:
+  - content-feedback-log.md
+---
+
 # Content Anti-Patterns
 
 > **What this file is:** A catalog of content mistakes that weaken portfolio effectiveness, documented so they are never repeated. Each anti-pattern includes the trigger, why it's wrong, and the correct alternative.
@@ -20,6 +33,7 @@
 
 ---
 
+<a id="cap-001"></a>
 ## CAP-001: Process-First Case Study Narrative
 
 **Status: ACTIVE**
@@ -34,6 +48,7 @@
 
 ---
 
+<a id="cap-002"></a>
 ## CAP-002: Generic Positioning Statement
 
 **Status: ACTIVE**
@@ -49,6 +64,7 @@
 
 ---
 
+<a id="cap-003"></a>
 ## CAP-003: Screenshot Gallery Without Narrative Context
 
 **Status: ACTIVE**
@@ -61,6 +77,7 @@
 
 ---
 
+<a id="cap-004"></a>
 ## CAP-004: Vague Impact Claims
 
 **Status: ACTIVE**
@@ -77,6 +94,7 @@
 
 ---
 
+<a id="cap-005"></a>
 ## CAP-005: Overloaded Project Count
 
 **Status: ACTIVE**
@@ -89,6 +107,7 @@
 
 ---
 
+<a id="cap-006"></a>
 ## CAP-006: Burying the Lede
 
 **Status: ACTIVE**
@@ -103,6 +122,7 @@
 
 ---
 
+<a id="cap-007"></a>
 ## CAP-007: Explaining Instead of Showing for Internal Tools
 
 **Status: ACTIVE**
@@ -115,6 +135,7 @@
 
 ---
 
+<a id="cap-008"></a>
 ## CAP-008: Tool Logo Grids on About Page
 
 **Status: ACTIVE**
@@ -127,6 +148,7 @@
 
 ---
 
+<a id="cap-009"></a>
 ## CAP-009: Leading with Personal Photo/Bio Before Professional Relevance
 
 **Status: ACTIVE**
@@ -141,6 +163,7 @@
 
 ---
 
+<a id="cap-010"></a>
 ## CAP-010: Overly Experimental Portfolio That Sacrifices Usability
 
 **Status: ACTIVE**
@@ -153,6 +176,7 @@
 
 ---
 
+<a id="cap-011"></a>
 ## CAP-011: Title Inflation in Role Field
 
 **Status: ACTIVE**
@@ -165,6 +189,7 @@
 
 ---
 
+<a id="cap-012"></a>
 ## CAP-012: Database Column Names as User-Facing Labels
 
 **Status: ACTIVE**
@@ -184,6 +209,7 @@ For fields with non-obvious formats, add a help line or placeholder with an exam
 
 ---
 
+<a id="cap-013"></a>
 ## CAP-013: System Error Dumps as User-Facing Copy
 
 **Status: ACTIVE**
@@ -200,6 +226,7 @@ For fields with non-obvious formats, add a help line or placeholder with an exam
 
 ---
 
+<a id="cap-014"></a>
 ## CAP-014: Ship Dates in Duration Field (Redundant Metadata)
 
 **Status: ACTIVE**
@@ -214,6 +241,7 @@ For fields with non-obvious formats, add a help line or placeholder with an exam
 
 ---
 
+<a id="cap-015"></a>
 ## CAP-015: Strategic Transparency Leak
 
 **Status: ACTIVE**
@@ -228,6 +256,7 @@ For fields with non-obvious formats, add a help line or placeholder with an exam
 
 ---
 
+<a id="cap-016"></a>
 ## CAP-016: Feature-List Case Study (Showing WHAT Without WHY)
 
 **Status: ACTIVE**
@@ -242,6 +271,7 @@ For fields with non-obvious formats, add a help line or placeholder with an exam
 
 ---
 
+<a id="cap-017"></a>
 ## CAP-017: AI-Generated Voice Tells
 
 **Status: ACTIVE**
@@ -263,6 +293,7 @@ For fields with non-obvious formats, add a help line or placeholder with an exam
 
 ---
 
+<a id="cap-018"></a>
 ## CAP-018: Blurb That Summarizes Instead of Teasing
 
 **Status: ACTIVE**
@@ -277,6 +308,7 @@ For fields with non-obvious formats, add a help line or placeholder with an exam
 
 ---
 
+<a id="cap-019"></a>
 ## CAP-019: Credential Performance (Editorializing Outcomes)
 
 **Status: ACTIVE**
@@ -293,6 +325,7 @@ For fields with non-obvious formats, add a help line or placeholder with an exam
 
 ---
 
+<a id="cap-020"></a>
 ## CAP-020: Buzzword Misapplication
 
 **Status: ACTIVE**
@@ -307,6 +340,7 @@ For fields with non-obvious formats, add a help line or placeholder with an exam
 
 ---
 
+<a id="cap-021"></a>
 ## CAP-021: Claiming AI Agent Work as Designer Expertise
 
 **Status: ACTIVE**
@@ -321,6 +355,7 @@ For fields with non-obvious formats, add a help line or placeholder with an exam
 
 ---
 
+<a id="cap-022"></a>
 ## CAP-022: Em Dash Usage
 
 **Status: ACTIVE**
@@ -335,6 +370,7 @@ For fields with non-obvious formats, add a help line or placeholder with an exam
 
 ---
 
+<a id="cap-023"></a>
 ## CAP-023: Voice Flattening During Refinement
 
 **Status: ACTIVE**
@@ -349,6 +385,7 @@ For fields with non-obvious formats, add a help line or placeholder with an exam
 
 ---
 
+<a id="cap-024"></a>
 ## CAP-024: Divider Overuse Between Narrative Sections
 
 **Status: ACTIVE**
@@ -363,6 +400,7 @@ For fields with non-obvious formats, add a help line or placeholder with an exam
 
 ---
 
+<a id="cap-025"></a>
 ## CAP-025: Floating Metric
 
 **Status: ACTIVE**
@@ -381,6 +419,7 @@ For fields with non-obvious formats, add a help line or placeholder with an exam
 
 ---
 
+<a id="cap-026"></a>
 ## CAP-026: Employment Classification Signal
 
 **Status: ACTIVE**
@@ -397,6 +436,7 @@ For fields with non-obvious formats, add a help line or placeholder with an exam
 
 ---
 
+<a id="cap-027"></a>
 ## CAP-027: Fragment Chain as Default Prose
 
 **Status: ACTIVE**
@@ -411,6 +451,7 @@ For fields with non-obvious formats, add a help line or placeholder with an exam
 
 ---
 
+<a id="cap-028"></a>
 ## CAP-028: Technique-as-Posturing
 
 **Status: ACTIVE**
@@ -429,6 +470,7 @@ For fields with non-obvious formats, add a help line or placeholder with an exam
 
 ---
 
+<a id="cap-029"></a>
 ## CAP-029: Parallel-Structure Encyclopedia
 
 **Status: ACTIVE**
@@ -443,6 +485,7 @@ For fields with non-obvious formats, add a help line or placeholder with an exam
 
 ---
 
+<a id="cap-030"></a>
 ## CAP-030: Inline Bold Imported From Source Markdown
 
 **Status: ACTIVE**
@@ -469,6 +512,7 @@ Also do NOT use inline `###` headings inside a richText `bodyMarkdown`. `src/lib
 
 ---
 
+<a id="cap-031"></a>
 ## CAP-031: Chronological Case-Study Order
 
 **Status: ACTIVE**
@@ -485,6 +529,7 @@ Operational check: `rg "order: \d+" src/app/\(frontend\)/api/update-\*/route.ts`
 
 ---
 
+<a id="cap-032"></a>
 ## CAP-032: Redundant Noun in Labelled Count
 
 **Status: ACTIVE**
@@ -507,6 +552,36 @@ Operational check: `rg "order: \d+" src/app/\(frontend\)/api/update-\*/route.ts`
 **Applies to:** All count badges, stat chips, column headers, section subtitles, and filter counts in the main site, playground, and ASCII Studio. When authoring any new design that shows a numeric count, ask: "Does a parent label already name the thing being counted?" If yes, drop the noun.
 
 **Reference:** FB-201 (2026-04-25). Élan SkillMap `categoryCount` displayed `{count} skills` inside a column header already labeled "ITERATION / QUALITY / OPERATIONS". Stripped to bare `{count}`.
+
+---
+
+## CAP-033: Defensive Aside in Scope Statement
+
+**Status: ACTIVE**
+
+**Trigger:** A scope statement or intro paragraph that contains a clause apologizing for, explaining away, or preemptively defending a perceived weakness. Common shapes: "X took effort, but it's not where the time went", "The [visible part] is only part of the story", "Yes, I know [thing] isn't polished, but...".
+
+**Why it's wrong:** The scope statement is premium real estate. Every clause must earn its position by advancing the reader's understanding of what was built, by whom, at what scale. A defensive aside spends that space managing the reader's potential criticism rather than showing what the work actually is. It signals insecurity, not confidence. Worse, it names the weakness for readers who might not have noticed it.
+
+**Correct alternative:** State what's underneath without contrasting it against what's on top. "Underneath the visual layer: 16 skills..." is a bridge, not an apology. If the visual craft is genuinely underdeveloped relative to the architecture, the case study structure itself (leading with architecture, not pixels) communicates the emphasis without narrating it.
+
+**Reference:** CF-029 (2026-04-25). Elan scope statement contained "The visual layer took effort, but it's not where most of the time went." Trimmed to "Underneath the visual layer:" which bridges into the architecture without apologizing.
+
+---
+
+## CAP-034: Missing Paragraph Whitespace in Narrative Content
+
+**Status: ACTIVE**
+
+**Trigger:** Multi-paragraph narrative text (blurb bodies, case study sections, essays) written or presented as a continuous block with no blank line separating paragraphs. Applies both to source strings in seeding routes (`\n\n` between paragraphs) and to draft text presented in chat (blank lines between paragraphs in blockquotes).
+
+**Why it's wrong:** Narrative writing uses paragraph breaks as breathing room - they signal a shift in beat, tone, or subject. Without visual separation, paragraphs merge into a wall of text that the reader must parse linearly. For storytelling content in particular (where each paragraph has a distinct purpose - setup, pivot, resolution), the whitespace IS part of the meaning. The break tells the reader to pause before the next thought lands.
+
+**Correct alternative:** Follow the paragraph break heuristic in `docs/content/voice-style.md` > Paragraph shape > "When to insert a paragraph break." The heuristic defines 5 "break when" triggers (beat shift, speaker shift, temporal jump + beat shift, rhetorical pivot + beat shift, 3-sentence cap) and 4 "keep together when" conditions. The default for narrative content is to break; same-paragraph is the exception.
+
+**Engineering enforcement:** `@include prose-paragraph-spacing` mixin in `src/styles/mixins/_layout.scss` (see EAP-123). Every CSS class that wraps `dangerouslySetInnerHTML` from a Lexical field must include this mixin.
+
+**Reference:** CF-031 (2026-04-26), ENG-202, ENG-233.
 
 ---
 

@@ -1,3 +1,14 @@
+<!-- graph metadata for docs knowledge graph (see docs/knowledge-graph.md) -->
+---
+type: spoke
+id: engineering-localhost-verification
+topics:
+  - engineering
+  - parity
+derivedFrom:
+  - engineering.md
+---
+
 # Localhost Verification
 
 > Spoke file for `docs/engineering.md`. Return to the [hub](../engineering.md) for the Section Index.

@@ -4,13 +4,343 @@
 >
 > **Who reads this:** AI agents at session start (scan recent entries for context), and during feedback processing (check for recurring patterns).
 > **Who writes this:** AI agents after each feedback cycle via the `design-iteration` skill.
-> **Last updated:** 2026-04-25 (FB-207: MaturityTimeline combined VWAP-style chart — merged separate stacked-bar and trend-band charts into a single visualization with per-build-day bars, grayscale DS tokens, and rolling-median trend overlay. Cross-category with ENG-217.) Prior: 2026-04-24 (FB-195: Treemap white gaps from height:auto — row-mode tiles collapsed to text height leaving blank D3-allocated space. Fix: revert to height:${h}% for all tiles; row mode now pins label to top-left corner while domain colour fills the full block. Prior: FB-194: Treemap tooltip height should animate — grow up / shrink down anchored at cursor bottom. Fix: always-mounted tooltip with CSS `transition: height + opacity`; rAF-deferred `scrollHeight` measurement ensures browser paints the "before" state so the transition has a from-value. Prior: FB-193: Row-mode tiles still rendered as tall narrow rectangles — `flex-direction: row` only reordered content inside the block; the block's own height was still the D3-allocated %. Fix: row-mode tiles get `height: auto` so the block physically collapses to label line-height. Prior: FB-192: Micro mode abolished — `type-3xs` (8px) in row/sliver mode is not legible on coloured surfaces regardless of tile width. Removed micro mode entirely; row mode now uses the same `type-xs` as column mode. Silent width lowered from 32 to 20px so 31px-wide slivers show a truncated label rather than blank. AP-072 updated. Prior: FB-191: Treemap count font too small — `type-3xs` (8px) on a saturated coloured surface with `weight-regular` is below the legibility floor. Bumped to `type-2xs` (10px); hierarchy still holds via weight (semibold vs regular) + opacity (1.0 vs 0.6). Prior: FB-190: Silent threshold 64px too aggressive — 3 tiles 36–64px wide showed as blank rectangles. Added "micro" layout mode (32–64px wide): label only at type-3xs/semibold, 2px padding, no count. Truly silent threshold lowered to 32px. A blank tile is always worse than a truncated one when a tooltip exists. Prior: FB-189: KnowledgeTreemap tooltip structure — header label "Top examples" added at top to explain the bullet list; list gap increased to `$portfolio-spacer-0-5x`; domain + count moved to footer row (bottom, `space-between`). Prior: FB-188: KnowledgeTreemap column-mode height blind spot — count visible without label on short tiles. `justify-content: space-between` places count at bottom edge even when pxH < label font height, making the label invisible while the count floats. Fix: `pxH < 20px` → silent; column mode suppresses count when `pxH < 35px`. Prior: FB-187: AP-072 thresholds too permissive — tiles 36-64px wide were classified as text-showing and produced illegible "De…" labels; tiles with h/w 1.5-2.5 stayed in column mode and showed stacked text in vertical-feeling rectangles. Fixed: `TILE_MIN_TEXT_PX` 36→64, `TILE_SLIVER_RATIO` 2.5→1.5. Prior: FB-186: KnowledgeTreemap block visual hierarchy inverted — label was `type-2xs`/semibold while count was `type-sm`/semibold, making the count visually dominant over the more-informative label. Fixed: label → `type-xs`/semibold (hero), count → `type-3xs`/normal/opacity-0.55 (supporting metadata). Prior: FB-185: KnowledgeTreemap vertical-sliver tiles — orientation-blind `flex-column` layout made narrow tiles illegible. Fix: ResizeObserver + `classifyTile()` produces three modes: column (normal), row (vertical sliver, height/width > 2.5), silent (width < 36px). Extracted as core design principle AP-072. Prior: FB-184: KnowledgeTreemap block IA redesign — label top-left, count bottom-right, tooltip shows DOMAIN allcaps + top-3 most recent AP titles + count; API enhanced to parse AP IDs and look up titles. Prior: FB-183: CollaborationLoop transport — play/pause was 32×32 while prev/next were 28×28 and speed trigger 28px tall; unified hit targets to 32px (`transportBtn` base + `min-width`/`min-height`, speed trigger `height`/`min-height` 32px, removed duplicate sizing from `transportPlayBtn` while keeping accent color/font). Prior: FB-182: MaturityTimeline used `border-radius` on bar stack, milestone chip, legend dots, and popover — conflicts with portfolio zero-radius identity (`branding.md` / Design Hard Guardrail #9). Removed all four; tooltip repositioned to segment right edge per ENG-210. Prior: FB-181: Elan SkillMap vs MaturityTimeline legend rhythm — Maturity used outer `.container` `gap: 3x` between chart and legend while SkillMap used `1x` margin; introduced shared `.visualizationWithLegend` flex stack (`gap: $portfolio-spacer-1x`) in both SCSS modules, wrapped treemap and timeline chart+legend, removed SkillMap `.legend` margin-top. Prior: FB-180: SkillMap Knowledge treemap legend sat flush under the treemap with no vertical separation; added `margin-top: $portfolio-spacer-1x` on `.legend` to match `.section` header-to-content rhythm. Prior: FB-179: CollaborationLoop step dots misaligned with detail panel — removed `.stepNav` horizontal padding so dots span full content width; removed transport bar `border-top` divider between content and controls. Prior: FB-178: CollaborationLoop overuses Lumen accent — 22 decorative `$portfolio-accent-*` usages converted to neutral palette, preserving accent on only 4 elements: two "NEW" status badges and two interactive transport controls. Reinforces Lumen Scarcity Principle from branding.md §9.4 — embedded case study visuals follow the same accent restraint as page chrome. Prior: FB-177: Personalization badge style decision — stayed with `neutral/minimal` over `highlight/minimal` (accent text). Lumen scoping corrected in branding doc: most links use neutral colors, not Lumen. Full rationale documented in `branding.md` §9 including Lumen Scarcity Principle. Prior: FB-176: Company-personalized "for {Company}" badge on home page — repurposed the disabled essay badge slot for a lowercase "for {Company}" tag above case study titles, visible only to authenticated company visitors with non-empty caseStudyNotes. Essay badge logic fully removed. Cross-category with ENG-202. Prior: FB-175: CollaborationLoop transport bar — pager (‹ N / M ›) and play/speed clusters used 2px inter-control gaps and a vertically thin bar; bumped to `$portfolio-spacer-1x` gaps, `$portfolio-spacer-1x` vertical bar padding, and speed trigger horizontal padding to `$portfolio-spacer-1x` with 0.5x internal icon gap. Prior: FB-174: Link toolbar button conflates inspect and destroy actions — replaced binary toggle with a link popover showing URL preview + edit/open/remove actions. Cross-category with ENG-198. Prior: FB-170: Essay layout content column widened from `$elan-container-narrow` (672px) to `$elan-container-content` (720px) in `work/[slug]/page.module.scss` for `.layoutEssay` / `.contentEssay` so the ETRO essay matches the same prose max-width as the case-study body column, about page, and reading page. Prior: FB-168: Password gate composition tuned for OPTICAL balance rather than mathematical balance, per the design principle that dense/animated/high-contrast elements carry more perceived visual weight than sparse/static/low-contrast elements and therefore need MORE surrounding whitespace on their outer side to feel balanced against the lighter element. FB-167 had achieved mathematical centering (~4px off inner center); user pointed out the animated halftone portrait carries significantly more visual weight than the simple serif text on the right and needs a larger outer-side breathing gutter. Widened `.canvasPane` from `flex: 0 0 53%` to `flex: 0 0 55%`, which shifts the portrait's visual center rightward enough that the empty space to the left of the portrait figure (~133px on 1120px canonical) now exceeds the empty space to the right of the card (~108px) by ~25px — an intentional asymmetry favoring the heavier element. Same `.formPane` padding (`$portfolio-spacer-6x` with `padding-left: $portfolio-spacer-2x` override). Portrait-to-card gap widens by ~12px (137 → 149) as the cost of the optical rebalance — acceptable because (a) the user's original too-far gap was 195px, so 149 is still a 23% improvement, and (b) gap preservation and optical balance are in tension at the current card max-width. SEPARATELY: caught and fixed a mobile regression introduced by FB-166 — on viewports ≤768px the canvasPane is hidden and the form becomes the only content on screen, but the desktop `justify-content: flex-start` + asymmetric left padding was still firing, pinning the form to the left of the mobile viewport. Added mobile override resetting to `justify-content: center` and symmetric `$portfolio-spacer-6x` padding. New design principle extracted (candidate for `docs/design/spacing.md`): optical balance — when two elements in a composition have meaningfully different visual weight (density, motion, contrast, detail), mathematical centering reads as imbalanced; the heavier element needs more surrounding whitespace on its outer side to feel balanced. This is an explicit architectural principle, not a case-by-case judgement. Responsiveness principle reinforced: whenever a layout uses alignment or padding tuning for a specific breakpoint context (two-column here), there MUST be a corresponding breakpoint override for when that context disappears (mobile single-column here) — otherwise the desktop tuning bleeds into other contexts as a regression.) Prior: FB-167: Password gate composition re-centered on the viewport. After FB-166 pulled the action card close to the portrait by anchoring it to the start of its pane, the overall composition read left-skewed — the 50/50 column split left ~43px more empty space on the card side than on the portrait side. Fixed by widening `.canvasPane` from `flex: 0 0 50%` to `flex: 0 0 53%` (shifts the portrait's visual center rightward by ~17px on the canonical 1120px container) and tightening `.formPane` left padding from `$portfolio-spacer-4x` to `$portfolio-spacer-2x` so the portrait-to-card distance the user just approved in FB-166 is preserved exactly (~137px). Switched `.formPane` padding declaration from a 4-value shorthand to `padding: 6x` + `padding-left: 2x` override for readability. Composition center is now ~4px of inner center versus ~22px before. Design principle extracted: when one half of a two-column composition has its content centered within its pane and the other has content anchored to the start of its pane, a 50/50 split is inherently imbalanced — widen the centered-content pane slightly so its content's visual center offsets the opposing half's start-anchor offset. No engineering/content dimension.) Prior: FB-166: Password gate two-column layout — reduced the perceived distance between the halftone portrait (left 50%) and the action card (right 50%) by anchoring the form card to the start of its pane. Changed `.formPane` `justify-content: center` → `flex-start` and switched padding from symmetric `$portfolio-spacer-6x` to asymmetric `6x 6x 6x 4x`, pulling the card's left edge ~58px closer to the center divider on the 1120px canonical width while leaving the portrait position, responsive mobile hide breakpoint, and card max-width (380px) unchanged. Portfolio branding guardrail #9 (zero border-radius) respected — no radius added. All values remain on the `$portfolio-spacer-*` 8px primitive scale per §1.) Prior: FB-165: Password gate interaction design documented as a unified concept - the "Welcome, ___" sentence completion with visible-text password, fuzzy normalization as UX requirement, hierarchy-conscious phrase selection. Password changed from `preview-2026` to `glad you are here`. Cross-category with ENG-193 and CFB-041.) Prior: FB-164: Introduced an `essay` content format alongside the existing `caseStudy` layout in the `projects` collection. Essays switch from the two-column (sidebar + content) layout to a single-column Medium-style reading layout capped at `$elan-container-narrow`. Between the H1 and the blurb body, a new `EssayHeader` renders a three-line vertical stack: category eyebrow (reusing `<Eyebrow size="sm">`) → H1 (inline-editable `introBlurbHeadline`) → `EssayMeta` row (publication date · N min read · optional "Also on Medium" link). Design decisions: (1) the header is hoisted OUTSIDE the pre-existing `.introBlurb` `{headline && (...)}` guard so the meta row never disappears when the headline is blank — on essays the `.introBlurb` wrapper renders only the body and the H1 is emitted exactly once by `EssayHeader`; (2) the Medium cross-post link replaces the originally-proposed like/reaction count because a visible engagement signal on a portfolio primarily read by interviewers is socially off-key (user's reversal captured in CFB-040); (3) separators between meta segments use `$portfolio-text-placeholder` dots, passive segments use `$portfolio-text-secondary` at `body-sm`, and the Medium link uses `$portfolio-text-primary` for recognizability without borrowing the brand's cyan accent; (4) the Medium logo is a hand-authored inline SVG sized at `1em` — decorative, `aria-hidden="true"` — under branding guardrail #7's icon/logo exception, and the link itself opens in a new tab with a trailing `↗` affordance consistent with other external links; (5) zero border-radius across all new surfaces per branding guardrail #9; (6) the homepage "Essay" badge detection was moved from a fragile `category.toLowerCase() === 'essay'` string match to the explicit `contentFormat === 'essay'` discriminant, closing a latent bug where ETRO's `"Essay · …"` category never actually matched. Cross-category with ENG-191 (discriminant schema + hybrid read-time + homepage projection fix) and CFB-040 (cross-post link rationale, dropped scope statement, category doubling as topic eyebrow, `title` intentionally unrendered on essays). `docs/content/case-study.md` §3.2 "Essay Sidebar Variant" reconciled: the sidebar is *replaced* by a single-column layout, not lightened.) Prior: FB-163: Fourth complaint on DS `Input` border-thickness in one session — Design Hard Guardrail #4 tripped a second time within the same sequence. The FB-162 two-axis grammar was structurally right but left the base `border-width` at 2px, so resting inputs read as over-heavy and engaged inputs compounded to a visual 3px rim. User's ground truth (consistent across FB-088 → FB-161 → FB-162 → FB-163): rest = 1px hairline, engaged = 2px border. Fix drops `.regular` base border and `.minimal` base `border-bottom` from 2px to 1px; the ENG-186 engaged-state rings are left untouched and now compose on a 1px base for a solid 2px visual rim on hover/focus. All status variants (`error`/`success`/`warning`/`brand`) inherit the same composition — resting 1px status-color, engaged 2px status-color. Extracted principle: when a component has a paint-only weight channel (box-shadow, outline), the base `border-width` is a pure design choice — pick the value that matches the component's resting character (1px hairline for inputs), not the value that makes engaged states convenient. AP-054 amended to separate the structural rule (change is forbidden) from the value choice (free within the constraint). Rejection chronology now four rejected + one standing: FB-086 gapped ring → FB-088 padding comp → ENG-136 color-only / 2px → ENG-186 two-axis / 2px → ENG-187 two-axis / 1px (current). Cross-category with ENG-187.) Prior: FB-162: Third complaint on DS `Input` border-thickness in one session — architectural-complaint threshold hit per the Design guardrail. After FB-161 → ENG-184's constant-2px / color-only fix, the user still reads "engaged" as a thickness change, not a color change. The one-axis state-affordance grammar was structurally insufficient. Shipped a two-axis grammar: axis A (color channel on `border-color`) unchanged from ENG-184; axis B (weight channel on `box-shadow`) new — resting has no shadow, engaged adds a 1px matching-color ring (full-box for `.regular`, directional bottom band for `.minimal`). Layout-invariant because `box-shadow` does not participate in the box model — `border-width`, `border-bottom-width`, `padding`, `--_border-offset` all identical at every state. Status `:focus-within` overrides extended with matching-color rings so the engaged rim never mismatches the status border. Ring color matches border color on purpose — FB-086 correctly rejected the earlier "contrasting ring with white gap" pattern as a double-layer artifact; same-color at zero gap reads as a single continuous 3px rim, not a halo. AP-054 in `docs/design-anti-patterns.md` amended with the two-axis correct-alternative and the full rejection chronology (FB-086 gapped ring → FB-088 padding comp → ENG-136 color-only → ENG-186 two-axis). Note: ENG-184 and FB-161 cite this anti-pattern as AP-057 — citation typo; AP-057 is about bypassing DS components with custom-styled natives. The correct reference is AP-054. Cross-category with ENG-186.) Prior: FB-161: DS `Input` border-thickness state grammar was silently broken by a token-renaming refactor (`fde660a`, 2026-04-11) which dropped `border-width: 2px` from `:focus-within` and pinned `--_border-offset: 1px` unconditionally — collapsing resting/hover/focus to identical 1px rendering. Two-iteration fix within one session: (1) reverted the refactor's deletions to restore FB-088's tri-state grammar (rest 1px gray, hover 1px black, focus 2px black); (2) user re-reported "still no thickness variation" because FB-088's hover was color-only, and the user's mental model treats thickness as the primary engaged-state signal. Extended the 2px border-width + padding-compensation to hover on both `.regular` and `.minimal` emphases. Revised two-state grammar: resting 1px subtle, engaged (hover OR focus) 2px bold. Supersedes FB-088 on the thickness-axis decision; preserves its padding-compensation mechanism. Cross-category with ENG-183. See also EAP-112 / AP-075.) Prior: FB-158: Case-study block drag handles floated far above their content and disappeared on sub-laptop viewports. The between-section spacing lived as `margin-top` on the inner `.sectionHeading`, which sat inside the flex-item `.sortableContent` BFC — so the margin inflated `.sortableInner`'s top area while the absolute-positioned `.dragHandle` at `top: 2px` anchored to that inflated top, producing a ~48px visible gap. Separately, `.dragHandle { display: none }` until `$elan-mq-md` (1056px) hid the affordance on any window narrower than a standard laptop. Fix: moved the between-section margin from `.sectionHeading` onto the outer `.blockWrapper + .blockWrapper:has(.sectionHeading)` (external spacing, handle now aligns with heading's visible top); below md the handle flips from absolute-gutter to in-flow flex + `margin-right: $portfolio-spacer-0-5x` and stays at `opacity: 0.55`; `@media (hover: none)` also surfaces it at `0.55` so tablet admins aren't dependent on a hover state that never fires. Cross-category with ENG-178.) Prior: FB-157 (Audio controls on `VideoSettings` conflated *capability* with *default state* — a single "Muted / Sound" `ButtonSelect` implied every video had user-operable audio when most are silent captures with no sound track. Replaced with a two-layer tree: primary "Audio off / Audio on" (capability) → revealed-when-on "Muted by default / Sound by default" (default state). On `videoEmbed` blocks, the audio default control was removed entirely because provider iframes own their own audio UI. Cross-category with ENG-170, CFB-039.) Prior: FB-156 (ScrollSpy portaled highlight label — three-iteration bug cycle: (1) wrong anchor element (tick vs notch), (2) framer-motion `animate={{ x }}` overwriting the base CSS `transform`, (3) after splitting the tree to fix (2), `mix-blend-mode: difference` stayed on the inner span whose parent was now the anchor's own stacking context — direct recurrence of AP-069 inside the fix. Final shape: outer `div` owns `position:fixed` + transform + `color:#fff` + `mix-blend-mode:difference`; inner `motion.span` owns only the `x`/`opacity` entrance animation. AP-070 extracted.) Prior: FB-155 (ScrollSpy's active notch label now auto-contrasts against any backdrop via a `document.body`-portaled span with `mix-blend-mode: difference` + `color: #fff`. Escapes the rail's fixed-position stacking context so the blend reaches page content below. Only the currently-active/drag-targeted notch flips; hover-revealed non-active labels keep their existing token-driven colors.) Prior: FB-154 ("Muted by default" / "Sound by default" promoted from a hidden dropdown item to a primary `ButtonSelect` on the `VideoSettings` overlay, and added for the first time to `videoEmbed` blocks via a new `VideoEmbedSettings` control. Cross-category with ENG-168.)
+> **Last updated:** 2026-04-26 (FB-224: Semantic link coloring changed from inbound/outbound to unidirectional (Terra) vs bidirectional (Lumen) — inbound/outbound is relative to a node and meaningless at the network level. Prior: FB-223: orphans + size curve. Prior: FB-222: signal particles fix. Prior: FB-221: always-active. Prior: FB-220: brightness inverted. Prior: FB-219: hierarchy brightness. Prior: FB-218: Canvas FigJam. Prior: FB-217: ForceGraph consistent hover-to-emphasize interaction across all views — dim non-connected nodes/links, brighten connected ones. Prior: FB-216: neutral nodes, path-only signal. Prior: FB-215: particle speed time-based. Prior: FB-214: particle shared mutable state fix. Prior: FB-213: Canvas DS component — dot-grid background, zoom/pan, grab cursor. Prior: FB-212: rotation fix. Prior: FB-211: tooltip animation. Prior: FB-210: arrow colors + particles. Prior: FB-209: pin-on-settle + drag. Prior: FB-208: jiggle + tooltip + hover-highlight.) Prior: 2026-04-25 (FB-207: MaturityTimeline combined VWAP-style chart.) Prior: 2026-04-24 (FB-195: Treemap white gaps from height:auto. Prior: FB-194: Treemap tooltip height should animate — grow up / shrink down anchored at cursor bottom. Fix: always-mounted tooltip with CSS `transition: height + opacity`; rAF-deferred `scrollHeight` measurement ensures browser paints the "before" state so the transition has a from-value. Prior: FB-193: Row-mode tiles still rendered as tall narrow rectangles — `flex-direction: row` only reordered content inside the block; the block's own height was still the D3-allocated %. Fix: row-mode tiles get `height: auto` so the block physically collapses to label line-height. Prior: FB-192: Micro mode abolished — `type-3xs` (8px) in row/sliver mode is not legible on coloured surfaces regardless of tile width. Removed micro mode entirely; row mode now uses the same `type-xs` as column mode. Silent width lowered from 32 to 20px so 31px-wide slivers show a truncated label rather than blank. AP-072 updated. Prior: FB-191: Treemap count font too small — `type-3xs` (8px) on a saturated coloured surface with `weight-regular` is below the legibility floor. Bumped to `type-2xs` (10px); hierarchy still holds via weight (semibold vs regular) + opacity (1.0 vs 0.6). Prior: FB-190: Silent threshold 64px too aggressive — 3 tiles 36–64px wide showed as blank rectangles. Added "micro" layout mode (32–64px wide): label only at type-3xs/semibold, 2px padding, no count. Truly silent threshold lowered to 32px. A blank tile is always worse than a truncated one when a tooltip exists. Prior: FB-189: KnowledgeTreemap tooltip structure — header label "Top examples" added at top to explain the bullet list; list gap increased to `$portfolio-spacer-0-5x`; domain + count moved to footer row (bottom, `space-between`). Prior: FB-188: KnowledgeTreemap column-mode height blind spot — count visible without label on short tiles. `justify-content: space-between` places count at bottom edge even when pxH < label font height, making the label invisible while the count floats. Fix: `pxH < 20px` → silent; column mode suppresses count when `pxH < 35px`. Prior: FB-187: AP-072 thresholds too permissive — tiles 36-64px wide were classified as text-showing and produced illegible "De…" labels; tiles with h/w 1.5-2.5 stayed in column mode and showed stacked text in vertical-feeling rectangles. Fixed: `TILE_MIN_TEXT_PX` 36→64, `TILE_SLIVER_RATIO` 2.5→1.5. Prior: FB-186: KnowledgeTreemap block visual hierarchy inverted — label was `type-2xs`/semibold while count was `type-sm`/semibold, making the count visually dominant over the more-informative label. Fixed: label → `type-xs`/semibold (hero), count → `type-3xs`/normal/opacity-0.55 (supporting metadata). Prior: FB-185: KnowledgeTreemap vertical-sliver tiles — orientation-blind `flex-column` layout made narrow tiles illegible. Fix: ResizeObserver + `classifyTile()` produces three modes: column (normal), row (vertical sliver, height/width > 2.5), silent (width < 36px). Extracted as core design principle AP-072. Prior: FB-184: KnowledgeTreemap block IA redesign — label top-left, count bottom-right, tooltip shows DOMAIN allcaps + top-3 most recent AP titles + count; API enhanced to parse AP IDs and look up titles. Prior: FB-183: CollaborationLoop transport — play/pause was 32×32 while prev/next were 28×28 and speed trigger 28px tall; unified hit targets to 32px (`transportBtn` base + `min-width`/`min-height`, speed trigger `height`/`min-height` 32px, removed duplicate sizing from `transportPlayBtn` while keeping accent color/font). Prior: FB-182: MaturityTimeline used `border-radius` on bar stack, milestone chip, legend dots, and popover — conflicts with portfolio zero-radius identity (`branding.md` / Design Hard Guardrail #9). Removed all four; tooltip repositioned to segment right edge per ENG-210. Prior: FB-181: Elan SkillMap vs MaturityTimeline legend rhythm — Maturity used outer `.container` `gap: 3x` between chart and legend while SkillMap used `1x` margin; introduced shared `.visualizationWithLegend` flex stack (`gap: $portfolio-spacer-1x`) in both SCSS modules, wrapped treemap and timeline chart+legend, removed SkillMap `.legend` margin-top. Prior: FB-180: SkillMap Knowledge treemap legend sat flush under the treemap with no vertical separation; added `margin-top: $portfolio-spacer-1x` on `.legend` to match `.section` header-to-content rhythm. Prior: FB-179: CollaborationLoop step dots misaligned with detail panel — removed `.stepNav` horizontal padding so dots span full content width; removed transport bar `border-top` divider between content and controls. Prior: FB-178: CollaborationLoop overuses Lumen accent — 22 decorative `$portfolio-accent-*` usages converted to neutral palette, preserving accent on only 4 elements: two "NEW" status badges and two interactive transport controls. Reinforces Lumen Scarcity Principle from branding.md §9.4 — embedded case study visuals follow the same accent restraint as page chrome. Prior: FB-177: Personalization badge style decision — stayed with `neutral/minimal` over `highlight/minimal` (accent text). Lumen scoping corrected in branding doc: most links use neutral colors, not Lumen. Full rationale documented in `branding.md` §9 including Lumen Scarcity Principle. Prior: FB-176: Company-personalized "for {Company}" badge on home page — repurposed the disabled essay badge slot for a lowercase "for {Company}" tag above case study titles, visible only to authenticated company visitors with non-empty caseStudyNotes. Essay badge logic fully removed. Cross-category with ENG-202. Prior: FB-175: CollaborationLoop transport bar — pager (‹ N / M ›) and play/speed clusters used 2px inter-control gaps and a vertically thin bar; bumped to `$portfolio-spacer-1x` gaps, `$portfolio-spacer-1x` vertical bar padding, and speed trigger horizontal padding to `$portfolio-spacer-1x` with 0.5x internal icon gap. Prior: FB-174: Link toolbar button conflates inspect and destroy actions — replaced binary toggle with a link popover showing URL preview + edit/open/remove actions. Cross-category with ENG-198. Prior: FB-170: Essay layout content column widened from `$elan-container-narrow` (672px) to `$elan-container-content` (720px) in `work/[slug]/page.module.scss` for `.layoutEssay` / `.contentEssay` so the ETRO essay matches the same prose max-width as the case-study body column, about page, and reading page. Prior: FB-168: Password gate composition tuned for OPTICAL balance rather than mathematical balance, per the design principle that dense/animated/high-contrast elements carry more perceived visual weight than sparse/static/low-contrast elements and therefore need MORE surrounding whitespace on their outer side to feel balanced against the lighter element. FB-167 had achieved mathematical centering (~4px off inner center); user pointed out the animated halftone portrait carries significantly more visual weight than the simple serif text on the right and needs a larger outer-side breathing gutter. Widened `.canvasPane` from `flex: 0 0 53%` to `flex: 0 0 55%`, which shifts the portrait's visual center rightward enough that the empty space to the left of the portrait figure (~133px on 1120px canonical) now exceeds the empty space to the right of the card (~108px) by ~25px — an intentional asymmetry favoring the heavier element. Same `.formPane` padding (`$portfolio-spacer-6x` with `padding-left: $portfolio-spacer-2x` override). Portrait-to-card gap widens by ~12px (137 → 149) as the cost of the optical rebalance — acceptable because (a) the user's original too-far gap was 195px, so 149 is still a 23% improvement, and (b) gap preservation and optical balance are in tension at the current card max-width. SEPARATELY: caught and fixed a mobile regression introduced by FB-166 — on viewports ≤768px the canvasPane is hidden and the form becomes the only content on screen, but the desktop `justify-content: flex-start` + asymmetric left padding was still firing, pinning the form to the left of the mobile viewport. Added mobile override resetting to `justify-content: center` and symmetric `$portfolio-spacer-6x` padding. New design principle extracted (candidate for `docs/design/spacing.md`): optical balance — when two elements in a composition have meaningfully different visual weight (density, motion, contrast, detail), mathematical centering reads as imbalanced; the heavier element needs more surrounding whitespace on its outer side to feel balanced. This is an explicit architectural principle, not a case-by-case judgement. Responsiveness principle reinforced: whenever a layout uses alignment or padding tuning for a specific breakpoint context (two-column here), there MUST be a corresponding breakpoint override for when that context disappears (mobile single-column here) — otherwise the desktop tuning bleeds into other contexts as a regression.) Prior: FB-167: Password gate composition re-centered on the viewport. After FB-166 pulled the action card close to the portrait by anchoring it to the start of its pane, the overall composition read left-skewed — the 50/50 column split left ~43px more empty space on the card side than on the portrait side. Fixed by widening `.canvasPane` from `flex: 0 0 50%` to `flex: 0 0 53%` (shifts the portrait's visual center rightward by ~17px on the canonical 1120px container) and tightening `.formPane` left padding from `$portfolio-spacer-4x` to `$portfolio-spacer-2x` so the portrait-to-card distance the user just approved in FB-166 is preserved exactly (~137px). Switched `.formPane` padding declaration from a 4-value shorthand to `padding: 6x` + `padding-left: 2x` override for readability. Composition center is now ~4px of inner center versus ~22px before. Design principle extracted: when one half of a two-column composition has its content centered within its pane and the other has content anchored to the start of its pane, a 50/50 split is inherently imbalanced — widen the centered-content pane slightly so its content's visual center offsets the opposing half's start-anchor offset. No engineering/content dimension.) Prior: FB-166: Password gate two-column layout — reduced the perceived distance between the halftone portrait (left 50%) and the action card (right 50%) by anchoring the form card to the start of its pane. Changed `.formPane` `justify-content: center` → `flex-start` and switched padding from symmetric `$portfolio-spacer-6x` to asymmetric `6x 6x 6x 4x`, pulling the card's left edge ~58px closer to the center divider on the 1120px canonical width while leaving the portrait position, responsive mobile hide breakpoint, and card max-width (380px) unchanged. Portfolio branding guardrail #9 (zero border-radius) respected — no radius added. All values remain on the `$portfolio-spacer-*` 8px primitive scale per §1.) Prior: FB-165: Password gate interaction design documented as a unified concept - the "Welcome, ___" sentence completion with visible-text password, fuzzy normalization as UX requirement, hierarchy-conscious phrase selection. Password changed from `preview-2026` to `glad you are here`. Cross-category with ENG-193 and CFB-041.) Prior: FB-164: Introduced an `essay` content format alongside the existing `caseStudy` layout in the `projects` collection. Essays switch from the two-column (sidebar + content) layout to a single-column Medium-style reading layout capped at `$elan-container-narrow`. Between the H1 and the blurb body, a new `EssayHeader` renders a three-line vertical stack: category eyebrow (reusing `<Eyebrow size="sm">`) → H1 (inline-editable `introBlurbHeadline`) → `EssayMeta` row (publication date · N min read · optional "Also on Medium" link). Design decisions: (1) the header is hoisted OUTSIDE the pre-existing `.introBlurb` `{headline && (...)}` guard so the meta row never disappears when the headline is blank — on essays the `.introBlurb` wrapper renders only the body and the H1 is emitted exactly once by `EssayHeader`; (2) the Medium cross-post link replaces the originally-proposed like/reaction count because a visible engagement signal on a portfolio primarily read by interviewers is socially off-key (user's reversal captured in CFB-040); (3) separators between meta segments use `$portfolio-text-placeholder` dots, passive segments use `$portfolio-text-secondary` at `body-sm`, and the Medium link uses `$portfolio-text-primary` for recognizability without borrowing the brand's cyan accent; (4) the Medium logo is a hand-authored inline SVG sized at `1em` — decorative, `aria-hidden="true"` — under branding guardrail #7's icon/logo exception, and the link itself opens in a new tab with a trailing `↗` affordance consistent with other external links; (5) zero border-radius across all new surfaces per branding guardrail #9; (6) the homepage "Essay" badge detection was moved from a fragile `category.toLowerCase() === 'essay'` string match to the explicit `contentFormat === 'essay'` discriminant, closing a latent bug where ETRO's `"Essay · …"` category never actually matched. Cross-category with ENG-191 (discriminant schema + hybrid read-time + homepage projection fix) and CFB-040 (cross-post link rationale, dropped scope statement, category doubling as topic eyebrow, `title` intentionally unrendered on essays). `docs/content/case-study.md` §3.2 "Essay Sidebar Variant" reconciled: the sidebar is *replaced* by a single-column layout, not lightened.) Prior: FB-163: Fourth complaint on DS `Input` border-thickness in one session — Design Hard Guardrail #4 tripped a second time within the same sequence. The FB-162 two-axis grammar was structurally right but left the base `border-width` at 2px, so resting inputs read as over-heavy and engaged inputs compounded to a visual 3px rim. User's ground truth (consistent across FB-088 → FB-161 → FB-162 → FB-163): rest = 1px hairline, engaged = 2px border. Fix drops `.regular` base border and `.minimal` base `border-bottom` from 2px to 1px; the ENG-186 engaged-state rings are left untouched and now compose on a 1px base for a solid 2px visual rim on hover/focus. All status variants (`error`/`success`/`warning`/`brand`) inherit the same composition — resting 1px status-color, engaged 2px status-color. Extracted principle: when a component has a paint-only weight channel (box-shadow, outline), the base `border-width` is a pure design choice — pick the value that matches the component's resting character (1px hairline for inputs), not the value that makes engaged states convenient. AP-054 amended to separate the structural rule (change is forbidden) from the value choice (free within the constraint). Rejection chronology now four rejected + one standing: FB-086 gapped ring → FB-088 padding comp → ENG-136 color-only / 2px → ENG-186 two-axis / 2px → ENG-187 two-axis / 1px (current). Cross-category with ENG-187.) Prior: FB-162: Third complaint on DS `Input` border-thickness in one session — architectural-complaint threshold hit per the Design guardrail. After FB-161 → ENG-184's constant-2px / color-only fix, the user still reads "engaged" as a thickness change, not a color change. The one-axis state-affordance grammar was structurally insufficient. Shipped a two-axis grammar: axis A (color channel on `border-color`) unchanged from ENG-184; axis B (weight channel on `box-shadow`) new — resting has no shadow, engaged adds a 1px matching-color ring (full-box for `.regular`, directional bottom band for `.minimal`). Layout-invariant because `box-shadow` does not participate in the box model — `border-width`, `border-bottom-width`, `padding`, `--_border-offset` all identical at every state. Status `:focus-within` overrides extended with matching-color rings so the engaged rim never mismatches the status border. Ring color matches border color on purpose — FB-086 correctly rejected the earlier "contrasting ring with white gap" pattern as a double-layer artifact; same-color at zero gap reads as a single continuous 3px rim, not a halo. AP-054 in `docs/design-anti-patterns.md` amended with the two-axis correct-alternative and the full rejection chronology (FB-086 gapped ring → FB-088 padding comp → ENG-136 color-only → ENG-186 two-axis). Note: ENG-184 and FB-161 cite this anti-pattern as AP-057 — citation typo; AP-057 is about bypassing DS components with custom-styled natives. The correct reference is AP-054. Cross-category with ENG-186.) Prior: FB-161: DS `Input` border-thickness state grammar was silently broken by a token-renaming refactor (`fde660a`, 2026-04-11) which dropped `border-width: 2px` from `:focus-within` and pinned `--_border-offset: 1px` unconditionally — collapsing resting/hover/focus to identical 1px rendering. Two-iteration fix within one session: (1) reverted the refactor's deletions to restore FB-088's tri-state grammar (rest 1px gray, hover 1px black, focus 2px black); (2) user re-reported "still no thickness variation" because FB-088's hover was color-only, and the user's mental model treats thickness as the primary engaged-state signal. Extended the 2px border-width + padding-compensation to hover on both `.regular` and `.minimal` emphases. Revised two-state grammar: resting 1px subtle, engaged (hover OR focus) 2px bold. Supersedes FB-088 on the thickness-axis decision; preserves its padding-compensation mechanism. Cross-category with ENG-183. See also EAP-112 / AP-075.) Prior: FB-158: Case-study block drag handles floated far above their content and disappeared on sub-laptop viewports. The between-section spacing lived as `margin-top` on the inner `.sectionHeading`, which sat inside the flex-item `.sortableContent` BFC — so the margin inflated `.sortableInner`'s top area while the absolute-positioned `.dragHandle` at `top: 2px` anchored to that inflated top, producing a ~48px visible gap. Separately, `.dragHandle { display: none }` until `$elan-mq-md` (1056px) hid the affordance on any window narrower than a standard laptop. Fix: moved the between-section margin from `.sectionHeading` onto the outer `.blockWrapper + .blockWrapper:has(.sectionHeading)` (external spacing, handle now aligns with heading's visible top); below md the handle flips from absolute-gutter to in-flow flex + `margin-right: $portfolio-spacer-0-5x` and stays at `opacity: 0.55`; `@media (hover: none)` also surfaces it at `0.55` so tablet admins aren't dependent on a hover state that never fires. Cross-category with ENG-178.) Prior: FB-157 (Audio controls on `VideoSettings` conflated *capability* with *default state* — a single "Muted / Sound" `ButtonSelect` implied every video had user-operable audio when most are silent captures with no sound track. Replaced with a two-layer tree: primary "Audio off / Audio on" (capability) → revealed-when-on "Muted by default / Sound by default" (default state). On `videoEmbed` blocks, the audio default control was removed entirely because provider iframes own their own audio UI. Cross-category with ENG-170, CFB-039.) Prior: FB-156 (ScrollSpy portaled highlight label — three-iteration bug cycle: (1) wrong anchor element (tick vs notch), (2) framer-motion `animate={{ x }}` overwriting the base CSS `transform`, (3) after splitting the tree to fix (2), `mix-blend-mode: difference` stayed on the inner span whose parent was now the anchor's own stacking context — direct recurrence of AP-069 inside the fix. Final shape: outer `div` owns `position:fixed` + transform + `color:#fff` + `mix-blend-mode:difference`; inner `motion.span` owns only the `x`/`opacity` entrance animation. AP-070 extracted.) Prior: FB-155 (ScrollSpy's active notch label now auto-contrasts against any backdrop via a `document.body`-portaled span with `mix-blend-mode: difference` + `color: #fff`. Escapes the rail's fixed-position stacking context so the blend reaches page content below. Only the currently-active/drag-targeted notch flips; hover-revealed non-active labels keep their existing token-driven colors.) Prior: FB-154 ("Muted by default" / "Sound by default" promoted from a hidden dropdown item to a primary `ButtonSelect` on the `VideoSettings` overlay, and added for the first time to `videoEmbed` blocks via a new `VideoEmbedSettings` control. Cross-category with ENG-168.)
 >
 > **For agent skills:** Read only the first 30 lines of this file (most recent entries) for pattern detection.
 > **Older entries:** Synthesized in `docs/design-feedback-synthesis.md`. Raw archive in `docs/design-feedback-log-archive.md`.
 
 ---
 
+<a id="fb-219"></a>
+### FB-219: ForceGraph hierarchy-derived node brightness — val drives size + brightness
+
+**Date:** 2026-04-26
+
+**What happened:** User observed that all nodes rendered at the same gray regardless of their importance tier. The hierarchy was only expressed through size (val drives radius), not brightness. User wanted hub nodes (highest degree) to be the darkest, boldest, and leaf nodes (lowest degree) to be the dimmest, creating a dual-channel hierarchy signal that works across all view modes.
+
+**Root cause:** The `nodeColor` callback in the KnowledgeGraph wrapper and playground mapped node colors by *group type* (hub, guardrail, spoke, etc.) rather than by *importance value*. Two nodes of the same type with different degrees rendered identically. The ForceGraph component's default `getNodeColor` returned a flat `DEFAULT_NODE_COLOR` for all nodes when no consumer override was provided. The hierarchy was single-channel (size only).
+
+**Resolution:**
+- Added `maxVal` computation (memoized from nodes array) to ForceGraph.tsx
+- `getNodeColor` default now derives brightness from `val / maxVal` using sqrt scaling: `channel = 80 + sqrt(t) * 150` (range: rgb 80-230), `alpha = 0.35 + sqrt(t) * 0.6` (range: 0.35-0.95). Sqrt compression spreads the bottom of the range (most nodes are low-val) while keeping hubs clearly brightest.
+- Removed `GROUP_COLORS` maps and `nodeColor` prop from both KnowledgeGraph wrapper and playground. The component now handles hierarchy coloring internally.
+- The `nodeColor` prop remains available for consumers who need custom override.
+
+**Design principle learned:** When visualizing a hierarchy, every visual channel available should reinforce the same ranking. Size-only hierarchy is single-channel and easy to miss at small differences. Dual-channel (size + brightness) creates redundant encoding that's immediately legible even without labels. The hierarchy should be derived from the actual data (degree/val), not from categorical metadata (type/group), because two nodes of the same type can have very different importance.
+
+**Cross-category note:** Also documented as ENG-239 (engineering).
+
+---
+
+<a id="fb-224"></a>
+### FB-224: Semantic link coloring — unidirectional (Terra) vs bidirectional (Lumen)
+
+**Date:** 2026-04-26
+
+**What happened:** The original color semantic (FB-210) used Terra for outbound links and Lumen for inbound links. The user pointed out that inbound/outbound are relative to whichever node you're looking at - they flip depending on perspective. When viewing the network as a whole, the distinction is meaningless and confusing.
+
+**Root cause:** The inbound/outbound framing came from a node-centric mental model (standing at node A, what goes out vs what comes in). But the Pathway and Signal views show the entire network simultaneously - no single node is "the" reference point. A link that's "outbound" from A is simultaneously "inbound" to B.
+
+**Resolution:** Reframed the semantic to an absolute property of the connection itself: **unidirectional** (one-way flow, Terra) vs **bidirectional** (two-way flow, Lumen). This distinction is independent of viewing perspective - a bidirectional link is bidirectional regardless of which node you're focused on. The code already used `link.bidirectional` to make this determination, so the actual accessor logic was already correct. Updated comments and playground descriptions to reflect the corrected semantic.
+
+**Design principle learned:** Color semantics in network visualizations must encode **absolute properties of the connection** (uni- vs bidirectional, confidence, type), not **relative properties dependent on a reference node** (inbound vs outbound). Relative properties are useful in node-centric views (ego networks, adjacency lists) but meaningless in global network views. If a color semantic flips meaning when the user moves their focus to a different node, the semantic is broken.
+
+---
+
+<a id="fb-223"></a>
+### FB-223: ForceGraph orphan nodes not visible + hub-to-second-tier size gap too extreme
+
+**Date:** 2026-04-26
+
+**What happened:** Two issues: (1) Orphan nodes (val=0, no connections) weren't showing up in the graph. (2) The hub node was disproportionately larger than the second-tier node, creating a jarring size jump that didn't match the gradual hierarchy intent.
+
+**Root cause:** (1) Orphans were technically rendering (val=0 → size 2 from floor, color rgb(210)) but on a light canvas background rgb(210) is nearly invisible, and the `val ?? 1` fallback in size meant orphans got treated as val=1 instead of their true val=0. (2) The `sqrt(v) * 1.0` size formula without normalization against maxVal meant absolute val differences drove size: a hub with val=50 produced `sqrt(50)=7.1` while val=10 produced `sqrt(10)=3.2` - a 2.2x ratio that reads as one node dominating the graph.
+
+**Resolution:**
+- **Orphans**: Explicit val=0 branch returns size 1.5 (clearly smallest) and color `rgb(190, 190, 190)` (light but visible). Added a "Deprecated" orphan node to playground demo.
+- **Size curve**: Normalized against `maxVal` then applied `pow(0.4)` compression. Range: 2 (leaf) → 5 (hub). Hub-to-second-tier gap is now ~4% instead of ~25%. The hierarchy is still visible through gradual stepping but no single node dominates.
+- **Color floor**: Leaf color raised from rgb(210) to rgb(200) so the lightest connected nodes are more visible.
+
+**Design principle learned:** Size hierarchy in data visualization should use gradual stepping, not dramatic jumps. The hub node should be clearly the largest but not disproportionately so - the hierarchy should read as a continuum, not as "one big node and a bunch of small ones." Normalizing against maxVal and using a compression curve (pow < 0.5) ensures the relative hierarchy is preserved regardless of the absolute data range.
+
+**Cross-category note:** Also documented as ENG-243 (engineering).
+
+---
+
+<a id="fb-221"></a>
+### FB-221: Signal view always-active — default path fires on mount, hover previews, click switches
+
+**Date:** 2026-04-26
+
+**What happened:** Signal view was dead by default - no particles fired until the user hovered a node. The user expected the Signal view to always be alive, with a default active path firing particles from the moment the view loads.
+
+**Root cause:** The particle emitter was gated on `hoveredNode`, so entering Signal view showed static links with no activity. This made Signal look identical to Mesh until the user discovered they needed to hover. A visualization mode that requires discovery before it shows its distinguishing feature is broken.
+
+**Resolution:** Three-layer interaction model:
+1. **Default active path**: On entering Signal view, the highest-val (hub) node is auto-selected as the signal source. Its BFS-reachable path always shows particles.
+2. **Hover preview**: Hovering a different node shows a second set of translucent particles (0.4 alpha vs 0.85) on that node's path, alongside the active path. The preview path's links are also subtly highlighted.
+3. **Click to switch**: Clicking a node replaces the active source. The clicked node's path becomes the primary (solid) particle stream. The old active path disappears.
+
+Implementation: `signalActiveNodeId` state (defaults to max-val node), `signalActiveNode` derived object, `activatedPathLinks` uses active node (not hover), `previewPathLinks` uses hovered node (when different from active), particle emitter reads both via refs for stable interval. Particle color accessor checks which path a link belongs to and adjusts alpha accordingly.
+
+**Design principle learned:** A visualization mode must demonstrate its defining behavior immediately on activation, not on discovery. If Signal view exists to show "how things propagate," it must propagate on load. The three-layer interaction (always-on default, hover preview, click commit) is a general pattern for any view where the user can select a focus within a continuous visualization - the default shows the most meaningful selection, hover teases alternatives without commitment, click commits.
+
+**Cross-category note:** Also documented as ENG-241 (engineering).
+
+---
+
+<a id="fb-220"></a>
+### FB-220: ForceGraph node brightness inverted — hub = darkest, not brightest
+
+**Date:** 2026-04-26
+
+**What happened:** FB-219 and the first correction both used "brighter = more important," culminating in near-white hubs at full opacity. The user rejected this twice - the second time emphatically. The correct model: **hub nodes must use the darkest, most solid color** (near-black), and leaf nodes step up toward lighter gray. Additionally, opacity variation across nodes was explicitly rejected - all nodes must be fully opaque; brightness alone carries the hierarchy signal.
+
+**Root cause:** A fundamental misread of "boldest" on a dark canvas. The agent assumed "boldest" = "highest luminance" (white stands out on dark). The correct interpretation: "boldest" = "most ink" = darkest, most saturated mark. A near-black node on a dark canvas reads as solid, deliberate, weighty - like bold type. A light gray node reads as ghostly and uncertain. This is the same logic as bold text: bold weight is denser/darker ink, not lighter ink. Opacity was an additional mistake - varying alpha introduces transparency artifacts and visual noise that muddies the clean brightness stepping.
+
+**Resolution:**
+- Hub (highest val): `rgb(40, 40, 40)` - near-black, fully opaque
+- Leaf (lowest val): `rgb(210, 210, 210)` - light gray, fully opaque
+- pow(0.6) curve stretches the lower range where most nodes cluster
+- Zero opacity variation - every node uses `rgb()`, not `rgba()`
+- Size channel unchanged (sqrt scaling, floor 2, multiplier 1.0)
+
+**Design principle learned:** In data visualization on dark surfaces, "visual weight" follows ink logic, not light logic. The most important node gets the most ink (darkest color), not the most light (brightest color). This is why bold text is heavier/darker, not lighter. Opacity is not a hierarchy channel for nodes - it introduces transparency artifacts and conflates "importance" with "presence." The hierarchy of nodes in a knowledge graph encodes the **hierarchy of thought** behind the author's design intent. The biggest, darkest node is the most central idea; the smallest, lightest is peripheral. Brightness stepping alone (no opacity) keeps the hierarchy clean and unambiguous - every node is equally "there," but their visual weight differs through darkness.
+
+**Cross-category note:** Also documented as ENG-240 (engineering).
+
+---
+
+<a id="fb-217"></a>
+### FB-217: ForceGraph consistent hover-to-emphasize interaction across all views
+
+**Date:** 2026-04-26
+
+**What happened:** User identified three related issues:
+1. The hover-to-emphasize pattern (bolder connected links, highlighted connected nodes, dimmed unconnected elements) only worked in Mesh view, not Pathway or Signal
+2. Non-connected nodes and links needed higher opacity to create a "focused, cleaner view" of relationships
+3. Residual confusion about which visual element is a node vs. a particle when they share similar colors
+
+**Root cause:** The hover interaction was built piecemeal per view mode — Mesh had link emphasis via `hoveredNeighborLinks`, Pathway had no hover differentiation at all, and Signal only highlighted the activated path. The `paintNode` function drew all nodes at full opacity regardless of hover state, so hovering a node didn't create any contrast between connected and unconnected regions. The lack of a `hoveredNeighborNodes` set meant node-level dimming wasn't possible.
+
+**Resolution:** Unified hover-to-emphasize across all three views:
+- **Node painting**: Added `hoveredNeighborNodes` set. When a hover is active: hovered node gets a bright white stroke ring, connected neighbors get a subtle ring + 0.9 opacity, non-connected nodes drop to 0.2 opacity. Labels auto-show for all connected neighbors (not just hubs), with graduated alpha (hovered: 0.95, neighbor: 0.75, dimmed: 0.15).
+- **Link colors**: Three-state system across all views — emphasis (connected, bolder/brighter), resting (no hover), dim (not connected, near-invisible). In Pathway view, connected links get brighter Terra/Lumen; in Signal, activated-path links that are also connected get full emphasis. Non-connected links dim universally to `rgba(160, 160, 160, 0.06)`.
+- **Link widths**: Connected links get 1.4 width, non-connected drop to 0.4. Pathway scales confidence-weighted width by 1.3x on hover.
+- **Arrows**: Non-connected arrows hidden entirely (length 0) to reduce visual clutter in Pathway view when focusing on one node.
+
+**Design principle learned:** Hover-to-emphasize is a *component-level* interaction pattern, not a view-mode-specific feature. It should be implemented once in the base component and work identically across all modes. Each mode only varies *what* gets emphasized (Mesh: immediate neighbors, Signal: activated path + neighbors), not *whether* emphasis exists. The emphasis vocabulary (opacity for nodes, color brightness + width for links, visibility for arrows) must be defined as constants, not inline per-mode.
+
+**Cross-category note:** Also documented as ENG-237 (engineering).
+
+---
+
+<a id="fb-218"></a>
+### FB-218: Canvas — Jamboard-style navigation and world-anchored dot grid
+
+**Date:** 2026-04-26
+
+**What happened:** User reported the `Canvas` DS surface felt wrong compared to FigJam / Jamboard: trackpad pinch should zoom, two-finger scroll should pan, mouse wheel should pan on empty canvas, left-drag and middle-mouse drag on the background should pan; the dot field looked uneven (tiny dots in huge cells when zoomed) and did not give a clear sense of scale when zooming.
+
+**Root cause:** Interaction was implemented through React `onWheel` (passive, cannot capture gestures) and a single “wheel = zoom” mapping. Pan started only when `pointerdown` hit the root node directly, but the full-bleed content wrapper intercepted hits. The grid used a fixed pixel dot radius in the gradient while only the repeat step scaled with zoom.
+
+**Resolution:** Managed mode now uses native non-passive `wheel` with `ctrlKey` → zoom and otherwise → pan; `.contentManaged` passes events through empty space to the root; middle and primary buttons pan from the background; dot radius and cell step both scale with `k`; default spacing eased to 32px and slightly lower contrast for a lighter field. Playground Canvas page documents passthrough wiring to the child and interaction-only managed demos (no auxiliary controls).
+
+**Design principle learned:** Infinite-canvas “paper” backgrounds need **two coupled scales** (mark size and repeat pitch) tied to the same transform, or zoom reads as broken. Gesture models that depend on `preventDefault` must not rely on React’s default passive wheel path.
+
+**Cross-category note:** Also documented as ENG-238 (engineering).
+
+---
+
+<a id="fb-216"></a>
+### FB-216: ForceGraph visual hierarchy — neutral nodes, size ratio, path-scoped signal
+
+**Date:** 2026-04-26
+
+**What happened:** User gave four related pieces of feedback on the ForceGraph visualization:
+1. Nodes should only use the neutral color family - no Terra/warm tones - so they're clearly separated from arrow and particle colors
+2. Non-hub nodes should be slightly larger so they're visible, but particles must be smaller than nodes
+3. The Signal view was firing particles across the entire network simultaneously, which defeats its purpose. It should simulate a single signal propagating through the network: only the "activated path" from the hovered node gets particles, everything else falls back to mesh default lines
+
+**Root cause:** The original color scheme used Terra-warm tones for guardrail/anti-pattern nodes (in the case study) and service nodes (in the playground), conflicting with the semantic color role of Terra (outbound direction) and Lumen (inbound direction) on arrows and particles. Node size floor was 1.5px with particle width at 3px, making particles larger than small nodes. Signal view emitted particles on every link simultaneously, making it look like "the whole network is running" rather than "one signal propagating through a path."
+
+**Resolution:**
+- **Colors**: Shifted all GROUP_COLORS in both KnowledgeGraph wrapper and playground to pure neutral grays (rgba 100-220 range). Hub nodes are brightest (220), graduating darker through guardrail/route/skill/spoke/feedback. No Terra or Lumen hues in any node.
+- **Sizes**: Node size floor raised from 1.5 to 2.5, scale factor from 0.8 to 0.9. Particle width reduced from 3 to 2. Ensures every node is visibly larger than any particle.
+- **Signal path isolation**: Replaced blanket `linkDirectionalParticles={3}` with `emitParticle` driven by a BFS-computed `activatedPathLinks` set. When a node is hovered, BFS walks outward following link direction (and bidirectional reverse). Only those links get particles (via a 250ms interval + initial burst). Links not on the activated path render with mesh defaults (same color and width as mesh view). When no node is hovered, no particles fire and all links show mesh defaults.
+
+**Design principle learned:** In a multi-signal visualization (nodes + links + arrows + particles), each visual channel must own an exclusive domain of the color space. Nodes = neutral, directional indicators = semantic color. When two channels share color, the viewer can't parse which dimension they're reading. Similarly, a dynamics view (signal) must simulate causality (one thing triggering downstream), not simultaneity (everything running at once) - the latter is just visual noise.
+
+**Cross-category note:** Also documented as ENG-236 (engineering).
+
+---
+
+<a id="fb-215"></a>
+### FB-215: ForceGraph particle speed inconsistent across browsers — time-based compensation
+
+**Date:** 2026-04-26
+
+**What happened:** User reported that particle animation speed in Signal view looked visibly different between a standalone browser (Chrome) and Cursor's embedded webview. Particles appeared slower in the embedded browser. The user's expectation: "Visual consistency is critical in UX design principles. Even if I zoom in, it shouldn't really have a different firing speed."
+
+**Root cause:** The `force-graph` library advances particle positions by a fixed `speed` (link-length ratio) **per animation frame**. When `requestAnimationFrame` is throttled (background tabs, embedded webviews like Cursor's browser), the frame rate drops from ~60fps to ~30fps or lower. Fewer frames per second means fewer speed increments per second, so particles visually slow down. The library provides no built-in time-delta compensation.
+
+**Resolution:** Replaced the constant `PARTICLE_SPEED = 0.005` with a time-based system:
+1. A `TARGET_SPEED_PER_SECOND` constant (0.3 link-lengths/sec) defines the intended visual velocity
+2. A `requestAnimationFrame` loop (active only in Signal mode) measures actual frame delta
+3. Each frame computes `frameSpeedRef.current = TARGET_SPEED_PER_SECOND * deltaSec`
+4. `linkDirectionalParticleSpeed` uses a stable accessor function that reads from the ref
+
+At 60fps: `0.3 * 0.0167 = 0.005` (same as before). At 30fps: `0.3 * 0.033 = 0.01` (particles move twice as far per frame, maintaining the same visual speed per second). Delta is capped at 100ms to prevent jumps after tab switches.
+
+**Design principle learned:** Any frame-rate-dependent animation in a canvas library needs time-delta compensation to maintain visual consistency across environments. This is standard game-loop practice (`distance = speed * deltaTime`) but is easy to miss when a library API expects a fixed per-frame value.
+
+**Cross-category note:** Also documented as ENG-235 (engineering).
+
+---
+
+<a id="fb-214"></a>
+### FB-214: ForceGraph Signal view particles finally resolved - shared mutable state root cause
+
+**Date:** 2026-04-26
+
+**What happened:** User reported zero particles in Signal view across 6+ attempts and escalating frustration. Multiple fixes were tried (imperative emitParticle intervals, adjusting particle speed/width/count, calling resumeAnimation, switching between declarative and imperative APIs). None worked.
+
+**Root cause:** The playground page rendered 4 ForceGraph instances sharing the same JavaScript link objects. The Mesh instance (linkDirectionalParticles=0) ran `delete link.__photons` on every link object during its initialization, destroying the Signal instance's photons before they could render. Additional compounding: graphData wasn't memoized (causing constant re-creation), and the graphRef didn't expose `graphData()` (breaking all imperative workarounds).
+
+**Resolution:** Deep-clone nodes and links per ForceGraph instance via useMemo so each owns isolated objects that no other instance can corrupt.
+
+**Design principle learned:** When debugging a visual effect that "should work" by the library's API but doesn't, check whether multiple instances on the same page share mutable state. The bug was not in the particle API, the animation loop, or the render pipeline - it was in the data ownership model. Cross-instance mutation is invisible in single-instance testing.
+
+**Cross-category note:** Also documented as ENG-234 (engineering).
+
+---
+
+<a id="fb-213"></a>
+### FB-213: Canvas DS component — dot-grid, zoom, pan, cursor states
+
+**Date:** 2026-04-26
+
+**What happened:** User requested the ForceGraph to live inside a proper canvas container with: (1) scroll-to-zoom, (2) click-drag-to-pan with grab/grabbing cursor states, and (3) a dotted grid background for spatial orientation, matching Obsidian/FigJam canvas behavior.
+
+**Root cause:** The ForceGraph had `enableZoomInteraction={false}` (from EAP-036 scroll-hijack avoidance) and no spatial reference grid. The component was embedded as a widget, but the user's intent is to use it as a full canvas interaction surface.
+
+**Resolution:**
+1. **New `Canvas` DS component** (`src/components/ui/Canvas/`): renders a CSS radial-gradient dot grid that scales and offsets with zoom/pan transform. Supports two modes:
+   - **Passthrough** (default): Grid syncs to an external `transform` prop. Zoom/pan managed by the child.
+   - **Managed**: Canvas handles wheel-to-zoom and drag-to-pan internally. For wrapping static content.
+   Cursor defaults to `grab` (idle) and `grabbing` (active pan).
+2. **ForceGraph** updated: new `enableZoom` and `enablePan` boolean props (defaults `false`/`true`). New `onTransformChange` callback fires on every zoom/pan change, exposing `{x, y, k}` transform for grid sync.
+3. **KnowledgeGraph** wrapper: ForceGraph wrapped in `<Canvas>` with `enableZoom` enabled. `onTransformChange` feeds `setCanvasTransform` to keep the dot grid in sync.
+4. ForceGraph container now sets `cursor: grab` / `:active { cursor: grabbing }` on the container and its internal `<canvas>` element.
+
+**EAP-036 reconciliation:** The scroll-hijack anti-pattern applies to embedded *widgets* inside scrollable pages. When the canvas IS the primary interaction surface (user explicitly opts into canvas mode), scroll-to-zoom is the expected behavior. The `enableZoom` prop defaults to `false`, preserving the safe default.
+
+**Design principle learned:** A canvas component has two distinct responsibilities: spatial chrome (grid, cursors) and transform management (zoom/pan). These should be separable so the canvas can wrap children that manage their own transforms (like `react-force-graph-2d`) without double-handling events.
+
+---
+
+<a id="fb-212"></a>
+### FB-212: ForceGraph still rotates on hover + drag spring-back too slow
+
+**Date:** 2026-04-26
+
+**What happened:** User reports the graph STILL rotates when the cursor approaches a node, and that the drag spring-back is so slow the node barely returns. Both are described as interaction-breaking.
+
+**Root cause:**
+1. **Rotation:** `cooldownTicks={0}` meant the d3-force simulation never terminates on its own. `onEngineStop` pinned nodes once, but `d3ReheatSimulation()` in drag-end restarted it, and the low decay values (`d3AlphaDecay=0.03`) kept it alive long enough that React re-renders from `setHoveredNode` could perturb the still-running simulation. The fundamental error: relying on `onEngineStop` to pin nodes while the simulation never actually reaches a stop condition.
+2. **Slow spring-back:** `d3AlphaDecay=0.03` and `d3VelocityDecay=0.4` were too gentle. The released node needed hundreds of ticks to return, producing a ~3-5 second drift instead of a snappy bounce.
+
+**Resolution:**
+1. **Terminating simulation:** Changed `cooldownTicks` from `0` to `200`. The simulation now has a hard tick limit and actually stops, triggering `onEngineStop` which pins all nodes. Combined with `warmupTicks=200`, the initial layout completes in the synchronous warmup pass, and the cooldown pass settles any remaining energy before the first paint.
+2. **Fast decay:** `d3AlphaDecay` raised from `0.03` to `0.12`, `d3VelocityDecay` from `0.4` to `0.55`. After a drag release, the simulation reheats but the high decay means the unpinned node snaps back in ~15-20 ticks (under half a second). Since all OTHER nodes remain pinned (`fx`/`fy` set), only the released node moves - eliminating any global graph disturbance.
+3. **Simplified drag handler:** `handleNodeDrag` now only sets the `isDraggingRef` flag. The library internally manages `fx`/`fy` during drag. `handleNodeDragEnd` unpins only the dragged node and reheats. `onEngineStop` re-pins everything when the simulation terminates.
+
+**Design principle learned:** A force simulation that never terminates (`cooldownTicks=0`) is fundamentally incompatible with a "frozen after layout" interaction model. The simulation must have a hard stop condition. Pinning nodes is a workaround for a paused simulation, but if the simulation can be reheated, it must also be able to re-terminate. This is the third iteration (FB-208, FB-209, FB-212) - the correct architecture was always: `warmupTicks` for pre-paint layout, `cooldownTicks` for post-paint settling, `onEngineStop` for universal pinning, and aggressive decay for fast convergence.
+
+---
+
+<a id="fb-211"></a>
+### FB-211: ForceGraph tooltip must match Elan case study animation pattern
+
+**Date:** 2026-04-26
+
+**What happened:** User pointed out the ForceGraph tooltip doesn't inherit the interaction pattern used in other Elan case study visuals (specifically the SkillMap treemap tooltip). The existing tooltip appears/disappears mechanically without the animated height grow/shrink, the anchored position stability, or the corner-retract dismiss behavior.
+
+**Root cause:** The ForceGraph tooltip was implemented as a conditionally rendered `{hoveredNode && ...}` element with static positioning via CSS custom properties. This is a completely different pattern from the treemap tooltip, which is always-mounted and uses animated `height`, `opacity`, and `transform: scale()` with CSS transitions. The agent didn't study the actual SkillMap code before implementing the ForceGraph tooltip.
+
+**Resolution:** Rewrote the ForceGraph tooltip to exactly match the treemap pattern (FB-194):
+1. **Always-mounted** - the tooltip DOM is never conditionally rendered. A `.tooltipAnchor` div handles absolute positioning + `translate(-50%, -100%)`. A `.tooltipVisual` div inside handles animated `height`, `opacity`, and `transform: scale()`.
+2. **Animated height** - `tooltipContentRef` measures `scrollHeight` of the inner content. Height transitions between 0 (dismissed) and the measured value (visible) using `cubic-bezier(0.4, 0, 0.2, 1)` over 200ms. A `requestAnimationFrame` defers the measurement so the browser paints the "before" height first.
+3. **Anchored dismiss** - `lastTooltipPosRef` preserves the last known screen position so the tooltip doesn't jump to `(0,0)` during its dismiss animation.
+4. **Corner-retract scale** - `tooltipOrigin` is set to `'50% 100%'` (bottom-center) on appear, and to the nearest container corner on dismiss, so the scale animation retracts toward where the interaction ended.
+5. **Visual styling** - switched from `--portfolio-surface-primary` (light) background to `$portfolio-surface-inverse-bold` (dark) to match the treemap tooltip. Typography hierarchy: node ID in mono/semibold with separator, group as mono/small/dimmed metadata, description as regular-weight body.
+
+**Design principle reinforced:** Interactive visualization tooltips within a case study must share the same animation DNA. A mechanically appearing/disappearing tooltip next to a smoothly animated one creates cognitive dissonance. The SkillMap treemap established the canonical tooltip pattern for this case study: always-mounted, animated height, anchored dismiss with corner retract. Every new tooltip must follow it.
+
+---
+
+<a id="fb-210"></a>
+### FB-210: ForceGraph arrow color differentiation + signal particles not visible
+
+**Date:** 2026-04-26
+
+**What happened:** Two issues: (1) In pathway/signal view, all arrows were the same Terra color regardless of link directionality. User wanted inbound vs outbound visually distinct using Terra and Lumen color families. (2) Signal view particles were completely invisible - nothing animated on screen.
+
+**Root cause:**
+1. **Arrow color:** `linkDirectionalArrowColor` was a static function returning `TERRA_40` for all directional links. No distinction between unidirectional (outbound-only) and bidirectional (mutual) links.
+2. **No particles:** Two compounding bugs: (a) `linkDirectionalParticles` was never set - without an ambient particle count, there are no particles to render; (b) `autoPauseRedraw` defaults to `true`, which stops the canvas animation loop when the simulation engine stops, so even `emitParticle()` calls on hover produced particles that were never drawn.
+
+**Resolution:**
+1. **Direction-based color:** Links now use two color palettes based on the `bidirectional` flag: **Terra** for unidirectional links (outbound-only, one-way influence) and **Lumen** for bidirectional links (mutual reference). This applies to link line color, arrow color, and particle color in signal mode. Terra link: `rgba(184,144,98,0.3)`, arrow: `rgba(184,144,98,0.7)`. Lumen link: `rgba(115,146,255,0.25)`, arrow: `rgba(115,146,255,0.65)`.
+2. **Particle fix:** Added `linkDirectionalParticles={1}` in signal mode for ambient flow on all links. Set `autoPauseRedraw={false}` in signal mode to keep the animation loop running after the simulation stops. Hover bursts 3 extra particles per outbound link for emphasis.
+
+**Design principle learned:** Particle animation in force-graph libraries requires three orthogonal conditions to be true simultaneously: (a) particle count > 0, (b) particle speed > 0, and (c) the canvas redraw loop must be running. Any one being zero produces invisible particles. Additionally, using two brand color families (Terra vs Lumen) for semantic direction-type encoding is an effective data visualization strategy that leverages existing brand vocabulary.
+
+---
+
+<a id="fb-209"></a>
+### FB-209: ForceGraph static layout + Obsidian-style drag + link visibility
+
+**Date:** 2026-04-26
+
+**What happened:** Three interaction issues: (1) the graph still rotates/rearranges when hovering nodes; (2) nodes should be draggable with elastic spring-back like Obsidian's graph view; (3) connection lines are nearly invisible.
+
+**Root cause:**
+1. **Rotation:** The previous fix (`cooldownTicks=200`) stopped the simulation eventually but didn't prevent residual movement or re-triggering. Any React state change during the simulation's cooldown window could cause visible node displacement.
+2. **No drag:** `enableNodeDrag` defaulted to `false` and there was no spring-back mechanism. Obsidian's graph lets you pull nodes freely while neighbors elastically adjust, then the dragged node springs back to equilibrium on release.
+3. **Invisible links:** `LINK_WIDTH=0.3` and `LINK_COLOR` at `0.08` opacity made connections nearly invisible on dark backgrounds, defeating the purpose of showing the mesh.
+
+**Resolution:**
+1. **Pin-on-settle pattern:** Added `onEngineStop` callback that pins every node (`fx=x, fy=y`) once the simulation reaches rest. This makes the graph permanently static after initial layout. Hover can never cause movement because all nodes are position-locked.
+2. **Obsidian-style drag:** Changed `enableNodeDrag` default to `true`. `onNodeDrag` keeps the dragged node pinned to the cursor position. `onNodeDragEnd` unpins the dragged node (`fx=fy=undefined`) and calls `d3ReheatSimulation()` to let the simulation spring the node back to equilibrium while neighbors elastically adjust. When the simulation re-settles, `onEngineStop` re-pins everything. The effect: pull a node out, release it, watch it and its neighbors bounce back into place.
+3. **Link visibility:** `LINK_WIDTH` 0.3 to 0.6, `LINK_COLOR` opacity 0.08 to 0.15, highlight values proportionally increased. Directional `TERRA_LINK` opacity 0.15 to 0.25.
+
+**Design principle learned:** Force-directed graphs need two distinct physics regimes: (a) a settling regime during initial layout where the simulation runs freely, and (b) a frozen regime during interaction where all positions are locked. The transition is mediated by `onEngineStop` pinning and drag temporarily unpinning. Without this separation, any interaction that triggers a React re-render can disturb the layout.
+
+---
+
+<a id="fb-208"></a>
+### FB-208: ForceGraph interaction design — jiggle, tooltip anchoring, hover-highlight
+
+**Date:** 2026-04-26
+
+**What happened:** Three interaction design complaints on the ForceGraph knowledge graph canvas: (1) the graph "jiggles" every time the cursor enters the canvas, which is disruptive; (2) the tooltip follows raw cursor position rather than anchoring to the node, creating jank; (3) in mesh view, hovering a node gives no indication of which links connect to it.
+
+**Root cause:**
+1. **Jiggle:** `cooldownTicks={0}` kept the d3-force simulation running indefinitely. Any state change (hover callback setting React state) triggered a re-render with the simulation still active, causing visible node displacement.
+2. **Tooltip:** Tooltip was positioned via `onPointerMove` tracking raw cursor coordinates relative to the container. This meant the tooltip moved with the cursor rather than staying fixed to the node's canvas location, and produced constant re-renders from pointer tracking.
+3. **No link highlight:** The `linkColor` and `linkWidth` accessors had no awareness of which node was hovered, so all links rendered identically regardless of adjacency.
+
+**Resolution:**
+1. **Jiggle fix:** Changed `cooldownTicks` from `0` to `200`, added `d3AlphaDecay={0.05}` and `d3VelocityDecay={0.3}` so the simulation settles fully after ~200 ticks and then stops. Combined with the existing `warmupTicks={200}`, the graph is completely static before the first paint. No force re-activation on hover.
+2. **Tooltip anchoring:** Replaced cursor-tracking (`onPointerMove` + `tooltipPos` state) with `graph2ScreenCoords()` to convert the hovered node's graph-space `(x, y)` to container-space pixel position. Tooltip now anchors to the node itself and stays put when the cursor moves within the node's hit area.
+3. **Link hover-highlight:** Built an adjacency `Set<string>` from the hovered node's ID (recomputed via `useMemo` on `hoveredNode` change). Both `linkColor` and `linkWidth` accessors now check membership: connected links render at `rgba(200, 200, 200, 0.35)` and `0.8px` width (vs default `0.08` opacity and `0.3px`). Dimmed links stay unchanged. This only activates in mesh view; directional views retain their own coloring.
+
+**Design principle learned:** Canvas-based interactive visualizations should anchor overlays to data coordinates, not screen cursor coordinates. The cursor is an input device; the tooltip should describe the data point, not the pointer. Additionally, simulation-based layouts must reach a terminal state before first interaction; an always-running simulation creates the illusion of instability.
+
+---
+
+<a id="fb-207"></a>
 ### FB-207: MaturityTimeline combined chart — VWAP-style stacked bars + trend overlay
 
 **Date:** 2026-04-25
@@ -33,6 +363,7 @@
 
 ---
 
+<a id="fb-206"></a>
 ### FB-206: SkillMap category header — count and divider line removed
 
 **Date:** 2026-04-25
@@ -51,6 +382,7 @@
 
 ---
 
+<a id="fb-205"></a>
 ### FB-205: CollaborationLoop speed trigger width mismatch + static chevron
 
 **Date:** 2026-04-25
@@ -68,6 +400,9 @@
 
 ---
 
+**Loose match:** Related: AP-060.
+
+<a id="fb-204"></a>
 ### FB-204: CollaborationLoop track line disappears after the active step
 
 **Date:** 2026-04-25
@@ -82,6 +417,9 @@
 
 ---
 
+**Loose match:** Related: AP-026.
+
+<a id="fb-201"></a>
 ### FB-201: SkillMap card borders removed, fill darkened, trigger text made legible
 
 **Date:** 2026-04-25
@@ -105,6 +443,9 @@
 
 ---
 
+**Anti-pattern:** See CAP-032.
+
+<a id="fb-200"></a>
 ### FB-200: KnowledgeTreemap tooltip information hierarchy inverted
 
 **Date:** 2026-04-25
@@ -122,6 +463,7 @@
 
 ---
 
+<a id="fb-199"></a>
 ### FB-199: CollaborationLoop step dots — uneven spacing and line artefact (two-iteration fix)
 
 **Date:** 2026-04-25
@@ -142,6 +484,7 @@
 
 ---
 
+<a id="fb-198"></a>
 ### FB-198: CollaborationLoop transport bar padding
 
 **Date:** 2026-04-25
@@ -152,6 +495,9 @@
 
 ---
 
+**Loose match:** Related: AP-045.
+
+<a id="fb-197"></a>
 ### FB-197: CollaborationLoop `.vizArea` border removed
 
 **Date:** 2026-04-25
@@ -162,6 +508,7 @@
 
 ---
 
+<a id="fb-196"></a>
 ### FB-196: CollaborationLoop transport control hierarchy inverted
 
 **Date:** 2026-04-25
@@ -177,6 +524,7 @@
 
 ---
 
+<a id="fb-192"></a>
 ### FB-192: Micro mode abolished — `type-3xs` in row/sliver tiles is not legible
 
 **Date:** 2026-04-24
@@ -198,6 +546,9 @@
 
 ---
 
+**Anti-pattern:** See AP-072.
+
+<a id="fb-191"></a>
 ### FB-191: Treemap count font too small — `type-3xs` (8px) on a coloured surface is not legible
 
 **Date:** 2026-04-24
@@ -210,6 +561,9 @@
 
 ---
 
+**Loose match:** Related: AP-072.
+
+<a id="fb-187"></a>
 ### FB-187: AP-072 tile-classification thresholds under-calibrated — illegible text still showing
 
 **Date:** 2026-04-24
@@ -226,6 +580,9 @@
 
 ---
 
+**Loose match:** Related: AP-072.
+
+<a id="fb-186"></a>
 ### FB-186: KnowledgeTreemap block visual hierarchy inverted — count dominated label
 
 **Date:** 2026-04-24
@@ -243,6 +600,7 @@
 
 ---
 
+<a id="fb-185"></a>
 ### FB-185: KnowledgeTreemap orientation-blind layout — vertical sliver tiles illegible
 
 **Date:** 2026-04-24
@@ -262,6 +620,9 @@ Added `.treemapBlockRow` SCSS modifier that flips `flex-direction: row`, centers
 
 ---
 
+**Anti-pattern:** See AP-072.
+
+<a id="fb-184"></a>
 ### FB-184: KnowledgeTreemap block and tooltip information architecture redesign
 
 **Date:** 2026-04-24
@@ -279,6 +640,7 @@ Added `.treemapBlockRow` SCSS modifier that flips `flex-direction: row`, centers
 
 ---
 
+<a id="fb-183"></a>
 ### FB-183: CollaborationLoop transport play vs step controls mismatched size
 
 **Date:** 2026-04-24
@@ -293,6 +655,9 @@ Added `.treemapBlockRow` SCSS modifier that flips `flex-direction: row`, centers
 
 ---
 
+**Loose match:** Related: AP-060.
+
+<a id="fb-182"></a>
 ### FB-182: MaturityTimeline chart used corner radius (portfolio identity violation)
 
 **Date:** 2026-04-24
@@ -309,6 +674,9 @@ Added `.treemapBlockRow` SCSS modifier that flips `flex-direction: row`, centers
 
 ---
 
+**Loose match:** Related: AP-024.
+
+<a id="fb-181"></a>
 ### FB-181: Elan Tier-3 viz legends — align SkillMap and MaturityTimeline spacing
 
 **Date:** 2026-04-24
@@ -325,6 +693,9 @@ Added `.treemapBlockRow` SCSS modifier that flips `flex-direction: row`, centers
 
 ---
 
+**Loose match:** Related: AP-018.
+
+<a id="fb-180"></a>
 ### FB-180: SkillMap treemap legend too tight to visualization
 
 **Date:** 2026-04-24
@@ -339,6 +710,9 @@ Added `.treemapBlockRow` SCSS modifier that flips `flex-direction: row`, centers
 
 ---
 
+**Loose match:** Related: AP-018.
+
+<a id="fb-179"></a>
 ### FB-179: CollaborationLoop step dots misaligned with detail panel + transport divider
 
 **Date:** 2026-04-23
@@ -353,6 +727,7 @@ Added `.treemapBlockRow` SCSS modifier that flips `flex-direction: row`, centers
 
 ---
 
+<a id="fb-178"></a>
 ### FB-178: CollaborationLoop overuses brand accent — neutralize decorative color
 
 **Date:** 2026-04-23
@@ -367,6 +742,9 @@ Added `.treemapBlockRow` SCSS modifier that flips `flex-direction: row`, centers
 
 ---
 
+**Loose match:** Related: AP-065.
+
+<a id="fb-177"></a>
 ### FB-177: Personalization badge style decision — neutral/minimal over accent
 
 **Date:** 2026-04-23
@@ -381,6 +759,7 @@ Added `.treemapBlockRow` SCSS modifier that flips `flex-direction: row`, centers
 
 ---
 
+<a id="fb-176"></a>
 ### FB-176: Company-personalized "for {Company}" badge on home page
 
 **Date:** 2026-04-23
@@ -399,6 +778,7 @@ Added `.treemapBlockRow` SCSS modifier that flips `flex-direction: row`, centers
 
 ---
 
+<a id="fb-175"></a>
 ### FB-175: CollaborationLoop transport controls need breathing room
 
 **Date:** 2026-04-23
@@ -417,6 +797,9 @@ Added `.treemapBlockRow` SCSS modifier that flips `flex-direction: row`, centers
 
 ---
 
+**Loose match:** Related: AP-045.
+
+<a id="fb-174"></a>
 ### FB-174: Link toolbar button conflates inspect and destroy actions
 
 **Date:** 2026-04-23
@@ -435,6 +818,7 @@ Added `.treemapBlockRow` SCSS modifier that flips `flex-direction: row`, centers
 
 ---
 
+<a id="fb-173"></a>
 ### FB-173: Block toolbar overlapping content text
 
 **Date:** 2026-04-23
@@ -453,6 +837,9 @@ Added `.treemapBlockRow` SCSS modifier that flips `flex-direction: row`, centers
 
 ---
 
+**Loose match:** Related: AP-033.
+
+<a id="fb-172"></a>
 ### FB-172: Hide homepage "Essay" format badge (temporary)
 
 **Date:** 2026-04-23
@@ -467,6 +854,7 @@ Added `.treemapBlockRow` SCSS modifier that flips `flex-direction: row`, centers
 
 ---
 
+<a id="fb-171"></a>
 ### FB-171: MaturityTimeline toggle buttons too small to read
 
 **Date:** 2026-04-23
@@ -479,6 +867,7 @@ Added `.treemapBlockRow` SCSS modifier that flips `flex-direction: row`, centers
 
 ---
 
+<a id="fb-170"></a>
 ### FB-170: ETRO essay page - widen single-column content measure
 
 **Date:** 2026-04-22
@@ -493,6 +882,7 @@ Added `.treemapBlockRow` SCSS modifier that flips `flex-direction: row`, centers
 
 ---
 
+<a id="fb-169"></a>
 ### FB-169: "In the ultra-wide screen (around 1900px wide), the distance between the art and the action section is still a bit far. For a lot of the breakpoints beyond what we have planned, it just looks a bit inconsistent."
 
 **Date:** 2026-04-22
@@ -543,6 +933,7 @@ Each iteration correctly solved the previous complaint in isolation but didn't a
 
 ---
 
+<a id="fb-168"></a>
 ### FB-168: "You shouldn't only think about the actual distance, but also the visual weight that the art piece naturally carries … add even just slightly more space on the left-hand side to make it feel visually balanced"
 
 **Date:** 2026-04-22
@@ -593,6 +984,7 @@ At narrow desktop (769–1120px), the optical delta naturally grows because the 
 
 ---
 
+<a id="fb-167"></a>
 ### FB-167: "I like the distance between them now, but now the whole thing looks a little left-skewed, not centered on the whole screen"
 
 **Date:** 2026-04-22
@@ -624,6 +1016,7 @@ This is an architectural consequence of mixing alignment modes across the two co
 
 ---
 
+<a id="fb-166"></a>
 ### FB-166: "I don't like how far the action section on the right-hand side is from the portrait"
 
 **Date:** 2026-04-22
@@ -648,6 +1041,7 @@ This is an architectural consequence of mixing alignment modes across the two co
 
 ---
 
+<a id="fb-165"></a>
 ### FB-165: Password gate as conversational greeting - interaction design for "Welcome, ___" sentence completion
 
 **Date:** 2026-04-22
@@ -670,6 +1064,7 @@ This is an architectural consequence of mixing alignment modes across the two co
 
 ---
 
+<a id="fb-164"></a>
 ### FB-164: Essay content format — single-column Medium-style layout with category eyebrow, inline-editable H1, and a date · read-time · Medium meta row
 
 **Date:** 2026-04-21
@@ -713,6 +1108,7 @@ This is an architectural consequence of mixing alignment modes across the two co
 
 ---
 
+<a id="fb-163"></a>
 ### FB-163: "Why tf are both states thicker and thicker?? Default should be 1px, thick active 2px."
 
 **Date:** 2026-04-21
@@ -793,6 +1189,9 @@ The user's stated requirement is stable across all three reports: the engaged st
 
 ---
 
+**Anti-pattern:** See AP-054.
+
+<a id="fb-161"></a>
 ### FB-161: "why is this search input field component in the regular style (box style) not having the border thickness variation?"
 
 **Date:** 2026-04-21
@@ -834,6 +1233,9 @@ The user's stated requirement is stable across all three reports: the engaged st
 
 ---
 
+**Anti-pattern:** See AP-054.
+
+<a id="fb-160"></a>
 ### FB-160: "I cannot delete empty image slots/dropzones. Pls fix"
 
 **Date:** 2026-04-20
@@ -865,6 +1267,7 @@ The design failure is discoverability parity: the "delete" affordance on filled 
 
 ---
 
+<a id="fb-158"></a>
 ### FB-158: "Why are the drag handles being so far from the actual block/paragraph/asset? Also, they disappear when the screen is narrow."
 
 **Date:** 2026-04-20
@@ -893,6 +1296,7 @@ The design failure is discoverability parity: the "delete" affordance on filled 
 
 ---
 
+<a id="fb-157"></a>
 ### FB-157: "You're conflating two different things, and that's very dangerous" — audio capability vs. default state on video settings
 
 **Date:** 2026-04-20
@@ -930,6 +1334,7 @@ On `videoEmbed` blocks, the conflation was even less defensible: YouTube / Vimeo
 
 ---
 
+<a id="fb-156"></a>
 ### FB-156: ScrollSpy portaled highlight label landed rightward of the notch, extending past the viewport
 
 **Date:** 2026-04-20
@@ -964,6 +1369,9 @@ On `videoEmbed` blocks, the conflation was even less defensible: YouTube / Vimeo
 
 ---
 
+**Anti-pattern:** See AP-070.
+
+<a id="fb-155"></a>
 ### FB-155: ScrollSpy active notch label must auto-contrast against whatever background pixel it sits over
 
 **Date:** 2026-04-20
@@ -995,6 +1403,9 @@ The complication is stacking contexts. `position: fixed` *always* creates a new 
 
 ---
 
+**Loose match:** Related: AP-065.
+
+<a id="fb-154"></a>
 ### FB-154: Editor-facing mute default needs to be a primary control with self-documenting labels — not a buried dropdown item
 
 **Date:** 2026-04-20
@@ -1024,6 +1435,7 @@ Labeling was the other half of the problem. The dropdown item said "Muted" with 
 
 ---
 
+<a id="fb-153"></a>
 ### FB-153: Empty scaffold slots need an explicit remove affordance, not only a fill affordance
 
 **Date:** 2026-04-19
@@ -1047,6 +1459,7 @@ Labeling was the other half of the problem. The dropdown item said "Muted" with 
 
 ---
 
+<a id="fb-152"></a>
 ### FB-152: Videos with editor-enabled sound need a viewer-facing mute control — new DS primitive `MediaMuteToggle`
 
 **Date:** 2026-04-19
@@ -1074,6 +1487,7 @@ Labeling was the other half of the problem. The dropdown item said "Muted" with 
 
 ---
 
+<a id="fb-151"></a>
 ### FB-151: Drag-to-reorder on case-study blocks read as "not enabled" — missing drop indicator + ghost
 
 **Date:** 2026-04-19
@@ -1095,6 +1509,7 @@ Labeling was the other half of the problem. The dropdown item said "Muted" with 
 
 ---
 
+<a id="fb-150"></a>
 ### FB-150: Experience column must never wrap company names to 2 lines — rigid min-width + nowrap
 
 **Date:** 2026-04-19
@@ -1129,6 +1544,9 @@ Beyond the immediate viewport zones, there's a more fundamental issue: relying o
 
 ---
 
+**Loose match:** Related: AP-065.
+
+<a id="fb-149"></a>
 ### FB-149: Desktop min-width floor should apply to content only — nav and footer must stay fluid
 
 **Date:** 2026-04-19
@@ -1163,6 +1581,9 @@ Beyond the immediate viewport zones, there's a more fundamental issue: relying o
 
 ---
 
+**Loose match:** Related: AP-065.
+
+<a id="fb-148"></a>
 ### FB-148: Footer wrap pattern — About on row 1, columns wrap below on compact desktop
 
 **Date:** 2026-04-19
@@ -1194,6 +1615,9 @@ There was no mechanism to prioritize About over the three list columns. Flex-wra
 
 ---
 
+**Loose match:** Related: AP-065.
+
+<a id="fb-147"></a>
 ### FB-147: Desktop min-width floor — prevent mobile layout at narrow desktop widths
 
 **Date:** 2026-04-19
@@ -1216,6 +1640,7 @@ There was no mechanism to prioritize About over the three list columns. Flex-wra
 
 ---
 
+<a id="fb-146"></a>
 ### FB-146: Nav logo "Yilan Gao" wrapping to two lines under squeeze
 
 **Date:** 2026-04-19
@@ -1241,6 +1666,9 @@ Nothing in the nav CSS expressed the user's priority ordering (logo > tagline). 
 
 ---
 
+**Anti-pattern:** See AP-066.
+
+<a id="fb-145"></a>
 ### FB-145: Project hero splash too horizontal on mobile
 
 **Date:** 2026-04-19
@@ -1262,6 +1690,7 @@ Nothing in the nav CSS expressed the user's priority ordering (logo > tagline). 
 
 ---
 
+<a id="fb-144"></a>
 ### FB-144: Site footer — narrow, centred column block on mobile
 
 **Date:** 2026-04-19
@@ -1283,6 +1712,7 @@ Nothing in the nav CSS expressed the user's priority ordering (logo > tagline). 
 
 ---
 
+<a id="fb-143"></a>
 ### FB-143: ETRO essay - bold abuse collapsing section hierarchy
 
 **Date:** 2026-04-17
@@ -1310,6 +1740,7 @@ The user perceived two problems, but they shared one cause. The section heading 
 
 ---
 
+<a id="fb-142"></a>
 ### FB-142: Home case study section - symmetrical top/bottom margin
 
 **Date:** 2026-04-10
@@ -1325,6 +1756,7 @@ The user perceived two problems, but they shared one cause. The section heading 
 
 ---
 
+<a id="fb-141"></a>
 ### FB-141: Site footer — Experience vs Links row rhythm
 
 **Date:** 2026-04-10
@@ -1339,6 +1771,7 @@ The user perceived two problems, but they shared one cause. The section heading 
 
 ---
 
+<a id="fb-140"></a>
 ### FB-140: Site footer — Terra subtle surface + softer wide shadow
 
 **Date:** 2026-04-09
@@ -1351,6 +1784,7 @@ The user perceived two problems, but they shared one cause. The section heading 
 
 ---
 
+<a id="fb-139"></a>
 ### FB-139: Login page — Terra-10 background (page, canvas pane, shader)
 
 **Date:** 2026-04-09
@@ -1367,6 +1801,7 @@ The user perceived two problems, but they shared one cause. The section heading 
 
 ---
 
+<a id="fb-138"></a>
 ### FB-138: Case study sidebar meta — remove tinted card background
 
 **Date:** 2026-04-09
@@ -1379,6 +1814,7 @@ The user perceived two problems, but they shared one cause. The section heading 
 
 ---
 
+<a id="fb-137"></a>
 ### FB-137: Case study pages — white canvas, sidebar meta card Terra-05
 
 **Date:** 2026-04-09
@@ -1393,6 +1829,7 @@ The user perceived two problems, but they shared one cause. The section heading 
 
 ---
 
+<a id="fb-136"></a>
 ### FB-136: Button `onColor` variant for colored surfaces
 
 **Date:** 2026-04-09
@@ -1410,6 +1847,7 @@ The user perceived two problems, but they shared one cause. The section heading 
 
 ---
 
+<a id="fb-135"></a>
 ### FB-135: Typed text overflow with glyph-safe clipping
 
 **Date:** 2026-04-09
@@ -1422,6 +1860,7 @@ The user perceived two problems, but they shared one cause. The section heading 
 
 ---
 
+<a id="fb-134"></a>
 ### FB-134: Login page — Terra-05 background and halftone portrait color match
 
 **Date:** 2026-04-09
@@ -1436,6 +1875,7 @@ The user perceived two problems, but they shared one cause. The section heading 
 
 ---
 
+<a id="fb-133"></a>
 ### FB-133: Global Terra selection highlight across entire site
 
 **Date:** 2026-04-09
@@ -1452,6 +1892,7 @@ The user perceived two problems, but they shared one cause. The section heading 
 
 ---
 
+<a id="fb-132"></a>
 ### FB-132: Placeholder/typed text horizontal alignment
 
 **Date:** 2026-04-09
@@ -1464,6 +1905,7 @@ The user perceived two problems, but they shared one cause. The section heading 
 
 ---
 
+<a id="fb-130"></a>
 ### FB-130: Login page — branded selection highlight with Terra
 
 **Date:** 2026-04-08
@@ -1476,6 +1918,7 @@ The user perceived two problems, but they shared one cause. The section heading 
 
 ---
 
+<a id="fb-129"></a>
 ### FB-129: Login page — serif glyph clipping on `<input>` elements
 
 **Date:** 2026-04-08
@@ -1490,6 +1933,9 @@ The user perceived two problems, but they shared one cause. The section heading 
 
 ---
 
+**Anti-pattern:** See AP-064.
+
+<a id="fb-128"></a>
 ### FB-128: Login page — icon sizing and alignment for oversized input text
 
 **Date:** 2026-04-08
@@ -1505,6 +1951,7 @@ The user perceived two problems, but they shared one cause. The section heading 
 
 ---
 
+<a id="fb-127"></a>
 ### FB-127: Login page — input/footer alignment and layout stability
 
 **Date:** 2026-04-08
@@ -1521,6 +1968,9 @@ The user perceived two problems, but they shared one cause. The section heading 
 
 ---
 
+**Anti-pattern:** See AP-065.
+
+<a id="fb-126"></a>
 ### FB-126: Login page — password-as-name greeting concept
 
 **Date:** 2026-04-08
@@ -1545,6 +1995,7 @@ The user perceived two problems, but they shared one cause. The section heading 
 
 ---
 
+<a id="fb-125"></a>
 ### FB-125: Button shape axis — default zero radius, opt-in soft corners
 
 **Date:** 2026-04-08
@@ -1564,6 +2015,9 @@ The user perceived two problems, but they shared one cause. The section heading 
 
 ---
 
+**Loose match:** Related: AP-024.
+
+<a id="fb-124"></a>
 ### FB-124: Testimonial card attribution name — IBM Plex Serif
 
 **Date:** 2026-04-07
@@ -1574,6 +2028,7 @@ The user perceived two problems, but they shared one cause. The section heading 
 
 ---
 
+<a id="fb-123"></a>
 ### FB-123: Case study page intro headline — IBM Plex Serif
 
 **Date:** 2026-04-07
@@ -1586,6 +2041,7 @@ The user perceived two problems, but they shared one cause. The section heading 
 
 ---
 
+<a id="fb-122"></a>
 ### FB-122: Hero image not filling the slot height
 
 **Date:** 2026-04-06
@@ -1620,6 +2076,7 @@ The user perceived two problems, but they shared one cause. The section heading 
 
 ---
 
+<a id="fb-121"></a>
 ### FB-121: TestimonialCard LinkedIn control beside name
 
 **Date:** 2026-04-06
@@ -1634,6 +2091,7 @@ The user perceived two problems, but they shared one cause. The section heading 
 
 ---
 
+<a id="fb-120"></a>
 ### FB-120: TestimonialCard avatar now composes DS Avatar
 
 **Date:** 2026-04-06
@@ -1650,6 +2108,7 @@ The user perceived two problems, but they shared one cause. The section heading 
 
 ---
 
+<a id="fb-119"></a>
 ### FB-119: Project sidebar tools badges — regular Badge emphasis
 
 **Date:** 2026-04-06
@@ -1664,6 +2123,7 @@ The user perceived two problems, but they shared one cause. The section heading 
 
 ---
 
+<a id="fb-118"></a>
 ### FB-118: Terra scope lockdown, color tier architecture, neutral-fallback dark mode
 
 **Date:** 2026-04-06
@@ -1688,6 +2148,7 @@ The user perceived two problems, but they shared one cause. The section heading 
 
 ---
 
+<a id="fb-117"></a>
 ### FB-117: TestimonialCard recolored with Terra accent palette
 
 **Date:** 2026-04-06
@@ -1711,6 +2172,7 @@ The user perceived two problems, but they shared one cause. The section heading 
 
 ---
 
+<a id="fb-116"></a>
 ### FB-116: Hero metric value font changed to Geist Mono, regular weight, no brand color
 
 **Date:** 2026-04-06
@@ -1729,6 +2191,7 @@ The user perceived two problems, but they shared one cause. The section heading 
 
 ---
 
+<a id="fb-115"></a>
 ### FB-115: Hero image container dimension mismatch + missing replace affordance
 
 **Date:** 2026-04-06
@@ -1747,6 +2210,7 @@ The user perceived two problems, but they shared one cause. The section heading 
 
 ---
 
+<a id="fb-114"></a>
 ### FB-114: External link visual inconsistency across site
 
 **Date:** 2026-04-06
@@ -1761,6 +2225,9 @@ The user perceived two problems, but they shared one cause. The section heading 
 
 ---
 
+**Loose match:** Related: AP-013.
+
+<a id="fb-113"></a>
 ### FB-113: Tooltip caret touching container edge — needs inset
 
 **User said:** "For the chevron, when it's emerging on the side, there should be a mini gap just so that the chevron is not literally touching the edge of the box. Horizontally, there should always be a spacing, a very mini, the minimum spacing, just so that there's breathing room."
@@ -1775,6 +2242,7 @@ The user perceived two problems, but they shared one cause. The section heading 
 
 ---
 
+<a id="fb-112"></a>
 ### FB-112: Back button and nav links not using DS Button component
 
 **Date:** 2026-04-06
@@ -1791,6 +2259,7 @@ The user perceived two problems, but they shared one cause. The section heading 
 
 ---
 
+<a id="fb-111"></a>
 ### FB-111: InfoTooltip on hero metrics for metric derivation context
 
 **Date:** 2026-04-06
@@ -1811,6 +2280,7 @@ The user perceived two problems, but they shared one cause. The section heading 
 
 ---
 
+<a id="fb-110"></a>
 ### FB-110: Hero metric value should use Geist Pixel font with thicker weight
 
 **⚠️ SUPERSEDED by FB-116** — decorative pixel font + brand color reverted to Geist Mono + regular weight + default color.
@@ -1827,6 +2297,7 @@ The user perceived two problems, but they shared one cause. The section heading 
 
 ---
 
+<a id="fb-109"></a>
 ### FB-109: "Divider sits under the scope statement instead of above it; not enough space between sections"
 
 **Date:** 2026-04-05
@@ -1848,6 +2319,7 @@ The user perceived two problems, but they shared one cause. The section heading 
 
 ---
 
+<a id="fb-106"></a>
 ### FB-106: Semantic field split - title becomes app name, introBlurbHeadline becomes case study title
 
 **User feedback:** The sidebar h1 (`page_title`) should display the application name (e.g. "Lacework"), not the case study headline. The intro blurb headline (`page_introBlurbHeadline`) should be promoted to the official case study title and drive the homepage masonry card title. Editing the card title on the homepage or the intro blurb headline on the case study page edits the same `introBlurbHeadline` field.
@@ -1867,6 +2339,7 @@ The user perceived two problems, but they shared one cause. The section heading 
 
 ---
 
+<a id="fb-104"></a>
 ### FB-104: Scope statement visibly smaller than section body + different editing UX
 
 **Feedback:** "These two are both body text, but the paragraph starting with 'Lacework (now FortiCNAPP) is visibly smaller and less legible font compared to the other one. Also they're not having the same editing behavior/ux."
@@ -1883,6 +2356,7 @@ The user perceived two problems, but they shared one cause. The section heading 
 
 ---
 
+<a id="fb-103"></a>
 ### FB-103: Intro blurb headline needs bigger font and bolder weight for hierarchy
 
 **Feedback:** "This should use a bigger font size and thicker font weight to have it visually further distinguished from the rest of the article (e.g. section header) so there's a better information hierarchy."
@@ -1899,6 +2373,7 @@ The user perceived two problems, but they shared one cause. The section heading 
 
 ## Session: 2026-04-04 — Inline edit system enhancements
 
+<a id="fb-102"></a>
 ### FB-102: Links section renders inline instead of vertical list — inconsistent with collaborators
 
 **Feedback:** "Links should not be on the same row in the case study template. It should look like how the collaborators section work - putting them into vertical lists. This should be a consistent pattern."
@@ -1909,6 +2384,7 @@ The user perceived two problems, but they shared one cause. The section heading 
 
 ---
 
+<a id="fb-101"></a>
 ### FB-101: Hero image renders below intro blurb — wrong template rendering order
 
 **Feedback:** "Hero image not sitting above Intro blurb. Please fix this template and enforce this format for all existing case studies and ensure the future ones has this template."
@@ -1921,6 +2397,7 @@ The user perceived two problems, but they shared one cause. The section heading 
 
 ---
 
+<a id="fb-100"></a>
 ### FB-100: Lexical toolbar overlapping content — transparent background from undefined tokens
 
 **Feedback:** "Bad UI, edit modal clashing with content." The floating rich text toolbar renders on top of body text with no visible background, making both unreadable.
@@ -1933,6 +2410,7 @@ The user perceived two problems, but they shared one cause. The section heading 
 
 ---
 
+<a id="fb-099"></a>
 ### FB-099: Inline edit toolbar accessibility, color picker, font family picker, formatting consistency
 
 **User feedback:** "The accessibility for this dropdown is horrible... the contrast is just bad. It's very hard to see the blue text." Also: "I cannot choose the font I want to use" and "I cannot change colors for the text."
@@ -1955,6 +2433,7 @@ The user perceived two problems, but they shared one cause. The section heading 
 
 ## Session: 2026-04-03 — Sidebar shell refactored from Tailwind to Élan DS tokens
 
+<a id="fb-098"></a>
 ### FB-098: Sidebar Tailwind → Élan DS SCSS module migration
 
 **User feedback:** "Rebuild the playground sidebar by refactoring all the Tailwind code into using the full Élan design system code only. No hardcoded inline, no visually matching by hardcoding, but completely using the design system token."
@@ -1978,6 +2457,7 @@ The user perceived two problems, but they shared one cause. The section heading 
 
 ## Session: 2026-04-03 — Playground sidebar collapse/expand spacing jitter
 
+<a id="fb-097"></a>
 ### FB-097: Content below search jitters when toggling sidebar collapsed/expanded
 
 **User feedback:** "The content below the search jitter when I go from making the navigation bar from expanded to collapsed or from collapsed to expanded, because there's not enough spacing between the search bar and the section header."
@@ -1992,6 +2472,7 @@ The user perceived two problems, but they shared one cause. The section heading 
 
 ## Session: 2026-04-03 — Accent scale audit + extended palette blue removal
 
+<a id="fb-096"></a>
 ### FB-096: Lumen accent scale perceptually uneven; extended Blue too close to brand
 
 **User feedback:** "There are certain steps that don't really make sense. They're a little bit too close, especially for step 50 (#7182FD). It seriously is not enough of a distinction from 40, and it's too far from 60." Also: "Remove the blue color from the extended palette — it's too close to the brand accent, clashing."
@@ -2013,6 +2494,7 @@ The user perceived two problems, but they shared one cause. The section heading 
 
 ## Session: 2026-04-03 — Checkbox height fluctuation on toggle
 
+<a id="fb-095"></a>
 ### FB-095: Checkbox visually fluctuates in height when toggling checked state
 
 **User feedback:** "When I tick the checkbox, it kind of just fluctuates in height or something. It really bothers me."
@@ -2031,6 +2513,7 @@ The user perceived two problems, but they shared one cause. The section heading 
 
 ## Session: 2026-04-03 — Playground doc primitives: Tailwind to Élan DS migration
 
+<a id="fb-094"></a>
 ### FB-094: Playground documentation infrastructure migrated from Tailwind to Élan DS tokens + SCSS modules
 
 **User feedback:** "Why tf is Tailwind still here? Everything should be built using the actual Élan design system code. Use anything that we can use in the design system as a token instead of hardcoding things that mirror the design system."
@@ -2051,6 +2534,7 @@ The user perceived two problems, but they shared one cause. The section heading 
 
 ## Session: 2026-04-03 — Colors page IA, typography hierarchy, and layout restructure
 
+<a id="fb-093"></a>
 ### FB-093: Playground documentation typography hierarchy standardized; colors page restructured
 
 **User feedback:** The colors page had three problems: (1) information architecture was flat — palette reference (raw primitives) appeared in the same list as semantic token sections with no visual separation; (2) `h3` meant three different things across the playground (uppercase eyebrow, large semibold section title, and ComponentPreview demo title); (3) light/dark theme panels stacked vertically, wasting horizontal space on wide screens.
@@ -2071,8 +2555,11 @@ The user perceived two problems, but they shared one cause. The section heading 
 
 ---
 
+**Loose match:** Related: AP-054.
+
 ## Session: 2026-04-03 — Input xs icon disproportionate to text
 
+<a id="fb-092"></a>
 #### FB-092: "The icon size for xs is just a hair too big — doesn't match the placeholder typography size"
 
 **User feedback:** At the `xs` size, the input icon (16px) looks disproportionately large next to the 12px font-size placeholder text. It takes up too much space and feels visually unbalanced.
@@ -2087,8 +2574,11 @@ The user perceived two problems, but they shared one cause. The section heading 
 
 ---
 
+**Loose match:** Related: AP-055.
+
 ## Session: 2026-04-03 — Eyebrow component created to canonicalize uppercase text pattern
 
+<a id="fb-091"></a>
 ### FB-091: Eyebrow component built — canonical uppercase tracked text primitive for section headings, group labels, and metric annotations
 
 **Date:** 2026-04-03
@@ -2113,6 +2603,7 @@ The user perceived two problems, but they shared one cause. The section heading 
 
 ## Session: 2026-04-03 — Label renamed to TextRow to resolve naming collision
 
+<a id="fb-090"></a>
 ### FB-090: "Label" component renamed to "TextRow" after audit revealed naming collision with 4 distinct label patterns
 
 **Date:** 2026-04-03
@@ -2138,6 +2629,7 @@ The user perceived two problems, but they shared one cause. The section heading 
 
 ## Session: 2026-04-03 — Brand status variant for Input
 
+<a id="fb-089"></a>
 #### FB-089: "Add a brand version for the input field — active state border in the brand color"
 
 **User feedback:** The Input component has neutral, success, error, and warning statuses, but no brand/accent variant. The playground's sidebar search bar already uses the accent color for its active border — the Input component should support this as a first-class status.
@@ -2152,6 +2644,7 @@ The user perceived two problems, but they shared one cause. The section heading 
 
 ## Session: 2026-04-03 — Input focus border layout shift
 
+<a id="fb-088"></a>
 #### FB-088: "Clicking the input makes everything jump — placeholder, icons, all content shifts"
 
 **User feedback:** When clicking/focusing the Input component, all content (placeholder text, icons, prefix/suffix) visibly shifts position. The component's geometry changes between resting and active states.
@@ -2166,8 +2659,11 @@ The user perceived two problems, but they shared one cause. The section heading 
 
 ---
 
+**Anti-pattern:** See AP-054.
+
 ## Session: 2026-04-02 — Colors page: dual-theme display and token audit
 
+<a id="fb-087"></a>
 #### FB-087: "Playground colors page doesn't show dark theme values; needs full audit"
 
 **User feedback:** The playground colors page only documented light mode token values. Dark theme border colors (and all other dark mode overrides) were invisible. Color swatches should stay true to their hex values regardless of the playground theme. The page needs to show both light and dark resolved values explicitly.
@@ -2190,6 +2686,7 @@ The user perceived two problems, but they shared one cause. The section heading 
 
 ## Session: 2026-04-02 — Input focus state visual fix
 
+<a id="fb-086"></a>
 #### FB-086: "Focus state has double-layer border; default focus should be black, not gray"
 
 **User feedback:** Two issues with the Input component's focus state: (1) the active/focused state shows a double-layer border effect, and (2) the default focus border color appears gray instead of black.
@@ -2214,8 +2711,11 @@ The user perceived two problems, but they shared one cause. The section heading 
 
 ---
 
+**Anti-pattern:** See AP-054.
+
 ## Session: 2026-04-02 — Parent nav item active state propagation
 
+<a id="fb-085"></a>
 #### FB-085: "Parent nav items containing active children should also show active state (brand color)"
 
 **UX Intent:** In a tiered/hierarchical navigation, when a child item is active, the parent trigger must also reflect the active state. This is a basic navigation contract — the parent shows "you are in this section" while the child shows "you are on this page."
@@ -2232,6 +2732,7 @@ The user perceived two problems, but they shared one cause. The section heading 
 
 ## Session: 2026-04-02 — AdminBar role label (informational vs brand)
 
+<a id="fb-084"></a>
 #### FB-084: "Admin badge should be neutral regular — not bold brand; banner already explains context"
 
 **UX Intent:** The "Admin" chip is a **quiet role descriptor**, not a warning, success state, or primary affordance. The sticky bar and hint line already establish that the user is in edit mode. Using `highlight`/`bold`/`mono` overstates importance, pulls attention away from real actions (Edit / Dashboard), and violates informational hierarchy.
@@ -2246,6 +2747,7 @@ The user perceived two problems, but they shared one cause. The section heading 
 
 ## Session: 2026-04-02 — AdminBar accessibility & design system alignment
 
+<a id="fb-083"></a>
 #### FB-083: "Admin edit view accessibility is horrible — use correct DS components and primitives"
 
 **UX Intent:** The sticky admin toolbar must meet WCAG contrast for all functional text and labels. It should read as part of the same design system as the rest of the product (Badge for status, Button for actions) rather than bespoke SCSS that drifts from token rules.
@@ -2258,8 +2760,11 @@ The user perceived two problems, but they shared one cause. The section heading 
 
 ---
 
+**Anti-pattern:** See AP-052.
+
 ## Session: 2026-04-01 — NavItem Badge Overlay Contrast
 
+<a id="fb-082"></a>
 #### FB-082: "Badges should avoid any color — the gray background blends with the nav item"
 
 **UX Intent:** Overlay badges on collapsed NavItems are status indicators (unread counts, new flags). They must be instantly scannable at a glance. A subtle-emphasis badge (gray fill + dark text) has near-zero contrast against the NavItem's own neutral surface, defeating the purpose of the overlay. The badge must maximally contrast against its parent — black-on-white or white-on-black depending on theme — and switch to the brand color when the NavItem is active to maintain visual coherence with the active icon/label.
@@ -2272,8 +2777,11 @@ The user perceived two problems, but they shared one cause. The section heading 
 
 ---
 
+**Anti-pattern:** See AP-050.
+
 ## Session: 2026-04-01 — Playground Sidebar IA Reorganization
 
+<a id="fb-080"></a>
 #### FB-080: "Nav items are in a different tab than navigation — why is navigation not in layout and shell?"
 
 **UX Intent:** Related components must be colocated in the sidebar navigation. When a user is working with `Navigation` they immediately want `NavItem` — splitting them across two categories ("Layout & Shell" vs "Navigation & Menus") forces unnecessary hunting.
@@ -2298,6 +2806,9 @@ Dissolved categories: "Navigation & Menus", "Layout & Shell", "Interaction", "En
 
 **Pattern extracted → design principle: Group sidebar navigation by usage context (where the developer uses the component), not by abstract component taxonomy (what the component is). Parent-child components must always be colocated.**
 
+**Anti-pattern:** See AP-049.
+
+<a id="fb-081"></a>
 #### FB-081: "Why are the categories and items ordered this way? Should they be alphabetical? Should there be sub-sections?"
 
 **UX Intent:** Sidebar ordering should follow a predictable, discoverable principle — both at the category level and the item level. As the component count grows, flat lists within flyout panels become hard to scan without internal structure.
@@ -2318,6 +2829,7 @@ Dissolved categories: "Navigation & Menus", "Layout & Shell", "Interaction", "En
 
 ## Session: 2026-04-01 — Content Area Horizontal Padding Aligned to Sidebar Rhythm
 
+<a id="fb-079"></a>
 #### FB-079: "The side distance in the header and main content doesn't match the sidebar nav items — visually inconsistent"
 
 **UX Intent:** In a sidebar+content layout, the horizontal distance from the panel border to the first content element must be the same across both panels. When the sidebar's nav items sit 14px from the sidebar edge but the content area's header/main/footer start 16–20px from their left edge, the eye detects the misalignment — especially at the shared horizontal boundary where the sidebar border meets the content area.
@@ -2335,8 +2847,11 @@ Dissolved categories: "Navigation & Menus", "Layout & Shell", "Interaction", "En
 
 ---
 
+**Anti-pattern:** See AP-048.
+
 ## Session: 2026-04-01 — Sidebar Hover Background: Neutral, Not Brand
 
+<a id="fb-078"></a>
 #### FB-078: "Navigation items hover background should not use the brand color, it's way too light"
 
 **UX Intent:** Hover backgrounds in sidebar navigation must be neutral (gray/black-derived), not brand-colored. The blue-tinted `sidebar-accent` (`#F0F5FD`) is too light and introduces an unwanted brand hue into a utility interaction state. Hover is a transient affordance signal — it should darken subtly without introducing color semantics that compete with the active state's blue accent.
@@ -2353,8 +2868,11 @@ Dissolved categories: "Navigation & Menus", "Layout & Shell", "Interaction", "En
 
 ---
 
+**Loose match:** Related: AP-062.
+
 ## Session: 2026-04-01 — Border/Action Warning Token Dark-Mode Completion
 
+<a id="fb-077"></a>
 #### FB-077: "Complete the dark-mode adaptation contract for border and action warning tokens"
 
 **UX Intent:** The brightness inversion rule (§9.12) was established for text and icon tokens but had not been applied to border and action tokens. `border-warning` used yellow-30 in both modes — yielding 1.68:1 on white (fails WCAG 1.4.11's 3:1 requirement for UI components). This is the same yellow-30 problem fixed for text/icon in FB-076, now completed across the remaining properties.
@@ -2373,6 +2891,7 @@ Dissolved categories: "Navigation & Menus", "Layout & Shell", "Interaction", "En
 
 ## Session: 2026-04-01 — Text Color Brightness Inversion for Dark/Light Mode
 
+<a id="fb-076"></a>
 #### FB-076: "For the footer, the dark mode color should be slightly lighter"
 
 **UX Intent:** Colored text used for functional purposes (status indicators, warnings, emphasis labels) must maintain optimal legibility in both light and dark modes. On dark surfaces, text colors need to be brighter; on light surfaces, darker. The user referenced the brand/highlight text color as the gold standard — it already shifts from accent-60 (light) to accent-40 (dark). All functional text color tokens should follow this brightness inversion pattern.
@@ -2393,8 +2912,11 @@ Dissolved categories: "Navigation & Menus", "Layout & Shell", "Interaction", "En
 
 ---
 
+**Anti-pattern:** See AP-047.
+
 ## Session: 2026-04-01 — Unified Four-State Model for Sidebar Navigation Items
 
+<a id="fb-075"></a>
 #### FB-075: "The nav item highlight color doesn't persist" / "hover text is not black" / "expanded parent should not differ from children"
 
 **UX Intent:** Every nav item in the sidebar must follow one unified four-state model. Two visual dimensions communicate two different things: neutral colors (gray/black) signal interaction, brand accent color (blue) signals location, and font weight (medium) signals activation (expanded or active). The states are:
@@ -2421,8 +2943,11 @@ Dissolved categories: "Navigation & Menus", "Layout & Shell", "Interaction", "En
 
 ---
 
+**Anti-patterns:** See AP-048. See AP-062.
+
 ## Session: 2026-04-01 — Minimum Inter-Button Spacing Principle
 
+<a id="fb-074"></a>
 #### FB-074: "There is no spacing in between those buttons. It's so cramped."
 
 **UX Intent:** Buttons are discrete interactive elements and must always be visually distinguishable from one another. Placing buttons flush or near-flush (< 8px) makes them visually merge, especially when they have filled backgrounds or borders. This is a fundamental design principle — no buttons should be adjacent without breathing room unless a deliberate button group component overrides it.
@@ -2438,8 +2963,11 @@ Dissolved categories: "Navigation & Menus", "Layout & Shell", "Interaction", "En
 
 ---
 
+**Loose match:** Related: AP-061.
+
 ## Session: 2026-04-01 — Systemic Dark-Mode Hover/Active Fixes
 
+<a id="fb-073"></a>
 #### FB-073: "These buttons in the dark mode on hover are having a problematic display"
 
 **UX Intent:** Every interactive state (hover, active) must provide clear visual feedback and maintain WCAG AA contrast in both color modes. A button that visually disappears on hover, or produces zero visible change, is a broken interaction — users lose confidence that the UI is responsive.
@@ -2458,8 +2986,11 @@ Dissolved categories: "Navigation & Menus", "Layout & Shell", "Interaction", "En
 
 ---
 
+**Anti-patterns:** See AP-044. See AP-047.
+
 ## Session: 2026-04-01 — Bold Button Dark-Mode WCAG Contrast
 
+<a id="fb-072"></a>
 #### FB-072: "I doubt that bold style buttons pass WCAG in dark theme"
 
 **UX Intent:** Functional interactive elements (buttons) must meet WCAG 2.1 AA contrast as a first-class requirement. Decorative/emphasis uses of brand color can prioritize visual pop over strict ratios. This is a deliberate split: buttons serve action affordance and must be readable; non-button brand accents serve identity and are judged differently.
@@ -2474,8 +3005,11 @@ Dissolved categories: "Navigation & Menus", "Layout & Shell", "Interaction", "En
 
 ---
 
+**Anti-patterns:** See AP-044. See AP-047.
+
 ## Session: 2026-04-01 — Button Inverse / Always Taxonomy
 
+<a id="fb-071"></a>
 #### FB-071: "I think this section tells me that we haven't defined the inverse vs always logic well"
 
 **User intent:** The playground's "Context Appearances" section for buttons showed inverse and always-light variants on the same fixed dark surface, making the distinction unclear. The user wanted the One GS taxonomy properly implemented: inverse is theme-responsive, always-* is locked.
@@ -2492,8 +3026,11 @@ Dissolved categories: "Navigation & Menus", "Layout & Shell", "Interaction", "En
 
 ---
 
+**Anti-pattern:** See AP-043.
+
 ## Session: 2026-04-01 — Design System Dark Mode Adaptation
 
+<a id="fb-070"></a>
 #### FB-070: "Design system components don't adapt well to dark vs light theme"
 
 **UX Intent:** A design system that only renders correctly in light mode appears incomplete and untested. When the playground toggles to dark mode, Card/Input/Table components should adapt their backgrounds, borders, and text colors to match the dark context — maintaining readability and visual hierarchy.
@@ -2510,8 +3047,11 @@ Dissolved categories: "Navigation & Menus", "Layout & Shell", "Interaction", "En
 
 ---
 
+**Loose match:** Related: AP-003.
+
 ## Session: 2026-03-30 — Button Component Sizing Redesign
 
+<a id="fb-069"></a>
 #### FB-069: "Vertical spacing too big, icons don't scale with label size"
 
 **UX Intent:** The button's internal proportions feel wrong — vertical padding is visually excessive and icons appear tiny/disconnected from the label at larger sizes. The user wants buttons where (a) vertical padding is noticeably tighter than horizontal, producing a wider pill shape, and (b) icons scale proportionally with the label text as button size increases, so all button content forms a cohesive visual unit.
@@ -2538,6 +3078,7 @@ Dissolved categories: "Navigation & Menus", "Layout & Shell", "Interaction", "En
 
 ## Session: 2026-03-30 — TokenGrid Interactive Token Builder
 
+<a id="fb-068"></a>
 #### FB-068: "The interactivity is just confusing because you cannot select a color picker"
 
 **UX Intent:** The user's mental model is color-first: pick a concrete color, then see which semantic tokens use it. The previous design forced users to work in the opposite direction — picking abstract dimensions (property, role, emphasis) independently, with no link to actual colors. Separate tabs for Extended Palette and Neutral were redundant because they showed colors without connecting them to the token naming system. The user wants a single integrated builder where choosing a color drives the rest of the interaction.
@@ -2561,6 +3102,7 @@ Dissolved categories: "Navigation & Menus", "Layout & Shell", "Interaction", "En
 
 ## Session: 2026-03-30 — Token Architecture Interactive Affordances & IA
 
+<a id="fb-067"></a>
 #### FB-067: "Can there be some interactiveness here? Currently, the color doesn't really show options"
 
 **UX Intent:** Interactive-looking elements that aren't interactive create a false affordance — the visual treatment signals "I'm clickable" but the behavior says "I'm static." This violates Norman's principle of perceived affordance: the appearance of an element must match its function. The accent-highlighted "color" prefix and pill-shaped dimension values both used visual treatments (colored background, pill shape) that universally signal interactivity in UI, but were static spans. Users see pills and expect to click them.
@@ -2585,6 +3127,7 @@ Additionally, the information architecture within the tab was inverted: rational
 
 ## Session: 2026-03-30 — Playground Swatch Focus Ring Clipping
 
+<a id="fb-066"></a>
 #### FB-066: "The border is kind of chopped up on the top for the brand key brand color"
 
 **UX Intent:** Every interactive element must visually complete its focus/selection indicator without clipping. A chopped border signals a rendering bug and erodes trust in the design system's own tooling. If the playground — the design system's showcase — can't render clean focus states, it undermines the system's credibility.
@@ -2601,8 +3144,11 @@ Additionally, the information architecture within the tab was inverted: rational
 
 ---
 
+**Loose match:** Related: AP-014.
+
 ## Session: 2026-03-30 — Breakpoint System Audit & Unification Plan
 
+<a id="fb-064"></a>
 #### FB-064: "Look at the breakpoints for the design system — audit existing and compare OneGS/Carbon"
 
 **UX Intent:** The design system needs a breakpoint scale built for enterprise B2B SaaS — supporting screens from small phones through ultrawide desktop monitors, with the ability to vary information density at any viewport size. The current breakpoints were inherited from IBM Carbon without adaptation, and two of three apps (Playground, ASCII Tool) silently use different Tailwind defaults. The user wants a deliberate, audited decision on what to adopt, adapt, or reject from Carbon and OneGS, with explicit consideration for large/ultra-large screens and compact-on-big-screen scenarios.
@@ -2644,6 +3190,7 @@ From Tailwind — **Partially adapt:** as implementation mechanism (`@theme` ove
 
 ## Session: 2026-03-30 — Typography System Revamp
 
+<a id="fb-063"></a>
 #### FB-063: "Reference OneGS typography and IBM Carbon — audit and revamp typography setup"
 
 **UX Intent:** The typography system had only 9 semantic mixins and no support for enterprise-density compact interfaces, body weight variants, responsive headings, quotes, captions, stats, or utility text categories. A B2B enterprise SaaS product needs dense typography with small minimums (8px per OneGS), explicit font role assignments, and enough semantic variety to avoid raw token usage in components.
@@ -2666,6 +3213,7 @@ From Tailwind — **Partially adapt:** as implementation mechanism (`@theme` ove
 
 ## Session: 2026-03-30 — Spacing Token Audit (Agent Parseability)
 
+<a id="fb-062"></a>
 #### FB-062: "This modal's height has the same exact issue — viewport adjustment"
 
 **UX Intent:** Every modal must provide enough vertical space for content to breathe. A squeezed modal with no min-height collapses to its content size, making it unusable when content is minimal (e.g., a cover image placeholder + two short inputs). This is the same feedback as FB-043 and FB-045 — the user explicitly said "the same kind of UX feedback I gave you before."
@@ -2680,6 +3228,9 @@ From Tailwind — **Partially adapt:** as implementation mechanism (`@theme` ove
 
 ---
 
+**Anti-patterns:** See AP-027. See AP-053.
+
+<a id="fb-061"></a>
 #### FB-061: "Hover upload blocks navigation; edit button should open modal instead of dashboard"
 
 **UX Intent:** Admin editing must not degrade the visitor experience. The hover-to-upload overlay blocked navigation to case study detail pages — a core visitor action. The Edit button opening the Payload dashboard in a new tab forced a context switch. The user wants a single modal that consolidates image management and text editing without leaving the page.
@@ -2694,6 +3245,7 @@ From Tailwind — **Partially adapt:** as implementation mechanism (`@theme` ove
 
 ---
 
+<a id="fb-060"></a>
 #### FB-060: Spacing token system audit — 5 consistency fixes for agent parseability
 
 **UX Intent:** The three-tier spacing system (implemented in FB-055) had inconsistencies that degraded agent parseability. Agents need unambiguous tier rules: Tier 1 = clean grid, Tier 2 = layout intent, Tier 3 = component internals. Mixing tiers or leaking oddball values into the wrong tier forces agents to learn exceptions instead of rules.
@@ -2713,6 +3265,7 @@ From Tailwind — **Partially adapt:** as implementation mechanism (`@theme` ove
 
 ## Session: 2026-03-30 — Media Upload Affordances
 
+<a id="fb-059"></a>
 #### FB-059: "Link modals don't let me upload files; tiles don't let me upload images"
 
 **UX Intent:** Two distinct upload affordance gaps: (1) Inline edit link modals forced users to type URLs even when the target was an uploaded file (like a resume). The natural flow is "pick/upload the file and let the system handle the URL." (2) Homepage project tiles had no way to set or change cover images — the admin had to use the Payload panel, find the project, upload there, and refresh. The natural flow is hover → drop/click → done.
@@ -2727,8 +3280,11 @@ From Tailwind — **Partially adapt:** as implementation mechanism (`@theme` ove
 
 ---
 
+**Anti-pattern:** See AP-051.
+
 ## Session: 2026-03-30 — Élan Case Study TokenGrid & Section Restructuring
 
+<a id="fb-058"></a>
 #### FB-058: "Upload screen is not intuitive — no field explanations, no validation"
 
 **UX Intent:** Form fields without descriptions, labels using technical jargon, and no validation feedback violate basic form UX principles. Users need to understand what each field does before they can fill it in correctly. Errors must be specific and contextual, not generic toasts.
@@ -2743,6 +3299,7 @@ From Tailwind — **Partially adapt:** as implementation mechanism (`@theme` ove
 
 ---
 
+<a id="fb-057"></a>
 #### FB-057: "Token examples don't follow convention — $portfolio is meaningless — need Lumen accent tab with brand story"
 
 **UX Intent:** The TokenGrid component serves a dual role: it's an interactive showcase in the Élan case study AND it demonstrates the design system's token architecture. Three visual/structural issues:
@@ -2765,6 +3322,7 @@ From Tailwind — **Partially adapt:** as implementation mechanism (`@theme` ove
 
 ## Session: 2026-03-30 — TokenGrid Color Section Relevance
 
+<a id="fb-056"></a>
 #### FB-056: "Spacing and radius tab is irrelevant — section is about color, tabs should be color schemes"
 
 **UX Intent:** The TokenGrid component lives in the "Lumen — A Custom Color Identity" section of the Élan case study. Every tab within that interactive visual must be relevant to the section's topic (color). The Spacing and Radius tabs show non-color design tokens — they belong to a spacing or layout section, not a color identity section. Additionally, the token naming convention (`property.role.emphasis`) that defines the color architecture was missing entirely — this was previously part of the section content and its absence left a gap in the design system narrative.
@@ -2785,6 +3343,7 @@ From Tailwind — **Partially adapt:** as implementation mechanism (`@theme` ove
 
 ## Session: 2026-03-30 — Admin Overlay vs Component Content Separation
 
+<a id="fb-055"></a>
 #### FB-055: "You're forcing an admin view inline edit button on, treating it as the same element as the actual component"
 
 **UX Intent:** Admin controls (edit, delete) are a separate concern from component content. They must be layered on top as an overlay, never inserted into the document flow where they displace real content. The LinkedIn button was pushed to `position: absolute` at the card's top-right corner to make room for admin buttons in the attribution row — violating Fitts' law (the button should be near the name/role it relates to, not in an arbitrary corner). Admin mode should never alter the spatial layout that a visitor would see.
@@ -2806,6 +3365,7 @@ From Tailwind — **Partially adapt:** as implementation mechanism (`@theme` ove
 **Chat:** Current session
 **Scope:** `src/components/TestimonialCard.tsx`, `src/components/TestimonialCard.module.scss`, `src/app/(frontend)/HomeClient.tsx`, `src/app/(frontend)/page.tsx`
 
+<a id="fb-055-occ2"></a>
 #### FB-055: "This DAG is drawn horribly — hard to navigate — consider infinite canvas"
 
 **UX Intent:** The Feedback Architecture diagram in the Élan case study was unreadable: 12 nodes crammed into a 380px container with 9px text, percentage-based absolute positioning causing overlap, and no way to explore a complex multi-tier graph. The user requested a draggable canvas approach. Simultaneously, the user identified that zero accessibility standards existed for interactive components.
@@ -2824,6 +3384,7 @@ From Tailwind — **Partially adapt:** as implementation mechanism (`@theme` ove
 
 ---
 
+<a id="fb-054"></a>
 #### FB-054: "Build a testimonial card to mix in with the waterfall gallery"
 
 **UX Intent:** The homepage masonry grid is currently all project cards — a uniform tile type. Interleaving testimonial cards breaks the visual monotony, adds social proof at the browsing layer (before the visitor commits to reading a case study), and creates height variation that enhances the waterfall stagger effect described in §15.3.
@@ -2846,6 +3407,7 @@ From Tailwind — **Partially adapt:** as implementation mechanism (`@theme` ove
 **Chat:** Current session
 **Scope:** `src/components/ScrollSpy.module.scss`, `src/app/(frontend)/work/[slug]/ProjectClient.tsx`, `src/app/(frontend)/about/AboutClient.tsx`
 
+<a id="fb-053"></a>
 #### FB-053: "IT IS STILL NOT FIXED!!!! This text is not fixed. It's still aligned to the center."
 
 **UX Intent:** ScrollSpy section labels that appear on hover must be vertically centered with their corresponding tick marks — the visual midline of each label text must sit at the exact same Y-coordinate as the center of its tick bar. Labels that are "a few pixels down" break the spatial mapping between text and notch. A secondary issue: labels must sit close to the ticks with only a small gap, not be pushed far away.
@@ -2867,11 +3429,14 @@ From Tailwind — **Partially adapt:** as implementation mechanism (`@theme` ove
 
 ---
 
+**Anti-patterns:** See AP-031. See AP-051.
+
 ## Session: 2026-03-30 — Playground Sidebar Header Spacing
 
 **Chat:** Current session
 **Scope:** `playground/src/components/sidebar.tsx`
 
+<a id="fb-052"></a>
 #### FB-052: "Navigation bar header spacing is asymmetric with collapse button distance inconsistent between states"
 
 **UX Intent:** The sidebar header used `px-4` (16px) horizontal padding while the rest of the sidebar (nav area, search, archive) used `px-1.5` (6px). This created visible misalignment between the logo/collapse button and the nav items below. Additionally, the collapse button's distance from the sidebar's right border was 16px in expanded mode but ~14px in collapsed mode — the inconsistency makes the expand/collapse transition feel unstable.
@@ -2900,6 +3465,7 @@ From Tailwind — **Partially adapt:** as implementation mechanism (`@theme` ove
 **Chat:** Current session
 **Scope:** `src/app/(frontend)/work/[slug]/ProjectClient.tsx`, `src/app/(frontend)/work/[slug]/page.module.scss`
 
+<a id="fb-051"></a>
 #### FB-051: "Collaborators are all stacked into one line; description text too small"
 
 **UX Intent:** Three distinct issues on the case study detail page, all related to scannability and information hierarchy in the sidebar and intro blurb:
@@ -2928,6 +3494,7 @@ From Tailwind — **Partially adapt:** as implementation mechanism (`@theme` ove
 **Chat:** Current session
 **Scope:** `src/app/(frontend)/HomeClient.tsx`, `src/app/(frontend)/page.module.scss`, `src/components/admin/ViewSiteLink.tsx`, `src/payload.config.ts`
 
+<a id="fb-049"></a>
 #### FB-049: "no easy way for me to enter the visual edit view"
 
 **UX Intent:** The user needs a clear, discoverable path from the Payload CMS admin dashboard to the visual editing experience on the live site. Currently, the only way is to manually navigate to the public URL after logging in.
@@ -2940,6 +3507,7 @@ From Tailwind — **Partially adapt:** as implementation mechanism (`@theme` ove
 
 **Cross-category note:** Also documented as ENG-039 (engineering) — CMS tab organization.
 
+<a id="fb-048"></a>
 #### FB-048: "it's a link and will bring users outside elsewhere, not showing the redirect icon"
 
 **UX Intent:** External links should consistently show the ↗ (northeast arrow) icon to signal they will navigate away from the site. The Links section had this icon but the Experience section (formerly Teams) did not.
@@ -2957,6 +3525,7 @@ From Tailwind — **Partially adapt:** as implementation mechanism (`@theme` ove
 **Chat:** Current session
 **Scope:** `src/components/ui/BadgeOverlay/BadgeOverlay.module.scss`
 
+<a id="fb-050"></a>
 #### FB-050: "bordered badge overlays are way too thick and color too strong for light mode"
 
 **UX Intent:** The bordered variant creates a "knockout ring" — visual separation between the badge and its anchor element (avatar, icon). The ring should be barely perceptible: just enough to prevent the badge from visually merging with the surface underneath. It should not be a decorative stroke.
@@ -2967,6 +3536,9 @@ From Tailwind — **Partially adapt:** as implementation mechanism (`@theme` ove
 
 **Pattern extracted -> `design.md`:** For overlay indicators, use the "knockout ring" pattern — border color should be the page surface, not a contrast color. The ring creates visual separation by revealing the background, not by adding a decorative stroke. At sub-24px element sizes, border thickness should not exceed 1.5px.
 
+**Anti-pattern:** See AP-031.
+
+<a id="fb-051-occ2"></a>
 #### FB-051: "BadgeOverlay is not even touching the base"
 
 **UX Intent:** When a BadgeOverlay sits on a circular anchor (avatar), it should visually overlap the circle's edge — not float in the dead space between the circle and its bounding box corner.
@@ -2977,6 +3549,7 @@ From Tailwind — **Partially adapt:** as implementation mechanism (`@theme` ove
 
 **Pattern extracted -> `design.md`:** When positioning overlay indicators on circular anchors, never use bounding-box corner positioning — the corner is ~7-10px outside the visible circle. Use percentage insets (`14%` from each edge for the standard circle-inscribed-in-square case) plus `translate(50%)` centering to land the badge at the circle's edge.
 
+<a id="fb-052-occ2"></a>
 #### FB-052: "highlight bold BadgeOverlay label is invisible — contrast violation"
 
 **UX Intent:** Counter labels inside a bold-emphasis badge overlay must be instantly legible at any size — especially at 10-12px where the element is already at the perceptibility floor.
@@ -2991,6 +3564,7 @@ From Tailwind — **Partially adapt:** as implementation mechanism (`@theme` ove
 
 ### Session: 2026-04-02 — Collapsed NavItem Badge Overlay Vertical Spacing
 
+<a id="fb-053-occ2"></a>
 #### FB-053: "The vertical spacing is cramped — badges are sticking out and there's barely any breathing room"
 
 **UX Intent:** When stacking collapsed NavItems with badge overlays vertically, the visual gap between items should feel open and breathable — not crowded by badges that overflow the element's bounding box.
@@ -3007,6 +3581,9 @@ From Tailwind — **Partially adapt:** as implementation mechanism (`@theme` ove
 
 ### Session: 2026-04-02 — VerticalNav Component & NavItem Brand Active Variant
 
+**Anti-patterns:** See AP-031. See AP-051.
+
+<a id="fb-054-occ2"></a>
 #### FB-054: "Build a VerticalNav design system component mirroring the playground sidebar"
 
 **UX Intent:** Promote the playground sidebar's interaction model and layout into a reusable design system component. The sidebar's 4-state model (default, hover, expanded, active with brand accent) should be formally available through the NavItem component.
@@ -3027,6 +3604,7 @@ From Tailwind — **Partially adapt:** as implementation mechanism (`@theme` ove
 
 ### Session: 2026-04-02 — NavItem Tiered Architecture (Expanded State + NavItemTrigger + NavItemChildren)
 
+<a id="fb-055-occ3"></a>
 #### FB-055: "Category button states should belong to NavItem, not VerticalNav — need parent/children tier"
 
 **UX Intent:** The NavItem component should be the single source of truth for all navigation item visual states and behaviors, including expandable parent items. The tiered navigation pattern (parent with children) should be defined at the NavItem primitive level, not reimplemented at the sidebar layout level.
@@ -3045,6 +3623,7 @@ From Tailwind — **Partially adapt:** as implementation mechanism (`@theme` ove
 
 ### Session: 2026-04-02 — NavItem Expanded Chevron, Expandable Badge, Trailing Spacing
 
+<a id="fb-056-occ2"></a>
 #### FB-056: "Expanded state has no chevron — and expandable items can have badges too"
 
 **UX Intent:** (1) The "Expanded" visual state demo should show the complete expandable appearance — including the rotated chevron — because users will never see an expanded item without one. (2) Expandable nav items can carry badges (notification counts, status indicators) alongside the chevron. (3) The trailing slot (chevron) should be right-aligned consistently with how badges are right-aligned.
@@ -3061,6 +3640,7 @@ From Tailwind — **Partially adapt:** as implementation mechanism (`@theme` ove
 
 ### Session: 2026-04-02 — DS Parity Remediation (Primitives Pass)
 
+<a id="fb-057-occ2"></a>
 #### FB-057: Systematic DS primitive adoption across portfolio site
 
 **UX Intent:** Bring all site-level SCSS into alignment with Elan design system primitives — tokens, typography mixins, layout mixins, interactive mixins, spacing, color, elevation, border, and z-index scales. No component swaps; restyle existing code using DS fundamentals. Motion explicitly deferred.
@@ -3080,6 +3660,7 @@ From Tailwind — **Partially adapt:** as implementation mechanism (`@theme` ove
 
 **Cross-category note:** Also documented as ENG-095 (engineering) for token sync, build verification, and dependency cleanup.
 
+<a id="fb-058-occ2"></a>
 #### FB-058: NavItem sizing adjustments informed by cross-system audit
 
 **UX Intent:** Align NavItem sizing with industry best practices from MUI, IBM Carbon, shadcn/ui, Ant Design, and Adobe Spectrum while preserving the design system's identity. Four specific adjustments: (1) increase sm horizontal padding from 6px to 8px to match md, (2) flatten md/lg gap from 8/10px to 8/8px, (3) unify trailing icon size with leading icon at every size, (4) add a touch-optimized size tier at 44px (Apple HIG minimum tap target).
@@ -3097,6 +3678,7 @@ From Tailwind — **Partially adapt:** as implementation mechanism (`@theme` ove
 
 ---
 
+<a id="fb-059-occ2"></a>
 #### FB-059: Hardcoded tool/technology tags should use DS Badge component
 
 **UX Intent:** Tool and technology tags displayed on case study detail pages and the experiments listing page were rendering as raw `<span>` elements with custom SCSS, bypassing the existing DS Badge component. The user requested an audit to identify all such instances and swap them with the Badge component for consistency.
@@ -3114,6 +3696,9 @@ From Tailwind — **Partially adapt:** as implementation mechanism (`@theme` ove
 
 ---
 
+**Anti-pattern:** See AP-051.
+
+<a id="fb-060-occ2"></a>
 #### FB-060: Uppercase label typography inconsistency — handrolled patterns replaced with `@include label` / `@include label-sm`
 
 **UX Intent:** All uppercase section labels, group headers, and category titles across the site should use the DS `label` or `label-sm` typography mixin for consistency. The user flagged "ROLE" / "TEAM" / "DURATION" / "TOOLS" labels on case study pages and asked whether all similar uppercase text uses the same DS style.
@@ -3146,6 +3731,7 @@ From Tailwind — **Partially adapt:** as implementation mechanism (`@theme` ove
 
 ---
 
+<a id="fb-061-occ2"></a>
 #### FB-061: "Label text is too thick — uppercase labels should use regular (400) weight"
 
 **UX Intent:** The user found the uppercase "ROLE" / "TEAM" / "DURATION" / "TOOLS" labels on the case study sidebar too heavy and asked for a thinner weight — specifically at the design system mixin level, not as a one-off page fix.
@@ -3165,6 +3751,7 @@ From Tailwind — **Partially adapt:** as implementation mechanism (`@theme` ove
 
 ---
 
+<a id="fb-062-occ2"></a>
 #### FB-062: "Zoom buttons and other elan-visual elements not using DS components"
 
 **UX Intent:** The user observed that the ArchitectureDag zoom buttons (+, −, ↺) were raw `<button>` elements with custom CSS instead of using the DS `Button` component. Audit revealed additional non-DS elements across all elan-visual case study components.
@@ -3192,6 +3779,9 @@ These remain custom because they are purpose-built visualization primitives with
 
 ---
 
+**Anti-patterns:** See AP-027. See AP-053.
+
+<a id="fb-063-occ2"></a>
 #### FB-063: "Menu item spacing audit vs. IBM Carbon, MUI, Ant Design"
 
 **UX Intent:** Comparative analysis of Élan Menu item spacing against three industry-standard design systems (IBM Carbon v11, MUI v6, Ant Design v5). Goal: identify discrepancies in inline padding, vertical padding, font-size scaling, icon sizing, and icon-to-text gap.
@@ -3216,6 +3806,7 @@ These remain custom because they are purpose-built visualization primitives with
 
 ---
 
+<a id="fb-064-occ2"></a>
 #### FB-064: "Menu header demo should use real use case, not generic placeholder"
 
 **UX Intent:** The MenuHeader playground demo used a "Select all" button — a plausible but uncommon use case. The user pointed out that high-fidelity demos create strong mental models, and showing the wrong content misleads viewers about the component's purpose even if they're "smart enough" to know it's a demo.
@@ -3232,6 +3823,7 @@ These remain custom because they are purpose-built visualization primitives with
 
 ---
 
+<a id="fb-065"></a>
 #### FB-065: "Line-on-line visual collision — Input minimal inside Menu with separators"
 
 **UX Intent:** The user observed that using `Input emphasis="minimal"` (bottom-border underline style) inside a `MenuHeader` creates visual ambiguity because the menu already uses horizontal lines for `MenuSeparator` dividers and `MenuHeader`/`MenuFooter` border lines. Two different semantic elements — "type here" vs. "group boundary" — render as visually identical horizontal lines.
@@ -3247,6 +3839,7 @@ These remain custom because they are purpose-built visualization primitives with
 
 ---
 
+<a id="fb-066-occ2"></a>
 #### FB-066: "Header/footer padding stacks with nested component padding; Input size must match Menu size"
 
 **UX Intent:** Two issues in the MenuHeader demo: (1) the header had the same padding as menu items (e.g., 10px/12px at md), but since it wraps an Input that has its own internal padding, the total whitespace was visually doubled compared to regular items; (2) the Input was hardcoded to `size="xs"` regardless of the Menu's size, causing a 16px search icon next to 20px menu item icons at the default md size.
@@ -3266,6 +3859,7 @@ These remain custom because they are purpose-built visualization primitives with
 
 ---
 
+<a id="fb-070-occ2"></a>
 #### FB-070: "Eyebrow mono font looks bad as section headers — revert to sans, keep mono as option for metrics"
 
 **UX Intent:** The Eyebrow component was switched to mono font (Geist Mono) globally, but mono doesn't work well for section header / nav divider use cases — it looks too technical and clashes with the surrounding sans-serif UI. However, mono is desirable for metric/data annotations where tabular alignment aids scanability.
@@ -3281,6 +3875,7 @@ These remain custom because they are purpose-built visualization primitives with
 
 ---
 
+<a id="fb-071-occ2"></a>
 #### FB-071: "Prop names must communicate intent, not implementation — rename `mono` to `metric`"
 
 **UX Intent:** The `mono` prop on Eyebrow describes what CSS changes (switches to monospace font) but not when to use it. An agent encountering `mono` has to reason through a two-step chain: "Is this a data context? → If so, use mono." The prop name should collapse that to one step so agents can make the right decision from the name alone.
@@ -3297,6 +3892,9 @@ These remain custom because they are purpose-built visualization primitives with
 
 ---
 
+**Anti-pattern:** See AP-043.
+
+<a id="fb-072-occ2"></a>
 #### FB-072: "Eyebrow adoption audit — migrate ~44 hand-rolled label instances to `<Eyebrow>`"
 
 **UX Intent:** Consolidate all hand-rolled uppercase+tracked text (via `@include label` / `label-sm` SCSS mixins) into the canonical `<Eyebrow>` component across all public-facing pages and elan-visuals, ensuring a single source of truth for this text pattern.
@@ -3322,6 +3920,9 @@ These remain custom because they are purpose-built visualization primitives with
 
 ---
 
+**Anti-patterns:** See AP-044. See AP-047.
+
+<a id="fb-073-occ2"></a>
 #### FB-073: "Input trailing slot — generic content slot for Kbd, badges, and chips"
 
 **UX Intent:** Expand the Input component's API to support a generic `trailing` slot for arbitrary content (Kbd shortcut hints, status badges, action chips) positioned after clear/status but before `trailingIcon`. The Kbd component was already designed with sizes calibrated to fit inside Input, but the Input never had a slot to accept it.
@@ -3340,6 +3941,9 @@ These remain custom because they are purpose-built visualization primitives with
 
 ---
 
+**Anti-patterns:** See AP-044. See AP-047.
+
+<a id="fb-074-occ2"></a>
 #### FB-074: "Menu lg/xl icon-to-text gap too wide, content not left-aligned at xl"
 
 **UX Intent:** The gap between leading icon and text label in Menu items at lg and xl sizes felt disproportionately spacious compared to xs/sm/md. The xl size's content also appeared insufficiently left-aligned due to excessive inline padding.
@@ -3365,6 +3969,9 @@ These remain custom because they are purpose-built visualization primitives with
 
 ---
 
+**Loose match:** Related: AP-061.
+
+<a id="fb-075-occ2"></a>
 #### FB-075: "Menu item hover state must boost text and icon to max contrast"
 
 **UX Intent:** When a menu item's hover background shifts from white to light gray, the text and icon must compensate by increasing to maximum contrast (pure black in light mode, pure white in dark mode). Without this, hover *decreases* the contrast between content and background — the opposite of what a hover state should do. This is a universal interactive-state principle, not Menu-specific.
@@ -3392,6 +3999,9 @@ This applies to Menu, NavItem, sidebar items, command palettes, and any future l
 
 ---
 
+**Anti-patterns:** See AP-048. See AP-062.
+
+<a id="fb-095-occ2"></a>
 #### FB-095: "Token Architecture should belong to the application section"
 
 **UX Intent:** Standardize the information architecture across all 6 foundational styles pages in the playground. The "Token Architecture" section on the colors page was positioned at the global level (as a SubsectionTitle h4), but its content explains how semantic token *names* are constructed — an application/use-case concern. The user wanted it scoped inside the semantic zone as a proper SectionTitle (h3), and wanted every foundational styles page to have its own Token Architecture section explaining the naming convention for that token category.
@@ -3413,6 +4023,7 @@ This applies to Menu, NavItem, sidebar items, command palettes, and any future l
 
 ---
 
+<a id="fb-097-occ2"></a>
 #### FB-097: "Dark half of Lumen scale has uneven perceptual stepping — 60→70 too tight, 90→100 too wide"
 
 **UX Intent:** The user noticed a perceived gap in the accent scale between steps 10 and 20. Audit revealed the 10→20 gap was actually 97% of average (correct), but exposed genuine unevenness in the dark half (steps 60–100): the 60→70 transition was only 79% of average (too tight), while 90→100 was 116% of average (too wide). Max/min perceptual distance ratio was 1.48x.
@@ -3431,6 +4042,7 @@ Max/min perceptual distance ratio improved from **1.48x → 1.33x**. Range narro
 
 ---
 
+<a id="fb-096-occ2"></a>
 #### FB-096: "Light/dark columns and ScrollSpy should appear at medium widths, not just largest"
 
 **UX Intent:** On the playground colors page, the light/dark theme strip columns (side-by-side arrangement) and the ScrollSpy navigation only activated at `$elan-mq-lg` (1440px). At medium viewport widths (1056px–1439px) the sidebar is in hamburger mode, so the content area has the full viewport width — plenty of horizontal space for both features. The user wanted them to activate earlier so that medium-width viewports aren't stuck with stacked panels and no page navigation.
@@ -3445,6 +4057,7 @@ Max/min perceptual distance ratio improved from **1.48x → 1.33x**. Range narro
 
 ---
 
+<a id="fb-100-occ2"></a>
 #### FB-100: Image management controls and section layout presets for case study inline editing
 
 **UX Intent:** The user needed in-context controls for managing images within case study sections — deleting, reordering, replacing, choosing layout styles, adding per-image captions, and toggling section dividers. The existing system only allowed uploading, with layout hardcoded by image count and dividers always rendered.
@@ -3463,6 +4076,7 @@ Max/min perceptual distance ratio improved from **1.48x → 1.33x**. Range narro
 
 ---
 
+<a id="fb-101-occ2"></a>
 #### FB-101: "Token names in toolbar menus are irrelevant to users — remove them"
 
 **UX Intent:** The inline edit toolbar menus (font family, size, weight) showed design system token names (`$portfolio-font-sans`, `$portfolio-type-sm`, `$portfolio-weight-regular`) and rem values alongside human-readable labels. The user pointed out that these are implementation details irrelevant to the editing experience — equivalent to showing code behind a button. The backend must use the correct tokens transparently, but the user should never see them.
@@ -3480,6 +4094,7 @@ Max/min perceptual distance ratio improved from **1.48x → 1.33x**. Range narro
 
 ---
 
+<a id="fb-102-occ2"></a>
 #### FB-102: Block editor redesign — from rigid sections to flexible content blocks
 
 **UX Intent:** The user identified a holistic structural problem with the inline editing experience. Every complaint — can't add standalone text, can't reorder within sections, can't move content above the hero, forced dividers, non-functional layout selector on empty image slots — traced to the same root cause: the section model was a fixed tuple, not a composable block system.
@@ -3503,6 +4118,7 @@ Max/min perceptual distance ratio improved from **1.48x → 1.33x**. Range narro
 
 ---
 
+<a id="fb-103-occ2"></a>
 #### FB-103: Playground sidebar logo invisible in dark mode
 
 **UX Intent:** The YG logo in the playground sidebar header blended into the dark background, failing accessibility contrast requirements.
@@ -3515,7 +4131,10 @@ Max/min perceptual distance ratio improved from **1.48x → 1.33x**. Range narro
 
 ---
 
-### Block Editor Enhancement — Rich Text UX Overhaul
+**Loose match:** Related: AP-013.
+
+<a id="fb-208"></a>
+### FB-208: Block Editor Enhancement — Rich Text UX Overhaul
 
 **Date:** 2026-04-04
 
@@ -3541,6 +4160,7 @@ Max/min perceptual distance ratio improved from **1.48x → 1.33x**. Range narro
 
 ---
 
+<a id="fb-104-occ2"></a>
 #### FB-104: "Intro blurb should match description styling; remove description as template concept"
 
 **UX Intent:** The intro blurb body text (`body-lg`, `text-secondary`, normal weight) looked visually weaker than the description section below it (`body-lg`, `text-primary`, medium weight). The user wanted the intro blurb to be the single prominent entry text, eliminating the description as a distinct template element.
@@ -3557,6 +4177,7 @@ Max/min perceptual distance ratio improved from **1.48x → 1.33x**. Range narro
 
 ---
 
+<a id="fb-105"></a>
 #### FB-105: Block list content indented ~24px vs intro blurb in admin mode
 
 **Date:** 2026-04-04
@@ -3576,6 +4197,9 @@ Max/min perceptual distance ratio improved from **1.48x → 1.33x**. Range narro
 
 ---
 
+**Anti-pattern:** See AP-034.
+
+<a id="fb-106-occ2"></a>
 #### FB-106: "Hero image taking up too much space vertically, no breathing room top/bottom"
 
 **UX Intent:** The full-width hero splash should have symmetric breathing room on all four sides, not just horizontal padding. If the hero is not a full-bleed takeover, directional asymmetry (horizontal padding but no vertical) creates a visual imbalance where the image feels pressed against the top/bottom edges. Additionally, uploading images with non-16:9 dimensions should not result in cropping.
@@ -3595,6 +4219,7 @@ Max/min perceptual distance ratio improved from **1.48x → 1.33x**. Range narro
 
 ---
 
+<a id="fb-107"></a>
 #### FB-107: "No separation between intro blurb and article start; divider lines between sections are too much"
 
 **Date:** 2026-04-05
@@ -3618,6 +4243,7 @@ Max/min perceptual distance ratio improved from **1.48x → 1.33x**. Range narro
 
 ---
 
+<a id="fb-108"></a>
 #### FB-108: "Hero image still too tall at widest breakpoint - needs to fit without scrolling"
 
 **Date:** 2026-04-05
@@ -3634,6 +4260,7 @@ Max/min perceptual distance ratio improved from **1.48x → 1.33x**. Range narro
 
 ---
 
+<a id="fb-109-occ2"></a>
 #### FB-109: "Hero image and two columns not vertically aligned - should be centered"
 
 **Date:** 2026-04-05
@@ -3659,6 +4286,7 @@ Max/min perceptual distance ratio improved from **1.48x → 1.33x**. Range narro
 
 ---
 
+<a id="fb-110-occ2"></a>
 #### FB-110: "Hero and two-column layout not sharing the same visual center - layout is left-biased"
 
 **Date:** 2026-04-05
@@ -3681,6 +4309,7 @@ Max/min perceptual distance ratio improved from **1.48x → 1.33x**. Range narro
 
 ---
 
+<a id="fb-111-occ2"></a>
 #### FB-111: "Hero skeleton too wide - impractical 21:9 ratio, impossible to create matching assets"
 
 **Date:** 2026-04-05
@@ -3700,6 +4329,7 @@ Max/min perceptual distance ratio improved from **1.48x → 1.33x**. Range narro
 
 **Addendum (same session):** After the hero narrowed to 1056px, the sidebar+content block (~1100px) visually bled past the hero edges on both sides. Fix: changed `.layout` max-width from `$elan-container-wide` (1440px) to `calc($elan-container-default + $portfolio-spacer-4x * 2)` (1120px). This gives the layout an inner content area of 1056px - exactly matching the hero's max-width. At every viewport, the hero and layout share the same visual edges. Content column narrows from 720px to 676px at lg+ (still 95+ characters per line, well within readability range).
 
+<a id="fb-112-occ2"></a>
 #### FB-112: "Case study title should sit above the sidebar, not beside it" — REVERTED
 
 **Date:** 2026-04-05
@@ -3756,7 +4386,8 @@ Max/min perceptual distance ratio improved from **1.48x → 1.33x**. Range narro
 
 ---
 
-### Login page DS compliance audit and refactoring
+<a id="fb-209"></a>
+### FB-209: Login page DS compliance audit and refactoring
 
 **Date:** 2026-04-06
 
@@ -3776,7 +4407,8 @@ Max/min perceptual distance ratio improved from **1.48x → 1.33x**. Range narro
 - The DS Input subsumes label, error display, and accessibility attributes (aria-invalid, aria-describedby, role="alert") — re-implementing these in page-level code loses all those built-in behaviors
 - When overriding DS component styles for per-page theming, scoped CSS custom property overrides on ancestor elements are the cleanest approach for base states. For hover/active, a 3-class ancestor chain provides deterministic specificity without fragile hacks
 
-### Geist Pixel fonts: weight mismatch destroys decorative rendering
+<a id="fb-210"></a>
+### FB-210: Geist Pixel fonts: weight mismatch destroys decorative rendering
 
 **Date:** 2026-04-06
 
@@ -3795,7 +4427,8 @@ Max/min perceptual distance ratio improved from **1.48x → 1.33x**. Range narro
 - Accessibility floor: never use type tokens smaller than `$portfolio-type-xs` (0.75rem / 12px) for any visible text, regardless of whether smaller tokens exist in the scale. The sub-12px tokens exist for non-text use cases (e.g., spacing, optical adjustments)
 - Cross-category note: also documented as AP-062 (design anti-patterns)
 
-### Login page split layout with halftone portrait
+<a id="fb-211"></a>
+### FB-211: Login page split layout with halftone portrait
 
 **Date:** 2026-04-06
 
@@ -3820,6 +4453,7 @@ Max/min perceptual distance ratio improved from **1.48x → 1.33x**. Range narro
 
 ## Session: 2026-04-09 — Logo/name moved to nav lost original styling
 
+<a id="fb-078-occ2"></a>
 ### FB-078: "Font is IBM Plex Serif! And thinner!"
 
 **Date:** 2026-04-09
@@ -3837,8 +4471,11 @@ Max/min perceptual distance ratio improved from **1.48x → 1.33x**. Range narro
 
 ---
 
+**Loose match:** Related: AP-062.
+
 ## Session: 2026-04-09 — Reveal footer (sticky hidden-page effect)
 
+<a id="fb-079-occ2"></a>
 ### FB-079: Footer should be revealed like a hidden page underneath
 
 **Date:** 2026-04-09
@@ -3854,8 +4491,11 @@ Max/min perceptual distance ratio improved from **1.48x → 1.33x**. Range narro
 
 ---
 
+**Anti-pattern:** See AP-048.
+
 ## Session: 2026-04-09 — Nav logo mark hover state not synced with text
 
+<a id="fb-079-occ3"></a>
 ### FB-079: "Visual consistency - if it's in the same item, their states should sync"
 
 **Date:** 2026-04-09
@@ -3870,6 +4510,9 @@ Max/min perceptual distance ratio improved from **1.48x → 1.33x**. Range narro
 
 ---
 
+**Anti-pattern:** See AP-048.
+
+<a id="fb-080-occ2"></a>
 ### FB-080: "The login page shouldn't have any navigation bar"
 
 **Date:** 2026-04-09
@@ -3884,6 +4527,9 @@ Max/min perceptual distance ratio improved from **1.48x → 1.33x**. Range narro
 
 ---
 
+**Anti-pattern:** See AP-049.
+
+<a id="fb-081-occ2"></a>
 ### FB-081: "Halftone portrait strokes too thick and blurry"
 
 **Date:** 2026-04-09
@@ -3900,6 +4546,7 @@ Max/min perceptual distance ratio improved from **1.48x → 1.33x**. Range narro
 
 ---
 
+<a id="fb-084-occ2"></a>
 ### FB-084: Footer restructured to 4-column layout with Terra20 background
 
 **Date:** 2026-04-09
@@ -3922,6 +4569,7 @@ Max/min perceptual distance ratio improved from **1.48x → 1.33x**. Range narro
 
 ---
 
+<a id="fb-083-occ2"></a>
 ### FB-083: Homepage-v1 archived; major visual redesign of home page layout
 
 **Date:** 2026-04-09
@@ -3942,6 +4590,9 @@ Max/min perceptual distance ratio improved from **1.48x → 1.33x**. Range narro
 
 ---
 
+**Anti-pattern:** See AP-052.
+
+<a id="fb-082-occ2"></a>
 ### FB-082: Home page and navbar background changed to Terra10
 
 **Date:** 2026-04-09
@@ -3961,6 +4612,9 @@ Max/min perceptual distance ratio improved from **1.48x → 1.33x**. Range narro
 
 ---
 
+**Anti-pattern:** See AP-050.
+
+<a id="fb-083-occ3"></a>
 ### FB-083: Case study intro headlines as homepage navigation
 
 **Date:** 2026-04-09
@@ -3979,6 +4633,9 @@ Max/min perceptual distance ratio improved from **1.48x → 1.33x**. Range narro
 
 ---
 
+**Anti-pattern:** See AP-052.
+
+<a id="fb-085-occ2"></a>
 ### FB-085: Cursor thumbnail - horizontal rail model
 
 **Date:** 2026-04-11
@@ -4000,6 +4657,7 @@ Max/min perceptual distance ratio improved from **1.48x → 1.33x**. Range narro
 
 ---
 
+<a id="fb-084-occ3"></a>
 ### FB-084: Zero corner radius branding enforcement
 
 **Date:** 2026-04-10
@@ -4021,6 +4679,9 @@ Max/min perceptual distance ratio improved from **1.48x → 1.33x**. Range narro
 
 ---
 
+**Loose match:** Related: AP-024.
+
+<a id="fb-086-occ2"></a>
 ### FB-086: Inline links in case study content should match metaLink style
 
 **Date:** 2026-04-12
@@ -4035,6 +4696,9 @@ Max/min perceptual distance ratio improved from **1.48x → 1.33x**. Range narro
 
 ---
 
+**Anti-pattern:** See AP-054.
+
+<a id="fb-087-occ2"></a>
 ### FB-087: Company callout padding too generous
 
 **Date:** 2026-04-23
@@ -4064,4 +4728,185 @@ Max/min perceptual distance ratio improved from **1.48x → 1.33x**. Range narro
 - A left-border accent on the sub-content block creates visual attachment to the parent item without reusing structural patterns
 
 **Design principle learned:** Sub-content attached to a list item should indent to align with the item's label text, not its leading icon/marker. Aligning with the marker creates ambiguity about whether the sub-content belongs to the item or stands independently.
+
+## Session: 2026-04-26 — ForceGraph node sizing and tooltip placement
+
+<a id="fb-225"></a>
+### FB-225: ForceGraph node sizes too large overall
+
+**Component:** `ForceGraph` (src/components/ui/ForceGraph/ForceGraph.tsx)
+
+**Feedback:** User confirmed the relative size stepping was good but all nodes were "way too big." The hub node dominated the canvas.
+
+**Root cause:** `getNodeSize` used `2 + pow(v/maxVal, 0.4) * 3`, yielding a range of 2-5. The hub at size 5 was disproportionately large relative to the canvas area.
+
+**Resolution:** Scaled down uniformly to `1.2 + t * 1.8` (range 1.2-3.0), preserving the relative stepping while reducing absolute sizes.
+
+**Cross-category note:** Also documented as ENG-244 (engineering).
+
+**Design principle:** When iterating on data visualization element sizing, get the relative proportions right first, then scale the entire range down to fit the canvas. Adjusting individual tiers independently creates inconsistency.
+
+---
+
+<a id="fb-226"></a>
+### FB-226: ForceGraph needs discrete size tiers, orphans should not be smallest
+
+**Component:** `ForceGraph` (src/components/ui/ForceGraph/ForceGraph.tsx)
+
+**Feedback:** User wanted the hub node slightly smaller still, and asked for three discrete size variations instead of a continuous curve. Orphans should share the small tier, not have their own unique smallest size.
+
+**Root cause:** Continuous sizing via `1.2 + t * 1.8` created a gradient where every node was a slightly different size, making the hierarchy feel noisy rather than structured. Orphans at 0.8 were too small and visually separate from the rest.
+
+**Resolution:** Replaced continuous formula with three discrete tiers based on normalized `val`: Large (2.4, top hubs where t > 0.6), Medium (1.8, mid-tier where t > 0.2), Small (1.3, leaves and orphans). This creates clear visual grouping.
+
+**Cross-category note:** Also documented as ENG-245 (engineering).
+
+**Design principle:** For hierarchical data visualization, discrete size tiers (3-4 levels) communicate hierarchy more clearly than continuous scaling. Continuous scaling creates visual noise where the viewer can't distinguish meaningful size differences. Orphan/edge-case nodes should share the smallest standard tier, not have a unique sub-tier.
+
+---
+
+<a id="fb-227"></a>
+### FB-227: Tooltip blocks active paths in Signal view
+
+**Component:** `ForceGraph` (src/components/ui/ForceGraph/ForceGraph.tsx)
+
+**Feedback:** User observed that the tooltip, anchored directly above the hovered node, was blocking the active link paths radiating from that node. "It can block other nodes and other paths when they're not active, but when the path is highlighted, the tooltip should not be blocking it."
+
+**Root cause:** The tooltip was anchored with a fixed `translate(-50%, -100%)` (centered above node) regardless of where the node's links extend. On nodes with many upward-radiating links, the tooltip sat directly over the most interesting visual information.
+
+**Resolution:** Implemented quadrant-aware tooltip placement. On hover, the component computes the average direction of all connected neighbors in graph space, then positions the tooltip in the opposite quadrant (top-left, top-right, bottom-left, or bottom-right). The transform-origin for the grow/shrink animation also adapts to emerge from the corner nearest the node, preserving the animated tooltip pattern from SkillMap (FB-194).
+
+**Cross-category note:** Also documented as ENG-246 (engineering).
+
+**Design principle:** Tooltips in data visualizations must be context-aware. Static anchor positions (always-above, always-right) work for simple UIs but fail in graph/network visualizations where the information of interest radiates outward from the trigger element. The tooltip should yield to the visual content the user is exploring - block what's not in focus, never block what is.
+
+---
+
+<a id="fb-228"></a>
+### FB-228: Node tooltip hit area too small, tooltip dismisses too easily
+
+**Component:** `ForceGraph` (src/components/ui/ForceGraph/ForceGraph.tsx)
+
+**Feedback:** User reported the trigger area for viewing node tooltips was frustratingly small, requiring pixel-perfect cursor placement. Moving from a node onto its connected links would dismiss the tooltip even though the user was still exploring that node's connections. "As soon as the user has the cursor hovering over the node, it should realistically be when the user's cursor moves over to the path. The tooltip should still persist in its original location until the user's cursor leaves the path and to the blank space in the canvas."
+
+**Root cause:** Two issues: (1) `nodePointerAreaPaint` used `getNodeSize(node) + 2` as the radius, which for small nodes (1.3) meant a ~3.3px hit area - smaller than a comfortable touch/pointer target. (2) The tooltip was only sustained by direct node hover. Moving the cursor onto a connected link fired `onNodeHover(null)`, immediately dismissing the tooltip even though the user was still contextually engaged with that node's neighborhood.
+
+**Resolution:**
+1. Increased node pointer area to `getNodeSize(node) * 3 + 4` (~8-11px radius), providing a generous target without visually inflating the node
+2. Added `onLinkHover` handler: when cursor moves from a node onto a connected link, the tooltip persists at the original node's position via `linkSustainedNodeRef`
+3. Added `linkHoverPrecision={8}` for comfortable link targeting (default was ~4px)
+4. Used `requestAnimationFrame` deferral in `handleNodeHover` dismissal so that `onLinkHover` can set the sustained ref before the dismiss check executes
+
+**Cross-category note:** Also documented as ENG-247 (engineering).
+
+**Design principle:** Interactive hit areas in data visualizations should extend beyond the visual footprint of the element. In a graph, the node's "interaction zone" is not just the dot - it includes the connected links. A tooltip triggered by a node should persist as long as the cursor is anywhere in that node's visual neighborhood (node or its links), and only dismiss when the cursor reaches empty canvas. Forcing users to hold their cursor over a 3px target violates Fitts's Law and creates unnecessary friction.
+
+---
+
+<a id="fb-229"></a>
+### FB-229: Pathway view misrepresents bidirectional vs unidirectional links
+
+**Component:** `ForceGraph` (src/components/ui/ForceGraph/ForceGraph.tsx)
+
+**Feedback:** In Pathway view, unidirectional links were showing Lumen (bidirectional) color instead of Terra. The visual encoding - Terra for unidirectional, Lumen for bidirectional - was not being demonstrated correctly. Bidirectional links showed a single arrow in Lumen, which was indistinguishable from a unidirectional link with the wrong color.
+
+**Root cause:** Two issues: (1) `react-force-graph-2d` renders one arrow per link object. A bidirectional link with a single arrow in Lumen looked identical to a unidirectional link with Lumen color - there was no visual indicator of bidirectionality. (2) The demo data contained duplicate bidirectional pairs (e.g., `api->gateway` AND `gateway->api` both with `bidirectional: true`), creating confusion about which links were truly bidirectional vs unidirectional.
+
+**Resolution:**
+1. Bidirectional links are now expanded into paired link objects (forward + reverse) during data preparation, each with `_curveDirection` (+1/-1) for slight curvature offset (0.15). This renders two curved arrows in Lumen between the same node pair, making bidirectionality visually unambiguous.
+2. Unidirectional links remain as single straight arrows in Terra.
+3. Demo data cleaned: removed duplicate pairs, ensured 5 clear bidirectional links and 25 unidirectional links with no overlap.
+4. Adjacency builders updated to use `graphData.links` (expanded) so hover emphasis and signal path BFS correctly match the rendered links.
+
+**Cross-category note:** Also documented as ENG-248 (engineering).
+
+**Design principle:** In network visualizations, the visual encoding of a connection property must be unambiguous at the atomic level. A single arrow in color X does not communicate "bidirectional" - it just looks like a unidirectional arrow that might be the wrong color. Bidirectionality requires a second arrow or a distinct visual form (double-headed, curved pair) that cannot be confused with unidirectional rendering.
+
+---
+
+<a id="fb-230"></a>
+### FB-230: Orphan nodes look accidental; tooltip lacks topology context
+
+**Component:** `ForceGraph` (src/components/ui/ForceGraph/ForceGraph.tsx), playground page
+
+**Feedback:** A single orphan node in the demo looked like a bug, not a feature. Additionally, the tooltip showed only id/group/label with no information about the node's connectivity - how many direct and transitive connections it has. In the Elan case study context (agent memory as a topology), the tooltip should communicate a node's influence radius within the network.
+
+**Root cause:** Demo data had only one orphan (`deprecated`), which could be mistaken for a data error. The tooltip had no degree statistics because the component lacked topology analysis.
+
+**Resolution:**
+1. Added 2 more orphan nodes to demo data (`legacy-auth`, `sandbox`) so the pattern reads as intentional.
+2. Built an undirected adjacency map from original (pre-expansion) links for accurate degree counting (bidirectional links count as one connection).
+3. Added BFS-based degree computation: 1st-degree (direct neighbors) and 2nd-degree (neighbors-of-neighbors excluding the node itself and its direct neighbors).
+4. Tooltip now shows degree stats for connected nodes (count of direct + 2nd-degree connections) and an "orphan" badge for unconnected nodes.
+5. Strategic decision: stopped at 2nd degree because in small-world networks (which knowledge graphs are), 3+ hops typically reach most of the graph, making the numbers uninformative. The contrast between a hub's reach and a leaf's reach is what communicates the mesh architecture.
+
+**Cross-category note:** Also documented as ENG-249 (engineering).
+
+**Design principle:** Topology metrics in data visualization tooltips should reveal strategic information about the node's role, not just descriptive metadata. For knowledge graphs, the relevant metric is influence radius (how far a change propagates). Show 1st-degree (direct connections) and 2nd-degree (transitive reach) - these two numbers together communicate centrality vs peripherality. Beyond 2nd degree, the numbers approach total node count and lose discriminative value. Orphan nodes (zero connections) should be explicitly labeled, and must appear in multiples so the pattern reads as intentional design, not data error.
+
+---
+
+<a id="fb-231"></a>
+### FB-231: Progressive node disclosure - zoom to reveal graph detail
+
+**Component:** `ForceGraph` (src/components/ui/ForceGraph/ForceGraph.tsx)
+
+**Feedback:** At default zoom, all nodes render simultaneously, making large graphs (1000+ nodes) a dense cloud where everything competes for attention. The zoomed-out view should show only the structural overview (hubs + orphans), with mid-tier and leaf nodes fading in as the user zooms in.
+
+**Root cause:** The component had no zoom-responsive visibility system. All nodes rendered at all zoom levels regardless of their structural importance.
+
+**Resolution:**
+1. Added `nodeDisclosure` prop with values `"all"` (default, current behavior) and `"progressive"` (zoom-responsive).
+2. Built a three-tier system reusing the existing size thresholds: Tier 1 (hubs + orphans, always visible), Tier 2 (mid-tier, fades in at globalScale >= 0.8), Tier 3 (leaves, fades in at globalScale >= 1.5).
+3. Orphans are promoted to Tier 1 (always visible) because in a knowledge graph, an orphan represents disconnected knowledge the agent cannot reach - hiding it at any zoom conceals a structural gap.
+4. Each tier fades in via a 0.4-unit opacity ramp (not a hard cut) for organic transitions.
+5. Links to invisible nodes are also hidden (transparent color, zero width). Pointer areas are disabled for invisible nodes so they cannot be hovered.
+6. Labels only render when `disclosureAlpha > 0.3` to prevent ghostly text during early fade-in.
+
+**Cross-category note:** Also documented as ENG-250 (engineering).
+
+**Design principle:** Progressive disclosure in data visualization should mirror the information hierarchy: structural overview first (backbone + gaps), detail on demand (zoom to reveal). Orphans deserve special treatment - they are not "unimportant small nodes" but structural signals. On a subway map, a disconnected station is more important to show than a mid-route stop because it represents a service gap. The same principle applies to knowledge graphs: the gaps in the mesh are as important as the mesh itself.
+
+---
+
+<a id="fb-232"></a>
+### FB-232: Signal view particles feel monolithic - need organic wave motion
+
+**Component:** `ForceGraph` (src/components/ui/ForceGraph/ForceGraph.tsx)
+
+**Feedback:** In Signal view, all particles emit at the same interval (250ms), at the same speed, on all links simultaneously. The result looks mechanical and robotic - like a metronomic pulse rather than a living system. Particles should feel like ocean waves: bursts that swell and recede, with organic variation in timing and density.
+
+**Root cause:** The emission system used a flat `setInterval(emit, 250)` that fired one particle on every active link simultaneously. Particle speed was constant across all particles. No temporal or per-link variation existed.
+
+**Resolution:**
+1. Replaced the 250ms uniform interval with an 80ms tick that uses sine-wave modulated emission probability. Each tick, a wave factor (0..1) determines the likelihood of emitting on each link. This creates organic crest/trough cycles with a 2.2s period.
+2. Added per-link phase offsets derived from a deterministic hash of the link key. Links don't all crest at the same moment - the wave ripples across the graph, creating a staggered pulse effect.
+3. Added 25% speed jitter to the particle speed accessor. Each particle gets a random speed variation on creation, causing particles within the same burst to cluster and spread organically (accordion effect).
+
+**Cross-category note:** Also documented as ENG-251 (engineering).
+
+**Design principle:** Animated data visualizations should use stochastic variation to avoid mechanical uniformity. When all elements move identically, the eye reads the animation as a system artifact rather than meaningful signal. Three layers of variation break the monotony: temporal (wave probability), spatial (per-link phase offset), and kinetic (speed jitter). The result is organic motion that reads as "information flowing through a network" rather than "a timer firing every 250ms."
+
+---
+
+### FB-233: Link labels on paths - hover-only relational metadata in Mesh view
+
+**Date:** 2026-04-26
+
+**Component:** `ForceGraph` (src/components/ui/ForceGraph/ForceGraph.tsx)
+
+**Feedback:** The ForceGraph shows connections but provides no relational metadata on links. When a user hovers a node and sees its connections emphasized, there is no way to understand what kind of relationship each link represents or how strong it is. Add labels along each path showing edge type and confidence.
+
+**Resolution:**
+1. Added `linkCanvasObject` callback using `"after"` mode so the library renders the link line first, then our label draws on top.
+2. Labels use Geist Mono at a small scale-responsive size, positioned at the link midpoint, rotated to follow the link angle. Text always reads left-to-right (flipped by +PI when the angle would render upside-down). Offset slightly above the line to avoid overlapping the link stroke.
+3. Edge types are abbreviated via `EDGE_TYPE_ABBR` map (e.g., "reference" -> "ref", "trigger" -> "trig", "documents" -> "doc"). Unknown types use first 4 characters.
+4. Labels are completely hover-gated: they render only when the link is in `hoveredNeighborLinks`. Zero labels visible at rest.
+5. Bidirectional dedup guard: expanded bidirectional link pairs overlap as straight lines in Mesh view (curvature is 0). `_curveDirection === -1` early-return prevents doubled text.
+6. Progressive disclosure integration: labels respect `linkDisclosureAlpha` and don't render on invisible links.
+7. Scoped to Mesh view only. Pathway and Signal views already use arrows/particles as the visual channel.
+
+**Cross-category note:** Also documented as ENG-254 (engineering).
+
+**Design principle:** Contextual metadata labels should be hover-gated, not always-visible. In a dense graph, always-on labels create visual noise that overwhelms topology. Hover-gating preserves the clean resting state while surfacing relational detail exactly when the user inspects a specific node. The label becomes part of the hover-emphasis interaction pattern, not a separate information layer.
 

@@ -1,3 +1,14 @@
+<!-- graph metadata for docs knowledge graph (see docs/knowledge-graph.md) -->
+---
+type: spoke
+id: design-css-framework
+topics:
+  - design
+  - system-architecture
+derivedFrom:
+  - design.md
+---
+
 # CSS Framework Integration (Tailwind v4)
 
 > Spoke file for `docs/design.md`. Return to the [hub](../design.md) for the Section Index.

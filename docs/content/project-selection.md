@@ -1,3 +1,14 @@
+<!-- graph metadata for docs knowledge graph (see docs/knowledge-graph.md) -->
+---
+type: spoke
+id: content-project-selection
+topics:
+  - content
+  - projects
+derivedFrom:
+  - content.md
+---
+
 # §8. Project Selection & Curation
 
 ### 8.1 The Curator Problem
