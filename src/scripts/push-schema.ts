@@ -232,6 +232,13 @@ async function pushSchema() {
     // DEFAULT only applies to new inserts.
     `UPDATE "projects" SET "content_format" = 'caseStudy' WHERE "content_format" IS NULL`,
 
+    // Admin password for owner analytics exclusion (Layer 1)
+    `DO $$ BEGIN
+      ALTER TABLE "companies" ADD COLUMN "admin_password" varchar;
+    EXCEPTION
+      WHEN duplicate_column THEN NULL;
+    END $$`,
+
   ]
 
   for (const sql of statements) {

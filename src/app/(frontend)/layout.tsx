@@ -65,9 +65,11 @@ export default async function RootLayout({
   // The dev auto-login fallback (isAdminAuthenticated) always returns true
   // when PAYLOAD_ADMIN_EMAIL is set, which would disable Mixpanel in dev.
   let isAdminForAnalytics = false;
+  let isOwnerForAnalytics = false;
   try {
     const cookieStore = await cookies();
     isAdminForAnalytics = !!cookieStore.get("payload-token")?.value;
+    isOwnerForAnalytics = !!cookieStore.get("yg_owner")?.value;
   } catch {
     // cookies() unavailable
   }
@@ -76,7 +78,7 @@ export default async function RootLayout({
     <html lang="en" data-theme="light" className={fontVariables}>
       <body>
           <TooltipProvider>
-            <AnalyticsProvider companySlug={companySlug} isAdmin={isAdminForAnalytics}>
+            <AnalyticsProvider companySlug={companySlug} isAdmin={isAdminForAnalytics} isOwner={isOwnerForAnalytics}>
               {children}
             </AnalyticsProvider>
           </TooltipProvider>

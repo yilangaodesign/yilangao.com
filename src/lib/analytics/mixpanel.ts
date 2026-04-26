@@ -61,3 +61,12 @@ export function registerSuperProps(props: Record<string, string | number | boole
   if (!initialized || disabled) return;
   mixpanel.register(props);
 }
+
+/**
+ * Return the stable Mixpanel device ID for this browser/device.
+ * Unlike `get_distinct_id()`, this value does NOT change after `identify()`.
+ */
+export function getDeviceId(): string | null {
+  if (!initialized || disabled) return null;
+  return mixpanel.get_property('$device_id') ?? null;
+}

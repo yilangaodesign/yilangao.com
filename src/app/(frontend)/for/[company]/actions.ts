@@ -33,12 +33,26 @@ export async function validatePassword(
     return { success: false, error: "Incorrect password" };
   }
 
+  const adminPw = config?.adminPassword
+    ?? (company === "welcome" ? (process.env.ANALYTICS_OWNER_KEY ?? "yg-owner-2026") : undefined);
+  const isAdminPw = adminPw ? comparePasswords(password, adminPw) : false;
+
   const slug = config ? company : "welcome";
   const signed = createSignedValue(slug);
   const cookieConfig = getSessionCookieConfig(signed);
 
   const cookieStore = await cookies();
   cookieStore.set(cookieConfig);
+
+  if (isAdminPw) {
+    cookieStore.set("yg_owner", "1", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24 * 30,
+      path: "/",
+    });
+  }
 
   if (config) {
     await incrementLoginAnalytics(config.id);
