@@ -2995,6 +2995,29 @@ The browser HTTP cache is the correct persistence layer — it's already there, 
 
 ---
 
+### ENG-202: Owner device activity polluting Mixpanel analytics reports
+
+**Issue:** The user's own devices (MacBook Chrome, iPhone Safari in incognito) were generating Mixpanel events without `is_owner: true`, polluting analytics reports. The previous `localStorage`-based tagging failed in incognito mode (localStorage clears on session close) and Safari Private Browsing deletes httpOnly cookies on tab close.
+
+**Root cause:** Single-layer owner detection (`localStorage`) is fundamentally unreliable across browser privacy modes. Incognito generates a new device ID each session, so hardcoded device ID matching also fails. The problem required multiple independent detection layers.
+
+**Resolution:** Implemented a four-layer owner detection strategy:
+- **Layer 1 (admin password):** Added `adminPassword` field to Companies collection. When the user logs in with this password, `actions.ts` sets a `yg_owner` httpOnly cookie alongside the session cookie. For the welcome slug (no CMS record), falls back to `ANALYTICS_OWNER_KEY` env var.
+- **Layer 2 (tag-owner URL):** `/api/tag-owner?key=SECRET` route sets the `yg_owner` cookie directly (for normal browsing).
+- **Layer 3 (known device ID):** Client-side check of `mixpanel.get_property('$device_id')` against a hardcoded list (safety net for primary browser).
+- **Layer 4 (Payload admin):** Existing mechanism — Mixpanel fully disabled when `payload-token` cookie present.
+- **Legacy:** `localStorage` check kept as zero-cost fallback.
+
+`AnalyticsProvider` checks all layers at render-time init and calls `registerSuperProps({ is_owner: true })` if any match. The `secure` flag on all `yg_owner` cookies is conditional on `NODE_ENV === "production"` (matching the existing session cookie pattern).
+
+Two rounds of adversarial audits caught: missing CMS-Frontend parity (CompanyRecord type/data fetch), missing schema push step, `secure` flag inconsistency, welcome slug fallback gap, null-safe device ID check, and `distinct_id` vs `$device_id` confusion after `identify()`.
+
+**Files modified:** `src/collections/Companies.ts`, `src/lib/company-data.ts`, `src/scripts/push-schema.ts`, `src/app/(frontend)/for/[company]/actions.ts`, `src/app/(frontend)/layout.tsx`, `src/components/AnalyticsProvider.tsx`, `src/lib/analytics/mixpanel.ts`, `src/app/(frontend)/api/tag-owner/route.ts`
+
+**Principle:** Owner/developer exclusion in analytics requires multiple independent detection layers because no single mechanism survives all browser privacy modes. Design each layer to cover a specific scenario class independently. Use `$device_id` (not `distinct_id`) for client-side device matching since `distinct_id` changes after `identify()`.
+
+---
+
 ### ENG-200: Treemap tooltip flies to (0,0) on dismiss with no directional animation
 
 **Issue:** When the mouse left the treemap, the tooltip jumped to the top-left corner (position 0,0) as it faded out, because `left: tooltip?.x ?? 0` resolved to 0 when tooltip state became null. No exit animation communicated direction.

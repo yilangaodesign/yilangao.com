@@ -349,6 +349,28 @@ prop that no longer exists in the current `SiteFooterConfig` type.
 When shelving code to archive, verify it won't be type-checked by any
 tsconfig in the repo.
 
+### REL-AP-008: Release commit message node substitution fails with escaped quotes
+
+**Occurrences:** 1 (REL-027)
+
+**Trigger:** Using `node -p \"require('./elan.json').release.version\"` inside
+a `git commit -m "..."` string causes bash to fail on the escaped quotes,
+producing an empty substitution and a broken commit message.
+
+**Failure:** Commit created with message "release: Élan , ASCII Art Studio"
+instead of the correct version labels. Required an immediate `git commit --amend`.
+
+**Fix:** Always use pre-captured shell variables for version strings in commit
+messages:
+```bash
+ELAN_VER=$(node -p "require('./elan.json').release.version")
+ASCII_VER=$(node -p "require('./ascii-studio.json').release.version")
+git commit -m "release: Élan $ELAN_VER, ASCII Art Studio $ASCII_VER"
+```
+Never inline `node -p` with escaped quotes directly inside `git commit -m`.
+
+---
+
 ### REL-AP-007: version:auto misclassifies Next.js route group renames as URL breaking changes
 
 **Occurrences:** 1 (REL-009)

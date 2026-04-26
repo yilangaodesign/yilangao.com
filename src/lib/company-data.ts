@@ -5,6 +5,7 @@ export type CompanyRecord = {
   name: string
   slug: string
   password: string
+  adminPassword: string | null
   altPasswords: string[]
   active: boolean
   accent: string
@@ -32,6 +33,7 @@ export async function getCompanyBySlug(slug: string): Promise<CompanyRecord | nu
       name: doc.name as string,
       slug: doc.slug as string,
       password: doc.password as string,
+      adminPassword: (doc.adminPassword as string) || null,
       altPasswords: (doc.altPasswords as Array<{ value: string }> || []).map((p) => p.value),
       active: (doc.active as boolean) ?? true,
       accent: (doc.accent as string) || '#888888',

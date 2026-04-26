@@ -2454,3 +2454,22 @@ Concrete canonical shape in this codebase: `ProjectClient.tsx` DnD after the ato
 **Detection:** Search for `redirect("/")` or `redirect(...)` in login/auth page server components where the guard is a bare truthy check on a session value without comparing it to the route parameter.
 
 **Incident:** ENG-203 — User visited `/for/cognition` with a prior "unknown" session cookie. The login page server component checked `if (existingSession)` → truthy → redirected to `/`. User never saw the login form, never entered the password, cookie stayed "unknown", home page showed no personalization badge. Fixed to `if (existingSession && existingSession === company)`.
+
+---
+
+### EAP-119: Single-layer client-side storage for cross-session identity tagging
+
+**Status:** Active
+**Category:** Analytics / Identity
+**First observed:** ENG-202 (2026-04-25)
+**Occurrences:** 1
+
+**Pattern:** Using `localStorage` as the sole mechanism to tag a device/user identity across sessions. Fails silently in any incognito/private browsing mode because localStorage is ephemeral.
+
+**Why it fails:** Safari Private Browsing, Chrome Incognito, and Firefox Private Browsing all create isolated localStorage scopes that are destroyed when the session ends. Any identity stored there is lost. Additionally, Mixpanel's `persistence: "localStorage"` option means `$device_id` also resets in incognito, so device ID matching fails too.
+
+**Correct alternative:** Use multiple independent detection layers. Server-set httpOnly cookies survive across tabs within a session (even in incognito). Login-flow tagging (setting a cookie when the user authenticates with a special password) is the most reliable mechanism because it piggybacks on the authentication action the user is already performing. Use `mixpanel.get_property('$device_id')` (not `get_distinct_id()`) for device matching, since `distinct_id` changes after `identify()`.
+
+**Detection:** Search for `localStorage.setItem` or `localStorage.getItem` used as the sole mechanism for tagging identity properties that must persist across browser modes.
+
+**Incident:** ENG-202 — Owner device activity polluted Mixpanel reports because `localStorage.getItem("yg_owner")` was the only check. Failed on iPhone incognito and MacBook incognito. Fixed with four-layer detection (admin password, server cookie URL, known device ID, Payload admin).

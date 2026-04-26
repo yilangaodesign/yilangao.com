@@ -4,7 +4,28 @@
 >
 > **Who reads this:** AI agents when the `ship-it` skill is activated — scan recent entries for recurring pitfalls before starting a new release.
 > **Who writes this:** AI agents after each ship-it run via the Post-Release Audit protocol in `ship-it/SKILL.md`.
-> **Last updated:** 2026-04-25 (REL-026: Élan 2.13.1, yilangao.com 1.5.1, ASCII Art Studio 0.6.16)
+> **Last updated:** 2026-04-25 (REL-027: Élan 2.13.2, ASCII Art Studio 0.6.17)
+
+---
+
+## REL-027 — Élan 2.13.2, ASCII Art Studio 0.6.17 (2026-04-25)
+
+**Scope:** 12 files across 3 dependency-ordered layer commits (L0 config x3, L1 docs x8, L7 site components x1) + 1 release commit + 1 dev-patch-bump commit. Layers 2-6, 8-10 empty.
+**Semver:** Patch for both apps (docs additions + analytics timing fix; no new features or API changes).
+**Previous release:** Élan 2.13.1, ASCII Art Studio 0.6.16
+
+**Incidents during release:**
+1. **Release commit message substitution failed:** The `node -p require(...)` command inside a `git commit -m "$(cat <<'EOF'...)"` heredoc errored due to escaped quotes in bash substitution. Commit was created as "release: Élan , ASCII Art Studio". Fixed immediately via `git commit --amend`.
+
+**Build gate:** All 3 apps passed on first attempt. Playground ~31s, main site ~40s, ASCII Art Studio ~22s.
+
+**Post-deploy verification:** `vercel ls` confirmed `yilangao-design-system` (playground) Ready at 3m and `yilangao-portfolio` (main site) Ready at 5m post-push.
+
+**Layer classification notes:**
+- `scripts/audit-docs.mjs` classified as Layer 0 (project maintenance utility alongside `.cursor/skills/`). Could arguably be Layer 1 (docs tooling) but L0 is appropriate given it's a build script.
+- 3 new docs files (`docs/analytics.md`, `docs/content/analytics-measurement.md`, `docs/engineering/analytics-instrumentation.md`) committed together with 5 modified docs in a single L1 commit — tight coupling justified single commit.
+
+**Known Pitfall references:** Release commit message substitution matches a pattern not previously cataloged. See new REL-AP-008 below.
 
 ---
 

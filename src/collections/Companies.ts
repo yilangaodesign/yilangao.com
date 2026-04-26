@@ -41,6 +41,13 @@ export const Companies: CollectionConfig = {
       },
     },
     {
+      name: 'adminPassword',
+      type: 'text',
+      admin: {
+        description: 'Your personal admin password — logging in with this tags you as owner in analytics',
+      },
+    },
+    {
       name: 'altPasswords',
       type: 'array',
       admin: {
