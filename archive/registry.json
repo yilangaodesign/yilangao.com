@@ -1292,6 +1292,56 @@
       },
       "tags": ["ui", "video", "embed", "iframe", "youtube", "vimeo", "loom", "media", "click-to-load", "privacy"],
       "hasPreview": true
+    },
+    {
+      "id": "shared-ui-canvas-toolbar",
+      "name": "CanvasToolbar",
+      "type": "Component",
+      "experiment": "shared",
+      "status": "active",
+      "description": "Vertical icon-button stack for canvas control surfaces. Absolute-positioned in the top-right corner. Supports active states, left-side hover tooltips, and visual separators between functional groups. Generic and consumer-agnostic.",
+      "sourcePath": "src/components/ui/CanvasToolbar/CanvasToolbar.tsx",
+      "createdAt": "2026-04-26T00:00:00Z",
+      "createdBy": "cursor",
+      "origin": {
+        "type": "custom"
+      },
+      "tags": ["ui", "toolbar", "canvas", "controls", "visualization"],
+      "hasPreview": true
+    },
+    {
+      "id": "shared-ui-force-graph",
+      "name": "ForceGraph",
+      "type": "Component",
+      "experiment": "shared",
+      "status": "active",
+      "description": "Interactive force-directed graph visualization built on react-force-graph-2d. Renders on HTML5 Canvas for performance with large datasets (1000+ nodes). Supports pan, zoom, hover tooltips, configurable node colors, label visibility modes, and Geist Mono/Sans font selection.",
+      "sourcePath": "src/components/ui/ForceGraph/ForceGraph.tsx",
+      "createdAt": "2026-04-26T00:00:00Z",
+      "createdBy": "cursor",
+      "origin": {
+        "type": "hybrid",
+        "library": "react-force-graph-2d",
+        "url": "https://github.com/vasturiano/react-force-graph"
+      },
+      "tags": ["ui", "visualization", "graph", "force-directed", "canvas", "data"],
+      "hasPreview": true
+    },
+    {
+      "id": "shared-ui-canvas",
+      "name": "Canvas",
+      "type": "Component",
+      "experiment": "shared",
+      "status": "active",
+      "description": "Pannable, zoomable container with a dot-grid background. Supports passthrough mode (syncs grid to a child's zoom transform) and managed mode (handles zoom/pan internally). Cursor shows grab/grabbing states. Inspired by Obsidian and FigJam canvas interactions.",
+      "sourcePath": "src/components/ui/Canvas/Canvas.tsx",
+      "createdAt": "2026-04-26T00:00:00Z",
+      "createdBy": "cursor",
+      "origin": {
+        "type": "custom"
+      },
+      "tags": ["ui", "canvas", "zoom", "pan", "grid", "visualization", "container"],
+      "hasPreview": true
     }
   ]
 }

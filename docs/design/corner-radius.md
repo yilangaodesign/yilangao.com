@@ -1,3 +1,14 @@
+<!-- graph metadata for docs knowledge graph (see docs/knowledge-graph.md) -->
+---
+type: spoke
+id: design-corner-radius
+topics:
+  - design
+  - branding
+derivedFrom:
+  - design.md
+---
+
 # Corner Radius (B2B Sharp)
 
 > Spoke file for `docs/design.md`. Return to the [hub](../design.md) for the Section Index.

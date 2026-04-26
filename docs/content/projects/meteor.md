@@ -1,3 +1,15 @@
+<!-- graph metadata for docs knowledge graph (see docs/knowledge-graph.md) -->
+---
+type: spoke
+id: content-meteor
+topics:
+  - content
+  - projects
+  - case-study
+derivedFrom:
+  - content.md
+---
+
 # Goldman Sachs Meteor - Case Study Dossier
 
 > Bootstrapped 2026-04-03 by synthesizing CFB-016 from content feedback log.

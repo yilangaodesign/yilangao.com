@@ -44,7 +44,7 @@ const INTERACTIVE_VISUALS: Record<string, Record<string, { component: string; pl
       playgroundLabel: "Explore the full design system",
     },
     "The System Behind the System": {
-      component: "SkillMap",
+      component: "SystemVisuals",
       playgroundUrl: "https://yilangao-design-system.vercel.app",
       playgroundLabel: "Explore the full design system",
     },

@@ -61,3 +61,9 @@
   align-items: center;
   justify-content: space-between;
 }
+
+@mixin prose-paragraph-spacing($gap: $portfolio-spacer-3x) {
+  p + p {
+    margin-top: $gap;
+  }
+}

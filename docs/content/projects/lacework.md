@@ -1,3 +1,15 @@
+<!-- graph metadata for docs knowledge graph (see docs/knowledge-graph.md) -->
+---
+type: spoke
+id: content-lacework
+topics:
+  - content
+  - projects
+  - case-study
+derivedFrom:
+  - content.md
+---
+
 # Lacework — Case Study Dossier
 
 > Bootstrapped 2026-04-03 by synthesizing CF-003 through CF-010 from content feedback log.

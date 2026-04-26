@@ -1,0 +1,60 @@
+@use '../../../styles' as *;
+
+.toolbar {
+  position: absolute;
+  top: var(--portfolio-spacer-1x);
+  right: var(--portfolio-spacer-1x);
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 2px;
+  background: var(--portfolio-surface-primary);
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+}
+
+.itemWrap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.separator {
+  width: calc(100% - 8px);
+  height: 0;
+  margin: 4px auto;
+  border: none;
+  border-top: 1px solid var(--color-border);
+}
+
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: var(--portfolio-text-secondary);
+  cursor: pointer;
+  transition: background-color 150ms ease, color 150ms ease;
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  &:hover {
+    background: var(--portfolio-surface-secondary);
+    color: var(--portfolio-text-primary);
+  }
+}
+
+.buttonActive {
+  background: var(--portfolio-surface-secondary);
+  color: var(--portfolio-text-primary);
+}

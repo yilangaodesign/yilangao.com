@@ -1,3 +1,14 @@
+<!-- graph metadata for docs knowledge graph (see docs/knowledge-graph.md) -->
+---
+type: spoke
+id: engineering-git-branching
+topics:
+  - engineering
+  - release
+derivedFrom:
+  - engineering.md
+---
+
 # Git Branching & Session Safety
 
 > Spoke file for `docs/engineering.md`. Return to the [hub](../engineering.md) for the Section Index.

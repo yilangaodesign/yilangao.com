@@ -1,0 +1,10 @@
+type: rule
+id: rule-src-components
+topics:
+  - engineering
+  - playground
+  - parity
+enforces:
+  - AGENTS.md
+references:
+  - AGENTS.md

@@ -1,0 +1,9 @@
+type: skill
+id: skill-content-iteration
+topics:
+  - content
+references:
+  - AGENTS.md
+  - content.md
+  - content-anti-patterns.md
+  - content-feedback-log.md

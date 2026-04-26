@@ -1,3 +1,16 @@
+<!-- graph metadata for docs knowledge graph (see docs/knowledge-graph.md) -->
+---
+type: spoke
+id: content-etro-framework
+topics:
+  - content
+  - system-architecture
+  - projects
+  - case-study
+derivedFrom:
+  - content.md
+---
+
 # Project Dossier: ETRO Framework
 
 ## Current State

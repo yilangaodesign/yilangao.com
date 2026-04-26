@@ -1,3 +1,14 @@
+<!-- graph metadata for docs knowledge graph (see docs/knowledge-graph.md) -->
+---
+type: spoke
+id: content-internal-tools
+topics:
+  - content
+  - projects
+derivedFrom:
+  - content.md
+---
+
 # §7. Internal Tool Compensation Strategies
 
 **The core challenge:** When the product lives behind a firewall, you cannot say "go see for yourself." The strategies below replace live product access with equivalent evidence.

@@ -1,3 +1,17 @@
+<!-- graph metadata for docs knowledge graph (see docs/knowledge-graph.md) -->
+---
+type: spoke
+id: content-portfolio-coherence
+topics:
+  - content
+  - port-registry
+  - portfolio
+  - branding
+  - parity
+derivedFrom:
+  - content.md
+---
+
 # §18. Portfolio Coherence Manifest
 
 > **What this file is:** A living inventory tracking stylistic and structural diversity across all active case studies. Ensures the portfolio doesn't repeat the same narrative shape, headline technique, or technique emphasis across multiple entries.

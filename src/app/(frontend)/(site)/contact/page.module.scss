@@ -178,6 +178,7 @@ $card-margin: $portfolio-spacer-2x;
   line-height: $portfolio-leading-relaxed;
   color: $portfolio-overlay-white-65;
   margin-bottom: $portfolio-spacer-1-5x;
+  @include prose-paragraph-spacing($portfolio-spacer-2x);
 }
 
 .sliderAttrib {

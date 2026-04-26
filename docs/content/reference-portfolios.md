@@ -1,3 +1,17 @@
+<!-- graph metadata for docs knowledge graph (see docs/knowledge-graph.md) -->
+---
+type: spoke
+id: content-reference-portfolios
+topics:
+  - content
+  - port-registry
+  - portfolio
+  - branding
+  - case-study
+derivedFrom:
+  - content.md
+---
+
 # Appendix A: Reference Portfolios
 
 ### A.1 Visual Craft References

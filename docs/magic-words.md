@@ -1,3 +1,17 @@
+<!-- graph metadata for docs knowledge graph (see docs/knowledge-graph.md) -->
+---
+type: cross-cutting
+id: magic-words
+topics:
+  - route
+  - skill
+  - knowledge-graph
+references:
+  - AGENTS.md
+  - docs/knowledge-graph.md
+  - .cursor/skills/graph-query/SKILL.md
+---
+
 # Magic Words
 
 Quick reference for trigger phrases that activate agent skills. Say any of these (or their aliases) to start the corresponding workflow.
@@ -45,6 +59,14 @@ Quick reference for trigger phrases that activate agent skills. Say any of these
 | **"docs health"** | Runs static analysis + AI-powered semantic review of the entire knowledge base. Finds broken references, duplicates, contradictions, orphaned files. | Periodically (every 7 days) or when docs feel inconsistent. |
 | *Aliases:* "audit my docs", "check doc health" | | |
 
+## Knowledge Access (Graph Query)
+
+| Say this | What happens | When to use it |
+|----------|-------------|----------------|
+| **"look up `<id>`"** / **"show me EAP-027"** | Activates the [graph-query](../.cursor/skills/graph-query/SKILL.md) skill. Runs `npm run query-graph -- <id>` and returns the node + its 1-hop neighbors (frontmatter, anchors, edges). | You want a specific anti-pattern, guardrail, route, skill, or release without reading the whole file. |
+| **"neighborhood of `<id>`"** / **"context around `<id>`"** | Activates [graph-query](../.cursor/skills/graph-query/SKILL.md). Runs `npm run query-graph -- <id>` (1-hop default; depth 2 with `--depth 2`). | You need surrounding context for a node before making a decision. |
+| **"search docs for `<query>`"** | Activates [graph-query](../.cursor/skills/graph-query/SKILL.md). Runs `npm run query-graph -- --search "<query>"` (BM25-ranked). | You only have a keyword and need to find the right doc. |
+
 ---
 
 ## Not Magic Words (Automatic Routing)
@@ -60,3 +82,4 @@ These phrases aren't triggers you need to memorize. The agent detects them autom
 - Touching playground files → Playground skill (automatic)
 - Generating portfolio UI (main site) → Branding reference check (automatic, route 16)
 - Touching analytics code → Analytics reference + engineering spoke (automatic, route 17)
+- Touching graph metadata or links (frontmatter, HTML anchors, markdown link edges) → [Knowledge graph spec](knowledge-graph.md) + `npm run audit-docs` (automatic)

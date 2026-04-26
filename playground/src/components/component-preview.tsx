@@ -19,11 +19,14 @@ export function ComponentPreview({
   code,
   title,
   description,
+  flush = false,
 }: {
   children: React.ReactNode;
   code?: string;
   title?: string;
   description?: string;
+  /** Remove padding so children fill the preview pane edge-to-edge. */
+  flush?: boolean;
 }) {
   const [view, setView] = useState<"preview" | "code">("preview");
 
@@ -54,7 +57,7 @@ export function ComponentPreview({
       </div>
 
       {view === "preview" ? (
-        <div className={s.previewPane}>{children}</div>
+        <div className={flush ? s.previewPaneFlush : s.previewPane}>{children}</div>
       ) : (
         <div className={s.codePane}>
           <pre className={s.codePre}>

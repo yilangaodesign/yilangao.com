@@ -1,3 +1,17 @@
+<!-- graph metadata for docs knowledge graph (see docs/knowledge-graph.md) -->
+---
+type: cross-cutting
+id: analytics
+topics:
+  - analytics
+  - engineering
+  - content
+references:
+  - engineering/analytics-instrumentation.md
+  - content/analytics-measurement.md
+  - architecture.md
+---
+
 # Client Analytics Reference
 
 > **What this file is:** A cross-cutting reference consumed by both engineering and content work streams. It is **not a hub** — it has no spokes of its own. Implementation details live in [`docs/engineering/analytics-instrumentation.md`](engineering/analytics-instrumentation.md); measurement strategy lives in [`docs/content/analytics-measurement.md`](content/analytics-measurement.md). The event registry below is the shared artifact both pillars reference.

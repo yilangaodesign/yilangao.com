@@ -1,3 +1,37 @@
+<!--
+graph metadata for docs knowledge graph (see docs/knowledge-graph.md)
+-->
+---
+type: route-table
+id: AGENTS
+topics: [route, guardrail, skill]
+references:
+  - docs/design.md
+  - docs/engineering.md
+  - docs/content.md
+  - docs/magic-words.md
+  - docs/knowledge-graph.md
+triggers:
+  - skill-boot-up
+  - skill-case-study-authoring
+  - skill-checkpoint
+  - skill-cms-parity
+  - skill-content-iteration
+  - skill-cross-app-parity
+  - skill-design-iteration
+  - skill-doc-audit
+  - skill-engineering-iteration
+  - skill-graph-query
+  - skill-orchestrator
+  - skill-password-gate
+  - skill-personalize
+  - skill-plan-audit
+  - skill-plan-structure
+  - skill-playground
+  - skill-ship-it
+  - skill-stress-test
+---
+
 # This is NOT the Next.js you know
 
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
@@ -15,58 +49,59 @@ dispatched by the orchestrator. Follow these rules:
 # Hard Guardrails
 
 **Design:**
-1. **NEVER** use inline `style={{}}` — always use Tailwind classes or CSS custom properties
-2. **NEVER** place CSS resets outside `@layer base` — unlayered resets override all Tailwind utilities
-3. **NEVER** use `@theme inline` for themeable values — use `@theme` so dark mode works
-4. **NEVER** treat repeated user complaints incrementally — 3+ in the same category means the root cause is architectural
-5. **NEVER** skip dark mode verification when touching colors or backgrounds
-6. **ALWAYS** use flex layout with in-flow spacers for fixed sidebars — never rely on padding-left offsets
-7. **NEVER** use SVG to render text, labels, or component UI — SVG is permitted only for icons, logos, and decorative illustrations. Text in SVG bypasses the typography token system, breaks copy/paste, and is invisible to screen readers.
-8. **ALWAYS** name component props, CSS classes, and design tokens by **semantic intent** (when/why to use), never by **visual implementation** (what CSS changes). An agent must be able to decide whether to use a prop from its name alone, in one reasoning step, without knowing the underlying CSS. Bad: `mono` (implementation — "use monospace font"). Good: `metric` (intent — "this labels a statistic"). Bad: `rounded` (implementation). Good: `pill` (intent — "tag/badge shape"). This applies to every new prop, variant, token, and CSS class. See §7.7 in `docs/design.md`.
-9. **NEVER** add border-radius to any element on the portfolio website (yilangao.com / main site) — the portfolio identity is zero corner radius on all elements. Badges must use `shape="squared"`. The only exceptions are structural shapes (avatars, progress bars, toggle switches, spinners). Read `docs/design/branding.md` before generating any portfolio UI. See §24 in `docs/design.md`.
+1. <a id="guardrail-design-1"></a>**NEVER** use inline `style={{}}` — always use Tailwind classes or CSS custom properties
+2. <a id="guardrail-design-2"></a>**NEVER** place CSS resets outside `@layer base` — unlayered resets override all Tailwind utilities
+3. <a id="guardrail-design-3"></a>**NEVER** use `@theme inline` for themeable values — use `@theme` so dark mode works
+4. <a id="guardrail-design-4"></a>**NEVER** treat repeated user complaints incrementally — 3+ in the same category means the root cause is architectural
+5. <a id="guardrail-design-5"></a>**NEVER** skip dark mode verification when touching colors or backgrounds
+6. <a id="guardrail-design-6"></a>**ALWAYS** use flex layout with in-flow spacers for fixed sidebars — never rely on padding-left offsets
+7. <a id="guardrail-design-7"></a>**NEVER** use SVG to render text, labels, or component UI — SVG is permitted only for icons, logos, and decorative illustrations. Text in SVG bypasses the typography token system, breaks copy/paste, and is invisible to screen readers.
+8. <a id="guardrail-design-8"></a>**ALWAYS** name component props, CSS classes, and design tokens by **semantic intent** (when/why to use), never by **visual implementation** (what CSS changes). An agent must be able to decide whether to use a prop from its name alone, in one reasoning step, without knowing the underlying CSS. Bad: `mono` (implementation — "use monospace font"). Good: `metric` (intent — "this labels a statistic"). Bad: `rounded` (implementation). Good: `pill` (intent — "tag/badge shape"). This applies to every new prop, variant, token, and CSS class. See §7.7 in `docs/design.md`.
+9. <a id="guardrail-design-9"></a>**NEVER** add border-radius to any element on the portfolio website (yilangao.com / main site) — the portfolio identity is zero corner radius on all elements. Badges must use `shape="squared"`. The only exceptions are structural shapes (avatars, progress bars, toggle switches, spinners). Read `docs/design/branding.md` before generating any portfolio UI. See §24 in `docs/design.md`.
 
 **Content:**
-1. **NEVER** write a paragraph that exceeds 3 sentences — the target is ~60% visual, ~40% text for case studies. Essay-type content is text-majority. No paragraph exceeds 3 sentences; whitespace between paragraphs is mandatory.
-2. **NEVER** lead a case study with process methodology (research → ideate → prototype → test) — lead with the problem and outcome (inverted pyramid)
-3. **NEVER** use generic positioning language ("delightful experiences", "user-centered solutions") — every word must be specific enough that it couldn't describe a different designer
-4. **NEVER** describe an internal tool with paragraphs when screenshots exist — replace every descriptive paragraph with a full-width screenshot + one-line caption
-5. **NEVER** respond to content feedback without FIRST completing all documentation steps — append to `docs/content-feedback-log.md`, check if a new anti-pattern belongs in `docs/content-anti-patterns.md`, update the frequency map in `docs/content.md`. The fix is not done until the documentation is done.
-6. **ALWAYS** include a scope statement (2-4 sentences) at the top of every case study that simultaneously communicates: what the company/product does, what you specifically did, and evidence of scale/impact
-7. **NEVER** use em dashes (U+2014) in any portfolio text. Use a regular dash surrounded by spaces ( - ) or split into separate sentences. Em dashes are an AI voice tell. See `docs/content/voice-style.md` line 73 and CAP-022. Violated 6+ times in a single writing pass (CFB-022).
+1. <a id="guardrail-content-1"></a>**NEVER** write a paragraph that exceeds 3 sentences — the target is ~60% visual, ~40% text for case studies. Essay-type content is text-majority. No paragraph exceeds 3 sentences; whitespace between paragraphs is mandatory.
+2. <a id="guardrail-content-2"></a>**NEVER** lead a case study with process methodology (research → ideate → prototype → test) — lead with the problem and outcome (inverted pyramid)
+3. <a id="guardrail-content-3"></a>**NEVER** use generic positioning language ("delightful experiences", "user-centered solutions") — every word must be specific enough that it couldn't describe a different designer
+4. <a id="guardrail-content-4"></a>**NEVER** describe an internal tool with paragraphs when screenshots exist — replace every descriptive paragraph with a full-width screenshot + one-line caption
+5. <a id="guardrail-content-5"></a>**NEVER** respond to content feedback without FIRST completing all documentation steps — append to `docs/content-feedback-log.md`, check if a new anti-pattern belongs in `docs/content-anti-patterns.md`, update the frequency map in `docs/content.md`. The fix is not done until the documentation is done.
+6. <a id="guardrail-content-6"></a>**ALWAYS** include a scope statement (2-4 sentences) at the top of every case study that simultaneously communicates: what the company/product does, what you specifically did, and evidence of scale/impact
+7. <a id="guardrail-content-7"></a>**NEVER** use em dashes (U+2014) in any portfolio text. Use a regular dash surrounded by spaces ( - ) or split into separate sentences. Em dashes are an AI voice tell. See `docs/content/voice-style.md` line 73 and CAP-022. Violated 6+ times in a single writing pass (CFB-022).
 
 **Engineering:**
-1. **NEVER** respond to the user after fixing a bug or incident without FIRST completing all documentation steps — append to `docs/engineering-feedback-log.md`, check if a new anti-pattern belongs in `docs/engineering-anti-patterns.md`, update the frequency map in `docs/engineering.md`. The fix is not done until the documentation is done. This applies even when the bug was reported mid-task — pause, document, then respond.
+1. <a id="guardrail-engineering-1"></a>**NEVER** respond to the user after fixing a bug or incident without FIRST completing all documentation steps — append to `docs/engineering-feedback-log.md`, check if a new anti-pattern belongs in `docs/engineering-anti-patterns.md`, update the frequency map in `docs/engineering.md`. The fix is not done until the documentation is done. This applies even when the bug was reported mid-task — pause, document, then respond.
    - **ENFORCEMENT (EAP-027):** Before writing the fix, create the feedback log entry stub (Issue + Root Cause). After the fix, fill in Resolution. Only then compose the response message. This makes documentation a pre-condition, not a deferred post-step. Violated 6 times — behavioral urgency overrides process unless documentation is woven into the fix workflow itself.
-2. **NEVER** make file changes while on `main` — check `git branch --show-current` first; if on `main`, switch to `dev` (`git checkout dev`). All work happens on `dev`.
-3. **NEVER** create new git branches. The only branches are `dev` (working) and `main` (stable checkpoints).
-4. **NEVER** switch branches during a session unless the user explicitly asks for a checkpoint merge to `main`.
-5. **NEVER** modify `src/styles/tokens/` without running `npm run sync-tokens` afterward
-6. **NEVER** start a dev server without first reading `docs/port-registry.md`
-7. **NEVER** kill a process on a port without checking what it is first
-8. **NEVER** use ports below 4000 — they are reserved for other projects
-9. **NEVER** assume a dev server from a previous session is still running — verify it
-10. **ALWAYS** verify changes on localhost after implementation — HTTP 200 is NOT sufficient. For any change that touches React components, open the page in the browser (via `browser-use` subagent or equivalent) and check for console errors, hydration mismatches, and runtime warnings BEFORE reporting the task as done. `curl` only checks the server; React errors only appear in the browser.
-11. **ALWAYS** flush and restart the playground after ANY playground edit — Turbopack HMR is fundamentally unreliable for the playground (cross-directory `@ds/*` imports, stale WebSocket connections, incremental cache). HMR delivery fails more often than it succeeds. The flush-and-restart is NOT a fallback — it is the mandatory default step. After editing any playground file or any `src/` file consumed by the playground: (1) kill the playground server, (2) `rm -rf playground/.next`, (3) restart the server, (4) curl the page and confirm the specific change is in the HTML response, (5) ONLY THEN report as done. NEVER rely on HMR to deliver changes. NEVER skip the flush. NEVER report a playground edit as done without completing all 5 steps. Violated 6+ times — see EAP-042.
-12. **ALWAYS** trace data flow (source → build → server → browser) when debugging visibility issues
-13. **NEVER** render `<script>` elements in the React component tree (raw, `dangerouslySetInnerHTML`, or `next/script`) — React 19 warns on all of them. See EAP-013.
-14. **NEVER** branch rendered output on `typeof window` or `window.location` in client components — this causes hydration mismatches. Use `useState` + `useEffect` to defer client-only values. See EAP-014.
-15. **NEVER** use barrel imports from `lucide-react` in the playground (`import { X } from "lucide-react"`) — Turbopack's `optimizePackageImports` resolves named exports to wrong icon components on server vs client, causing hydration mismatches. Use individual imports: `import X from "lucide-react/dist/esm/icons/x"`. This also applies to any large barrel-export package in `playground/` where SSR parity matters. See EAP-056.
-16. **ALWAYS** run the Cross-App Parity Checklist after creating or modifying anything in `src/`
-17. **NEVER** merge to `main` without first running `npm run version:release` for each app with unreleased changes — every checkpoint is a versioned release. Check all manifests (`elan.json`, `website.json`, `ascii-studio.json`) to see if `version` differs from `release.version`.
-18. **ALWAYS** run the CMS-Frontend Parity Checklist after adding, removing, or renaming any CMS field or frontend data field. A field that exists in one layer but not all three (schema, data fetch, UI) is a bug. See EAP-019.
-19. **ALWAYS** run `src/scripts/push-schema.ts` (or equivalent SQL) after adding a new Payload collection — Payload 3's auto-push does NOT work on this project. The admin will 500 with "column does not exist" until the table + `payload_locked_documents_rels` column are created manually. After pushing, restart the dev server. See EAP-062.
-20. **NEVER** create a component that renders CMS data without inline edit support — every text field from a Payload collection or global MUST be wrapped in `EditableText` (with `fieldId`, `target`, `fieldPath`) when `isAdmin`. The component MUST accept `id` and `isAdmin` props, and include an `EditButton`. A component that renders CMS text as plain elements is incomplete. See EAP-029.
-21. **NEVER** create or modify a playground component page (`playground/src/app/components/*/page.tsx`) without first reading `.cursor/skills/playground/SKILL.md`. Playground pages are thin harnesses that import and render production components — they must never re-implement components in Tailwind, raw HTML, or SVG. See EAP-037.
-22. **NEVER** edit a playground component page (`playground/src/app/components/*/page.tsx`) to fix how a component **looks or behaves** — visual/behavioral changes go to the design system source (`src/components/ui/` or `src/components/`). The playground auto-updates via `@ds/*` imports. Before editing any playground file, classify the task:
+2. <a id="guardrail-engineering-2"></a>**NEVER** make file changes while on `main` — check `git branch --show-current` first; if on `main`, switch to `dev` (`git checkout dev`). All work happens on `dev`.
+3. <a id="guardrail-engineering-3"></a>**NEVER** create new git branches. The only branches are `dev` (working) and `main` (stable checkpoints).
+4. <a id="guardrail-engineering-4"></a>**NEVER** switch branches during a session unless the user explicitly asks for a checkpoint merge to `main`.
+5. <a id="guardrail-engineering-5"></a>**NEVER** modify `src/styles/tokens/` without running `npm run sync-tokens` afterward
+6. <a id="guardrail-engineering-6"></a>**NEVER** start a dev server without first reading `docs/port-registry.md`
+7. <a id="guardrail-engineering-7"></a>**NEVER** kill a process on a port without checking what it is first
+8. <a id="guardrail-engineering-8"></a>**NEVER** use ports below 4000 — they are reserved for other projects
+9. <a id="guardrail-engineering-9"></a>**NEVER** assume a dev server from a previous session is still running — verify it
+10. <a id="guardrail-engineering-10"></a>**ALWAYS** verify changes on localhost after implementation — HTTP 200 is NOT sufficient. For any change that touches React components, open the page in the browser (via `browser-use` subagent or equivalent) and check for console errors, hydration mismatches, and runtime warnings BEFORE reporting the task as done. `curl` only checks the server; React errors only appear in the browser.
+11. <a id="guardrail-engineering-11"></a>**ALWAYS** flush and restart the playground after ANY playground edit — Turbopack HMR is fundamentally unreliable for the playground (cross-directory `@ds/*` imports, stale WebSocket connections, incremental cache). HMR delivery fails more often than it succeeds. The flush-and-restart is NOT a fallback — it is the mandatory default step. After editing any playground file or any `src/` file consumed by the playground: (1) kill the playground server, (2) `rm -rf playground/.next`, (3) restart the server, (4) curl the page and confirm the specific change is in the HTML response, (5) ONLY THEN report as done. NEVER rely on HMR to deliver changes. NEVER skip the flush. NEVER report a playground edit as done without completing all 5 steps. Violated 6+ times — see EAP-042.
+12. <a id="guardrail-engineering-12"></a>**ALWAYS** trace data flow (source → build → server → browser) when debugging visibility issues
+13. <a id="guardrail-engineering-13"></a>**NEVER** render `<script>` elements in the React component tree (raw, `dangerouslySetInnerHTML`, or `next/script`) — React 19 warns on all of them. See EAP-013.
+14. <a id="guardrail-engineering-14"></a>**NEVER** branch rendered output on `typeof window` or `window.location` in client components — this causes hydration mismatches. Use `useState` + `useEffect` to defer client-only values. See EAP-014.
+15. <a id="guardrail-engineering-15"></a>**NEVER** use barrel imports from `lucide-react` in the playground (`import { X } from "lucide-react"`) — Turbopack's `optimizePackageImports` resolves named exports to wrong icon components on server vs client, causing hydration mismatches. Use individual imports: `import X from "lucide-react/dist/esm/icons/x"`. This also applies to any large barrel-export package in `playground/` where SSR parity matters. See EAP-056.
+16. <a id="guardrail-engineering-16"></a>**ALWAYS** run the Cross-App Parity Checklist after creating or modifying anything in `src/`
+17. <a id="guardrail-engineering-17"></a>**NEVER** merge to `main` without first running `npm run version:release` for each app with unreleased changes — every checkpoint is a versioned release. Check all manifests (`elan.json`, `website.json`, `ascii-studio.json`) to see if `version` differs from `release.version`.
+18. <a id="guardrail-engineering-18"></a>**ALWAYS** run the CMS-Frontend Parity Checklist after adding, removing, or renaming any CMS field or frontend data field. A field that exists in one layer but not all three (schema, data fetch, UI) is a bug. See EAP-019.
+19. <a id="guardrail-engineering-19"></a>**ALWAYS** run `src/scripts/push-schema.ts` (or equivalent SQL) after adding a new Payload collection — Payload 3's auto-push does NOT work on this project. The admin will 500 with "column does not exist" until the table + `payload_locked_documents_rels` column are created manually. After pushing, restart the dev server. See EAP-062.
+20. <a id="guardrail-engineering-20"></a>**NEVER** create a component that renders CMS data without inline edit support — every text field from a Payload collection or global MUST be wrapped in `EditableText` (with `fieldId`, `target`, `fieldPath`) when `isAdmin`. The component MUST accept `id` and `isAdmin` props, and include an `EditButton`. A component that renders CMS text as plain elements is incomplete. See EAP-029.
+21. <a id="guardrail-engineering-21"></a>**NEVER** create or modify a playground component page (`playground/src/app/components/*/page.tsx`) without first reading `.cursor/skills/playground/SKILL.md`. Playground pages are thin harnesses that import and render production components — they must never re-implement components in Tailwind, raw HTML, or SVG. See EAP-037.
+22. <a id="guardrail-engineering-22"></a>**NEVER** edit a playground component page (`playground/src/app/components/*/page.tsx`) to fix how a component **looks or behaves** — visual/behavioral changes go to the design system source (`src/components/ui/` or `src/components/`). The playground auto-updates via `@ds/*` imports. Before editing any playground file, classify the task:
     - **Component visual** (colors, spacing, sizing, states, animations, interaction behavior) → Edit `src/components/` ONLY — NEVER the playground page
     - **Documentation / page structure** (reordering demo sections, updating props table data, changing code examples, adding new sections, creating a parity page for a new component) → Edit the playground page — this is legitimate
     - **Shell** (sidebar layout, ComponentPreview rendering, playground-wide IA, theme behavior) → Edit `playground/src/components/` or `playground/src/app/layout.tsx`
     - **Ambiguous** → Ask the user before proceeding
     This classification is a **central guardrail** — it applies regardless of which skill or route activated the task (design-iteration, engineering-iteration, or direct playground work). When the user explicitly overrides this gate, document the exception reason and scope before proceeding.
-23. **NEVER** modify `src/proxy.ts`, `src/collections/Companies.ts`, `src/lib/company-session.ts`, or `src/lib/company-data.ts` without first reading `.cursor/skills/password-gate/SKILL.md`. These files form the visitor access boundary — incorrect changes can expose the site publicly or lock out all visitors.
-24. **ALWAYS** update the playground page when adding a new variant, prop, or visual state to any DS component in `src/components/ui/`. Before writing: (1) read the existing playground page (`playground/src/app/components/<name>/page.tsx`) to understand structure, section ordering, and conventions; (2) add a `ComponentPreview` for the new variant in the logical position; (3) update the `PropsTable`; (4) update Notes if the variant has usage guidance. A variant that exists in code but not in the playground is invisible to consumers. See EAP-082.
-25. **ALWAYS** call the content seeding endpoint after modifying any `src/app/(frontend)/api/update-*/route.ts` file. These files are content *definitions*, not content *deployments* — the CMS database is unchanged until the POST endpoint is called. After every edit: (1) `curl -X POST http://localhost:4000/api/update-{slug}` and confirm `action: "updated"` in the response, (2) verify via `curl` or Payload REST API that the new content is present in the CMS, (3) only then report the content edit as done. A saved file with uncalled endpoint is an incomplete task. See EAP-087.
-26. **ALWAYS** update the event registry in `docs/analytics.md` when adding or removing a Mixpanel `track()` call. Registry row format: `| Event Name (Title Case) | Properties (snake_case) | Firing condition | Source file |`. The static parity check in `npm run audit-docs` will flag drift.
+23. <a id="guardrail-engineering-23"></a>**NEVER** modify `src/proxy.ts`, `src/collections/Companies.ts`, `src/lib/company-session.ts`, or `src/lib/company-data.ts` without first reading `.cursor/skills/password-gate/SKILL.md`. These files form the visitor access boundary — incorrect changes can expose the site publicly or lock out all visitors.
+24. <a id="guardrail-engineering-24"></a>**ALWAYS** update the playground page when adding a new variant, prop, or visual state to any DS component in `src/components/ui/`. Before writing: (1) read the existing playground page (`playground/src/app/components/<name>/page.tsx`) to understand structure, section ordering, and conventions; (2) add a `ComponentPreview` for the new variant in the logical position; (3) update the `PropsTable`; (4) update Notes if the variant has usage guidance. A variant that exists in code but not in the playground is invisible to consumers. See EAP-082.
+25. <a id="guardrail-engineering-25"></a>**ALWAYS** call the content seeding endpoint after modifying any `src/app/(frontend)/api/update-*/route.ts` file. These files are content *definitions*, not content *deployments* — the CMS database is unchanged until the POST endpoint is called. After every edit: (1) `curl -X POST http://localhost:4000/api/update-{slug}` and confirm `action: "updated"` in the response, (2) verify via `curl` or Payload REST API that the new content is present in the CMS, (3) only then report the content edit as done. A saved file with uncalled endpoint is an incomplete task. See EAP-087.
+26. <a id="guardrail-engineering-26"></a>**ALWAYS** update the event registry in `docs/analytics.md` when adding or removing a Mixpanel `track()` call. Registry row format: `| Event Name (Title Case) | Properties (snake_case) | Firing condition | Source file |`. The static parity check in `npm run audit-docs` will flag drift.
+27. <a id="guardrail-engineering-27"></a>**ALWAYS** run `npm run build-graph && npm run audit-docs` after any structural change to docs (frontmatter, HTML anchors, markdown links between docs, anti-pattern entries, release-log entries, skill/rule metadata, hub/spoke registrations). The graph cache backs the `graph-query` skill and MCP server; if it goes stale or breaks, every downstream retrieval is silently wrong. The audit's `checkGraphStaleness()` and topology checks (broken anchors, orphan anti-patterns, frontmatter schema, anchor uniqueness, topic vocabulary) are the safety net — running both commands is the safety net's *only* trigger. See `docs/knowledge-graph.md` and the `graph-query` skill.
 
 # Pre-Flight: Conditional Reading
 
@@ -96,29 +131,29 @@ skill assignment, and gate identification internally.
 
 **Task-based routing (pick all that apply):**
 
-1. **Am I touching UI, visuals, spacing, interaction, or components?**
+1. <a id="route-1"></a>**Am I touching UI, visuals, spacing, interaction, or components?**
    → Read `docs/design.md` Section Index (top of file), then the section matching your task.
    → Read `docs/design-anti-patterns.md`.
 
-2. **Am I touching infra, build, data sync, ports, or git?**
+2. <a id="route-2"></a>**Am I touching infra, build, data sync, ports, or git?**
    → Read `docs/engineering.md` Section Index (top of file), then the section matching your task.
    → Read `docs/engineering-anti-patterns.md`.
 
-3. **Am I touching portfolio copy, case studies, project descriptions, about page text, or content strategy?**
+3. <a id="route-3"></a>**Am I touching portfolio copy, case studies, project descriptions, about page text, or content strategy?**
    → Read `docs/content.md` Section Index (top of file), then the section matching your task.
    → Read `docs/content-anti-patterns.md`.
 
 **Feedback-based routing (pick all that apply — these are NOT mutually exclusive):**
 
-4. **Is there a design dimension? (visual complaints, spacing, interaction, form UX, affordances, "it looks wrong", "it's confusing")**
+4. <a id="route-4"></a>**Is there a design dimension? (visual complaints, spacing, interaction, form UX, affordances, "it looks wrong", "it's confusing")**
    → Activate `design-iteration` skill at `.cursor/skills/design-iteration/SKILL.md`.
    → The skill handles full doc reading + feedback log processing.
 
-5. **Is there an engineering dimension? (data not saving, schema issues, build errors, "it doesn't work", "it's broken")**
+5. <a id="route-5"></a>**Is there an engineering dimension? (data not saving, schema issues, build errors, "it doesn't work", "it's broken")**
    → Activate `engineering-iteration` skill at `.cursor/skills/engineering-iteration/SKILL.md`.
    → The skill handles full doc reading + incident processing.
 
-6. **Is there a content dimension? (poor labels, unclear copy, UX microcopy, naming, "this doesn't read well", "it's unclear")**
+6. <a id="route-6"></a>**Is there a content dimension? (poor labels, unclear copy, UX microcopy, naming, "this doesn't read well", "it's unclear")**
    → Activate `content-iteration` skill at `.cursor/skills/content-iteration/SKILL.md`.
    → The skill handles full doc reading + feedback log processing.
 
@@ -129,39 +164,39 @@ skill assignment, and gate identification internally.
 - "it doesn't read well" / "the story isn't clear" → always includes Content
 - Form/input/editing complaints → always includes Design + Engineering; usually Content too
 
-7. **Am I starting or stopping a server?**
+7. <a id="route-7"></a>**Am I starting or stopping a server?**
    → Read `docs/port-registry.md`.
 
-8. **Is it time for a doc audit?** (check `docs/doc-audit-log.md` — if last audit was 7+ days ago or the file doesn't exist, suggest running one)
+8. <a id="route-8"></a>**Is it time for a doc audit?** (check `docs/doc-audit-log.md` — if last audit was 7+ days ago or the file doesn't exist, suggest running one)
    → Activate `doc-audit` skill at `.cursor/skills/doc-audit/SKILL.md`.
 
-9. **Am I touching the playground? (any file under `playground/src/app/components/`, `playground/src/components/`, or `playground/src/app/layout.tsx`)**
+9. <a id="route-9"></a>**Am I touching the playground? (any file under `playground/src/app/components/`, `playground/src/components/`, or `playground/src/app/layout.tsx`)**
    → Activate `playground` skill at `.cursor/skills/playground/SKILL.md`.
    → The skill handles architecture rules, composition rules, import decision tree, and post-build parity.
    → This route is **mandatory** — a file-scoped rule (`.cursor/rules/playground-components.md`) also fires automatically when touching component pages, but the skill must be read in full before writing any code.
    → **Before any edit**, apply Engineering guardrail #21 (Intent Gate): classify the task as Component visual / Documentation-structure / Shell / Ambiguous. Component visual changes NEVER go to playground pages.
 
-10. **Am I touching CMS fields or frontend data fields?**
+10. <a id="route-10"></a>**Am I touching CMS fields or frontend data fields?**
     → Activate `cms-parity` skill at `.cursor/skills/cms-parity/SKILL.md`.
 
-11. **Am I doing a checkpoint, merge to main, or deploy?**
+11. <a id="route-11"></a>**Am I doing a checkpoint, merge to main, or deploy?**
     → If changes are already committed on `dev`: activate `checkpoint` skill directly at `.cursor/skills/checkpoint/SKILL.md`.
     → If there are uncommitted changes and the user wants to release: activate `ship-it` skill instead (it will hand off to checkpoint after committing).
 
-12. **Am I creating or modifying components in `src/`?**
+12. <a id="route-12"></a>**Am I creating or modifying components in `src/`?**
     → Activate `cross-app-parity` skill at `.cursor/skills/cross-app-parity/SKILL.md`.
 
-13. **Am I shipping / releasing / publishing all local changes?**
+13. <a id="route-13"></a>**Am I shipping / releasing / publishing all local changes?**
     (triggers: "ship it", "publish", "release everything", "push it live", "deploy everything", "go live")
     → Activate `ship-it` skill at `.cursor/skills/ship-it/SKILL.md`.
     → This skill handles diff analysis, commit batching, and hands off to `checkpoint` for the release pipeline.
 
-14. **Am I starting / booting dev servers?**
+14. <a id="route-14"></a>**Am I starting / booting dev servers?**
     (triggers: "boot up", "start servers", "spin up", "fire up", or "I can't see X on localhost")
     → Activate `boot-up` skill at `.cursor/skills/boot-up/SKILL.md`.
     → Probes ports, starts what's missing, waits for HTTP 200, updates the port registry.
 
-15. **Am I writing a new case study from raw materials, or rebuilding an existing one?**
+15. <a id="route-15"></a>**Am I writing a new case study from raw materials, or rebuilding an existing one?**
     (triggers: "write up", "write this up", "draft this", "turn this into a case study",
     "redo/rebuild/rethink this case study", "apply the new framework to X",
     "this case study doesn't work", or user provides raw notes/transcripts/project details)
@@ -170,13 +205,13 @@ skill assignment, and gate identification internally.
     → If the rebuild involves new interactive components (Tier 3 artifacts), the skill
       may trigger the orchestrator for cross-category dispatch.
 
-16. **Am I doing any work on the portfolio website (main site) — UI, content, or strategy?**
+16. <a id="route-16"></a>**Am I doing any work on the portfolio website (main site) — UI, content, or strategy?**
     (any file under `src/app/(frontend)/(site)/`, or any component in `src/components/` consumed by the main site, or any content/strategy work for the portfolio)
     → Read `docs/design/branding.md`.
     → The branding reference contains brand identity (position, personality, edges), taste and tradition, atmospheric dials, visual identity rules (zero corner radius, Badge shape overrides, etc.), and the proof map.
     → This route is **mandatory** for all portfolio work. It is **additive to** Route 3 (content routing) and Route 1 (design routing) — read `branding.md` in addition to your category-specific docs, not instead of them.
 
-17. **Am I touching site analytics, Mixpanel, visitor tracking, or event instrumentation?**
+17. <a id="route-17"></a>**Am I touching site analytics, Mixpanel, visitor tracking, or event instrumentation?**
     → Read `docs/analytics.md` first (event registry, config summary, data flow).
     → Then follow to `docs/engineering/analytics-instrumentation.md` for instrumentation work, or `docs/content/analytics-measurement.md` for measurement strategy.
     → For server-side login analytics (`incrementLoginAnalytics`, `loginCount`), see `docs/architecture.md` §4.1 instead.
@@ -198,22 +233,48 @@ Do NOT read docs that don't match your task. Do NOT read full doc files when onl
 > Workflow 3 requires write access; if in a read-only mode, note the
 > requirement and let the user/system handle the transition.
 
-18. **Is the user asking me to adversarially audit a plan or proposal?**
+18. <a id="route-18"></a>**Is the user asking me to adversarially audit a plan or proposal?**
     (triggers: "pressure test plan")
     → Activate `plan-audit` skill at `.cursor/skills/plan-audit/SKILL.md`.
     → Prerequisite: a plan, proposal, or set of proposed changes exists in context.
     → Mode: any (read-only skill).
 
-19. **Is the user asking me to check a plan's structure and sequencing?**
+19. <a id="route-19"></a>**Is the user asking me to check a plan's structure and sequencing?**
     (triggers: "meta audit plan")
     → Activate `plan-structure` skill at `.cursor/skills/plan-structure/SKILL.md`.
     → Prerequisite: a plan or proposal exists and its logical content is finalized.
     → Mode: any (read-only skill).
 
-20. **Is the user asking me to stress-test existing content?**
+20. <a id="route-20"></a>**Is the user asking me to stress-test existing content?**
     (triggers: "content stress test", "fresh eyes", "recheck portfolio")
     → Activate `stress-test` skill at `.cursor/skills/stress-test/SKILL.md`.
     → Mode: requires write access (modifies files, pushes to CMS).
+
+# Knowledge Access
+
+> The docs and skills now form a typed, anchored knowledge graph. Use these
+> retrieval routes when you need a specific node, neighborhood, or keyword
+> search instead of reading whole files. See `docs/knowledge-graph.md` for
+> the full spec.
+
+A. <a id="route-knowledge-a"></a>**Do you need to look up a specific anti-pattern, guardrail, route, skill, or release by ID?** (e.g., `EAP-027`, `AP-072`, `route-9`, `rel-024`)
+   → Activate `graph-query` skill at `.cursor/skills/graph-query/SKILL.md`.
+   → Run `npm run query-graph -- <id>` (returns node + 1-hop neighbors by default).
+   → Cheaper than reading the full file when you only need one entry.
+
+B. <a id="route-knowledge-b"></a>**Do you need the 1-2 hop neighborhood around a hub or spoke for context?**
+   → Activate `graph-query` skill.
+   → Run `npm run query-graph -- <id> [--depth N]`.
+   → Use depth=1 by default; depth=2 only when fan-out is small.
+
+C. <a id="route-knowledge-c"></a>**Do you only have a keyword/topic and need to find the right doc?**
+   → Activate `graph-query` skill.
+   → Run `npm run query-graph -- --search "<query>"` (BM25-ranked).
+   → Then drill into top results with `Read` or another `query-graph` call.
+
+D. <a id="route-knowledge-d"></a>**Are you touching graph metadata (frontmatter, anchors, edges)?**
+   → Read `docs/knowledge-graph.md` Section Index, then the relevant subsection.
+   → After edits, run `npm run audit-docs` to validate topology.
 
 # Mid-Flight: Verification Gate
 

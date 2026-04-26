@@ -1,3 +1,15 @@
+<!-- graph metadata for docs knowledge graph (see docs/knowledge-graph.md) -->
+---
+type: spoke
+id: engineering-multi-app-architecture
+topics:
+  - engineering
+  - parity
+  - case-study
+derivedFrom:
+  - engineering.md
+---
+
 # Multi-App Architecture & URL Namespace Separation
 
 > Spoke file for `docs/engineering.md`. Return to the [hub](../engineering.md) for the Section Index.

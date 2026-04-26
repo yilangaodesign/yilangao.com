@@ -1,3 +1,16 @@
+<!-- graph metadata for docs knowledge graph (see docs/knowledge-graph.md) -->
+---
+type: spoke
+id: content-elan-design-system
+topics:
+  - content
+  - system-architecture
+  - projects
+  - case-study
+derivedFrom:
+  - content.md
+---
+
 # Élan Design System - Case Study Dossier
 
 > Bootstrapped 2026-04-03 by synthesizing CFB-013 through CFB-019 + design/engineering logs.
@@ -152,7 +165,7 @@ energy while tightening grammar and thesis coherence.
 
 | Section | Heading | Technique | Interactive Visual | Artifact Tier | Beat |
 |---------|---------|-----------|-------------------|---------------|------|
-| Blurb | "You're looking at the wrong part." | T7 (Framework Inversion) | - | - | Hook + Stakes |
+| Blurb | "Every day is a first date..." | T11 (Identification) + T8 (Verdict) | - | - | Hook + Stakes + Insight |
 | 1 | Not the Components | T7 (Framework Inversion) | CollaborationLoop | Tier 3 (new) | Reframe + Decisions |
 | 2 | The System Behind the System | T6 (Object Substitution) | SkillMap (dual-view) | Tier 3 (new) | Architecture + Decisions |
 | 3 | The Rising Floor | T6 (Object Substitution) | MaturityTimeline | Tier 3 (new) | Evidence + Residue |
@@ -195,9 +208,8 @@ energy while tightening grammar and thesis coherence.
 - 2026-04-06: Voice framework tone pass (CF-023). Applied T11+T13+T15 technique
   emphasis after voice framework upgrade. Over-indexed on clever contrarian
   positioning - result was condescending. Reverted in CF-024.
-- 2026-04-23: Headline change (CFB-TBD). "You're looking at the wrong part" (T7)
-  replaced with "Harnessed my code production - 40 sessions in" (T8 + Staccato
-  Authority). Motivated by: (1) "harness" is a top positioning keyword, (2) the
+- 2026-04-23: Headline change. "You're looking at the wrong part" (T7) replaced with "Harnessed my code production - 40 sessions in" (T8 + Staccato Authority).
+- 2026-04-26: Headline updated to "I built an agent's memory out of my own mistakes." (T10 Protagonist Framing). Blurb body fully rewritten to match new headline's T10 frame. New body: first date / Severance metaphor opener, "intelligence was never the bottleneck, context is" as the insight peak, "The agent didn't get smarter. It just stopped forgetting." as the closer (T15 closed loop on the memory theme). Previous body was written for T7 and created a mismatch. CF-029, CF-030. Motivated by: (1) "harness" is a top positioning keyword, (2) the
   previous headline didn't communicate the project's core value prop to scanners,
   (3) user preference for verb-first opening without "I" pronoun. Content strategy
   rule updated: first-person perspective includes possessives ("my"), not just "I"/"you."

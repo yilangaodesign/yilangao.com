@@ -7,6 +7,7 @@
 
 ---
 
+<a id="fb-047"></a>
 #### FB-047: "footer too tall, editing function is broken, why is it so tall"
 
 **UX Intent:** The footer was disproportionately tall for its content (5 items in a column layout with generous padding, totaling 300px+). The duplicate links in the footer were not editable (plain `<a>` tags), and the version/date metadata was not user-facing content. The user questioned the footer's existence given sidebar already has the links.
@@ -26,6 +27,7 @@
 **Chat:** Current session
 **Scope:** Design system (`@yilangaodesign/design-system/components/ScrollSpy`), portfolio consumers (`ProjectClient.tsx`, `AboutClient.tsx`, `next.config.ts`)
 
+<a id="fb-050"></a>
 #### FB-050: "ScrollSpy notches too close, text not aligned with notches — fix upstream"
 
 **UX Intent:** ScrollSpy labels must be legible at a glance and precisely aligned with their corresponding tick marks. Tight spacing causes labels to feel cramped; misaligned labels break the visual mapping between text and notch. User established the principle: all component fixes must flow upstream through the design system, not be patched at the portfolio level.
@@ -47,11 +49,14 @@
 
 ---
 
+**Anti-pattern:** See AP-031.
+
 ## Session: 2026-03-29 — Array Edit Modal Height
 
 **Chat:** Current session
 **Scope:** `src/components/inline-edit/inline-edit.module.scss` (`.arrayPanel`)
 
+<a id="fb-045"></a>
 #### FB-045: "extend the modal height a little — max viewport share is too short"
 
 **UX Intent:** The inline array editor (e.g. Edit Teams) should show more rows before the inner scroll kicks in. The previous `80vh` cap felt slightly cramped relative to typical laptop viewports.
@@ -60,11 +65,14 @@
 
 ---
 
+**Anti-pattern:** See AP-027.
+
 ## Session: 2026-03-29 — Required Field Indicators and Inline Validation
 
 **Chat:** Current session
 **Scope:** `src/components/inline-edit/EditableArray.tsx`, `src/components/inline-edit/inline-edit.module.scss`
 
+<a id="fb-044"></a>
 #### FB-044: "this input field doesn't show that it's a mandatory input field"
 
 **UX Intent:** Required fields must be visually distinguishable from optional fields before the user interacts with them. When validation fails, error feedback must appear at the point of failure (the specific field), not at a distant location (the server response bar). The save button should become disabled to prevent futile attempts.
@@ -87,6 +95,7 @@
 **Chat:** Current session
 **Scope:** `src/components/inline-edit/inline-edit.module.scss`
 
+<a id="fb-043"></a>
 #### FB-043: "you should always have a minimum height and minimum width consideration with all the responsiveness considered"
 
 **UX Principle:** Every modal, panel, or dialog must have minimum dimension constraints to guarantee usability regardless of content. A panel that collapses to near-zero height when empty or lightly loaded is unusable. Responsiveness means setting both a minimum (usability floor) and maximum (viewport ceiling) using `min()` for the lower bound and `max-height`/`max-width` for the upper.
@@ -99,11 +108,14 @@
 
 ---
 
+**Anti-pattern:** See AP-027.
+
 ## Session: 2026-03-29 — Error Banner Visibility for Critical Actions
 
 **Chat:** Current session
 **Scope:** `src/components/inline-edit/InlineEditBar.tsx`, `src/components/inline-edit/inline-edit.module.scss`
 
+<a id="fb-042"></a>
 #### FB-042: "this banner should have an error state... it's too subtle for something that's critical"
 
 **UX Intent:** When a save fails, the user's work is at risk of being lost. The error state must be unmissable. A small red text label next to the buttons is insufficient — the entire bar should visually transform to signal danger, using color, contrast, and hierarchy to communicate urgency.
@@ -127,6 +139,7 @@
 **Chat:** Current session
 **Scope:** `src/components/inline-edit/EditableArray.tsx`, `src/components/inline-edit/inline-edit.module.scss`
 
+<a id="fb-041"></a>
 #### FB-041a: "the CTA for Save and Close or Add Item is not always visible to me"
 
 **UX Intent:** For high-stakes actions like Save (where not saving means losing the user's work), the action button must ALWAYS be visible. Scrolling it off-screen violates the principle that critical actions belong on a persistent navigation layer, not in the content flow.
@@ -137,6 +150,7 @@
 
 **Pattern extracted → `design-anti-patterns.md` AP-024: critical action buttons in scrollable content flow**
 
+<a id="fb-041-occ2"></a>
 #### FB-041b: "why are you forcing users to have multiple clicks... when things can be dragged"
 
 **UX Intent:** Reordering a list by clicking up/down arrows is high-friction: N-1 clicks to move an item from position N to position 1. Drag-and-drop is the expected interaction for reordering — it's direct manipulation with immediate spatial feedback. During drag, items should collapse so the user doesn't have to scroll past expanded content to find the drop target.
@@ -158,6 +172,7 @@
 **Chat:** [Inline CMS experience](0c0a7972-7ad5-4928-a1fd-0c61746d4816) (originally documented as ENG-029 engineering-only; retroactively capturing the design dimension)
 **Scope:** `src/components/inline-edit/EditableArray.tsx`, `src/components/inline-edit/inline-edit.module.scss`
 
+<a id="fb-040"></a>
 #### FB-040: "It's really unclear about what the second field is"
 
 **UX Intent:** When editing structured data in a panel (like a Teams list with Company, Period, and Website fields), every input must communicate what it is and what format it expects. The user should never have to guess. A URL field should look like a URL field. A text field should have a label above it, not just a placeholder that disappears.
@@ -184,6 +199,7 @@ This feedback was originally processed only through the engineering track (ENG-0
 **Chat:** Current session
 **Scope:** `src/app/(frontend)/work/[slug]/page.module.scss`, `src/app/globals.scss`
 
+<a id="fb-039"></a>
 #### FB-039: "Why is there such a weird, super bad layout for the text here?"
 
 **UX Intent:** A description paragraph with inline links should read as flowing prose. When each link and its icon break onto separate lines, the paragraph becomes a vertical list — destroying readability and making the page look broken rather than designed.
@@ -203,6 +219,7 @@ This feedback was originally processed only through the engineering track (ENG-0
 **Chat:** Current session
 **Scope:** `src/app/(frontend)/page.module.scss`
 
+<a id="fb-038"></a>
 #### FB-038: "Why is there a scroll bar on the left-hand side? Left and right spacing is not even"
 
 **UX Intent:** A scrollbar that appears when content fits is visual noise — it signals to the user that there's hidden content when there isn't. It undermines trust in the layout. The asymmetric spacing is a consequence: the scrollbar gutter (~15px) eats into the sidebar's 300px width, making the effective content area ~285px, which creates a visible gap between sidebar content and the main grid that doesn't match the left page margin.
@@ -215,11 +232,14 @@ This feedback was originally processed only through the engineering track (ENG-0
 
 ---
 
+**Anti-pattern:** See AP-020.
+
 ## Session: 2026-03-29 — Homepage Spacing Density Pass
 
 **Chat:** Current session
 **Scope:** `src/app/(frontend)/page.module.scss`
 
+<a id="fb-037"></a>
 #### FB-037: "Too much spacing in between for an enterprise-type product"
 
 **UX Intent:** The previous spacing pass (FB-036) converted the grid to masonry but left all gap/padding values at consumer-level sizes. The user reiterated the §0 Design Posture: this is B2B, and every pixel of whitespace must justify its existence. "Not dense enough" means the grid gutter, layout margins, sidebar section gaps, and footer spacing were all one tier too generous.
@@ -246,6 +266,7 @@ This feedback was originally processed only through the engineering track (ENG-0
 **Chat:** Current session
 **Scope:** `src/app/(frontend)/page.module.scss`, `src/app/(frontend)/HomeClient.tsx`
 
+<a id="fb-036"></a>
 #### FB-036: "Case studies space is taking up a lot of space, not great for quick scanning"
 
 **UX Intent:** The homepage's primary job is to let a visitor quickly assess the *breadth* of work — how many companies, what industries, what types of projects. The existing layout optimized for individual project showcase (large hero cards, full-width featured items) at the expense of scanability. The user explicitly referenced Pinterest as a density benchmark: multiple tiles visible simultaneously so the eye can jump between them without committing to sequential scrolling. The blank space at the top (96px padding) compounded the problem by pushing the first project card below the fold on many viewports.
@@ -271,11 +292,14 @@ This feedback was originally processed only through the engineering track (ENG-0
 
 ---
 
+**Anti-pattern:** See AP-019.
+
 ## Session: 2026-03-29 — Square Icon Tabs in Collapsed Sidebar
 
 **Chat:** Current session
 **Scope:** `playground/src/components/sidebar.tsx`
 
+<a id="fb-035"></a>
 #### FB-035: "Each collapsed nav tab is not a square — keep the height, make it wider"
 
 **UX Intent:** Collapsed nav icons should live inside a perfect square hit zone, not a rectangle. The user wants visual symmetry — each tab should be as wide as it is tall.
@@ -295,6 +319,7 @@ This feedback was originally processed only through the engineering track (ENG-0
 **Chat:** Current session
 **Scope:** `playground/src/components/sidebar.tsx`
 
+<a id="fb-034"></a>
 #### FB-034: "Spacing between search and nav is too much; divider not centered; 'Foundational' collides with 'Foundations'"
 
 **UX Intent:** Three related sidebar polish issues: (1) excessive gap between search and the first nav section, especially visible in collapsed view; (2) the divider line positioned closer to the items below than the search above (2:1 ratio instead of 1:1); (3) naming collision between the "Foundations" section header and the "Foundational" component category.
@@ -314,11 +339,14 @@ This feedback was originally processed only through the engineering track (ENG-0
 
 ---
 
+**Anti-patterns:** See AP-017. See AP-018.
+
 ## Session: 2026-03-29 — Collapsed Icon Centering
 
 **Chat:** Current session
 **Scope:** `playground/src/components/sidebar.tsx`
 
+<a id="fb-033"></a>
 #### FB-033: "Navigation bar items are not centrally aligned — skewed towards the right"
 
 **UX Intent:** In a narrow 40px collapsed sidebar, even a 1.5px offset from center is perceptible. Multiple icons stacked vertically amplify the asymmetry. The user expects icons to appear centered in the collapsed column.
@@ -331,11 +359,14 @@ This feedback was originally processed only through the engineering track (ENG-0
 
 ---
 
+**Anti-patterns:** See AP-015. See AP-031.
+
 ## Session: 2026-03-29 — Navigation IA: Foundations Section + Overview Identity
 
 **Chat:** Current session
 **Scope:** `playground/src/components/sidebar.tsx`, `playground/src/app/page.tsx`
 
+<a id="fb-032"></a>
 #### FB-032: "Put Overview and Styles together under a section — add branding to Overview page"
 
 **UX Intent:** The sidebar navigation lacked a conceptual tier for the system's identity layer. Overview (what is this system?) and Styles (what are its visual atoms?) are both "foundation-level" artifacts — they describe what the system IS, not what it BUILDS. Grouping them under a shared "Foundations" section header establishes a clear hierarchy: Foundations → Components → Archive. The Overview page itself was generic ("Design System / Tokens, components, and patterns") and needed to become the system's front door — introducing Élan by name, explaining its purpose, methodology, and intended use.
@@ -375,6 +406,7 @@ This session surfaced two interaction-level issues that share a common principle
 
 ---
 
+<a id="fb-030"></a>
 #### FB-030: "When collapsing, everything moves to the middle — should be left-aligned"
 
 **UX Intent:** The navigation sidebar should be anchored to the left edge. During the collapse transition, icons should stay at the same horizontal position. The sidebar width shrinks from the right; the left edge is invariant. Centering icons in collapsed mode creates horizontal shift during the transition that users perceive as unstable layout.
@@ -391,6 +423,9 @@ This session surfaced two interaction-level issues that share a common principle
 
 ---
 
+**Anti-patterns:** See AP-015. See AP-031.
+
+<a id="fb-031"></a>
 #### FB-031: "Side panel should slide out on hover, not require clicking"
 
 **UX Intent:** Navigation exploration should be fluid and effortless. Requiring a click to open the category sliver creates unnecessary interaction friction for what is essentially a "peek at what's inside" action. Hover-to-reveal treats the user's cursor position as a statement of interest; leaving the area is a statement of disinterest. No commitment (click) required.
@@ -419,11 +454,14 @@ This session surfaced two interaction-level issues that share a common principle
 
 ---
 
+**Anti-pattern:** See AP-016.
+
 ## Session: 2026-03-29 — Footer Height Alignment
 
 **Chat:** Current session
 **Scope:** `playground/src/components/shell.tsx`, `playground/src/components/sidebar.tsx`
 
+<a id="fb-029"></a>
 #### FB-029: "The footer height and the navigation tab archive section height are not aligned"
 
 **UX Intent:** Horizontal bands that span the full page width (sidebar + content) must share the same height. The top row already does this (sidebar header `h-12`, page header `h-12`). The bottom row was inconsistent — the sidebar archive section was ~44px (implicit from `py-2` + `h-7` link) while the page footer was ~40px (implicit from `py-3` + text). A 4px mismatch at the bottom edge creates a visible seam that undermines the otherwise aligned grid. The principle: if adjacent panels share a horizontal boundary, the boundary must be at the same Y coordinate.
@@ -443,6 +481,7 @@ This session surfaced two interaction-level issues that share a common principle
 **Chat:** Current session
 **Scope:** `playground/src/components/sidebar.tsx`, `playground/src/components/shell.tsx`
 
+<a id="fb-028"></a>
 #### FB-028: "I don't think you should add the version controlling navigation bar"
 
 **UX Intent:** Version metadata belongs at the page level, not in persistent navigation. The sidebar had "Élan 1.0.0" while the page footer had "Local Dev · Design System last updated 2026-03-29" — two competing sources of the same information. Conflicting metadata erodes trust and creates visual noise in the nav, which should be reserved for navigation only.
@@ -480,6 +519,7 @@ This session surfaced three issues that share a common root principle: **the pla
 
 ---
 
+<a id="fb-025"></a>
 #### FB-025: "Why are all the colors using different sizes?"
 
 **UX Intent:** Visual consistency is foundational to a design system's credibility. If the playground — the system's own documentation — can't maintain consistent sizing for its most basic element (a color swatch), it undermines trust in the system's rigor. Every swatch on the page represents the same conceptual object (a color sample) and should have the same visual weight.
@@ -495,6 +535,7 @@ This session surfaced three issues that share a common root principle: **the pla
 
 ---
 
+<a id="fb-026"></a>
 #### FB-026: "I don't need what it was before; that is just noise"
 
 **UX Intent:** Design system documentation should be user-centric, not maintainer-centric. Legacy token names answer a question only the system author cares about ("what was this called before the refactor?"). The audience — designers and developers consuming the tokens — only needs the current, canonical name and value. Historical information belongs in changelogs and git history, not in the product surface.
@@ -505,6 +546,7 @@ This session surfaced three issues that share a common root principle: **the pla
 
 ---
 
+<a id="fb-027"></a>
 #### FB-027: "There could be a version in footnotes — when was this last released?"
 
 **UX Intent:** Consumers of a design system need to know how current the documentation is. A "last updated" footnote is a trust signal — it tells the audience "this was reviewed recently" or "this might be stale." The localhost vs. production distinction is important: on localhost, the developer needs to know they're looking at a local build (not the published version); on production, the audience just needs the release date.
@@ -550,6 +592,7 @@ The critical phrase was: *"Only if the scroll is significant, and you need to fi
 
 ---
 
+<a id="fb-024"></a>
 #### FB-024: "For all pages with significant vertical overflow, add ScrollSpy — only if it's a lot of scrolling"
 
 **UX Intent:** Establish a content navigation policy: secondary navigation aids (ScrollSpy) should only be added when the cost-benefit analysis is positive. The costs are: implementation effort, maintenance burden, additional interaction surface for the user to learn, and visual noise on shorter pages. The benefit is: wayfinding in deeply structured, long pages where the user loses their place. The user wants the agent to develop judgment about where this threshold falls, not apply a blanket rule.
@@ -617,6 +660,7 @@ This session's deepest lesson: **the navigation IS the design system's first imp
 
 ---
 
+<a id="fb-019"></a>
 #### FB-019: "Change UI Primitives to Foundational; rearrange components — Toast to feedback, forms and controls, data grid, menu"
 
 **UX Intent:** Component taxonomy should reflect design tasks (what the user is trying to accomplish), not implementation types (what the component technically is). A catch-all "UI Primitives" category with 15 items signals a system that hasn't been curated. Each category should answer the question "what kind of design problem am I solving?" — Foundational (base building blocks), Forms & Controls (data input), Feedback & Overlay (system responses), etc.
@@ -633,6 +677,7 @@ This session's deepest lesson: **the navigation IS the design system's first imp
 
 ---
 
+<a id="fb-020"></a>
 #### FB-020: "Instead of the form expanding, have an extension as a floating menu or modal"
 
 **UX Intent:** Search interaction responses should appear adjacent to the trigger (Fitts's Law) without displacing existing navigation (spatial stability). A centered modal requires long mouse travel; an inline expansion shifts nav items. A floating panel next to the sidebar synthesizes proximity with stability.
@@ -649,6 +694,9 @@ This session's deepest lesson: **the navigation IS the design system's first imp
 
 ---
 
+**Anti-pattern:** See AP-014.
+
+<a id="fb-021"></a>
 #### FB-021: "The floating modal is not center-aligned with the search tab; not the same size"
 
 **UX Intent:** When the same affordance (search input) appears in two spatial contexts, it must be visually identical. Different sizes signal "two different controls" rather than "one control in two positions." Visual identity must survive spatial transformation.
@@ -664,6 +712,7 @@ This session's deepest lesson: **the navigation IS the design system's first imp
 
 ---
 
+<a id="fb-022"></a>
 #### FB-022: "When I expand the sidebar, the search modal doesn't disappear — becomes duplicate"
 
 **UX Intent:** Transient UI state (open flyouts, search queries) must be coherent with layout state. When the sidebar mode changes, all mode-dependent transient state must either transfer or reset. A flyout that persists into expanded mode creates a visual duplicate — the user sees two search bars, which is disorienting and signals broken state management.
@@ -676,6 +725,7 @@ This session's deepest lesson: **the navigation IS the design system's first imp
 
 ---
 
+<a id="fb-023"></a>
 #### FB-023: "It's trapped in the navigation bar; I can't see anything; same as screenshot"
 
 **UX Intent:** A flyout that is visually trapped inside its parent container defeats the purpose of a flyout. The user couldn't see the search results, couldn't interact with the sidebar, and couldn't dismiss the overlay — a complete interaction dead-end.
@@ -700,6 +750,8 @@ This session's deepest lesson: **the navigation IS the design system's first imp
 
 ---
 
+**Anti-pattern:** See AP-013.
+
 ## Session: 2026-03-29 — ScrollSpy Interaction Design
 
 **Chat:** [ScrollSpy playground interaction fixes](current-session)
@@ -710,6 +762,7 @@ This session's deepest lesson: **the navigation IS the design system's first imp
 
 ---
 
+<a id="fb-017"></a>
 #### FB-017: "ScrollSpy spacing should be slightly wider; drag sensitivity too low; active tick width change squeezes content"
 
 **UX Intent:** Three related interaction design issues that compound into a broken feel:
@@ -735,6 +788,9 @@ This session's deepest lesson: **the navigation IS the design system's first imp
 
 ---
 
+**Anti-patterns:** See AP-011. See AP-012.
+
+<a id="fb-018"></a>
 #### FB-018: "The drag sensitivity and distance are still too long; click is not working"
 
 **UX Intent:** The first fix improved spacing and added click/drag discrimination, but the pointer-to-index mapping was still broken. Clicking a specific tick mapped to the wrong section because the linear interpolation didn't account for padding and centering. This is a precision issue: the user clicks exactly on a tick and expects to go to that section — any mismatch feels random and broken.
@@ -747,6 +803,8 @@ This session's deepest lesson: **the navigation IS the design system's first imp
 
 ---
 
+**Anti-pattern:** See AP-011.
+
 ## Session: 2026-03-29 — Color Palette Expansion (Carbon-Influenced)
 
 **Chat:** [Carbon color comparison and palette expansion](current-session)
@@ -757,6 +815,7 @@ This session's deepest lesson: **the navigation IS the design system's first imp
 
 ---
 
+<a id="fb-016"></a>
 #### FB-016: "I want a comprehensive, accessible color palette influenced by IBM Carbon"
 
 **UX Intent:** The existing color system was functional but minimal — only neutral grays, a brand accent, and two support colors. A comprehensive palette ensures that when future use cases arise (data visualization, status indicators, tags, notifications, syntax highlighting), there are pre-vetted, accessible colors ready. The user explicitly wants the palette to be a toolkit ("just because I have that color doesn't mean I have to use it") while keeping the current UI neutral-dominant.
@@ -783,6 +842,7 @@ This session's deepest lesson: **the navigation IS the design system's first imp
 
 ---
 
+<a id="fb-013"></a>
 #### FB-013: "Collapse view and expanded view have different spacing. Tabs jump up and down."
 
 **UX Intent:** When a component has two states connected by a toggle, the transition must feel seamless. If tabs shift vertically during the transition, it reads as a layout bug — the user loses their spatial anchor. A staff-level UX designer catches this; it's a detail that separates polished products from prototypes. The collapsed state represents the most intentional spacing (every pixel matters in 40px), so it should be the canonical reference.
@@ -809,6 +869,7 @@ These differences compounded, causing tabs to visibly jump 15–20px when toggli
 
 ---
 
+<a id="fb-014"></a>
 #### FB-014: "Way too much spacing above Overview tab. Section gaps too much. Collapsed divider not centered."
 
 **UX Intent:** Every pixel of vertical space in a sidebar competes with content. Excessive top padding wastes the most premium screen position. Section gaps that are too generous make a short list of nav items feel spread thin. And a divider that isn't visually centered between two sections reads as a misaligned element rather than a separator.
@@ -828,6 +889,7 @@ These differences compounded, causing tabs to visibly jump 15–20px when toggli
 
 ---
 
+<a id="fb-015"></a>
 #### FB-015: "Way too much spacing between content and sidebar/top nav. Corner radius too much."
 
 **UX Intent:** As a B2B-focused designer, density and precision matter. Large content gutters feel like a consumer marketing page, not a professional tool. Similarly, large corner radii (6–8px) signal "friendly consumer app" — incongruent with B2B utility. The designer wants the product to feel like a staff-level tool: sharp, dense, intentional.
@@ -865,6 +927,7 @@ These differences compounded, causing tabs to visibly jump 15–20px when toggli
 
 ---
 
+<a id="fb-001"></a>
 #### FB-001: "The responsiveness is so shitty. Look at all the things being truncated."
 
 **UX Intent:** A layout that clips content signals a lack of care. If the design system's own documentation can't display properly, it undermines trust in the system itself.
@@ -877,6 +940,7 @@ These differences compounded, causing tabs to visibly jump 15–20px when toggli
 
 ---
 
+<a id="fb-002"></a>
 #### FB-002: "The navigation bar is blocking all the views."
 
 **UX Intent:** Content is the primary artifact. Navigation is a tool to reach content — it should never compete with or obstruct it.
@@ -891,6 +955,7 @@ These differences compounded, causing tabs to visibly jump 15–20px when toggli
 
 ---
 
+<a id="fb-003"></a>
 #### FB-003: "I want the navigation bar to be collapsible to icon-only."
 
 **UX Intent:** The user should control how much screen real estate the nav consumes. A designer working in a design system doc will toggle between reference (sidebar open) and focused reading (sidebar collapsed).
@@ -901,6 +966,7 @@ These differences compounded, causing tabs to visibly jump 15–20px when toggli
 
 ---
 
+<a id="fb-004"></a>
 #### FB-004: "The spacing in the navigation bar sucks."
 
 **UX Intent:** Tight spacing communicates cheapness. A design system must embody the spatial rhythm it documents. If the nav has cramped padding, the system contradicts itself.
@@ -911,6 +977,7 @@ These differences compounded, causing tabs to visibly jump 15–20px when toggli
 
 ---
 
+<a id="fb-005"></a>
 #### FB-005: "The collapsed icons are not centered. Equal distance left and right."
 
 **UX Intent:** Asymmetric spacing in a compact UI looks broken. In icon-only mode, the eye expects perfect centering — any pixel offset is immediately noticeable.
@@ -923,6 +990,7 @@ These differences compounded, causing tabs to visibly jump 15–20px when toggli
 
 ---
 
+<a id="fb-006"></a>
 #### FB-006: "There's no padding between the content and the sidebar border."
 
 **UX Intent:** Content starting at the exact pixel where the sidebar ends feels like a rendering bug. The boundary between navigation and content needs a visible gutter.
@@ -935,6 +1003,7 @@ These differences compounded, causing tabs to visibly jump 15–20px when toggli
 
 ---
 
+<a id="fb-007"></a>
 #### FB-007: "Dark mode — why is there a white background? Why isn't the nav changing?"
 
 **UX Intent:** A broken dark mode signals that theming was an afterthought. If the system can't reliably switch themes, designers won't trust it for production work.
@@ -947,6 +1016,7 @@ These differences compounded, causing tabs to visibly jump 15–20px when toggli
 
 ---
 
+<a id="fb-008"></a>
 #### FB-008: "Section headers (TOKENS, COMPONENTS) are too big, too dark. Hard to distinguish from tabs."
 
 **UX Intent:** In a nav sidebar, section headers are organizational labels — they should recede visually so the interactive links stand out. Typography must create clear hierarchy even at small scales.
@@ -957,6 +1027,7 @@ These differences compounded, causing tabs to visibly jump 15–20px when toggli
 
 ---
 
+<a id="fb-009"></a>
 #### FB-009: "There's no spacing! Where's all the margin and padding?!" (×3 messages)
 
 **UX Intent:** When the same problem is reported 3 times with escalating frustration, the fix was never reaching the user. The issue wasn't insufficient values — it was an architectural defect silently nullifying all values.
@@ -971,6 +1042,7 @@ These differences compounded, causing tabs to visibly jump 15–20px when toggli
 
 ---
 
+<a id="fb-010"></a>
 #### FB-010: "Never use inline; always use token."
 
 **UX Intent:** Inline styles bypass the design token system. They can't be themed, can't be audited, can't respond to breakpoints. A design system that uses inline styles is not a system — it's ad-hoc styling with extra steps.
@@ -981,6 +1053,7 @@ These differences compounded, causing tabs to visibly jump 15–20px when toggli
 
 ---
 
+<a id="fb-011"></a>
 #### FB-011: "Collapsed sidebar too wide. Square proportion, 4-8px padding."
 
 **UX Intent:** A collapsed sidebar should be minimal. It exists to provide icon shortcuts, not to consume 56px of screen width for a 14px icon.
@@ -991,6 +1064,7 @@ These differences compounded, causing tabs to visibly jump 15–20px when toggli
 
 ---
 
+<a id="fb-012"></a>
 #### FB-012: "Section divider cut off in the middle."
 
 **UX Intent:** A divider that doesn't span its container looks like a rendering artifact. Dividers exist to separate — they must visually reach both edges.
@@ -1011,6 +1085,7 @@ These differences compounded, causing tabs to visibly jump 15–20px when toggli
 
 ---
 
+<a id="fb-020-occ2"></a>
 #### FB-020: "Reshape color token structure referencing One GS design system"
 
 **UX Intent:** The flat semantic token naming (`text-primary`, `surface-inverse`, `border-subtle`) was ad-hoc — each category used different naming conventions with no predictable pattern. A staff UX designer should be able to look at any token name and immediately know what element it applies to, what its semantic role is, and how prominent it is.
@@ -1023,6 +1098,9 @@ These differences compounded, causing tabs to visibly jump 15–20px when toggli
 
 ---
 
+**Anti-pattern:** See AP-014.
+
+<a id="fb-021-occ2"></a>
 #### FB-021: "Map accent/brand color to match Lumen from IBM Carbon project"
 
 **UX Intent:** The brand accent scale should be a single, intentionally designed ramp shared across projects. The Cadence project's "Lumen" scale was designed with perceptual uniformity (no hue jump at step 50) and serves as the canonical brand blue-violet.
@@ -1035,6 +1113,7 @@ These differences compounded, causing tabs to visibly jump 15–20px when toggli
 
 ---
 
+<a id="fb-022-occ2"></a>
 #### FB-022: "Check accessibility — accent color for text is too light"
 
 **UX Intent:** Meaningful text in the playground (prop types, token values, active navigation labels) must be readable by all users. Using a decorative/light accent step for text fails users with low vision.
@@ -1047,6 +1126,7 @@ These differences compounded, causing tabs to visibly jump 15–20px when toggli
 
 ---
 
+<a id="fb-044-occ2"></a>
 #### FB-044: "Mobile experience squeezes everything, unnecessary tabs, follow Joseph's denser layout"
 
 **UX Intent:** The homepage sidebar stacked vertically on mobile with 32px gaps between each section, pushing the project grid far below the fold. Teams and Links sat in separate blocks instead of side-by-side, wasting vertical space. Navigation was inconsistent — the homepage had no way to reach About or Experiments, while case study pages had a nav bar that included Reading and Contact (pages the user agreed were unnecessary). The user wanted Joseph Zhang's compact, information-dense pattern.
@@ -1068,6 +1148,7 @@ These differences compounded, causing tabs to visibly jump 15–20px when toggli
 
 ---
 
+<a id="fb-045-occ2"></a>
 #### FB-045: "Area for mouse maneuvering is too narrow, causes very bad experience"
 
 **UX Intent:** When navigating from a sidebar category to a hover-to-reveal sliver panel, the diagonal mouse path crosses adjacent category buttons. Each crossing switches the sliver to a different category, making it impossible to reach the intended submenu item. This is the classic "whack-a-mole" menu problem that Amazon solved with path prediction in their mega-dropdown menus.
@@ -1087,6 +1168,9 @@ These differences compounded, causing tabs to visibly jump 15–20px when toggli
 
 ---
 
+**Anti-pattern:** See AP-027.
+
+<a id="fb-046"></a>
 #### FB-046: "Case study navigation is confusing — top nav doesn't exist, inconsistency with homepage"
 
 **UX Intent:** The case study detail pages used a top navigation bar (`Navigation` component) that doesn't match the homepage's sidebar-based navigation model. The homepage uses a split-view layout (left sidebar with identity/metadata, right content area), but case study pages used a traditional full-width layout with a hero splash image. This created a jarring navigation inconsistency when moving between the homepage and a case study — the user's navigation mental model broke on every transition. The user wanted the case study pages to mirror the homepage's split-view structure, with metadata on the left and content on the right, and the only navigation being a "back" link and prev/next case study at the bottom.
@@ -1107,6 +1191,7 @@ These differences compounded, causing tabs to visibly jump 15–20px when toggli
 
 ---
 
+<a id="fb-047-occ2"></a>
 #### FB-047: "Missing hero design screen — case studies should begin with strong visuals"
 
 **UX Intent:** Case studies must lead with outcome visuals, not text. This is a time-to-value practice: the visitor's first impression should be the finished product, not a description of it. A portfolio case study that begins with text requires the visitor to read before they understand what was built. A case study that begins with a hero screenshot lets the visitor evaluate the quality of the work in under 2 seconds — before any text is read. The ScrollSpy was also still needed for section navigation in the right content column.
@@ -1124,6 +1209,7 @@ These differences compounded, causing tabs to visibly jump 15–20px when toggli
 
 ---
 
+<a id="fb-048"></a>
 #### FB-048: "ScrollSpy overlaps content, notch labels misaligned, content needs centering"
 
 **UX Intent:** Three interrelated layout issues on the case study split-view: (1) The ScrollSpy notch ticks rendered on top of content because the right content column had no clearance margin for the viewport-fixed ScrollSpy rail. At `lg` (1056px), the content edge and the notch ticks overlapped by 12px. (2) The right content column had no max-width, so on wide screens it stretched to 900px+, creating an uncomfortably wide text block and pushing content toward the ScrollSpy zone. (3) The ScrollSpy label text was visually misaligned with its corresponding tick mark because the `.notch` container was only ~2px tall (the tick's height), making `top: 50%` resolve to ~1px — a sub-pixel reference that caused rounding errors.
@@ -1139,6 +1225,7 @@ These differences compounded, causing tabs to visibly jump 15–20px when toggli
 
 ---
 
+<a id="fb-050-occ2"></a>
 #### FB-050: "ScrollSpy navigation should bring to page location with breathing room"
 
 **UX Intent:** Scroll-to navigation should preserve spatial context. When a user clicks a ScrollSpy notch, the target section should not slam against the top edge of the viewport. A small offset provides a "landing zone" — the user sees a sliver of the previous section's content (or its divider), maintaining their mental map of where they are on the page. Without it, the jump feels like teleportation: the user arrives at a heading with zero visual context of what came before. This is the scroll navigation equivalent of showing approach context in wayfinding — you don't teleport to a room, you walk through a doorway.
@@ -1154,6 +1241,9 @@ These differences compounded, causing tabs to visibly jump 15–20px when toggli
 
 ---
 
+**Anti-pattern:** See AP-031.
+
+<a id="fb-049"></a>
 #### FB-049: "For the ScrollSpy component, active notch color should match label"
 
 **UX Intent:** Visual state consistency — when an interactive control has two visual channels (a tick bar and a text label), both channels must reflect the same state. An active notch with a bold dark bar but a medium-gray label creates a disconnect: the bar says "you are here" but the label says "I'm the same as everything else." The user reads the label color as a hierarchy signal. When all labels look identical regardless of which notch is active, the component fails to communicate state through its text layer. This is a gestalt principle: paired visual elements must share visual properties to be perceived as a unit.
@@ -1171,6 +1261,7 @@ These differences compounded, causing tabs to visibly jump 15–20px when toggli
 
 ---
 
+<a id="fb-050-occ3"></a>
 #### FB-050: "Admin bar blocks navigation, bad practice to overlay page content"
 
 **UX Intent:** Fixed-position toolbars that overlay page content violate the principle of non-destructive augmentation. An admin bar exists to help the admin interact with the page — if it covers navigation buttons or other interactive elements, it directly undermines the task it's supposed to support. The admin bar should be additive (pushing content down to make room for itself) not subtractive (hiding content behind itself). This is the same principle as AP-004 (fixed sidebar with padding offset), extended to top/bottom bars.
@@ -1185,6 +1276,9 @@ These differences compounded, causing tabs to visibly jump 15–20px when toggli
 
 ---
 
+**Anti-pattern:** See AP-031.
+
+<a id="fb-051"></a>
 #### FB-051: ASCII Art Tool — Design System Expansion (7 new components)
 
 **UX Intent:** The ASCII tool required UI primitives that didn't exist in the Élan design system: ColorPicker, Slider, ScrubInput, Dropzone, ProgressBar, SegmentedControl, CodeBlock. Rather than building one-off custom components, each was built as a proper DS component with SCSS source in `src/components/ui/`, a Tailwind playground demo page, and sidebar entry. Nine existing components (Textarea, Select, Checkbox, Toggle, Toast, Tooltip, DropdownMenu, Avatar, Divider) also lacked playground pages — those were created simultaneously.
@@ -1199,6 +1293,7 @@ These differences compounded, causing tabs to visibly jump 15–20px when toggli
 
 ---
 
+<a id="fb-052"></a>
 #### FB-052: Masonry grid — thumbnails cropped, tiles all same height, testimonial ordering
 
 **UX Intent:** Portfolio masonry grid should reflect the designer's identity through intentional ordering (product work first, illustration work last) and respect each project's thumbnail proportions rather than forcing uniform aspect ratios. Mohammed A.'s testimonial — from a high-credibility source (Apple Siri founding team) — should be immediately visible at position "first row, third column."
@@ -1213,6 +1308,7 @@ These differences compounded, causing tabs to visibly jump 15–20px when toggli
 
 ---
 
+<a id="fb-053"></a>
 #### FB-053: Drag-and-drop tile reordering for homepage masonry grid (admin)
 
 **UX Intent:** The portfolio owner needs direct manipulation to curate homepage tile order — drag-and-drop is the expected interaction pattern for spatial reordering. The algorithmic interleave didn't allow fine-grained placement control.
@@ -1227,6 +1323,9 @@ These differences compounded, causing tabs to visibly jump 15–20px when toggli
 
 ---
 
+**Anti-patterns:** See AP-031. See AP-051.
+
+<a id="fb-054"></a>
 #### FB-054: "I cannot drag things still" — drag handle affordance failure
 
 **UX Intent:** The user expected to grab any part of a tile and drag it. A 28×28px grip icon in the corner is not a sufficient drag affordance — especially when the rest of the tile looks and behaves like a clickable link. The mismatch between "this looks draggable" (dashed outline on hover) and "only this tiny corner is actually draggable" violates the principle of least surprise.
@@ -1241,6 +1340,7 @@ These differences compounded, causing tabs to visibly jump 15–20px when toggli
 
 ---
 
+<a id="fb-055"></a>
 #### FB-055: Spacing token migration from numeric-indexed to multiplier-based naming (One GS reference)
 
 **UX Intent:** The spacing token system's naming convention directly impacts how AI agents (the primary consumers of token names) select and verify tokens during implementation. Opaque numeric indices (`spacing-06` = 24px) require memorization or lookup tables; multiplier-based names (`spacer-3x` = 3 x 8 = 24px) are self-documenting. A three-tier architecture (primitive / layout-semantic / utility) enables agents to reason about intent at the layout tier ("is this section standard or spacious?") and verify values at the primitive/utility tier through arithmetic.
@@ -1264,6 +1364,7 @@ Agent readability analysis determined: (1) Multiplier names win for primitives a
 ## Entry Template
 
 ```markdown
+<a id="fb-056"></a>
 #### FB-056: "Doing all this on the button — map to spacing tokens"
 
 **UX Intent:** Every component dimension must trace back to the design system's token grid. Hardcoded pixel values that sit between tokens create "token drift" — the design system says one thing, the component says another. Inspecting the button in DevTools should show `var(--spacer-utility-2x)`, not `16px`, so the relationship to the 8px base unit is immediately visible.
@@ -1283,6 +1384,7 @@ Agent readability analysis determined: (1) Multiplier names win for primitives a
 
 ---
 
+<a id="fb-057"></a>
 #### FB-057: "Color swatches — interactive inconsistency, circular shapes, inconsistent sizing"
 
 **UX Intent:** Every swatch in the color token page should behave identically — hover reveals a copy affordance, click copies the value. Swatches should be uniform square shapes across all sections (semantic tokens, interaction states, palette reference) so the page reads as a single cohesive system, not a patchwork of different components.
@@ -1299,6 +1401,7 @@ Agent readability analysis determined: (1) Multiplier names win for primitives a
 
 ---
 
+<a id="fb-058"></a>
 #### FB-058: "B2B compact — color swatches are massive, inconsistent sizes across sections"
 
 **UX Intent:** A B2B design system playground must respect the density posture (§0). Color swatches are reference documentation, not hero visuals — they should be compact enough that an entire palette scale fits on one row without dominating the viewport. Every swatch must be identical in size regardless of which section it appears in; size inconsistency signals a broken system.
@@ -1315,6 +1418,7 @@ Agent readability analysis determined: (1) Multiplier names win for primitives a
 
 ---
 
+<a id="fb-065"></a>
 #### FB-065: "Do a thorough DS compliance audit on the portfolio"
 
 **UX Intent:** Ensure every surface of the portfolio site uses the design system's tokens, mixins, and components consistently — brand integrity, visual rhythm, and maintainability.
@@ -1336,6 +1440,7 @@ Agent readability analysis determined: (1) Multiplier names win for primitives a
 
 ---
 
+<a id="fb-067"></a>
 #### FB-067: "Playground experiments not reflected in production — comprehensive parity alignment"
 
 **UX Intent:** The design system must be consistent between the playground (documentation surface) and production (live surface). Drift between the two means the playground can't be trusted as documentation, and production doesn't benefit from design experiments.

@@ -1,3 +1,14 @@
+<!-- graph metadata for docs knowledge graph (see docs/knowledge-graph.md) -->
+---
+type: spoke
+id: engineering-media-embeds
+topics:
+  - engineering
+  - content
+derivedFrom:
+  - engineering.md
+---
+
 # External Video Embeds (YouTube / Vimeo / Loom)
 
 > Spoke file for `docs/engineering.md`. Return to the [hub](../engineering.md) for the Section Index.

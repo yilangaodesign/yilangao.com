@@ -1,3 +1,14 @@
+<!-- graph metadata for docs knowledge graph (see docs/knowledge-graph.md) -->
+---
+type: spoke
+id: content-voice-style
+topics:
+  - content
+  - voice
+derivedFrom:
+  - content.md
+---
+
 # Section 13 — Voice & Style
 
 > Two-tier scoping: **universal rules** apply to all case study text work
@@ -44,6 +55,32 @@ sentence breathe when the idea needs room.
 1-3 sentences per paragraph. Four sentences signals a wall of text. Case studies follow the ~60/40 visual-prose model. Essay-type content (opinion pieces, written arguments like ETRO) follows a text-majority model - see `visual-economy.md` section 4.1.
 
 One idea per paragraph. If a paragraph has a setup and a payoff, split them.
+
+#### When to insert a paragraph break
+
+For narrative content, the default is to break between paragraphs. Same-paragraph is the exception.
+
+**Insert a paragraph break (`\n\n`) when ANY of these are true:**
+
+1. **Beat shift** - The narrative purpose changes (setup to pivot, problem to action, action to outcome). Each beat is its own paragraph.
+2. **Speaker/perspective shift** - The text moves from "you" address to "I" narrative, or from describing a situation to commenting on it.
+3. **Temporal jump that also shifts the beat** - The text moves to a different time frame AND the narrative purpose changes. A temporal marker alone ("After forty sessions...") does NOT force a break if the sentence continues the same argument within the same beat.
+4. **Rhetorical pivot that shifts the beat** - A "but", "so", "except", or contrast word introduces a turn that changes the narrative purpose. A pivot word that continues the same argument within the same beat does NOT force a break (e.g., "but that's exactly why" extending the same point stays in the paragraph).
+5. **3-sentence cap** - If a paragraph reaches 3 sentences, the next sentence starts a new paragraph.
+
+**Keep in the same paragraph when ALL of these are true:**
+
+1. The sentences serve the same beat (same narrative purpose).
+2. No speaker or perspective shift occurs.
+3. The total is 3 sentences or fewer.
+4. The sentences form a continuous thought where the second sentence completes or extends the first.
+
+**Worked example (Elan blurb):**
+
+- "That's me and my agent: a Severance-style collaboration where nothing learned from one session carries to the next. After being burned the 50th time, I realized one thing: intelligence was never the bottleneck, context is." - Same paragraph: same beat (problem statement), same perspective, temporal marker ("50th time") continues the argument, 2 sentences, continuous thought.
+- "So I built the memory it never had." starts a new paragraph: "so" is a rhetorical pivot AND the beat shifts from problem to action.
+
+Engineering enforcement: `@include prose-paragraph-spacing` mixin in `src/styles/mixins/_layout.scss` (see EAP-123).
 
 ### Banned words — always rewrite
 

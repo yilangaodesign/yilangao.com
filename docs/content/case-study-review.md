@@ -1,3 +1,14 @@
+<!-- graph metadata for docs knowledge graph (see docs/knowledge-graph.md) -->
+---
+type: spoke
+id: content-case-study-review
+topics:
+  - content
+  - case-study
+derivedFrom:
+  - content.md
+---
+
 # Section 14 — Case Study Review Checklist
 
 > Standalone quality checklist. Usable by:

@@ -1,3 +1,13 @@
+<!-- graph metadata for docs knowledge graph (see docs/knowledge-graph.md) -->
+---
+type: release-log
+id: release-log-archive
+topics:
+  - release
+  - engineering
+deprecated: true
+---
+
 # Release Log — Archive
 
 > **What this file is:** Archived release log entries that exceeded the 15-entry cap in `docs/release-log.md`. Kept for historical reference.
@@ -6,6 +16,7 @@
 
 ---
 
+<a id="rel-010"></a>
 ## REL-010 — Élan 2.9.0, yilangao.com 1.1.1, ASCII Art Studio 0.6.0 (2026-04-17)
 
 **Scope:** 38 working-tree files across 7 dependency-ordered layer commits, 1 release commit, 1 dev patch bump on `dev` after merge (48 files shown in fast-forward diff including release artifacts)
@@ -14,6 +25,7 @@
 
 ---
 
+<a id="rel-009"></a>
 ## REL-009 — Élan 2.8.0, yilangao.com 1.1.0, ASCII Art Studio 0.5.3 (2026-04-11)
 
 **Scope:** 112 files merged to `main` via fast-forward: 11 dependency-ordered layer commits, 1 build-fix commit, 1 release commit, 1 dev patch bump on `dev` after merge
@@ -29,6 +41,7 @@
 
 ---
 
+<a id="rel-008"></a>
 ## REL-008 — Élan 2.7.0, ASCII Art Studio 0.5.2 (2026-04-08)
 
 **Scope:** 46 files merged to `main` (39 working-tree changes plus release artifacts): 8 dependency-ordered layer commits, 1 release commit, 1 dev patch bump on `dev` after merge
@@ -49,6 +62,7 @@
 
 ---
 
+<a id="rel-007"></a>
 ## REL-007 — Élan 2.6.0, ASCII Art Studio 0.5.1 (2026-04-07)
 
 **Scope:** 66 files across 10 layer commits + release commit + dev patch bump
@@ -67,6 +81,7 @@
 
 ---
 
+<a id="rel-006"></a>
 ## REL-006 — Élan 2.5.0, ASCII Art Studio 0.5.0 (2026-04-06)
 
 **Scope:** 104 files across 9 layer commits + release commit + 2 build-gate fix commits + dev patch bump
@@ -95,6 +110,7 @@
 
 ---
 
+<a id="rel-005"></a>
 ## REL-005 — Élan 2.4.1, ASCII Art Studio 0.4.1 (2026-04-03)
 
 **Scope:** 15 files across 5 layer commits + release commit
@@ -115,6 +131,7 @@
 
 ---
 
+<a id="rel-004"></a>
 ## REL-004 — Élan 2.4.0, ASCII Art Studio 0.4.0 (2026-04-03)
 
 **Scope:** 55 files across 7 layer commits + release commit + 1 fix commit
@@ -137,6 +154,7 @@
 
 ---
 
+<a id="rel-003"></a>
 ## REL-003 — Élan 2.3.0, ASCII Art Studio 0.3.0 (2026-04-03)
 
 **Scope:** 92 files across 12 layer commits + release commit
@@ -156,6 +174,7 @@
 
 ---
 
+<a id="rel-002"></a>
 ## REL-002 — Main site deployed to new.yilangao.com (2026-04-02)
 
 **Scope:** First production deployment of the portfolio site. Documentation updates (4 files) + build fixes (5 files).
@@ -180,6 +199,7 @@
 
 ---
 
+<a id="rel-001"></a>
 ## REL-001 — Élan 2.2.0, ASCII Art Studio 0.2.1 (2026-04-02)
 
 **Scope:** 78 files across 10 layer commits + 2 build-gate fix commits + release/sync commits
@@ -205,6 +225,7 @@
 
 ---
 
+<a id="rel-011"></a>
 ## REL-011 — Élan 2.10.0, yilangao.com 1.2.0, ASCII Art Studio 0.6.1 (2026-04-21)
 
 **Scope:** ~88 working-tree files across 8 dependency-ordered layer commits. Minor for Élan (3 new DS primitives), Minor for yilangao.com (video embed, inline-edit expansion), Patch for ASCII Art Studio (sync only).

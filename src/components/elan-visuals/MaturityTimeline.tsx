@@ -27,10 +27,11 @@ function clampTooltipX(x: number, containerWidthPx: number): number {
 
 // ── View mode ─────────────────────────────────────────────────────────────────
 
-type ViewMode = "severity" | "domain";
+type ViewMode = "severity" | "domain" | "recurrence";
 
 const SEVERITY_KEYS = ["fundamental", "structural", "refinement"] as const;
 const DOMAIN_KEYS = ["engineering", "design", "content"] as const;
+const RECURRENCE_KEYS = ["recurrent", "approximate", "novel"] as const;
 
 const SEVERITY_LABELS: Record<string, string> = {
   fundamental: "Fundamental",
@@ -42,6 +43,12 @@ const DOMAIN_LABELS: Record<string, string> = {
   design: "Design",
   engineering: "Engineering",
   content: "Content",
+};
+
+const RECURRENCE_LABELS: Record<string, string> = {
+  recurrent: "Recurrent (cited AP)",
+  approximate: "Approximate (loose match)",
+  novel: "Novel (uncategorized)",
 };
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -109,8 +116,14 @@ export default function MaturityTimeline() {
 
   const days: DayBreakdown[] = liveData?.days ?? [];
 
-  const keys = mode === "severity" ? SEVERITY_KEYS : DOMAIN_KEYS;
-  const labels = mode === "severity" ? SEVERITY_LABELS : DOMAIN_LABELS;
+  const keys =
+    mode === "severity" ? SEVERITY_KEYS
+    : mode === "domain" ? DOMAIN_KEYS
+    : RECURRENCE_KEYS;
+  const labels =
+    mode === "severity" ? SEVERITY_LABELS
+    : mode === "domain" ? DOMAIN_LABELS
+    : RECURRENCE_LABELS;
 
   const maxTotal = useMemo(
     () => (days.length === 0 ? 1 : Math.max(...days.map((d) => d.total))),
@@ -129,12 +142,16 @@ export default function MaturityTimeline() {
   const segClasses: Record<string, string> =
     mode === "severity"
       ? { fundamental: styles.accentDark, structural: styles.accentMid, refinement: styles.accentLight }
-      : { engineering: styles.domainEngineering, design: styles.domainDesign, content: styles.domainContent };
+      : mode === "domain"
+      ? { engineering: styles.domainEngineering, design: styles.domainDesign, content: styles.domainContent }
+      : { recurrent: styles.recurrenceDark, approximate: styles.recurrenceMid, novel: styles.recurrenceLight };
 
   const legendClasses: Record<string, string> =
     mode === "severity"
       ? { fundamental: styles.legendAccentDark, structural: styles.legendAccentMid, refinement: styles.legendAccentLight }
-      : { engineering: styles.legendEngineering, design: styles.legendDesign, content: styles.legendContent };
+      : mode === "domain"
+      ? { engineering: styles.legendEngineering, design: styles.legendDesign, content: styles.legendContent }
+      : { recurrent: styles.legendRecurrenceDark, approximate: styles.legendRecurrenceMid, novel: styles.legendRecurrenceLight };
 
   const buildDayLabel = liveData
     ? `${liveData.totalBuildDays} build days`
@@ -230,6 +247,14 @@ export default function MaturityTimeline() {
             aria-checked={mode === "domain"}
           >
             By domain
+          </button>
+          <button
+            className={`${styles.toggleButton} ${mode === "recurrence" ? styles.toggleButtonActive : ""}`}
+            onClick={() => { setMode("recurrence"); setActiveFilter(null); }}
+            role="radio"
+            aria-checked={mode === "recurrence"}
+          >
+            By recurrence
           </button>
         </div>
       </div>

@@ -1,0 +1,10 @@
+type: skill
+id: skill-case-study-authoring
+topics:
+  - content
+  - case-study
+references:
+  - AGENTS.md
+  - content.md
+  - content-anti-patterns.md
+  - content-feedback-log.md

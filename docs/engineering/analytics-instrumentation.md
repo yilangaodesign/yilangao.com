@@ -1,3 +1,14 @@
+<!-- graph metadata for docs knowledge graph (see docs/knowledge-graph.md) -->
+---
+type: spoke
+id: engineering-analytics-instrumentation
+topics:
+  - engineering
+  - analytics
+derivedFrom:
+  - engineering.md
+---
+
 # §16. Analytics Instrumentation
 
 > **What this file is:** Engineering spoke for client-side analytics (Mixpanel + Vercel Analytics). Covers the provider architecture, hook internals, naming conventions, and how to add or modify events.

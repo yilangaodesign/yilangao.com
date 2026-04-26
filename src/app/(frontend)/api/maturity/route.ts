@@ -20,6 +20,13 @@ export type DayBreakdown = {
   design: number;
   engineering: number;
   content: number;
+  // Recurrence breakdown (per Plan B canonical citations).
+  // - recurrent: ≥1 strong citation (`See AP-NNN`) — issue mapped to existing AP
+  // - approximate: only loose-match citations (`Related: AP-NNN`) — semantically close
+  // - novel: no canonical citations — first-time observation, candidate for new AP
+  recurrent: number;
+  approximate: number;
+  novel: number;
   total: number;
 };
 
@@ -76,6 +83,8 @@ type Correction = {
   fundamental: boolean;
   /** Cross-category or substantially complex entry. */
   structural: boolean;
+  /** Recurrence classification from Plan B canonical citations. */
+  recurrence: 'recurrent' | 'approximate' | 'novel';
 };
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -107,6 +116,20 @@ function classifyBlock(block: string): { fundamental: boolean; structural: boole
 }
 
 /**
+ * Classify a block by recurrence using Plan B canonical citations.
+ * The regex matches the same line-anchored canonical syntax enforced by
+ * scripts/audit-docs.mjs (see CANON_CITATION_GLOBAL).
+ */
+const STRONG_CITE_RE = /^(?:\*\*[^*]+:\*\*\s+)?See\s+(?:AP|EAP|CAP)-\d{1,4}/m;
+const APPROX_CITE_RE = /^(?:\*\*[^*]+:\*\*\s+)?Related:\s+(?:AP|EAP|CAP)-\d{1,4}/m;
+
+function classifyRecurrence(block: string): 'recurrent' | 'approximate' | 'novel' {
+  if (STRONG_CITE_RE.test(block)) return 'recurrent';
+  if (APPROX_CITE_RE.test(block)) return 'approximate';
+  return 'novel';
+}
+
+/**
  * Parse logs that use the standard `**Date:** YYYY-MM-DD` format.
  * Design-feedback-log.md and both engineering logs use this format.
  * Entries are separated by `\n---\n`.
@@ -123,7 +146,8 @@ function parseStandardLog(
     if (!dateMatch) continue;
 
     const { fundamental, structural } = classifyBlock(block);
-    corrections.push({ date: dateMatch[1], domain, fundamental, structural });
+    const recurrence = classifyRecurrence(block);
+    corrections.push({ date: dateMatch[1], domain, fundamental, structural, recurrence });
   }
 
   return corrections;
@@ -149,8 +173,9 @@ function parseContentLog(text: string): Correction[] {
     if (cfbEntries === 0) continue;
 
     const { fundamental, structural } = classifyBlock(block);
+    const recurrence = classifyRecurrence(block);
     for (let i = 0; i < cfbEntries; i++) {
-      corrections.push({ date, domain: 'content', fundamental, structural });
+      corrections.push({ date, domain: 'content', fundamental, structural, recurrence });
     }
   }
 
@@ -283,13 +308,18 @@ export async function GET() {
   for (const c of allCorrections) {
     let db = dayBreakdownMap.get(c.date);
     if (!db) {
-      db = { fundamental: 0, structural: 0, refinement: 0, design: 0, engineering: 0, content: 0 };
+      db = {
+        fundamental: 0, structural: 0, refinement: 0,
+        design: 0, engineering: 0, content: 0,
+        recurrent: 0, approximate: 0, novel: 0,
+      };
       dayBreakdownMap.set(c.date, db);
     }
     db[c.domain]++;
     if (c.fundamental) db.fundamental++;
     else if (c.structural) db.structural++;
     else db.refinement++;
+    db[c.recurrence]++;
   }
 
   const days: DayBreakdown[] = uniqueDates.map((date) => {

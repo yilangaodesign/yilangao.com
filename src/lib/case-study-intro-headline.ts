@@ -10,6 +10,6 @@
 export const INTRO_HEADLINE_BY_SLUG: Record<string, string> = {
   meteor: "I had to choose whom not to design for.",
   lacework: "I saved the page my own team gave up on.",
-  "elan-design-system": "Harnessed my code production - 40 sessions in.",
+  "elan-design-system": "I built an agent's memory out of my own mistakes.",
   "etro-framework": "Your AI product doesn't need more transparency. It needs the right kind.",
 }

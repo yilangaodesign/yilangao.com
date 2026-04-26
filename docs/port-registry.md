@@ -1,3 +1,15 @@
+<!-- graph metadata for docs knowledge graph (see docs/knowledge-graph.md) -->
+---
+type: cross-cutting
+id: port-registry
+topics:
+  - engineering
+  - port-registry
+references:
+  - engineering.md
+  - engineering/port-management.md
+---
+
 # Port Registry (Live Ledger)
 
 > **This file is the single source of truth for all localhost ports used by this
@@ -23,8 +35,8 @@
 
 | Service | Default Port | Current Port | Status | PID | Notes |
 |---|---|---|---|---|---|
-| Main site (`yilangao.com`) | 4000 | 4000 | running | 87471 | `npm run dev` (webpack mode) |
-| Playground | 4001 | 4001 | running | 35776 | `npm run playground` (`--webpack`; see ENG-150) |
+| Main site (`yilangao.com`) | 4000 | 4000 | running | 23898 | `npm run dev` (webpack mode) |
+| Playground | 4001 | 4001 | running | 44076 | `npm run playground` (`--webpack`; see ENG-150) |
 | ASCII Art Studio | 4002 | 4002 | running | 35777 | `npm run ascii-tool` (`--webpack`; see ENG-150) |
 
 ## Key Pages (on main site, no separate server)
@@ -38,6 +50,7 @@
 
 | Timestamp (UTC) | Service | Action | Port | Reason |
 |---|---|---|---|---|
+| 2026-04-26 16:51 | Main site, Playground, ASCII Art Studio | already running | 4000–4002 | User boot up — health probe: `curl -L http://127.0.0.1:4000/` → 200; `/for/welcome?preview=true` → 200; playground `/` → 200; ASCII `/` → 200. Ledger PIDs refreshed (4000: 23898, 4001: 25555, 4002: 35777). |
 | 2026-04-24 17:05 | Main site | restarted | 4000 | User boot up — ports were down; started all three apps. Main site returned HTTP 500 (webpack ENOENT manifests/chunks); `rm -rf .next` alone did not fix. `rm -rf node_modules .next` + `npm install`, fresh `npm run dev`. Verified `curl -L` on `/` and `/for/welcome?preview=true` → 200. Playground and ASCII were already healthy from same session (left running). LISTEN PID 4000: 43332 (4001: 35776, 4002: 35777). |
 | 2026-04-24 14:56 | Main site, Playground, ASCII Art Studio | restarted | 4000–4002 | User boot up — 4000/4001 accepted TCP but `curl` timed out (zombie `next-server`); 4002 later hung the same way. SIGKILL listeners on 4000/4001/4002; `rm -rf` `.next`, `playground/.next`, `ascii-tool/.next`; fresh `npm run dev`, `npm run playground`, `npm run ascii-tool`. Verified `-L` on `/` → 200, `/for/welcome?preview=true` → 200, playground `/` → 200, ASCII `/` → 200. LISTEN PIDs: 92481 (4000), 92517 (4001), 94130 (4002). |
 | 2026-04-23 15:04 | Main site, ASCII Art Studio | restarted | 4000, 4002 | User boot up — HTTP 500 on main site (followed `/` after redirect) and login preview; HTTP 500 then hung first-byte on ASCII `/` after stale listeners. Identified `next-server` PIDs on 4000/4002, SIGKILL, `rm -rf` root `.next` and `ascii-tool/.next`, fresh `npm run dev` and ASCII `next dev --port 4002 --webpack`. Playground on 4001 already HTTP 200 (left running). Verified HTTP 200 on `/` (redirect chain), `/for/unknown?preview=true`, playground `/`, ASCII `/` (first `/` can block until initial webpack compile completes after Ready). LISTEN PIDs: 34506 (4000), 64704 (4001), 37096 (4002). |

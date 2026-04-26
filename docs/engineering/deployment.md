@@ -1,3 +1,14 @@
+<!-- graph metadata for docs knowledge graph (see docs/knowledge-graph.md) -->
+---
+type: spoke
+id: engineering-deployment
+topics:
+  - engineering
+  - release
+derivedFrom:
+  - engineering.md
+---
+
 # §13 — Deployment Verification
 
 > **Read when:** deploying, checking Vercel status, diagnosing build failures, configuring domains

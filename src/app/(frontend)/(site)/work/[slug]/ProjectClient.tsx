@@ -34,6 +34,7 @@ import {
   IncidentDensityMap,
   CollaborationLoop,
   SkillMap,
+  SystemVisuals,
   MaturityTimeline,
 } from "@/components/elan-visuals";
 import {
@@ -275,6 +276,7 @@ const VISUAL_COMPONENTS: Record<string, React.ComponentType> = {
   IncidentDensityMap,
   CollaborationLoop,
   SkillMap,
+  SystemVisuals,
   MaturityTimeline,
 };
 

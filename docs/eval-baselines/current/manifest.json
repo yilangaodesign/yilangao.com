@@ -1,0 +1,56 @@
+{
+  "schema_version": "1.0",
+  "purpose": "Methodology-validation smoke test — NOT part of the eval dataset. The future eval plan runs N=5x12 = 60 invocations per arm; this 9-run subset only validates that the procedure works end-to-end.",
+  "source_corpus": "docs/eval-task-corpus.md",
+  "source_plan": ".cursor/plans/docs_kg_eval_handle_c7e2a5f9.plan.md",
+  "arm": "current",
+  "commit_sha": "56f876024fc95591b95f0f181686ba4dda0ac03f",
+  "branch_at_tag_time": "dev",
+  "tag": "eval-baseline-current",
+  "tag_created": "2026-04-25T23:44:43-04:00",
+  "worktree_path": "~/eval/yilangao-current",
+  "model": null,
+  "temperature": 0.3,
+  "captured_by": null,
+  "captured_window_start": null,
+  "captured_window_end": null,
+  "selection_bias_note": "All 3 tasks in this subset are from the corpus's subtle bucket. The post-initiative arm is favored by construction. The future eval plan should apply a discount when interpreting effect size on subtle tasks.",
+  "tasks": [
+    {
+      "task_id": "eval-T002",
+      "pillar": "design",
+      "difficulty": "subtle",
+      "source": "docs/design-feedback-log.md#fb-163",
+      "expected_citation": "AP-054",
+      "runs": [
+        { "run_number": 1, "file": "eval-T002/run-1.md", "captured": false },
+        { "run_number": 2, "file": "eval-T002/run-2.md", "captured": false },
+        { "run_number": 3, "file": "eval-T002/run-3.md", "captured": false }
+      ]
+    },
+    {
+      "task_id": "eval-T008",
+      "pillar": "engineering",
+      "difficulty": "subtle",
+      "source": "docs/engineering-feedback-log.md#eng-156",
+      "expected_citation": "EAP-094",
+      "runs": [
+        { "run_number": 1, "file": "eval-T008/run-1.md", "captured": false },
+        { "run_number": 2, "file": "eval-T008/run-2.md", "captured": false },
+        { "run_number": 3, "file": "eval-T008/run-3.md", "captured": false }
+      ]
+    },
+    {
+      "task_id": "eval-T011",
+      "pillar": "content",
+      "difficulty": "subtle",
+      "source": "docs/content-feedback-log.md#cfb-034",
+      "expected_citation": "CAP-029",
+      "runs": [
+        { "run_number": 1, "file": "eval-T011/run-1.md", "captured": false },
+        { "run_number": 2, "file": "eval-T011/run-2.md", "captured": false },
+        { "run_number": 3, "file": "eval-T011/run-3.md", "captured": false }
+      ]
+    }
+  ]
+}

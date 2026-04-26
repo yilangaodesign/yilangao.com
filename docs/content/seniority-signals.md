@@ -1,3 +1,14 @@
+<!-- graph metadata for docs knowledge graph (see docs/knowledge-graph.md) -->
+---
+type: spoke
+id: content-seniority-signals
+topics:
+  - content
+  - voice
+derivedFrom:
+  - content.md
+---
+
 # §6. Seniority Signals
 
 ### 6.1 How Hiring Managers Calibrate Level

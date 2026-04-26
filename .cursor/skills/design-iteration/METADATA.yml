@@ -1,0 +1,9 @@
+type: skill
+id: skill-design-iteration
+topics:
+  - design
+references:
+  - AGENTS.md
+  - design.md
+  - design-anti-patterns.md
+  - design-feedback-log.md

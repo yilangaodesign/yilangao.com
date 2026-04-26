@@ -1,0 +1,8 @@
+type: skill
+id: skill-boot-up
+topics:
+  - engineering
+  - port-registry
+references:
+  - AGENTS.md
+  - port-registry.md

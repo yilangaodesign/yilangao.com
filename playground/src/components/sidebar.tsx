@@ -47,9 +47,11 @@ import BellRing from "lucide-react/dist/esm/icons/bell-ring";
 import Shapes from "lucide-react/dist/esm/icons/shapes";
 import Compass from "lucide-react/dist/esm/icons/compass";
 import Table2 from "lucide-react/dist/esm/icons/table-2";
+import Share2 from "lucide-react/dist/esm/icons/share-2";
 import Paintbrush from "lucide-react/dist/esm/icons/paintbrush";
 import Pipette from "lucide-react/dist/esm/icons/pipette";
 import SlidersHorizontal from "lucide-react/dist/esm/icons/sliders-horizontal";
+import Scan from "lucide-react/dist/esm/icons/scan";
 import GripHorizontal from "lucide-react/dist/esm/icons/grip-horizontal";
 import Upload from "lucide-react/dist/esm/icons/upload";
 import Loader from "lucide-react/dist/esm/icons/loader";
@@ -198,14 +200,16 @@ const componentCategories: NavCategory[] = [
     ],
   },
   {
-    id: "data-display",
-    label: "Data Display",
+    id: "data",
+    label: "Data",
     icon: Table2,
     section: "Components",
     links: [
-      { href: "/components/code-block", label: "CodeBlock", icon: Code2 },
-      { href: "/components/description-list", label: "DescriptionList", icon: LayoutList },
-      { href: "/components/table", label: "Table", icon: Table2 },
+      { href: "/components/code-block", label: "CodeBlock", icon: Code2, group: "Display" },
+      { href: "/components/description-list", label: "DescriptionList", icon: LayoutList, group: "Display" },
+      { href: "/components/table", label: "Table", icon: Table2, group: "Display" },
+      { href: "/components/canvas", label: "Canvas", icon: Scan, group: "Visualization" },
+      { href: "/components/force-graph", label: "ForceGraph", icon: Share2, group: "Visualization" },
     ],
   },
   {

@@ -13,7 +13,14 @@
     "seed:companies": "PAYLOAD_CONFIG_PATH=src/payload.config.ts npx tsx src/scripts/seed-companies.ts",
     "playground": "npm run dev --prefix playground",
     "ascii-tool": "npm run dev --prefix ascii-tool",
-    "audit-docs": "node scripts/audit-docs.mjs",
+    "audit-docs": "npm run build-graph -s && node scripts/audit-docs.mjs",
+    "audit-docs:quick": "node scripts/audit-docs.mjs --quick",
+    "build-graph": "node scripts/build-graph.mjs",
+    "query-graph": "node scripts/query-graph.mjs",
+    "graph-mcp": "node scripts/mcp-graph-server.mjs",
+    "export-canvas": "npm run build-graph -s && node scripts/export-canvas.mjs",
+    "postinstall": "node scripts/build-graph.mjs || echo '[postinstall] graph build skipped'",
+    "cluster-check": "node scripts/cluster-check.mjs",
     "version:patch": "node scripts/version-bump.mjs patch",
     "version:minor": "node scripts/version-bump.mjs minor",
     "version:major": "node scripts/version-bump.mjs major",
@@ -75,12 +82,14 @@
     "payload": "^3.80.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
+    "react-force-graph-2d": "^1.29.1",
     "resend": "^6.10.0",
     "sass": "^1.98.0",
     "sharp": "^0.33.5",
     "three": "^0.183.2"
   },
   "devDependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
     "@types/d3-hierarchy": "^3.1.7",
     "@types/mixpanel-browser": "^2.60.0",
     "@types/node": "^20",
@@ -90,6 +99,11 @@
     "culori": "^4.0.2",
     "eslint": "^9",
     "eslint-config-next": "16.2.1",
-    "typescript": "^5"
+    "graphology": "^0.26.0",
+    "graphology-communities-louvain": "^2.0.2",
+    "js-yaml": "^4.1.1",
+    "lunr": "^2.3.9",
+    "typescript": "^5",
+    "zod": "^3.25.0"
   }
 }

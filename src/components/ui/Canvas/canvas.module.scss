@@ -1,0 +1,74 @@
+@use '../../../styles' as *;
+
+.canvas {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 0;
+  background: var(--canvas-bg, transparent);
+}
+
+.canvasManaged {
+  touch-action: none;
+}
+
+.grid {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+
+  // Driven by Canvas.tsx via CSS variables so dot size and step scale together.
+  --canvas-grid-step: 20px;
+  --canvas-dot-r: 1.5px;
+  --canvas-grid-ox: 0px;
+  --canvas-grid-oy: 0px;
+  --canvas-dot-color: var(--color-border);
+
+  background-image: radial-gradient(
+    circle,
+    var(--canvas-dot-color) var(--canvas-dot-r),
+    transparent calc(var(--canvas-dot-r) + 0.35px)
+  );
+  background-size: var(--canvas-grid-step) var(--canvas-grid-step);
+  background-position: var(--canvas-grid-ox) var(--canvas-grid-oy);
+}
+
+.content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+}
+
+// Managed mode: events pass through the full-bleed content wrapper to the root
+// so background pan/zoom hit the canvas; interactive children opt back in.
+.contentManaged {
+  pointer-events: none;
+}
+
+// Transformed layer that moves/scales children with zoom and pan.
+// No will-change here — it would promote the layer to a GPU texture rasterized
+// at the base zoom, causing blurry text/borders when scaled up. Without it the
+// browser re-paints at the current resolution on each frame.
+.transformLayer {
+  transform-origin: 0 0;
+  pointer-events: none;
+
+  & > * {
+    pointer-events: auto;
+  }
+}
+
+// ── Cursor states ─────────────────────────────────────────────────────────────
+// Applied to the canvas wrapper to set cursor for zoom-in (idle) and
+// grab/grabbing (pan). Child elements override with their own cursors
+// (e.g. pointer on nodes) via specificity.
+
+.cursorGrab {
+  cursor: grab;
+}
+
+.cursorGrabbing {
+  cursor: grabbing;
+}

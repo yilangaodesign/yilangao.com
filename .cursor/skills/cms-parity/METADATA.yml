@@ -1,0 +1,10 @@
+type: skill
+id: skill-cms-parity
+topics:
+  - cms
+  - parity
+  - engineering
+enforces:
+  - AGENTS.md
+references:
+  - engineering.md

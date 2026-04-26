@@ -1,3 +1,14 @@
+<!-- graph metadata for docs knowledge graph (see docs/knowledge-graph.md) -->
+---
+type: spoke
+id: content-language-patterns
+topics:
+  - content
+  - voice
+derivedFrom:
+  - content.md
+---
+
 # §5. Language Patterns
 
 ### 5.1 The Scope Claim

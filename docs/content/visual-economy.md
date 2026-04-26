@@ -1,3 +1,14 @@
+<!-- graph metadata for docs knowledge graph (see docs/knowledge-graph.md) -->
+---
+type: spoke
+id: content-visual-economy
+topics:
+  - content
+  - design
+derivedFrom:
+  - content.md
+---
+
 # §4. Image-to-Text Ratio & Visual Economy
 
 ### 4.1 Content Type Triage

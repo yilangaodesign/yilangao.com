@@ -1,3 +1,16 @@
+<!-- graph metadata for docs knowledge graph (see docs/knowledge-graph.md) -->
+---
+type: spoke
+id: content-elan-design-system-interview
+topics:
+  - content
+  - system-architecture
+  - projects
+  - case-study
+derivedFrom:
+  - content.md
+---
+
 # Élan Design System - Interview Defense Notes
 
 > Created 2026-04-06 during v3 case study rebuild.

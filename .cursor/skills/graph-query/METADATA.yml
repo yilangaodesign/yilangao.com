@@ -1,0 +1,9 @@
+type: skill
+id: skill-graph-query
+topics:
+  - knowledge-graph
+  - search
+  - engineering
+references:
+  - knowledge-graph.md
+  - AGENTS.md

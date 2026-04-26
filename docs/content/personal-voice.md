@@ -1,3 +1,14 @@
+<!-- graph metadata for docs knowledge graph (see docs/knowledge-graph.md) -->
+---
+type: spoke
+id: content-personal-voice
+topics:
+  - content
+  - voice
+derivedFrom:
+  - content.md
+---
+
 # Section 17 - Personal Voice & Techniques
 
 > Universal voice calibration for the portfolio. Applies to ALL case studies.

@@ -1,3 +1,16 @@
+<!-- graph metadata for docs knowledge graph (see docs/knowledge-graph.md) -->
+---
+type: anti-pattern
+id: design-anti-patterns
+topics:
+  - design
+  - guardrail
+enforces:
+  - design.md
+references:
+  - design-feedback-log.md
+---
+
 # Design Anti-Patterns
 
 > **What this file is:** A catalog of mistakes that caused user frustration, documented so they are never repeated. Each anti-pattern includes the trigger, why it's wrong, and the correct alternative.
@@ -29,6 +42,7 @@
 
 ---
 
+<a id="ap-001"></a>
 ## AP-001: Unlayered CSS Reset with Tailwind v4
 
 **Status: ACTIVE**
@@ -48,6 +62,7 @@
 
 ---
 
+<a id="ap-002"></a>
 ## AP-002: @theme inline for Themeable Values
 
 **Status: ACTIVE**
@@ -62,6 +77,7 @@
 
 ---
 
+<a id="ap-003"></a>
 ## AP-003: Inline Styles as Workarounds
 
 **Status: ACTIVE**
@@ -74,6 +90,7 @@
 
 ---
 
+<a id="ap-004"></a>
 ## AP-004: Fixed Sidebar with padding-left Offset
 
 **Status: ACTIVE**
@@ -86,6 +103,7 @@
 
 ---
 
+<a id="ap-005"></a>
 ## AP-005: Centering with w-N mx-auto Inside Padded Containers
 
 **Status: ACTIVE**
@@ -98,6 +116,7 @@
 
 ---
 
+<a id="ap-006"></a>
 ## AP-006: Truncated Dividers in Compact Layouts
 
 **Status: ACTIVE**
@@ -110,6 +129,7 @@
 
 ---
 
+<a id="ap-007"></a>
 ## AP-007: Excessive Content Padding for B2B Interfaces
 
 **Status: ACTIVE**
@@ -124,6 +144,7 @@
 
 ---
 
+<a id="ap-008"></a>
 ## AP-008: Treating Symptoms Instead of Diagnosing Root Causes
 
 **Status: ACTIVE**
@@ -140,6 +161,7 @@
 
 ---
 
+<a id="ap-009"></a>
 ## AP-009: Inconsistent Spacing Between Toggle States
 
 **Status: ACTIVE**
@@ -154,6 +176,7 @@
 
 ---
 
+<a id="ap-010"></a>
 ## AP-010: Consumer-Grade Corner Radius in B2B
 
 **Status: ACTIVE**
@@ -168,6 +191,7 @@
 
 ---
 
+<a id="ap-011"></a>
 ## AP-011: Linear Interpolation for Pointer-to-Element Mapping
 
 **Status: ACTIVE**
@@ -182,6 +206,7 @@
 
 ---
 
+<a id="ap-012"></a>
 ## AP-012: Entering Drag Mode on Pointer Down
 
 **Status: ACTIVE**
@@ -201,6 +226,7 @@ This cleanly separates two intents: "I want to go to this specific section" (cli
 
 ---
 
+<a id="ap-013"></a>
 ## AP-013: Fixed Positioning Inside Transformed Containers
 
 **Status: ACTIVE**
@@ -215,6 +241,7 @@ This cleanly separates two intents: "I want to go to this specific section" (cli
 
 ---
 
+<a id="ap-014"></a>
 ## AP-014: Centered Modals for Contextual Actions
 
 **Status: ACTIVE**
@@ -229,6 +256,7 @@ This cleanly separates two intents: "I want to go to this specific section" (cli
 
 ---
 
+<a id="ap-015"></a>
 ## AP-015: Centering Icons in Collapsed Sidebar
 
 **Status: ACTIVE**
@@ -243,6 +271,7 @@ This cleanly separates two intents: "I want to go to this specific section" (cli
 
 ---
 
+<a id="ap-016"></a>
 ## AP-016: Click-to-Open for Navigation Sub-Menus
 
 **Status: ACTIVE**
@@ -257,6 +286,7 @@ This cleanly separates two intents: "I want to go to this specific section" (cli
 
 ---
 
+<a id="ap-017"></a>
 ## AP-017: Shared-Stem Names at Visible Proximity
 
 **Status: ACTIVE**
@@ -271,6 +301,7 @@ This cleanly separates two intents: "I want to go to this specific section" (cli
 
 ---
 
+<a id="ap-018"></a>
 ## AP-018: Additive Gap Padding Between Sections
 
 **Status: ACTIVE**
@@ -285,6 +316,7 @@ This cleanly separates two intents: "I want to go to this specific section" (cli
 
 ---
 
+<a id="ap-019"></a>
 ## AP-019: Hero-Scale Cards in Portfolio Overview
 
 **Status: ACTIVE**
@@ -299,6 +331,7 @@ This cleanly separates two intents: "I want to go to this specific section" (cli
 
 ---
 
+<a id="ap-020"></a>
 ## AP-020: Unnecessary overflow-y on Fit-Content Containers
 
 **Status: ACTIVE**
@@ -313,6 +346,7 @@ This cleanly separates two intents: "I want to go to this specific section" (cli
 
 ---
 
+<a id="ap-022"></a>
 ## AP-022: Unprotected Diagonal Mouse Path Between Menu Tiers
 
 **Status: ACTIVE**
@@ -327,6 +361,7 @@ This cleanly separates two intents: "I want to go to this specific section" (cli
 
 ---
 
+<a id="ap-021"></a>
 ## AP-021: Global `svg { display: block }` Breaking Inline Icons
 
 **Status: ACTIVE**
@@ -347,6 +382,7 @@ This cleanly separates two intents: "I want to go to this specific section" (cli
 
 ---
 
+<a id="ap-023"></a>
 ## AP-023: Form Inputs Without Persistent Labels or Field Type Affordances
 
 **Status: ACTIVE**
@@ -364,6 +400,7 @@ This cleanly separates two intents: "I want to go to this specific section" (cli
 
 ---
 
+<a id="ap-024"></a>
 ## AP-024: Critical Action Buttons in Scrollable Content Flow
 
 **Status: ACTIVE**
@@ -378,6 +415,7 @@ This cleanly separates two intents: "I want to go to this specific section" (cli
 
 ---
 
+<a id="ap-025"></a>
 ## AP-025: Arrow Buttons for List Reorder When Drag Is Available
 
 **Status: ACTIVE**
@@ -392,6 +430,7 @@ This cleanly separates two intents: "I want to go to this specific section" (cli
 
 ---
 
+<a id="ap-026"></a>
 ## AP-026: Low-Contrast Error States for Critical Actions
 
 **Status: ACTIVE**
@@ -406,6 +445,7 @@ This cleanly separates two intents: "I want to go to this specific section" (cli
 
 ---
 
+<a id="ap-027"></a>
 ## AP-027: Flex Containers Without Minimum Dimension Constraints
 
 **Status: ACTIVE**
@@ -420,6 +460,7 @@ This cleanly separates two intents: "I want to go to this specific section" (cli
 
 ---
 
+<a id="ap-028"></a>
 ## AP-028: Form Fields Without Required Indicators or Client-Side Validation
 
 **Status: ACTIVE**
@@ -440,6 +481,7 @@ This cleanly separates two intents: "I want to go to this specific section" (cli
 
 ---
 
+<a id="ap-029"></a>
 ## AP-029: Duplicate Navigation in Footer
 
 **Status: ACTIVE**
@@ -454,6 +496,7 @@ This cleanly separates two intents: "I want to go to this specific section" (cli
 
 ---
 
+<a id="ap-030"></a>
 ## AP-030: Inconsistent External Link Indicators
 
 **Status: ACTIVE**
@@ -468,6 +511,7 @@ This cleanly separates two intents: "I want to go to this specific section" (cli
 
 ---
 
+<a id="ap-031"></a>
 ## AP-031: CSS Transform for Centering on Framer-Motion-Animated Elements
 
 **Status: ACTIVE**
@@ -482,6 +526,7 @@ This cleanly separates two intents: "I want to go to this specific section" (cli
 
 ---
 
+<a id="ap-032"></a>
 ## AP-032: Static Label Color on Multi-State Controls
 
 **Status: ACTIVE**
@@ -496,6 +541,7 @@ This cleanly separates two intents: "I want to go to this specific section" (cli
 
 ---
 
+<a id="ap-033"></a>
 ## AP-033: Fixed Toolbars Overlaying Page Content
 
 **Status: ACTIVE**
@@ -510,6 +556,7 @@ This cleanly separates two intents: "I want to go to this specific section" (cli
 
 ---
 
+<a id="ap-034"></a>
 ## AP-034: Admin Controls in Component Document Flow
 
 **Status: ACTIVE**
@@ -529,6 +576,7 @@ This cleanly separates two intents: "I want to go to this specific section" (cli
 
 ---
 
+<a id="ap-035"></a>
 ## AP-035: Small Drag Handle as Sole Drag Target Inside Clickable Card
 
 **Status: ACTIVE**
@@ -543,6 +591,7 @@ This cleanly separates two intents: "I want to go to this specific section" (cli
 
 ---
 
+<a id="ap-036"></a>
 ## AP-036: Bare CMS Fields Without Labels, Descriptions, or Placeholders
 
 **Status: ACTIVE**
@@ -562,6 +611,7 @@ For collection-level context, set `admin.description` on the collection config t
 
 ---
 
+<a id="ap-037"></a>
 ## AP-037: Full-Surface Admin Overlays on Navigable Elements
 
 **Status: ACTIVE**
@@ -576,6 +626,7 @@ For collection-level context, set `admin.description` on the collection config t
 
 ---
 
+<a id="ap-038"></a>
 ## AP-038: Mixed Breakpoint Systems Across Apps in a Monorepo
 
 **Status: ACTIVE**
@@ -590,6 +641,7 @@ For collection-level context, set `admin.description` on the collection config t
 
 ---
 
+<a id="ap-039"></a>
 ## AP-039: Interactive Elements Without Focus Ring Clearance
 
 **Status: ACTIVE**
@@ -611,6 +663,7 @@ For collection-level context, set `admin.description` on the collection config t
 
 ---
 
+<a id="ap-040"></a>
 ## AP-040: False Affordances on Static Elements
 
 **Status: ACTIVE**
@@ -628,6 +681,7 @@ For collection-level context, set `admin.description` on the collection config t
 
 ---
 
+<a id="ap-041"></a>
 ## AP-041: Bounding-Box-With-Padding Icon Sizing in Buttons
 
 **Status: ACTIVE**
@@ -646,6 +700,7 @@ For collection-level context, set `admin.description` on the collection config t
 
 ---
 
+<a id="ap-042"></a>
 ## AP-042: SCSS-Only Color Tokens in Multi-Theme Contexts
 
 **Status: ACTIVE**
@@ -666,6 +721,7 @@ Use `var(--ds-*, #{$scss-fallback})`. The CSS custom property adapts at runtime;
 
 ---
 
+<a id="ap-043"></a>
 ## AP-043: Raw Primitives in Locked-Appearance Component Styles
 
 **Trigger:** Using `$portfolio-neutral-100` or `$portfolio-neutral-10` directly in "always-dark" / "always-light" component SCSS instead of semantic tokens like `$portfolio-action-always-dark` / `$portfolio-text-always-light-bold`.
@@ -678,6 +734,7 @@ Use `var(--ds-*, #{$scss-fallback})`. The CSS custom property adapts at runtime;
 
 ---
 
+<a id="ap-044"></a>
 ## AP-044: Hardcoded SCSS Palette Values for Hover/Active in Theme-Responsive Components
 
 **Status: ACTIVE**
@@ -692,6 +749,7 @@ Use `var(--ds-*, #{$scss-fallback})`. The CSS custom property adapts at runtime;
 
 ---
 
+<a id="ap-045"></a>
 ## AP-045: Adjacent Buttons Without Minimum Gap
 
 **Status: ACTIVE**
@@ -706,6 +764,7 @@ Use `var(--ds-*, #{$scss-fallback})`. The CSS custom property adapts at runtime;
 
 ---
 
+<a id="ap-046"></a>
 ## AP-046: Inconsistent Active/Hover Treatment Across Nav Item Types
 
 **Status: ACTIVE**
@@ -725,6 +784,7 @@ Use `var(--ds-*, #{$scss-fallback})`. The CSS custom property adapts at runtime;
 
 ---
 
+<a id="ap-047"></a>
 ## AP-047: Static Colored Text Palette Step Across Both Modes
 
 **Status: ACTIVE**
@@ -739,6 +799,7 @@ Use `var(--ds-*, #{$scss-fallback})`. The CSS custom property adapts at runtime;
 
 ---
 
+<a id="ap-048"></a>
 ## AP-048: Incremental State-by-State Implementation Without a Holistic Model
 
 **Status: ACTIVE**
@@ -753,6 +814,7 @@ Use `var(--ds-*, #{$scss-fallback})`. The CSS custom property adapts at runtime;
 
 ---
 
+<a id="ap-048-b"></a>
 ## AP-048: Independent Padding Decisions Across Adjacent Panels
 
 **Status: ACTIVE**
@@ -767,6 +829,7 @@ Use `var(--ds-*, #{$scss-fallback})`. The CSS custom property adapts at runtime;
 
 ---
 
+<a id="ap-049"></a>
 ## AP-049: Taxonomy-Based Navigation Grouping That Splits Related Components
 
 **Trigger:** Organizing a component sidebar by abstract type ("what it is") rather than usage context ("where/how a developer uses it"), causing parent-child or sibling components to land in different categories.
@@ -779,6 +842,7 @@ Use `var(--ds-*, #{$scss-fallback})`. The CSS custom property adapts at runtime;
 
 ---
 
+<a id="ap-050"></a>
 ## AP-050: Subtle-Emphasis Overlay Badges Blending with Parent Surface
 
 **Trigger:** Using `emphasis="subtle"` (gray tinted fill) on a Badge that overlays a neutral-surface component (e.g., collapsed NavItem, toolbar button, avatar). The subtle fill has near-zero contrast against the parent's own neutral background.
@@ -791,6 +855,7 @@ Use `var(--ds-*, #{$scss-fallback})`. The CSS custom property adapts at runtime;
 
 ---
 
+<a id="ap-051"></a>
 ## AP-051: Box-Model Gap on Elements with Positioned Overlays
 
 **Trigger:** Using standard flex/grid `gap` values (e.g., `gap-1`) between stacked elements that contain `position: absolute` overlay indicators (badge overlays, status dots, notification pips) without accounting for the overlay's visual protrusion.
@@ -803,6 +868,7 @@ Use `var(--ds-*, #{$scss-fallback})`. The CSS custom property adapts at runtime;
 
 ---
 
+<a id="ap-051-b"></a>
 ## AP-051: Recreating Badge/Tag/Pill Styling with Raw `<span>` + Custom SCSS
 
 **Status: ACTIVE**
@@ -817,6 +883,7 @@ Use `var(--ds-*, #{$scss-fallback})`. The CSS custom property adapts at runtime;
 
 ---
 
+<a id="ap-052"></a>
 ## AP-052: Typography Mixin Color Clobbering On-Color Text
 
 **Status: ACTIVE**
@@ -833,6 +900,7 @@ Use `var(--ds-*, #{$scss-fallback})`. The CSS custom property adapts at runtime;
 
 ---
 
+<a id="ap-053"></a>
 ## AP-053: Reimplementing DS Components in Bespoke Visualizations
 
 **Status: ACTIVE**
@@ -847,6 +915,7 @@ Use `var(--ds-*, #{$scss-fallback})`. The CSS custom property adapts at runtime;
 
 ---
 
+<a id="ap-054"></a>
 ## AP-054: Ad-Hoc Heading Elements in Playground Documentation
 
 **Status: ACTIVE**
@@ -861,6 +930,7 @@ Use `var(--ds-*, #{$scss-fallback})`. The CSS custom property adapts at runtime;
 
 ---
 
+<a id="ap-054-b"></a>
 ## AP-054: Changing border-width on State Transitions
 
 **Trigger:** Writing CSS that changes `border-width` (or `border-bottom-width`) on `:focus`, `:focus-within`, `:hover`, or `:active`.
@@ -916,6 +986,7 @@ Multiple engineering iterations misread AP-054 as binding the value *and* the st
 
 ---
 
+<a id="ap-058"></a>
 ## AP-058: Overlapping Visual Language — Line-on-Line Ambiguity
 
 **Trigger:** Nesting a component that uses a line-based visual treatment (e.g., `Input emphasis="minimal"` with its bottom-border underline) inside a container that already uses lines for a different semantic purpose (e.g., `MenuSeparator` divider lines, `MenuHeader`/`MenuFooter` border lines).
@@ -928,6 +999,7 @@ Multiple engineering iterations misread AP-054 as binding the value *and* the st
 
 ---
 
+<a id="ap-059"></a>
 ## AP-059: Treating Structural Slots Like Content Rows
 
 **Trigger:** Giving a structural slot (header, footer, toolbar area) the same padding as a content row (menu item, list item) when the slot wraps a child component that already has its own internal padding/sizing.
@@ -940,6 +1012,7 @@ Multiple engineering iterations misread AP-054 as binding the value *and* the st
 
 ---
 
+<a id="ap-060"></a>
 ## AP-060: Mismatched Size Keywords Across Shared-Scale Components
 
 **Trigger:** Using `size="xs"` on a component (Input, Button) nested inside a container that defaults to `size="md"` (Menu, DropdownMenu), when both components share the same spatial scale (identical icon/font/padding values at each size step).
@@ -952,6 +1025,7 @@ Multiple engineering iterations misread AP-054 as binding the value *and* the st
 
 ---
 
+<a id="ap-062"></a>
 ## AP-062: Same Text Color for Default and Hover on Light Surfaces
 
 **Trigger:** Setting a component's hover state to change only the background color without also boosting the text and icon color to maximum contrast.
@@ -964,6 +1038,7 @@ Multiple engineering iterations misread AP-054 as binding the value *and* the st
 
 ---
 
+<a id="ap-061"></a>
 ## AP-061: Lifting Button Spacing 1:1 Into Dense List Components
 
 **Trigger:** Creating a list-based component (Menu, Sidebar, CommandPalette) and copying the Button's gap/padding scale verbatim for all five sizes.
@@ -976,6 +1051,7 @@ Multiple engineering iterations misread AP-054 as binding the value *and* the st
 
 ---
 
+<a id="ap-055"></a>
 ## AP-055: Disproportionate Icon Size Relative to Text Scale
 
 **Trigger:** Setting icon dimensions (width/height) without checking the corresponding font-size at the same size variant — especially at small sizes where 2px differences are perceptually significant.
@@ -988,6 +1064,7 @@ Multiple engineering iterations misread AP-054 as binding the value *and* the st
 
 ---
 
+<a id="ap-063"></a>
 ## AP-063: Tailwind Utility Classes in Playground Doc Infrastructure
 
 **Trigger:** Using Tailwind className strings (`"text-sm text-muted-foreground"`, `cn("bg-white", ...)`) in playground documentation infrastructure files (`token-grid.tsx`, `component-preview.tsx`, `scroll-spy.tsx`, token page files) when the Élan DS provides equivalent `var(--portfolio-*)` custom properties and SCSS mixins.
@@ -1000,6 +1077,7 @@ Multiple engineering iterations misread AP-054 as binding the value *and* the st
 
 ---
 
+<a id="ap-064"></a>
 ## AP-064: Native `<input>` Text Rendering for Display-Scale Serif Fonts
 
 **Trigger:** Using a native `<input>` element to render serif text at display scale (2rem+), where glyph flourishes (tittles, hooks, swashes) have negative left side-bearing.
@@ -1012,6 +1090,7 @@ Multiple engineering iterations misread AP-054 as binding the value *and* the st
 
 ---
 
+<a id="ap-066"></a>
 ## AP-066: Unconstrained Flex Compression Breaking Identity Text
 
 **Status: ACTIVE**
@@ -1043,6 +1122,7 @@ Rule of thumb: **if losing a piece of text to clipping would be worse than losin
 
 ---
 
+<a id="ap-065"></a>
 ## AP-065: Centered-Align Footer Text Below Left-Aligned Form Elements
 
 **Trigger:** Using `text-align: center` on helper/footer text below a left-aligned input field or form group, where the form and footer share a narrow container.
@@ -1071,6 +1151,7 @@ Rule of thumb: **if losing a piece of text to clipping would be worse than losin
 
 ---
 
+<a id="ap-055-b"></a>
 ### AP-055: Hand-picked hex values for color scales
 
 **Trigger:** Building a color scale by selecting individual hex values by eye, without verifying perceptual uniformity in a color space like OKLCH.
@@ -1083,6 +1164,7 @@ Rule of thumb: **if losing a piece of text to clipping would be worse than losin
 
 ---
 
+<a id="ap-056"></a>
 ### AP-056: Exposing design system tokens in user-facing UI
 
 **Trigger:** Displaying token names (`$portfolio-font-sans`), CSS variable names, rem values, or other internal implementation identifiers in menus, dropdowns, or labels visible to end users.
@@ -1095,6 +1177,7 @@ Rule of thumb: **if losing a piece of text to clipping would be worse than losin
 
 ---
 
+<a id="ap-060-b"></a>
 ### AP-060: Inconsistent external link visual treatments
 
 **Trigger:** Creating a new external link with different color, font weight, or arrow indicator than existing external links on the site.
@@ -1107,6 +1190,7 @@ Rule of thumb: **if losing a piece of text to clipping would be worse than losin
 
 ---
 
+<a id="ap-057"></a>
 ### AP-057: Bypassing DS components with custom-styled native elements
 
 **Trigger:** Using a plain `<Link>` or `<a>` with custom CSS (e.g., `.backLink`) for a button-like action when a design system `Button` component exists.
@@ -1119,6 +1203,7 @@ Rule of thumb: **if losing a piece of text to clipping would be worse than losin
 
 ---
 
+<a id="ap-061-b"></a>
 ### AP-061: Uniform step inversion for atmospheric/decorative colors
 
 **Trigger:** Applying standard brightness inversion (step-60 light to step-100/70 dark) to a Tier 2 (brand/marketing) color whose purpose is atmospheric rather than functional.
@@ -1131,6 +1216,7 @@ Rule of thumb: **if losing a piece of text to clipping would be worse than losin
 
 ---
 
+<a id="ap-062-b"></a>
 ### AP-062: Using non-native font-weight with single-weight decorative fonts
 
 **Trigger:** Applying `font-weight: bold` (700) or any weight other than 500 to a Geist Pixel variant font (Line, Grid, Square, Circle, Triangle).
@@ -1143,6 +1229,7 @@ Rule of thumb: **if losing a piece of text to clipping would be worse than losin
 
 ---
 
+<a id="ap-067"></a>
 ### AP-067: Min-Width Floor on a Root Wrapper That Contains Functional Chrome
 
 **Trigger:** Applying `min-width: $floor` (or any width constraint) to a top-level layout wrapper that holds both scrollable content AND functional chrome (nav, footer, cookie banners, global CTAs) in the same flex/grid tree.
@@ -1175,6 +1262,7 @@ Rule of thumb: **content can opinionate minimum width; functional chrome must al
 
 ---
 
+<a id="ap-068"></a>
 ### AP-068: Relying on Grid Track Minimum Alone to Prevent Text Wrap in a One-Line-Per-Item List
 
 **Trigger:** Using `grid-template-columns: repeat(auto-fit, minmax(Npx, 1fr))` or `minmax(Nmin, Nmax)` to guarantee that list items (company names, product names, dates, IDs) render on one line — relying *only* on the track min being ≥ the longest item's rendered width.
@@ -1205,6 +1293,7 @@ Classify each column's role up front: **rigid** columns (structural one-line rul
 
 ---
 
+<a id="ap-069"></a>
 ### AP-069: `mix-blend-mode` Applied Inside a Fixed-Position (or Otherwise Stacking-Context-Creating) Ancestor
 
 **Status: ACTIVE**
@@ -1257,6 +1346,7 @@ return (
 
 ---
 
+<a id="ap-070"></a>
 ### AP-070: framer-motion `x` / `y` / `scale` / `rotate` Animation on an Element with a Base CSS `transform`
 
 **Status: ACTIVE**
@@ -1297,6 +1387,7 @@ return (
 
 ---
 
+<a id="ap-072"></a>
 ### AP-072: Orientation-Blind Content Layout in Variable-Size Containers
 
 **Status: ACTIVE**
@@ -1332,6 +1423,7 @@ return (
 
 ---
 
+<a id="ap-071"></a>
 ### AP-071: Brand Accent as General-Purpose Highlight in Embedded Visuals
 
 **Status: ACTIVE**

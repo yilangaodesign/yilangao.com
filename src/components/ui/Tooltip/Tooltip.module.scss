@@ -51,8 +51,15 @@ $_tooltip-slide-distance: $portfolio-spacer-0-5x;
 .neutral {
   background-color: var(--portfolio-surface-neutral-regular);
   color: var(--portfolio-text-neutral-bold);
-  border: $portfolio-spacer-0-125x solid var(--portfolio-border-neutral-subtle);
   box-shadow: var(--portfolio-shadow-sm);
+  // Use drop-shadow to trace the composite shape (box + caret) with a single
+  // continuous border. A CSS `border` only wraps the box, creating a visible
+  // seam where the arrow meets the edge.
+  filter:
+    drop-shadow(1px 0 0 var(--portfolio-border-neutral-subtle))
+    drop-shadow(-1px 0 0 var(--portfolio-border-neutral-subtle))
+    drop-shadow(0 1px 0 var(--portfolio-border-neutral-subtle))
+    drop-shadow(0 -1px 0 var(--portfolio-border-neutral-subtle));
 }
 
 .brand {
@@ -92,8 +99,6 @@ $_tooltip-slide-distance: $portfolio-spacer-0-5x;
 
 .caretNeutral {
   fill: var(--portfolio-surface-neutral-regular);
-  stroke: var(--portfolio-border-neutral-subtle);
-  stroke-width: $portfolio-spacer-0-125x;
 }
 
 .caretBrand {

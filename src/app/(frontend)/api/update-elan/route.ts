@@ -5,10 +5,10 @@ import { markdownToLexical, createCaseStudyBlocks } from '@/lib/content-helpers'
 import { INTRO_HEADLINE_BY_SLUG } from '@/lib/case-study-intro-headline'
 
 const BLURB_BODY =
-  "I built a design system for vibe coding. You've probably heard this story before. You may have built your own, or at least thought about it.\n\nThis isn't about that. Everyone's excited about making design systems readable to agents. I want to show you what happened when I documented the failures instead - each correction became a rule the agent couldn't break next time. After forty sessions, the corrections nearly disappeared. Not because the work got easier."
+  "Every day is a first date. Sounds romantic for a married couple. Sounds like a nightmare for a working relationship.\n\nThat's me and my agent: a Severance-style collaboration where nothing learned from one session carries to the next. After being burned the 50th time, I realized one thing: intelligence was never the bottleneck, context is.\n\nSo I built the memory it never had. Gradually, we stopped starting over. Forty sessions. Fifteen corrections became three. The agent didn't get smarter. It just stopped forgetting."
 
 const SCOPE_STATEMENT =
-  "[Élan](https://yilangao-design-system.vercel.app) spans three Next.js apps with tokens, components, and a playground, published as an npm package. I'm the sole designer and engineer. The visual layer took effort, but it's not where most of the time went. Underneath: 16 skills routing my corrections into documentation, 130+ anti-patterns encoding what not to repeat, and an escalation protocol deciding when a rule stops being optional. Over 40+ sessions, corrections dropped from 15 fundamental issues per session to 3 refinement-level ones."
+  "[Élan](https://yilangao-design-system.vercel.app) spans three Next.js apps with tokens, components, and a playground, published as an npm package. I'm the sole designer and engineer. Underneath the visual layer: 16 skills routing my corrections into documentation, 130+ anti-patterns encoding what not to repeat, and an escalation protocol deciding when a rule stops being optional. Over 40+ sessions, corrections dropped from 15 fundamental issues per session to 3 refinement-level ones."
 
 const CONTENT_BLOCKS = createCaseStudyBlocks(
   [
@@ -38,7 +38,7 @@ const CONTENT_BLOCKS = createCaseStudyBlocks(
 const ELAN_DATA = {
   title: 'Élan Design System',
   slug: 'elan-design-system',
-  category: 'Design Systems \u00b7 AI Collaboration Architecture',
+  category: 'Design Systems \u00b7 Self-Improving AI Collaboration',
   featured: true,
   order: 3,
   introBlurbHeadline: INTRO_HEADLINE_BY_SLUG['elan-design-system'],

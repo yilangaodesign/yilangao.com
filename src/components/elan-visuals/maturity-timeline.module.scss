@@ -188,6 +188,20 @@
   background: $portfolio-accent-20;
 }
 
+// Recurrence segment tones — Plan B citation classification
+// recurrent (cited AP, mature signal) → approximate → novel (still surfacing)
+.recurrenceDark {
+  background: $portfolio-cyan-50;
+}
+
+.recurrenceMid {
+  background: $portfolio-cyan-30;
+}
+
+.recurrenceLight {
+  background: $portfolio-cyan-10;
+}
+
 // ── Trend line overlay ──────────────────────────────────────────────────────
 
 .trendOverlay {
@@ -405,6 +419,18 @@
 
 .legendAccentLight {
   background: $portfolio-accent-20;
+}
+
+.legendRecurrenceDark {
+  background: $portfolio-cyan-50;
+}
+
+.legendRecurrenceMid {
+  background: $portfolio-cyan-30;
+}
+
+.legendRecurrenceLight {
+  background: $portfolio-cyan-10;
 }
 
 .legendTrendLine {
