@@ -6,6 +6,6 @@
 export const HOME_CASE_SUBLINE_BY_SLUG: Record<string, string> = {
   meteor: 'Goldman Sachs · Exception-Review Workflow',
   lacework: 'Lacework · Consumption-Based Usage Dashboard',
-  'elan-design-system': 'Élan Design System · Self-Improving AI Generation',
+  'elan-design-system': 'Élan Design System · Self-Improving AI Collaboration',
   'etro-framework': 'Opinion · AI Trust Architecture',
 }

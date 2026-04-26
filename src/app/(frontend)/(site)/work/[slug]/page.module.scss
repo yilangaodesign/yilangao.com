@@ -372,39 +372,13 @@ $_nav-height: 45px;
   font-weight: $portfolio-weight-medium;
   color: $portfolio-text-primary;
   line-height: 1.65;
+  @include prose-paragraph-spacing;
 }
 
 .articleSeparator {
   border: none;
   border-top: 1px solid $portfolio-border-subtle;
   margin: $portfolio-spacer-layout-spacious 0;
-}
-
-.legacyDescription {
-  margin-bottom: $portfolio-spacer-4x;
-}
-
-.legacyDescriptionText {
-  @include body-base;
-  line-height: $portfolio-leading-relaxed;
-  color: $portfolio-text-secondary;
-
-  a {
-    color: $portfolio-text-primary;
-    text-decoration: none;
-    white-space: nowrap;
-    @include transition-fast;
-
-    &::after {
-      content: " \2197";
-      @include caption;
-      opacity: 0.5;
-    }
-
-    &:hover {
-      color: $portfolio-text-secondary;
-    }
-  }
 }
 
 .divider {
@@ -640,6 +614,7 @@ $_nav-height: 45px;
   line-height: $portfolio-leading-relaxed;
   color: $portfolio-text-secondary;
   margin-bottom: $portfolio-spacer-4x;
+  @include prose-paragraph-spacing;
 
   a {
     color: $portfolio-text-primary;
