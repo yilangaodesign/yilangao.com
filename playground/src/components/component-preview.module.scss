@@ -69,6 +69,11 @@
   justify-content: center;
 }
 
+.previewPaneFlush {
+  background-color: var(--preview-bg, var(--portfolio-surface-neutral-minimal));
+  min-height: 140px;
+}
+
 .codePane {
   overflow-x: auto;
   background-color: var(--code-bg, var(--portfolio-surface-inverse-bold));
