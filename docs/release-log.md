@@ -4,7 +4,29 @@
 >
 > **Who reads this:** AI agents when the `ship-it` skill is activated — scan recent entries for recurring pitfalls before starting a new release.
 > **Who writes this:** AI agents after each ship-it run via the Post-Release Audit protocol in `ship-it/SKILL.md`.
-> **Last updated:** 2026-04-25 (REL-027: Élan 2.13.2, ASCII Art Studio 0.6.17)
+> **Last updated:** 2026-04-26 (REL-028: Élan 2.13.3, ASCII Art Studio 0.6.18)
+
+---
+
+## REL-028 — Élan 2.13.3, ASCII Art Studio 0.6.18 (2026-04-26)
+
+**Scope:** 12 files across 3 dependency-ordered layer commits (L1 docs x4, L7 site components x1, L8 frontend/lib x7) + 1 release commit + 1 dev-patch-bump commit. Layers 0, 2-6, 9-10 empty.
+**Semver:** Patch for both apps (analytics instrumentation additions, new internal tag-owner API route, company data layer expansion, engineering docs updates).
+**Previous release:** Élan 2.13.2, ASCII Art Studio 0.6.17
+
+**Incidents during release:**
+1. **Dev-patch-bump commit message substitution failed:** Used escaped-quote node -p substitution inside `git commit -m "..."` for the chore bump commit. Commit was created as "chore: begin Élan , ASCII Art Studio". Already pushed — cannot amend. REL-AP-008 already documented; will apply pre-captured variable pattern for ALL commits in future, not just the release commit.
+
+**Build gate:** All 3 apps passed on first attempt. Playground ~22s, main site ~31s, ASCII Art Studio ~12s.
+
+**Post-deploy verification:** `vercel ls` confirmed `yilangao-design-system` (playground) Ready at 2m and `yilangao-portfolio` (main site) Ready at 5m post-push.
+
+**Layer classification notes:**
+- `src/collections/Companies.ts` classified as Layer 8 (frontend/lib) since it's a CMS collection config alongside `src/lib/*` changes in the same thematic group (company data layer).
+- `src/scripts/push-schema.ts` also classified as Layer 8 — it's a utility supporting the CMS schema updates in this batch.
+- `docs/initiatives/docs-knowledge-graph-initiative.md` classified as Layer 1 (new docs file, untracked).
+
+**Known Pitfall references:** REL-AP-008 recurred on the dev-patch-bump commit (not the release commit). The fix from REL-AP-008 was applied correctly for the release commit but missed on the subsequent chore commit.
 
 ---
 
