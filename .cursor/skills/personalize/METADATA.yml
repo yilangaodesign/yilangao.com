@@ -1,0 +1,7 @@
+type: skill
+id: skill-personalize
+topics:
+  - engineering
+  - content
+references:
+  - AGENTS.md

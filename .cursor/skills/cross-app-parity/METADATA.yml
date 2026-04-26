@@ -1,0 +1,9 @@
+type: skill
+id: skill-cross-app-parity
+topics:
+  - parity
+  - engineering
+enforces:
+  - AGENTS.md
+references:
+  - engineering.md

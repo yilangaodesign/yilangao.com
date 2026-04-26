@@ -1,0 +1,8 @@
+type: skill
+id: skill-orchestrator
+topics:
+  - engineering
+  - design
+  - content
+references:
+  - AGENTS.md

@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "docs-graph": {
+      "command": "node",
+      "args": ["scripts/mcp-graph-server.mjs"],
+      "description": "Docs knowledge graph: query-node, subgraph, search over .cache/graph.json"
+    }
+  }
+}

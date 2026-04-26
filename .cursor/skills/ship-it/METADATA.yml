@@ -1,0 +1,8 @@
+type: skill
+id: skill-ship-it
+topics:
+  - release
+  - engineering
+references:
+  - AGENTS.md
+  - engineering.md

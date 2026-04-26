@@ -1,0 +1,7 @@
+type: skill
+id: skill-doc-audit
+topics:
+  - engineering
+references:
+  - AGENTS.md
+  - knowledge-graph.md

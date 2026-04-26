@@ -1,0 +1,6 @@
+type: skill
+id: skill-plan-structure
+topics:
+  - engineering
+references:
+  - AGENTS.md

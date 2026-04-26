@@ -1,0 +1,6 @@
+type: skill
+id: skill-plan-audit
+topics:
+  - engineering
+references:
+  - AGENTS.md

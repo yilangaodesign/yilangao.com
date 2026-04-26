@@ -1,0 +1,9 @@
+type: skill
+id: skill-playground
+topics:
+  - playground
+  - engineering
+enforces:
+  - AGENTS.md
+references:
+  - engineering.md

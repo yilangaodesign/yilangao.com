@@ -1,0 +1,9 @@
+type: skill
+id: skill-engineering-iteration
+topics:
+  - engineering
+references:
+  - AGENTS.md
+  - engineering.md
+  - engineering-anti-patterns.md
+  - engineering-feedback-log.md

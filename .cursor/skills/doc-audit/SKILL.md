@@ -55,6 +55,10 @@ Hub docs:
 - `docs/architecture.md`
 - `docs/port-registry.md`
 - `docs/magic-words.md`
+- `docs/knowledge-graph.md` (graph spec — read when verifying frontmatter/anchor conventions)
+- `docs/cluster-validation-report.md` (advisory cluster output, if present)
+- `docs/eng-renumber-log.md` (if present — feedback-log renumbering history)
+- `docs/candidate-anti-patterns.md` (if present — Plan B's outstanding patterns awaiting promotion)
 
 Spoke directories (scan all files in each):
 - `docs/design/*.md`
@@ -133,6 +137,18 @@ Verify that parallel docs follow the same patterns:
 - Do all three anti-pattern catalogs include a category index?
 - Do hub files correctly link to their spoke files?
 - Do synthesis files accurately reflect the themes in the archived entries?
+
+### Check F: Graph Topology
+
+Read the static report's "Graph Topology" sections and the contents of `.cache/graph.json` (regenerate via `npm run build-graph` if stale or missing). Verify:
+- **Broken anchors** — every edge target resolves to either a node ID or an HTML anchor that exists. New broken anchors after the last audit indicate either a typo in a frontmatter `references:` array or a renamed file/anchor without a co-edit. Fix the source, not the cache.
+- **Orphan anti-patterns** — every entry in `docs/{design,engineering,content}-anti-patterns.md` has at least one inbound `enforcedBy` edge. An orphan AP has been catalogued but no rule, skill, or feedback entry cites it; either backfill the citation or downgrade the entry to a candidate.
+- **Topic vocabulary cap** — `docs/knowledge-graph.md` §9 has at most 35 terms, and every frontmatter `topics:` entry is in the list. New entries appearing as warnings are drift candidates; consolidate them into existing terms before extending the cap.
+- **Frontmatter schema** — every node has a known `type:` value. An "unknown type" warning means a hand-edit slipped in a non-standard string; align with §3 of `docs/knowledge-graph.md` or extend the schema deliberately.
+- **Anchor uniqueness** — no two nodes share the same ID. Collisions almost always indicate a copy-paste error in a frontmatter `id:` field.
+- **Graph staleness** — the cache's `mtime` is newer than every watched file. A stale cache means an agent skipped Hard Guardrail 27 (`npm run build-graph && npm run audit-docs` after structural changes); rebuild and re-audit.
+
+These checks are gated by the `--quick` flag — `npm run audit-docs:quick` skips them; the full audit runs them. During scheduled doc audits, always run the full version.
 
 ## Step 3: Fix What You Can
 

@@ -1,0 +1,9 @@
+type: rule
+id: rule-playground-components
+topics:
+  - engineering
+  - playground
+enforces:
+  - AGENTS.md
+references:
+  - AGENTS.md

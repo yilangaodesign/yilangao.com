@@ -1,0 +1,9 @@
+type: skill
+id: skill-password-gate
+topics:
+  - engineering
+  - security
+enforces:
+  - AGENTS.md
+references:
+  - engineering.md
