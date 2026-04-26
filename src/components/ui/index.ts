@@ -226,3 +226,21 @@ export { TestimonialCard } from "./TestimonialCard";
 export type { TestimonialCardProps } from "./TestimonialCard";
 export { ThemeProvider } from "./ThemeProvider";
 export { ThemeToggle } from "./ThemeToggle";
+
+// Tier 7 — Data Visualization
+export { Canvas } from "./Canvas";
+export type { CanvasProps, CanvasTransform } from "./Canvas";
+
+export { ForceGraph } from "./ForceGraph";
+export type {
+  ForceGraphProps,
+  ForceGraphNode,
+  ForceGraphLink,
+  ForceGraphTransform,
+} from "./ForceGraph";
+
+export { CanvasToolbar } from "./CanvasToolbar";
+export type {
+  CanvasToolbarProps,
+  CanvasToolbarItem,
+} from "./CanvasToolbar";
