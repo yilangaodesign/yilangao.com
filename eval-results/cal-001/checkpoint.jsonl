@@ -1,0 +1,12 @@
+{"arm":"B","task_id":"cal-C001","rep":1,"cost_usd":0,"cumulative_cost_usd":0,"has_response":true,"timestamp":"2026-04-28T04:58:45.926Z"}
+{"arm":"B","task_id":"cal-C002","rep":1,"cost_usd":0,"cumulative_cost_usd":0,"has_response":true,"timestamp":"2026-04-28T04:59:20.411Z"}
+{"arm":"B","task_id":"cal-C003","rep":1,"cost_usd":0,"cumulative_cost_usd":0,"has_response":true,"timestamp":"2026-04-28T05:00:04.379Z"}
+{"arm":"R","task_id":"cal-C001","rep":1,"cost_usd":0,"cumulative_cost_usd":0,"has_response":false,"timestamp":"2026-04-28T05:00:48.491Z"}
+{"arm":"R","task_id":"cal-C002","rep":1,"cost_usd":0,"cumulative_cost_usd":0,"has_response":true,"timestamp":"2026-04-28T05:01:29.731Z"}
+{"arm":"R","task_id":"cal-C003","rep":1,"cost_usd":0,"cumulative_cost_usd":0,"has_response":true,"timestamp":"2026-04-28T05:03:23.047Z"}
+{"arm":"P","task_id":"cal-C001","rep":1,"cost_usd":0,"cumulative_cost_usd":0,"has_response":false,"timestamp":"2026-04-28T05:04:12.716Z"}
+{"arm":"P","task_id":"cal-C002","rep":1,"cost_usd":0,"cumulative_cost_usd":0,"has_response":true,"timestamp":"2026-04-28T05:05:03.128Z"}
+{"arm":"P","task_id":"cal-C003","rep":1,"cost_usd":0,"cumulative_cost_usd":0,"has_response":false,"timestamp":"2026-04-28T05:05:36.128Z"}
+{"arm":"T","task_id":"cal-C001","rep":1,"cost_usd":0,"cumulative_cost_usd":0,"has_response":false,"timestamp":"2026-04-28T05:07:21.276Z"}
+{"arm":"T","task_id":"cal-C002","rep":1,"cost_usd":0,"cumulative_cost_usd":0,"has_response":true,"timestamp":"2026-04-28T05:08:08.308Z"}
+{"arm":"T","task_id":"cal-C003","rep":1,"cost_usd":0,"cumulative_cost_usd":0,"has_response":true,"timestamp":"2026-04-28T05:09:50.924Z"}
