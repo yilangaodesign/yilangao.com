@@ -202,7 +202,7 @@
   width: 28px;
   height: 28px;
   border-radius: $portfolio-radius-full;
-  background: $portfolio-purple-30;
+  background: $portfolio-accent-30;
   flex-shrink: 0;
 }
 
@@ -375,8 +375,8 @@
 }
 
 .vizDocRowNoMatch {
-  background: $portfolio-orange-10;
-  color: $portfolio-orange-60;
+  background: $portfolio-terra-10;
+  color: $portfolio-terra-60;
   font-weight: $portfolio-weight-medium;
   justify-content: center;
   gap: $portfolio-spacer-0-5x;
@@ -390,8 +390,8 @@
 .vizDocBadge {
   font-size: $portfolio-type-3xs;
   font-weight: $portfolio-weight-semibold;
-  color: $portfolio-orange-70;
-  background: $portfolio-orange-20;
+  color: $portfolio-terra-70;
+  background: $portfolio-terra-20;
   padding: 1px 6px;
   flex-shrink: 0;
 }
@@ -484,8 +484,8 @@
   font-weight: $portfolio-weight-medium;
   color: $portfolio-text-neutral-bold;
   padding: $portfolio-spacer-0-25x $portfolio-spacer-1x;
-  background: $portfolio-orange-10;
-  border: 1px solid $portfolio-orange-30;
+  background: $portfolio-terra-10;
+  border: 1px solid $portfolio-terra-30;
 }
 
 // ── Viz 5: State table ───────────────────────────────────────────────────────
