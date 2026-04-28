@@ -1,0 +1,238 @@
+{
+  "run_id": "full-001",
+  "aggregated_at": "2026-04-28T20:32:21.358Z",
+  "thresholds": {
+    "primary_preference_pct": 60,
+    "primary_preference_ci_floor": 50,
+    "citation_advantage_pp": 10,
+    "hallucination_tolerance_pp": 5,
+    "adversarial_max_cite": 0,
+    "judge_kappa_floor": 0.4,
+    "bootstrap_iterations": 10000,
+    "budget_cap_usd": 300
+  },
+  "total_judgments": 741,
+  "decisions": {
+    "rule_1": {
+      "name": "Primary preference T>R >= 60%",
+      "threshold": 60,
+      "observed": 63.1578947368421,
+      "ci_lower": 52.63157894736842,
+      "ci_floor_threshold": 50,
+      "pass": true
+    },
+    "rule_2": {
+      "name": "Citation advantage T>=R+10pp (subtle)",
+      "threshold_pp": 10,
+      "observed_advantage_pp": 57.89473684210526,
+      "pass": true
+    },
+    "rule_3": {
+      "name": "Non-inferiority on hallucination T<=R+5pp",
+      "threshold_pp": 5,
+      "observed_wrong_t": 60.526315789473685,
+      "observed_wrong_r": 52.63157894736842,
+      "difference": 7.894736842105267,
+      "pass": false
+    },
+    "rule_5_adherence": {
+      "name": "Inter-judge agreement (adherence) kappa >= 0.4",
+      "threshold": 0.4,
+      "observed": 0.2408289798495893,
+      "pass": false
+    },
+    "rule_5_quality": {
+      "name": "Inter-judge agreement (quality) kappa >= 0.4",
+      "threshold": 0.4,
+      "observed": 0.2839901477832512,
+      "pass": false
+    }
+  },
+  "results": {
+    "T-R": {
+      "pair": "T-R",
+      "is_primary": true,
+      "n_judgments": 228,
+      "preference": {
+        "rate_pct": 63.1578947368421,
+        "ci_lower": 52.63157894736842,
+        "ci_upper": 73.68421052631578,
+        "n": 76,
+        "by_difficulty": {
+          "obvious": 55.35714285714286,
+          "subtle": 70.51282051282051
+        }
+      },
+      "citation": {
+        "gold_rate_a_pct": 75,
+        "gold_rate_b_pct": 17.105263157894736,
+        "gold_advantage_pp": 57.89473684210526,
+        "wrong_rate_a_pct": 60.526315789473685,
+        "wrong_rate_b_pct": 52.63157894736842,
+        "mcnemar": {
+          "chi2": 40.19565217391305,
+          "p": 2.3078672306553472e-10,
+          "b": 45,
+          "c": 1
+        }
+      },
+      "adherence": {
+        "wilcoxon": {
+          "stat": 5081.5,
+          "wPlus": 13639.5,
+          "wMinus": 5081.5,
+          "z": -5.506972469537456,
+          "p": 3.6596282448897455e-8,
+          "n": 193
+        },
+        "cohens_d": {
+          "d": 0.558542194746728,
+          "lower": 0.3714263262937811,
+          "upper": 0.7456580631996748
+        },
+        "kappa": 0.2408289798495893
+      },
+      "quality": {
+        "wilcoxon": {
+          "stat": 4344,
+          "wPlus": 12492,
+          "wMinus": 4344,
+          "z": -5.677526330663324,
+          "p": 1.3704406498504795e-8,
+          "n": 183
+        },
+        "cohens_d": {
+          "d": 0.5841592233254269,
+          "lower": 0.3967141575123602,
+          "upper": 0.7716042891384935
+        },
+        "kappa": 0.2839901477832512
+      },
+      "preference_kappa": 0.5320263288272352
+    },
+    "T-P": {
+      "pair": "T-P",
+      "is_primary": false,
+      "n_judgments": 213,
+      "preference": {
+        "rate_pct": 56.33802816901409,
+        "ci_lower": 45.07042253521127,
+        "ci_upper": 67.6056338028169,
+        "n": 71,
+        "by_difficulty": {
+          "obvious": 47.368421052631575,
+          "subtle": 64.28571428571429
+        }
+      },
+      "citation": {
+        "gold_rate_a_pct": 71.83098591549296,
+        "gold_rate_b_pct": 16.901408450704224,
+        "gold_advantage_pp": 54.929577464788736,
+        "wrong_rate_a_pct": 67.6056338028169,
+        "wrong_rate_b_pct": 66.19718309859155,
+        "mcnemar": {
+          "chi2": 37.02564102564103,
+          "p": 1.1702838698113283e-9,
+          "b": 39,
+          "c": 0
+        }
+      },
+      "adherence": {
+        "wilcoxon": {
+          "stat": 8853.5,
+          "wPlus": 9867.5,
+          "wMinus": 8853.5,
+          "z": -0.6524970885850643,
+          "p": 0.514080424776959,
+          "n": 193
+        },
+        "cohens_d": {
+          "d": 0.057999919535806826,
+          "lower": -0.13196462838767706,
+          "upper": 0.2479644674592907
+        },
+        "kappa": 0.3537208559565631
+      },
+      "quality": {
+        "wilcoxon": {
+          "stat": 7635.5,
+          "wPlus": 7635.5,
+          "wMinus": 8654.5,
+          "z": -0.7278144407115407,
+          "p": 0.4667270449196739,
+          "n": 180
+        },
+        "cohens_d": {
+          "d": -0.13499547601603504,
+          "lower": -0.3251362950563609,
+          "upper": 0.05514534302429078
+        },
+        "kappa": 0.45310810810810803
+      },
+      "preference_kappa": 0.45129608758654,
+      "holm_corrected_p": 0.514080424776959
+    },
+    "T-B": {
+      "pair": "T-B",
+      "is_primary": false,
+      "n_judgments": 300,
+      "preference": {
+        "rate_pct": 53.5,
+        "ci_lower": 44,
+        "ci_upper": 63,
+        "n": 100,
+        "by_difficulty": {
+          "obvious": 43.75,
+          "subtle": 62
+        }
+      },
+      "citation": {
+        "gold_rate_a_pct": 72,
+        "gold_rate_b_pct": 6,
+        "gold_advantage_pp": 66,
+        "wrong_rate_a_pct": 54,
+        "wrong_rate_b_pct": 93,
+        "mcnemar": {
+          "chi2": 58.68055555555556,
+          "p": 1.865174681370263e-14,
+          "b": 69,
+          "c": 3
+        }
+      },
+      "adherence": {
+        "wilcoxon": {
+          "stat": 15004.5,
+          "wPlus": 15004.5,
+          "wMinus": 20240.5,
+          "z": -2.096352193595932,
+          "p": 0.036050834190856085,
+          "n": 265
+        },
+        "cohens_d": {
+          "d": -0.21614765748583836,
+          "lower": -0.37664760250521717,
+          "upper": -0.055647712466459553
+        },
+        "kappa": 0.3989053235159972
+      },
+      "quality": {
+        "wilcoxon": {
+          "stat": 11962.5,
+          "wPlus": 11962.5,
+          "wMinus": 20422.5,
+          "z": -3.6091102464922087,
+          "p": 0.0003073220136116106,
+          "n": 254
+        },
+        "cohens_d": {
+          "d": -0.46036504096595776,
+          "lower": -0.6225043155263823,
+          "upper": -0.2982257664055332
+        },
+        "kappa": 0.43270411040706
+      },
+      "preference_kappa": 0.5128503267711797,
+      "holm_corrected_p": 0.07210166838171217
+    }
+  }
+}
