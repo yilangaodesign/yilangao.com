@@ -66,7 +66,7 @@ The last 30 entries from each of the three active feedback logs, with the APs th
 
 Each band has feedback entries on the left, cited APs on the right, edges colored by confidence (green = strong / 1.0, cyan = loose / 0.6).
 
-**Use this when:** you want to see what's actively recurring vs novel — the visual mirror of the `MaturityTimeline` "By recurrence" toggle. A feedback entry with no edge to an AP node is **novel** in the Plan B sense.
+**Use this when:** you want to see what's actively recurring vs novel — the visual mirror of recurrence classification. A feedback entry with no edge to an AP node is **novel** in the Plan B sense.
 
 ## Regeneration
 
@@ -94,4 +94,4 @@ These are non-obvious behaviors of Obsidian's Canvas that the exporter compensat
 
 ## When to consider a richer UI
 
-If you outgrow the three canvases — typical signs: zooming becomes painful, you want filterable views, you want to deep-link from outside Obsidian — the next step is the **in-site `KnowledgeGraph.tsx` viewer** discussed in [`docs/knowledge-graph.md`](../knowledge-graph.md) §15. That builds the same data into a queryable web UI on the portfolio site (Cytoscape/Sigma), mirroring the `MaturityTimeline` pattern.
+If you outgrow the three canvases — typical signs: zooming becomes painful, you want filterable views, you want to deep-link from outside Obsidian — the next step is the **in-site knowledge graph viewer** discussed in [`docs/knowledge-graph.md`](../knowledge-graph.md) §15. The `GraphCanvas` component on the case study page already renders the graph data; a standalone explorer page would extend this into a queryable web UI.

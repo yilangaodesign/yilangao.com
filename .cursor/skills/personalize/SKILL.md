@@ -181,6 +181,9 @@ Create the record with:
 - `altPasswords` -- if the user mentions having already shared a different
   password (e.g. on a resume or in a prior message), add the distributed
   password as an alt password entry: `altPasswords: [{ value: "the-password" }]`
+- `adminPassword` -- always `{password}_admin` (auto-generated from the primary
+  password, never user-facing). Used for owner analytics exclusion. The `_` is
+  cosmetic and stripped by normalization.
 
 ### 4b: Write Notes
 
@@ -222,6 +225,7 @@ available in the environment (falls back to `PAYLOAD_SECRET`, then
 | Greeting | **Always `"Welcome."`** -- never `"Hi, {Company} team"` or any variant |
 | Password | Human-sounding, completes the greeting -- never `slug-preview-year` patterns |
 | Alt passwords | Optional, set when multiple passwords may have been distributed (e.g. on a resume) |
+| Admin password | Always `{password}_admin` -- auto-generated from primary password, used for owner analytics exclusion |
 | Dev server | Must be running on port 4000 before Step 5 |
 | Payload auth | `payload-token` cookie required for all CMS API calls |
 
@@ -274,6 +278,8 @@ not a machine-generated access token. The password is a first impression.
 - Re-application: present existing record details, ask before modifying.
 - Slug rename: warn user about note delivery breakage for active sessions. Only
   rename if stale or zero logins.
+- When a company's primary password changes, update `adminPassword` to match
+  (`{new_password}_admin`).
 
 For detailed sub-procedures, see the **Protocols** section below.
 

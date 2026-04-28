@@ -18,47 +18,44 @@ derivedFrom:
 
 ## 1. Metric Defense
 
-### Hero Metric: "15 → 3" (corrections per session, first week to last)
+### Hero Metric: "~5K" (knowledge graph edges)
 
-**Derivation:** Counted from `docs/content-feedback-log.md`,
-`docs/design-feedback-log.md`, and `docs/engineering-feedback-log.md`. "Corrections"
-means design-relevant feedback entries - not engineering infrastructure bugs (Turbopack
-HMR, CMS sync, build errors) which are excluded from the count.
+**Derivation:** The knowledge graph contains ~4,892 typed edges across 6 relationship
+types (strengthens, supersedes, narrows, weakens, related, cites). Built from 200+
+anti-patterns, 18 skills, and 234 feedback entries across design, engineering, and content.
+Edge count sourced from `.cache/graph.json`.
 
-**Method:** Manual log analysis across 40+ sessions over 8 days (March 29 - April 5,
-2026). Early sessions (first 2-3 days) averaged approximately 15 corrections that
-touched fundamental design decisions (wrong tokens, inverted hierarchy, generic
-positioning language, incorrect section structure). Late sessions averaged approximately
-3 corrections, all at the refinement level (voice register calibration, headline
-technique selection, portfolio diversity constraints).
+**Method:** A regex extractor lifts cross-references between anti-patterns, skills,
+and feedback entries into typed edges with confidence scores. An audit enforcer validates
+new entries against the existing graph at write time — contradictions surface before they
+ship. The live graph is rendered on the case study page with an auto-transition tour.
 
-**Sample size:** 40+ logged sessions. Not a controlled experiment. No baseline
-comparison with a non-meta-system workflow.
+**What it measures:** The density of the system's interconnected knowledge. Not just how
+many rules exist, but how explicitly they relate to each other. A graph with ~5K edges
+means corrections don't exist in isolation — they form a queryable network of design
+judgment.
 
 **Limitations:**
-- The 15 and 3 are approximate session averages, not exact daily counts
-- Natural project maturation contributes to the decline - any designer gets more
-  efficient with a codebase over time, regardless of meta-system
-- The stronger evidence is the TYPE shift (fundamental → refinement), not the count
-  decline alone
-- Solo practitioner context - no evidence this scales to teams
-- 8-day window is short; long-term sustainability is unknown
+- Edge count alone doesn't indicate quality — some relationships may be weak or redundant
+- Solo practitioner context — no evidence this scales to teams
+- No baseline comparison yet (12-task eval corpus designed, baseline sealed, comparator pending)
 
 **Prepared response if challenged:**
-"The count decline tells part of the story, but the more interesting signal is the type
-shift. Early corrections were things like 'you used the wrong token' or 'the hierarchy
-is inverted' - fundamental errors. Late corrections were 'the voice register for this
-section should be more conversational' or 'this headline technique is already used in
-another case study' - refinement-level decisions that require taste, not rules. The
-meta-system eliminated a category of error, not just reduced its frequency."
+"The edge count is more interesting than the anti-pattern count because it measures
+relationships, not just entries. When one anti-pattern strengthens, supersedes, or narrows
+another, that's a typed edge the agent can query at decision time. 200+ isolated rules
+are a catalog; ~5K edges between them are a network. The eval framework I built — 12 tasks,
+LLM-as-judge, bare baseline vs full system — is designed to test whether the agent actually
+uses this network. The honest answer is I don't have results yet. The next deliverable
+is a number, not a feature."
 
 ## 2. Role Scope Precision
 
 **What was mine:**
 - All design decisions: token naming, component API design, interaction patterns,
   information architecture, visual hierarchy
-- The collaboration architecture: all 16 skills, the feedback loop structure, the
-  escalation protocol, the anti-pattern catalogs, the hard guardrails
+- The collaboration architecture: all 18 skills, the feedback loop structure, the
+  escalation protocol, the anti-pattern catalogs, the knowledge graph, the eval framework
 - Content strategy: case study thesis, section structure, voice calibration, narrative
   arc, portfolio coherence framework
 - All content writing: blurb, scope, section bodies (refined through the collaboration
@@ -91,10 +88,10 @@ not the employment context.
 
 **Prepared response if asked "Is this a real product?":**
 "It's a real design system used across three applications, published as an npm package.
-The interesting part isn't the product - it's the collaboration methodology. I built a
-system where a designer and an AI agent co-evolve design quality over time. The 130+
-anti-patterns and 16 skills are real artifacts from real design sessions. The methodology
-is what I'm demonstrating, not a product shipped to users."
+The interesting part isn't the product - it's the apparatus around it. I built a system
+where a designer and an AI agent co-evolve design quality over time. The 200+ anti-patterns,
+18 skills, and a ~5K-edge knowledge graph are real artifacts from real design sessions.
+The methodology is what I'm demonstrating, not a product shipped to users."
 
 **Team size:** Solo. No team management experience demonstrated here. Other case studies
 (Lacework, Meteor) demonstrate team collaboration.
@@ -120,7 +117,7 @@ feedback loop with teeth."
 ### "How is this different from writing a good design system README?"
 
 "A README tells an agent what components exist. The meta-system tells an agent how to
-think about design decisions. The 130+ anti-patterns aren't component docs - they're
+think about design decisions. The 200+ anti-patterns aren't component docs - they're
 encoded design judgment. Things like 'never use inline style attributes' or 'never treat
 repeated complaints incrementally - 3+ in the same category means the root cause is
 architectural.' A README doesn't get smarter over time. This does."

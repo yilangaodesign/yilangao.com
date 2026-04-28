@@ -83,31 +83,25 @@
 
 .tooltipDegrees {
   display: flex;
-  gap: $portfolio-spacer-1-5x;
+  align-items: baseline;
+  gap: $portfolio-spacer-0-5x;
   padding-top: $portfolio-spacer-0-5x;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   margin-top: $portfolio-spacer-0-5x;
 }
 
-.tooltipDegreeRow {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
 .tooltipDegreeValue {
   font-family: $portfolio-font-mono;
-  font-size: $portfolio-type-xs;
-  font-weight: $portfolio-weight-semibold;
-  letter-spacing: -0.02em;
-  color: $portfolio-neutral-00;
+  font-size: $portfolio-type-3xs;
+  letter-spacing: 0.02em;
+  opacity: 0.6;
 }
 
-.tooltipDegreeLabel {
+.tooltipDegreeSplit {
   font-family: $portfolio-font-mono;
   font-size: $portfolio-type-3xs;
-  letter-spacing: 0.04em;
-  opacity: 0.4;
+  letter-spacing: 0.02em;
+  opacity: 0.45;
 }
 
 .tooltipOrphan {

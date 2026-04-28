@@ -75,7 +75,7 @@
 
 .chartWithAxis {
   display: grid;
-  grid-template-columns: 24px 1fr;
+  grid-template-columns: 30px 1fr;
   grid-template-rows: auto auto;
   gap: 0 $portfolio-spacer-0-5x;
 }
@@ -173,19 +173,6 @@
 
 .domainContent {
   background: $portfolio-green-20;
-}
-
-// Lumen accent segment tones — severity view (darkest → lightest)
-.accentDark {
-  background: $portfolio-accent-50;
-}
-
-.accentMid {
-  background: $portfolio-accent-40;
-}
-
-.accentLight {
-  background: $portfolio-accent-20;
 }
 
 // Recurrence segment tones — Plan B citation classification
@@ -407,18 +394,6 @@
 
 .legendContent {
   background: $portfolio-green-20;
-}
-
-.legendAccentDark {
-  background: $portfolio-accent-50;
-}
-
-.legendAccentMid {
-  background: $portfolio-accent-40;
-}
-
-.legendAccentLight {
-  background: $portfolio-accent-20;
 }
 
 .legendRecurrenceDark {

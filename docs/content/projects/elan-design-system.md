@@ -21,15 +21,15 @@ derivedFrom:
 
 - **Thesis:** What happens when you stop designing for the agent and start designing
   with it. The designer's primary deliverable was not the components - it was the
-  collaboration architecture that produces them: 16 operational skills, 130+
-  anti-patterns, feedback loops, and an escalation protocol that promotes repeated
-  failures to hard constraints. Complementary to the industry's consumption work
+  apparatus around the design system: 18 operational skills, 200+ anti-patterns,
+  a knowledge graph with ~4,892 typed edges, and a measurement framework to validate
+  whether any of it works. Complementary to the industry's consumption work
   (MCP servers, metadata files), this demonstrates a different starting point:
   co-creation.
-- **Status:** draft-v3 (materialized to CMS via update-elan route). Tier 3
-  interactive components built (CollaborationLoop, SkillMap, MaturityTimeline).
-  Remaining: "session 1 vs session 40" before/after comparison in Section 1.
-- **Last significant edit:** 2026-04-06
+- **Status:** draft-v4 (materialized to CMS via update-elan route). 4 sections:
+  3 with Tier 3 interactive components (CollaborationLoop, SkillMap, GraphCanvas),
+  1 text-only closing ("Is Any of This Working?"). MaturityTimeline removed.
+- **Last significant edit:** 2026-04-28
 - **Quality check results:** Pending Phase 4 review.
 
 ## Positive Signals
@@ -82,7 +82,7 @@ derivedFrom:
 - 2026-04-03: "Feedback-Driven Component Library" section too high - **resolved by
   removing the section entirely; learning mechanism now in "How the System Learns."**
 - 2026-04-04: "120+ as hero metric doesn't tell me anything" - resolved by v3 hero
-  metric: "15 -> 3" (corrections per session, first week to last).
+  metric: "15 -> 3" (corrections per session). Later revised to "130+" (anti-patterns encoded) after data verification showed the declining count wasn't reproducible from API data.
 - 2026-04-04: "Don't over-index on engineering fixes" - reframed all sections around
   design corrections, not engineering bugs. Addressed in rebuild.
 - 2026-04-06: "Super dissatisfied with how the content is written" - full v3 rebuild.
@@ -106,7 +106,7 @@ derivedFrom:
 - Interactive visuals scoped to section topic - no general-purpose showcases
 - Information hierarchy: show the system/structure first, then rationale
 - Frame from designer's perspective: what design decisions were made, not what bugs were fixed
-- Hero metric must have derivation in scope statement (maturity-based: 15 -> 3)
+- Hero metric must have derivation in scope statement (knowledge-graph scale: ~5K edges)
 - **Narrative shape:** Translation Arc. Interview prep: see `elan-design-system-interview.md` (pending creation)
 
 ## Voice Samples
@@ -131,20 +131,27 @@ energy while tightening grammar and thesis coherence.
 
 ## Interactive Visual History
 
-### v3 (current)
+### v4 (current)
 
-- **CollaborationLoop:** Tier 3 (new). Section 1 "Not the Components." Design ref:
+- **CollaborationLoop:** Tier 3. Section 1 "Teach Once, Enforce Forever." Design ref:
   ccunpacked.dev "The Agent Loop" (sequential step-through with source display).
-  10-step guided walkthrough of the correction-to-rule lifecycle. Interaction:
+  8-step guided walkthrough of the correction-to-rule lifecycle. Interaction:
   play/pause, forward/back. Each step highlights the relevant document in a side panel.
-- **SkillMap:** Tier 3 (new). Section 2 "The System Behind the System." Design ref:
+- **SkillMap:** Tier 3. Section 2 "The System Behind the System." Design ref:
   ccunpacked.dev "Tool System" (card grid) + "Architecture Explorer" (treemap).
-  Dual-view component: View 1 "Operations" (16 skills by function), View 2 "Knowledge"
-  (130+ anti-patterns by domain as proportional blocks). Side panel for document
-  dependencies and origin incidents.
-- **MaturityTimeline:** Tier 3 (new). Section 3 "The Rising Floor." Stacked area/bar
-  chart showing correction density over time with severity color bands. Toggle between
-  "by severity" and "by domain." Annotations for milestones.
+  Dual-view component: View 1 "Operations" (18 skills by phase, dynamic count),
+  View 2 "Knowledge" (200+ anti-patterns by domain as proportional blocks).
+- **GraphCanvas:** Tier 3. Section 3 "The Living Graph." Force-directed knowledge
+  graph (~995 nodes, ~4,892 edges). Auto-transition loop: Signal (rotating hubs) →
+  Pathway → Mesh, 18s cycle. Tour stops on node click in Signal view. Viewport-gated.
+- Section 4 "Is Any of This Working?" is text-only (no interactive visual). Deliberate
+  gear shift: three interactive sections then prose and an honest question.
+
+### v3 (archived)
+
+- **MaturityTimeline:** Tier 3. Was Section 4 "The Rising Floor." Stacked percentage
+  bar chart showing correction recurrence breakdown over time. Removed: recurrence
+  data didn't trend meaningfully. Replaced by text-only closing section.
 
 ### v2 (archived)
 
@@ -161,22 +168,24 @@ energy while tightening grammar and thesis coherence.
 - **ComponentShowcase:** Dropped from v2. No section mapping.
 - **FunnelDiagram:** Dropped from v2. No section mapping.
 
-## Content Map (v3)
+## Content Map (v4)
 
-| Section | Heading | Technique | Interactive Visual | Artifact Tier | Beat |
-|---------|---------|-----------|-------------------|---------------|------|
-| Blurb | "Every day is a first date..." | T11 (Identification) + T8 (Verdict) | - | - | Hook + Stakes + Insight |
-| 1 | Not the Components | T7 (Framework Inversion) | CollaborationLoop | Tier 3 (new) | Reframe + Decisions |
-| 2 | The System Behind the System | T6 (Object Substitution) | SkillMap (dual-view) | Tier 3 (new) | Architecture + Decisions |
-| 3 | The Rising Floor | T6 (Object Substitution) | MaturityTimeline | Tier 3 (new) | Evidence + Residue |
+| Section | Heading | Interactive Visual | Artifact Tier | Narrative Beat |
+|---------|---------|-------------------|---------------|----------------|
+| Blurb | "Every day is a first date..." | - | - | Hook + Stakes + Insight |
+| 1 | Teach Once, Enforce Forever | CollaborationLoop | Tier 3 | Mechanism (Acts I-II) |
+| 2 | The System Behind the System | SkillMap (dual-view) | Tier 3 | Scale + Decay (Acts II-IV) |
+| 3 | The Living Graph | GraphCanvas | Tier 3 | The Graph (Act V) |
+| 4 | Is Any of This Working? | (text-only) | - | The Question (Acts VI-VIII) |
 
 ## Open Questions for Next Iteration
 
 1. **Session 1 vs Session 40 comparison:** The only remaining image placeholder in
    Section 1. Needs a before/after visual showing the same design task handled early
    vs. late in the project (demonstrating the maturity curve).
-2. **Metric verification:** Hero metric "15 -> 3" is approximate from log analysis.
-   Exact counts should be verified from feedback log entries by date range.
+2. **Metric verification:** Hero metric updated from "15 -> 3" to "130+" (anti-patterns
+   encoded). The declining correction count was not reproducible from API data; total
+   corrections per day trend upward as project scope expands.
 3. **Hero image:** Hero image asset still needed. Current placeholder describes the slot.
 
 ## Evolution Timeline
@@ -197,7 +206,8 @@ energy while tightening grammar and thesis coherence.
 - 2026-04-06: Full rebuild (v3). Thesis pivoted to "designing with the agent."
   Narrative shape changed to Translation Arc. All sections replaced. All interactive
   visuals replaced with Tier 3 components (CollaborationLoop, SkillMap, MaturityTimeline).
-  Hero metric changed from "54" to "15 -> 3" (maturity-based). Horseless carriage
+  Hero metric changed from "54" to "15 -> 3" (maturity-based), later revised to
+  "130+" (anti-patterns encoded) after data verification. Horseless carriage
   metaphor introduced for blurb. ccunpacked.dev visualization patterns adopted as
   design references.
 - 2026-04-06: Prose style rewrite (CF-022). Fragment chains in all sections replaced
@@ -219,14 +229,20 @@ energy while tightening grammar and thesis coherence.
   use personal agency ("I made it mandatory") not architectural abstraction. Section 3
   closes with emotional deflation ("The agent didn't get smarter.") instead of
   declarative framing. CAP-028 (Technique-as-Posturing) created.
+- 2026-04-28: v4 restructure (CF-032). Narrative arc redistributed: mechanism → scale + decay
+  → the graph → the question. MaturityTimeline removed (recurrence data didn't trend
+  meaningfully). Section 1 renamed to "Teach Once, Enforce Forever." GraphCanvas promoted
+  to Section 3 with auto-transition loop. New text-only Section 4 "Is Any of This Working?"
+  as closing. Hero metric changed from "130+" (anti-patterns) to "~5K" (knowledge graph
+  edges). All metrics updated to verified current numbers (18 skills, 200+ APs, ~4,892 edges).
 
 ## Portfolio Coherence Manifest Entry
 
 - **Narrative shape:** Translation Arc
 - **Headline technique:** T8 Verdict + Staccato Authority ("Harnessed my code production - 40 sessions in.")
 - **Voice register:** Conversational-irreverent
-- **Metric type:** Behavioral/maturity-based absolute (15 -> 3)
-- **Evidence method:** Interactive demo (3 Tier 3 components)
+- **Metric type:** Knowledge-graph scale (~5K edges)
+- **Evidence method:** Interactive demo (3 Tier 3 components: CollaborationLoop, SkillMap, GraphCanvas)
 - **Employment context:** Solo project / portfolio piece
 
 ## Cross-References

@@ -46,6 +46,10 @@ export interface CanvasProps {
   toolbar?: CanvasToolbarItem[];
   /** Callback when a toolbar item is clicked. */
   onToolbarItemClick?: (id: string) => void;
+  /** When true, the toolbar's active indicator shows a breathing pulse. */
+  toolbarAutoTour?: boolean;
+  /** Show the CSS dot grid. Set to false when a child draws its own grid. */
+  showGrid?: boolean;
   className?: string;
 }
 
@@ -53,7 +57,7 @@ export interface CanvasProps {
 
 const DEFAULT_HEIGHT = 500;
 const DEFAULT_GRID_SPACING = 20;
-const DEFAULT_DOT_COLOR = "var(--color-border)";
+const DEFAULT_DOT_COLOR = "var(--portfolio-border-subtle)";
 const DEFAULT_DOT_RADIUS = 1.5;
 const DEFAULT_MIN_ZOOM = 0.1;
 const DEFAULT_MAX_ZOOM = 8;
@@ -73,6 +77,8 @@ export default function Canvas({
   onTransformChange,
   toolbar,
   onToolbarItemClick,
+  toolbarAutoTour,
+  showGrid = true,
   className,
 }: CanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -86,6 +92,7 @@ export default function Canvas({
   });
   const isPanningRef = useRef(false);
   const [isPanningState, setIsPanningState] = useState(false);
+  const [toolbarHovered, setToolbarHovered] = useState(false);
   const panStartRef = useRef({ x: 0, y: 0, tx: 0, ty: 0 });
   const transformRef = useRef(internalTransform);
   const minZoomRef = useRef(minZoom);
@@ -360,10 +367,11 @@ export default function Canvas({
       }
       style={{ height }}
     >
-      <div ref={gridRef} className={styles.grid} style={gridVars} />
+      {showGrid && <div ref={gridRef} className={styles.grid} style={gridVars} />}
       <div
         ref={contentRef}
         className={[styles.content, manageTransform ? styles.contentManaged : ""].filter(Boolean).join(" ")}
+        style={toolbarHovered ? { pointerEvents: "none" } : undefined}
       >
         {manageTransform ? (
           <div
@@ -380,8 +388,12 @@ export default function Canvas({
         )}
       </div>
       {toolbar && toolbar.length > 0 && (
-        <div ref={toolbarRef}>
-          <CanvasToolbar items={toolbar} onItemClick={handleToolbarClick} />
+        <div
+          ref={toolbarRef}
+          onPointerEnter={() => setToolbarHovered(true)}
+          onPointerLeave={() => setToolbarHovered(false)}
+        >
+          <CanvasToolbar items={toolbar} onItemClick={handleToolbarClick} autoTour={toolbarAutoTour} />
         </div>
       )}
     </div>

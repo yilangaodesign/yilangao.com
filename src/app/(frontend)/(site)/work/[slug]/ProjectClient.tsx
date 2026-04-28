@@ -34,8 +34,7 @@ import {
   IncidentDensityMap,
   CollaborationLoop,
   SkillMap,
-  SystemVisuals,
-  MaturityTimeline,
+  GraphCanvas,
 } from "@/components/elan-visuals";
 import {
   DndContext,
@@ -276,8 +275,7 @@ const VISUAL_COMPONENTS: Record<string, React.ComponentType> = {
   IncidentDensityMap,
   CollaborationLoop,
   SkillMap,
-  SystemVisuals,
-  MaturityTimeline,
+  GraphCanvas,
 };
 
 function InteractiveVisual({ config }: { config: InteractiveVisualConfig }) {

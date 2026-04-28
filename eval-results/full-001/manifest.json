@@ -1,0 +1,20 @@
+{
+  "run_id": "full-001",
+  "started_at": "2026-04-28T05:21:17.836Z",
+  "generation_model": "anthropic/claude-4.6-sonnet",
+  "budget_cap_usd": 300,
+  "graph_sha": "26fe9ee6d1aceec450f25c123cd5ba69f1a86da253f708bc41fcede6b250567d",
+  "index_sha": "cd580365a345b2a6a83160e3520d81dbe57a715f0bc242ff25df672f0f441879",
+  "completed_at": "2026-04-28T10:59:41.783Z",
+  "arm_B_runs": 130,
+  "arm_B_errors": 0,
+  "arm_B_cost": 0,
+  "arm_P_runs": 130,
+  "arm_P_errors": 0,
+  "arm_P_cost": 0,
+  "arm_R_runs": 130,
+  "arm_R_errors": 1,
+  "arm_R_cost": 0,
+  "sha_updated_at": "2026-04-28T15:24:15.998Z",
+  "sha_update_reason": "Final update before Arm T. EVAL_FREEZE_CACHE now prevents auto-rebuild."
+}

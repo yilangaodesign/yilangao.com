@@ -50,13 +50,44 @@ The tag `eval-baseline-current` itself stays on origin permanently — the futur
 
 For each run, follow this exact sequence:
 
-1. **Open Cursor at the worktree root.** From a fresh Cursor window: `File → Open Folder → ~/eval/yilangao-current`. This is critical — opening the main checkout instead pollutes the agent's context with post-initiative documentation. Verify the workspace path in Cursor's title bar before continuing.
+1. **Open Cursor at the worktree root** (one-time, per session). From a fresh Cursor window: `File → Open Folder → ~/eval/yilangao-current`. Critical — opening the main checkout pollutes the agent's context with post-initiative documentation. Verify the workspace path in Cursor's title bar before continuing.
 2. **Start a fresh chat.** Do not resume an existing chat. The agent's context must be clean per run.
 3. **Select the model.** Match the model + temperature defaults below. Confirm in Cursor's model selector before sending the prompt.
 4. **Paste the task `prompt` verbatim.** Copy the `prompt` field from the corresponding YAML block in [`docs/eval-task-corpus.md`](../eval-task-corpus.md). Do NOT add framing, "this is a test", "please show your work", or any other meta instruction. The prompt must look like a normal feedback request.
-5. **Capture the full response.** When the agent stops, capture: planning blocks, tool calls (names + arguments + truncated outputs are fine), and final message. Paste into the corresponding `current/<task-id>/run-<n>.md` file BELOW the existing frontmatter line.
-6. **Record metadata.** Fill in `model`, `temperature`, `timestamp` (ISO 8601 with timezone), and `cursor_window_path` in the frontmatter. The `commit_sha` field is pre-filled and should always read `56f876024fc95591b95f0f181686ba4dda0ac03f`. The `task_id` and `run_number` are pre-filled.
-7. **Update the manifest.** After all 9 runs complete, fill in the aggregate fields in `current/manifest.json`.
+5. **Wait for the agent to finish.** When the agent stops responding, the run is complete. Do nothing in the chat — no follow-up questions, no thanks, no edits. The next run is captured by leaving the chat alone.
+6. **Notify the main-window agent.** From the main Cursor window (this repo at `~/Desktop/Job Application/Vibe Coding/yilangao.com`), tell the main agent which run just finished (e.g. `done with T002 run 2`). The main agent runs:
+
+    ```bash
+    node scripts/capture-eval-run.mjs --task eval-T0XX --run N
+    ```
+
+    The script reads the worktree's Cursor JSONL transcript directly (`~/.cursor/projects/Users-yilangao-eval-yilangao-current/agent-transcripts/<latest>.jsonl`), validates that the JSONL's first user prompt matches the corpus prompt for the task, renders the transcript into `current/<task-id>/run-<n>.md` with full frontmatter, marks the run captured in `manifest.json`, and runs `git restore . && git clean -fd` in the worktree to reset for the next run. No copy-paste, no "Export Transcript", no manual frontmatter editing.
+
+7. **Repeat for the next run.** Same chat-window if it's still pristine, but a fresh chat per run is safer (the script's prompt-validation guards against accidentally capturing the wrong JSONL by selecting the most-recently-modified file by default — a fresh chat per run keeps that selection unambiguous).
+
+The script's safety checks: refuses to overwrite an already-captured run unless `--force` is passed, refuses to capture if the JSONL's prompt doesn't match the corpus prompt for the named task, and reports git status after the cleanup so the operator can see the worktree is back to a clean reference state.
+
+### Transcript-format limitations
+
+The `cursor-jsonl` format is the canonical evidence format for the 9-run smoke test. The capture script reads Cursor's internal per-chat JSONL transcripts directly (one event per line, structured user/assistant messages with embedded tool_use blocks). This is **strictly more useful** than Cursor's built-in `Export Transcript` feature, which collapses tool calls into UI cards that are dropped on export. The JSONL preserves every `Read` path, `Grep` pattern, `Glob` pattern, `Shell` command, and `Edit`/`Write`/`StrReplace` target with full arguments.
+
+What the JSONL does **not** preserve (limitation shared with the export):
+
+- **Tool RESULTS** — file-read contents, grep matches, shell stdout, `git log` output. Cursor stores tool call args but not their outputs in the per-chat JSONL. The agent's narrative ("git log shows commit X made the change") serves as the surrogate for what it actually saw.
+- **Model name** and **Cursor version** are not embedded in the JSONL events. The capture script fills these from the run-file's pre-existing frontmatter (which the manifest's `model` default seeds).
+
+This is acceptable for the smoke test because:
+1. Tool call args are sufficient for grading the "tool calls to relevant context" metric on the 9 runs (we can see the agent Read `Input.module.scss`, `_borders.scss`, `design-anti-patterns.md` — all relevant).
+2. The agent's narrative + final response reports its actual findings, sufficient for AP citation grading.
+3. The future N=5×12 eval will capture results in addition to args via a deterministic harness (`scripts/eval-runner.mjs`), which is out of scope for Plan C.
+
+The future LLM-as-judge prompt should account for this: when grading on smoke-test transcripts, treat the agent's narrative claims about what it found as evidence supplementing the captured tool call args.
+
+### Resolved-already confound (T002 specifically; possible on others)
+
+A subset of the corpus prompts derive from feedback entries whose **gold resolution committed BEFORE** the `eval-baseline-current` tag (e.g. T002 — FB-163 → commit `35225d3` on 2026-04-22, two days before the tag). In these cases the agent in the baseline state finds the fix already applied and cannot reproduce it from scratch. The agent's correct response is to recognize the prior fix and verify it (commit history + token resolution + AP citation), not to re-implement.
+
+The future LLM-as-judge prompt should grade "verified prior resolution" as a positive signal on these tasks. See `docs/eval-baselines/current/eval-T002/run-1.md` "Capture notes" section for a worked example.
 
 ## Model + temperature defaults
 
@@ -147,8 +178,9 @@ Exit code is `0` when all checks pass; `1` otherwise. The script is safe to re-r
 | Failure | What it means | Next action |
 |---|---|---|
 | `git log eval-baseline-current..HEAD` empty | Plan A + B haven't committed to `dev` yet (they're being shipped in another window) | Wait for the Ship It session to finish, then `git pull` and re-run |
-| Run files present but transcripts empty | Operator hasn't pasted agent output yet | Complete the 9 baseline invocations per the procedure above |
-| Manifest `model` / `captured_by` / `captured_window_*` are `null` | Aggregate metadata not filled in after baseline runs | Fill in `docs/eval-baselines/current/manifest.json` after all 9 transcripts are captured |
+| Run files present but transcripts empty | Operator hasn't run `scripts/capture-eval-run.mjs` for that run yet | Tell the main-window agent which run finished; it captures + cleans the worktree automatically |
+| `manifest.json` has runs with `captured: false` | Some baseline runs not yet captured | Continue capturing per the agent invocation procedure; the script flips each run to `captured: true` and updates `runs_captured` |
+| Manifest `captured_by` is `null` | Aggregate field not filled in (set once at the end) | After all 9 runs report `captured: true`, set `captured_by` to the operator name in `docs/eval-baselines/current/manifest.json` |
 
 When the script reports `All checks passed`, mark the `phase11-eval-verify` todo complete in the plan.
 
@@ -171,3 +203,15 @@ The eval plan's responsibilities (out of scope for Plan C):
 7. Write up findings as `docs/eval-results.md`.
 
 Effort estimate for the future eval plan: ~34–40h. Blockers to flag in advance: model version drift across the eval window (run all 120 invocations in one session), token cost for the 120+ agent runs + grading runs, human grader time (~12–25h subsumed in the estimate).
+
+### Amendment (2026-04-28): Self-Automated KG A/B Evaluation
+
+The eval plan has been authored as [`.cursor/plans/self-automated_kg_a_b_eval_a49a67c6.plan.md`](../../.cursor/plans/self-automated_kg_a_b_eval_a49a67c6.plan.md). Pre-registration at [`docs/eval-pre-registration.md`](../eval-pre-registration.md).
+
+**N=5 to N=10 override:** The plan increases sample size from N=5 (specified above) to N=10 repetitions per task per arm. Justification: the original N=5 was sized for a human-graded protocol where each run cost ~20min of manual grading time. The automated evaluation replaces human grading with a 3-judge LLM ensemble, removing the per-run grading bottleneck. N=10 provides higher statistical power for paired comparisons at acceptable compute cost (~$150-250 for 520 generation runs + 1170 judge calls, hard cap $300).
+
+**Multi-arm expansion:** The plan adds two arms beyond the original two-arm (pre-init vs post-init) design:
+- Arm R (Naive RAG at HEAD): grep + lunr search over post-initiative docs without the knowledge graph. Isolates the graph's marginal contribution.
+- Arm B (Bare LLM): zero tools, parametric knowledge only. Establishes a floor.
+
+**Automated judging:** Replaces the hybrid "LLM-as-judge + 20% human spot-check" with a 3-judge non-Anthropic ensemble (`openai/gpt-5.4`, `google/gemini-2.5-pro`, `xai/grok-3`). Judge agreement is calibrated on held-out prompts (Phase 3) before corpus data is seen. Human spot-check is replaced by agent-driven cross-validation (Phase 6: 8 sampled runs read end-to-end for surface anomalies).

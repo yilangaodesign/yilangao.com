@@ -62,6 +62,7 @@ Examples:
 }
 
 function refreshCache() {
+  if (process.env.EVAL_FREEZE_CACHE) return;
   const buildScript = resolve(ROOT, 'scripts', 'build-graph.mjs');
   const result = spawnSync(process.execPath, [buildScript], { stdio: ['ignore', 'pipe', 'inherit'] });
   if (result.status !== 0) {

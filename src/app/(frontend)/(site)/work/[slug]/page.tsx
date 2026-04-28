@@ -21,9 +21,9 @@ const HERO_METRICS: Record<string, { value: string; label: string; tooltip?: str
     tooltip: "Perceived ease-of-use scores from task-based evaluations with the customer success team. Scores rose from 60 to 95 out of 100.",
   },
   "elan-design-system": {
-    value: "15 \u2192 3",
-    label: "Avg corrections / session",
-    tooltip: "Correction density across 40+ sessions over 8 days. Early sessions averaged 15 fundamental corrections (wrong tokens, inverted hierarchy, generic positioning). Late sessions averaged 3 refinement-level adjustments (voice register, headline technique, portfolio diversity).",
+    value: "~5K",
+    label: "knowledge graph edges",
+    tooltip: "A typed knowledge graph with ~4,892 edges across 6 relationship types (strengthens, supersedes, narrows, weakens, related, cites). Built from 200+ anti-patterns, 18 skills, and 234 feedback entries across design, engineering, and content. The graph below is live.",
   },
   meteor: {
     value: "95%",
@@ -38,18 +38,18 @@ const COVER_IMAGES: Record<string, string> = {
 
 const INTERACTIVE_VISUALS: Record<string, Record<string, { component: string; playgroundUrl: string; playgroundLabel: string }>> = {
   "elan-design-system": {
-    "Not the Components": {
+    "Teach Once, Enforce Forever": {
       component: "CollaborationLoop",
       playgroundUrl: "https://yilangao-design-system.vercel.app",
       playgroundLabel: "Explore the full design system",
     },
     "The System Behind the System": {
-      component: "SystemVisuals",
+      component: "SkillMap",
       playgroundUrl: "https://yilangao-design-system.vercel.app",
       playgroundLabel: "Explore the full design system",
     },
-    "The Rising Floor": {
-      component: "MaturityTimeline",
+    "The Living Graph": {
+      component: "GraphCanvas",
       playgroundUrl: "https://yilangao-design-system.vercel.app",
       playgroundLabel: "Explore the full design system",
     },

@@ -122,7 +122,11 @@ function OperationsGrid() {
     });
   }, [phases]);
 
+  const operationsLabel = total > 0 ? `Operations (${total} skills)` : "Operations";
+
   return (
+    <>
+    <h3 className={styles.sectionHeader}>{operationsLabel}</h3>
     <div
       ref={gridRef}
       className={styles.operationsGrid}
@@ -166,6 +170,7 @@ function OperationsGrid() {
         </Fragment>
       ))}
     </div>
+    </>
   );
 }
 
@@ -517,7 +522,6 @@ export default function SkillMap() {
   return (
     <div className={styles.container}>
       <section className={styles.section}>
-        <h3 className={styles.sectionHeader}>Operations (16 skills)</h3>
         <OperationsGrid />
       </section>
       <section className={styles.section}>

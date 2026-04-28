@@ -1,0 +1,23 @@
+{
+  "run_id": "cal-001",
+  "started_at": "2026-04-28T04:58:15.524Z",
+  "generation_model": "anthropic/claude-4.6-sonnet",
+  "budget_cap_usd": 300,
+  "graph_sha": "682868758d3d5edbc5a28c5e78c14cbf1c8b1b6f06752c15e667e48d3ff96c7c",
+  "index_sha": "ec19ea3df21badce82308970b2fae28042cab2a3962332672bf2186d4ec4a0be",
+  "completed_at": "2026-04-28T05:09:50.926Z",
+  "arm_B_runs": 3,
+  "arm_B_errors": 0,
+  "arm_B_cost": 0,
+  "arm_R_runs": 3,
+  "arm_R_errors": 0,
+  "arm_R_cost": 0,
+  "arm_P_runs": 3,
+  "arm_P_errors": 0,
+  "arm_P_cost": 0,
+  "sha_updated_at": "2026-04-28T05:05:49.473Z",
+  "sha_update_reason": "Calibration run - graph rebuilt between arm runs",
+  "arm_T_runs": 3,
+  "arm_T_errors": 0,
+  "arm_T_cost": 0
+}

@@ -5,6 +5,5 @@ export { default as InteractionShowcase } from "./InteractionShowcase";
 export { default as IncidentDensityMap } from "./IncidentDensityMap";
 export { default as CollaborationLoop } from "./CollaborationLoop";
 export { default as SkillMap } from "./SkillMap";
-export { default as KnowledgeGraph } from "./KnowledgeGraph";
-export { default as SystemVisuals } from "./SystemVisuals";
 export { default as MaturityTimeline } from "./MaturityTimeline";
+export { default as GraphCanvas } from "./GraphCanvas";

@@ -1,0 +1,238 @@
+{
+  "run_id": "cal-001",
+  "aggregated_at": "2026-04-28T05:20:40.994Z",
+  "thresholds": {
+    "primary_preference_pct": 60,
+    "primary_preference_ci_floor": 50,
+    "citation_advantage_pp": 10,
+    "hallucination_tolerance_pp": 5,
+    "adversarial_max_cite": 0,
+    "judge_kappa_floor": 0.4,
+    "bootstrap_iterations": 10000,
+    "budget_cap_usd": 300
+  },
+  "total_judgments": 15,
+  "decisions": {
+    "rule_1": {
+      "name": "Primary preference T>R >= 60%",
+      "threshold": 60,
+      "observed": 75,
+      "ci_lower": 50,
+      "ci_floor_threshold": 50,
+      "pass": false
+    },
+    "rule_2": {
+      "name": "Citation advantage T>=R+10pp (subtle)",
+      "threshold_pp": 10,
+      "observed_advantage_pp": 0,
+      "pass": false
+    },
+    "rule_3": {
+      "name": "Non-inferiority on hallucination T<=R+5pp",
+      "threshold_pp": 5,
+      "observed_wrong_t": 50,
+      "observed_wrong_r": 50,
+      "difference": 0,
+      "pass": true
+    },
+    "rule_5_adherence": {
+      "name": "Inter-judge agreement (adherence) kappa >= 0.4",
+      "threshold": 0.4,
+      "observed": -0.20000000000000057,
+      "pass": false
+    },
+    "rule_5_quality": {
+      "name": "Inter-judge agreement (quality) kappa >= 0.4",
+      "threshold": 0.4,
+      "observed": -0.20000000000000057,
+      "pass": false
+    }
+  },
+  "results": {
+    "T-R": {
+      "pair": "T-R",
+      "is_primary": true,
+      "n_judgments": 6,
+      "preference": {
+        "rate_pct": 75,
+        "ci_lower": 50,
+        "ci_upper": 100,
+        "n": 2,
+        "by_difficulty": {
+          "obvious": null,
+          "subtle": null
+        }
+      },
+      "citation": {
+        "gold_rate_a_pct": 100,
+        "gold_rate_b_pct": 100,
+        "gold_advantage_pp": 0,
+        "wrong_rate_a_pct": 50,
+        "wrong_rate_b_pct": 50,
+        "mcnemar": {
+          "chi2": 0,
+          "p": 1,
+          "b": 0,
+          "c": 0
+        }
+      },
+      "adherence": {
+        "wilcoxon": {
+          "stat": 0,
+          "wPlus": 3,
+          "wMinus": 0,
+          "z": -1.3416407864998738,
+          "p": 0.1797126230350108,
+          "n": 2
+        },
+        "cohens_d": {
+          "d": 0.7745966692414834,
+          "lower": -0.398677950501624,
+          "upper": 1.9478712889845908
+        },
+        "kappa": -0.20000000000000057
+      },
+      "quality": {
+        "wilcoxon": {
+          "stat": 0,
+          "wPlus": 6,
+          "wMinus": 0,
+          "z": -1.6035674514745464,
+          "p": 0.10880942707270602,
+          "n": 3
+        },
+        "cohens_d": {
+          "d": 1.0741723110591492,
+          "lower": -0.1362927404915517,
+          "upper": 2.28463736260985
+        },
+        "kappa": -0.20000000000000057
+      },
+      "preference_kappa": 1
+    },
+    "T-P": {
+      "pair": "T-P",
+      "is_primary": false,
+      "n_judgments": 3,
+      "preference": {
+        "rate_pct": 100,
+        "ci_lower": 100,
+        "ci_upper": 100,
+        "n": 1,
+        "by_difficulty": {
+          "obvious": null,
+          "subtle": null
+        }
+      },
+      "citation": {
+        "gold_rate_a_pct": 100,
+        "gold_rate_b_pct": 0,
+        "gold_advantage_pp": 100,
+        "wrong_rate_a_pct": 0,
+        "wrong_rate_b_pct": 100,
+        "mcnemar": {
+          "chi2": 0,
+          "p": 0.9999999989999999,
+          "b": 1,
+          "c": 0
+        }
+      },
+      "adherence": {
+        "wilcoxon": {
+          "stat": 0,
+          "wPlus": 6,
+          "wMinus": 0,
+          "z": -1.6035674514745464,
+          "p": 0.10880942707270602,
+          "n": 3
+        },
+        "cohens_d": {
+          "d": 2.0412414523193156,
+          "lower": 0.0676772766322018,
+          "upper": 4.01480562800643
+        },
+        "kappa": -0.5000000000000001
+      },
+      "quality": {
+        "wilcoxon": {
+          "stat": 0,
+          "wPlus": 3,
+          "wMinus": 0,
+          "z": -1.3416407864998738,
+          "p": 0.1797126230350108,
+          "n": 2
+        },
+        "cohens_d": {
+          "d": 1.6329931618554527,
+          "lower": -0.21491255964539158,
+          "upper": 3.4808988833562973
+        },
+        "kappa": 1
+      },
+      "preference_kappa": 1,
+      "holm_corrected_p": 0.21761885414541204
+    },
+    "T-B": {
+      "pair": "T-B",
+      "is_primary": false,
+      "n_judgments": 6,
+      "preference": {
+        "rate_pct": 50,
+        "ci_lower": 0,
+        "ci_upper": 100,
+        "n": 2,
+        "by_difficulty": {
+          "obvious": null,
+          "subtle": null
+        }
+      },
+      "citation": {
+        "gold_rate_a_pct": 100,
+        "gold_rate_b_pct": 50,
+        "gold_advantage_pp": 50,
+        "wrong_rate_a_pct": 50,
+        "wrong_rate_b_pct": 100,
+        "mcnemar": {
+          "chi2": 0,
+          "p": 0.9999999989999999,
+          "b": 1,
+          "c": 0
+        }
+      },
+      "adherence": {
+        "wilcoxon": {
+          "stat": 4.5,
+          "wPlus": 4.5,
+          "wMinus": 5.5,
+          "z": -0.18257418583505536,
+          "p": 0.8551321626214476,
+          "n": 4
+        },
+        "cohens_d": {
+          "d": -0.16012815380508744,
+          "lower": -1.2935467026376035,
+          "upper": 0.9732903950274288
+        },
+        "kappa": 0
+      },
+      "quality": {
+        "wilcoxon": {
+          "stat": 5,
+          "wPlus": 5,
+          "wMinus": 5,
+          "z": 0,
+          "p": 0.9999999989999999,
+          "n": 4
+        },
+        "cohens_d": {
+          "d": 0,
+          "lower": -1.1316065276116665,
+          "upper": 1.1316065276116665
+        },
+        "kappa": 0.24999999999999986
+      },
+      "preference_kappa": 0.4545454545454544,
+      "holm_corrected_p": 0.8551321626214476
+    }
+  }
+}

@@ -9,12 +9,15 @@
   "tag": "eval-baseline-current",
   "tag_created": "2026-04-25T23:44:43-04:00",
   "worktree_path": "~/eval/yilangao-current",
-  "model": null,
+  "model": "claude-opus-4.6",
   "temperature": 0.3,
-  "captured_by": null,
-  "captured_window_start": null,
-  "captured_window_end": null,
+  "transcript_format": "cursor-jsonl",
+  "transcript_format_note": "Captured by scripts/capture-eval-run.mjs which reads the worktree window's Cursor JSONL transcripts directly from ~/.cursor/projects/Users-yilangao-eval-yilangao-current/agent-transcripts/. Strictly more useful than Cursor's Export Transcript feature: preserves all tool call ARGS (Read paths, Grep patterns, Shell commands) which the export collapses into invisible UI cards. Tool RESULTS (file contents, grep matches, shell stdout) are not in the JSONL — only call args; the agent's narrative is the surrogate for what it actually saw. The future N=5x12 eval's deterministic harness can capture results in addition.",
+  "captured_by": "yilangao",
+  "captured_window_start": "2026-04-27T02:06:41-04:00",
+  "captured_window_end": "2026-04-28T03:14:24Z",
   "selection_bias_note": "All 3 tasks in this subset are from the corpus's subtle bucket. The post-initiative arm is favored by construction. The future eval plan should apply a discount when interpreting effect size on subtle tasks.",
+  "known_confound_note": "Each prompt is derived from a previously-resolved feedback entry (see docs/eval-task-corpus.md selection criteria). Some tasks - notably T002 - have their gold resolution committed BEFORE the eval-baseline-current tag, meaning the agent in the baseline state finds the fix already applied and cannot reproduce it from scratch. The agent's correct response in this case is to recognize the prior fix and verify it; the future LLM-as-judge should grade 'verified prior resolution' as a positive signal on these tasks. See run-1 capture notes in eval-T002/run-1.md.",
   "tasks": [
     {
       "task_id": "eval-T002",
@@ -23,9 +26,27 @@
       "source": "docs/design-feedback-log.md#fb-163",
       "expected_citation": "AP-054",
       "runs": [
-        { "run_number": 1, "file": "eval-T002/run-1.md", "captured": false },
-        { "run_number": 2, "file": "eval-T002/run-2.md", "captured": false },
-        { "run_number": 3, "file": "eval-T002/run-3.md", "captured": false }
+        {
+          "run_number": 1,
+          "file": "eval-T002/run-1.md",
+          "captured": true,
+          "captured_at": "2026-04-27T06:05:16Z",
+          "transcript_source_uuid": "e6033255-960e-4f74-9bc1-b01ca1b824b3"
+        },
+        {
+          "run_number": 2,
+          "file": "eval-T002/run-2.md",
+          "captured": true,
+          "captured_at": "2026-04-27T18:47:49Z",
+          "transcript_source_uuid": "6fcec570-b9b3-4328-a99e-19c4e6cd4151"
+        },
+        {
+          "run_number": 3,
+          "file": "eval-T002/run-3.md",
+          "captured": true,
+          "captured_at": "2026-04-27T19:06:01Z",
+          "transcript_source_uuid": "262f7b38-e8fc-4ce2-b360-55c056e7199a"
+        }
       ]
     },
     {
@@ -35,9 +56,27 @@
       "source": "docs/engineering-feedback-log.md#eng-156",
       "expected_citation": "EAP-094",
       "runs": [
-        { "run_number": 1, "file": "eval-T008/run-1.md", "captured": false },
-        { "run_number": 2, "file": "eval-T008/run-2.md", "captured": false },
-        { "run_number": 3, "file": "eval-T008/run-3.md", "captured": false }
+        {
+          "run_number": 1,
+          "file": "eval-T008/run-1.md",
+          "captured": true,
+          "captured_at": "2026-04-27T23:19:38Z",
+          "transcript_source_uuid": "893cdbde-bf24-4b8d-b21c-4254e2ab4791"
+        },
+        {
+          "run_number": 2,
+          "file": "eval-T008/run-2.md",
+          "captured": true,
+          "captured_at": "2026-04-27T23:24:04Z",
+          "transcript_source_uuid": "08eb44c0-8d5e-4dc7-a83e-ac991ebc1206"
+        },
+        {
+          "run_number": 3,
+          "file": "eval-T008/run-3.md",
+          "captured": true,
+          "captured_at": "2026-04-28T02:00:00Z",
+          "transcript_source_uuid": "7085efa9-ca52-4b0c-a20a-44f31555f7cf"
+        }
       ]
     },
     {
@@ -47,10 +86,29 @@
       "source": "docs/content-feedback-log.md#cfb-034",
       "expected_citation": "CAP-029",
       "runs": [
-        { "run_number": 1, "file": "eval-T011/run-1.md", "captured": false },
-        { "run_number": 2, "file": "eval-T011/run-2.md", "captured": false },
-        { "run_number": 3, "file": "eval-T011/run-3.md", "captured": false }
+        {
+          "run_number": 1,
+          "file": "eval-T011/run-1.md",
+          "captured": true,
+          "captured_at": "2026-04-28T02:19:26Z",
+          "transcript_source_uuid": "4b6f46eb-d627-48c4-95ff-35782a0517af"
+        },
+        {
+          "run_number": 2,
+          "file": "eval-T011/run-2.md",
+          "captured": true,
+          "captured_at": "2026-04-28T02:57:58Z",
+          "transcript_source_uuid": "6b7d88b0-e08e-484d-b36a-7c44bea08ae6"
+        },
+        {
+          "run_number": 3,
+          "file": "eval-T011/run-3.md",
+          "captured": true,
+          "captured_at": "2026-04-28T03:14:24Z",
+          "transcript_source_uuid": "65cac69b-03e3-456a-ba8e-79c057b70be8"
+        }
       ]
     }
-  ]
+  ],
+  "runs_captured": "9/9"
 }
