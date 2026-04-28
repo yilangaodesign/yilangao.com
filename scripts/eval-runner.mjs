@@ -315,6 +315,7 @@ function startMcpServer() {
     mcpProcess = spawn(process.execPath, [serverPath], {
       cwd: ROOT,
       stdio: ['pipe', 'pipe', 'pipe'],
+      env: { ...process.env, EVAL_FREEZE_CACHE: '1' },
     });
 
     let started = false;

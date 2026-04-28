@@ -49,6 +49,8 @@ const REQUIRED_README_SECTIONS = [
   "Phase 00 baseline tag",
   "Worktree setup",
   "Agent invocation procedure",
+  "Transcript-format limitations",
+  "Resolved-already confound",
   "Model + temperature defaults",
   "Output format",
   "Representative subset selection",
