@@ -6,8 +6,8 @@ export const website = {
   name: "yilangao.com",
   version: "1.5.5",
   release: {
-    version: "1.5.4",
-    name: "yilangao.com 1.5.4",
-    releasedAt: "2026-04-28T19:39:17.600Z",
+    version: "1.5.5",
+    name: "yilangao.com 1.5.5",
+    releasedAt: "2026-04-28T22:08:55.264Z",
   },
 } as const;
