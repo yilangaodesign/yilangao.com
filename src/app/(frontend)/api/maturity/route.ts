@@ -156,12 +156,11 @@ function parseStandardLog(
 /**
  * Parse the content-feedback-log.md, which uses `## Session: YYYY-MM-DD` headers
  * and `#### CFB-NNN:` sub-entries rather than the `**Date:**` style.
- * Each CFB entry counts as one correction; the session block's text is used
- * for severity classification.
+ * Each CFB entry counts as one correction. Severity and recurrence are classified
+ * per CFB sub-block so a single session with mixed citations is counted accurately.
  */
 function parseContentLog(text: string): Correction[] {
   const corrections: Correction[] = [];
-  // Content log blocks are also `---`-separated, each containing one session
   const blocks = text.split(/\n---\n/);
 
   for (const block of blocks) {
@@ -169,12 +168,15 @@ function parseContentLog(text: string): Correction[] {
     if (!dateMatch) continue;
 
     const date = dateMatch[1];
-    const cfbEntries = (block.match(/^####\s+CFB-\d+:/gm) ?? []).length;
-    if (cfbEntries === 0) continue;
+    const cfbStarts = [...block.matchAll(/^####\s+CFB-\d+:/gm)];
+    if (cfbStarts.length === 0) continue;
 
-    const { fundamental, structural } = classifyBlock(block);
-    const recurrence = classifyRecurrence(block);
-    for (let i = 0; i < cfbEntries; i++) {
+    for (let i = 0; i < cfbStarts.length; i++) {
+      const start = cfbStarts[i].index!;
+      const end = i + 1 < cfbStarts.length ? cfbStarts[i + 1].index! : block.length;
+      const subBlock = block.slice(start, end);
+      const { fundamental, structural } = classifyBlock(subBlock);
+      const recurrence = classifyRecurrence(subBlock);
       corrections.push({ date, domain: 'content', fundamental, structural, recurrence });
     }
   }

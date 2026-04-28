@@ -33,8 +33,10 @@ export async function validatePassword(
     return { success: false, error: "Incorrect password" };
   }
 
+  // Welcome admin pw: site password + "_admin" suffix.
+  // ANALYTICS_OWNER_KEY is only used by /api/tag-owner for its URL secret.
   const adminPw = config?.adminPassword
-    ?? (company === "welcome" ? (process.env.ANALYTICS_OWNER_KEY ?? "yg-owner-2026") : undefined);
+    ?? (company === "welcome" ? `${SITE_PASSWORD}_admin` : undefined);
   const isAdminPw = adminPw ? comparePasswords(password, adminPw) : false;
 
   const slug = config ? company : "welcome";
