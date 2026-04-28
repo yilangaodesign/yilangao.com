@@ -2668,3 +2668,15 @@ Concrete canonical shape in this codebase: `ProjectClient.tsx` DnD after the ato
 **Detection:** Multiple `<ForceGraph>` (or `<ForceGraph2D>`, `<ForceGraph3D>`) instances on the same page receiving the same `nodes`/`links` array references. Also: any `graphRef.current.graphData()` call (method not on ref).
 
 **Incident:** ENG-234 — Signal view particles were invisible across 6+ debugging attempts. The Mesh instance's `linkDirectionalParticles=0` kept deleting `__photons` from shared link objects before the Signal instance could render them.
+
+### EAP-125: Embedding timestamps in generated artifacts that need SHA-pinning
+
+**Pattern:** A build script (e.g., `build-graph.mjs`) writes a `generatedAt` ISO timestamp into its output JSON. Any process that SHA-hashes the output for integrity verification will see a different hash on every invocation, even when the semantic content is identical.
+
+**Why it fails:** SHA-based integrity checks compare byte-for-byte file content. A single timestamp character change produces a completely different hash. This makes the SHA-pinning pattern (record hash at start, verify hash before each run) unusable without either stripping the timestamp before hashing or freezing the file.
+
+**Correct alternative:** Either (a) omit runtime-varying metadata from files that need SHA-pinning, (b) compute the hash over a canonicalized subset of the content (excluding metadata fields), or (c) provide an env var (`EVAL_FREEZE_CACHE`) that skips regeneration when the file will be consumed by an integrity-checked pipeline.
+
+**Detection:** Any `generatedAt`, `buildTime`, `timestamp`, or similar field in a JSON/YAML file that is also SHA-hashed or checkpointed by another process.
+
+**Incident:** ENG-266 — Eval runner's cache integrity check failed repeatedly because `query-graph.mjs` auto-invoked `build-graph.mjs` (which writes `generatedAt`), changing the graph.json SHA on every MCP server startup.
