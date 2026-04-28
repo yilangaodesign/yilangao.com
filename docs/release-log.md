@@ -17,7 +17,32 @@ references:
 >
 > **Who reads this:** AI agents when the `ship-it` skill is activated — scan recent entries for recurring pitfalls before starting a new release.
 > **Who writes this:** AI agents after each ship-it run via the Post-Release Audit protocol in `ship-it/SKILL.md`.
-> **Last updated:** 2026-04-28 (REL-031: Visual refactors, eval results, dependency additions — Élan 2.15.0, ASCII Art Studio 0.6.20, yilangao.com 1.5.3)
+> **Last updated:** 2026-04-28 (REL-032: Elan-visuals refinements, eval expansion, content updates — Élan 2.15.1, ASCII Art Studio 0.6.21, yilangao.com 1.5.4)
+
+---
+
+<a id="rel-032"></a>
+## REL-032 — Elan-Visuals Refinements & Eval Expansion (2026-04-28)
+
+**Scope:** Refined elan-visuals SCSS (SkillMap, MaturityTimeline, CollaborationLoop), expanded eval suite with new ADV-001/T010-T012 tasks and judgments, updated content feedback log and Élan case study dossier, project detail page and CMS update route fixes.
+
+**Versions released:**
+- Élan 2.15.1 (patch — visual refinements to elan-visuals components)
+- ASCII Art Studio 0.6.21 (patch — no functional changes)
+- yilangao.com 1.5.4 (patch — project page and API route updates)
+
+**Commits:** 7 (4 planned + 2 straggler eval data + 1 release)
+**Files:** ~119
+
+**Semver level:** Patch
+**Reasoning:** All changes are SCSS value tweaks, content/data updates, and minor bug fixes. No new components or features. Auto-analyzer confirmed patch.
+
+**Incidents:**
+1. **Straggler eval files during commit/build phase:** Running eval process generated new JSONL files between Phase 4 and the branch switch, blocking `git checkout main`. Required 2 additional micro-commits (REL-031 had the same issue). This is the 2nd occurrence in consecutive releases.
+
+**Layer classification notes:**
+- Eval data (~96 files) has no standard layer; committed as a single `chore:` batch.
+- T006 had 10 modified files (run-1 through run-10), not 8 as initially counted from git status snapshot — diff captured additional files.
 
 ---
 
