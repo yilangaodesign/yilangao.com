@@ -36,6 +36,7 @@ import {
   SkillMap,
   GraphCanvas,
   MaturityTimeline,
+  ExperimentSection,
 } from "@/components/elan-visuals";
 import {
   DndContext,
@@ -278,6 +279,7 @@ const VISUAL_COMPONENTS: Record<string, React.ComponentType> = {
   SkillMap,
   GraphCanvas,
   MaturityTimeline,
+  ExperimentSection,
 };
 
 function InteractiveVisual({ config }: { config: InteractiveVisualConfig }) {
