@@ -4910,3 +4910,210 @@ Max/min perceptual distance ratio improved from **1.48x → 1.33x**. Range narro
 
 **Design principle:** Contextual metadata labels should be hover-gated, not always-visible. In a dense graph, always-on labels create visual noise that overwhelms topology. Hover-gating preserves the clean resting state while surfacing relational detail exactly when the user inspects a specific node. The label becomes part of the hover-emphasis interaction pattern, not a separate information layer.
 
+---
+
+### FB-238: Contrast-first brightness hierarchy - theme-aware node rendering
+
+**Date:** 2026-04-26
+**Category:** ForceGraph / theming / accessibility
+**Tags:** `AP-072` `AP-032` `accessibility` `design-principle`
+
+**Feedback:** In dark mode, the most important node (hub) should be the lightest (highest contrast against dark background). In light mode, the hub should be the darkest (highest contrast against light background). The current implementation always used dark-on-dark, making hubs nearly invisible in dark mode. Node hover/neighbor borders should also flip: white borders in dark mode, dark borders in light mode.
+
+**Root cause:** All node colors, hover strokes, and label text were hardcoded for dark-background-only rendering. No theme detection existed.
+
+**Resolution:** Added `isDark` state via MutationObserver on `<html>` class. Node brightness gradient reverses per theme:
+- Dark mode: hub=rgb(250) (lightest), leaf=rgb(80) (dimmest), orphan=rgb(190)
+- Light mode: hub=rgb(40) (darkest), leaf=rgb(200) (lightest), orphan=rgb(140)
+
+Hover strokes: white rgba in dark mode, black rgba in light mode. Label text: same inversion. Mesh link colors: separate sets for each theme.
+
+**Design principle established:** **Contrast-first brightness hierarchy.** In data visualization, the most important element gets the highest contrast against the background, not a fixed luminance value. This means the brightness scale *inverts* between light and dark themes. This is an accessibility principle: visual hierarchy must be preserved regardless of color scheme, and WCAG contrast requirements apply equally in both directions.
+
+**Cross-category note:** Also documented as ENG-259 (engineering).
+
+---
+
+### FB-237: Sink node visual affordance - hollow = "won't emit"
+
+**Date:** 2026-04-26
+**Category:** ForceGraph / node rendering / interaction design
+**Tags:** `AP-072` `AP-032` `AP-058` `interaction-design`
+
+**Feedback:** In Signal view, clicking a sink node (inbound-only, zero outbound) produces no particles, which is confusing. There's no visual signal before clicking that distinguishes "this node will emit" from "this node won't." User wants hollow rendering for dead-end receivers, not orphans.
+
+**Root cause:** The initial implementation (FB-235) applied hollow rendering to orphans, which was semantically wrong. Orphans are disconnected (latent potential), not dead ends. The actual problem is nodes that receive links but have no outbound path for signals to propagate along.
+
+**Resolution:** Introduced `sinkSet` (computed from directed link analysis: `outDegree === 0 AND biDegree === 0 AND inDegree > 0`). Sink nodes render as hollow circles (border-only, 1.2/globalScale stroke weight). Orphans reverted to filled. Added directional split to tooltip ("N in / M out") to reinforce the affordance.
+
+**Design principle established:** Fill vs. hollow is a behavioral affordance, not a graph-theory taxonomy. The semantic meaning is narrowly scoped: **hollow = this node will not fire particles in Signal view**. This is the 3rd preattentive channel (size + brightness + fill/hollow), which is at the safe limit per AP-032/AP-058.
+
+**Supersedes:** FB-235 (orphan hollow rendering was incorrect classification).
+
+**Cross-category note:** Also documented as ENG-258 (engineering).
+
+---
+
+### FB-235: Orphan nodes rendered as border-only (hollow circles) [SUPERSEDED by FB-237]
+
+**Date:** 2026-04-26
+**Category:** ForceGraph / node rendering
+**Tags:** `AP-072` `interaction-design`
+
+**Feedback:** Dead-end (orphan) nodes should not be solid-fill circles. Render them as border-only (hollow) to visually distinguish them from connected nodes.
+
+**Resolution:** Superseded by FB-237: hollow rendering now applies to sink nodes (inbound-only), not orphans. Orphans are filled.
+
+---
+
+### FB-236: Pathway hover arrows should be solid core + translucent glow
+
+**Date:** 2026-04-26
+**Category:** ForceGraph / pathway view
+**Tags:** `AP-072` `interaction-design`
+
+**Feedback:** In Pathway view, hovered link arrows should not have opacity applied to the arrow itself. The arrow color should be fully solid. Thickness indication should come from a translucent glow border around a thin solid core line, not from a single semi-transparent wider line.
+
+**Root cause:** The emphasis color constants used `rgba()` with alpha (0.55 for Terra, 0.5 for Lumen), making the entire line semi-transparent. The arrow color also used alpha.
+
+**Resolution:** Introduced a two-layer rendering approach: (1) the library draws a wide translucent glow line (low-alpha color, increased width via `base * 2.5`), (2) the `paintLinkOverlay` callback draws a thin solid-color core stroke (0.6px, `rgb()` with no alpha) on top in "after" mode. Arrow colors changed from `rgba()` to solid `rgb()`. This creates a "neon wire" effect: thin crisp core surrounded by soft color shading.
+
+**Cross-category note:** Also documented as ENG-257 (engineering).
+
+---
+
+### FB-234: Bidirectional arrows clashing - arrowheads should point away from each other
+
+**Date:** 2026-04-26
+
+**Component:** `ForceGraph` (src/components/ui/ForceGraph/ForceGraph.tsx)
+
+**Feedback:** In Pathway view, the two curved arrows of a bidirectional link have their arrowheads pointing toward each other (inward), creating a visual clash. The arrows should flow past each other with their backs facing - arrowheads pointing outward.
+
+**Root cause:** The curve direction assignment for expanded bidirectional pairs was: forward link = `_curveDirection: 1`, reverse link = `_curveDirection: -1`. This curving pattern placed arrowheads on the inner edges of the curves, making them face each other.
+
+**Resolution:** Swapped the curve directions: forward link = `_curveDirection: -1`, reverse link = `_curveDirection: 1`. Now arrowheads sit on the outer edges of the curves, pointing away from each other. Updated the link label dedup guard to skip the new reverse direction value.
+
+**Cross-category note:** Also documented as ENG-256 (engineering).
+
+---
+
+### FB-239: Hollow sink node interior masking - lines and particles must not pass through center
+
+**Date:** 2026-04-26
+**Trigger:** User feedback - "The center of the nodes for the hollow ones should be empty. The lines should not be hitting the center; at least they should not show that it's hitting the center. The particles should not be hit, like going into the center either."
+**Category:** Interaction design, visual metaphor integrity
+**Anti-patterns:** None new
+
+**Issue:** Sink (dead-end) nodes rendered as hollow rings correctly, but the library's link lines and particles still drew through the node center, breaking the visual metaphor of "empty center = won't emit."
+
+**Root cause:** The `force-graph` library draws links and particles from node center to node center before calling `nodeCanvasObject`. Custom node rendering cannot retroactively erase link geometry underneath.
+
+**Resolution:** Exploit the library's render order (links → arrows → particles → nodes). In `paintNode`, for sink nodes, fill the node interior with the resolved container background color before drawing the hollow ring on top. A `bgColorRef` reads the computed background by walking up the DOM from the container element, making the masking work regardless of the parent's theme or surface color. The fill matches the background, visually hiding link endpoints and particles within the node boundary.
+
+**Design principle:** When a visualization library forces geometry through node centers and doesn't support border-stop rendering, a background-matched fill mask is the correct pattern. The visual metaphor ("hollow = inert") matters more than pixel-perfect transparency - the user perceives an empty center even though there's actually an opaque fill.
+
+**Cross-category note:** Also documented as ENG-260 (engineering).
+
+---
+
+### FB-240: Consistent two-layer hover emphasis across all ForceGraph views
+
+**Date:** 2026-04-26
+**Trigger:** User feedback - "The active states are not the same as the pathway view, where the hover state essentially has a thin solid line in the middle and then a shaded color border around it... I want the hover emphasis mode to be consistent across three different views."
+**Category:** Interaction design, visual consistency
+**Anti-patterns:** None new
+
+**Issue:** Hover emphasis on connected links was visually inconsistent across views:
+- **Pathway:** Two-layer (thin solid core + wide translucent glow) - the desired pattern
+- **Mesh:** Single solid line (just color/opacity change)
+- **Signal:** Single solid line (just color/opacity change)
+
+**Root cause:** The two-layer rendering pattern was implemented only for Pathway view. Mesh and Signal views used a single-layer color+width bump for emphasis, which looked flat compared to Pathway's glow effect.
+
+**Resolution:** Unified the hover emphasis to use the two-layer glow+core pattern in all three views:
+- Library draws the **glow** (wider, translucent) via `linkColorAccessor` + `linkWidthAccessor`
+- `paintLinkOverlay` draws the **core** (thin, solid, `0.6px`) on top via `linkCanvasObject` ("after" mode)
+- Pathway uses semantic colors (Terra core for unidirectional, Lumen core for bidirectional)
+- Mesh and Signal use theme-aware neutral colors (`rgb(60, 60, 60)` light / `rgb(210, 210, 210)` dark)
+
+**Design principle:** Hover emphasis is a structural interaction pattern - it communicates "these elements are connected." The visual treatment must be identical across view modes because the user's spatial mental model of the graph doesn't change when switching views. Only the semantic coloring (neutral vs Terra/Lumen) should differ, not the emphasis shape (glow+core).
+
+**Cross-category note:** Also documented as ENG-261 (engineering).
+
+---
+
+### FB-241: ForceGraph auto-fit - graph too small for container, excessive whitespace
+
+**Date:** 2026-04-26
+**Trigger:** User feedback - "This container is so big, yet the graph only takes up some space. There's so much white space around."
+**Category:** Data visualization, spatial economy
+**Anti-patterns:** None new
+
+**Issue:** The force-directed graph clustered in a small area of its container, wasting the majority of available space. The visualization was hard to read because nodes and links were too compressed.
+
+**Root cause:** After the d3-force simulation settled, nodes were pinned at their final positions but no zoom/pan adjustment was made. The default simulation produces a compact cluster sized by the charge force defaults, independent of the container dimensions.
+
+**Resolution:** Added `zoomToFit(400, 40)` call in `handleEngineStop` after pinning nodes. Runs once per data set (guarded by `initialFitDoneRef`), with 400ms animation and 40px padding. The flag resets when `graphData` changes so new datasets also auto-fit.
+
+**Design principle:** A data visualization must fill its allocated viewport. When a force layout produces geometry smaller than the container, auto-fitting on layout completion is mandatory - the user should never have to manually zoom to see the full graph. Padding (40px) preserves breathing room without wasting space.
+
+**Cross-category note:** Also documented as ENG-262 (engineering).
+
+---
+
+### FB-242: Signal view hover emphasis used neutral gray, clashing with semantic particle colors
+
+**Date:** 2026-04-26
+**Trigger:** User feedback - "For the signal view, the core line and the color, the translucent border around it is not using the same color as the particle color, which creates a very dirty and muddy view."
+**Category:** Color consistency, semantic coherence
+**Anti-patterns:** None new
+
+**Issue (1 of 2):** Signal view hover emphasis used neutral gray glow+core (`meshEmphasisGlow` / `meshEmphasisCore`) on active paths that already displayed Terra/Lumen colored particles. The gray emphasis mixed with colored particles created a muddy, polluted visual.
+
+**Issue (2 of 2):** Across Mesh and Signal views, the glow layer was not wide enough (`2.5`) and the core was not distinct enough from it (`0.6`). The two-layer effect was barely perceptible compared to Pathway view's clearly differentiated glow+core.
+
+**Resolution:**
+- Signal view now uses semantic colors for emphasis: `TERRA/LUMEN_LINK_EMPHASIS_GLOW` for the glow layer and `TERRA/LUMEN_LINK_EMPHASIS_CORE` for the core line, matching the particle color family.
+- Glow width increased from `2.5` to `4.0` (more cushion around the core).
+- Core width reduced from `0.6` to `0.5` (thinner for clearer contrast).
+- Mesh glow opacity reduced (dark: `0.12`, light: `0.10`) so the translucent border reads more clearly as a separate layer from the solid core.
+
+**Design principle:** When a view mode already uses semantic colors (particles in Signal, arrows in Pathway), the hover emphasis must use the same color family. Mixing a neutral emphasis with semantic elements creates visual pollution. The emphasis is reinforcing existing semantics, not competing with them. Additionally, the glow-to-core ratio must be large enough for the two-layer structure to be perceptible - a glow that's only slightly wider than the core reads as a single thick line.
+
+---
+
+### FB-243: Tooltip degree stats simplified to single compact row
+
+**Date:** 2026-04-26
+**Trigger:** User feedback - "For the tooltip, let's do inbound and outbound instead of second degree. Help me plan this."
+**Category:** Information architecture, data density
+**Anti-patterns:** None new
+
+**Issue:** The tooltip showed two rows of degree stats - "N in / M out" labeled "direct" plus a separate "2nd-degree" count. The 2nd-degree metric was too abstract for a glanceable tooltip; users couldn't act on it. The two-row layout also consumed vertical space that competed with the tooltip's primary content (node ID, group, label).
+
+**Resolution:** Collapsed to a single compact row: `8 (3 in / 5 out)`. Total as headline number in mono bold, directional split as parenthetical in muted mono. Removed 2nd-degree BFS computation entirely. For sink nodes, `0 out` naturally reinforces the hollow visual. Orphan badge behavior unchanged (no degree row shown).
+
+**Design principle:** Tooltip data density follows the analytics convention pattern: headline metric first, dimensional breakdown in parentheses. This lets the eye grab the total at a glance and optionally parse the split. When a metric requires explanation to be meaningful (what does "2nd-degree" mean in this context?), it fails the glanceability test and should be dropped from a tooltip.
+
+**Cross-category note:** Also documented as ENG-264 (engineering).
+
+---
+
+### FB-244: Progressive disclosure needs organic grow-in animation, not mechanical fade
+
+**Date:** 2026-04-26
+**Trigger:** User feedback - "Can we do some kind of smooth transition animation where the nodes kind of grow out with a little bit of bounce and a little bit of smooth in and outs, just like using our motion library to make it look more organic?"
+**Category:** Motion design, progressive disclosure, micro-interaction
+**Anti-patterns:** None new
+
+**Issue:** Progressive disclosure transitions were purely opacity-based with a linear ramp. Nodes appeared mechanically - fading in at full size like a switch, with no spatial animation. The transition felt robotic and disconnected from the organic, force-driven nature of the graph.
+
+**Resolution:** Added two layers of eased animation to progressive disclosure:
+1. **Eased opacity**: Replaced the linear alpha ramp with the design system's expressive easing curve (cubic-bezier 0.4, 0.14, 0.3, 1), producing a fast attack and gradual settle instead of uniform fade.
+2. **Spring-like scale**: Added a `tierScale` function that grows node radius from 0 through a 12% overshoot then settles to 1.0. The sine-damped bounce peaks around 60-70% progress, mimicking a physical spring's first oscillation. Node hit areas scale accordingly.
+
+**Design principle:** In a data visualization driven by physics simulation (force-directed layout), user-facing transitions must also feel physics-derived. Linear interpolation is the absence of character. The motion token system's expressive curve already encodes the right personality - use it everywhere the user sees state change, including progressive disclosure. Overshoot communicates elasticity and life; settle communicates stability. Together they read as "organic growth" rather than "mechanical reveal."
+
+**Cross-category note:** Also documented as ENG-265 (engineering).
+

@@ -44,8 +44,8 @@ The manifest tracks seven dimensions per case study:
 | **Narrative shape** | Contrarian Discovery | Rescue Arc | Translation Arc | Accumulation Arc |
 | **Headline technique** | Protagonist Framing (T10) | Protagonist Framing (T10) | Verdict + Staccato Authority (T8) | Deliberate Ambiguity (T9) |
 | **Technique emphasis** | T3+T4 (Survival Frame, Escalation) | T10+T8 (Protagonist, Verdict) | T11+T13+T15 (Identification, Anti-Sell, Closed-Loop) | T13+T14 (Anti-Sell, Emotional Deflation) |
-| **Metric type** | Absolute reduction (12K to 560) | Percentage improvement (58%) | Behavioral/maturity-based absolute (15 → 3) | N/A |
-| **Evidence method** | Behavioral observation ("stopped verifying line by line") | Task-based evaluation with internal users | Interactive demo (3 Tier 3 components) | Argument coherence |
+| **Metric type** | Absolute reduction (12K to 560) | Percentage improvement (58%) | Knowledge-graph scale (~5K edges) | N/A |
+| **Evidence method** | Behavioral observation ("stopped verifying line by line") | Task-based evaluation with internal users | Interactive demo (3 Tier 3 components: CollaborationLoop, SkillMap, GraphCanvas) | Argument coherence |
 | **Employment context** | Full-time founding role | Interview-only context | Personal project (2026 - Present) | Cross-domain expertise |
 
 ---

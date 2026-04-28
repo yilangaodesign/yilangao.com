@@ -35,9 +35,9 @@ references:
 
 | Service | Default Port | Current Port | Status | PID | Notes |
 |---|---|---|---|---|---|
-| Main site (`yilangao.com`) | 4000 | 4000 | running | 23898 | `npm run dev` (webpack mode) |
-| Playground | 4001 | 4001 | running | 44076 | `npm run playground` (`--webpack`; see ENG-150) |
-| ASCII Art Studio | 4002 | 4002 | running | 35777 | `npm run ascii-tool` (`--webpack`; see ENG-150) |
+| Main site (`yilangao.com`) | 4000 | 4000 | running | 10686 | `npm run dev` (webpack mode) |
+| Playground | 4001 | 4001 | running | 3764 | `npm run playground` (`--webpack`; see ENG-150) |
+| ASCII Art Studio | 4002 | 4002 | running | 3767 | `npm run ascii-tool` (`--webpack`; see ENG-150) |
 
 ## Key Pages (on main site, no separate server)
 
@@ -50,6 +50,8 @@ references:
 
 | Timestamp (UTC) | Service | Action | Port | Reason |
 |---|---|---|---|---|
+| 2026-04-28 04:11 | Main site | restarted | 4000 | User boot up — 4001/4002 healthy; 4000 had `next-server` LISTEN (ex-PID 71007) but `curl` timed out (no HTTP). SIGKILL listener; fresh `npm run dev`. Verified `curl -L` `/` → 200, `/for/welcome?preview=true` → 200. Playground/ASCII left running. LISTEN PID 4000: 10686 (4001: 3764, 4002: 3767). |
+| 2026-04-27 18:10 | Main site, Playground, ASCII Art Studio | started | 4000–4002 | User boot up — ports were down (`curl` → 000); fresh `npm run dev` / `npm run playground` / `npm run ascii-tool`. Verified `/` → 200 on 4000–4002; `/for/welcome?preview=true` → 200. LISTEN PIDs: 3719 (4000), 3764 (4001), 3767 (4002). |
 | 2026-04-26 16:51 | Main site, Playground, ASCII Art Studio | already running | 4000–4002 | User boot up — health probe: `curl -L http://127.0.0.1:4000/` → 200; `/for/welcome?preview=true` → 200; playground `/` → 200; ASCII `/` → 200. Ledger PIDs refreshed (4000: 23898, 4001: 25555, 4002: 35777). |
 | 2026-04-24 17:05 | Main site | restarted | 4000 | User boot up — ports were down; started all three apps. Main site returned HTTP 500 (webpack ENOENT manifests/chunks); `rm -rf .next` alone did not fix. `rm -rf node_modules .next` + `npm install`, fresh `npm run dev`. Verified `curl -L` on `/` and `/for/welcome?preview=true` → 200. Playground and ASCII were already healthy from same session (left running). LISTEN PID 4000: 43332 (4001: 35776, 4002: 35777). |
 | 2026-04-24 14:56 | Main site, Playground, ASCII Art Studio | restarted | 4000–4002 | User boot up — 4000/4001 accepted TCP but `curl` timed out (zombie `next-server`); 4002 later hung the same way. SIGKILL listeners on 4000/4001/4002; `rm -rf` `.next`, `playground/.next`, `ascii-tool/.next`; fresh `npm run dev`, `npm run playground`, `npm run ascii-tool`. Verified `-L` on `/` → 200, `/for/welcome?preview=true` → 200, playground `/` → 200, ASCII `/` → 200. LISTEN PIDs: 92481 (4000), 92517 (4001), 94130 (4002). |
