@@ -27,17 +27,10 @@ function clampTooltipX(x: number, containerWidthPx: number): number {
 
 // ── View mode ─────────────────────────────────────────────────────────────────
 
-type ViewMode = "severity" | "domain" | "recurrence";
+type ViewMode = "recurrence" | "domain";
 
-const SEVERITY_KEYS = ["fundamental", "structural", "refinement"] as const;
 const DOMAIN_KEYS = ["engineering", "design", "content"] as const;
 const RECURRENCE_KEYS = ["recurrent", "approximate", "novel"] as const;
-
-const SEVERITY_LABELS: Record<string, string> = {
-  fundamental: "Fundamental",
-  structural: "Structural",
-  refinement: "Refinement",
-};
 
 const DOMAIN_LABELS: Record<string, string> = {
   design: "Design",
@@ -73,14 +66,13 @@ function rollingMedian(values: number[], window: number): number[] {
 // ── Component ────────────────────────────────────────────────────────────────
 
 export default function MaturityTimeline() {
-  const [mode, setMode] = useState<ViewMode>("severity");
+  const [mode, setMode] = useState<ViewMode>("recurrence");
   const [hoveredDay, setHoveredDay] = useState<number | null>(null);
   const [trendHovered, setTrendHovered] = useState(false);
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
   const [liveData, setLiveData] = useState<MaturityData | null>(null);
   const chartRef = useRef<HTMLDivElement | null>(null);
 
-  // Always-mounted tooltip: animate height/opacity/scale instead of mount/unmount
   const [tooltip, setTooltip] = useState<TooltipState>(null);
   const tooltipContentRef = useRef<HTMLDivElement>(null);
   const [tooltipH, setTooltipH] = useState(0);
@@ -116,14 +108,10 @@ export default function MaturityTimeline() {
 
   const days: DayBreakdown[] = liveData?.days ?? [];
 
-  const keys =
-    mode === "severity" ? SEVERITY_KEYS
-    : mode === "domain" ? DOMAIN_KEYS
-    : RECURRENCE_KEYS;
-  const labels =
-    mode === "severity" ? SEVERITY_LABELS
-    : mode === "domain" ? DOMAIN_LABELS
-    : RECURRENCE_LABELS;
+  const isRecurrence = mode === "recurrence";
+
+  const keys = isRecurrence ? RECURRENCE_KEYS : DOMAIN_KEYS;
+  const labels = isRecurrence ? RECURRENCE_LABELS : DOMAIN_LABELS;
 
   const maxTotal = useMemo(
     () => (days.length === 0 ? 1 : Math.max(...days.map((d) => d.total))),
@@ -131,57 +119,51 @@ export default function MaturityTimeline() {
   );
 
   const medianLine = useMemo(() => {
-    if (days.length < 2) return [];
+    if (!isRecurrence || days.length < 2) return [];
     const windowSize = Math.max(3, Math.round(days.length * 0.25));
     return rollingMedian(
-      days.map((d) => d.total),
+      days.map((d) => d.novel / (d.total || 1)),
       windowSize
     );
-  }, [days]);
+  }, [days, isRecurrence]);
 
-  const segClasses: Record<string, string> =
-    mode === "severity"
-      ? { fundamental: styles.accentDark, structural: styles.accentMid, refinement: styles.accentLight }
-      : mode === "domain"
-      ? { engineering: styles.domainEngineering, design: styles.domainDesign, content: styles.domainContent }
-      : { recurrent: styles.recurrenceDark, approximate: styles.recurrenceMid, novel: styles.recurrenceLight };
+  const segClasses: Record<string, string> = isRecurrence
+    ? { recurrent: styles.recurrenceDark, approximate: styles.recurrenceMid, novel: styles.recurrenceLight }
+    : { engineering: styles.domainEngineering, design: styles.domainDesign, content: styles.domainContent };
 
-  const legendClasses: Record<string, string> =
-    mode === "severity"
-      ? { fundamental: styles.legendAccentDark, structural: styles.legendAccentMid, refinement: styles.legendAccentLight }
-      : mode === "domain"
-      ? { engineering: styles.legendEngineering, design: styles.legendDesign, content: styles.legendContent }
-      : { recurrent: styles.legendRecurrenceDark, approximate: styles.legendRecurrenceMid, novel: styles.legendRecurrenceLight };
+  const legendClasses: Record<string, string> = isRecurrence
+    ? { recurrent: styles.legendRecurrenceDark, approximate: styles.legendRecurrenceMid, novel: styles.legendRecurrenceLight }
+    : { engineering: styles.legendEngineering, design: styles.legendDesign, content: styles.legendContent };
 
   const buildDayLabel = liveData
     ? `${liveData.totalBuildDays} build days`
     : "build days";
 
-  // SVG geometry for the trend line
+  // SVG geometry
   const chartHeight = 220;
   const trendPadTop = 20;
   const trendPadBottom = 0;
   const usableH = chartHeight - trendPadTop - trendPadBottom;
 
-  // Y-axis scale: round up to a nice ceiling, compute gridline positions
   const yCeiling = useMemo(() => {
+    if (isRecurrence) return 1;
     if (maxTotal <= 5) return 5;
     return Math.ceil(maxTotal / 5) * 5;
-  }, [maxTotal]);
+  }, [maxTotal, isRecurrence]);
 
   const yGridLines = useMemo(() => {
+    if (isRecurrence) return [0.25, 0.5, 0.75, 1.0];
     const step = yCeiling <= 15 ? 5 : 10;
     const lines: number[] = [];
     for (let v = step; v <= yCeiling; v += step) lines.push(v);
     return lines;
-  }, [yCeiling]);
+  }, [yCeiling, isRecurrence]);
 
   function yFromVal(val: number): number {
     if (yCeiling === 0) return chartHeight;
     return trendPadTop + usableH * (1 - val / yCeiling);
   }
 
-  // X-axis ceiling: next multiple of 5 above actual day count
   const xCeiling = useMemo(() => {
     if (days.length === 0) return 5;
     return Math.ceil(days.length / 5) * 5;
@@ -195,7 +177,6 @@ export default function MaturityTimeline() {
     })
     .join(" ");
 
-  // Resolve pointer clientX to the nearest day index within the chart
   const resolveDayFromPointer = useCallback(
     (clientX: number) => {
       const el = chartRef.current;
@@ -210,7 +191,6 @@ export default function MaturityTimeline() {
     [xCeiling, days.length]
   );
 
-  // Hovered day's median trend value and position (for the crosshair dot)
   const hoveredMedian = hoveredDay !== null && medianLine.length > hoveredDay
     ? medianLine[hoveredDay]
     : null;
@@ -233,12 +213,12 @@ export default function MaturityTimeline() {
       <div className={styles.controls}>
         <div className={styles.toggleGroup} role="radiogroup" aria-label="View mode">
           <button
-            className={`${styles.toggleButton} ${mode === "severity" ? styles.toggleButtonActive : ""}`}
-            onClick={() => { setMode("severity"); setActiveFilter(null); }}
+            className={`${styles.toggleButton} ${mode === "recurrence" ? styles.toggleButtonActive : ""}`}
+            onClick={() => { setMode("recurrence"); setActiveFilter(null); }}
             role="radio"
-            aria-checked={mode === "severity"}
+            aria-checked={mode === "recurrence"}
           >
-            By severity
+            By recurrence
           </button>
           <button
             className={`${styles.toggleButton} ${mode === "domain" ? styles.toggleButtonActive : ""}`}
@@ -247,14 +227,6 @@ export default function MaturityTimeline() {
             aria-checked={mode === "domain"}
           >
             By domain
-          </button>
-          <button
-            className={`${styles.toggleButton} ${mode === "recurrence" ? styles.toggleButtonActive : ""}`}
-            onClick={() => { setMode("recurrence"); setActiveFilter(null); }}
-            role="radio"
-            aria-checked={mode === "recurrence"}
-          >
-            By recurrence
           </button>
         </div>
       </div>
@@ -267,16 +239,33 @@ export default function MaturityTimeline() {
         <div className={styles.chartWithAxis} style={liveData === null ? { display: "none" } : undefined}>
           {/* Y-axis labels */}
           <div className={styles.yAxis} style={{ height: chartHeight }}>
-            {yGridLines.map((v) => (
-              <span
-                key={v}
-                className={styles.yLabel}
-                style={{ bottom: `${(v / yCeiling) * (usableH / chartHeight) * 100}%` }}
-              >
-                {v}
-              </span>
-            ))}
-            <span className={styles.yLabel} style={{ bottom: 0 }}>0</span>
+            {isRecurrence ? (
+              <>
+                {(yGridLines as number[]).map((v) => (
+                  <span
+                    key={v}
+                    className={styles.yLabel}
+                    style={{ bottom: `${v * (usableH / chartHeight) * 100}%` }}
+                  >
+                    {Math.round(v * 100)}%
+                  </span>
+                ))}
+                <span className={styles.yLabel} style={{ bottom: 0 }}>0%</span>
+              </>
+            ) : (
+              <>
+                {(yGridLines as number[]).map((v) => (
+                  <span
+                    key={v}
+                    className={styles.yLabel}
+                    style={{ bottom: `${(v / yCeiling) * (usableH / chartHeight) * 100}%` }}
+                  >
+                    {v}
+                  </span>
+                ))}
+                <span className={styles.yLabel} style={{ bottom: 0 }}>0</span>
+              </>
+            )}
           </div>
 
           <div
@@ -294,21 +283,24 @@ export default function MaturityTimeline() {
               setTrendHovered(false);
             }}
           >
-            {/* Y-axis gridlines (HTML, faint horizontal lines) */}
-            {yGridLines.map((v) => (
-              <div
-                key={v}
-                className={styles.yGridLine}
-                style={{ top: yFromVal(v) }}
-              />
-            ))}
+            {/* Y-axis gridlines */}
+            {isRecurrence
+              ? (yGridLines as number[]).map((v) => (
+                  <div key={v} className={styles.yGridLine} style={{ top: yFromVal(v) }} />
+                ))
+              : (yGridLines as number[]).map((v) => (
+                  <div key={v} className={styles.yGridLine} style={{ top: yFromVal(v) }} />
+                ))
+            }
             <div className={styles.yGridLine} style={{ top: yFromVal(0) }} />
 
-            {/* Stacked bars — one per slot (real days + empty future slots) */}
+            {/* Stacked bars + hover columns */}
             <div className={`${styles.barsLayer} ${trendHovered ? styles.barsLayerDimmed : ""}`}>
               {Array.from({ length: xCeiling }, (_, i) => {
                 const day = i < days.length ? days[i] : null;
-                const barH = day && yCeiling > 0 ? (day.total / yCeiling) * 100 : 0;
+                const barH = isRecurrence
+                  ? (day ? 100 : 0)
+                  : (day && yCeiling > 0 ? (day.total / yCeiling) * 100 : 0);
 
                 return (
                   <div
@@ -361,7 +353,7 @@ export default function MaturityTimeline() {
               })}
             </div>
 
-            {/* SVG overlay: trend line + hover crosshair */}
+            {/* SVG overlay: trend line + crosshair */}
             {medianLine.length > 1 && (
               <svg
                 className={styles.trendOverlay}
@@ -369,7 +361,6 @@ export default function MaturityTimeline() {
                 preserveAspectRatio="none"
                 aria-hidden="true"
               >
-                {/* Invisible wide hit target for the trend line */}
                 <polyline
                   className={styles.trendHitTarget}
                   points={trendPoints}
@@ -422,7 +413,7 @@ export default function MaturityTimeline() {
               </svg>
             )}
 
-            {/* Hover crosshair dot + median value (HTML to avoid SVG non-uniform scaling) */}
+            {/* Hover crosshair dot + median value */}
             {hoveredX !== null && hoveredY !== null && (
               <div
                 className={styles.crosshairDot}
@@ -434,11 +425,14 @@ export default function MaturityTimeline() {
                 className={styles.crosshairLabel}
                 style={{ left: `${hoveredX}%`, top: hoveredY - 28 }}
               >
-                {Math.round(hoveredMedian * 10) / 10}
+                {isRecurrence
+                  ? `${Math.round(hoveredMedian * 100)}%`
+                  : Math.round(hoveredMedian * 10) / 10
+                }
               </span>
             )}
 
-            {/* Always-mounted tooltip: anchor + animated visual */}
+            {/* Always-mounted tooltip */}
             <div
               className={styles.tooltipAnchor}
               style={{
@@ -463,11 +457,18 @@ export default function MaturityTimeline() {
                         <span className={styles.tooltipTitle}>Day {day.day}</span>
                         {keys.map((key) => {
                           const value = (day as Record<string, unknown>)[key] as number;
+                          if (isRecurrence) {
+                            const pct = day.total > 0 ? Math.round((value / day.total) * 100) : 0;
+                            return (
+                              <span key={key} className={styles.tooltipRow}>
+                                <span className={`${styles.tooltipDot} ${segClasses[key] ?? ""}`} />
+                                {labels[key]}: {pct}% ({value})
+                              </span>
+                            );
+                          }
                           return (
                             <span key={key} className={styles.tooltipRow}>
-                              <span
-                                className={`${styles.tooltipDot} ${segClasses[key] ?? ""}`}
-                              />
+                              <span className={`${styles.tooltipDot} ${segClasses[key] ?? ""}`} />
                               {labels[key]}: {value}
                             </span>
                           );
@@ -481,7 +482,7 @@ export default function MaturityTimeline() {
             </div>
           </div>
 
-          {/* X-axis: day numbers (extends to xCeiling), aligned under the chart area */}
+          {/* X-axis */}
           {days.length > 0 && (
             <div className={styles.xAxis}>
               {Array.from({ length: xCeiling }, (_, i) => {
@@ -500,7 +501,7 @@ export default function MaturityTimeline() {
           )}
         </div>
 
-        {/* Legend (clickable filters) */}
+        {/* Legend */}
         <div className={styles.legend}>
           {keys.map((key) => {
             const isActive = activeFilter === key;
@@ -520,10 +521,12 @@ export default function MaturityTimeline() {
               </button>
             );
           })}
-          <span className={styles.legendItem}>
-            <span className={styles.legendTrendLine} />
-            Median trend
-          </span>
+          {isRecurrence && (
+            <span className={styles.legendItem}>
+              <span className={styles.legendTrendLine} />
+              Novel trend
+            </span>
+          )}
         </div>
       </div>
     </div>

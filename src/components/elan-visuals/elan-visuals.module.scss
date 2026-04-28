@@ -1410,6 +1410,20 @@
   }
 }
 
+// ── CANVAS OVERRIDES (passthrough mode) ─────────────────────────────────────
+// In passthrough mode Canvas defers zoom/pan to its child (ForceGraph), so it
+// doesn't apply its own grab cursor. This class restores the visual affordance
+// without enabling managed transform and sets the light background so nodes and
+// links have sufficient contrast against the surface.
+
+.canvasGrab {
+  cursor: grab;
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
 // ── PLAYGROUND LINK ─────────────────────────────────────────────────────────
 
 // Matches `.metaLink` in `page.module.scss` — same mixin, same token usage.
