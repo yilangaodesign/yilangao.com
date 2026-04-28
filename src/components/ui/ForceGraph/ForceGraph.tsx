@@ -309,12 +309,11 @@ export default function ForceGraph({
   const containerRef = useRef<HTMLDivElement>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height });
   const [hoveredNode, setHoveredNode] = useState<ForceGraphNode | null>(null);
-  const graphRef = useRef<any>(null);
+  const graphRef = useRef<any>(undefined);
   const [graphMounted, setGraphMounted] = useState(false);
-  const graphCallbackRef = useCallback((instance: any) => {
-    graphRef.current = instance;
-    setGraphMounted(!!instance);
-  }, []);
+  useEffect(() => {
+    if (graphRef.current && !graphMounted) setGraphMounted(true);
+  });
   const isDraggingRef = useRef(false);
   const isProgressive = nodeDisclosure === "progressive";
 
@@ -1470,7 +1469,7 @@ export default function ForceGraph({
     >
       {dimensions.width > 0 && (
         <ForceGraph2D
-          ref={graphCallbackRef}
+          ref={graphRef}
           graphData={graphData}
           width={dimensions.width}
           height={dimensions.height}
