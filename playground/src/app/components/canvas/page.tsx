@@ -17,7 +17,7 @@ import Activity from "lucide-react/dist/esm/icons/activity";
 import ZoomIn from "lucide-react/dist/esm/icons/zoom-in";
 import ZoomOut from "lucide-react/dist/esm/icons/zoom-out";
 import Crosshair from "lucide-react/dist/esm/icons/crosshair";
-import Brush from "lucide-react/dist/esm/icons/brush";
+import Shuffle from "lucide-react/dist/esm/icons/shuffle";
 
 const demoCode = `import { Canvas } from "@ds/Canvas";
 import type { CanvasToolbarItem } from "@ds/Canvas";
@@ -29,7 +29,7 @@ const toolbar: CanvasToolbarItem[] = [
   { id: "zoom-in", icon: <ZoomInIcon />, label: "Zoom in", separator: true },
   { id: "zoom-out", icon: <ZoomOutIcon />, label: "Zoom out" },
   { id: "fit", icon: <CrosshairIcon />, label: "Center" },
-  { id: "organize", icon: <BrushIcon />, label: "Organize" },
+  { id: "organize", icon: <ShuffleIcon />, label: "Organize" },
 ];
 
 <Canvas
@@ -81,7 +81,7 @@ function CanvasDemo() {
     { id: "zoom-in", icon: <ZoomIn />, label: "Zoom in", separator: true },
     { id: "zoom-out", icon: <ZoomOut />, label: "Zoom out" },
     { id: "fit", icon: <Crosshair />, label: "Center" },
-    { id: "organize", icon: <Brush />, label: "Organize" },
+    { id: "organize", icon: <Shuffle />, label: "Organize" },
   ];
 
   const handleClick = useCallback(
