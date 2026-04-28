@@ -8,10 +8,31 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
-  padding: 2px;
+  padding: 4px;
   background: var(--portfolio-surface-primary);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--portfolio-border-subtle);
   border-radius: 0;
+  overflow: hidden;
+}
+
+@keyframes indicatorBreathe {
+  0%, 100% { opacity: 0.72; }
+  50% { opacity: 1; }
+}
+
+.activeIndicator {
+  position: absolute;
+  top: 0;
+  left: 4px;
+  right: 4px;
+  pointer-events: none;
+  background: var(--portfolio-surface-inverse-bold);
+  transition: transform 380ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 0;
+}
+
+.activeIndicatorBreathing {
+  animation: indicatorBreathe 2.4s ease-in-out infinite;
 }
 
 .itemWrap {
@@ -19,6 +40,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  z-index: 1;
 }
 
 .separator {
@@ -26,7 +48,7 @@
   height: 0;
   margin: 4px auto;
   border: none;
-  border-top: 1px solid var(--color-border);
+  border-top: 1px solid var(--portfolio-border-subtle);
 }
 
 .button {
@@ -41,11 +63,15 @@
   background: transparent;
   color: var(--portfolio-text-secondary);
   cursor: pointer;
-  transition: background-color 150ms ease, color 150ms ease;
+  transition:
+    background-color 280ms cubic-bezier(0.25, 0.1, 0.25, 1),
+    color 280ms cubic-bezier(0.25, 0.1, 0.25, 1);
 
   svg {
     width: 16px;
     height: 16px;
+    transition: transform 280ms cubic-bezier(0.34, 1.56, 0.64, 1);
+    transform: scale(1);
   }
 
   &:hover {
@@ -55,6 +81,14 @@
 }
 
 .buttonActive {
-  background: var(--portfolio-surface-secondary);
-  color: var(--portfolio-text-primary);
+  color: var(--portfolio-text-inverse-bold);
+
+  svg {
+    transform: scale(1.1);
+  }
+
+  &:hover {
+    background: transparent;
+    color: var(--portfolio-text-inverse-bold);
+  }
 }

@@ -64,6 +64,22 @@ export interface ForceGraphProps {
   onFitToView?: (fn: () => void) => void;
   /** Fires on every zoom/pan change — use to sync an external grid. */
   onTransformChange?: (t: ForceGraphTransform) => void;
+  /** Draw a background pill behind hub labels for legibility on busy graphs. */
+  labelBackground?: boolean;
+  /** Minimum on-screen radius (in CSS px) so nodes stay visible at any zoom. */
+  minNodeScreenRadius?: number;
+  /** Floor for the initial zoomToFit scale — prevents starting too zoomed out. */
+  minInitialZoom?: number;
+  /** Draw a dot grid directly on the canvas so it moves in lockstep with content.
+   *  When set, the host Canvas component should hide its own CSS grid. */
+  gridDotColor?: string;
+  /** Grid spacing in graph-space px at zoom 1×. Default 20. */
+  gridSpacing?: number;
+  /** Grid dot radius at zoom 1×. Default 1.5. */
+  gridDotRadius?: number;
+  /** Override the active signal source node. When set and in Signal mode,
+   *  this takes priority over the internal highest-val auto-selection. */
+  signalSourceOverride?: string;
   className?: string;
 }
 
@@ -77,9 +93,9 @@ const DEFAULT_NODE_COLOR = "rgba(160, 160, 160, 0.6)";
 // Resting state (no hover)
 const LINK_COLOR = "rgba(160, 160, 160, 0.15)";
 const LINK_WIDTH = 0.6;
-// Hover: emphasized (connected to hovered node)
-const LINK_COLOR_EMPHASIS = "rgba(210, 210, 210, 0.5)";
-const LINK_WIDTH_EMPHASIS = 1.4;
+// Hover: emphasized (connected to hovered node) — two-layer: glow (library) + core (overlay)
+const LINK_EMPHASIS_WIDTH = 4.0;
+const LINK_EMPHASIS_CORE_WIDTH = 0.5;
 // Hover: dimmed (not connected to hovered node)
 const LINK_COLOR_DIM = "rgba(160, 160, 160, 0.06)";
 const LINK_WIDTH_DIM = 0.4;
@@ -88,11 +104,13 @@ const LINK_WIDTH_DIM = 0.4;
 // Inbound/outbound are relative to a node and meaningless at the network level;
 // uni- vs bi-directional is an absolute property of the connection itself.
 const TERRA_LINK = "rgba(184, 144, 98, 0.3)";
-const TERRA_LINK_EMPHASIS = "rgba(184, 144, 98, 0.55)";
-const TERRA_ARROW = "rgba(184, 144, 98, 0.7)";
+const TERRA_LINK_EMPHASIS_GLOW = "rgba(184, 144, 98, 0.18)";
+const TERRA_LINK_EMPHASIS_CORE = "rgb(184, 144, 98)";
+const TERRA_ARROW = "rgb(184, 144, 98)";
 const LUMEN_LINK = "rgba(115, 146, 255, 0.25)";
-const LUMEN_LINK_EMPHASIS = "rgba(115, 146, 255, 0.5)";
-const LUMEN_ARROW = "rgba(115, 146, 255, 0.65)";
+const LUMEN_LINK_EMPHASIS_GLOW = "rgba(115, 146, 255, 0.15)";
+const LUMEN_LINK_EMPHASIS_CORE = "rgb(115, 146, 255)";
+const LUMEN_ARROW = "rgb(115, 146, 255)";
 
 // ── Signal view: active path vs preview path ────────────────────────────────
 const SIGNAL_ACTIVE_LINK = "rgba(184, 144, 98, 0.35)";
@@ -139,6 +157,74 @@ function getNodeTier(
   return 3;
 }
 
+// Evaluate a cubic-bezier at parameter t (decasteljau on y-component).
+// p1y, p2y are the y-coordinates of the two control points (x is uniform).
+function cubicBezierY(t: number, p1y: number, p2y: number): number {
+  const inv = 1 - t;
+  return 3 * inv * inv * t * p1y + 3 * inv * t * t * p2y + t * t * t;
+}
+
+// Approximate the y-value of a cubic-bezier(p1x, p1y, p2x, p2y) at a given
+// x-value using Newton's method. This maps a linear progress (x) through
+// the easing curve to produce the eased value (y).
+function sampleCubicBezier(
+  x: number,
+  p1x: number,
+  p1y: number,
+  p2x: number,
+  p2y: number,
+): number {
+  if (x <= 0) return 0;
+  if (x >= 1) return 1;
+  let t = x;
+  for (let i = 0; i < 8; i++) {
+    const inv = 1 - t;
+    const currentX = 3 * inv * inv * t * p1x + 3 * inv * t * t * p2x + t * t * t;
+    const dx = currentX - x;
+    if (Math.abs(dx) < 1e-6) break;
+    const slope = 3 * inv * inv * p1x + 6 * inv * t * (p2x - p1x) + 3 * t * t * (1 - p2x);
+    if (Math.abs(slope) < 1e-6) break;
+    t -= dx / slope;
+  }
+  return cubicBezierY(t, p1y, p2y);
+}
+
+// Easing curve from the motion token system: EASING.expressive (0.4, 0.14, 0.3, 1).
+// Produces a slight overshoot before settling - used for organic grow-in.
+const EASE_P1X = 0.4;
+const EASE_P1Y = 0.14;
+const EASE_P2X = 0.3;
+const EASE_P2Y = 1;
+
+// ── Time-based spring animation for progressive disclosure ──────────────────
+// Duration of the grow-in animation (ms). Matches DURATION.slow from motion tokens.
+const DISCLOSURE_DURATION_MS = 400;
+// Peak overshoot fraction above 1.0 (0.12 = nodes grow 12% past final size).
+const SCALE_OVERSHOOT = 0.12;
+
+// Whether a node's tier is above the zoom threshold (should be visible).
+function isTierVisible(tier: 1 | 2 | 3, scale: number): boolean {
+  return scale >= TIER_THRESHOLDS[tier];
+}
+
+// Time-based spring curve: maps t (0→1) to a value that overshoots then settles.
+// Used for both alpha and scale during grow-in.
+function springCurve(t: number): number {
+  if (t <= 0) return 0;
+  if (t >= 1) return 1;
+  const eased = sampleCubicBezier(t, EASE_P1X, EASE_P1Y, EASE_P2X, EASE_P2Y);
+  return eased;
+}
+
+function springScaleCurve(t: number): number {
+  if (t <= 0) return 0;
+  if (t >= 1) return 1;
+  const eased = sampleCubicBezier(t, EASE_P1X, EASE_P1Y, EASE_P2X, EASE_P2Y);
+  const bounce = Math.sin(eased * Math.PI) * SCALE_OVERSHOOT * (1 - eased * eased);
+  return eased + bounce;
+}
+
+// Legacy zoom-based ramp kept for link disclosure (links don't need spring animation)
 function tierAlpha(tier: 1 | 2 | 3, scale: number): number {
   const threshold = TIER_THRESHOLDS[tier];
   if (threshold === 0) return 1;
@@ -146,6 +232,12 @@ function tierAlpha(tier: 1 | 2 | 3, scale: number): number {
   if (scale <= threshold) return 0;
   return (scale - threshold) / TIER_RAMP;
 }
+
+// Stable reference for linkCanvasObjectMode — avoids re-triggering the kapsule
+// on every render. Must be a function (accessorFn treats strings as property names).
+const linkCanvasAfterMode = () => "after" as const;
+const nodeCanvasReplaceMode = () => "replace" as const;
+const emptyLinkLabel = () => "";
 
 // ── Link label helpers ───────────────────────────────────────────────────────
 
@@ -205,13 +297,129 @@ export default function ForceGraph({
   onZoomOut,
   onFitToView,
   onTransformChange,
+  labelBackground = false,
+  minNodeScreenRadius = 0,
+  minInitialZoom = 0,
+  gridDotColor,
+  gridSpacing = 20,
+  gridDotRadius = 1.5,
+  signalSourceOverride,
   className,
 }: ForceGraphProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height });
   const [hoveredNode, setHoveredNode] = useState<ForceGraphNode | null>(null);
   const graphRef = useRef<any>(null);
+  const [graphMounted, setGraphMounted] = useState(false);
+  const graphCallbackRef = useCallback((instance: any) => {
+    graphRef.current = instance;
+    setGraphMounted(!!instance);
+  }, []);
   const isDraggingRef = useRef(false);
+  const isProgressive = nodeDisclosure === "progressive";
+
+  // Time-based disclosure animation: tracks when each node first becomes visible.
+  // Key = nodeId, value = timestamp (ms) when the node crossed its tier threshold.
+  // Cleared when the node goes back below threshold (zoom out).
+  const disclosureStartRef = useRef(new Map<string, number>());
+  // Animation pump: drives repaints while any disclosure animation is in-flight.
+  const disclosureRafRef = useRef<number | null>(null);
+  const [disclosureAnimating, setDisclosureAnimating] = useState(false);
+
+  // Theme detection: watch <html> class for "dark" to flip brightness hierarchy.
+  const [isDark, setIsDark] = useState(false);
+  useEffect(() => {
+    const html = document.documentElement;
+    const check = () => setIsDark(html.classList.contains("dark"));
+    check();
+    const observer = new MutationObserver(check);
+    observer.observe(html, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, []);
+
+  // Clean up disclosure animation RAF on unmount
+  useEffect(() => {
+    return () => {
+      if (disclosureRafRef.current) {
+        cancelAnimationFrame(disclosureRafRef.current);
+      }
+    };
+  }, []);
+
+  // Resolved background color for masking hollow (sink) node interiors.
+  // Walks up the DOM to find the first non-transparent background.
+  const bgColorRef = useRef("#ffffff");
+  useEffect(() => {
+    let el: HTMLElement | null = containerRef.current;
+    while (el) {
+      const bg = getComputedStyle(el).backgroundColor;
+      if (bg && bg !== "rgba(0, 0, 0, 0)" && bg !== "transparent") {
+        bgColorRef.current = bg;
+        return;
+      }
+      el = el.parentElement;
+    }
+    bgColorRef.current = isDark ? "#1e1e1e" : "#ffffff";
+  }, [isDark]);
+
+  // Resolved grid dot color (CSS variable → computed rgb value).
+  const resolvedGridColorRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!gridDotColor || !containerRef.current) {
+      resolvedGridColorRef.current = null;
+      return;
+    }
+    const probe = document.createElement("div");
+    probe.style.color = gridDotColor;
+    containerRef.current.appendChild(probe);
+    resolvedGridColorRef.current = getComputedStyle(probe).color;
+    probe.remove();
+  }, [gridDotColor]);
+
+  // Draw a dot grid directly on the ForceGraph canvas (onRenderFramePre) so
+  // the grid moves in perfect lockstep with nodes/links — no React-state lag.
+  const MIN_GRID_SCREEN_SPACING = 16;
+  const paintGrid = useCallback(
+    (ctx: CanvasRenderingContext2D, globalScale: number) => {
+      const color = resolvedGridColorRef.current;
+      if (!color) return;
+
+      const dpr = window.devicePixelRatio || 1;
+      const cssW = ctx.canvas.width / dpr;
+      const cssH = ctx.canvas.height / dpr;
+
+      // Extract pan offset from the current canvas transform.
+      const xform = ctx.getTransform();
+      const tx = xform.e / dpr;
+      const ty = xform.f / dpr;
+
+      ctx.save();
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      // Same multi-level spacing algorithm as the Canvas CSS grid.
+      let spacing = gridSpacing;
+      while (spacing * globalScale < MIN_GRID_SCREEN_SPACING) {
+        spacing *= 2;
+      }
+      const step = spacing * globalScale;
+      const dotR = Math.min(4, Math.max(1, gridDotRadius * globalScale));
+      const ox = ((tx % step) + step) % step;
+      const oy = ((ty % step) + step) % step;
+
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      for (let y = oy; y < cssH + step; y += step) {
+        for (let x = ox; x < cssW + step; x += step) {
+          ctx.moveTo(x + dotR, y);
+          ctx.arc(x, y, dotR, 0, Math.PI * 2);
+        }
+      }
+      ctx.fill();
+
+      ctx.restore();
+    },
+    [gridSpacing, gridDotRadius],
+  );
 
   // Track whether the tooltip is being sustained by a link hover rather than
   // a direct node hover. When the cursor moves from a node onto one of its
@@ -283,20 +491,24 @@ export default function ForceGraph({
     return () => el.removeEventListener("wheel", stop);
   }, [enableZoom]);
 
-  // Auto-select the highest-val node when entering Signal view
+  // Auto-select the active signal node when entering Signal view.
+  // When signalSourceOverride is set, it takes priority over auto-selection.
   useEffect(() => {
     if (viewMode !== "signal") {
       setSignalActiveNodeId(null);
       return;
     }
-    // Only auto-select if no active node is set yet
+    if (signalSourceOverride && nodes.some((n) => n.id === signalSourceOverride)) {
+      setSignalActiveNodeId(signalSourceOverride);
+      return;
+    }
     if (signalActiveNodeId && nodes.some((n) => n.id === signalActiveNodeId)) return;
     let best: ForceGraphNode | null = null;
     for (const n of nodes) {
       if (!best || (n.val ?? 0) > (best.val ?? 0)) best = n;
     }
     if (best) setSignalActiveNodeId(best.id);
-  }, [viewMode, nodes]);
+  }, [viewMode, nodes, signalSourceOverride]);
 
   // Resolve the active node object from the ID
   const signalActiveNode = useMemo(() => {
@@ -330,7 +542,8 @@ export default function ForceGraph({
     };
   }, [viewMode]);
 
-  // Expose zoom controls to parent via callback refs
+  // Expose zoom controls to parent via callback refs.
+  // graphMounted triggers re-run when the dynamic import finishes loading.
   useEffect(() => {
     if (!graphRef.current) return;
     const g = graphRef.current;
@@ -348,7 +561,7 @@ export default function ForceGraph({
     onFitToView?.(() => {
       g.zoomToFit(400);
     });
-  }, [onZoomIn, onZoomOut, onFitToView, dimensions.width]);
+  }, [onZoomIn, onZoomOut, onFitToView, dimensions.width, graphMounted]);
 
   // Deep-clone nodes and links so each ForceGraph instance owns its own objects.
   // Without this, multiple instances sharing the same arrays will clobber each
@@ -363,12 +576,13 @@ export default function ForceGraph({
       const expandedLinks: ForceGraphLink[] = [];
       for (const l of links) {
         if (l.bidirectional) {
-          expandedLinks.push({ ...l, _curveDirection: 1 } as any);
+          expandedLinks.push({ ...l, _curveDirection: 1, _isReverse: false } as any);
           expandedLinks.push({
             ...l,
             source: l.target,
             target: l.source,
-            _curveDirection: -1,
+            _curveDirection: 1,
+            _isReverse: true,
           } as any);
         } else {
           expandedLinks.push({ ...l });
@@ -391,9 +605,36 @@ export default function ForceGraph({
     }
   }, [graphData]);
 
+  // Auto-fit the graph to fill the container once after the initial layout.
+  const initialFitDoneRef = useRef(false);
+  useEffect(() => {
+    initialFitDoneRef.current = false;
+  }, [graphData]);
+
   const handleEngineStop = useCallback(() => {
     pinAllNodes();
-  }, [pinAllNodes]);
+    if (!initialFitDoneRef.current && graphRef.current) {
+      initialFitDoneRef.current = true;
+      const g = graphRef.current;
+      g.zoomToFit(400, 40);
+
+      // After zoomToFit settles, clamp the scale into the desired range.
+      // Progressive mode: cap to keep only tier-1 nodes visible.
+      // minInitialZoom: floor to keep nodes readable on dense graphs.
+      const maxClamp = isProgressive ? TIER_THRESHOLDS[2] * 0.9 : Infinity;
+      const minClamp = minInitialZoom;
+
+      if (maxClamp < Infinity || minClamp > 0) {
+        setTimeout(() => {
+          const currentZoom = g.zoom();
+          const clamped = Math.min(maxClamp, Math.max(minClamp, currentZoom));
+          if (clamped !== currentZoom) {
+            g.zoom(clamped, 400);
+          }
+        }, 420);
+      }
+    }
+  }, [pinAllNodes, isProgressive, minInitialZoom]);
 
   // During drag: the library handles moving the node via fx/fy internally.
   // We just mark that a drag is happening.
@@ -463,7 +704,6 @@ export default function ForceGraph({
 
   // Progressive disclosure: precompute each node's tier (1/2/3) so paintNode
   // and link accessors can look up visibility without recomputing.
-  const isProgressive = nodeDisclosure === "progressive";
   const orphanSet = useMemo(() => {
     const set = new Set<string>();
     for (const n of nodes) {
@@ -472,6 +712,34 @@ export default function ForceGraph({
     }
     return set;
   }, [nodes, undirectedAdj]);
+
+  // Sink nodes: inbound-only, zero outbound, zero bidirectional.
+  // These nodes will not fire particles in Signal view. Computed from
+  // the original links (before bidirectional expansion).
+  const sinkSet = useMemo(() => {
+    const outDeg = new Map<string, number>();
+    const inDeg = new Map<string, number>();
+    const biDeg = new Map<string, number>();
+    for (const link of links) {
+      const src = typeof link.source === "object" ? link.source.id : link.source;
+      const tgt = typeof link.target === "object" ? link.target.id : link.target;
+      if (link.bidirectional) {
+        biDeg.set(src, (biDeg.get(src) ?? 0) + 1);
+        biDeg.set(tgt, (biDeg.get(tgt) ?? 0) + 1);
+      } else {
+        outDeg.set(src, (outDeg.get(src) ?? 0) + 1);
+        inDeg.set(tgt, (inDeg.get(tgt) ?? 0) + 1);
+      }
+    }
+    const set = new Set<string>();
+    for (const n of nodes) {
+      const o = outDeg.get(n.id) ?? 0;
+      const b = biDeg.get(n.id) ?? 0;
+      const i = inDeg.get(n.id) ?? 0;
+      if (o === 0 && b === 0 && i > 0) set.add(n.id);
+    }
+    return set;
+  }, [nodes, links]);
 
   const nodeTierMap = useMemo(() => {
     const map = new Map<string, 1 | 2 | 3>();
@@ -483,24 +751,31 @@ export default function ForceGraph({
     return map;
   }, [nodes, maxVal, orphanSet]);
 
-  // Compute 1st-degree and 2nd-degree connection counts for the hovered node.
+  // Compute 1st-degree (with directional split) and 2nd-degree connection
+  // counts for the hovered node. Directional split at 1st-degree reinforces
+  // the sink affordance (hollow = zero outbound).
   const hoveredDegreeStats = useMemo(() => {
     if (!hoveredNode) return null;
     const first = undirectedAdj.get(hoveredNode.id);
-    if (!first || first.size === 0) return { first: 0, second: 0 };
+    if (!first || first.size === 0)
+      return { total: 0, inCount: 0, outCount: 0, biCount: 0 };
 
-    const secondSet = new Set<string>();
-    for (const neighbor of first) {
-      const neighbors2 = undirectedAdj.get(neighbor);
-      if (!neighbors2) continue;
-      for (const n2 of neighbors2) {
-        if (n2 !== hoveredNode.id && !first.has(n2)) {
-          secondSet.add(n2);
-        }
+    let inOnly = 0;
+    let outOnly = 0;
+    let bi = 0;
+    for (const link of links) {
+      const src = typeof link.source === "object" ? link.source.id : link.source;
+      const tgt = typeof link.target === "object" ? link.target.id : link.target;
+      if (link.bidirectional) {
+        if (src === hoveredNode.id || tgt === hoveredNode.id) bi++;
+      } else {
+        if (src === hoveredNode.id) outOnly++;
+        if (tgt === hoveredNode.id) inOnly++;
       }
     }
-    return { first: first.size, second: secondSet.size };
-  }, [hoveredNode, undirectedAdj]);
+
+    return { total: inOnly + outOnly + bi, inCount: inOnly, outCount: outOnly, biCount: bi };
+  }, [hoveredNode, undirectedAdj, links]);
 
   // Build forward adjacency map once (shared by active path + preview path BFS).
   // Uses graphData.links which already includes expanded reverse links for
@@ -563,14 +838,19 @@ export default function ForceGraph({
     (node: ForceGraphNode) => {
       if (nodeColor) return nodeColor(node);
       const v = node.val ?? 0;
-      if (v === 0) return "rgb(190, 190, 190)"; // orphan: light but visible
-      // t=1 (hub) → darkest, t≈0 (leaf) → lightest.
-      // pow(0.6) stretches the lower range where most nodes cluster.
+      if (v === 0) return isDark ? "rgb(190, 190, 190)" : "rgb(140, 140, 140)";
+      // Contrast-first hierarchy: the most important node (hub) gets the
+      // highest contrast against the background. On dark backgrounds that
+      // means lightest; on light backgrounds that means darkest.
       const t = Math.pow(v / maxVal, 0.6);
+      if (isDark) {
+        const channel = Math.round(80 + t * 170); // hub → 250, leaf → 80
+        return `rgb(${channel}, ${channel}, ${channel})`;
+      }
       const channel = Math.round(200 - t * 160); // hub → 40, leaf → 200
       return `rgb(${channel}, ${channel}, ${channel})`;
     },
-    [nodeColor, maxVal],
+    [nodeColor, maxVal, isDark],
   );
 
   const getNodeSize = useCallback(
@@ -736,22 +1016,62 @@ export default function ForceGraph({
     (node: any, ctx: CanvasRenderingContext2D, globalScale: number) => {
       currentScaleRef.current = globalScale;
 
-      // Progressive disclosure: skip invisible nodes entirely
-      const disclosureAlpha = isProgressive
-        ? tierAlpha(nodeTierMap.get(node.id) ?? 3, globalScale)
-        : 1;
+      const nodeTier = nodeTierMap.get(node.id) ?? 3;
+
+      let disclosureAlpha = 1;
+      let sizeScale = 1;
+
+      if (isProgressive && nodeTier !== 1) {
+        const visible = isTierVisible(nodeTier, globalScale);
+        const startMap = disclosureStartRef.current;
+        const now = performance.now();
+
+        if (visible) {
+          if (!startMap.has(node.id)) {
+            startMap.set(node.id, now);
+          }
+          const elapsed = now - startMap.get(node.id)!;
+          const t = Math.min(elapsed / DISCLOSURE_DURATION_MS, 1);
+          disclosureAlpha = springCurve(t);
+          sizeScale = springScaleCurve(t);
+
+          // While any node is mid-animation, keep canvas repainting every
+          // frame by toggling autoPauseRedraw off (via React state → prop).
+          if (t < 1 && !disclosureRafRef.current) {
+            setDisclosureAnimating(true);
+            const checkDone = () => {
+              const stillAnimating = Array.from(startMap.values()).some(
+                (s) => performance.now() - s < DISCLOSURE_DURATION_MS,
+              );
+              if (stillAnimating) {
+                disclosureRafRef.current = requestAnimationFrame(checkDone);
+              } else {
+                setDisclosureAnimating(false);
+                disclosureRafRef.current = null;
+              }
+            };
+            disclosureRafRef.current = requestAnimationFrame(checkDone);
+          }
+        } else {
+          startMap.delete(node.id);
+          return;
+        }
+      }
       if (disclosureAlpha <= 0) return;
 
-      const r = getNodeSize(node);
+      const baseR = getNodeSize(node) * sizeScale;
+      if (baseR <= 0) return;
+      const r = minNodeScreenRadius > 0
+        ? Math.max(baseR, minNodeScreenRadius / globalScale)
+        : baseR;
+
       const color = getNodeColor(node);
       const isHovered = hoveredNode?.id === node.id;
       const hasHover = hoveredNode !== null;
       const isNeighbor = hoveredNeighborNodes?.has(node.id) ?? false;
 
-      // Start with disclosure alpha as the base
       let alpha = disclosureAlpha;
 
-      // Layer hover dimming on top of disclosure alpha
       if (hasHover && !isNeighbor) {
         alpha *= 0.2;
       } else if (hasHover && isNeighbor && !isHovered) {
@@ -760,26 +1080,37 @@ export default function ForceGraph({
 
       ctx.globalAlpha = alpha;
 
-      ctx.beginPath();
-      ctx.arc(node.x, node.y, r, 0, 2 * Math.PI);
-      ctx.fillStyle = color;
-      ctx.fill();
+      const isSink = sinkSet.has(node.id);
+
+      if (isSink) {
+        ctx.beginPath();
+        ctx.arc(node.x, node.y, r, 0, 2 * Math.PI);
+        ctx.fillStyle = bgColorRef.current;
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(node.x, node.y, r, 0, 2 * Math.PI);
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 1.2 / globalScale;
+        ctx.stroke();
+      } else {
+        ctx.beginPath();
+        ctx.arc(node.x, node.y, r, 0, 2 * Math.PI);
+        ctx.fillStyle = color;
+        ctx.fill();
+      }
 
       if (isHovered) {
-        ctx.strokeStyle = "rgba(255, 255, 255, 0.7)";
+        ctx.strokeStyle = isDark ? "rgba(255, 255, 255, 0.7)" : "rgba(0, 0, 0, 0.5)";
         ctx.lineWidth = 1.5 / globalScale;
         ctx.stroke();
       } else if (hasHover && isNeighbor) {
-        ctx.strokeStyle = "rgba(255, 255, 255, 0.3)";
+        ctx.strokeStyle = isDark ? "rgba(255, 255, 255, 0.3)" : "rgba(0, 0, 0, 0.2)";
         ctx.lineWidth = 0.8 / globalScale;
         ctx.stroke();
       }
 
       ctx.globalAlpha = 1;
 
-      // Canvas labels: only for non-hover label modes (the tooltip handles
-      // hovered/neighbor identification). Hover used to trigger labels here but
-      // that's redundant with the tooltip and creates visual noise.
       const shouldLabel =
         labelVisibility === "all" ||
         (labelVisibility === "hubs" &&
@@ -801,11 +1132,33 @@ export default function ForceGraph({
         let labelAlpha = 0.55;
         if (hasHover && !isNeighbor) labelAlpha = 0.15;
 
-        ctx.fillStyle = `rgba(255, 255, 255, ${labelAlpha * disclosureAlpha})`;
-        ctx.fillText(label, node.x, node.y + r + 2 / globalScale);
+        const labelY = node.y + r + 2 / globalScale;
+
+        if (labelBackground) {
+          const metrics = ctx.measureText(label);
+          const padX = 3 / globalScale;
+          const padY = 1.5 / globalScale;
+          const bgW = metrics.width + padX * 2;
+          const bgH = fontSize + padY * 2;
+          const bgR = 2 / globalScale;
+          const bgX = node.x - bgW / 2;
+          const bgY = labelY - padY;
+
+          ctx.save();
+          ctx.globalAlpha = 0.85 * disclosureAlpha;
+          ctx.fillStyle = bgColorRef.current;
+          ctx.beginPath();
+          ctx.roundRect(bgX, bgY, bgW, bgH, bgR);
+          ctx.fill();
+          ctx.restore();
+        }
+
+        const labelChannel = isDark ? 255 : 0;
+        ctx.fillStyle = `rgba(${labelChannel}, ${labelChannel}, ${labelChannel}, ${labelAlpha * disclosureAlpha})`;
+        ctx.fillText(label, node.x, labelY);
       }
     },
-    [getNodeColor, getNodeSize, hoveredNode, hoveredNeighborNodes, labelVisibility, labelFont, isProgressive, nodeTierMap],
+    [getNodeColor, getNodeSize, hoveredNode, hoveredNeighborNodes, labelVisibility, labelFont, isProgressive, nodeTierMap, sinkSet, isDark, labelBackground, minNodeScreenRadius],
   );
 
   // View-mode-specific accessors
@@ -860,54 +1213,94 @@ export default function ForceGraph({
     [previewPathLinks],
   );
 
-  // Link label: canvas-rendered text along the link midpoint (Mesh view only,
-  // hover-only). Uses "after" mode so the library draws the line first.
+  // Custom link overlay: draws AFTER the library's default line.
+  // Two responsibilities:
+  //   1. Hover emphasis core: solid thin core stroke on top of the library's
+  //      wide translucent glow line (all three views).
+  //   2. Mesh labels: edge type + confidence text at the link midpoint.
   const isMesh = viewMode === "mesh";
 
-  const paintLinkLabel = useCallback(
+  // Theme-aware neutral emphasis colors (Mesh + Signal core line).
+  const meshEmphasisCore = isDark ? "rgb(210, 210, 210)" : "rgb(60, 60, 60)";
+
+  const hoveredNeighborLinksRef = useRef<Set<string> | null>(null);
+  hoveredNeighborLinksRef.current = hoveredNeighborLinks;
+
+  const paintLinkOverlay = useCallback(
     (link: any, ctx: CanvasRenderingContext2D, globalScale: number) => {
-      if (!isMesh) return;
-      if (link._curveDirection === -1) return;
-      if (!hoveredNeighborLinks) return;
-      const srcId = getLinkNodeId(link.source);
-      const tgtId = getLinkNodeId(link.target);
-      if (!hoveredNeighborLinks.has(`${srcId}→${tgtId}`)) return;
-
-      const text = linkLabelText(link);
-      if (!text) return;
-
-      const dAlpha = linkDisclosureAlpha(link);
-      if (dAlpha <= 0) return;
-
       const sx = link.source.x;
       const sy = link.source.y;
       const tx = link.target.x;
       const ty = link.target.y;
       if (sx == null || sy == null || tx == null || ty == null) return;
 
-      const mx = (sx + tx) / 2;
-      const my = (sy + ty) / 2;
-      let angle = Math.atan2(ty - sy, tx - sx);
-      if (angle > Math.PI / 2 || angle < -Math.PI / 2) angle += Math.PI;
+      const hoverLinks = hoveredNeighborLinksRef.current;
+      const srcId = getLinkNodeId(link.source);
+      const tgtId = getLinkNodeId(link.target);
+      const isConnected = hoverLinks?.has(`${srcId}→${tgtId}`) ?? false;
 
-      const fontSize = Math.max(8 / globalScale, 1.5);
-      const computedFont = getComputedStyle(document.documentElement)
-        .getPropertyValue("--font-geist-mono")
-        .trim();
-      const fontFamily = computedFont || "monospace";
-      ctx.font = `${fontSize}px ${fontFamily}`;
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillStyle = `rgba(255, 255, 255, ${0.55 * dAlpha})`;
+      // 1. Hover emphasis: thin solid core on top of the library's wide glow (all views)
+      if (isConnected) {
+        let coreColor: string;
+        if (isPathway || isSignal) {
+          coreColor = link.bidirectional
+            ? LUMEN_LINK_EMPHASIS_CORE
+            : TERRA_LINK_EMPHASIS_CORE;
+        } else {
+          coreColor = meshEmphasisCore;
+        }
+        ctx.beginPath();
+        const cp = link.__controlPoints;
+        if (cp) {
+          ctx.moveTo(sx, sy);
+          ctx.quadraticCurveTo(cp[0], cp[1], tx, ty);
+        } else {
+          ctx.moveTo(sx, sy);
+          ctx.lineTo(tx, ty);
+        }
+        ctx.strokeStyle = coreColor;
+        ctx.lineWidth = LINK_EMPHASIS_CORE_WIDTH;
+        ctx.stroke();
+      }
 
-      ctx.save();
-      ctx.translate(mx, my);
-      ctx.rotate(angle);
-      ctx.fillText(text, 0, -fontSize * 0.8);
-      ctx.restore();
+      // 2. Mesh link labels (hover-only, skip reverse of bidir pairs)
+      if (isMesh && !link._isReverse && isConnected) {
+        const text = linkLabelText(link);
+        if (!text) return;
+
+        const dAlpha = linkDisclosureAlpha(link);
+        if (dAlpha <= 0) return;
+
+        const mx = (sx + tx) / 2;
+        const my = (sy + ty) / 2;
+        let angle = Math.atan2(ty - sy, tx - sx);
+        if (angle > Math.PI / 2 || angle < -Math.PI / 2) angle += Math.PI;
+
+        const fontSize = Math.max(8 / globalScale, 1.5);
+        const computedFont = getComputedStyle(document.documentElement)
+          .getPropertyValue("--font-geist-mono")
+          .trim();
+        const fontFamily = computedFont || "monospace";
+        ctx.font = `${fontSize}px ${fontFamily}`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillStyle = `rgba(100, 100, 100, ${0.7 * dAlpha})`;
+
+        ctx.save();
+        ctx.translate(mx, my);
+        ctx.rotate(angle);
+        ctx.fillText(text, 0, -fontSize * 0.8);
+        ctx.restore();
+      }
     },
-    [isMesh, hoveredNeighborLinks, linkDisclosureAlpha],
+    [isMesh, isPathway, isSignal, meshEmphasisCore, linkDisclosureAlpha],
   );
+
+  // Theme-aware mesh link colors: neutral gray that contrasts with the background.
+  const meshLinkColor = isDark ? LINK_COLOR : "rgba(80, 80, 80, 0.18)";
+  const meshLinkDim = isDark ? LINK_COLOR_DIM : "rgba(80, 80, 80, 0.06)";
+  // Glow layer for two-layer hover emphasis (Mesh + Signal)
+  const meshEmphasisGlow = isDark ? "rgba(210, 210, 210, 0.12)" : "rgba(40, 40, 40, 0.10)";
 
   const linkColorAccessor = useCallback(
     (link: any) => {
@@ -920,23 +1313,23 @@ export default function ForceGraph({
       if (isSignal) {
         const onActive = isOnActivePath(link);
         const onPreview = isOnPreviewPath(link);
-        if (onActive && connected) return LINK_COLOR_EMPHASIS;
+        if (onActive && connected) return link.bidirectional ? LUMEN_LINK_EMPHASIS_GLOW : TERRA_LINK_EMPHASIS_GLOW;
         if (onActive) return link.bidirectional ? SIGNAL_ACTIVE_LINK_BI : SIGNAL_ACTIVE_LINK;
         if (onPreview) return link.bidirectional ? SIGNAL_PREVIEW_LINK_BI : SIGNAL_PREVIEW_LINK;
-        return LINK_COLOR;
+        return meshLinkColor;
       }
 
       if (isPathway) {
         if (!hasHover) return link.bidirectional ? LUMEN_LINK : TERRA_LINK;
-        if (connected) return link.bidirectional ? LUMEN_LINK_EMPHASIS : TERRA_LINK_EMPHASIS;
-        return LINK_COLOR_DIM;
+        if (connected) return link.bidirectional ? LUMEN_LINK_EMPHASIS_GLOW : TERRA_LINK_EMPHASIS_GLOW;
+        return meshLinkDim;
       }
 
       // Mesh view
-      if (!hasHover) return LINK_COLOR;
-      return connected ? LINK_COLOR_EMPHASIS : LINK_COLOR_DIM;
+      if (!hasHover) return meshLinkColor;
+      return connected ? meshEmphasisGlow : meshLinkDim;
     },
-    [isPathway, isSignal, hoveredNeighborLinks, activatedPathLinks, previewPathLinks, isLinkConnected, isOnActivePath, isOnPreviewPath, linkDisclosureAlpha],
+    [isPathway, isSignal, hoveredNeighborLinks, activatedPathLinks, previewPathLinks, isLinkConnected, isOnActivePath, isOnPreviewPath, linkDisclosureAlpha, meshLinkColor, meshEmphasisGlow, meshLinkDim],
   );
 
   const linkWidthAccessor = useCallback(
@@ -949,7 +1342,7 @@ export default function ForceGraph({
       if (isSignal) {
         const onActive = isOnActivePath(link);
         const onPreview = isOnPreviewPath(link);
-        if (onActive && connected) return LINK_WIDTH_EMPHASIS;
+        if (onActive && connected) return LINK_EMPHASIS_WIDTH;
         if (onActive) return SIGNAL_ACTIVE_WIDTH;
         if (onPreview) return LINK_WIDTH * 0.8;
         return LINK_WIDTH;
@@ -958,12 +1351,12 @@ export default function ForceGraph({
       if (isPathway) {
         const base = LINK_WIDTH + (link.confidence ?? 0.5) * 1.2;
         if (!hasHover) return base;
-        return connected ? base * 1.3 : LINK_WIDTH_DIM;
+        return connected ? base * 2.5 : LINK_WIDTH_DIM;
       }
 
       // Mesh view
       if (!hasHover) return LINK_WIDTH;
-      return connected ? LINK_WIDTH_EMPHASIS : LINK_WIDTH_DIM;
+      return connected ? LINK_EMPHASIS_WIDTH : LINK_WIDTH_DIM;
     },
     [isPathway, isSignal, hoveredNeighborLinks, activatedPathLinks, previewPathLinks, isLinkConnected, isOnActivePath, isOnPreviewPath, linkDisclosureAlpha],
   );
@@ -1077,17 +1470,22 @@ export default function ForceGraph({
     >
       {dimensions.width > 0 && (
         <ForceGraph2D
-          ref={graphRef}
+          ref={graphCallbackRef}
           graphData={graphData}
           width={dimensions.width}
           height={dimensions.height}
+          autoPauseRedraw={!disclosureAnimating && !isSignal}
           nodeLabel=""
           nodeCanvasObject={paintNode}
-          nodeCanvasObjectMode={() => "replace" as const}
+          nodeCanvasObjectMode={nodeCanvasReplaceMode}
           nodePointerAreaPaint={(node: any, color: string, ctx: CanvasRenderingContext2D) => {
-            if (isProgressive) {
-              const dAlpha = tierAlpha(nodeTierMap.get(node.id) ?? 3, currentScaleRef.current);
-              if (dAlpha <= 0) return;
+            const nodeTier = nodeTierMap.get(node.id) ?? 3;
+            if (isProgressive && nodeTier !== 1) {
+              if (!isTierVisible(nodeTier, currentScaleRef.current)) return;
+              if (!disclosureStartRef.current.has(node.id)) return;
+              const elapsed = performance.now() - disclosureStartRef.current.get(node.id)!;
+              const t = Math.min(elapsed / DISCLOSURE_DURATION_MS, 1);
+              if (t <= 0) return;
             }
             const r = getNodeSize(node) * 3 + 4;
             ctx.beginPath();
@@ -1096,9 +1494,9 @@ export default function ForceGraph({
             ctx.fill();
           }}
           linkHoverPrecision={8}
-          linkLabel={() => ""}
-          linkCanvasObject={paintLinkLabel}
-          linkCanvasObjectMode={() => "after" as const}
+          linkLabel={emptyLinkLabel}
+          linkCanvasObject={paintLinkOverlay}
+          linkCanvasObjectMode={linkCanvasAfterMode}
           linkColor={linkColorAccessor}
           linkWidth={linkWidthAccessor}
           linkDirectionalArrowLength={arrowLength}
@@ -1111,7 +1509,6 @@ export default function ForceGraph({
           linkDirectionalParticleSpeed={particleSpeedAccessor}
           linkDirectionalParticleWidth={PARTICLE_WIDTH}
           linkDirectionalParticleColor={particleColorAccessor}
-          autoPauseRedraw={!isSignal}
           onNodeHover={handleNodeHover as any}
           onLinkHover={handleLinkHover as any}
           onNodeClick={handleNodeClick as any}
@@ -1126,6 +1523,7 @@ export default function ForceGraph({
           d3AlphaDecay={ALPHA_DECAY}
           d3VelocityDecay={VELOCITY_DECAY}
           onEngineStop={handleEngineStop}
+          onRenderFramePre={gridDotColor ? paintGrid : undefined}
           backgroundColor="rgba(0,0,0,0)"
         />
       )}
@@ -1169,21 +1567,19 @@ export default function ForceGraph({
                     {hoveredNode.label}
                   </span>
                 )}
-                {hoveredDegreeStats && hoveredDegreeStats.first > 0 && (
+                {hoveredDegreeStats && hoveredDegreeStats.total > 0 && (
                   <div className={styles.tooltipDegrees}>
-                    <span className={styles.tooltipDegreeRow}>
-                      <span className={styles.tooltipDegreeValue}>{hoveredDegreeStats.first}</span>
-                      <span className={styles.tooltipDegreeLabel}>direct</span>
+                    <span className={styles.tooltipDegreeValue}>{hoveredDegreeStats.total}</span>
+                    <span className={styles.tooltipDegreeSplit}>
+                      ({[
+                        hoveredDegreeStats.inCount > 0 && `${hoveredDegreeStats.inCount} in`,
+                        hoveredDegreeStats.outCount > 0 && `${hoveredDegreeStats.outCount} out`,
+                        hoveredDegreeStats.biCount > 0 && `${hoveredDegreeStats.biCount} bi`,
+                      ].filter(Boolean).join(" / ")})
                     </span>
-                    {hoveredDegreeStats.second > 0 && (
-                      <span className={styles.tooltipDegreeRow}>
-                        <span className={styles.tooltipDegreeValue}>{hoveredDegreeStats.second}</span>
-                        <span className={styles.tooltipDegreeLabel}>2nd-degree</span>
-                      </span>
-                    )}
                   </div>
                 )}
-                {hoveredDegreeStats && hoveredDegreeStats.first === 0 && (
+                {hoveredDegreeStats && hoveredDegreeStats.total === 0 && (
                   <span className={styles.tooltipOrphan}>orphan</span>
                 )}
               </>
