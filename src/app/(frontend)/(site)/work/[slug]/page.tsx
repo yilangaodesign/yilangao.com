@@ -53,8 +53,8 @@ const INTERACTIVE_VISUALS: Record<string, Record<string, { component: string; pl
       playgroundUrl: "https://yilangao-design-system.vercel.app",
       playgroundLabel: "Explore the full design system",
     },
-    "The Experiment": {
-      component: "GraphCanvas",
+    "0, 0, 72.": {
+      component: "ExperimentSection",
       playgroundUrl: "https://yilangao-design-system.vercel.app",
       playgroundLabel: "Explore the full design system",
     },

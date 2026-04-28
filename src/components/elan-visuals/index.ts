@@ -7,3 +7,4 @@ export { default as CollaborationLoop } from "./CollaborationLoop";
 export { default as SkillMap } from "./SkillMap";
 export { default as MaturityTimeline } from "./MaturityTimeline";
 export { default as GraphCanvas } from "./GraphCanvas";
+export { default as ExperimentSection } from "./ExperimentSection";

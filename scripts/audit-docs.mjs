@@ -648,7 +648,7 @@ function checkAnalyticsEventRegistryParity() {
 
 const GRAPH_CACHE_PATH = resolve(ROOT, '.cache/graph.json');
 const KG_SPEC_PATH = resolve(ROOT, 'docs/knowledge-graph.md');
-const TOPIC_VOCAB_CAP = 39;
+const TOPIC_VOCAB_CAP = 40;
 
 function loadGraphCacheOrWarn(checkName) {
   if (!existsSync(GRAPH_CACHE_PATH)) {
@@ -788,6 +788,8 @@ function checkFrontmatterSchema() {
     'alias',
     'eval-task-corpus',
     'eval-baseline',
+    'eval-report',
+    'eval-spec',
     'release-log',
     'spec',
   ]);

@@ -1,3 +1,14 @@
+---
+type: eval-task-corpus
+id: eval-task-corpus
+topics: [eval, knowledge-graph]
+derivedFrom:
+  - docs/initiatives/docs-knowledge-graph-initiative.md
+references:
+  - docs/eval-pre-registration.md
+  - docs/eval-adversarial-controls.md
+---
+
 # Eval task corpus
 
 > **Purpose**: a frozen 12-task set drawn from past feedback log entries — each with a known-correct resolution and a gold AP citation — used by a future A/B evaluation plan to compare agent generation outcomes between the pre-initiative documentation system (`eval-baseline-current` worktree) and the post-initiative `main`.

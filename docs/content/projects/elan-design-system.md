@@ -27,8 +27,8 @@ derivedFrom:
   (MCP servers, metadata files), this demonstrates a different starting point:
   co-creation.
 - **Status:** draft-v4 (materialized to CMS via update-elan route). 4 sections:
-  3 with Tier 3 interactive components (CollaborationLoop, SkillMap, GraphCanvas),
-  1 text-only closing ("Is Any of This Working?"). MaturityTimeline removed.
+  all with interactive components (CollaborationLoop, SkillMap, MaturityTimeline,
+  ExperimentSection). ExperimentSection is a compound: GraphCanvas + EvalComparisonGrid.
 - **Last significant edit:** 2026-04-28
 - **Quality check results:** Pending Phase 4 review.
 
@@ -145,10 +145,11 @@ energy while tightening grammar and thesis coherence.
   Stacked bar chart showing correction recurrence breakdown (recurrent/approximate/novel)
   over build days. Domain toggle hidden; narrative focuses on novel-% trending upward
   (+0.34%/day) as the "muddier than expected" signal. Trend line overlay on recurrence view.
-- **GraphCanvas:** Tier 3. Section 4 "The Experiment." Force-directed knowledge graph
-  (~995 nodes, ~4,892 edges). Auto-transition loop: Signal (rotating hubs) → Pathway →
-  Mesh, 18s cycle. Tour stops on node click in Signal view. Viewport-gated. Paired with
-  eval corpus description: this is where the project currently sits.
+- **ExperimentSection:** Tier 3 compound. Section 4 "0, 0, 72." Stacks GraphCanvas
+  (force-directed knowledge graph, ~995 nodes, ~4,892 edges, auto-transition loop) +
+  EvalComparisonGrid (3-column comparison: Bare LLM / Old Docs / Knowledge Graph, stratified
+  by subtle/obvious tasks). Body text replaced with actual eval results: 72% gold cite on
+  subtle tasks vs 0% for all other arms, verdict inconclusive by pre-registered rules.
 
 ### v3 (archived)
 
@@ -179,7 +180,7 @@ energy while tightening grammar and thesis coherence.
 | 1 | Teach Once, Enforce Forever | CollaborationLoop | Tier 3 | The Seed: vibe-coding, steady cost, first file (Act I) |
 | 2 | The System Behind the System | SkillMap (dual-view) | Tier 3 | CTA split, bucket problem, rot (Acts II-IV) |
 | 3 | Relationships Hidden in Context | MaturityTimeline (recurrence only) | Tier 2 | Novel-% trending up = muddier than expected → research → need for graph + measurement (Acts IV-VI) |
-| 4 | The Experiment | GraphCanvas | Tier 3 | The graph + eval: where the project is now (Acts V-VIII) |
+| 4 | 0, 0, 72. | ExperimentSection (compound: GraphCanvas + EvalComparisonGrid) | Tier 3 | The graph + eval results: 72% vs 0% on subtle tasks, inconclusive by own rules (Acts V-VIII) |
 
 ## Open Questions for Next Iteration
 
@@ -248,6 +249,19 @@ energy while tightening grammar and thesis coherence.
   recurrence view showing novel-% trending upward as narrative evidence for "muddier than
   expected." Section 3 body rewritten to reference the chart directly. Section 3 no longer
   text-only.
+- 2026-04-28: Section 4 rewrite with actual eval results. GraphCanvas replaced by
+  ExperimentSection (compound: GraphCanvas + EvalComparisonGrid). Body para 2 adjusted
+  for 3-arm framing; para 3 replaced with results narrative (72% vs 0% on subtle tasks,
+  inconclusive by own rules, "the number is just not clean"). Eval artifacts graph-indexed
+  via docs/eval-navigator.md. 7 eval docs received graph frontmatter. New node types
+  (eval-report, eval-spec) and topic (eval) added to knowledge-graph.md taxonomy.
+- 2026-04-28: Section 4 title + body rewrite. "The Experiment" (Preview Title, Check 7
+  fail) replaced with "0, 0, 72." (Staccato Authority on raw arm scores). Body cut from
+  5 paragraphs / 14 sentences to 2 paragraphs / 6 sentences. Architecture beat content
+  (graph-building details) dropped entirely — scope statement and GraphCanvas already
+  cover it. New body leads with result (T14 Emotional Deflation), adds Concessive Turn
+  (T12+T13), closes with T15 Closed-Loop callback to "stopped forgetting" from blurb.
+  Driven by Phase 1b audit: 5 FAILs (Checks 1, 2, 4, 7, 10, 19).
 
 ## Portfolio Coherence Manifest Entry
 
@@ -255,7 +269,7 @@ energy while tightening grammar and thesis coherence.
 - **Headline technique:** T8 Verdict + Staccato Authority ("Harnessed my code production - 40 sessions in.")
 - **Voice register:** Conversational-irreverent
 - **Metric type:** Knowledge-graph scale (~5K edges)
-- **Evidence method:** Interactive demo (3 Tier 3 components: CollaborationLoop, SkillMap, GraphCanvas)
+- **Evidence method:** Interactive demo (3 Tier 3 components: CollaborationLoop, SkillMap, ExperimentSection) + quantitative eval results
 - **Employment context:** Solo project / portfolio piece
 
 ## Cross-References
