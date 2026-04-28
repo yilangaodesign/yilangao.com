@@ -22,7 +22,28 @@
 import { readFileSync, writeFileSync, mkdirSync, existsSync, appendFileSync, readdirSync } from 'fs';
 import { resolve, join } from 'path';
 import { generateText } from 'ai';
-import { gateway } from '@ai-sdk/gateway';
+
+async function resolveModel(modelId) {
+  if (process.env.VERCEL_OIDC_TOKEN) {
+    const { gateway } = await import('@ai-sdk/gateway');
+    return gateway(modelId);
+  }
+  const [provider, model] = modelId.split('/');
+  if (provider === 'openai' && process.env.OPENAI_API_KEY) {
+    const { openai } = await import('@ai-sdk/openai');
+    return openai(model);
+  }
+  if (provider === 'google' && process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
+    const { google } = await import('@ai-sdk/google');
+    return google(model);
+  }
+  if (provider === 'xai' && process.env.XAI_API_KEY) {
+    const { xai } = await import('@ai-sdk/xai');
+    return xai(model);
+  }
+  const { gateway } = await import('@ai-sdk/gateway');
+  return gateway(modelId);
+}
 
 const ROOT = resolve(import.meta.dirname, '..');
 
@@ -154,8 +175,9 @@ function loadExistingJudgments() {
 // ---------------------------------------------------------------------------
 async function callJudge(judgeModel, systemPrompt, userPrompt) {
   try {
+    const model = await resolveModel(judgeModel);
     const result = await generateText({
-      model: gateway(judgeModel),
+      model,
       system: systemPrompt,
       prompt: userPrompt,
       maxTokens: 512,

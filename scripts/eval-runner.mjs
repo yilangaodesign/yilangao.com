@@ -26,8 +26,33 @@ import { resolve, join } from 'path';
 import { execSync, spawn } from 'child_process';
 import { createHash } from 'crypto';
 import { generateText, tool, stepCountIs } from 'ai';
-import { gateway } from '@ai-sdk/gateway';
 import { z } from 'zod';
+
+// Model resolution: prefer AI Gateway OIDC, fall back to direct provider SDK
+async function resolveModel(modelId) {
+  // Try AI Gateway first
+  if (process.env.VERCEL_OIDC_TOKEN) {
+    const { gateway } = await import('@ai-sdk/gateway');
+    return gateway(modelId);
+  }
+  // Fall back to direct provider SDKs
+  const [provider, model] = modelId.split('/');
+  if (provider === 'anthropic' && process.env.ANTHROPIC_API_KEY) {
+    const { anthropic } = await import('@ai-sdk/anthropic');
+    return anthropic(model);
+  }
+  if (provider === 'openai' && process.env.OPENAI_API_KEY) {
+    const { openai } = await import('@ai-sdk/openai');
+    return openai(model);
+  }
+  if (provider === 'google' && process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
+    const { google } = await import('@ai-sdk/google');
+    return google(model);
+  }
+  // Last resort: try gateway anyway (will fail with a clear error)
+  const { gateway } = await import('@ai-sdk/gateway');
+  return gateway(modelId);
+}
 
 const ROOT = resolve(import.meta.dirname, '..');
 
@@ -632,8 +657,9 @@ async function runTask(task, rep, armTools, systemPrompt) {
   toolCallLog.length = 0;
 
   try {
+    const model = await resolveModel('anthropic/claude-4.6-sonnet');
     const result = await generateText({
-      model: gateway('anthropic/claude-4.6-sonnet'),
+      model,
       system: systemPrompt,
       prompt: task.prompt,
       tools: Object.keys(taskTools).length > 0 ? taskTools : undefined,
