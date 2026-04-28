@@ -48,7 +48,12 @@ const INTERACTIVE_VISUALS: Record<string, Record<string, { component: string; pl
       playgroundUrl: "https://yilangao-design-system.vercel.app",
       playgroundLabel: "Explore the full design system",
     },
-    "The Living Graph": {
+    "Organized\u2026 Until It Wasn\u2019t": {
+      component: "MaturityTimeline",
+      playgroundUrl: "https://yilangao-design-system.vercel.app",
+      playgroundLabel: "Explore the full design system",
+    },
+    "The Experiment": {
       component: "GraphCanvas",
       playgroundUrl: "https://yilangao-design-system.vercel.app",
       playgroundLabel: "Explore the full design system",
