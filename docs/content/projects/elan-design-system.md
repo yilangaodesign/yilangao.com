@@ -141,11 +141,14 @@ energy while tightening grammar and thesis coherence.
   ccunpacked.dev "Tool System" (card grid) + "Architecture Explorer" (treemap).
   Dual-view component: View 1 "Operations" (18 skills by phase, dynamic count),
   View 2 "Knowledge" (200+ anti-patterns by domain as proportional blocks).
-- **GraphCanvas:** Tier 3. Section 3 "The Living Graph." Force-directed knowledge
-  graph (~995 nodes, ~4,892 edges). Auto-transition loop: Signal (rotating hubs) →
-  Pathway → Mesh, 18s cycle. Tour stops on node click in Signal view. Viewport-gated.
-- Section 4 "Is Any of This Working?" is text-only (no interactive visual). Deliberate
-  gear shift: three interactive sections then prose and an honest question.
+- **MaturityTimeline:** Tier 2. Section 3 "Relationships Hidden in Context."
+  Stacked bar chart showing correction recurrence breakdown (recurrent/approximate/novel)
+  over build days. Domain toggle hidden; narrative focuses on novel-% trending upward
+  (+0.34%/day) as the "muddier than expected" signal. Trend line overlay on recurrence view.
+- **GraphCanvas:** Tier 3. Section 4 "The Experiment." Force-directed knowledge graph
+  (~995 nodes, ~4,892 edges). Auto-transition loop: Signal (rotating hubs) → Pathway →
+  Mesh, 18s cycle. Tour stops on node click in Signal view. Viewport-gated. Paired with
+  eval corpus description: this is where the project currently sits.
 
 ### v3 (archived)
 
@@ -173,10 +176,10 @@ energy while tightening grammar and thesis coherence.
 | Section | Heading | Interactive Visual | Artifact Tier | Narrative Beat |
 |---------|---------|-------------------|---------------|----------------|
 | Blurb | "Every day is a first date..." | - | - | Hook + Stakes + Insight |
-| 1 | Teach Once, Enforce Forever | CollaborationLoop | Tier 3 | Mechanism (Acts I-II) |
-| 2 | The System Behind the System | SkillMap (dual-view) | Tier 3 | Scale + Decay (Acts II-IV) |
-| 3 | The Living Graph | GraphCanvas | Tier 3 | The Graph (Act V) |
-| 4 | Is Any of This Working? | (text-only) | - | The Question (Acts VI-VIII) |
+| 1 | Teach Once, Enforce Forever | CollaborationLoop | Tier 3 | The Seed: vibe-coding, steady cost, first file (Act I) |
+| 2 | The System Behind the System | SkillMap (dual-view) | Tier 3 | CTA split, bucket problem, rot (Acts II-IV) |
+| 3 | Relationships Hidden in Context | MaturityTimeline (recurrence only) | Tier 2 | Novel-% trending up = muddier than expected → research → need for graph + measurement (Acts IV-VI) |
+| 4 | The Experiment | GraphCanvas | Tier 3 | The graph + eval: where the project is now (Acts V-VIII) |
 
 ## Open Questions for Next Iteration
 
@@ -235,6 +238,16 @@ energy while tightening grammar and thesis coherence.
   to Section 3 with auto-transition loop. New text-only Section 4 "Is Any of This Working?"
   as closing. Hero metric changed from "130+" (anti-patterns) to "~5K" (knowledge graph
   edges). All metrics updated to verified current numbers (18 skills, 200+ APs, ~4,892 edges).
+- 2026-04-28: Narrative twist injection (CFB-044). All four section bodies rewritten to
+  incorporate the 8-act draft's missing reversals. Section 1: vibe-coding setup, specific
+  failure examples (hex/flush/em dashes). Section 2: bucket problem (cross-pillar + doubled
+  overhead) and rot as named failure mode. Section 3: retitled "Relationships Hidden in
+  Context" (from "The Living Graph"); deflation beat added ("felt good for two weeks").
+  Section 4: capture protocol twist (Act VII) added. Visual assignments unchanged.
+- 2026-04-28: MaturityTimeline reintroduced to Section 3. Domain toggle hidden; locked to
+  recurrence view showing novel-% trending upward as narrative evidence for "muddier than
+  expected." Section 3 body rewritten to reference the chart directly. Section 3 no longer
+  text-only.
 
 ## Portfolio Coherence Manifest Entry
 

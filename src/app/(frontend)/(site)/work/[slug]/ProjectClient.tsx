@@ -35,6 +35,7 @@ import {
   CollaborationLoop,
   SkillMap,
   GraphCanvas,
+  MaturityTimeline,
 } from "@/components/elan-visuals";
 import {
   DndContext,
@@ -276,6 +277,7 @@ const VISUAL_COMPONENTS: Record<string, React.ComponentType> = {
   CollaborationLoop,
   SkillMap,
   GraphCanvas,
+  MaturityTimeline,
 };
 
 function InteractiveVisual({ config }: { config: InteractiveVisualConfig }) {

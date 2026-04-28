@@ -72,13 +72,15 @@
   flex-direction: column;
   gap: 2px;
   padding: $portfolio-spacer-1x;
-  // Filled gray background, no border — on white grid, the fill creates the
-  // card boundary. Border would double-frame every card against the grid border.
   background: $portfolio-neutral-10;
   border: none;
   cursor: pointer;
-  transition: background $portfolio-duration-fast $portfolio-easing-standard;
   text-align: left;
+  transform-origin: top center;
+  transform: scaleY(1);
+  transition:
+    background 280ms cubic-bezier(0.25, 0.1, 0.25, 1),
+    transform 400ms cubic-bezier(0.22, 1.2, 0.36, 1);
 
   &:hover {
     background: $portfolio-neutral-20;
@@ -92,6 +94,7 @@
 
 .skillCardExpanded {
   background: $portfolio-neutral-20;
+  transform: scaleY(1.08);
 }
 
 .skillName {
@@ -111,15 +114,26 @@
   line-height: $portfolio-leading-compact;
 }
 
+@keyframes detailGrowDown {
+  from {
+    opacity: 0;
+    transform: scaleY(0);
+  }
+  to {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+}
+
 .skillDetail {
   margin-top: $portfolio-spacer-0-25x;
   padding-top: $portfolio-spacer-0-25x;
   border-top: 1px solid $portfolio-border-neutral-minimal;
-  // type-xs ≈ 12px — minimum accessible size for explanatory body copy.
-  // type-3xs (8px) is below every accessibility baseline.
   font-size: $portfolio-type-xs;
   line-height: $portfolio-leading-relaxed;
   color: $portfolio-text-neutral-regular;
+  transform-origin: top center;
+  animation: detailGrowDown 350ms cubic-bezier(0.22, 1.2, 0.36, 1) both;
 }
 
 // ── Knowledge treemap ────────────────────────────────────────────────────────
@@ -338,21 +352,21 @@
 // ── Domain colors ────────────────────────────────────────────────────────────
 
 .domainDesign {
-  background: $portfolio-cyan-20;
-  color: $portfolio-cyan-70;
-  border-color: $portfolio-cyan-30;
-}
-
-.domainEngineering {
   background: $portfolio-accent-20;
   color: $portfolio-accent-70;
   border-color: $portfolio-accent-30;
 }
 
+.domainEngineering {
+  background: $portfolio-accent-10;
+  color: $portfolio-accent-60;
+  border-color: $portfolio-accent-20;
+}
+
 .domainContent {
-  background: $portfolio-green-10;
-  color: $portfolio-green-60;
-  border-color: $portfolio-green-20;
+  background: $portfolio-accent-30;
+  color: $portfolio-accent-80;
+  border-color: $portfolio-accent-40;
 }
 
 // ── Legend ────────────────────────────────────────────────────────────────────
@@ -376,15 +390,15 @@
 }
 
 .legendDotDesign {
-  background: $portfolio-cyan-30;
+  background: $portfolio-accent-20;
 }
 
 .legendDotEngineering {
-  background: $portfolio-accent-40;
+  background: $portfolio-accent-10;
 }
 
 .legendDotContent {
-  background: $portfolio-green-20;
+  background: $portfolio-accent-30;
 }
 
 @media (prefers-reduced-motion: reduce) {

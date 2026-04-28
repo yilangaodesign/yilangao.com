@@ -4,10 +4,10 @@
  */
 export const asciiStudio = {
   name: "ASCII Art Studio",
-  version: "0.6.20",
+  version: "0.6.21",
   release: {
-    version: "0.6.20",
-    name: "ASCII Art Studio 0.6.20",
-    releasedAt: "2026-04-28T17:39:59.898Z",
+    version: "0.6.21",
+    name: "ASCII Art Studio 0.6.21",
+    releasedAt: "2026-04-28T19:39:14.107Z",
   },
 } as const;

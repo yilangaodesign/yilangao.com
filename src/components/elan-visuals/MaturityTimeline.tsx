@@ -14,7 +14,7 @@ type TooltipState = {
   dayIndex: number;
 } | null;
 
-const TOOLTIP_HALF_PX = 75;
+const TOOLTIP_HALF_PX = 130;
 
 function clampTooltipX(x: number, containerWidthPx: number): number {
   const edge = 8;
@@ -210,26 +210,7 @@ export default function MaturityTimeline() {
         }
       }}
     >
-      <div className={styles.controls}>
-        <div className={styles.toggleGroup} role="radiogroup" aria-label="View mode">
-          <button
-            className={`${styles.toggleButton} ${mode === "recurrence" ? styles.toggleButtonActive : ""}`}
-            onClick={() => { setMode("recurrence"); setActiveFilter(null); }}
-            role="radio"
-            aria-checked={mode === "recurrence"}
-          >
-            By recurrence
-          </button>
-          <button
-            className={`${styles.toggleButton} ${mode === "domain" ? styles.toggleButtonActive : ""}`}
-            onClick={() => { setMode("domain"); setActiveFilter(null); }}
-            role="radio"
-            aria-checked={mode === "domain"}
-          >
-            By domain
-          </button>
-        </div>
-      </div>
+      {/* Toggle hidden: Section 3 narrative focuses on recurrence only */}
 
       <div className={styles.visualizationWithLegend}>
         {liveData === null && (

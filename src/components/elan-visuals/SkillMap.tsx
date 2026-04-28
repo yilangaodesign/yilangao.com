@@ -72,6 +72,8 @@ function domainTotalsFromData(data: AntipatternData): DomainTotals {
 
 // ── Operations view ──────────────────────────────────────────────────────────
 
+const AUTO_TOUR_DELAY_MS = 3000;
+
 function OperationsGrid() {
   const [expanded, setExpanded] = useState<string | null>(null);
   const [phases, setPhases] = useState<LiveSkillPhase[]>(FALLBACK_PHASES);
@@ -79,6 +81,9 @@ function OperationsGrid() {
   const [gridFixedHeight, setGridFixedHeight] = useState<number | undefined>(undefined);
   const gridRef = useRef<HTMLDivElement | null>(null);
   const measuredRef = useRef(false);
+  const [tourStopped, setTourStopped] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     fetch("/api/skills")
@@ -87,17 +92,9 @@ function OperationsGrid() {
         setPhases(data.phases);
         setTotal(data.total);
       })
-      .catch(() => {
-        // Leave fallback in place on error
-      });
+      .catch(() => {});
   }, []);
 
-  // One-time measurement pass: expand each card, measure the tallest grid
-  // height, then lock that value so the grid never shifts on expand/collapse.
-  // The measurement runs inside a microtask so flushSync executes outside
-  // React's commit phase (React 19 forbids flushSync during lifecycle methods).
-  // Microtasks fire after the current task ends but before the browser paints,
-  // so intermediate expansion states remain invisible.
   useLayoutEffect(() => {
     if (measuredRef.current) return;
     if (phases.every((p) => p.skills.length === 0)) return;
@@ -122,10 +119,44 @@ function OperationsGrid() {
     });
   }, [phases]);
 
+  // Visibility observer for auto-tour
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([entry]) => setIsVisible(entry.isIntersecting),
+      { threshold: 0.3 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  // Auto-tour: cycle through skills while visible and not stopped
+  useEffect(() => {
+    if (tourStopped || !isVisible) return;
+    const allNames = phases.flatMap((p) => p.skills.map((s) => s.name));
+    if (allNames.length === 0) return;
+
+    const timer = setInterval(() => {
+      setExpanded((prev) => {
+        const idx = prev ? allNames.indexOf(prev) : -1;
+        const next = (idx + 1) % allNames.length;
+        return allNames[next];
+      });
+    }, AUTO_TOUR_DELAY_MS);
+
+    return () => clearInterval(timer);
+  }, [tourStopped, isVisible, phases]);
+
+  const handleUserClick = (skillName: string) => {
+    setTourStopped(true);
+    setExpanded((prev) => (prev === skillName ? null : skillName));
+  };
+
   const operationsLabel = total > 0 ? `Operations (${total} skills)` : "Operations";
 
   return (
-    <>
+    <div ref={containerRef}>
     <h3 className={styles.sectionHeader}>{operationsLabel}</h3>
     <div
       ref={gridRef}
@@ -150,7 +181,7 @@ function OperationsGrid() {
                 <button
                   key={skill.name}
                   className={`${styles.skillCard} ${isExpanded ? styles.skillCardExpanded : ""}`}
-                  onClick={() => setExpanded(isExpanded ? null : skill.name)}
+                  onClick={() => handleUserClick(skill.name)}
                   aria-expanded={isExpanded}
                 >
                   <span className={styles.skillName}>{skill.name}</span>
@@ -170,7 +201,7 @@ function OperationsGrid() {
         </Fragment>
       ))}
     </div>
-    </>
+    </div>
   );
 }
 

@@ -162,31 +162,31 @@
   opacity: 0.15;
 }
 
-// Domain segment tones — cool families, desaturated with wide brightness spread
+// Domain segment tones — Terra + Neutral palette
 .domainEngineering {
-  background: $portfolio-accent-40;
+  background: $portfolio-terra-40;
 }
 
 .domainDesign {
-  background: $portfolio-cyan-30;
+  background: $portfolio-terra-20;
 }
 
 .domainContent {
-  background: $portfolio-green-20;
+  background: $portfolio-neutral-20;
 }
 
-// Recurrence segment tones — Plan B citation classification
+// Recurrence segment tones — Lumen palette (single-chart, single family)
 // recurrent (cited AP, mature signal) → approximate → novel (still surfacing)
 .recurrenceDark {
-  background: $portfolio-cyan-50;
+  background: $portfolio-terra-40;
 }
 
 .recurrenceMid {
-  background: $portfolio-cyan-30;
+  background: $portfolio-terra-20;
 }
 
 .recurrenceLight {
-  background: $portfolio-cyan-10;
+  background: $portfolio-terra-10;
 }
 
 // ── Trend line overlay ──────────────────────────────────────────────────────
@@ -209,7 +209,7 @@
 
 .trendLine {
   stroke: $portfolio-neutral-90;
-  stroke-width: 2.5px;
+  stroke-width: 1.5px;
   pointer-events: none;
 }
 
@@ -255,7 +255,9 @@
 }
 
 .tooltip {
-  width: 150px;
+  width: max-content;
+  min-width: 150px;
+  max-width: 260px;
   overflow: hidden;
   transition:
     height 200ms cubic-bezier(0.4, 0, 0.2, 1),
@@ -275,6 +277,7 @@
   gap: 2px;
   padding: $portfolio-spacer-0-5x $portfolio-spacer-1x;
   white-space: nowrap;
+  width: max-content;
 }
 
 .tooltipTitle {
@@ -385,27 +388,27 @@
 }
 
 .legendEngineering {
-  background: $portfolio-accent-40;
+  background: $portfolio-terra-40;
 }
 
 .legendDesign {
-  background: $portfolio-cyan-30;
+  background: $portfolio-terra-20;
 }
 
 .legendContent {
-  background: $portfolio-green-20;
+  background: $portfolio-neutral-20;
 }
 
 .legendRecurrenceDark {
-  background: $portfolio-cyan-50;
+  background: $portfolio-terra-40;
 }
 
 .legendRecurrenceMid {
-  background: $portfolio-cyan-30;
+  background: $portfolio-terra-20;
 }
 
 .legendRecurrenceLight {
-  background: $portfolio-cyan-10;
+  background: $portfolio-terra-10;
 }
 
 .legendTrendLine {

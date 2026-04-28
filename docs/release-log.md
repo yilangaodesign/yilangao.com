@@ -17,7 +17,35 @@ references:
 >
 > **Who reads this:** AI agents when the `ship-it` skill is activated — scan recent entries for recurring pitfalls before starting a new release.
 > **Who writes this:** AI agents after each ship-it run via the Post-Release Audit protocol in `ship-it/SKILL.md`.
-> **Last updated:** 2026-04-26 (REL-030: Knowledge graph infrastructure release — Élan 2.14.0, ASCII Art Studio 0.6.19, yilangao.com 1.5.2)
+> **Last updated:** 2026-04-28 (REL-031: Visual refactors, eval results, dependency additions — Élan 2.15.0, ASCII Art Studio 0.6.20, yilangao.com 1.5.3)
+
+---
+
+<a id="rel-031"></a>
+## REL-031 — Visual Refactors & Eval Results (2026-04-28)
+
+**Scope:** Consolidation of elan-visuals (replaced KnowledgeGraph + SystemVisuals with GraphCanvas), ForceGraph enhancements, Canvas/CanvasToolbar updates, KG A/B evaluation results (498 JSONL files from calibration + full suite), new dependencies (lucide-react, ai, @ai-sdk/gateway), feedback log + eval baseline updates, and content dossier refinements.
+
+**Versions released:**
+- Élan 2.15.0 (minor — internal visual component consolidation, ForceGraph enhancements)
+- ASCII Art Studio 0.6.20 (patch — no functional changes)
+- yilangao.com 1.5.3 (patch — case study page + API route updates)
+
+**Commits:** 12 (9 planned + 2 straggler eval data + 1 build gate fix)
+**Files:** ~548
+
+**Semver level:** Minor
+**Reasoning:** New GraphCanvas component, enhanced ForceGraph, new dependencies (lucide-react, ai SDK). Deletions of KnowledgeGraph.tsx and SystemVisuals.tsx are internal elan-visuals replacements, not public API breaks. Auto-analyzer recommended Major (REL-AP-007 triggered again), manually overridden to Minor.
+
+**Incidents:**
+1. **Build gate failure — ForceGraph2D ref type mismatch:** `ForceGraph2D` component requires a `MutableRefObject` ref but was receiving a callback ref function. TypeScript error at line 1473. Fixed by replacing callback ref pattern with a direct `useRef` + mount detection `useEffect`. Resolved with a fix commit before merge.
+2. **version:auto misclassification (REL-AP-007):** Auto-analyzer detected 2 deleted components and recommended Major (3.0.0). These were internal elan-visuals components replaced by GraphCanvas — not public API breaks. Manually overridden to Minor (2.15.0). This is the 2nd occurrence of REL-AP-007.
+3. **Straggler eval files during commit phase:** A running eval process kept generating new JSONL files during the ship-it pipeline, requiring 3 additional micro-commits to capture them. No functional impact but slowed the checkout-to-main step (first attempt blocked by dirty working tree).
+
+**Layer classification notes:**
+- eval-results/ (498+ files) treated as a standalone data layer between Layer 3 and Layer 6
+- scripts/*.mjs changes grouped with Layer 0 (config/tooling)
+- GraphCanvas.tsx (new) grouped with elan-visuals family in Layer 7 despite being under `src/components/elan-visuals/`, not `ui/`
 
 ---
 
