@@ -480,3 +480,6 @@
 {"arm":"T","task_id":"eval-T009","rep":10,"cost_usd":0,"cumulative_cost_usd":0,"has_response":true,"timestamp":"2026-04-28T17:36:35.615Z"}
 {"arm":"T","task_id":"eval-T010","rep":1,"cost_usd":0,"cumulative_cost_usd":0,"has_response":false,"timestamp":"2026-04-28T17:37:27.610Z"}
 {"arm":"T","task_id":"eval-T010","rep":2,"cost_usd":0,"cumulative_cost_usd":0,"has_response":false,"timestamp":"2026-04-28T17:38:15.667Z"}
+{"arm":"T","task_id":"eval-T010","rep":3,"cost_usd":0,"cumulative_cost_usd":0,"has_response":true,"timestamp":"2026-04-28T17:39:12.584Z"}
+{"arm":"T","task_id":"eval-T010","rep":4,"cost_usd":0,"cumulative_cost_usd":0,"has_response":true,"timestamp":"2026-04-28T17:41:10.445Z"}
+{"arm":"T","task_id":"eval-T010","rep":5,"cost_usd":0,"cumulative_cost_usd":0,"has_response":true,"timestamp":"2026-04-28T17:42:24.547Z"}
