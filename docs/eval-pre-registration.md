@@ -1,3 +1,16 @@
+---
+type: eval-spec
+id: eval-pre-registration
+topics: [eval, knowledge-graph]
+derivedFrom:
+  - docs/initiatives/docs-knowledge-graph-initiative.md
+references:
+  - docs/eval-task-corpus.md
+  - docs/eval-judge-rubric.md
+  - docs/eval-adversarial-controls.md
+  - docs/eval-calibration-prompts.md
+---
+
 # Eval Pre-Registration
 
 > **Status:** Pre-registered. Committed before any corpus generation runs.

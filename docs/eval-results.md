@@ -1,3 +1,15 @@
+---
+type: eval-report
+id: eval-results-full-001
+topics: [eval, knowledge-graph]
+derivedFrom:
+  - docs/initiatives/docs-knowledge-graph-initiative.md
+references:
+  - docs/eval-pre-registration.md
+  - docs/eval-task-corpus.md
+  - docs/eval-judge-rubric.md
+---
+
 # Eval Results: Self-Automated KG A/B Evaluation
 
 > **Status:** COMPLETE

@@ -215,6 +215,8 @@ The full set declared by Plan A so that Plans B and C have stable types to point
 | `alias` | A pointer to a canonical node. | `CLAUDE.md` (alias for AGENTS.md) | A |
 | `eval-task-corpus` | The frozen evaluation task list. | `docs/eval-task-corpus.md` | C |
 | `eval-baseline` | A captured baseline run output. | `docs/eval-baselines/current/<task-id>/run-<n>.md` | C |
+| `eval-report` | A completed evaluation results document. | `docs/eval-results.md` | C |
+| `eval-spec` | A pre-registered evaluation specification (rubric, pre-registration, controls). | `docs/eval-*.md` | C |
 | `spec` | A canonical specification (this file, knowledge-graph.md). | `docs/knowledge-graph.md` | A |
 
 `type` values not in this table cause a `checkFrontmatterSchema()` warning.
@@ -222,9 +224,9 @@ The full set declared by Plan A so that Plans B and C have stable types to point
 <a id="kg-topic-vocab"></a>
 ## 9. Topic vocabulary
 
-**Cap: 39 terms.** When an annotator wants a term not in this list, they propose an addition in their PR; if accepted, the term is appended here AND the cap raised by 1 (never silently). The cap exists because lumping below 40 forces low-precision categories ("a11y" + "ux" + "interaction" all collapsed into one is unhelpful for retrieval).
+**Cap: 40 terms.** When an annotator wants a term not in this list, they propose an addition in their PR; if accepted, the term is appended here AND the cap raised by 1 (never silently). The cap exists because lumping below 40 forces low-precision categories ("a11y" + "ux" + "interaction" all collapsed into one is unhelpful for retrieval).
 
-**Seed terms (count: 39).**
+**Seed terms (count: 40).**
 
 ```
 accessibility
@@ -243,6 +245,7 @@ dark-mode
 design
 edge
 engineering
+eval
 feedback
 graph
 guardrail
@@ -268,12 +271,12 @@ typography
 voice
 ```
 
-The build script's `checkTopicVocabulary()` reads this section, parses the fenced block, and emits a warning if any frontmatter `topics:` entry is not in the list. Adding a term requires editing this section AND keeping the count <= 39.
+The build script's `checkTopicVocabulary()` reads this section, parses the fenced block, and emits a warning if any frontmatter `topics:` entry is not in the list. Adding a term requires editing this section AND keeping the count <= 40.
 
-**Cap principle.** A term enters the vocabulary when it has 2+ distinct uses across annotated files OR represents a core retrieval surface (a query an agent would routinely issue). Vague variants are folded into existing terms: `frontmatter`/`mcp`/`retrieval` -> `knowledge-graph`, `quality` -> `audit`, `visual-evidence` -> `design`, `internal-tools` -> `projects`, `positioning` -> `voice`, `admin-ui` -> `design`. Past 39 requires editing the cap, a §1 non-goal review, and a documented justification per term - do NOT silently extend. Past 50 means the vocabulary has lost its retrieval-surface discipline; consolidate before growing.
+**Cap principle.** A term enters the vocabulary when it has 2+ distinct uses across annotated files OR represents a core retrieval surface (a query an agent would routinely issue). Vague variants are folded into existing terms: `frontmatter`/`mcp`/`retrieval` -> `knowledge-graph`, `quality` -> `audit`, `visual-evidence` -> `design`, `internal-tools` -> `projects`, `positioning` -> `voice`, `admin-ui` -> `design`. Past 40 requires editing the cap, a §1 non-goal review, and a documented justification per term - do NOT silently extend. Past 50 means the vocabulary has lost its retrieval-surface discipline; consolidate before growing.
 
 **Growth log.**
-- 28 (Plan A Phase 0a seed) -> 35 (Plan A Phase 7a, 7 empirical terms with multi-use evidence) -> 39 (Plan A Foundation fix-up, 4 distinct retrieval surfaces: `navigation`, `typography`, `storage`, `security`).
+- 28 (Plan A Phase 0a seed) -> 35 (Plan A Phase 7a, 7 empirical terms with multi-use evidence) -> 39 (Plan A Foundation fix-up, 4 distinct retrieval surfaces: `navigation`, `typography`, `storage`, `security`) -> 40 (Eval archive: `eval` — 7+ eval docs form a core retrieval surface).
 
 <a id="kg-cache"></a>
 ## 10. Build artifacts and cache

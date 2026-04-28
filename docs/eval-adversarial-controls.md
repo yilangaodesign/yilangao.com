@@ -1,3 +1,14 @@
+---
+type: eval-spec
+id: eval-adversarial-controls
+topics: [eval, knowledge-graph]
+derivedFrom:
+  - docs/initiatives/docs-knowledge-graph-initiative.md
+references:
+  - docs/eval-pre-registration.md
+  - docs/eval-task-corpus.md
+---
+
 # Eval Adversarial Controls
 
 > **Purpose:** Adversarial task(s) for the KG A/B evaluation. These live in a separate file from the frozen 12-task corpus at [`docs/eval-task-corpus.md`](eval-task-corpus.md) to preserve corpus integrity and avoid breaking `scripts/verify-eval-handle.mjs`.

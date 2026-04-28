@@ -1,3 +1,14 @@
+---
+type: eval-baseline
+id: eval-baselines
+topics: [eval, knowledge-graph]
+derivedFrom:
+  - docs/initiatives/docs-knowledge-graph-initiative.md
+references:
+  - docs/eval-task-corpus.md
+  - docs/eval-pre-registration.md
+---
+
 # Eval baselines
 
 > **Purpose**: capture pre-initiative agent outputs against the frozen documentation system at `eval-baseline-current` so a future A/B evaluation plan can compare agent generation outcomes between the pre-graph "current structure" and the post-initiative "new structure."

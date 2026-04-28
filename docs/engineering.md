@@ -20,6 +20,7 @@ references:
   - engineering-feedback-log.md
   - port-registry.md
   - architecture.md
+  - eval-navigator.md
 ---
 
 # Engineering — Accumulated Knowledge
@@ -53,6 +54,7 @@ references:
 | §14 | Inline-Edit CRUD Contract | *(this file)* | Any inline-edit primitive (text, array, Lexical, toolbar, managers) |
 | §15 | External Video Embeds | [`docs/engineering/media-embeds.md`](engineering/media-embeds.md) | Adding/modifying YouTube/Vimeo/Loom embed support, `videoEmbed` block, parser, poster policy |
 | §16 | Analytics Instrumentation | [`docs/engineering/analytics-instrumentation.md`](engineering/analytics-instrumentation.md) | Adding/modifying Mixpanel events, debugging tracking, touching AnalyticsProvider |
+| — | KG Eval Navigator | [`docs/eval-navigator.md`](eval-navigator.md) | Reviewing the KG eval effort, its methodology, or its results |
 | App. | Frequency Map | *(this file)* | Checking recurring patterns |
 
 ---

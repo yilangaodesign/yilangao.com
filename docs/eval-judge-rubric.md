@@ -1,3 +1,14 @@
+---
+type: eval-spec
+id: eval-judge-rubric
+topics: [eval, knowledge-graph]
+derivedFrom:
+  - docs/initiatives/docs-knowledge-graph-initiative.md
+references:
+  - docs/eval-pre-registration.md
+  - docs/eval-calibration-prompts.md
+---
+
 # Eval Judge Rubric
 
 > **Status:** Frozen after Phase 3 calibration.

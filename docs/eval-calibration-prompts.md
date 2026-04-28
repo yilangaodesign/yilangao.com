@@ -1,3 +1,14 @@
+---
+type: eval-spec
+id: eval-calibration-prompts
+topics: [eval, knowledge-graph]
+derivedFrom:
+  - docs/initiatives/docs-knowledge-graph-initiative.md
+references:
+  - docs/eval-pre-registration.md
+  - docs/eval-judge-rubric.md
+---
+
 # Eval Calibration Prompts
 
 > **Purpose:** 3 held-out calibration tasks for Phase 3 of the KG A/B evaluation. These are NOT in the 12-task corpus, NOT graded for the eval, and exist solely to test judge agreement (Fleiss' kappa) before any corpus data is observed.
