@@ -12,7 +12,78 @@ deprecated: true
 
 > **What this file is:** Archived release log entries that exceeded the 15-entry cap in `docs/release-log.md`. Kept for historical reference.
 >
-> **Last updated:** 2026-04-25 (archived REL-001 through REL-010)
+> **Last updated:** 2026-04-28 (archived REL-001 through REL-018)
+
+---
+
+<a id="rel-018"></a>
+## REL-018 — Élan 2.11.6, yilangao.com 1.3.6, ASCII Art Studio 0.6.8 (2026-04-23)
+
+**Scope:** 23 files across 3 dependency-ordered layer commits (L0 config ×4, L1 docs ×12, L8 frontend ×7) + 1 release commit + 1 dev-patch-bump commit. Layers 2-7, 9-10 empty.
+**Semver:** Patch for all three apps. Élan 2.11.6: personalization badge on home page, Élan headline rewrite, fallback route rename (unknown → welcome), session re-auth fix. yilangao.com 1.3.6: same feature set. ASCII Art Studio 0.6.8: manifest sync only.
+
+**Incidents during release:** None. Clean run.
+
+---
+
+<a id="rel-017"></a>
+## REL-017 — Élan 2.11.5, yilangao.com 1.3.5, ASCII Art Studio 0.6.7 (2026-04-23)
+
+**Scope:** 9 files across 3 dependency-ordered layer commits (L1 docs ×2, L7 site components ×2, L8 frontend pages ×5). Élan 2.11.5: CollaborationLoop transport strip spacing, SkillMap min-width overflow fix. yilangao.com 1.3.5: brand favicon SVG.
+
+**Incidents during release:** None. Clean run.
+
+---
+
+<a id="rel-016"></a>
+## REL-016 — Élan 2.11.4, yilangao.com 1.3.4, ASCII Art Studio 0.6.6 (2026-04-23)
+
+**Scope:** 14 files across 4 dependency-ordered layer commits (L1 docs ×5, L5 new lib ×1, L7 site components ×4, L8 frontend pages ×4). Élan 2.11.4: link toolbar popover, block toolbar positioning fix, bidirectional Lexical-Payload link normalization.
+
+**Incidents during release:** None. Clean run.
+
+---
+
+<a id="rel-015"></a>
+## REL-015 — Élan 2.11.3, yilangao.com 1.3.3, ASCII Art Studio 0.6.5 (2026-04-23)
+
+**Scope:** 10 files across 3 dependency-ordered layer commits (L1 docs ×4, L7 site components ×5, L8 frontend pages ×1). Élan 2.11.3: Lexical cross-block focus fix, elan-visuals style refinements. yilangao.com 1.3.3: essay badge feature flag.
+
+**Incidents during release:** None. Clean run.
+
+---
+
+<a id="rel-014"></a>
+## REL-014 — Élan 2.11.2, yilangao.com 1.3.2, ASCII Art Studio 0.6.4 (2026-04-22)
+
+**Scope:** 3 files across 2 dependency-ordered layer commits (L1 docs, L8 frontend). yilangao.com: essay layout token change per FB-170. Élan and ASCII Art Studio: manifest sync releases.
+
+**Incidents during release:** None.
+
+---
+
+<a id="rel-013"></a>
+## REL-013 — Élan 2.11.1, yilangao.com 1.3.1, ASCII Art Studio 0.6.3 (2026-04-22)
+
+**Scope:** 1 file across 1 layer commit (L8). yilangao.com: SCSS-only fix to login page container.
+
+**Incidents during release:** Unexpected uncommitted doc files after release scripts (Post-Flight docs from previous session). Included in release commit.
+
+---
+
+<a id="rel-012"></a>
+## REL-012 — Élan 2.11.0, yilangao.com 1.3.0, ASCII Art Studio 0.6.2 (2026-04-22)
+
+**Scope:** 39 files across 6 dependency-ordered layer commits (L0, L1, L5, L6, L7, L8). Minor for Élan (new Essay component family). Minor for yilangao.com (essay components on project pages).
+
+**Incidents during release:** website-version.ts sync target left uncommitted (REL-AP-001 variant). Amended release commit to include it.
+
+---
+
+<a id="rel-011"></a>
+## REL-011 (archived 2026-04-25)
+
+Condensed entry. See git history for full details.
 
 ---
 

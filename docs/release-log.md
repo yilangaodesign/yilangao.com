@@ -17,7 +17,31 @@ references:
 >
 > **Who reads this:** AI agents when the `ship-it` skill is activated — scan recent entries for recurring pitfalls before starting a new release.
 > **Who writes this:** AI agents after each ship-it run via the Post-Release Audit protocol in `ship-it/SKILL.md`.
-> **Last updated:** 2026-04-28 (REL-032: Elan-visuals refinements, eval expansion, content updates — Élan 2.15.1, ASCII Art Studio 0.6.21, yilangao.com 1.5.4)
+> **Last updated:** 2026-04-28 (REL-033: ExperimentSection, eval graph integration, Section 4 rewrite — Élan 2.15.2, ASCII Art Studio 0.6.22, yilangao.com 1.5.5)
+
+---
+
+<a id="rel-033"></a>
+## REL-033 — ExperimentSection & Eval Graph Integration (2026-04-28)
+
+**Scope:** Added ExperimentSection (compound: GraphCanvas + EvalComparisonGrid) and EvalComparisonGrid elan-visuals components. Integrated eval framework docs into knowledge graph (frontmatter on 7 eval docs, new eval-navigator.md, new node types eval-report/eval-spec, new topic "eval"). Rewrote Élan case study Section 4 with eval results narrative ("0, 0, 72."). Updated eval run data for ADV-001 and T012. Expanded audit-docs schema.
+
+**Versions released:**
+- Élan 2.15.2 (patch — new elan-visuals components, eval docs integration)
+- ASCII Art Studio 0.6.22 (patch — version sync only)
+- yilangao.com 1.5.5 (patch — Section 4 rewrite with eval results, ExperimentSection wiring)
+
+**Commit count:** 4 (+ release commit + dev bump)
+**File count:** 41 changed
+
+**Semver level:** Patch — new components are internal to the Élan case study (elan-visuals), not public DS components. Content and eval data are refinements.
+
+**Incidents:**
+- website.json initially missed from release commit — the `version:release` script only covers Élan and ASCII. Required running `website:version:release` separately and amending the release commit. This is a known gap: the checkpoint skill's Registered Apps table doesn't list the website as a separate release target.
+
+**Layer classification notes:**
+- eval-results/ files (22 files) classified as a separate "eval data" commit — they don't map cleanly to any existing layer. Used `chore:` prefix.
+- `scripts/audit-docs.mjs` grouped with eval data commit (same concern: eval infrastructure tooling).
 
 ---
 
@@ -382,151 +406,7 @@ Adversarial audit (`pressure test plan` against the Plan B implementation) surfa
 - L1: Design feedback (FB-178/179 accent neutralization + step alignment, FB-087 callout padding), content feedback (CF-025 Cognition wording), design anti-patterns (AP-071 accent as highlight), design.md frequency map update, engineering feedback log update.
 - L7/L8 combined: `CollaborationLoop.tsx` (step number removal), `collaboration-loop.module.scss` (22 accent→neutral, transport cleanup, step nav padding), `page.module.scss` (callout padding 4x/5x→3x), `update-elan/route.ts` (remove stale imagePlaceholders array).
 
----
-
-<a id="rel-018"></a>
-## REL-018 — Élan 2.11.6, yilangao.com 1.3.6, ASCII Art Studio 0.6.8 (2026-04-23)
-
-**Scope:** 23 files across 3 dependency-ordered layer commits (L0 config ×4, L1 docs ×12, L8 frontend ×7) + 1 release commit + 1 dev-patch-bump commit. Layers 2-7, 9-10 empty.
-**Semver:** Patch for all three apps. Élan 2.11.6: personalization badge on home page, Élan headline rewrite, fallback route rename (unknown → welcome), session re-auth fix. yilangao.com 1.3.6: same feature set. ASCII Art Studio 0.6.8: manifest sync only.
-**Previous release:** Élan 2.11.5, yilangao.com 1.3.5, ASCII Art Studio 0.6.7
-
-**Incidents during release:** None. Clean run — all three build gates passed on first attempt.
-
-**Build gate:** Playground ~27s (including token sync prebuild), main site ~60s, ASCII tool ~15s.
-
-**Post-deploy verification:** `vercel ls --prod` (default linked project `yilangao-design-system`) showed latest production deployment Ready within 4m of the `main` push. Portfolio project (`yilangao-portfolio`) deploys from the same GitHub `main` integration.
-
-**Layer classification notes:**
-- L0: Agent skills (`boot-up`, `password-gate`), `architecture.md`, `deployment.md` — all renaming `unknown` → `welcome`.
-- L1: Content feedback (CFB-042 Élan headline rewrite), design feedback (FB-176/177 personalization badge + Lumen scarcity), engineering feedback (ENG-202/203 session identity), branding §9, portfolio coherence manifest, personal-voice T10 broadening.
-- L8: `HomeClient.tsx` (personalization badge replaces dead essay badge), `page.module.scss` (renamed class), `page.tsx` (server-side personalization data fetch), `actions.ts` + `page.tsx` (session slug rename), `case-study-intro-headline.ts` (Élan headline), `proxy.ts` (fallback route rename).
 
 ---
 
-<a id="rel-017"></a>
-## REL-017 — Élan 2.11.5, yilangao.com 1.3.5, ASCII Art Studio 0.6.7 (2026-04-23)
-
-**Scope:** 9 files across 3 dependency-ordered layer commits (L1 docs ×2, L7 site components ×2, L8 frontend pages ×5) + 1 release commit + 1 dev-patch-bump commit. Layers 0, 2-6, 9-10 empty.
-**Semver:** Patch for all three apps. Élan 2.11.5: CollaborationLoop transport strip spacing (FB-175), SkillMap min-width overflow fix. yilangao.com 1.3.5: brand favicon SVG replaces default Vercel favicon.ico, explicit icons metadata in layout. ASCII Art Studio 0.6.7: manifest sync only.
-**Previous release:** Élan 2.11.4, yilangao.com 1.3.4, ASCII Art Studio 0.6.6
-
-**Incidents during release:** None. Clean run — all three build gates passed on first attempt.
-
-**Build gate:** Playground ~33s (including token sync prebuild), main site ~41s, ASCII tool ~23s.
-
-**Post-deploy verification:** `vercel ls --prod` (default linked project `yilangao-design-system`) showed latest production deployment Ready within 3m of the `main` push. Portfolio project (`yilangao-portfolio`) deploys from the same GitHub `main` integration.
-
-**Layer classification notes:**
-- L1: `docs/design-feedback-log.md` (FB-175), `docs/engineering-feedback-log.md` (ENG-198).
-- L7: `collaboration-loop.module.scss` (transport gaps widened to `1x`), `skill-map.module.scss` (`min-width: 120px` → `min-width: 0`).
-- L8: `favicon.ico` ×2 (deleted), `icon.svg` ×2 (new brand SVG), `layout.tsx` (icons metadata).
-
----
-
-<a id="rel-016"></a>
-## REL-016 — Élan 2.11.4, yilangao.com 1.3.4, ASCII Art Studio 0.6.6 (2026-04-23)
-
-**Scope:** 14 files across 4 dependency-ordered layer commits (L1 docs ×5, L5 new lib ×1, L7 site components ×4, L8 frontend pages ×4) + 1 release commit + 1 dev-patch-bump commit. Layers 0, 2-4, 6, 9-10 empty.
-**Semver:** Patch for all three apps. Élan 2.11.4: link toolbar popover (FB-174/ENG-198), block toolbar positioning fix (FB-173), bidirectional Lexical-Payload link normalization (EAP-119/ENG-195–197), removed ClickableLinkPlugin. yilangao.com 1.3.4: resume URL update, Élan scope statement hyperlink. ASCII Art Studio 0.6.6: manifest sync only.
-**Previous release:** Élan 2.11.3, yilangao.com 1.3.3, ASCII Art Studio 0.6.5
-
-**Incidents during release:** None. Clean run — all three build gates passed on first attempt.
-
-**Build gate:** Playground ~26s (including token sync prebuild), main site ~36s, ASCII tool ~12s.
-
-**Post-deploy verification:** `vercel ls --prod` (default linked project `yilangao-design-system`) showed latest production deployment queued within 1m of the `main` push. Portfolio project (`yilangao-portfolio`) deploys from the same GitHub `main` integration.
-
-**Layer classification notes:**
-- L1: `docs/design-feedback-log.md` (FB-173, FB-174), `docs/engineering-feedback-log.md` (ENG-195–198), `docs/engineering-anti-patterns.md` (EAP-119), `docs/engineering.md` (frequency map), `docs/port-registry.md` (PID update).
-- L5: `src/lib/normalize-lexical-links.ts` (new file — bidirectional transforms between `@lexical/link` and Payload `LinkNode` shapes).
-- L7: `LexicalToolbar.tsx` (link popover), `LexicalBlockEditor.tsx` (normalize/denormalize wiring, removed ClickableLinkPlugin), `inline-edit.module.scss` (block toolbar centering, link popover styles, cursor:text on editable links), `content-helpers.ts` (normalize/denormalize wiring for markdown conversion).
-- L8: `layout.tsx` (resume URL), `seed/route.ts` (resume URL), `update-elan/route.ts` (scope statement hyperlink), `seed.ts` (resume URL).
-
----
-
-<a id="rel-015"></a>
-## REL-015 — Élan 2.11.3, yilangao.com 1.3.3, ASCII Art Studio 0.6.5 (2026-04-23)
-
-**Scope:** 10 files across 3 dependency-ordered layer commits (L1 docs ×4, L7 site components ×5, L8 frontend pages ×1) + 1 release commit + 1 dev-patch-bump commit. Layers 0, 2-6, 9-10 empty.
-**Semver:** Patch for all three apps. Élan 2.11.3: Lexical cross-block focus fix (ENG-194), elan-visuals style refinements (FB-171 toggle sizing, CollaborationLoop refactor, SkillMap dead styles). yilangao.com 1.3.3: essay badge feature flag (FB-172). ASCII Art Studio 0.6.5: manifest sync only.
-**Previous release:** Élan 2.11.2, yilangao.com 1.3.2, ASCII Art Studio 0.6.4
-
-**Incidents during release:** None. Clean run — all three build gates passed on first attempt.
-
-**Build gate:** Playground ~24s (including token sync prebuild), main site ~33s, ASCII tool ~13s.
-
-**Post-deploy verification:** `vercel ls --prod` (default linked project `yilangao-design-system`) showed latest production deployment queued within 1m of the `main` push. Portfolio project (`yilangao-portfolio`) deploys from the same GitHub `main` integration.
-
-**Layer classification notes:**
-- L1: `docs/design-feedback-log.md` (FB-171, FB-172), `docs/engineering-feedback-log.md` (ENG-194), `docs/engineering-anti-patterns.md` (EAP update for Lexical focus), `docs/engineering.md` (§14.9.3 principle).
-- L7: `CollaborationLoop.tsx` (refactor), `collaboration-loop.module.scss` (cleanup), `maturity-timeline.module.scss` (toggle sizing), `skill-map.module.scss` (dead style removal), `useBlockKeyboardNav.ts` (Lexical blur-before-focus fix).
-- L8: `HomeClient.tsx` (essay badge feature flag).
-
----
-
-<a id="rel-014"></a>
-## REL-014 — Élan 2.11.2, yilangao.com 1.3.2, ASCII Art Studio 0.6.4 (2026-04-22)
-
-**Scope:** 3 files across 2 dependency-ordered layer commits (L1 docs, L8 frontend) + 1 release commit + 1 dev-patch-bump commit. The fast-forward merge to `main` also included pending commit `161f4e6` (REL-013 post-release audit: `docs/release-log.md`, `docs/design-feedback-log.md`) that had existed on `dev` but not yet on `main`. L2–L7, L9–L10 empty for this session’s authored work.
-**Semver:** Patch for all three apps. yilangao.com: essay layout (`$elan-container-narrow` → `$elan-container-content`) per FB-170. Élan 2.11.2 and ASCII Art Studio 0.6.4 are manifest sync releases (no DS component or ascii-tool source edits in this checkpoint).
-**Previous release:** Élan 2.11.1, yilangao.com 1.3.1, ASCII Art Studio 0.6.3
-
-**Incidents during release:** None. `CHANGELOG.md` updated in the release commit (not left to an implicit follow-up).
-
-**Build gate:** All three apps passed on first attempt (playground ~23s including token sync prebuild, main site ~34s, ASCII tool ~12s).
-
-**Post-deploy verification:** `vercel ls --prod` (default linked project `yilangao-design-system`) showed latest production deployment `● Ready` in ~1m build time after the `main` push. Portfolio project (`yilangao-portfolio`) deploys from the same GitHub `main` integration; not queried via CLI because root `.vercel/project.json` targets the playground.
-
-**Layer classification notes:**
-- L1: `docs/content/case-study.md` (essay sidebar variant copy), `docs/design-feedback-log.md` (FB-170 entry).
-- L8: `src/app/(frontend)/(site)/work/[slug]/page.module.scss` (`.layoutEssay` / `.contentEssay` max-width tokens).
-
----
-
-<a id="rel-013"></a>
-## REL-013 — Élan 2.11.1, yilangao.com 1.3.1, ASCII Art Studio 0.6.3 (2026-04-22)
-
-**Scope:** 1 file across 1 dependency-ordered layer commit (L8) + 1 release commit + 1 dev-patch-bump commit. All other layers empty.
-**Semver:** Patch for all three apps. yilangao.com: SCSS-only fix to login page `.inner` container (removed 80vw ultra-wide breakpoint). Élan and ASCII Art Studio: release sync only, no app code changes.
-**Previous release:** Élan 2.11.0, yilangao.com 1.3.0, ASCII Art Studio 0.6.2
-
-**Incidents during release:**
-- **Unexpected uncommitted doc files after release scripts.** After running `npm run version:release` and `npm run website:version:release`, `git diff --name-only` showed `docs/design.md` and `docs/design/responsive.md` as modified — these files were NOT shown in Phase 1 analysis (`git diff --name-status` only listed `login.module.scss`). Root cause unclear — possibly Post-Flight docs written by a previous session that were left uncommitted before `ship-it` was invoked, then became visible via a git-index state change. **Resolution:** the doc changes were legitimate FB-169 Post-Flight documentation, so they were included in the release commit. No functional impact.
-
-**Build gate:** All three apps passed on first attempt. Playground ~27s, main site ~33s, ASCII tool ~12s (static only, no code changes).
-
-**Layer classification notes:**
-- Single file in L8 (Frontend pages): `src/app/(frontend)/for/[company]/login.module.scss`.
-- No playground pages, no new components, no token changes — minimal release.
-- Vercel portfolio (`yilangao-portfolio`) went Queued → Ready in ~3m. Playground (`yilangao-design-system`) was Ready within 1m of the push.
-
-**Pattern note (Phase 1 doc-state gap):** Phase 1 uses `git diff --name-status` to enumerate changed files, but this compares working tree to HEAD and won't catch files that were modified in a prior session, partially staged, or written by pre-commit hooks without being re-dirtied. Consider adding `git diff --cached --name-status` to Phase 1 to catch staged-but-not-working-tree changes.
-
----
-
-<a id="rel-012"></a>
-## REL-012 — Élan 2.11.0, yilangao.com 1.3.0, ASCII Art Studio 0.6.2 (2026-04-22)
-
-**Scope:** 39 files across 6 dependency-ordered layer commits (L0, L1, L5, L6, L7, L8) + 1 release commit + 1 dev-patch-bump commit. L2 Tokens, L3 Deps, L4 Deletions, L9 Playground, L10 ASCII tool src were all empty.
-**Semver:** Minor for Élan (2.10.0 → 2.11.0: new Essay component family — EssayHeader, EssayMeta — and read-time utility). Minor for yilangao.com (1.2.0 → 1.3.0: essay components on project pages, elan-visuals updates, inline-edit improvements, company session changes, push-schema updates). Patch for ASCII Art Studio (0.6.1 → 0.6.2: release sync only, no app code changes).
-**Previous release:** Élan 2.10.0, yilangao.com 1.2.0, ASCII Art Studio 0.6.1
-
-**Incidents during release:**
-- **website-version.ts sync target left uncommitted.** `npm run website:version:release` auto-synced `src/lib/website-version.ts` but this file was not included in the release commit's `git add` command (it is not listed in the checkpoint skill's Registered Apps table). `git checkout main` refused with "local changes would be overwritten." **Resolution:** amended the release commit to include `src/lib/website-version.ts`, force-pushed dev, then proceeded. This is a REL-AP-001 variant — the existing pitfall covers manifest JSON + `playground/src/lib/elan.ts` + `ascii-tool/src/lib/version.ts`, but the website also has a TypeScript sync target at `src/lib/website-version.ts` that is not documented. Filing as pattern note below.
-
-**Build gate:** All three apps passed on first attempt. Playground ~29s, main site ~32s, ASCII tool ~34s (fast — no code changes).
-
-**Layer classification notes:**
-- L5 absorbed all 5 new files: `src/components/essay/EssayHeader.tsx`, `EssayHeader.module.scss`, `EssayMeta.tsx`, `EssayMeta.module.scss`, and `src/lib/read-time.ts`.
-- REL-AP-005 clean — verified `read-time.ts` imported by `page.tsx`; `EssayHeader`/`EssayMeta` imported by `ProjectClient.tsx`.
-- No L9 playground pages — no new playground commits required.
-- Vercel playground (`yilangao-design-system`) went Queued → Ready in ~4m, matching pattern from previous releases.
-
-**Pattern note (website sync target):** `src/lib/website-version.ts` is the TypeScript sync target for `website.json`, analogous to `playground/src/lib/elan.ts` for `elan.json`. The checkpoint skill's release commit `git add` command and REL-AP-001 guidance do not currently include it. After 2 releases involving website changes, this will need to be promoted to the checkpoint skill and REL-AP-001 fix.
-
----
-
----
-
-> **Archived entries:** REL-001 through REL-011 moved to `docs/release-log-archive.md` (2026-04-25, cap enforcement).
+> **Archived entries:** REL-001 through REL-018 moved to `docs/release-log-archive.md` (2026-04-28, cap enforcement).
