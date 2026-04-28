@@ -579,3 +579,5 @@
 {"arm":"T","task_id":"eval-T006","rep":9,"cost_usd":0,"cumulative_cost_usd":0,"has_response":true,"timestamp":"2026-04-28T19:36:15.551Z"}
 {"arm":"T","task_id":"eval-T006","rep":10,"cost_usd":0,"cumulative_cost_usd":0,"has_response":true,"timestamp":"2026-04-28T19:37:04.182Z"}
 {"arm":"T","task_id":"eval-T007","rep":1,"cost_usd":0,"cumulative_cost_usd":0,"has_response":true,"timestamp":"2026-04-28T19:38:10.853Z"}
+{"arm":"T","task_id":"eval-T007","rep":2,"cost_usd":0,"cumulative_cost_usd":0,"has_response":true,"timestamp":"2026-04-28T19:39:17.247Z"}
+{"arm":"T","task_id":"eval-T007","rep":3,"cost_usd":0,"cumulative_cost_usd":0,"has_response":true,"timestamp":"2026-04-28T19:40:36.269Z"}
