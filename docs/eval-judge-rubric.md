@@ -21,21 +21,21 @@ Your task is to evaluate both responses on two dimensions and state a pairwise p
 
 How well does the response address the user's specific request with actionable, correct guidance?
 
-5 = Directly addresses the request, provides the correct fix with code-level specificity, cites the relevant principle/anti-pattern by ID, and explains the root cause
-4 = Addresses the request correctly with minor omissions (e.g., missing one edge case, principle stated but not cited by ID)
-3 = Partially correct — identifies the right area but misses the root cause or provides an incomplete fix
-2 = Tangentially related response that doesn't solve the stated problem
-1 = Off-topic, wrong diagnosis, or harmful advice
+5 = Directly addresses the request with a correct, complete fix. Cites the specific anti-pattern by ID (e.g., AP-072, EAP-117). Explains the root cause. Names specific files/lines to change. Reserve 5 for responses that a senior engineer could act on immediately without additional research.
+4 = Correct diagnosis and fix but missing one of: anti-pattern citation by ID, specific file paths, or one edge case. The response is right but incomplete in a way that requires the reader to fill in a gap.
+3 = Partially correct. Identifies the right problem area but misses the root cause, provides a fix that would only partially work, or gets the diagnosis right but the fix wrong.
+2 = Tangentially related. The response discusses the right technology area but misdiagnoses the specific problem or proposes a fix for a different issue.
+1 = Off-topic, wrong diagnosis, or harmful advice that would make things worse.
 
 ### Quality (1-5)
 
 How clear, specific, and professionally useful is the response, independent of correctness?
 
-5 = Clear diagnosis-then-fix structure, specific file/line references, no filler, actionable immediately
-4 = Well-structured and specific with minor verbosity or formatting issues
-3 = Understandable but verbose, vague on specifics, or poorly structured
-2 = Confusing structure, significant filler, hard to act on
-1 = Incoherent, contradictory, or unusable
+5 = Clear diagnosis-then-fix structure. Every claim is specific (file paths, line numbers, config values). Zero filler paragraphs. A reader could execute the fix by following the response as a checklist. Reserve 5 for responses with no wasted sentences.
+4 = Well-structured and mostly specific, but contains one of: a filler introduction/conclusion, one vague claim without specifics ("update the config"), or minor formatting issues that slow comprehension.
+3 = Understandable but requires effort. May be verbose, repeat itself, mix diagnosis and fix in an unclear order, or make claims without specifying where/how.
+2 = Confusing structure, significant filler, or so vague that acting on it requires substantial independent research.
+1 = Incoherent, internally contradictory, or unusable as guidance.
 
 ## Pairwise preference
 

@@ -398,7 +398,7 @@ function stopMcpServer() {
 // Tool definitions per arm (using Zod schemas)
 // ---------------------------------------------------------------------------
 function buildToolsForArm(arm) {
-  if (arm === 'B') return {};
+  if (arm === 'B') return { tools: {}, toolCallLog: [] };
 
   const toolCallLog = [];
   const tools = {};
@@ -406,7 +406,7 @@ function buildToolsForArm(arm) {
   if (arm === 'T') {
     tools.query_node = tool({
       description: 'Look up a node by ID and return the node + its 1-hop neighbors. IDs are lowercase kebab-case.',
-      parameters: z.object({
+      inputSchema: z.object({
         id: z.string().describe('Node ID (lowercase kebab-case)'),
       }),
       execute: async ({ id }) => {
@@ -418,9 +418,9 @@ function buildToolsForArm(arm) {
 
     tools.subgraph = tool({
       description: 'Return the N-hop neighborhood around a node (default 1, max 3)',
-      parameters: z.object({
+      inputSchema: z.object({
         id: z.string().describe('Root node ID'),
-        depth: z.number().int().min(0).max(3).default(1).describe('Hops out (default 1, max 3)'),
+        depth: z.number().int().min(0).max(3).optional().describe('Hops out (default 1, max 3)'),
       }),
       execute: async ({ id, depth }) => {
         const result = await callMcpTool('subgraph', { id, depth: depth || 1 });
@@ -431,9 +431,9 @@ function buildToolsForArm(arm) {
 
     tools.search_graph = tool({
       description: 'BM25 search across all graph nodes. Returns ranked node IDs with scores.',
-      parameters: z.object({
+      inputSchema: z.object({
         query: z.string().min(1).describe('Search query (free text)'),
-        limit: z.number().int().min(1).max(50).default(10).describe('Max results (default 10)'),
+        limit: z.number().int().min(1).max(50).optional().describe('Max results (default 10)'),
       }),
       execute: async ({ query, limit }) => {
         const result = await callMcpTool('search', { query, limit: limit || 10 });
@@ -446,7 +446,7 @@ function buildToolsForArm(arm) {
   if (arm === 'T' || arm === 'R') {
     tools.read_file = tool({
       description: 'Read a file from the project docs directory',
-      parameters: z.object({
+      inputSchema: z.object({
         path: z.string().describe('Relative path from project root (e.g. docs/design.md)'),
       }),
       execute: async ({ path: filePath }) => {
@@ -467,9 +467,9 @@ function buildToolsForArm(arm) {
   if (arm === 'R') {
     tools.grep_docs = tool({
       description: 'Search docs with ripgrep. Searches docs/, AGENTS.md, .cursor/skills/, .cursor/rules/',
-      parameters: z.object({
+      inputSchema: z.object({
         pattern: z.string().describe('Regex pattern to search for'),
-        max_results: z.number().int().default(30).describe('Max result lines (default 30)'),
+        max_results: z.number().int().optional().describe('Max result lines (default 30)'),
       }),
       execute: async ({ pattern, max_results }) => {
         try {
@@ -489,9 +489,9 @@ function buildToolsForArm(arm) {
 
     tools.lunr_search = tool({
       description: 'BM25 keyword search over the search index',
-      parameters: z.object({
+      inputSchema: z.object({
         query: z.string().describe('Search query'),
-        limit: z.number().int().default(10).describe('Max results (default 10)'),
+        limit: z.number().int().optional().describe('Max results (default 10)'),
       }),
       execute: async ({ query, limit: maxResults }) => {
         try {
@@ -512,9 +512,9 @@ function buildToolsForArm(arm) {
   if (arm === 'P') {
     tools.grep_docs_pre_init = tool({
       description: 'Search pre-initiative docs with ripgrep (eval-baseline-current worktree)',
-      parameters: z.object({
+      inputSchema: z.object({
         pattern: z.string().describe('Regex pattern to search for'),
-        max_results: z.number().int().default(30).describe('Max result lines (default 30)'),
+        max_results: z.number().int().optional().describe('Max result lines (default 30)'),
       }),
       execute: async ({ pattern, max_results }) => {
         try {
@@ -535,7 +535,7 @@ function buildToolsForArm(arm) {
 
     tools.read_file_pre_init = tool({
       description: 'Read a file from the pre-initiative docs (eval-baseline-current worktree)',
-      parameters: z.object({
+      inputSchema: z.object({
         path: z.string().describe('Relative path from project root'),
       }),
       execute: async ({ path: filePath }) => {
@@ -808,12 +808,14 @@ async function main() {
         process.exit(0);
       }
 
-      try {
-        verifyCacheIntegrity(manifest);
-      } catch (e) {
-        console.error(`\nCACHE INTEGRITY FAILURE: ${e.message}`);
-        stopMcpServer();
-        process.exit(1);
+      if (!CALIBRATION) {
+        try {
+          verifyCacheIntegrity(manifest);
+        } catch (e) {
+          console.error(`\nCACHE INTEGRITY FAILURE: ${e.message}`);
+          stopMcpServer();
+          process.exit(1);
+        }
       }
 
       const injectedSkills = ARM === 'T' ? matchSkills(task.prompt, skills) : [];

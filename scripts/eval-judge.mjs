@@ -94,8 +94,8 @@ const COMPARISON_PAIRS = [
 // ---------------------------------------------------------------------------
 function loadRubric() {
   const content = readFileSync(RUBRIC_FILE, 'utf8');
-  const systemMatch = content.match(/## Judge system prompt\n\n```\n([\s\S]*?)```/);
-  const userMatch = content.match(/## Judge user prompt template\n\n```\n([\s\S]*?)```/);
+  const systemMatch = content.match(/## Judge system prompt[\s\S]*?```\n([\s\S]*?)```/);
+  const userMatch = content.match(/## Judge user prompt template[\s\S]*?```\n([\s\S]*?)```/);
 
   if (!systemMatch) throw new Error('Cannot find judge system prompt in rubric file');
 
