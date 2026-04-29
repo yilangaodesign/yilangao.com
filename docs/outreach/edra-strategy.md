@@ -79,3 +79,11 @@ The plan identified that Engram lists artifacts (18 skills, 200+ APs, ~4,892 edg
 **Recommendation:** "A type system for design judgment" is the strongest structural parallel for a technical audience (Edra's founders are ex-Palantir engineers). For a broader audience, "a codebase for institutional memory" borrows Edra's own framing and might land faster.
 
 **Decision needed from user:** Which structural parallel resonates? Or propose a different one.
+
+## 5. CMS Note Sync Log
+
+| Date | Change | Reason |
+|------|--------|--------|
+| 2026-04-29 | Fixed `projectSlug` from `elan-design-system` to `engram` | Slug rename broke note delivery |
+| 2026-04-29 | Rewrote Engram note: removed "Elan" and design-system framing, added knowledge graph/72%/context engineering language | Case study rewrite changed core thesis from design system to agent memory |
+| 2026-04-29 | Meteor note: kept as-is | Content still accurate (12,000 to 560, operational data framing) |

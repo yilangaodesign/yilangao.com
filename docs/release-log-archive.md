@@ -306,3 +306,22 @@ Condensed entry. See git history for full details.
 **Outcome:** All 3 builds passed after fixes. Merge to main. Vercel deploys Ready.
 
 ---
+
+<a id="rel-019"></a>
+## REL-019 — Élan 2.11.7, yilangao.com 1.3.7, ASCII Art Studio 0.6.9 (2026-04-23)
+
+**Scope:** 9 files across 2 dependency-ordered layer commits (L1 docs ×5, L7/L8 source ×4) + 1 release commit + 1 dev-patch-bump commit. Layers 0, 2-6, 9-10 empty.
+**Semver:** Patch for all three apps. Élan 2.11.7: CollaborationLoop accent neutralization (22 accent→neutral conversions per Lumen Scarcity Principle), step nav alignment fix, transport divider removal, callout padding reduction, stale image placeholder removal from Elan content. yilangao.com 1.3.7: same feature set. ASCII Art Studio 0.6.9: manifest sync only.
+**Previous release:** Élan 2.11.6, yilangao.com 1.3.6, ASCII Art Studio 0.6.8
+
+**Incidents during release:** None. Clean run — all three build gates passed on first attempt.
+
+**Build gate:** Playground ~22s, main site ~31s, ASCII tool ~13s.
+
+**Post-deploy verification:** `vercel ls --prod` (default linked project `yilangao-design-system`) showed latest production deployment Ready within 1m of the `main` push.
+
+**Layer classification notes:**
+- L1: Design feedback (FB-178/179 accent neutralization + step alignment, FB-087 callout padding), content feedback (CF-025 Cognition wording), design anti-patterns (AP-071 accent as highlight), design.md frequency map update, engineering feedback log update.
+- L7/L8 combined: `CollaborationLoop.tsx` (step number removal), `collaboration-loop.module.scss` (22 accent→neutral, transport cleanup, step nav padding), `page.module.scss` (callout padding 4x/5x→3x), `update-elan/route.ts` (remove stale imagePlaceholders array).
+
+---
