@@ -172,7 +172,7 @@ function OperationsGrid() {
       {phases.map((phase, i) => (
         <Fragment key={phase.label}>
           <div className={styles.categoryColumn} role="listitem">
-            <div className={styles.categoryHeader}>
+            <div className={`${styles.categoryHeader}${phase.skills.some((s) => s.name === expanded) ? ` ${styles.categoryHeaderActive}` : ''}`}>
               {phase.label}
             </div>
             {phase.skills.map((skill) => {
