@@ -16,9 +16,9 @@ references:
 
 # Eval Navigator
 
-Central index for the Knowledge Graph A/B evaluation effort. The eval measured whether the typed knowledge graph (995 nodes, 4,892 edges) improves agent accuracy compared to the pre-initiative flat docs and a bare LLM with no knowledge at all. Four arms, 12 tasks, 10 runs each, 3-judge ensemble scoring blind.
+Central index for the Knowledge Graph A/B evaluation effort. The eval measured whether the typed knowledge graph (995 nodes, 4,892 edges) improves agent accuracy compared to the pre-initiative hierarchical docs and a no-memory baseline with no external knowledge at all. Four arms, 12 tasks, 10 runs each, 3-judge ensemble scoring blind.
 
-**Key result:** The graph found the gold anti-pattern 72% of the time on subtle tasks where neither the old docs nor the bare model ever did (0%). Overall verdict by pre-registered decision rules: inconclusive - the bare model scored higher on holistic response quality. Full report: [`docs/eval-results.md`](eval-results.md).
+**Key result:** The graph found the gold anti-pattern 72% of the time on subtle tasks where neither the hierarchical docs nor the no-memory baseline ever did (0%). Overall verdict by pre-registered decision rules: inconclusive - the no-memory baseline scored higher on holistic response quality. Full report: [`docs/eval-results.md`](eval-results.md).
 
 ## Artifact map
 

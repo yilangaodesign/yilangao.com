@@ -1,59 +1,56 @@
 <!-- graph metadata for docs knowledge graph (see docs/knowledge-graph.md) -->
 ---
-type: alias
-id: content-elan-design-system-interview
-references:
-  - content-engram-interview
+type: spoke
+id: content-engram-interview
+topics:
+  - content
+  - system-architecture
+  - projects
+  - case-study
+derivedFrom:
+  - content.md
 ---
 
-# Élan Design System - Interview Defense Notes (renamed to Engram)
-
-> **Renamed:** This interview prep is now **Engram**. Canonical file: `engram-interview.md` (id: `content-engram-interview`).
-> Slug changed from `elan-design-system` to `engram` on 2026-04-29.
-> This file is retained as a graph alias so that references to `content-elan-design-system-interview`
-> resolve to the canonical node via the `references` edge.
-
-(Original content preserved below for historical record.)
-
----
-
-## Original Interview Notes (archived)
+# Engram (formerly Élan Design System) - Interview Defense Notes
 
 > Created 2026-04-06 during v3 case study rebuild.
+> Renamed 2026-04-29: case study reframed from "Élan Design System" to "Engram."
 > NOT for content iteration consumption. See dossier for cross-reference.
 
 ## 1. Metric Defense
 
-### Hero Metric: "~5K" (knowledge graph edges)
+### Hero Metric: "0→72%" (retrieval accuracy on subtle tasks)
 
-**Derivation:** The knowledge graph contains ~4,892 typed edges across 6 relationship
-types (strengthens, supersedes, narrows, weakens, related, cites). Built from 200+
-anti-patterns, 18 skills, and 234 feedback entries across design, engineering, and content.
-Edge count sourced from `.cache/graph.json`.
+**Derivation:** 520 generations across 13 tasks (10 corpus + 3 adversarial), three
+independent LLM judges scoring blind. On tasks requiring cross-document reasoning
+(subtle tasks), the knowledge graph retrieved the correct principle 72% of the time.
+Both baselines — no-memory model and hierarchical docs — scored 0% on the same tasks.
 
-**Method:** A regex extractor lifts cross-references between anti-patterns, skills,
-and feedback entries into typed edges with confidence scores. An audit enforcer validates
-new entries against the existing graph at write time — contradictions surface before they
-ship. The live graph is rendered on the case study page with an auto-transition tour.
+**Method:** Pre-registered evaluation with sealed baselines. Three arms: No Memory
+(bare model, no external context), Hierarchical Docs (the old tree-structured
+documentation), Knowledge Graph (the full ~4,892-edge graph). Each task run 10 times
+per arm. Judges evaluated correctness, citation quality, and reasoning fidelity.
 
-**What it measures:** The density of the system's interconnected knowledge. Not just how
-many rules exist, but how explicitly they relate to each other. A graph with ~5K edges
-means corrections don't exist in isolation — they form a queryable network of design
-judgment.
+**What it measures:** The comparative advantage of structured, relationship-aware
+context over unstructured or hierarchically organized documentation. The 0→72% gap
+demonstrates that the graph doesn't just store knowledge — it makes cross-domain
+connections that the other approaches cannot.
 
 **Limitations:**
-- Edge count alone doesn't indicate quality — some relationships may be weak or redundant
+- Verdict is inconclusive by pre-registered rules (judges rated confident guessing
+  higher than correct-but-messy retrieval)
 - Solo practitioner context — no evidence this scales to teams
-- No baseline comparison yet (12-task eval corpus designed, baseline sealed, comparator pending)
+- Tasks were designed by the system builder (potential bias toward known graph strengths)
 
 **Prepared response if challenged:**
-"The edge count is more interesting than the anti-pattern count because it measures
-relationships, not just entries. When one anti-pattern strengthens, supersedes, or narrows
-another, that's a typed edge the agent can query at decision time. 200+ isolated rules
-are a catalog; ~5K edges between them are a network. The eval framework I built — 12 tasks,
-LLM-as-judge, bare baseline vs full system — is designed to test whether the agent actually
-uses this network. The honest answer is I don't have results yet. The next deliverable
-is a number, not a feature."
+"The number that matters isn't 72% — it's zero. Both baselines scored zero on tasks
+that required connecting rules across different documentation domains. The hierarchical
+docs had all the same information, just organized in a tree instead of a graph. The
+graph's advantage is traversal: when one anti-pattern strengthens, supersedes, or
+narrows another, the model can follow those edges. A tree can't surface those
+relationships. The honest caveat: by my own pre-registered rules, the verdict is
+inconclusive. The judges rated confident guessing higher than correct-but-messy
+retrieval. But 0 vs 72 is a signal I can't ignore."
 
 ## 2. Role Scope Precision
 
@@ -93,11 +90,13 @@ make it clear. But the framing emphasizes the design methodology and systems thi
 not the employment context.
 
 **Prepared response if asked "Is this a real product?":**
-"It's a real design system used across three applications, published as an npm package.
-The interesting part isn't the product - it's the apparatus around it. I built a system
-where a designer and an AI agent co-evolve design quality over time. The 200+ anti-patterns,
-18 skills, and a ~5K-edge knowledge graph are real artifacts from real design sessions.
-The methodology is what I'm demonstrating, not a product shipped to users."
+"The design system (Élan) is a real system used across three applications, published
+as an npm package. But Engram — the case study — is about the memory system underneath.
+I built a system where every correction from a design session becomes a documented
+anti-pattern, every anti-pattern gets typed edges to related rules, and the whole
+thing is queryable by the agent at decision time. The 0→72% eval result is from a
+real pre-registered experiment with sealed baselines. The methodology is what I'm
+demonstrating, not a product shipped to users."
 
 **Team size:** Solo. No team management experience demonstrated here. Other case studies
 (Lacework, Meteor) demonstrate team collaboration.

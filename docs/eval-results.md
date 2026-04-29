@@ -87,7 +87,7 @@ Expected ordering: T > R > P > B
 | Mean adherence | YES (d=0.56) | Inverted (R < P, d=0.06) | Inverted (P < B, d=-0.22) | T > R ~ P < B |
 | Mean quality | YES (d=0.58) | Inverted (R < P, d=-0.14) | Inverted (P < B, d=-0.46) | T > R < P < B |
 
-**Interpretation:** Monotonic ordering holds for citation accuracy and pairwise preference. It breaks for adherence/quality Cohen's d, where the bare LLM (Arm B) scores surprisingly high. Root cause: the bare LLM produces confident, well-structured responses that impress judges on form, even when the substance (correct citations, specific fixes) is inferior. This is a known LLM-judge bias toward fluency over factuality.
+**Interpretation:** Monotonic ordering holds for citation accuracy and pairwise preference. It breaks for adherence/quality Cohen's d, where the no-memory baseline (Arm B) scores surprisingly high. Root cause: the no-memory model produces confident, well-structured responses that impress judges on form, even when the substance (correct citations, specific fixes) is inferior. This is a known LLM-judge bias toward fluency over factuality.
 
 ## 6. Adversarial Control Results
 
@@ -146,7 +146,7 @@ No formal comparison against the 9 captured Cursor runs in `docs/eval-baselines/
 | Quality | -0.460 | [-0.623, -0.298] | Medium (inverted) |
 | Holm-corrected p | 0.072 | | Marginal |
 
-**Note on inversions:** The negative Cohen's d for T vs B means the bare LLM received higher adherence/quality scores from judges, despite having dramatically worse citation accuracy (6.0% gold-cite vs 72.0%). This highlights a fundamental tension: LLM judges rate response quality holistically (fluency, structure, confidence), while citation accuracy requires factual grounding. The graph gives the treatment arm better facts but may produce longer, more tool-call-heavy responses that judges penalize on form.
+**Note on inversions:** The negative Cohen's d for T vs B means the no-memory baseline received higher adherence/quality scores from judges, despite having dramatically worse citation accuracy (6.0% gold-cite vs 72.0%). This highlights a fundamental tension: LLM judges rate response quality holistically (fluency, structure, confidence), while citation accuracy requires factual grounding. The graph gives the treatment arm better facts but may produce longer, more tool-call-heavy responses that judges penalize on form.
 
 ## 10. Fidelity Gaps
 
@@ -199,8 +199,8 @@ Each script supports `--resume` to continue from checkpoint after interruption.
 2. **Single generation model:** All arms use `anthropic/claude-4.6-sonnet`. Results may not generalize to other model families. The generation model was locked before data collection (pre-registration rule).
 
 3. **LLM judge failure modes:**
-   - **Fluency-over-factuality bias:** Judges gave higher adherence/quality scores to the bare LLM (Arm B) despite 6.0% gold-cite rate, suggesting they reward confident, well-structured prose over domain-specific accuracy. This is the root cause of the Cohen's d inversions in Section 5.
-   - **Length bias:** Tool-calling arms (T, R, P) produce responses shaped by multi-step retrieval, which may be less polished than single-turn bare LLM responses.
+   - **Fluency-over-factuality bias:** Judges gave higher adherence/quality scores to the no-memory baseline (Arm B) despite 6.0% gold-cite rate, suggesting they reward confident, well-structured prose over domain-specific accuracy. This is the root cause of the Cohen's d inversions in Section 5.
+   - **Length bias:** Tool-calling arms (T, R, P) produce responses shaped by multi-step retrieval, which may be less polished than single-turn no-memory responses.
    - **Kappa gap:** Judges agree moderately on preference (kappa 0.53) but poorly on 1-5 scales (kappa 0.24-0.28). The preference metric is more reliable than the Likert scores.
    - Mitigated by: 3-judge ensemble, non-Anthropic judges, randomized presentation order
 

@@ -58,7 +58,7 @@ All four arms use the same scripted runner (`scripts/eval-runner.mjs`), same gen
 - **Skill injection:** None
 - **Context:** Pre-initiative docs only (tag `eval-baseline-current`)
 
-### Arm B (Bare LLM)
+### Arm B (No Memory)
 
 - **Tools:** None
 - **Skill injection:** None

@@ -1,41 +1,35 @@
 <!-- graph metadata for docs knowledge graph (see docs/knowledge-graph.md) -->
 ---
-type: alias
-id: content-elan-design-system
-references:
-  - content-engram
+type: spoke
+id: content-engram
+topics:
+  - content
+  - system-architecture
+  - projects
+  - case-study
+derivedFrom:
+  - content.md
 ---
 
-# Élan Design System (renamed to Engram)
-
-> **Renamed:** This case study is now **Engram**. Canonical file: `engram.md` (id: `content-engram`).
-> Slug changed from `elan-design-system` to `engram` on 2026-04-29.
-> This file is retained as a graph alias so that references to `content-elan-design-system`
-> resolve to the canonical node via the `references` edge.
-
-(Original content preserved below for historical record.)
-
----
-
-## Original Dossier (archived)
+# Engram (formerly Élan Design System) - Case Study Dossier
 
 > Bootstrapped 2026-04-03 by synthesizing CFB-013 through CFB-019 + design/engineering logs.
 > Full rebuild 2026-04-04: thesis pivoted from "AI-native design system" to "compounding design knowledge for vibe coding."
 > v3 rebuild 2026-04-06: thesis pivoted to "what happens when you stop designing for the agent and start designing with it." Horseless carriage metaphor. Translation Arc. All interactive visuals replaced with Tier 3 components.
+> 2026-04-29: Renamed from "Élan Design System" to "Engram." Case study reframed around the agent memory system, not the design system product. Slug changed from `elan-design-system` to `engram`. Old dossier (`elan-design-system.md`) converted to `type: alias` pointer.
 
 ## Current State
 
-- **Thesis:** What happens when you stop designing for the agent and start designing
-  with it. The designer's primary deliverable was not the components - it was the
-  apparatus around the design system: 18 operational skills, 200+ anti-patterns,
-  a knowledge graph with ~4,892 typed edges, and a measurement framework to validate
-  whether any of it works. Complementary to the industry's consumption work
-  (MCP servers, metadata files), this demonstrates a different starting point:
-  co-creation.
+- **Thesis:** Intelligence was never the bottleneck — context is. Engram is the agent memory
+  system built to solve that: 18 skills routing corrections into the right documentation,
+  200+ anti-patterns encoding what not to repeat, and a knowledge graph with ~4,892 typed
+  edges making every relationship between rules explicit and auditable. The measurement
+  framework validates whether any of it works (72% retrieval accuracy on subtle tasks,
+  both baselines at zero).
 - **Status:** draft-v4 (materialized to CMS via update-elan route). 4 sections:
   all with interactive components (CollaborationLoop, SkillMap, MaturityTimeline,
   ExperimentSection). ExperimentSection is a compound: GraphCanvas + EvalComparisonGrid.
-- **Last significant edit:** 2026-04-28
+- **Last significant edit:** 2026-04-29 (slug rename, framing update)
 - **Quality check results:** Pending Phase 4 review.
 
 ## Positive Signals
@@ -112,8 +106,8 @@ references:
 - Interactive visuals scoped to section topic - no general-purpose showcases
 - Information hierarchy: show the system/structure first, then rationale
 - Frame from designer's perspective: what design decisions were made, not what bugs were fixed
-- Hero metric must have derivation in scope statement (knowledge-graph scale: ~5K edges)
-- **Narrative shape:** Translation Arc. Interview prep: see `elan-design-system-interview.md` (pending creation)
+- Hero metric: "0→72%" retrieval accuracy on subtle tasks (comparative impact metric)
+- **Narrative shape:** Translation Arc. Interview prep: see `engram-interview.md`
 
 ## Voice Samples
 
@@ -151,7 +145,7 @@ energy while tightening grammar and thesis coherence.
   Stacked bar chart showing correction recurrence breakdown (recurrent/approximate/novel)
   over build days. Domain toggle hidden; narrative focuses on novel-% trending upward
   (+0.34%/day) as the "muddier than expected" signal. Trend line overlay on recurrence view.
-- **ExperimentSection:** Tier 3 compound. Section 4 "0, 0, 72." Stacks GraphCanvas
+- **ExperimentSection:** Tier 3 compound. Section 4 "Zero, Zero, Seventy-Two." Stacks GraphCanvas
   (force-directed knowledge graph, ~995 nodes, ~4,892 edges, auto-transition loop) +
   EvalComparisonGrid (3-column comparison: No Memory / Hierarchical Docs / Knowledge Graph, stratified
   by subtle/obvious tasks). Body text replaced with actual eval results: 72% gold cite on
@@ -186,7 +180,7 @@ energy while tightening grammar and thesis coherence.
 | 1 | Teach Once, Enforce Forever | CollaborationLoop | Tier 3 | The Seed: vibe-coding, steady cost, first file (Act I) |
 | 2 | The System Behind the System | SkillMap (dual-view) | Tier 3 | CTA split, bucket problem, rot (Acts II-IV) |
 | 3 | Relationships Hidden in Context | MaturityTimeline (recurrence only) | Tier 2 | Novel-% trending up = muddier than expected → research → need for graph + measurement (Acts IV-VI) |
-| 4 | 0, 0, 72. | ExperimentSection (compound: GraphCanvas + EvalComparisonGrid) | Tier 3 | The graph + eval results: 72% vs 0% on subtle tasks, inconclusive by own rules (Acts V-VIII) |
+| 4 | Zero, Zero, Seventy-Two. | ExperimentSection (compound: GraphCanvas + EvalComparisonGrid) | Tier 3 | The graph + eval results: 72% vs 0% on subtle tasks, inconclusive by own rules (Acts V-VIII) |
 
 ## Open Questions for Next Iteration
 
@@ -229,68 +223,35 @@ energy while tightening grammar and thesis coherence.
   emphasis after voice framework upgrade. Over-indexed on clever contrarian
   positioning - result was condescending. Reverted in CF-024.
 - 2026-04-23: Headline change. "You're looking at the wrong part" (T7) replaced with "Harnessed my code production - 40 sessions in" (T8 + Staccato Authority).
-- 2026-04-26: Headline updated to "I built an agent's memory out of my own mistakes." (T10 Protagonist Framing). Blurb body fully rewritten to match new headline's T10 frame. New body: first date / Severance metaphor opener, "intelligence was never the bottleneck, context is" as the insight peak, "The agent didn't get smarter. It just stopped forgetting." as the closer (T15 closed loop on the memory theme). Previous body was written for T7 and created a mismatch. CF-029, CF-030. Motivated by: (1) "harness" is a top positioning keyword, (2) the
-  previous headline didn't communicate the project's core value prop to scanners,
-  (3) user preference for verb-first opening without "I" pronoun. Content strategy
-  rule updated: first-person perspective includes possessives ("my"), not just "I"/"you."
+- 2026-04-26: Headline updated to "I built an agent's memory out of my own mistakes." (T10 Protagonist Framing). Blurb body fully rewritten to match new headline's T10 frame.
 - 2026-04-06: Tone rewrite v2 (CF-024). Rewrote all prose to match reference
   sample register (humble, real, process-first). Removed horseless carriage metaphor
-  and all industry-positioning. Blurb now honest process narrative. Section bodies
-  use personal agency ("I made it mandatory") not architectural abstraction. Section 3
-  closes with emotional deflation ("The agent didn't get smarter.") instead of
-  declarative framing. CAP-028 (Technique-as-Posturing) created.
-- 2026-04-28: v4 restructure (CF-032). Narrative arc redistributed: mechanism → scale + decay
-  → the graph → the question. MaturityTimeline removed (recurrence data didn't trend
-  meaningfully). Section 1 renamed to "Teach Once, Enforce Forever." GraphCanvas promoted
-  to Section 3 with auto-transition loop. New text-only Section 4 "Is Any of This Working?"
-  as closing. Hero metric changed from "130+" (anti-patterns) to "~5K" (knowledge graph
-  edges). All metrics updated to verified current numbers (18 skills, 200+ APs, ~4,892 edges).
-- 2026-04-28: Narrative twist injection (CFB-044). All four section bodies rewritten to
-  incorporate the 8-act draft's missing reversals. Section 1: vibe-coding setup, specific
-  failure examples (hex/flush/em dashes). Section 2: bucket problem (cross-pillar + doubled
-  overhead) and rot as named failure mode. Section 3: retitled "Relationships Hidden in
-  Context" (from "The Living Graph"); deflation beat added ("felt good for two weeks").
-  Section 4: capture protocol twist (Act VII) added. Visual assignments unchanged.
-- 2026-04-28: MaturityTimeline reintroduced to Section 3. Domain toggle hidden; locked to
-  recurrence view showing novel-% trending upward as narrative evidence for "muddier than
-  expected." Section 3 body rewritten to reference the chart directly. Section 3 no longer
-  text-only.
-- 2026-04-28: Section 4 rewrite with actual eval results. GraphCanvas replaced by
-  ExperimentSection (compound: GraphCanvas + EvalComparisonGrid). Body para 2 adjusted
-  for 3-arm framing; para 3 replaced with results narrative (72% vs 0% on subtle tasks,
-  inconclusive by own rules, "the number is just not clean"). Eval artifacts graph-indexed
-  via docs/eval-navigator.md. 7 eval docs received graph frontmatter. New node types
-  (eval-report, eval-spec) and topic (eval) added to knowledge-graph.md taxonomy.
-- 2026-04-28: Section 4 title + body rewrite. "The Experiment" (Preview Title, Check 7
-  fail) replaced with "0, 0, 72." (Staccato Authority on raw arm scores). Body cut from
-  5 paragraphs / 14 sentences to 2 paragraphs / 6 sentences. Architecture beat content
-  (graph-building details) dropped entirely — scope statement and GraphCanvas already
-  cover it. New body leads with result (T14 Emotional Deflation), adds Concessive Turn
-  (T12+T13), closes with T15 Closed-Loop callback to "stopped forgetting" from blurb.
-  Driven by Phase 1b audit: 5 FAILs (Checks 1, 2, 4, 7, 10, 19).
+  and all industry-positioning.
+- 2026-04-28: v4 restructure (CF-032). Narrative arc redistributed. MaturityTimeline
+  reintroduced. Section 4 rewrite with actual eval results (ExperimentSection compound).
 - 2026-04-28: Category rewrite. "Design Systems · Self-Improving AI Collaboration" →
-  "Context Engineering · Agent Memory Design." "Design Systems" buried the lead (generic);
-  "Self-Improving AI Collaboration" was abstract. New category names the discipline and the
-  problem. (CFB-045)
-- 2026-04-28: Hero metric rewrite. "~5K knowledge graph edges" → "72% correct retrieval
-  on subtle tasks." Scale metric replaced with impact metric — aligns with Meteor (95%)
-  and Lacework (58%) which both lead with outcome, not size. Tooltip updated with eval
-  methodology (520 generations, 3 judges, 0% baselines). Portfolio coherence manifest
-  updated: metric type now "Percentage improvement" (same category as Lacework but
-  measuring fundamentally different things). (CFB-046)
+  "Context Engineering · Agent Memory Design." (CFB-045)
+- 2026-04-28: Hero metric rewrite. "~5K knowledge graph edges" → "0→72% retrieval
+  accuracy on subtle tasks." Scale metric replaced with comparative impact metric. (CFB-046)
+- 2026-04-28: Terminology standardized. "Flat docs" → "Hierarchical Docs," "bare LLM" →
+  "No Memory." Research-backed agent memory architecture naming. (CFB-048)
+- 2026-04-29: Case study renamed from "Élan Design System" to "Engram." Slug changed
+  from `elan-design-system` to `engram`. Framing shifted from design system product to
+  agent memory system. Old dossier converted to `type: alias` pointer. (CFB-049)
 
 ## Portfolio Coherence Manifest Entry
 
 - **Narrative shape:** Translation Arc
-- **Headline technique:** T8 Verdict + Staccato Authority ("Harnessed my code production - 40 sessions in.")
+- **Headline technique:** T10 Protagonist Framing ("I built an agent's memory out of my own mistakes.")
 - **Voice register:** Conversational-irreverent
-- **Metric type:** Percentage improvement (72% correct retrieval on subtle tasks vs 0% baseline)
+- **Metric type:** Percentage improvement (0→72% retrieval accuracy on subtle tasks vs 0% baseline)
 - **Evidence method:** Interactive demo (3 Tier 3 components: CollaborationLoop, SkillMap, ExperimentSection) + quantitative eval results
 - **Employment context:** Solo project / portfolio piece
 
 ## Cross-References
 
-- Content: CFB-013, CFB-014, CFB-015, CFB-019
+- Content: CFB-013, CFB-014, CFB-015, CFB-019, CFB-045, CFB-046, CFB-048, CFB-049
 - Design: FB-056 (interactive visual scoping), FB-067 (false affordance on static pills)
 - Engineering: ENG-054 (CMS heading vs INTERACTIVE_VISUALS key mismatch)
 - Plan: `.cursor/plans/ds_case_study_v3_f661b06e.plan.md`
+- Previous dossier: `elan-design-system.md` (alias → this file)
