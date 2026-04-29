@@ -20,10 +20,10 @@ const HERO_METRICS: Record<string, { value: string; label: string; tooltip?: str
     label: "usability improvement",
     tooltip: "Perceived ease-of-use scores from task-based evaluations with the customer success team. Scores rose from 60 to 95 out of 100.",
   },
-  "elan-design-system": {
-    value: "~5K",
-    label: "knowledge graph edges",
-    tooltip: "A typed knowledge graph with ~4,892 edges across 6 relationship types (strengthens, supersedes, narrows, weakens, related, cites). Built from 200+ anti-patterns, 18 skills, and 234 feedback entries across design, engineering, and content. The graph below is live.",
+  "engram": {
+    value: "0→72%",
+    label: "retrieval accuracy on subtle tasks",
+    tooltip: "Both baselines (no-memory model and hierarchical docs) scored 0% on tasks requiring cross-document reasoning. The knowledge graph scored 72%. 520 generations, three independent judges scoring blind.",
   },
   meteor: {
     value: "95%",
@@ -33,30 +33,30 @@ const HERO_METRICS: Record<string, { value: string; label: string; tooltip?: str
 };
 
 const COVER_IMAGES: Record<string, string> = {
-  "elan-design-system": "/images/elan-cover.svg",
+  "engram": "/images/elan-cover.svg",
 };
 
 const INTERACTIVE_VISUALS: Record<string, Record<string, { component: string; playgroundUrl: string; playgroundLabel: string }>> = {
-  "elan-design-system": {
+  "engram": {
     "Teach Once, Enforce Forever": {
       component: "CollaborationLoop",
-      playgroundUrl: "https://yilangao-design-system.vercel.app",
-      playgroundLabel: "Explore the full design system",
+      playgroundUrl: "",
+      playgroundLabel: "",
     },
     "The System Behind the System": {
       component: "SkillMap",
-      playgroundUrl: "https://yilangao-design-system.vercel.app",
-      playgroundLabel: "Explore the full design system",
+      playgroundUrl: "",
+      playgroundLabel: "",
     },
     "Organized\u2026 Until It Wasn\u2019t": {
       component: "MaturityTimeline",
-      playgroundUrl: "https://yilangao-design-system.vercel.app",
-      playgroundLabel: "Explore the full design system",
+      playgroundUrl: "",
+      playgroundLabel: "",
     },
-    "0, 0, 72.": {
+    "Zero, Zero, Seventy-Two.": {
       component: "ExperimentSection",
-      playgroundUrl: "https://yilangao-design-system.vercel.app",
-      playgroundLabel: "Explore the full design system",
+      playgroundUrl: "",
+      playgroundLabel: "",
     },
   },
 };

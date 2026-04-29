@@ -20,7 +20,7 @@
     },
     "caseStudyNotes": {
       "lacework": "The information architecture redesign I led required balancing power-user density with progressive disclosure — a tension familiar to anyone building internal tools at Meta's scale.",
-      "elan-design-system": "Élan was built to solve the same problem every fast-moving product org faces: how do you maintain design consistency when shipping velocity is the priority?"
+      "engram": "Engram tackles the context bottleneck in AI-assisted engineering — the same challenge any team building with LLMs at scale faces: how do you make institutional knowledge persist across sessions when the model forgets everything between conversations?"
     }
   }
 }
