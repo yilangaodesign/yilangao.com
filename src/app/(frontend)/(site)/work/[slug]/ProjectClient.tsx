@@ -288,20 +288,22 @@ function InteractiveVisual({ config }: { config: InteractiveVisualConfig }) {
   return (
     <div className={styles.interactiveVisualBlock}>
       <Component />
-      <a
-        href={config.playgroundUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        className={elanStyles.playgroundLink}
-        onClick={() => track("External Link Clicked", {
-          destination_url: config.playgroundUrl,
-          link_label: config.playgroundLabel,
-          context: "case_study_interactive",
-        })}
-      >
-        {config.playgroundLabel}
-        <span className={elanStyles.playgroundLinkArrow} aria-hidden="true">&#8599;</span>
-      </a>
+      {config.playgroundUrl && (
+        <a
+          href={config.playgroundUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={elanStyles.playgroundLink}
+          onClick={() => track("External Link Clicked", {
+            destination_url: config.playgroundUrl,
+            link_label: config.playgroundLabel,
+            context: "case_study_interactive",
+          })}
+        >
+          {config.playgroundLabel}
+          <span className={elanStyles.playgroundLinkArrow} aria-hidden="true">&#8599;</span>
+        </a>
+      )}
     </div>
   );
 }

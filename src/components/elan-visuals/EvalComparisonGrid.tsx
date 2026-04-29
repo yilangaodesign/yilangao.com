@@ -5,16 +5,16 @@ import styles from "./eval-comparison-grid.module.scss";
 
 const ARMS = [
   {
-    label: "No Docs",
-    tip: "Claude with no project documentation — pure model knowledge only.",
+    label: "No Memory",
+    tip: "The model with no external memory — pure parametric knowledge only.",
   },
   {
-    label: "Flat Docs",
-    tip: "The pre-revamp setup: markdown files with keyword search, no linking or structure.",
+    label: "Hierarchical Docs",
+    tip: "The old setup: documentation organized into pillars and categories — structured top-down, but with no cross-references between branches.",
   },
   {
-    label: "Linked Graph",
-    tip: "The new system: ~5K edges connecting every rule, pattern, and anti-pattern so the agent can traverse context.",
+    label: "Knowledge Graph",
+    tip: "The new system: ~5K typed edges connecting every rule, pattern, and anti-pattern so the agent can traverse relationships across domains.",
   },
 ] as const;
 

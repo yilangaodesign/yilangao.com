@@ -3,7 +3,6 @@ import { isAdminAuthenticated } from "@/lib/admin-auth";
 import { getCompanyFromSession } from "@/lib/company-session";
 import { getCompanyBySlug } from "@/lib/company-data";
 import { RefreshRouteOnSave } from "@/components/RefreshRouteOnSave";
-import { HOME_CASE_SUBLINE_BY_SLUG } from "@/lib/home-case-subline";
 import { isVisibleOnHome } from "@/lib/project-filters";
 import { resolveThumbnailUrl } from "@/lib/resolve-thumbnail-url";
 import { extractContentUrls } from "@/lib/extract-content-urls";
@@ -67,7 +66,7 @@ export default async function Home() {
           slug: doc.slug,
           headline: (doc as Record<string, unknown>).introBlurbHeadline as string,
           category: (doc.category as string) ?? "",
-          subline: HOME_CASE_SUBLINE_BY_SLUG[doc.slug] ?? "",
+          subline: (doc.category as string) ?? "",
           thumbnailUrl: resolved?.url,
           thumbnailKind: resolved?.kind,
         };

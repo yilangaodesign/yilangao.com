@@ -59,6 +59,11 @@
   letter-spacing: $portfolio-tracking-wider;
   color: $portfolio-text-neutral-subtle;
   margin-bottom: $portfolio-spacer-0-25x;
+  transition: color 280ms cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+.categoryHeaderActive {
+  color: $portfolio-text-neutral-bold;
 }
 
 .categoryCount {
@@ -76,11 +81,7 @@
   border: none;
   cursor: pointer;
   text-align: left;
-  transform-origin: top center;
-  transform: scaleY(1);
-  transition:
-    background 280ms cubic-bezier(0.25, 0.1, 0.25, 1),
-    transform 400ms cubic-bezier(0.22, 1.2, 0.36, 1);
+  transition: background 280ms cubic-bezier(0.25, 0.1, 0.25, 1);
 
   &:hover {
     background: $portfolio-neutral-20;
@@ -94,7 +95,6 @@
 
 .skillCardExpanded {
   background: $portfolio-neutral-20;
-  transform: scaleY(1.08);
 }
 
 .skillName {
@@ -405,5 +405,9 @@
   .skillCard,
   .treemapBlock {
     transition: none;
+  }
+
+  .skillDetail {
+    animation: none;
   }
 }

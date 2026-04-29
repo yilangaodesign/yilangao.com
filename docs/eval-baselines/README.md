@@ -223,6 +223,6 @@ The eval plan has been authored as [`.cursor/plans/self-automated_kg_a_b_eval_a4
 
 **Multi-arm expansion:** The plan adds two arms beyond the original two-arm (pre-init vs post-init) design:
 - Arm R (Naive RAG at HEAD): grep + lunr search over post-initiative docs without the knowledge graph. Isolates the graph's marginal contribution.
-- Arm B (Bare LLM): zero tools, parametric knowledge only. Establishes a floor.
+- Arm B (No Memory): zero tools, parametric knowledge only. Establishes a floor.
 
 **Automated judging:** Replaces the hybrid "LLM-as-judge + 20% human spot-check" with a 3-judge non-Anthropic ensemble (`openai/gpt-5.4`, `google/gemini-2.5-pro`, `xai/grok-3`). Judge agreement is calibrated on held-out prompts (Phase 3) before corpus data is seen. Human spot-check is replaced by agent-driven cross-validation (Phase 6: 8 sampled runs read end-to-end for surface anomalies).

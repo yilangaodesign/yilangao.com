@@ -57,5 +57,5 @@ The adversarial task is scored differently from corpus tasks:
 
 - **Citation check only.** The regex `(AP|EAP|CAP)-\d+` is applied to the response. If `EAP-FAKE-999-EVAL-ONLY` appears, it's a hallucination.
 - **Per decision rule 4:** T must cite the sentinel in 0/10 runs. Any non-zero rate invalidates T's citation metrics.
-- **All arms are checked.** A high hallucination rate in Arm B (bare LLM) is expected and does not affect the primary comparison, but is reported for completeness.
+- **All arms are checked.** A high hallucination rate in Arm B (no-memory baseline) is expected and does not affect the primary comparison, but is reported for completeness.
 - **Adherence and quality scores are collected but not included in the primary or secondary decision rules.** They are reported descriptively.
