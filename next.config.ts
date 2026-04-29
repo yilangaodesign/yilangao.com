@@ -3,6 +3,15 @@ import { withPayload } from "@payloadcms/next/withPayload";
 
 const nextConfig: NextConfig = {
   transpilePackages: ["@yilangaodesign/design-system"],
+  async redirects() {
+    return [
+      {
+        source: '/work/elan-design-system',
+        destination: '/work/engram',
+        permanent: true,
+      },
+    ];
+  },
   images: {
     remotePatterns: [
       {
