@@ -17,7 +17,47 @@ references:
 >
 > **Who reads this:** AI agents when the `ship-it` skill is activated — scan recent entries for recurring pitfalls before starting a new release.
 > **Who writes this:** AI agents after each ship-it run via the Post-Release Audit protocol in `ship-it/SKILL.md`.
-> **Last updated:** 2026-04-28 (REL-033: ExperimentSection, eval graph integration, Section 4 rewrite — Élan 2.15.2, ASCII Art Studio 0.6.22, yilangao.com 1.5.5)
+> **Last updated:** 2026-04-29 (REL-034: Élan→Engram rename, content rewrite, visual refinements — Élan 2.15.3, yilangao.com 1.5.6)
+
+---
+
+<a id="rel-034"></a>
+## REL-034 — Élan→Engram Rename & Content Rewrite (2026-04-29)
+
+**Scope:** 26 files across 4 dependency-ordered layer commits (L0 config ×1, L1 docs ×14, L7 site components ×4, L8 frontend pages ×7) + 1 release commit + 1 dev-patch-bump commit. Layers 2-6, 9-10 empty. 3 macOS duplicate junk files cleaned in Phase 2.
+
+**Versions released:**
+- Élan 2.15.3 (patch — visual label updates, SkillMap interaction polish)
+- yilangao.com 1.5.6 (patch — slug rename, content rewrite, home-case-subline removal)
+- ASCII Art Studio: skipped (no changes)
+
+**Previous release:** Élan 2.15.2, yilangao.com 1.5.5, ASCII Art Studio 0.6.22
+
+**Incidents during release:** None. Clean run — both build gates (main site, playground) passed on first attempt. ASCII Art Studio build skipped (no changes).
+
+**Build gate:** Main site ~40s, Playground ~32s.
+
+**Post-deploy verification:** `vercel ls --prod` (linked project `yilangao-design-system`) showed playground deployment Ready within 4m. Main site verified via `curl`: `/work/engram` returns 307 (password gate), `/work/elan-design-system` follows redirect chain to 200.
+
+**Key changes:**
+- Case study slug renamed from `elan-design-system` to `engram`; permanent redirect added in `next.config.ts`
+- Category rewritten: "Design Systems · Self-Improving AI Collaboration" → "Context Engineering · Agent Memory Design"
+- Hero metric changed: "~5K knowledge graph edges" → "0→72% retrieval accuracy on subtle tasks"
+- All 4 case study sections rewritten with clearer narrative arc
+- EvalComparisonGrid labels updated: "No Docs/Flat Docs/Linked Graph" → "No Memory/Hierarchical Docs/Knowledge Graph"
+- SkillMap: active category header state, removed scaleY transform animation
+- `home-case-subline.ts` deleted — homepage now uses `doc.category` directly
+- Old doc files (`elan-design-system.md`, `elan-design-system-interview.md`) converted to graph aliases pointing to new canonical `engram.md` / `engram-interview.md`
+- New docs: `engram.md`, `engram-interview.md`, `edra-strategy.md`
+- `companies.json` updated with Engram-specific company notes
+
+**Layer classification notes:**
+- L0: `next.config.ts` — permanent redirect `/work/elan-design-system` → `/work/engram`
+- L1: 11 modified docs (content feedback log, portfolio coherence, eval docs minor fixes, old elan docs→aliases) + 3 new docs (engram canonical files, outreach strategy)
+- L7: elan-visuals label updates for Engram framing, SkillMap categoryHeaderActive state, eval grid accent font-weight, skill-map animation cleanup
+- L8: homepage subline source change, ProjectClient conditional playground link, case study page slug/metrics/visuals rename, update-elan route content rewrite, companies.json, case-study-intro-headline key rename, home-case-subline deletion
+
+**Known Pitfall check:** No existing pitfalls triggered. No new pitfalls identified.
 
 ---
 
@@ -389,24 +429,6 @@ Adversarial audit (`pressure test plan` against the Plan B implementation) surfa
 
 ---
 
-<a id="rel-019"></a>
-## REL-019 — Élan 2.11.7, yilangao.com 1.3.7, ASCII Art Studio 0.6.9 (2026-04-23)
-
-**Scope:** 9 files across 2 dependency-ordered layer commits (L1 docs ×5, L7/L8 source ×4) + 1 release commit + 1 dev-patch-bump commit. Layers 0, 2-6, 9-10 empty.
-**Semver:** Patch for all three apps. Élan 2.11.7: CollaborationLoop accent neutralization (22 accent→neutral conversions per Lumen Scarcity Principle), step nav alignment fix, transport divider removal, callout padding reduction, stale image placeholder removal from Elan content. yilangao.com 1.3.7: same feature set. ASCII Art Studio 0.6.9: manifest sync only.
-**Previous release:** Élan 2.11.6, yilangao.com 1.3.6, ASCII Art Studio 0.6.8
-
-**Incidents during release:** None. Clean run — all three build gates passed on first attempt.
-
-**Build gate:** Playground ~22s, main site ~31s, ASCII tool ~13s.
-
-**Post-deploy verification:** `vercel ls --prod` (default linked project `yilangao-design-system`) showed latest production deployment Ready within 1m of the `main` push.
-
-**Layer classification notes:**
-- L1: Design feedback (FB-178/179 accent neutralization + step alignment, FB-087 callout padding), content feedback (CF-025 Cognition wording), design anti-patterns (AP-071 accent as highlight), design.md frequency map update, engineering feedback log update.
-- L7/L8 combined: `CollaborationLoop.tsx` (step number removal), `collaboration-loop.module.scss` (22 accent→neutral, transport cleanup, step nav padding), `page.module.scss` (callout padding 4x/5x→3x), `update-elan/route.ts` (remove stale imagePlaceholders array).
-
-
 ---
 
-> **Archived entries:** REL-001 through REL-018 moved to `docs/release-log-archive.md` (2026-04-28, cap enforcement).
+> **Archived entries:** REL-001 through REL-019 moved to `docs/release-log-archive.md` (2026-04-29, cap enforcement).
