@@ -6,8 +6,8 @@ export const elan = {
   name: "Élan",
   version: "2.15.3",
   release: {
-    version: "2.15.2",
-    name: "Élan 2.15.2",
-    releasedAt: "2026-04-28T22:08:25.294Z",
+    version: "2.15.3",
+    name: "Élan 2.15.3",
+    releasedAt: "2026-04-29T05:47:55.625Z",
   },
 } as const;
