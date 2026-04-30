@@ -61,7 +61,7 @@ import MediaRenderer from "@/components/ui/MediaRenderer/MediaRenderer";
 import { VideoEmbed } from "@/components/ui/VideoEmbed";
 import { Dropzone } from "@/components/ui/Dropzone";
 import type { EmbedProvider } from "@/lib/parse-video-embed";
-import { track } from "@/lib/analytics/mixpanel";
+import { track, canonicalSlug } from "@/lib/analytics/mixpanel";
 import { useEngagementTracker } from "@/lib/analytics/use-engagement-tracker";
 import elanStyles from "@/components/elan-visuals/elan-visuals.module.scss";
 import { siteShellStyles } from "@/components/SiteFooter";
@@ -574,7 +574,7 @@ function ProjectClientBody({
 
   useEffect(() => {
     track("Case Study Viewed", {
-      study_slug: p.slug,
+      study_slug: canonicalSlug(p.slug ?? ""),
       has_personalization: !!companyNote,
     });
   }, [p.slug, companyNote]);
@@ -596,7 +596,7 @@ function ProjectClientBody({
           if (section && !firedSections.current.has(section.id)) {
             firedSections.current.add(section.id);
             track("Section Reached", {
-              study_slug: p.slug,
+              study_slug: canonicalSlug(p.slug ?? ""),
               section_id: section.id,
               section_label: section.label,
             });

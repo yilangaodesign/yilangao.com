@@ -2,6 +2,15 @@ import mixpanel from "mixpanel-browser";
 
 type EventProperties = Record<string, string | number | boolean | null | undefined>;
 
+const SLUG_ALIASES: Record<string, string> = {
+  "elan-design-system": "engram",
+};
+
+/** Map legacy slugs to their current canonical name. */
+export function canonicalSlug(slug: string): string {
+  return SLUG_ALIASES[slug] ?? slug;
+}
+
 let initialized = false;
 let disabled = false;
 

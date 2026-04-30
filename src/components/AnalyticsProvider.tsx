@@ -38,9 +38,9 @@ export function AnalyticsProvider({
     const deviceId = getDeviceId();
     const ownerFromDeviceId = !!deviceId && KNOWN_OWNER_DEVICE_IDS.includes(deviceId);
 
-    if (ownerFromCookie || ownerFromStorage || ownerFromDeviceId) {
-      registerSuperProps({ is_owner: true });
-    }
+    registerSuperProps({
+      is_owner: !!(ownerFromCookie || ownerFromStorage || ownerFromDeviceId),
+    });
 
     if (!isAdmin && companySlug) {
       if (companySlug === "welcome") {

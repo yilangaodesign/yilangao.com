@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { track } from "@/lib/analytics/mixpanel";
+import { track, canonicalSlug } from "@/lib/analytics/mixpanel";
 
 // Module-level state survives SPA navigation, resets on full page reload.
 const engagedSlugs = new Set<string>();
@@ -70,12 +70,12 @@ export function useEngagementTracker(
       const dwellSeconds = Math.round(getActiveMs() / 1000);
 
       track("Case Study Engaged", {
-        case_study: slugRef.current,
+        case_study: canonicalSlug(slugRef.current),
         content_format: formatRef.current,
         dwell_seconds: dwellSeconds,
       });
 
-      engagedSlugs.add(slugRef.current);
+      engagedSlugs.add(canonicalSlug(slugRef.current));
 
       if (engagedSlugs.size >= 2 && !deepExplorerFired) {
         deepExplorerFired = true;
@@ -139,7 +139,7 @@ export function useEngagementTracker(
         dwellFiredRef.current = true;
         const totalMs = getActiveMs();
         track("Case Study Dwell", {
-          case_study: slugRef.current,
+          case_study: canonicalSlug(slugRef.current),
           content_format: formatRef.current,
           dwell_seconds: Math.round(totalMs / 1000),
         });

@@ -12,7 +12,29 @@ deprecated: true
 
 > **What this file is:** Archived release log entries that exceeded the 15-entry cap in `docs/release-log.md`. Kept for historical reference.
 >
-> **Last updated:** 2026-04-28 (archived REL-001 through REL-018)
+> **Last updated:** 2026-04-29 (archived REL-001 through REL-020)
+
+---
+
+<a id="rel-020"></a>
+## REL-020 — Élan 2.11.8, yilangao.com 1.3.8, ASCII Art Studio 0.6.10 (2026-04-23)
+
+**Scope:** 2 files across 2 dependency-ordered layer commits (L0 config ×1, L8 frontend ×1) + 1 release commit + 1 dev-patch-bump commit. Layers 1-7, 9-10 empty.
+**Semver:** Patch for all three apps. Élan 2.11.8: new `personalize` agent skill. yilangao.com 1.3.8: favicon added. ASCII Art Studio 0.6.10: manifest sync only.
+**Previous release:** Élan 2.11.7, yilangao.com 1.3.7, ASCII Art Studio 0.6.9
+
+**Incidents during release:**
+- Git orphaned branch: local `dev` had no commits (orphaned from `origin/dev`). Required `git reset --soft origin/dev` to re-attach, then `git reset HEAD` to rebuild the index. Root cause: unknown (likely a prior interrupted operation). Not a recurring pitfall - one-time recovery.
+- Phantom `M` files in `git status`: multiple files showed as modified with zero content diff (stat-cache mismatches). Did not affect commits. Known macOS behavior.
+- 16 macOS duplicate files (`* 2.*` pattern) found and deleted in Phase 2.
+
+**Build gate:** Playground ~42s, main site ~65s, ASCII tool ~39s. All passed first attempt.
+
+**Post-deploy verification:** `vercel ls --prod` (default linked project `yilangao-design-system`) showed latest production deployment Ready within 3m of the `main` push.
+
+**Layer classification notes:**
+- L0: `.cursor/skills/personalize/SKILL.md` (new agent skill for company visitor personalization pipeline).
+- L8: `src/app/(frontend)/favicon.ico` (new static asset).
 
 ---
 

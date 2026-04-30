@@ -17,7 +17,25 @@ references:
 >
 > **Who reads this:** AI agents when the `ship-it` skill is activated — scan recent entries for recurring pitfalls before starting a new release.
 > **Who writes this:** AI agents after each ship-it run via the Post-Release Audit protocol in `ship-it/SKILL.md`.
-> **Last updated:** 2026-04-29 (REL-034: Élan→Engram rename, content rewrite, visual refinements — Élan 2.15.3, yilangao.com 1.5.6)
+> **Last updated:** 2026-04-29 (REL-035: Edra outreach strategy CMS sync log — Élan 2.15.4, yilangao.com 1.5.7, ASCII Art Studio 0.6.23)
+
+---
+
+<a id="rel-035"></a>
+## REL-035 — Edra Outreach CMS Sync Log (2026-04-29)
+
+**Scope:** 1 file across 1 dependency-ordered layer commit (L1 docs ×1) + 1 release commit + 1 dev-patch-bump commit. All other layers empty.
+**Semver:** Patch for all three apps. Élan 2.15.4, yilangao.com 1.5.7, ASCII Art Studio 0.6.23 — all manifest-sync only (no code changes, docs-only release).
+**Previous release:** Élan 2.15.3, yilangao.com 1.5.6, ASCII Art Studio 0.6.22
+
+**Incidents during release:** None. Clean run.
+
+**Build gate:** Playground ~32s, main site ~47s, ASCII tool ~20s. All passed first attempt.
+
+**Post-deploy verification:** Playground deployment Ready within ~1m. Main site returned 307 (expected — password gate redirect for unauthenticated requests).
+
+**Layer classification notes:**
+- L1: `docs/outreach/edra-strategy.md` — added CMS note sync log table tracking slug fix and Engram note rewrite.
 
 ---
 
@@ -407,28 +425,6 @@ Adversarial audit (`pressure test plan` against the Plan B implementation) surfa
 
 ---
 
-<a id="rel-020"></a>
-## REL-020 — Élan 2.11.8, yilangao.com 1.3.8, ASCII Art Studio 0.6.10 (2026-04-23)
-
-**Scope:** 2 files across 2 dependency-ordered layer commits (L0 config ×1, L8 frontend ×1) + 1 release commit + 1 dev-patch-bump commit. Layers 1-7, 9-10 empty.
-**Semver:** Patch for all three apps. Élan 2.11.8: new `personalize` agent skill. yilangao.com 1.3.8: favicon added. ASCII Art Studio 0.6.10: manifest sync only.
-**Previous release:** Élan 2.11.7, yilangao.com 1.3.7, ASCII Art Studio 0.6.9
-
-**Incidents during release:**
-- Git orphaned branch: local `dev` had no commits (orphaned from `origin/dev`). Required `git reset --soft origin/dev` to re-attach, then `git reset HEAD` to rebuild the index. Root cause: unknown (likely a prior interrupted operation). Not a recurring pitfall - one-time recovery.
-- Phantom `M` files in `git status`: multiple files showed as modified with zero content diff (stat-cache mismatches). Did not affect commits. Known macOS behavior.
-- 16 macOS duplicate files (`* 2.*` pattern) found and deleted in Phase 2.
-
-**Build gate:** Playground ~42s, main site ~65s, ASCII tool ~39s. All passed first attempt.
-
-**Post-deploy verification:** `vercel ls --prod` (default linked project `yilangao-design-system`) showed latest production deployment Ready within 3m of the `main` push.
-
-**Layer classification notes:**
-- L0: `.cursor/skills/personalize/SKILL.md` (new agent skill for company visitor personalization pipeline).
-- L8: `src/app/(frontend)/favicon.ico` (new static asset).
-
 ---
 
----
-
-> **Archived entries:** REL-001 through REL-019 moved to `docs/release-log-archive.md` (2026-04-29, cap enforcement).
+> **Archived entries:** REL-001 through REL-020 moved to `docs/release-log-archive.md` (2026-04-29, cap enforcement).
