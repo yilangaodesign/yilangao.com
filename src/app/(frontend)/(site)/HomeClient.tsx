@@ -14,7 +14,7 @@ import { useCursorThumbnail } from "@/hooks/use-cursor-thumbnail";
 import { PreloadManager } from "@/lib/preload-manager";
 import type { AssetManifest } from "@/lib/extract-content-urls";
 import { useScrollRestoration } from "@/hooks/use-scroll-restoration";
-import { track } from "@/lib/analytics/mixpanel";
+import { track, canonicalSlug } from "@/lib/analytics/mixpanel";
 import { siteShellStyles } from "@/components/SiteFooter";
 import styles from "./page.module.scss";
 
@@ -58,7 +58,7 @@ export default function HomeClient({
             <StaggerChildren className={styles.caseStudyList}>
               {caseStudies.map((cs, i) => (
                 <StaggerItem key={cs.slug}>
-                  <Link href={`/work/${cs.slug}`} className={styles.caseStudyLink} onClick={() => { savePosition(); track("Case Study Clicked", { study_slug: cs.slug, position: i }); }} {...getBlockHandlers(i)}>
+                  <Link href={`/work/${cs.slug}`} className={styles.caseStudyLink} onClick={() => { savePosition(); track("Case Study Clicked", { study_slug: canonicalSlug(cs.slug), position: i }); }} {...getBlockHandlers(i)}>
                     {personalization?.slugs.includes(cs.slug) && (
                       <Badge appearance="neutral" emphasis="minimal" size="sm" shape="squared" className={styles.personalizationBadge}>
                         for {personalization.name}
