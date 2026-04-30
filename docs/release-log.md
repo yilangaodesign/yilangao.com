@@ -17,7 +17,26 @@ references:
 >
 > **Who reads this:** AI agents when the `ship-it` skill is activated — scan recent entries for recurring pitfalls before starting a new release.
 > **Who writes this:** AI agents after each ship-it run via the Post-Release Audit protocol in `ship-it/SKILL.md`.
-> **Last updated:** 2026-04-29 (REL-035: Edra outreach strategy CMS sync log — Élan 2.15.4, yilangao.com 1.5.7, ASCII Art Studio 0.6.23)
+> **Last updated:** 2026-04-30 (REL-036: Analytics slug normalization & is_owner fix — Élan 2.15.5, yilangao.com 1.5.8, ASCII Art Studio 0.6.24)
+
+---
+
+<a id="rel-036"></a>
+## REL-036 — Analytics Slug Normalization & is_owner Fix (2026-04-30)
+
+**Scope:** 5 files across 2 dependency-ordered layer commits (L7 site components ×1, L8 frontend pages + lib ×4) + 1 release commit + 1 dev-patch-bump commit. Layers 0-6, 9-10 empty.
+**Semver:** Patch for all three apps. Élan 2.15.5, yilangao.com 1.5.8, ASCII Art Studio 0.6.24 — all manifest-sync for playground/ASCII (analytics changes affect main site only).
+**Previous release:** Élan 2.15.4, yilangao.com 1.5.7, ASCII Art Studio 0.6.23
+
+**Incidents during release:** None. Clean run.
+
+**Build gate:** Playground ~17s compile + ~9s TS, main site ~25s compile + ~14s TS, ASCII tool ~9s compile + ~5s TS. All passed first attempt.
+
+**Post-deploy verification:** `vercel ls --prod` (default linked project `yilangao-design-system`) showed latest production deployment Ready (1m build) within 5m of the `main` push.
+
+**Layer classification notes:**
+- L7: `src/components/AnalyticsProvider.tsx` — always register `is_owner` super property (`true` or `false`) instead of only setting when true. Ensures non-owner visitor events carry explicit `is_owner: false`.
+- L8: `src/lib/analytics/mixpanel.ts` (new `canonicalSlug()` function + `SLUG_ALIASES` map), `src/lib/analytics/use-engagement-tracker.ts` (normalize slugs in engagement events), `src/app/(frontend)/(site)/HomeClient.tsx` (normalize slug in "Case Study Clicked"), `src/app/(frontend)/(site)/work/[slug]/ProjectClient.tsx` (normalize slug in "Case Study Viewed" + "Section Reached").
 
 ---
 
@@ -406,25 +425,6 @@ Adversarial audit (`pressure test plan` against the Plan B implementation) surfa
 
 ---
 
-<a id="rel-021"></a>
-## REL-021 — Élan 2.11.9, yilangao.com 1.3.9, ASCII Art Studio 0.6.11 (2026-04-24)
-
-**Scope:** 5 files across 2 dependency-ordered layer commits (L1 docs x4, L6 component update x1) + 1 release commit + 1 dev-patch-bump commit. Layers 0, 2-5, 7-10 empty.
-**Semver:** Patch for all three apps. Élan 2.11.9: Textarea SCSS cleared. yilangao.com 1.3.9: docs only. ASCII Art Studio 0.6.11: manifest sync only.
-**Previous release:** Élan 2.11.8, yilangao.com 1.3.8, ASCII Art Studio 0.6.10
-
-**Incidents during release:** None. Clean pass through all phases.
-
-**Build gate:** Playground ~29s, main site ~44s, ASCII tool ~18s. All passed first attempt.
-
-**Post-deploy verification:** `vercel ls --prod` (default linked project `yilangao-design-system`) showed latest production deployment Ready (58s build) within 4m of the `main` push.
-
-**Layer classification notes:**
-- L1: `docs/content-feedback-log.md` (CF-026 through CF-028, Chalk personalization), `docs/engineering-feedback-log.md` (ENG-205), `docs/engineering.md` (frequency map), `docs/port-registry.md` (PIDs + restart log).
-- L6: `src/components/ui/Textarea/Textarea.module.scss` (file emptied — styles cleared).
-
 ---
 
----
-
-> **Archived entries:** REL-001 through REL-020 moved to `docs/release-log-archive.md` (2026-04-29, cap enforcement).
+> **Archived entries:** REL-001 through REL-021 moved to `docs/release-log-archive.md` (2026-04-30, cap enforcement).
