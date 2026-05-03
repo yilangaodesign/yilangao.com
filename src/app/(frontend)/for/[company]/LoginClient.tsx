@@ -16,9 +16,10 @@ type Props = {
   company: string;
   accent: string | null;
   greeting: string;
+  redirectTo: string | null;
 };
 
-export default function LoginClient({ company, accent, greeting }: Props) {
+export default function LoginClient({ company, accent, greeting, redirectTo }: Props) {
   const headline = greeting.replace(/\.\s*$/, ",");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -55,7 +56,7 @@ export default function LoginClient({ company, accent, greeting }: Props) {
           success: true,
           company,
         });
-        router.push("/");
+        router.push(redirectTo || "/");
       } else {
         track("Sign In", {
           login_method: "password",

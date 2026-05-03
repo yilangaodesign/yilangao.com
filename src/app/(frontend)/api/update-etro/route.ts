@@ -51,7 +51,7 @@ const ETRO_DATA = {
   slug: 'etro-framework',
   category: 'AI Trust Architecture',
   contentFormat: 'essay',
-  publishedAt: '2025-12-01',
+  publishedAt: '2026-04-21',
   readTimeMinutesOverride: null as number | null,
   mediumUrl: '',
   featured: false,
