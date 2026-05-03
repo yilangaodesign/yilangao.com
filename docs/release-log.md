@@ -17,7 +17,27 @@ references:
 >
 > **Who reads this:** AI agents when the `ship-it` skill is activated — scan recent entries for recurring pitfalls before starting a new release.
 > **Who writes this:** AI agents after each ship-it run via the Post-Release Audit protocol in `ship-it/SKILL.md`.
-> **Last updated:** 2026-04-30 (REL-036: Analytics slug normalization & is_owner fix — Élan 2.15.5, yilangao.com 1.5.8, ASCII Art Studio 0.6.24)
+> **Last updated:** 2026-05-02 (REL-037: Password gate redirect-on-login, EssayMeta UTC date fix, etro publish date — Élan 2.15.6, ASCII Art Studio 0.6.25)
+
+---
+
+<a id="rel-037"></a>
+## REL-037 — Password Gate Redirect, EssayMeta UTC Fix, Etro Date (2026-05-02)
+
+**Scope:** 6 tracked files across 3 dependency-ordered commits (L0 ×1, L7 ×1, L8 ×4) + 1 release commit + 1 dev-patch-bump commit. 1 macOS duplicate cleaned (`docs/eval-navigator 2.md`). Layers 1-6, 9-10 empty.
+**Semver:** Patch for all apps. Élan 2.15.6, ASCII Art Studio 0.6.25 — both manifest-sync (main site changes only).
+**Previous release:** Élan 2.15.5, ASCII Art Studio 0.6.24
+
+**Incidents during release:** Main site build failed on first attempt with transient `MODULE_NOT_FOUND` in knowledge-graph route (stale `.next/` cache). Passed cleanly on second attempt. No code changes required.
+
+**Build gate:** Playground ~35s compile. ASCII Art Studio ~24s compile. Main site ~30s compile (first attempt failed — transient; second attempt passed). All green before merge.
+
+**Post-deploy verification:** `vercel ls --prod` (playground `yilangao-design-system`) showed latest production deployment Ready (1m build) within ~65s of the `main` push.
+
+**Layer classification notes:**
+- L0: `.cursor/skills/password-gate/SKILL.md` — updated step 8 to document redirect-on-login flow (pass `?redirect=` param, restore after login).
+- L7: `src/components/essay/EssayMeta.tsx` — added `timeZone: "UTC"` to `Intl.DateTimeFormat` to prevent off-by-one date display in EST.
+- L8: `src/proxy.ts` — when redirecting unauthenticated/invalid-session to login, appends `?redirect=<original path+search>` (skipped for `/`). `src/app/(frontend)/for/[company]/page.tsx` — parses and validates `?redirect=` param (must start with `/`, not `//`), passes validated `safeRedirect` to LoginClient. `src/app/(frontend)/for/[company]/LoginClient.tsx` — accepts `redirectTo` prop, uses it instead of hard-coded `/` after successful login. `src/app/(frontend)/api/update-etro/route.ts` — corrected `publishedAt` from `2025-12-01` to `2026-04-21`.
 
 ---
 

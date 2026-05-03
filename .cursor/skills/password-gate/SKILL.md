@@ -29,6 +29,8 @@ The collection is managed via:
 3. Login page renders → fetches company from Payload DB → applies theme
 4. Visitor → POST password via server action
 5. Server action validates password against DB (constant-time comparison)
+5a. If on /for/welcome and no match → fallback: check password against all active companies
+5b. If a company match is found → session is set with that company's slug (not "welcome")
 6. If valid → set portfolio_session cookie (HMAC-signed, company=google)
 7. Server action → increment loginCount + update lastLoginAt in DB
 8. Redirect to original URL (preserved via ?redirect= param) or / if none

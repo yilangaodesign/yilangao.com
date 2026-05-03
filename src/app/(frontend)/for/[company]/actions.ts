@@ -6,7 +6,7 @@ import {
   createSignedValue,
   getSessionCookieConfig,
 } from "@/lib/company-session";
-import { getCompanyBySlug, incrementLoginAnalytics } from "@/lib/company-data";
+import { getCompanyBySlug, getAllActiveCompanies, incrementLoginAnalytics } from "@/lib/company-data";
 
 const SITE_PASSWORD = process.env.SITE_PASSWORD || "glad you are here";
 const HARDCODED_FALLBACK = "glad you are here";
@@ -14,7 +14,7 @@ const HARDCODED_FALLBACK = "glad you are here";
 export async function validatePassword(
   company: string,
   password: string,
-): Promise<{ success: boolean; error?: string }> {
+): Promise<{ success: boolean; error?: string; matchedCompany?: string }> {
   const config = await getCompanyBySlug(company);
 
   if (config && !config.active) {
@@ -28,6 +28,24 @@ export async function validatePassword(
     altPasswords.some((alt) => comparePasswords(password, alt)) ||
     comparePasswords(password, SITE_PASSWORD) ||
     comparePasswords(password, HARDCODED_FALLBACK);
+
+  if (!isValid && company === "welcome") {
+    const allCompanies = await getAllActiveCompanies();
+    const matched = allCompanies.find(
+      (c) =>
+        comparePasswords(password, c.password) ||
+        c.altPasswords.some((alt) => comparePasswords(password, alt)),
+    );
+
+    if (matched) {
+      const signed = createSignedValue(matched.slug);
+      const cookieConfig = getSessionCookieConfig(signed);
+      const cookieStore = await cookies();
+      cookieStore.set(cookieConfig);
+      await incrementLoginAnalytics(matched.id);
+      return { success: true, matchedCompany: matched.slug };
+    }
+  }
 
   if (!isValid) {
     return { success: false, error: "Incorrect password" };
