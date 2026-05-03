@@ -16,13 +16,19 @@ export default async function LoginPage({ params, searchParams }: Props) {
   const { company } = await params;
   const query = await searchParams;
 
+  const redirectTo = typeof query.redirect === "string" ? query.redirect : null;
+  const safeRedirect =
+    redirectTo && redirectTo.startsWith("/") && !redirectTo.startsWith("//")
+      ? redirectTo
+      : null;
+
   const isDevPreview =
     process.env.NODE_ENV === "development" && query.preview === "true";
 
   if (!isDevPreview) {
     const existingSession = await getCompanyFromSession();
     if (existingSession && existingSession === company) {
-      redirect("/");
+      redirect(safeRedirect || "/");
     }
   }
 
@@ -72,6 +78,7 @@ export default async function LoginPage({ params, searchParams }: Props) {
         company={company}
         accent={theme.accent}
         greeting={theme.greeting}
+        redirectTo={safeRedirect}
       />
     </>
   );

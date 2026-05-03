@@ -31,7 +31,7 @@ The collection is managed via:
 5. Server action validates password against DB (constant-time comparison)
 6. If valid → set portfolio_session cookie (HMAC-signed, company=google)
 7. Server action → increment loginCount + update lastLoginAt in DB
-8. Redirect to /
+8. Redirect to original URL (preserved via ?redirect= param) or / if none
 9. proxy.ts → reads cookie, verifies HMAC, sets x-company header
    (proxy does NOT query DB — cookie-only validation, Option A)
 10. Page renders → case study reads session → fetches company from DB → renders callout

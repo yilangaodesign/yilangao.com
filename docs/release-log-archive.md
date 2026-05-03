@@ -12,7 +12,26 @@ deprecated: true
 
 > **What this file is:** Archived release log entries that exceeded the 15-entry cap in `docs/release-log.md`. Kept for historical reference.
 >
-> **Last updated:** 2026-04-29 (archived REL-001 through REL-020)
+> **Last updated:** 2026-04-30 (archived REL-001 through REL-021)
+
+---
+
+<a id="rel-021"></a>
+## REL-021 — Élan 2.11.9, yilangao.com 1.3.9, ASCII Art Studio 0.6.11 (2026-04-24)
+
+**Scope:** 5 files across 2 dependency-ordered layer commits (L1 docs x4, L6 component update x1) + 1 release commit + 1 dev-patch-bump commit. Layers 0, 2-5, 7-10 empty.
+**Semver:** Patch for all three apps. Élan 2.11.9: Textarea SCSS cleared. yilangao.com 1.3.9: docs only. ASCII Art Studio 0.6.11: manifest sync only.
+**Previous release:** Élan 2.11.8, yilangao.com 1.3.8, ASCII Art Studio 0.6.10
+
+**Incidents during release:** None. Clean pass through all phases.
+
+**Build gate:** Playground ~29s, main site ~44s, ASCII tool ~18s. All passed first attempt.
+
+**Post-deploy verification:** `vercel ls --prod` (default linked project `yilangao-design-system`) showed latest production deployment Ready (58s build) within 4m of the `main` push.
+
+**Layer classification notes:**
+- L1: `docs/content-feedback-log.md` (CF-026 through CF-028, Chalk personalization), `docs/engineering-feedback-log.md` (ENG-205), `docs/engineering.md` (frequency map), `docs/port-registry.md` (PIDs + restart log).
+- L6: `src/components/ui/Textarea/Textarea.module.scss` (file emptied — styles cleared).
 
 ---
 

@@ -20,6 +20,7 @@ function formatDate(publishedAt: string): string {
   const date = new Date(publishedAt);
   if (isNaN(date.getTime())) return "";
   return new Intl.DateTimeFormat("en-US", {
+    timeZone: "UTC",
     year: "numeric",
     month: "short",
     day: "numeric",
