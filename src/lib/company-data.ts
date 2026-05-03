@@ -48,6 +48,35 @@ export async function getCompanyBySlug(slug: string): Promise<CompanyRecord | nu
   }
 }
 
+export async function getAllActiveCompanies(): Promise<CompanyRecord[]> {
+  try {
+    const payload = await getPayloadClient()
+    const res = await payload.find({
+      collection: 'companies',
+      where: { active: { equals: true } },
+      limit: 100,
+    })
+
+    return res.docs.map((doc) => ({
+      id: doc.id,
+      name: doc.name as string,
+      slug: doc.slug as string,
+      password: doc.password as string,
+      adminPassword: (doc.adminPassword as string) || null,
+      altPasswords: (doc.altPasswords as Array<{ value: string }> || []).map((p) => p.value),
+      active: true,
+      accent: (doc.accent as string) || '#888888',
+      greeting: (doc.greeting as string) || 'Welcome.',
+      layoutVariant: (doc.layoutVariant as string) || 'centered',
+      caseStudyNotes: ((doc.caseStudyNotes as CompanyRecord['caseStudyNotes']) || []),
+      lastLoginAt: (doc.lastLoginAt as string) || null,
+      loginCount: (doc.loginCount as number) || 0,
+    }))
+  } catch {
+    return []
+  }
+}
+
 export async function incrementLoginAnalytics(companyId: string | number): Promise<void> {
   try {
     const payload = await getPayloadClient()

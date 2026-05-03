@@ -54,7 +54,7 @@ export default function LoginClient({ company, accent, greeting, redirectTo }: P
         track("Sign In", {
           login_method: "password",
           success: true,
-          company,
+          company: result.matchedCompany || company,
         });
         router.push(redirectTo || "/");
       } else {
