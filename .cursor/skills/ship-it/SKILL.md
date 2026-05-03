@@ -351,7 +351,7 @@ tsconfig in the repo.
 
 ### REL-AP-008: Release commit message node substitution fails with escaped quotes
 
-**Occurrences:** 1 (REL-027)
+**Occurrences:** 2 (REL-027, REL-038)
 
 **Trigger:** Using `node -p \"require('./elan.json').release.version\"` inside
 a `git commit -m "..."` string causes bash to fail on the escaped quotes,

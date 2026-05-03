@@ -17,7 +17,26 @@ references:
 >
 > **Who reads this:** AI agents when the `ship-it` skill is activated — scan recent entries for recurring pitfalls before starting a new release.
 > **Who writes this:** AI agents after each ship-it run via the Post-Release Audit protocol in `ship-it/SKILL.md`.
-> **Last updated:** 2026-05-02 (REL-037: Password gate redirect-on-login, EssayMeta UTC date fix, etro publish date — Élan 2.15.6, ASCII Art Studio 0.6.25)
+> **Last updated:** 2026-05-02 (REL-038: Welcome-page fallback login across all active companies — Élan 2.15.7, ASCII Art Studio 0.6.26)
+
+---
+
+<a id="rel-038"></a>
+## REL-038 — Welcome-Page Fallback Login (2026-05-02)
+
+**Scope:** 4 tracked files across 2 dependency-ordered commits (L0 ×1, L8 ×3) + 1 release commit + 1 dev-patch-bump commit. No junk files cleaned. Layers 1-9, 10 empty.
+**Semver:** Patch for all apps. Élan 2.15.7, ASCII Art Studio 0.6.26 — both manifest-sync (main site changes only).
+**Previous release:** Élan 2.15.6, ASCII Art Studio 0.6.25
+
+**Incidents during release:** REL-AP-008 recurred — dev-patch-bump commit message produced "chore: begin Élan , ASCII Art Studio" (empty version substitutions) due to escaped quotes in `git commit -m "... $(node -p \"...\")"`. Commit already pushed so not amended. Cosmetic only — no functional impact. **Occurrence count: 2** (see REL-AP-008 pitfall).
+
+**Build gate:** All 3 apps passed cleanly. Playground ~30s, Main site ~39s, ASCII Art Studio ~21s. No errors.
+
+**Post-deploy verification:** `vercel ls --prod` (playground `yilangao-design-system`) showed latest production deployment Ready (1m build) within ~5m of the `main` push.
+
+**Layer classification notes:**
+- L0: `.cursor/skills/password-gate/SKILL.md` — documented steps 5a/5b for the new welcome-fallback flow.
+- L8: `src/lib/company-data.ts` — new `getAllActiveCompanies()` export (queries all `active=true` companies from Payload). `src/app/(frontend)/for/[company]/actions.ts` — added fallback block: if `company === "welcome"` and direct password check fails, try the submitted password against all active companies; if matched, set session with that company's slug. Return type extended with `matchedCompany?: string`. `src/app/(frontend)/for/[company]/LoginClient.tsx` — passes `result.matchedCompany || company` to Mixpanel tracking so analytics records the actual matched company slug, not "welcome".
 
 ---
 
