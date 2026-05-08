@@ -58,7 +58,7 @@ Classify every changed file into a **dependency layer**:
 | 0 - Config | First | `AGENTS.md`, `.cursor/skills/`, `tsconfig.json`, `.gitignore` |
 | 1 - Docs | First | `docs/*`, `CHANGELOG.md` |
 | 2 - Tokens | Early | `src/styles/tokens/*`, `src/styles/mixins/*`, `src/styles/_*.scss` |
-| 3 - Dependencies | Early | `package.json`, `package-lock.json` (all apps) |
+| 3 - Dependencies | Early | `package.json`, `package-lock.json` (all apps), `ds-package/` |
 | 4 - Deletions | Mid | Removed files from `src/components/` (not `src/components/ui/`) |
 | 5 - New components | Mid | New directories under `src/components/ui/`, new `src/lib/*.ts` |
 | 6 - Component updates | Mid | Modified `src/components/ui/*/*.module.scss`, `*.tsx` |
@@ -161,8 +161,9 @@ The checkpoint skill handles:
 - CHANGELOG.md update
 - Release commit
 - Build gate (all 3 apps must pass)
-- Merge `dev` to `main` and push (triggers Vercel deploy)
+- Merge `dev` to `main` and push (triggers Vercel deploy + NPM publish via GitHub Actions)
 - Post-deploy verification (`vercel ls --prod`)
+- NPM publish verification (`npm view @yilangaodesign/design-system`)
 - Bump to next dev patch
 
 If the user only said "ship it" without specifying scope, proceed through
