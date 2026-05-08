@@ -11,25 +11,27 @@ import {
   type ReactNode,
   type KeyboardEvent,
 } from "react";
-import Plus from "lucide-react/dist/esm/icons/plus";
-import Search from "lucide-react/dist/esm/icons/search";
-import Clock from "lucide-react/dist/esm/icons/clock";
-import Bookmark from "lucide-react/dist/esm/icons/bookmark";
-import ImagePlus from "lucide-react/dist/esm/icons/image-plus";
-import Calendar from "lucide-react/dist/esm/icons/calendar";
-import X from "lucide-react/dist/esm/icons/x";
-import Folder from "lucide-react/dist/esm/icons/folder";
-import User from "lucide-react/dist/esm/icons/user";
-import File from "lucide-react/dist/esm/icons/file";
-import Building from "lucide-react/dist/esm/icons/building";
-import Tag from "lucide-react/dist/esm/icons/tag";
-import AlertTriangle from "lucide-react/dist/esm/icons/alert-triangle";
-import Circle from "lucide-react/dist/esm/icons/circle";
-import ArrowRight from "lucide-react/dist/esm/icons/arrow-right";
+import {
+  Plus,
+  Search,
+  Clock,
+  Bookmark,
+  ImagePlus,
+  Calendar,
+  X,
+  Folder,
+  User,
+  File,
+  Building,
+  Tag,
+  AlertTriangle,
+  Circle,
+  ArrowRight,
+  FileText,
+} from "lucide-react";
 import { Button } from "@ds/Button";
 import { Badge } from "@ds/Badge";
 import { Menu, MenuItem, MenuLabel, MenuSeparator } from "@ds/Menu";
-import FileText from "lucide-react/dist/esm/icons/file-text";
 import {
   detectEntities,
   getRegistryByType,
@@ -418,6 +420,10 @@ export const SearchInput = forwardRef<SearchInputHandle, SearchInputProps>(
         return prev + sep + text;
       });
       inputRef.current?.focus();
+    },
+    clear: () => {
+      setValue("");
+      setConfirmedEntities([]);
     },
   }));
 

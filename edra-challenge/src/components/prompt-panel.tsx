@@ -7,7 +7,7 @@ import {
   useCallback,
 } from "react";
 import { useRouter } from "next/navigation";
-import X from "lucide-react/dist/esm/icons/x";
+import { X } from "lucide-react";
 import { Button } from "@ds/Button";
 import { FolderTree } from "./folder-tree";
 import { SearchInput, type SearchInputHandle } from "./search-input";

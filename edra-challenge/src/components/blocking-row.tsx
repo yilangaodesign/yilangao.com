@@ -1,6 +1,6 @@
 "use client";
 
-import ArrowRight from "lucide-react/dist/esm/icons/arrow-right";
+import { ArrowRight } from "lucide-react";
 import { RelevanceBadge } from "./relevance-badge";
 import { useDocumentDrawer } from "./document-drawer";
 import type { BlockingItem } from "@/lib/queries";

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useMemo } from "react";
-import Gauge from "lucide-react/dist/esm/icons/gauge";
+import { Gauge } from "lucide-react";
 import type { FolderNode } from "@/lib/queries";
 import { Badge } from "@ds/Badge";
 
