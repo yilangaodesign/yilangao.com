@@ -1,0 +1,123 @@
+{
+  "run_id": "phase1-main",
+  "aggregated_at": "2026-05-03T05:19:31.842Z",
+  "thresholds": {
+    "reps_per_task": 5,
+    "total_runs": 60,
+    "total_judge_calls": 90,
+    "helps_materially_delta_f1": 0.1,
+    "no_effect_delta_f1": 0,
+    "phase2_n_escalation_delta_f1": 0.2,
+    "budget_cap_usd": 150,
+    "per_run_kill_usd": 5,
+    "per_run_kill_output_tokens": 30000,
+    "bootstrap_iterations": 10000,
+    "judge_kappa_floor": 0.4
+  },
+  "total_judgments": 48,
+  "eval_config": {
+    "phase": "typing",
+    "stratification_field": "pillar",
+    "strata": [
+      "multi-pillar",
+      "single-pillar"
+    ],
+    "primary_pair": "T-typed-T-untyped",
+    "arms": [
+      "T-typed",
+      "T-untyped"
+    ],
+    "_is_fallback": false
+  },
+  "decisions": {
+    "rule_5_adherence": {
+      "name": "Inter-judge agreement (adherence) kappa >= 0.4",
+      "threshold": 0.4,
+      "observed": 0.31428571428571417,
+      "pass": false
+    },
+    "rule_5_quality": {
+      "name": "Inter-judge agreement (quality) kappa >= 0.4",
+      "threshold": 0.4,
+      "observed": 0.13142857142857128,
+      "pass": false
+    }
+  },
+  "convergence_by_arm": {
+    "T-typed": {
+      "total_runs": 30,
+      "empty_response": 8,
+      "runaway": 0,
+      "convergence_rate_pct": 73.33333333333333
+    },
+    "T-untyped": {
+      "total_runs": 30,
+      "empty_response": 9,
+      "runaway": 0,
+      "convergence_rate_pct": 70
+    }
+  },
+  "results": {
+    "T-typed-T-untyped": {
+      "pair": "T-typed-T-untyped",
+      "is_primary": true,
+      "n_judgments": 48,
+      "preference": {
+        "rate_pct": 87.5,
+        "ci_lower": 68.75,
+        "ci_upper": 100,
+        "n": 16,
+        "by_stratum": {
+          "multi-pillar": 75,
+          "single-pillar": 91.66666666666666
+        }
+      },
+      "citation": {
+        "gold_rate_a_pct": 81.25,
+        "gold_rate_b_pct": 43.75,
+        "gold_advantage_pp": 37.5,
+        "wrong_rate_a_pct": 62.5,
+        "wrong_rate_b_pct": 37.5,
+        "mcnemar": {
+          "chi2": 3.125,
+          "p": 0.07709978005705276,
+          "b": 7,
+          "c": 1
+        }
+      },
+      "adherence": {
+        "wilcoxon": {
+          "stat": 148,
+          "wPlus": 713,
+          "wMinus": 148,
+          "z": -3.6607363634208583,
+          "p": 0.0002515573910462088,
+          "n": 41
+        },
+        "cohens_d": {
+          "d": 0.9157102886698408,
+          "lower": 0.49518185796236874,
+          "upper": 1.3362387193773129
+        },
+        "kappa": 0.31428571428571417
+      },
+      "quality": {
+        "wilcoxon": {
+          "stat": 116.5,
+          "wPlus": 624.5,
+          "wMinus": 116.5,
+          "z": -3.68357802176515,
+          "p": 0.00023004579984098328,
+          "n": 38
+        },
+        "cohens_d": {
+          "d": 0.9180107212160393,
+          "lower": 0.4973819499508606,
+          "upper": 1.3386394924812182
+        },
+        "kappa": 0.13142857142857128
+      },
+      "preference_kappa": 0.37254901960784315
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "run_id": "phase1-main",
+  "started_at": "2026-05-03T04:01:01.668Z",
+  "generation_model": "anthropic/claude-4.6-sonnet",
+  "budget_cap_usd": 150,
+  "graph_sha": "4f3f42c9f2e5ff0b6488caea2080b52c89a583bc01e29f15153f3e69ab046f10",
+  "graph_cache_path": "/Users/yilangao/Desktop/Job Application/Vibe Coding/yilangao.com/.cache/graph.json",
+  "index_sha": "80c307c845f4fe15057714053fe2e8864231bb59e91424b95954a116d648cad9",
+  "completed_at": "2026-05-03T05:11:13.472Z",
+  "arm_T-typed_runs": 30,
+  "arm_T-typed_errors": 0,
+  "arm_T-typed_cost": 0,
+  "arm_T-untyped_runs": 30,
+  "arm_T-untyped_errors": 0,
+  "arm_T-untyped_cost": 0
+}

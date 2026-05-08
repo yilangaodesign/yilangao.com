@@ -1,0 +1,123 @@
+{
+  "run_id": "phase1-dry-run",
+  "aggregated_at": "2026-05-03T03:59:53.994Z",
+  "thresholds": {
+    "reps_per_task": 5,
+    "total_runs": 60,
+    "total_judge_calls": 90,
+    "helps_materially_delta_f1": 0.1,
+    "no_effect_delta_f1": 0,
+    "phase2_n_escalation_delta_f1": 0.2,
+    "budget_cap_usd": 150,
+    "per_run_kill_usd": 5,
+    "per_run_kill_output_tokens": 30000,
+    "bootstrap_iterations": 10000,
+    "judge_kappa_floor": 0.4
+  },
+  "total_judgments": 12,
+  "eval_config": {
+    "phase": "typing",
+    "stratification_field": "pillar",
+    "strata": [
+      "multi-pillar",
+      "single-pillar"
+    ],
+    "primary_pair": "T-typed-T-untyped",
+    "arms": [
+      "T-typed",
+      "T-untyped"
+    ],
+    "_is_fallback": false
+  },
+  "decisions": {
+    "rule_5_adherence": {
+      "name": "Inter-judge agreement (adherence) kappa >= 0.4",
+      "threshold": 0.4,
+      "observed": 0.4146341463414634,
+      "pass": true
+    },
+    "rule_5_quality": {
+      "name": "Inter-judge agreement (quality) kappa >= 0.4",
+      "threshold": 0.4,
+      "observed": -0.02127659574468086,
+      "pass": false
+    }
+  },
+  "convergence_by_arm": {
+    "T-typed": {
+      "total_runs": 6,
+      "empty_response": 0,
+      "runaway": 0,
+      "convergence_rate_pct": 100
+    },
+    "T-untyped": {
+      "total_runs": 6,
+      "empty_response": 2,
+      "runaway": 0,
+      "convergence_rate_pct": 66.66666666666666
+    }
+  },
+  "results": {
+    "T-typed-T-untyped": {
+      "pair": "T-typed-T-untyped",
+      "is_primary": true,
+      "n_judgments": 12,
+      "preference": {
+        "rate_pct": 37.5,
+        "ci_lower": 0,
+        "ci_upper": 75,
+        "n": 4,
+        "by_stratum": {
+          "multi-pillar": 0,
+          "single-pillar": 50
+        }
+      },
+      "citation": {
+        "gold_rate_a_pct": 75,
+        "gold_rate_b_pct": 100,
+        "gold_advantage_pp": -25,
+        "wrong_rate_a_pct": 75,
+        "wrong_rate_b_pct": 50,
+        "mcnemar": {
+          "chi2": 0,
+          "p": 0.9999999989999999,
+          "b": 0,
+          "c": 1
+        }
+      },
+      "adherence": {
+        "wilcoxon": {
+          "stat": 6,
+          "wPlus": 6,
+          "wMinus": 15,
+          "z": -0.9434563530497265,
+          "p": 0.3454475056455417,
+          "n": 6
+        },
+        "cohens_d": {
+          "d": -0.45450277221712476,
+          "lower": -1.2649343695909618,
+          "upper": 0.3559288251567123
+        },
+        "kappa": 0.4146341463414634
+      },
+      "quality": {
+        "wilcoxon": {
+          "stat": 7.5,
+          "wPlus": 7.5,
+          "wMinus": 20.5,
+          "z": -1.0987005311470714,
+          "p": 0.2718987986088002,
+          "n": 7
+        },
+        "cohens_d": {
+          "d": -0.616275422533981,
+          "lower": -1.4352155657842487,
+          "upper": 0.2026647207162866
+        },
+        "kappa": -0.02127659574468086
+      },
+      "preference_kappa": 0.7446808510638296
+    }
+  }
+}
