@@ -11,7 +11,7 @@ import {
   useTransition,
   type ReactNode,
 } from "react";
-import X from "lucide-react/dist/esm/icons/x";
+import { X } from "lucide-react";
 import type { FolderNode, WorkspaceDocument } from "@/lib/queries";
 import { getRegistryByType } from "@/lib/entity-registry";
 import { moveDocument } from "@/app/workspace/actions";

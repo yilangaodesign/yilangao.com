@@ -2,13 +2,7 @@
 
 import { useState, useCallback, useMemo, useRef, useEffect, createContext, useContext, useTransition, type MouseEvent as ReactMouseEvent } from "react";
 import { createPortal } from "react-dom";
-import ChevronRight from "lucide-react/dist/esm/icons/chevron-right";
-import ArrowUp from "lucide-react/dist/esm/icons/arrow-up";
-import ArrowDown from "lucide-react/dist/esm/icons/arrow-down";
-import Folder from "lucide-react/dist/esm/icons/folder";
-import FolderOpen from "lucide-react/dist/esm/icons/folder-open";
-import FileText from "lucide-react/dist/esm/icons/file-text";
-import TriangleAlert from "lucide-react/dist/esm/icons/triangle-alert";
+import { ChevronRight, ArrowUp, ArrowDown, Folder, FolderOpen, FileText, TriangleAlert } from "lucide-react";
 import { Badge } from "@ds/Badge";
 import { ExpandCollapse } from "@ds/ExpandCollapse";
 import { Tooltip } from "@ds/Tooltip";

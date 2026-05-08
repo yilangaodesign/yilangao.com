@@ -1,7 +1,7 @@
 "use client";
 
 import styles from "@/components/smart-suggestion-toast.module.scss";
-import X from "lucide-react/dist/esm/icons/x";
+import { X } from "lucide-react";
 
 const RING_RADIUS = 11;
 const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;

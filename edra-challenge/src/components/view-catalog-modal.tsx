@@ -1,17 +1,19 @@
 "use client";
 
 import { useEffect, useState, useCallback, useMemo, useRef } from "react";
-import X from "lucide-react/dist/esm/icons/x";
-import Search from "lucide-react/dist/esm/icons/search";
-import Plus from "lucide-react/dist/esm/icons/plus";
-import Check from "lucide-react/dist/esm/icons/check";
-import ChevronLeft from "lucide-react/dist/esm/icons/chevron-left";
-import ChevronRight from "lucide-react/dist/esm/icons/chevron-right";
-import Folder from "lucide-react/dist/esm/icons/folder";
-import FolderOpen from "lucide-react/dist/esm/icons/folder-open";
-import FileText from "lucide-react/dist/esm/icons/file-text";
-import Gauge from "lucide-react/dist/esm/icons/gauge";
-import Lock from "lucide-react/dist/esm/icons/lock";
+import {
+  X,
+  Search,
+  Plus,
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  Folder,
+  FolderOpen,
+  FileText,
+  Gauge,
+  Lock,
+} from "lucide-react";
 import { Badge } from "@ds/Badge";
 import { ExpandCollapse } from "@ds/ExpandCollapse";
 import { InfoTooltip, Tooltip } from "@ds/Tooltip";

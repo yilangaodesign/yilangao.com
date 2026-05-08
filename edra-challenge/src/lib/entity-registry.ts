@@ -1,14 +1,16 @@
 import type { ComponentType } from "react";
-import User from "lucide-react/dist/esm/icons/user";
-import Folder from "lucide-react/dist/esm/icons/folder";
-import FileText from "lucide-react/dist/esm/icons/file-text";
-import Tag from "lucide-react/dist/esm/icons/tag";
-import CircleDot from "lucide-react/dist/esm/icons/circle-dot";
-import Clock from "lucide-react/dist/esm/icons/clock";
-import CalendarDays from "lucide-react/dist/esm/icons/calendar-days";
-import AlertTriangle from "lucide-react/dist/esm/icons/alert-triangle";
-import Building from "lucide-react/dist/esm/icons/building-2";
-import Link2 from "lucide-react/dist/esm/icons/link-2";
+import {
+  User,
+  Folder,
+  FileText,
+  Tag,
+  CircleDot,
+  Clock,
+  CalendarDays,
+  AlertTriangle,
+  Building2 as Building,
+  Link2,
+} from "lucide-react";
 
 export type EntityType =
   | "project"

@@ -2,9 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import ChevronDown from "lucide-react/dist/esm/icons/chevron-down";
-import Check from "lucide-react/dist/esm/icons/check";
-import LayoutGrid from "lucide-react/dist/esm/icons/layout-grid";
+import { ChevronDown, Check, LayoutGrid } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuTrigger,

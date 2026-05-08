@@ -1,11 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import Share2 from "lucide-react/dist/esm/icons/share-2";
-import Link2 from "lucide-react/dist/esm/icons/link-2";
-import Globe from "lucide-react/dist/esm/icons/globe";
-import Lock from "lucide-react/dist/esm/icons/lock";
-import Users from "lucide-react/dist/esm/icons/users";
+import { Share2, Link2, Globe, Lock, Users } from "lucide-react";
 import {
   Dialog,
   DialogTrigger,

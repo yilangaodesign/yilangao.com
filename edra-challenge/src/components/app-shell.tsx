@@ -2,15 +2,17 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import Home from "lucide-react/dist/esm/icons/home";
-import FolderOpen from "lucide-react/dist/esm/icons/folder-open";
-import FileText from "lucide-react/dist/esm/icons/file-text";
-import Tags from "lucide-react/dist/esm/icons/tags";
-import Settings from "lucide-react/dist/esm/icons/settings";
-import LogOut from "lucide-react/dist/esm/icons/log-out";
-import User from "lucide-react/dist/esm/icons/user";
-import PanelLeftClose from "lucide-react/dist/esm/icons/panel-left-close";
-import PanelLeftOpen from "lucide-react/dist/esm/icons/panel-left-open";
+import {
+  Home,
+  FolderOpen,
+  FileText,
+  Tags,
+  Settings,
+  LogOut,
+  User,
+  PanelLeftClose,
+  PanelLeftOpen,
+} from "lucide-react";
 import {
   VerticalNavProvider,
   VerticalNav,
