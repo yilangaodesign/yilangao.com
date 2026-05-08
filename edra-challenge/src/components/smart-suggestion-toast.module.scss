@@ -1,0 +1,178 @@
+@use '../../../src/styles' as *;
+
+$_countdown-duration: 15s;
+$_close-size: 28px;
+$_ring-size: 24px;
+$_ring-stroke: 2px;
+
+.wrapper {
+  position: fixed;
+  bottom: var(--portfolio-spacer-4x);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: var(--portfolio-z-toast);
+  pointer-events: none;
+}
+
+.toast {
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--portfolio-spacer-2x);
+  padding: var(--portfolio-spacer-2-5x);
+  background-color: var(--portfolio-surface-inverse-bold);
+  border-radius: var(--portfolio-radius-lg);
+  box-shadow: var(--portfolio-shadow-overlay);
+  width: 520px;
+  animation: toastEnter var(--portfolio-duration-slow) var(--portfolio-easing-expressive) forwards;
+
+  &.exiting {
+    animation: toastExit var(--portfolio-duration-moderate) var(--portfolio-easing-exit) forwards;
+  }
+
+  &:hover .ringProgress,
+  &.paused .ringProgress {
+    animation-play-state: paused;
+  }
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--portfolio-spacer-0-5x);
+}
+
+.primary {
+  font-family: var(--portfolio-font-sans);
+  font-size: var(--portfolio-type-sm);
+  font-weight: var(--portfolio-weight-medium);
+  line-height: var(--portfolio-leading-normal);
+  color: var(--portfolio-text-always-light-bold);
+}
+
+.secondary {
+  font-family: var(--portfolio-font-sans);
+  font-size: var(--portfolio-type-xs);
+  line-height: var(--portfolio-leading-normal);
+  color: var(--portfolio-text-always-light-bold);
+  opacity: 0.6;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cta {
+  @include button-reset;
+  font-family: var(--portfolio-font-sans);
+  font-size: var(--portfolio-type-xs);
+  font-weight: var(--portfolio-weight-medium);
+  color: var(--portfolio-text-always-light-bold);
+  padding: var(--portfolio-spacer-0-5x) var(--portfolio-spacer-1-5x);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: var(--portfolio-radius-sm);
+  white-space: nowrap;
+  cursor: pointer;
+  @include transition-fast;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+  }
+
+  &:active {
+    background-color: rgba(255, 255, 255, 0.12);
+  }
+
+  &.executing {
+    opacity: 0.6;
+    pointer-events: none;
+  }
+}
+
+// ─── Close button with countdown ring ─────────────────────────────────────────
+
+.close {
+  @include button-reset;
+  position: relative;
+  flex-shrink: 0;
+  width: $_close-size;
+  height: $_close-size;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: var(--portfolio-radius-full);
+  @include transition-fast;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+  }
+}
+
+.icon {
+  width: 14px;
+  height: 14px;
+  color: var(--portfolio-text-always-light-bold);
+  opacity: 0.7;
+}
+
+.ring {
+  position: absolute;
+  inset: 0;
+  width: $_close-size;
+  height: $_close-size;
+}
+
+.ringTrack {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.15);
+  stroke-width: $_ring-stroke;
+}
+
+.ringProgress {
+  fill: none;
+  stroke: var(--portfolio-text-always-light-bold);
+  stroke-width: $_ring-stroke;
+  stroke-linecap: round;
+  transform: rotate(-90deg);
+  transform-origin: center;
+  animation: countdown $_countdown-duration linear forwards;
+}
+
+// ─── Animations ───────────────────────────────────────────────────────────────
+
+@keyframes toastEnter {
+  0% {
+    opacity: 0;
+    transform: translateY(24px) scale(0.96);
+  }
+  60% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes toastExit {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+}
+
+@keyframes countdown {
+  from {
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: var(--ring-circumference);
+  }
+}

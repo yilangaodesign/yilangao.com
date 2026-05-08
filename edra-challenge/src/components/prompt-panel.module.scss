@@ -1,0 +1,180 @@
+@use '../../../src/styles' as *;
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  background: transparent;
+  transition: background 0.35s ease;
+  pointer-events: none;
+}
+
+.backdropVisible {
+  background: rgba(0, 0, 0, 0.06);
+  pointer-events: auto;
+}
+
+.panel {
+  position: fixed;
+  z-index: 21;
+  top: 16px;
+  right: 16px;
+  bottom: 0;
+  left: 72px;
+  background: var(--portfolio-surface-primary);
+  border-radius: var(--portfolio-radius-md) var(--portfolio-radius-md) 0 0;
+  box-shadow:
+    0 -2px 16px rgba(0, 0, 0, 0.06),
+    0 0 0 1px var(--portfolio-border-subtle);
+  display: flex;
+  flex-direction: column;
+  transform: translateY(100%);
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: auto;
+}
+
+.panelVisible {
+  transform: translateY(0);
+}
+
+// ─── Header ──────────────────────────────────────────────────────────────────
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--portfolio-spacer-2x) var(--portfolio-spacer-3x);
+  border-bottom: 1px solid var(--portfolio-border-subtle);
+  flex-shrink: 0;
+}
+
+.closeBtn {
+  appearance: none;
+  background: none;
+  border: 1px solid var(--portfolio-border-subtle);
+  border-radius: var(--portfolio-radius-sm);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--portfolio-text-secondary);
+  transition: color 0.15s, background 0.15s, border-color 0.15s;
+  padding: 0;
+
+  &:hover {
+    color: var(--portfolio-text-primary);
+    background: var(--portfolio-surface-secondary);
+    border-color: var(--portfolio-border-strong);
+  }
+}
+
+// ─── Chat thread ─────────────────────────────────────────────────────────────
+
+.thread {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--portfolio-spacer-3x);
+  display: flex;
+  flex-direction: column;
+  gap: var(--portfolio-spacer-3x);
+}
+
+// ─── User bubble ─────────────────────────────────────────────────────────────
+
+.userBubble {
+  align-self: flex-end;
+  max-width: 70%;
+  padding: var(--portfolio-spacer-1-5x) var(--portfolio-spacer-2x);
+  background: var(--portfolio-surface-brand-subtle);
+  color: var(--portfolio-text-primary);
+  border-radius: var(--portfolio-radius-sm);
+  border-bottom-right-radius: 4px;
+  font-family: var(--portfolio-font-sans);
+  font-size: var(--portfolio-type-sm);
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+// ─── Assistant response ──────────────────────────────────────────────────────
+
+.assistantResponse {
+  align-self: flex-start;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--portfolio-spacer-1x);
+}
+
+.viewLabel {
+  font-family: var(--portfolio-font-sans);
+  font-size: var(--portfolio-type-xs);
+  font-weight: var(--portfolio-weight-medium);
+  color: var(--portfolio-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.readOnlyTree {
+  [draggable='true'] {
+    cursor: default !important;
+    -webkit-user-drag: none;
+  }
+}
+
+// ─── Collapsed summary ──────────────────────────────────────────────────────
+
+.collapsedSummary {
+  align-self: flex-start;
+  padding: var(--portfolio-spacer-1x) var(--portfolio-spacer-2x);
+  background: var(--portfolio-surface-secondary);
+  border: 1px solid var(--portfolio-border-subtle);
+  border-radius: var(--portfolio-radius-sm);
+  font-family: var(--portfolio-font-sans);
+  font-size: var(--portfolio-type-xs);
+  color: var(--portfolio-text-secondary);
+  line-height: 1.5;
+}
+
+// ─── Loading indicator ───────────────────────────────────────────────────────
+
+.loading {
+  align-self: flex-start;
+  display: flex;
+  align-items: center;
+  gap: var(--portfolio-spacer-1x);
+  padding: var(--portfolio-spacer-1-5x) var(--portfolio-spacer-2x);
+  font-family: var(--portfolio-font-sans);
+  font-size: var(--portfolio-type-sm);
+  color: var(--portfolio-text-secondary);
+}
+
+.loadingDots {
+  display: inline-flex;
+  gap: 4px;
+
+  span {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--portfolio-text-secondary);
+    animation: dotPulse 1.2s ease-in-out infinite;
+
+    &:nth-child(2) { animation-delay: 0.2s; }
+    &:nth-child(3) { animation-delay: 0.4s; }
+  }
+}
+
+@keyframes dotPulse {
+  0%, 80%, 100% { opacity: 0.25; transform: scale(0.8); }
+  40% { opacity: 1; transform: scale(1); }
+}
+
+// ─── Bottom input bar ────────────────────────────────────────────────────────
+
+.inputBar {
+  padding: var(--portfolio-spacer-2x) var(--portfolio-spacer-3x);
+  border-top: 1px solid var(--portfolio-border-subtle);
+  flex-shrink: 0;
+}
