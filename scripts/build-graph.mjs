@@ -2,12 +2,14 @@
 
 import { readFileSync, existsSync, statSync, mkdirSync, writeFileSync, renameSync, readdirSync } from 'fs';
 import { resolve, relative, dirname, join, basename } from 'path';
+import { fileURLToPath } from 'url';
 import yaml from 'js-yaml';
 import lunr from 'lunr';
 
 const ROOT = resolve(import.meta.dirname, '..');
 const CACHE_DIR = resolve(ROOT, '.cache');
 const GRAPH_PATH = join(CACHE_DIR, 'graph.json');
+const GRAPH_UNTYPED_PATH = join(CACHE_DIR, 'graph-untyped.json');
 const SEARCH_PATH = join(CACHE_DIR, 'search-index.json');
 
 const WATCHED_GLOBS = [
@@ -47,6 +49,11 @@ const STRONG_KEYWORD_CONFIDENCE = {
 };
 
 const ANCHOR_RE = /<a\s+id="([a-z0-9][a-z0-9-]*)"\s*><\/a>/g;
+
+// Subdirectories to skip within specific parent directories (isolated namespaces).
+const SKIP_SUBDIRS = {
+  docs: ['edra'],
+};
 const HEADING_RE = /^(#{1,6})\s+(.+)$/gm;
 const MD_LINK_RE = /\[([^\]]+)\]\(([^)]+)\)/g;
 
@@ -80,6 +87,7 @@ function collectFiles() {
 
 function walkDirRecursive(dir, filePat, out) {
   if (!existsSync(dir) || !statSync(dir).isDirectory()) return;
+  const parentBase = basename(relative(ROOT, dir));
   for (const entry of readdirSafe(dir)) {
     const full = join(dir, entry);
     const st = safeStat(full);
@@ -87,6 +95,7 @@ function walkDirRecursive(dir, filePat, out) {
     if (st.isDirectory()) {
       if (entry.startsWith('.') && entry !== '.cursor') continue;
       if (['node_modules', '.next', '.cache', 'archive'].includes(entry)) continue;
+      if (SKIP_SUBDIRS[parentBase]?.includes(entry)) continue;
       walkDirRecursive(full, filePat, out);
     } else if (st.isFile() && matchesGlob(entry, filePat)) {
       out.add(full);
@@ -727,6 +736,33 @@ function readTopicVocab() {
     .filter((s) => s.length > 0 && !s.startsWith('#'));
 }
 
+// Collapse every edge to a uniform (type=references, confidence=1.0) shape
+// while preserving (from, to) pairs and total edge count. The original
+// `source` is wrapped in `untyped:collapsed:<source>` so provenance is still
+// debuggable. This function is also called by scripts/build-untyped-graph.mjs
+// for one-off rebuilds and by the dual-emit pass in `emit()`.
+//
+// Invariant (Gate I2): the pair set { (e.from, e.to) | e in original } equals
+// the pair set in the untyped output, and the per-pair counts match
+// position-for-position. ONLY type, confidence, and source change.
+export function untypeGraph(graph, generatedAt) {
+  return {
+    version: 1,
+    generatedAt,
+    nodes: graph.nodes,
+    edges: graph.edges.map((e) => ({
+      from: e.from,
+      to: e.to,
+      type: 'references',
+      confidence: 1.0,
+      source: `untyped:collapsed:${e.source ?? 'unknown'}`,
+    })),
+    feedbackStats: graph.feedbackStats,
+    warnings,
+    untyped: true,
+  };
+}
+
 function emit(graph) {
   const generatedAt = new Date().toISOString();
   const out = {
@@ -738,6 +774,11 @@ function emit(graph) {
     warnings,
   };
   atomicWriteJson(GRAPH_PATH, out);
+
+  // Dual emit: write the untyped variant in the same pass to prevent silent
+  // staleness when build-graph runs (e.g. via Hard Guardrail Eng #27).
+  const untyped = untypeGraph(graph, generatedAt);
+  atomicWriteJson(GRAPH_UNTYPED_PATH, untyped);
 
   const search = buildSearchIndex(graph.nodes);
   atomicWriteJson(SEARCH_PATH, {
@@ -760,8 +801,15 @@ function main() {
     : `${graph.feedbackStats.anchored}/${graph.feedbackStats.total} (${((graph.feedbackStats.anchored / graph.feedbackStats.total) * 100).toFixed(1)}%)`;
   console.log(`[build-graph] nodes: ${graph.nodes.length}, edges: ${graph.edges.length}, feedback anchored: ${fbCoverage}, warnings: ${warnings.length}, elapsed: ${elapsed}ms`);
   console.log(`[build-graph] -> ${relative(ROOT, GRAPH_PATH)}`);
+  console.log(`[build-graph] -> ${relative(ROOT, GRAPH_UNTYPED_PATH)}`);
   console.log(`[build-graph] -> ${relative(ROOT, SEARCH_PATH)}`);
   if (warnings.length > 0 && process.env.STRICT === '1') process.exit(1);
 }
 
-main();
+// Run main() only when invoked directly (not when imported by
+// build-untyped-graph.mjs or test scripts). Use fileURLToPath because
+// repository paths can contain spaces ("Job Application/Vibe Coding"), which
+// new URL().pathname percent-encodes but process.argv[1] does not.
+const invokedPath = process.argv[1] ? resolve(process.argv[1]) : '';
+const modulePath = fileURLToPath(import.meta.url);
+if (invokedPath === modulePath) main();

@@ -9,11 +9,25 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 const ROOT = resolve(import.meta.dirname, '..');
 const QUERY_SCRIPT = resolve(ROOT, 'scripts', 'query-graph.mjs');
 
+const CONFIDENCE_MIN_FLOOR = (() => {
+  const raw = process.env.CONFIDENCE_MIN_FLOOR;
+  if (raw == null || raw === '') return 0;
+  const v = parseFloat(raw);
+  if (Number.isNaN(v) || v < 0 || v > 1) {
+    process.stderr.write(`[mcp-graph-server] WARN: invalid CONFIDENCE_MIN_FLOOR="${raw}", using 0\n`);
+    return 0;
+  }
+  return v;
+})();
+
 function runQuery(args) {
+  // Explicitly forward env so GRAPH_CACHE_PATH and EVAL_FREEZE_CACHE reach
+  // query-graph.mjs reliably across spawn implementations.
   const result = spawnSync(process.execPath, [QUERY_SCRIPT, ...args], {
     cwd: ROOT,
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'pipe'],
+    env: { ...process.env },
   });
   if (result.status !== 0) {
     const stderr = (result.stderr || '').trim();
@@ -63,8 +77,9 @@ server.registerTool(
     },
   },
   async ({ id, confidenceMin }) => {
+    const effectiveMin = Math.max(confidenceMin ?? 0, CONFIDENCE_MIN_FLOOR) || undefined;
     const args = [id, '--depth', '1', '--json'];
-    if (confidenceMin != null) args.push('--confidence-min', String(confidenceMin));
+    if (effectiveMin != null && effectiveMin > 0) args.push('--confidence-min', String(effectiveMin));
     try {
       const stdout = runQuery(args);
       const { json, raw } = tryParseJson(stdout);
@@ -100,8 +115,9 @@ server.registerTool(
     },
   },
   async ({ id, depth, confidenceMin }) => {
+    const effectiveMin = Math.max(confidenceMin ?? 0, CONFIDENCE_MIN_FLOOR) || undefined;
     const args = [id, '--depth', String(depth ?? 1), '--json'];
-    if (confidenceMin != null) args.push('--confidence-min', String(confidenceMin));
+    if (effectiveMin != null && effectiveMin > 0) args.push('--confidence-min', String(effectiveMin));
     try {
       const stdout = runQuery(args);
       const { json, raw } = tryParseJson(stdout);
@@ -151,6 +167,16 @@ server.registerTool(
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
+  const resolvedCache = process.env.GRAPH_CACHE_PATH
+    ? resolve(ROOT, process.env.GRAPH_CACHE_PATH)
+    : resolve(ROOT, '.cache/graph.json');
+  process.stderr.write(`[mcp-graph-server] graph cache: ${resolvedCache}\n`);
+  if (process.env.EVAL_FREEZE_CACHE) {
+    process.stderr.write('[mcp-graph-server] EVAL_FREEZE_CACHE=1 (cache will not be auto-rebuilt)\n');
+  }
+  if (CONFIDENCE_MIN_FLOOR > 0) {
+    process.stderr.write(`[mcp-graph-server] CONFIDENCE_MIN_FLOOR=${CONFIDENCE_MIN_FLOOR} (all queries forced ≥ ${CONFIDENCE_MIN_FLOOR})\n`);
+  }
   process.stderr.write('[mcp-graph-server] connected via stdio\n');
 }
 

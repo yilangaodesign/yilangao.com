@@ -539,6 +539,9 @@ function printReport() {
     'frontmatter-schema': 'Graph Topology — Frontmatter Schema',
     'anchor-uniqueness': 'Graph Topology — Anchor ID Uniqueness',
     'graph-staleness': 'Graph Topology — Cache Staleness',
+    'outbound-dead-ends': 'Graph Hygiene — Outbound Dead-Ends',
+    'id-pattern-conformance': 'Graph Hygiene — ID Pattern Conformance',
+    'field-name-drift': 'Graph Hygiene — Field Name Drift',
   };
 
   for (const [check, items] of Object.entries(grouped)) {
@@ -792,9 +795,13 @@ function checkFrontmatterSchema() {
     'eval-spec',
     'release-log',
     'spec',
+    // §8.1 synthetic types (Plan D, D3)
+    'route',
+    'guardrail',
+    'section',
   ]);
   for (const node of graph.nodes) {
-    if (node.type === 'unknown' || node.type === 'section' || node.type === 'route' || node.type === 'guardrail') continue;
+    if (node.type === 'unknown') continue;
     if (!knownTypes.has(node.type)) {
       report(
         'WARN',
@@ -804,6 +811,103 @@ function checkFrontmatterSchema() {
       );
     }
   }
+}
+
+// ---------------------------------------------------------------------------
+// Plan D — Graph hygiene checks (D4)
+// ---------------------------------------------------------------------------
+
+const OUTBOUND_DEAD_END_ALLOWLIST = new Set([
+  'feedback', 'section', 'release', 'eval-baseline',
+]);
+
+function checkOutboundDeadEnds() {
+  const graph = loadGraphCacheOrWarn('outbound-dead-ends');
+  if (!graph) return;
+  const outbound = new Map();
+  for (const edge of graph.edges) {
+    outbound.set(edge.from, (outbound.get(edge.from) || 0) + 1);
+  }
+  for (const node of graph.nodes) {
+    if (outbound.has(node.id)) continue;
+    if (OUTBOUND_DEAD_END_ALLOWLIST.has(node.type)) continue;
+    report(
+      'ERROR',
+      'outbound-dead-ends',
+      node.path,
+      `Node \`${node.id}\` (type: ${node.type}) has zero outbound edges.`
+    );
+  }
+}
+
+function checkIdPatternConformance() {
+  const graph = loadGraphCacheOrWarn('id-pattern-conformance');
+  if (!graph) return;
+  const TYPE_PATTERNS = {
+    'anti-pattern:eap': /^eap-\d+$/,
+    'anti-pattern:ap': /^ap-\d+$/,
+    'anti-pattern:cap': /^cap-\d+$/,
+    'release': /^rel-\d+$/,
+    'feedback:eng': /^eng-\d+$/,
+    'feedback:fb': /^fb-\d+$/,
+    'feedback:cfb': /^cfb-\d+$/,
+    'route': /^route-(\d+|knowledge-[a-z])$/,
+    'guardrail': /^guardrail-(design|content|engineering)-\d+$/,
+    'skill': /^skill-[a-z0-9-]+$/,
+    'rule': /^rule-[a-z0-9-]+$/,
+    'hub': /^(design|engineering|content)$/,
+    'spoke': /^[a-z]+-[a-z0-9-]+$/,
+  };
+  for (const node of graph.nodes) {
+    let pattern;
+    if (node.type === 'anti-pattern') {
+      if (node.id.startsWith('eap-')) pattern = TYPE_PATTERNS['anti-pattern:eap'];
+      else if (node.id.startsWith('cap-')) pattern = TYPE_PATTERNS['anti-pattern:cap'];
+      else if (node.id.startsWith('ap-')) pattern = TYPE_PATTERNS['anti-pattern:ap'];
+      else continue;
+    } else if (node.type === 'feedback') {
+      if (node.id.startsWith('eng-')) pattern = TYPE_PATTERNS['feedback:eng'];
+      else if (node.id.startsWith('cfb-')) pattern = TYPE_PATTERNS['feedback:cfb'];
+      else if (node.id.startsWith('fb-')) pattern = TYPE_PATTERNS['feedback:fb'];
+      else continue;
+    } else {
+      pattern = TYPE_PATTERNS[node.type];
+    }
+    if (!pattern) continue;
+    if (!pattern.test(node.id)) {
+      report(
+        'ERROR',
+        'id-pattern-conformance',
+        node.path,
+        `Node \`${node.id}\` (type: ${node.type}) does not match expected pattern ${pattern}.`
+      );
+    }
+  }
+}
+
+function checkFieldNameDrift() {
+  const graph = loadGraphCacheOrWarn('field-name-drift');
+  if (!graph) return;
+  const docsDir = resolve(ROOT, 'docs');
+  function walkDir(dir) {
+    for (const entry of _readdirSync(dir)) {
+      const full = join(dir, entry);
+      const st = statSync(full);
+      if (st.isDirectory()) { walkDir(full); continue; }
+      if (!entry.endsWith('.md')) continue;
+      const content = readFileSync(full, 'utf-8');
+      const fmMatch = content.match(/^---\n([\s\S]*?)\n---/);
+      if (fmMatch && /^node_type:/m.test(fmMatch[1])) {
+        report(
+          'ERROR',
+          'field-name-drift',
+          relative(ROOT, full),
+          `Uses \`node_type:\` instead of \`type:\` in frontmatter.`
+        );
+      }
+    }
+  }
+  walkDir(docsDir);
 }
 
 function checkAnchorIdUniqueness() {
@@ -1190,6 +1294,9 @@ async function main() {
   checkTopicVocabulary();
   checkFrontmatterSchema();
   checkAnchorIdUniqueness();
+  checkOutboundDeadEnds();
+  checkIdPatternConformance();
+  checkFieldNameDrift();
   if (!args.quick) checkFeedbackTaggingRate();
   if (!args.quick) checkWeightedTaggingRate();
   if (!args.quick) checkWindowedTaggingRate();

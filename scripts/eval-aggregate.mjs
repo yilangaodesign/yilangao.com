@@ -12,8 +12,9 @@
  *   node scripts/eval-aggregate.mjs --run-id my-eval-001 --calibration-only
  */
 
-import { readFileSync, writeFileSync, existsSync } from 'fs';
+import { readFileSync, writeFileSync, existsSync, readdirSync } from 'fs';
 import { resolve } from 'path';
+import { loadEvalConfig } from './lib/eval-config.mjs';
 
 const ROOT = resolve(import.meta.dirname, '..');
 
@@ -32,19 +33,25 @@ function hasFlag(name) {
 
 const RUN_ID = getArg('run-id', '');
 const CALIBRATION_ONLY = hasFlag('calibration-only');
+const EVAL_CONFIG_PATH = getArg('eval-config', null);
 
 if (!RUN_ID) {
   console.error('Usage: --run-id <id> required');
   process.exit(1);
 }
 
+const EVAL_CONFIG = loadEvalConfig(EVAL_CONFIG_PATH, ROOT);
+const PRIMARY_PAIR = EVAL_CONFIG.primary_pair;
+const STRATIFICATION_FIELD = EVAL_CONFIG.stratification_field;
+const STRATA = EVAL_CONFIG.strata;
+
 // ---------------------------------------------------------------------------
 // Paths
 // ---------------------------------------------------------------------------
 const RESULTS_DIR = resolve(ROOT, 'eval-results', RUN_ID);
 const JUDGMENTS_FILE = resolve(RESULTS_DIR, 'judgments.jsonl');
-const PRE_REG_FILE = resolve(ROOT, 'docs/eval-pre-registration.md');
-const CORPUS_FILE = resolve(ROOT, 'docs/eval-task-corpus.md');
+const PRE_REG_FILE = resolve(ROOT, EVAL_CONFIG.files.pre_registration);
+const CORPUS_FILE = resolve(ROOT, EVAL_CONFIG.files.corpus);
 
 // ---------------------------------------------------------------------------
 // Parse thresholds from pre-registration doc (single source of truth)
@@ -66,21 +73,43 @@ const T = parseThresholds();
 console.log('Thresholds parsed from pre-registration doc:', T);
 
 // ---------------------------------------------------------------------------
-// Parse task metadata from corpus (for difficulty stratification)
+// Parse task metadata from corpus.
+//
+// Extracts the field named by config.stratification_field for each task so
+// the aggregator can stratify generically (v1: 'difficulty' → obvious/subtle;
+// Phase 2: 'combination' → D+E / D+E+C / D+C / E+C / single-pillar).
+//
+// We also retain `difficulty` unconditionally for backward-compat with the v1
+// summary.json shape, even when a different stratification field is in use.
 // ---------------------------------------------------------------------------
-function parseTaskMeta() {
+function parseTaskMeta(stratField) {
   const content = readFileSync(CORPUS_FILE, 'utf8');
   const yamlBlock = content.match(/```yaml\n([\s\S]*?)```/);
   if (!yamlBlock) return {};
   const meta = {};
   const entries = yamlBlock[1].split(/^- id:\s+/m).filter(Boolean);
+  // Build a regex for the configured stratification field; allow either bare
+  // word or quoted/multi-token values (e.g. "D+E").
+  const stratRe = new RegExp(`${stratField}:\\s*"?([^"\\n]+?)"?\\s*$`, 'm');
   for (const entry of entries) {
     const id = entry.match(/^(\S+)/)?.[1];
-    const diff = entry.match(/difficulty:\s*(\S+)/)?.[1];
-    if (id) meta[`eval-${id}`.replace('eval-eval-', 'eval-')] = {
-      difficulty: diff || 'unknown',
-      id: id.startsWith('eval-') ? id : `eval-${id}`,
+    if (!id) continue;
+    const stratVal = entry.match(stratRe)?.[1]?.trim() || 'unknown';
+    const diff = entry.match(/difficulty:\s*(\S+)/)?.[1] || 'unknown';
+    // Preserve the corpus's task ID verbatim. We DON'T inject an `eval-`
+    // prefix because runs/judgments key off task_id from the corpus YAML
+    // exactly. (v1 corpora already use `eval-T001`-style IDs; later phases
+    // may use different prefixes.)
+    meta[id] = {
+      id,
+      difficulty: diff,
+      stratum: stratVal,
     };
+    // Also expose under the `eval-${id}` alias for v1 callers that historically
+    // looked up by the prefixed key.
+    if (!id.startsWith('eval-')) {
+      meta[`eval-${id}`] = meta[id];
+    }
   }
   return meta;
 }
@@ -100,6 +129,21 @@ function loadJudgments() {
       catch { return null; }
     })
     .filter(Boolean);
+}
+
+// Resolve "armA-armB" to [armA, armB] honoring multi-dash arm IDs by
+// consulting the known arm list. Falls back to a simple single-dash split
+// when no match is found (preserves error visibility for misconfigured pairs).
+function splitPair(pairKey, knownArms) {
+  const parts = pairKey.split('-');
+  for (let i = 1; i < parts.length; i++) {
+    const a = parts.slice(0, i).join('-');
+    const b = parts.slice(i).join('-');
+    if (knownArms.includes(a) && knownArms.includes(b)) return [a, b];
+  }
+  // Best-effort fallback (used when the pair doesn't match known arms; the
+  // caller will surface a clearer error elsewhere).
+  return [parts[0], parts.slice(1).join('-') || parts[1]];
 }
 
 // ---------------------------------------------------------------------------
@@ -267,7 +311,9 @@ async function main() {
   const judgments = loadJudgments();
   console.log(`Loaded ${judgments.length} judgments`);
 
-  const taskMeta = parseTaskMeta();
+  const taskMeta = parseTaskMeta(STRATIFICATION_FIELD);
+  console.log(`Stratification: field='${STRATIFICATION_FIELD}', strata=[${STRATA.join(', ')}]`);
+  console.log(`Primary pair: ${PRIMARY_PAIR}`);
 
   // Group judgments by comparison pair
   const byPair = {};
@@ -279,12 +325,66 @@ async function main() {
 
   console.log('Pairs:', Object.keys(byPair).map(k => `${k}: ${byPair[k].length}`).join(', '));
 
-  // Stratify tasks
-  const obviousTasks = new Set();
-  const subtleTasks = new Set();
-  for (const [id, meta] of Object.entries(taskMeta)) {
-    if (meta.difficulty === 'obvious') obviousTasks.add(meta.id);
-    else if (meta.difficulty === 'subtle') subtleTasks.add(meta.id);
+  // ---------------------------------------------------------------------------
+  // Convergence rate per arm (Phase 1+ derived metric).
+  //
+  // Reads the raw run JSONLs directly so we can count how many runs produced
+  // an empty `response` (typically: agent exhausted its step budget without
+  // emitting final text). The judge SKIPs pairs where either side is null,
+  // which means a low convergence rate would otherwise vanish from the
+  // aggregated metrics — and Phase 1's Gate B explicitly cares about whether
+  // typed-vs-untyped affects convergence.
+  // ---------------------------------------------------------------------------
+  const convergenceByArm = {};
+  for (const arm of Object.keys(EVAL_CONFIG.arms)) {
+    const armDir = resolve(RESULTS_DIR, arm);
+    convergenceByArm[arm] = { total_runs: 0, empty_response: 0, runaway: 0 };
+    if (!existsSync(armDir)) continue;
+    const taskDirs = readdirSync(armDir, { withFileTypes: true })
+      .filter((d) => d.isDirectory())
+      .map((d) => d.name);
+    for (const taskId of taskDirs) {
+      const taskDir = resolve(armDir, taskId);
+      const runFiles = readdirSync(taskDir).filter((f) => /^run-\d+\.jsonl$/.test(f));
+      for (const file of runFiles) {
+        const lines = readFileSync(resolve(taskDir, file), 'utf8').split('\n').filter(Boolean);
+        for (const line of lines) {
+          let r;
+          try { r = JSON.parse(line); } catch { continue; }
+          convergenceByArm[arm].total_runs++;
+          if (!r.response) convergenceByArm[arm].empty_response++;
+          if (r.error === 'runaway') convergenceByArm[arm].runaway++;
+        }
+      }
+    }
+    const c = convergenceByArm[arm];
+    c.convergence_rate_pct = c.total_runs > 0
+      ? ((c.total_runs - c.empty_response) / c.total_runs) * 100
+      : null;
+  }
+  const convergenceLine = Object.entries(convergenceByArm)
+    .map(([arm, c]) => {
+      if (c.total_runs === 0) return `${arm}: no runs`;
+      const rate = c.convergence_rate_pct?.toFixed(1) ?? 'n/a';
+      return `${arm}: ${c.total_runs - c.empty_response}/${c.total_runs} (${rate}%)`;
+    })
+    .join(', ');
+  console.log(`Convergence: ${convergenceLine}`);
+
+  // Stratify tasks: build a Set per stratum value declared in config.
+  // Tasks whose stratum value isn't in config.strata are routed to a special
+  // 'unknown' bucket so they're surfaced rather than silently dropped.
+  const tasksByStratum = {};
+  for (const stratum of STRATA) tasksByStratum[stratum] = new Set();
+  tasksByStratum.unknown = new Set();
+  for (const meta of Object.values(taskMeta)) {
+    const bucket = STRATA.includes(meta.stratum) ? meta.stratum : 'unknown';
+    tasksByStratum[bucket].add(meta.id);
+  }
+  if (tasksByStratum.unknown.size > 0) {
+    console.warn(
+      `[aggregate] WARN: ${tasksByStratum.unknown.size} task(s) have stratum value not in config.strata: ${[...tasksByStratum.unknown].join(', ')}`,
+    );
   }
 
   // ---------------------------------------------------------------------------
@@ -292,8 +392,11 @@ async function main() {
   // ---------------------------------------------------------------------------
   const results = {};
 
+  const knownArms = Object.keys(EVAL_CONFIG.arms);
   for (const [pairKey, pairJudgments] of Object.entries(byPair)) {
-    const [armA, armB] = pairKey.split('-');
+    // Use splitPair() so multi-hyphen arm IDs (e.g. 'T-typed-T-untyped')
+    // resolve correctly. Naive split('-') would yield ['T', 'typed', 'T', 'untyped'].
+    const [armA, armB] = splitPair(pairKey, knownArms);
 
     // Preferences (per task-rep, majority vote across judges)
     const taskRepPrefs = {};
@@ -321,7 +424,9 @@ async function main() {
 
     // Majority preference per task-rep
     const prefValues = [];
-    const prefByDifficulty = { obvious: [], subtle: [] };
+    // N-way strata bins keyed by stratum value declared in config.
+    const prefByStratum = {};
+    for (const stratum of STRATA) prefByStratum[stratum] = [];
 
     for (const [, data] of Object.entries(taskRepPrefs)) {
       const aWins = data.votes.filter(v => v === 'A').length;
@@ -329,8 +434,12 @@ async function main() {
       const majority = aWins > bWins ? 1 : bWins > aWins ? 0 : 0.5;
       prefValues.push(majority);
 
-      if (obviousTasks.has(data.taskId)) prefByDifficulty.obvious.push(majority);
-      else if (subtleTasks.has(data.taskId)) prefByDifficulty.subtle.push(majority);
+      for (const stratum of STRATA) {
+        if (tasksByStratum[stratum].has(data.taskId)) {
+          prefByStratum[stratum].push(majority);
+          break;
+        }
+      }
     }
 
     const prefRate = prefValues.length > 0
@@ -408,23 +517,28 @@ async function main() {
     const kappaQual = fleissKappa(qualityRatings, [1, 2, 3, 4, 5]);
     const kappaPref = fleissKappa(prefRatings, ['A', 'B', 'tie']);
 
+    // Build per-stratum preference rates dictionary keyed by stratum name.
+    const byStratum = {};
+    for (const stratum of STRATA) {
+      const vals = prefByStratum[stratum];
+      byStratum[stratum] = vals.length > 0
+        ? (vals.reduce((s, v) => s + v, 0) / vals.length * 100)
+        : null;
+    }
+    // For backward-compat with v1 summary.json shape: emit by_difficulty
+    // when STRATIFICATION_FIELD === 'difficulty'. Otherwise emit by_stratum.
+    const stratumKey = STRATIFICATION_FIELD === 'difficulty' ? 'by_difficulty' : 'by_stratum';
+
     results[pairKey] = {
       pair: pairKey,
-      is_primary: pairKey === 'T-R',
+      is_primary: pairKey === PRIMARY_PAIR,
       n_judgments: pairJudgments.length,
       preference: {
         rate_pct: prefRate,
         ci_lower: prefCI.lower * 100,
         ci_upper: prefCI.upper * 100,
         n: prefValues.length,
-        by_difficulty: {
-          obvious: prefByDifficulty.obvious.length > 0
-            ? (prefByDifficulty.obvious.reduce((s, v) => s + v, 0) / prefByDifficulty.obvious.length * 100)
-            : null,
-          subtle: prefByDifficulty.subtle.length > 0
-            ? (prefByDifficulty.subtle.reduce((s, v) => s + v, 0) / prefByDifficulty.subtle.length * 100)
-            : null,
-        },
+        [stratumKey]: byStratum,
       },
       citation: {
         gold_rate_a_pct: goldRateA,
@@ -449,50 +563,82 @@ async function main() {
   }
 
   // ---------------------------------------------------------------------------
-  // Decision rules
+  // Decision rules — anchored on the primary pair declared in eval-config.
+  // Thresholds are parameterized from the pre-registration YAML; only the
+  // pair identity is config-driven here.
   // ---------------------------------------------------------------------------
-  const TR = results['T-R'];
+  const PRIMARY = results[PRIMARY_PAIR];
   const decisions = {};
 
-  if (TR) {
-    decisions.rule_1 = {
-      name: 'Primary preference T>R >= 60%',
-      threshold: T.primary_preference_pct,
-      observed: TR.preference.rate_pct,
-      ci_lower: TR.preference.ci_lower,
-      ci_floor_threshold: T.primary_preference_ci_floor,
-      pass: TR.preference.rate_pct >= T.primary_preference_pct &&
-            TR.preference.ci_lower > T.primary_preference_ci_floor,
-    };
+  if (PRIMARY) {
+    // Resolve armA/armB from primary_pair. The v1 form is exactly two single
+    // characters joined by '-' ('T-R'); Phase 1 form is hyphenated multi-char
+    // ('T-typed-T-untyped'). Use the same prefix-split heuristic as the
+    // judge's anchor resolution to handle both.
+    const [armA, armB] = splitPair(PRIMARY_PAIR, Object.keys(EVAL_CONFIG.arms));
 
-    decisions.rule_2 = {
-      name: 'Citation advantage T>=R+10pp (subtle)',
-      threshold_pp: T.citation_advantage_pp,
-      observed_advantage_pp: TR.citation.gold_advantage_pp,
-      pass: TR.citation.gold_advantage_pp >= T.citation_advantage_pp,
-    };
+    // V1 fallback preserves the original v1 rule name suffix and field names
+    // (observed_wrong_t / observed_wrong_r) so downstream tooling reading
+    // existing summary.json keeps working without --eval-config.
+    const isV1Fallback = !!EVAL_CONFIG._isFallback;
+    const subtleSuffix = isV1Fallback ? ' (subtle)' : '';
 
-    decisions.rule_3 = {
-      name: 'Non-inferiority on hallucination T<=R+5pp',
-      threshold_pp: T.hallucination_tolerance_pp,
-      observed_wrong_t: TR.citation.wrong_rate_a_pct,
-      observed_wrong_r: TR.citation.wrong_rate_b_pct,
-      difference: TR.citation.wrong_rate_a_pct - TR.citation.wrong_rate_b_pct,
-      pass: (TR.citation.wrong_rate_a_pct - TR.citation.wrong_rate_b_pct) <= T.hallucination_tolerance_pp,
-    };
+    // Rules 1-3 are v1-specific (preference/citation thresholds with explicit
+    // pass/fail). Phase 1+ pre-regs use Gate B / Gate C 4-outcome tables based
+    // on Δ F1 by stratum, evaluated downstream (e.g. Phase 1e write-up). Skip
+    // these rules when the v1 thresholds are absent so the dry-run / Phase 1+
+    // output isn't polluted with `undefined%` FAIL noise.
+    if (T.primary_preference_pct !== undefined) {
+      decisions.rule_1 = {
+        name: `Primary preference ${armA}>${armB} >= ${T.primary_preference_pct}%`,
+        threshold: T.primary_preference_pct,
+        observed: PRIMARY.preference.rate_pct,
+        ci_lower: PRIMARY.preference.ci_lower,
+        ci_floor_threshold: T.primary_preference_ci_floor,
+        pass: PRIMARY.preference.rate_pct >= T.primary_preference_pct &&
+              PRIMARY.preference.ci_lower > T.primary_preference_ci_floor,
+      };
+    }
+
+    if (T.citation_advantage_pp !== undefined) {
+      decisions.rule_2 = {
+        name: `Citation advantage ${armA}>=${armB}+${T.citation_advantage_pp}pp${subtleSuffix}`,
+        threshold_pp: T.citation_advantage_pp,
+        observed_advantage_pp: PRIMARY.citation.gold_advantage_pp,
+        pass: PRIMARY.citation.gold_advantage_pp >= T.citation_advantage_pp,
+      };
+    }
+
+    if (T.hallucination_tolerance_pp !== undefined) {
+      decisions.rule_3 = {
+        name: `Non-inferiority on hallucination ${armA}<=${armB}+${T.hallucination_tolerance_pp}pp`,
+        threshold_pp: T.hallucination_tolerance_pp,
+        ...(isV1Fallback
+          ? {
+              observed_wrong_t: PRIMARY.citation.wrong_rate_a_pct,
+              observed_wrong_r: PRIMARY.citation.wrong_rate_b_pct,
+            }
+          : {
+              observed_wrong_a: PRIMARY.citation.wrong_rate_a_pct,
+              observed_wrong_b: PRIMARY.citation.wrong_rate_b_pct,
+            }),
+        difference: PRIMARY.citation.wrong_rate_a_pct - PRIMARY.citation.wrong_rate_b_pct,
+        pass: (PRIMARY.citation.wrong_rate_a_pct - PRIMARY.citation.wrong_rate_b_pct) <= T.hallucination_tolerance_pp,
+      };
+    }
 
     decisions.rule_5_adherence = {
-      name: 'Inter-judge agreement (adherence) kappa >= 0.4',
+      name: `Inter-judge agreement (adherence) kappa >= ${T.judge_kappa_floor}`,
       threshold: T.judge_kappa_floor,
-      observed: TR.adherence.kappa,
-      pass: TR.adherence.kappa >= T.judge_kappa_floor,
+      observed: PRIMARY.adherence.kappa,
+      pass: PRIMARY.adherence.kappa >= T.judge_kappa_floor,
     };
 
     decisions.rule_5_quality = {
-      name: 'Inter-judge agreement (quality) kappa >= 0.4',
+      name: `Inter-judge agreement (quality) kappa >= ${T.judge_kappa_floor}`,
       threshold: T.judge_kappa_floor,
-      observed: TR.quality.kappa,
-      pass: TR.quality.kappa >= T.judge_kappa_floor,
+      observed: PRIMARY.quality.kappa,
+      pass: PRIMARY.quality.kappa >= T.judge_kappa_floor,
     };
   }
 
@@ -500,7 +646,7 @@ async function main() {
   const secondaryPValues = [];
   const secondaryKeys = [];
   for (const [key, r] of Object.entries(results)) {
-    if (key !== 'T-R') {
+    if (key !== PRIMARY_PAIR) {
       secondaryPValues.push(r.adherence.wilcoxon.p);
       secondaryKeys.push(key);
     }
@@ -518,7 +664,16 @@ async function main() {
     aggregated_at: new Date().toISOString(),
     thresholds: T,
     total_judgments: judgments.length,
+    eval_config: {
+      phase: EVAL_CONFIG.phase || 'v1',
+      stratification_field: STRATIFICATION_FIELD,
+      strata: STRATA,
+      primary_pair: PRIMARY_PAIR,
+      arms: Object.keys(EVAL_CONFIG.arms),
+      _is_fallback: !!EVAL_CONFIG._isFallback,
+    },
     decisions,
+    convergence_by_arm: convergenceByArm,
     results,
   };
 
@@ -539,8 +694,18 @@ async function main() {
     console.log(`  ${key}: ${status} - ${rule.name} (observed: ${JSON.stringify(rule.observed ?? rule.observed_advantage_pp ?? rule.difference)})`);
   }
 
-  const allPass = Object.values(decisions).every(r => r.pass);
-  console.log(`\nOverall: ${allPass ? 'TREATMENT WINS' : 'NO EFFECT / INCONCLUSIVE'}`);
+  // The "TREATMENT WINS / NO EFFECT" verdict only makes sense when the v1
+  // pass/fail rules (rule_1..rule_3) are present. Phase 1+ pre-regs use Gate
+  // B / Gate C 4-outcome tables evaluated downstream from the per-stratum
+  // metrics, so we suppress the verdict here to avoid implying a binary
+  // outcome that doesn't apply.
+  const hasV1Rules = !!(decisions.rule_1 && decisions.rule_2 && decisions.rule_3);
+  if (hasV1Rules) {
+    const allPass = Object.values(decisions).every(r => r.pass);
+    console.log(`\nOverall: ${allPass ? 'TREATMENT WINS' : 'NO EFFECT / INCONCLUSIVE'}`);
+  } else {
+    console.log('\nOverall: see per-stratum metrics in summary.json — Gate B/C verdict assigned downstream.');
+  }
 }
 
 function generateMarkdown(summary, decisions, results) {
@@ -562,6 +727,21 @@ function generateMarkdown(summary, decisions, results) {
     lines.push(`| ${rule.name} | ${JSON.stringify(rule.threshold ?? rule.threshold_pp)} | ${formatted} | ${rule.pass ? 'PASS' : 'FAIL'} |`);
   }
 
+  // Convergence-rate-by-arm. Phase 1+ explicitly cares about whether typed-vs-
+  // untyped affects the agent's ability to converge within its step budget; a
+  // skipped pair (one side is null response) would otherwise vanish in the
+  // judge-aggregated view.
+  if (summary.convergence_by_arm && Object.keys(summary.convergence_by_arm).length > 0) {
+    lines.push('', '## Convergence by arm', '');
+    lines.push('| Arm | Converged / total | Convergence rate | Empty responses | Runaway flagged |');
+    lines.push('|-----|-------------------|------------------|-----------------|-----------------|');
+    for (const [arm, c] of Object.entries(summary.convergence_by_arm)) {
+      const conv = c.total_runs - c.empty_response;
+      const rate = c.convergence_rate_pct != null ? `${c.convergence_rate_pct.toFixed(1)}%` : 'n/a';
+      lines.push(`| ${arm} | ${conv}/${c.total_runs} | ${rate} | ${c.empty_response} | ${c.runaway} |`);
+    }
+  }
+
   lines.push('', '## Comparison Results', '');
 
   for (const [key, r] of Object.entries(results)) {
@@ -574,8 +754,15 @@ function generateMarkdown(summary, decisions, results) {
     lines.push(`- **Quality Cohen's d:** ${r.quality.cohens_d.d.toFixed(3)} [${r.quality.cohens_d.lower.toFixed(3)}, ${r.quality.cohens_d.upper.toFixed(3)}]`);
     lines.push(`- **Fleiss' kappa:** adherence=${r.adherence.kappa.toFixed(3)}, quality=${r.quality.kappa.toFixed(3)}, preference=${r.preference_kappa.toFixed(3)}`);
 
-    if (r.preference.by_difficulty.obvious != null) {
-      lines.push(`- **Preference by difficulty:** obvious=${r.preference.by_difficulty.obvious.toFixed(1)}%, subtle=${r.preference.by_difficulty.subtle?.toFixed(1) || 'N/A'}%`);
+    // Render strata: works for either v1's by_difficulty or v2's by_stratum.
+    const strataDict = r.preference.by_difficulty || r.preference.by_stratum || {};
+    const strataEntries = Object.entries(strataDict).filter(([, v]) => v != null);
+    if (strataEntries.length > 0) {
+      const label = r.preference.by_difficulty ? 'difficulty' : 'stratum';
+      lines.push(
+        `- **Preference by ${label}:** ` +
+          strataEntries.map(([k, v]) => `${k}=${v.toFixed(1)}%`).join(', '),
+      );
     }
 
     if (r.holm_corrected_p != null) {
