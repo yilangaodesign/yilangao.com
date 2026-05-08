@@ -19,7 +19,7 @@ derivedFrom:
 |-----|---------------|----------------|-------------------|----------------|
 | Main site | `yilangao-portfolio` | `.` | `main` | `new.yilangao.com` (interim) → `yilangao.com` (final) |
 | Playground | `yilangao-design-system` | `playground` | `main` | — |
-| Edra Challenge | `edra-challenge` (TBD) | `edra-challenge` | `main` | `*.vercel.app` (auto-generated) |
+| Edra Challenge | `edra-challenge` | `edra-challenge` | `main` | `edra-challenge.vercel.app` |
 
 **Note:** `.vercel/project.json` at repo root links to the Playground project, not the main site.
 
@@ -70,16 +70,17 @@ not imported by any runtime code. All queries go through the `pg` pool using `DA
 
 ## Edra Challenge Deployment Setup
 
-**Status:** Not yet deployed. Steps to create the Vercel project:
+**Status:** Deployed at [edra-challenge.vercel.app](https://edra-challenge.vercel.app).
 
-1. Create a new Vercel project linked to this repo with root directory `edra-challenge`
-2. Set `DATABASE_URL` environment variable (same value as main site's Supabase pooler URI)
-3. The install command needs the same dual-install pattern as Playground because
-   `edra-challenge/src/` imports SCSS tokens from `../src/styles/`:
-   ```
-   npm install && cd .. && npm install --omit=dev
-   ```
-4. The auto-generated `*.vercel.app` URL is sufficient (no custom domain needed)
+**Vercel project:** `edra-challenge` (project ID: `prj_gcyeIxH62EiR8nw2wXInoo2F69Pg`)
+
+**Install command:** `npm install && cd .. && npm install --legacy-peer-deps`
+(dual-install needed because `edra-challenge/src/` imports SCSS tokens from `../src/styles/`;
+`--legacy-peer-deps` needed because root `@payloadcms/next` has peer dep conflicts with Next.js 16.2.1)
+
+**Build command:** `npm run build` (uses `next build --webpack` per `package.json`)
+
+No custom domain — the auto-generated `*.vercel.app` URL is sufficient.
 
 **Password gate note:** `src/proxy.ts` must be present for the password gate to function.
 If removed, all pages become publicly accessible. See `docs/architecture.md` §4.1.
@@ -144,7 +145,12 @@ the repo root for out-of-tree source files.
 installCommand: "npm install && cd .. && npm install --omit=dev"
 ```
 
-This is configured via the Vercel project settings API, not in `vercel.json`.
+The Edra Challenge project uses a similar dual-install but with `--legacy-peer-deps`:
+```
+installCommand: "npm install && cd .. && npm install --legacy-peer-deps"
+```
+
+These are configured via the Vercel project settings API, not in `vercel.json`.
 
 ## Common Build Failure Patterns
 
@@ -162,6 +168,7 @@ Before every merge to `main`, run all builds locally:
 npm run build --prefix playground   # Playground (Vercel-deployed)
 npm run build                       # Main site
 npm run build --prefix ascii-tool   # ASCII Art Studio
+npm run build --prefix edra-challenge  # Edra Challenge (Vercel-deployed)
 ```
 
 This is step 3 of the Checkpoint Procedure in `.cursor/skills/checkpoint/SKILL.md`.

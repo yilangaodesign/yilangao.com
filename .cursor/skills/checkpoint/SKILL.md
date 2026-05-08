@@ -66,6 +66,7 @@ git commit -m "release: Élan $ELAN_VER, ASCII Art Studio $ASCII_VER"
 npm run build --prefix playground   # Playground (Vercel-deployed)
 npm run build                       # Main site
 npm run build --prefix ascii-tool   # ASCII Art Studio (skip if no changes)
+npm run build --prefix edra-challenge  # Edra Challenge (Vercel-deployed)
 
 # 4. Merge to main and push
 git checkout main
