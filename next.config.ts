@@ -2,7 +2,6 @@ import type { NextConfig } from "next";
 import { withPayload } from "@payloadcms/next/withPayload";
 
 const nextConfig: NextConfig = {
-  transpilePackages: ["@yilangaodesign/design-system"],
   async redirects() {
     return [
       {
@@ -24,6 +23,20 @@ const nextConfig: NextConfig = {
         hostname: "i.ytimg.com",
       },
     ],
+  },
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      // Lexical 0.41.0's "node" conditional export uses top-level await with
+      // dynamic import. Webpack can't statically determine named exports for
+      // `export *` re-exports through that pattern, breaking the proxy in
+      // @payloadcms/richtext-lexical. Alias to the static ESM entry instead.
+      const resolved = require.resolve('@lexical/html');
+      config.resolve.alias['@lexical/html'] = resolved.replace(
+        /LexicalHtml\.\w+$/,
+        'LexicalHtml.mjs',
+      );
+    }
+    return config;
   },
 };
 

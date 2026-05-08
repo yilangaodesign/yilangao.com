@@ -29,6 +29,7 @@ description: >-
 |-----|----------|-------------|------------------|
 | **Élan** (design system + portfolio) | `elan.json` | `playground/src/lib/elan.ts` | `npm run version:patch/minor/major/release/analyze/auto` |
 | **ASCII Art Studio** | `ascii-studio.json` | `ascii-tool/src/lib/version.ts` | `npm run ascii-tool:version:patch/minor/major/release` |
+| **DS Package** (npm publish) | `elan.json` (shared) | — | Auto-published via GitHub Actions on push to `main` |
 
 **Deployment targets:** See AGENTS.md App Registry for production URLs and Vercel
 project names. The main site deploys to `yilangao-portfolio` (root dir `.`), the
@@ -81,6 +82,14 @@ vercel ls --prod                    # Check latest deployment status
 #      Use Vercel API: GET /v2/deployments/<id>/events for build logs
 #    If status is "Ready", deployment succeeded.
 
+# 5b. NPM publish verification — GitHub Actions auto-publishes on push to main
+#     Wait ~90s for the workflow to build and publish, then verify:
+sleep 90
+ELAN_REL=$(node -p "require('./elan.json').release.version")
+npm view "@yilangaodesign/design-system@$ELAN_REL" version
+#    If the version matches, npm publish succeeded.
+#    If it fails, check GitHub Actions: https://github.com/yilangaodesign/yilangao.com/actions
+
 # 6. Bump all released apps to next dev patch
 npm run version:patch
 npm run ascii-tool:version:patch
@@ -130,3 +139,5 @@ node -p "const a=require('./ascii-studio.json'); a.version !== a.release.version
 | `ascii-studio.json` | ASCII Art Studio manifest | Before any checkpoint | During release |
 | `CHANGELOG.md` | Version history | Before release | During release |
 | `playground/src/lib/elan.ts` | Synced version data | After release | Auto-synced |
+| `ds-package/package.json` | NPM package manifest | — | Version stamped in CI from `elan.json` |
+| `.github/workflows/publish-ds.yml` | NPM publish workflow | If publish fails | — |

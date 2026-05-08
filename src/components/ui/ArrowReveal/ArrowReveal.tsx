@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
-import { TRANSITION_INDICATOR, getReducedTransition } from "@/lib/motion";
+import { TRANSITION_INDICATOR, getReducedTransition } from "../_shared/motion";
 
 /**
  * Hover-driven arrow / icon reveal.

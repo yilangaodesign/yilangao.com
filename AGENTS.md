@@ -20,6 +20,7 @@ triggers:
   - skill-cross-app-parity
   - skill-design-iteration
   - skill-doc-audit
+  - skill-edra
   - skill-engineering-iteration
   - skill-graph-query
   - skill-orchestrator
@@ -216,6 +217,14 @@ skill assignment, and gate identification internally.
     → Then follow to `docs/engineering/analytics-instrumentation.md` for instrumentation work, or `docs/content/analytics-measurement.md` for measurement strategy.
     → For server-side login analytics (`incrementLoginAnalytics`, `loginCount`), see `docs/architecture.md` §4.1 instead.
 
+22. <a id="route-22"></a>**Am I doing any work on the Edra design challenge?**
+    (triggers: "edra", "edra challenge", or any file under `edra-challenge/` or `docs/edra/`)
+    → Activate `edra` skill at `.cursor/skills/edra/SKILL.md`.
+    → This route is **EXCLUSIVE** — when it fires, Post-Flight is SKIPPED.
+    → Design and engineering patterns from the main knowledge base may be READ but never WRITTEN.
+    → Feedback stays in `docs/edra/` only.
+    → **Precedence:** Route 22 takes priority over routes 1, 2, 4, 5 when the file being touched is under `edra-challenge/` or `docs/edra/`. Other routes (7 for ports, 14 for boot-up) still apply normally.
+
 Do NOT read docs that don't match your task. Do NOT read full doc files when only one section is relevant. The Section Index exists so you can target-read.
 
 # Self-Audit Protocol
@@ -343,6 +352,7 @@ This monorepo contains multiple Next.js apps. **This is the single source of tru
 | **Main site** | `src/` (root) | 4000 | `website.json` | `npm run dev` | Visitors, editors | `new.yilangao.com` (interim) | `yilangao-portfolio` | Vercel |
 | **Playground** | `playground/` | 4001 | — (reads `elan.json` via synced `elan.ts`) | `npm run playground` | Developers/designers | — | `yilangao-design-system` | Vercel |
 | **ASCII Art Studio** | `ascii-tool/` | 4002 | `ascii-studio.json` | `npm run ascii-tool` | Public users | — | — | Not deployed |
+| **Edra Challenge** | `edra-challenge/` | 4003 | — | `npm run edra-challenge` | Edra hiring team | — | — | Vercel (TBD) |
 
 **Pattern:** Each app owns its own `package.json`, `next.config.ts`, `tsconfig.json`, and `postcss.config.mjs`. Design tokens are shared via manually synced `globals.css` (Tailwind `@theme` block). Each app may have its own version manifest at the repo root.
 
@@ -354,18 +364,22 @@ This monorepo contains multiple Next.js apps. **This is the single source of tru
 
 # Design System Package
 
-Published as **`@yilangaodesign/design-system`** on GitHub Packages.
-Source repo: https://github.com/yilangaodesign/design-system
+Published as **`@yilangaodesign/design-system`** on public npmjs.com.
+Source: `src/components/ui/` + `src/styles/` in this monorepo.
+Build pipeline: `ds-package/` (tsup + sass + postcss-modules).
+Auto-published via GitHub Actions on push to `main`.
 
-| Import type | Path |
+| Import type | Path (for external consumers) |
 |---|---|
+| React components | `import { Button, FadeIn } from '@yilangaodesign/design-system'` |
+| Pre-compiled CSS | `import '@yilangaodesign/design-system/styles.css'` |
 | SCSS barrel | `@use '@yilangaodesign/design-system/scss' as *` |
 | SCSS sub-module | `@use '@yilangaodesign/design-system/scss/tokens/colors' as *` |
-| CSS custom properties | `@import '@yilangaodesign/design-system/css/tokens'` |
-| React components | `import { FadeIn } from '@yilangaodesign/design-system'` |
+| CSS custom properties | `@use '@yilangaodesign/design-system/css/_custom-properties'` |
 
-Local `src/styles/` exists for site-specific overrides not yet promoted to the package.
-`docs/design.md` is the canonical working copy — update it in-session, then periodically publish to the package.
+This repo never consumes its own published package — all local imports use `@/components/ui/` and `../styles`.
+`src/styles/` is the sole source of truth for design tokens.
+The old external repo (`yilangaodesign/design-system`) is archived.
 
 # Multi-App Versioning
 

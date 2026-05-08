@@ -5,7 +5,7 @@ import {
   TRANSITION_ENTER,
   ENTRANCE_Y,
   getReducedTransition,
-} from "@/lib/motion";
+} from "../_shared/motion";
 
 /**
  * Page-load entrance animation (non-scroll-triggered).

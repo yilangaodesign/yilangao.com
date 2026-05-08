@@ -7,7 +7,12 @@ import lunr from 'lunr';
 
 const ROOT = resolve(import.meta.dirname, '..');
 const CACHE_DIR = resolve(ROOT, '.cache');
-const GRAPH_PATH = join(CACHE_DIR, 'graph.json');
+// GRAPH_CACHE_PATH lets evals point query-graph at alternative graph variants
+// (e.g. .cache/graph-untyped.json) without rebuilding the cache. Path is
+// resolved relative to ROOT when not absolute. Default: .cache/graph.json.
+const GRAPH_PATH = process.env.GRAPH_CACHE_PATH
+  ? resolve(ROOT, process.env.GRAPH_CACHE_PATH)
+  : join(CACHE_DIR, 'graph.json');
 const SEARCH_PATH = join(CACHE_DIR, 'search-index.json');
 
 function parseArgs(argv) {

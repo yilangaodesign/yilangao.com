@@ -34,7 +34,7 @@ $_nav-height-touch: 44px;
   @include transition-fast;
 
   &:hover:not(.disabled) {
-    background-color: var(--portfolio-surface-neutral-subtle);
+    background-color: color-mix(in srgb, var(--portfolio-text-neutral-bold) 7%, transparent);
     color: var(--portfolio-text-neutral-max);
 
     .icon {
@@ -48,7 +48,7 @@ $_nav-height-touch: 44px;
 }
 
 .active {
-  background-color: var(--portfolio-surface-neutral-regular);
+  background-color: color-mix(in srgb, var(--portfolio-text-neutral-bold) 10%, transparent);
   color: var(--portfolio-text-neutral-max);
   font-weight: var(--portfolio-weight-medium);
 
@@ -57,7 +57,7 @@ $_nav-height-touch: 44px;
   }
 
   &:hover:not(.disabled) {
-    background-color: var(--portfolio-surface-neutral-regular);
+    background-color: color-mix(in srgb, var(--portfolio-text-neutral-bold) 12%, transparent);
   }
 }
 
@@ -66,7 +66,7 @@ $_nav-height-touch: 44px;
   font-weight: var(--portfolio-weight-medium);
 
   &:hover:not(.disabled) {
-    background-color: var(--portfolio-surface-brand-subtle);
+    background-color: color-mix(in srgb, var(--portfolio-text-brand-bold) 7%, transparent);
   }
 }
 
@@ -76,6 +76,10 @@ $_nav-height-touch: 44px;
 
   .icon {
     color: var(--portfolio-icon-neutral-max);
+  }
+
+  &:hover:not(.disabled) {
+    background-color: color-mix(in srgb, var(--portfolio-text-neutral-bold) 7%, transparent);
   }
 }
 
@@ -194,8 +198,10 @@ $_nav-height-touch: 44px;
 // =============================================================================
 
 .collapsed {
+  display: flex;
   justify-content: center;
   padding: 0;
+  margin: 0 auto;
 }
 
 // =============================================================================

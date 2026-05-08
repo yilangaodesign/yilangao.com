@@ -1,0 +1,12 @@
+{"arm":"T-typed","task_id":"eval-MP-DE-001","rep":1,"cost_usd":0,"cumulative_cost_usd":0,"has_response":true,"timestamp":"2026-05-03T03:39:12.389Z"}
+{"arm":"T-typed","task_id":"eval-MP-DEC-001","rep":1,"cost_usd":0,"cumulative_cost_usd":0,"has_response":true,"timestamp":"2026-05-03T03:39:59.582Z"}
+{"arm":"T-typed","task_id":"eval-MP-DC-001","rep":1,"cost_usd":0,"cumulative_cost_usd":0,"has_response":true,"timestamp":"2026-05-03T03:40:51.630Z"}
+{"arm":"T-typed","task_id":"eval-SP-C-001","rep":1,"cost_usd":0,"cumulative_cost_usd":0,"has_response":true,"timestamp":"2026-05-03T03:42:17.672Z"}
+{"arm":"T-typed","task_id":"eval-SP-D-001","rep":1,"cost_usd":0,"cumulative_cost_usd":0,"has_response":true,"timestamp":"2026-05-03T03:44:13.327Z"}
+{"arm":"T-typed","task_id":"eval-SP-D-002","rep":1,"cost_usd":0,"cumulative_cost_usd":0,"has_response":true,"timestamp":"2026-05-03T03:45:34.067Z"}
+{"arm":"T-untyped","task_id":"eval-MP-DE-001","rep":1,"cost_usd":0,"cumulative_cost_usd":0,"has_response":true,"timestamp":"2026-05-03T03:47:48.607Z"}
+{"arm":"T-untyped","task_id":"eval-MP-DEC-001","rep":1,"cost_usd":0,"cumulative_cost_usd":0,"has_response":false,"timestamp":"2026-05-03T03:48:37.595Z"}
+{"arm":"T-untyped","task_id":"eval-MP-DC-001","rep":1,"cost_usd":0,"cumulative_cost_usd":0,"has_response":false,"timestamp":"2026-05-03T03:49:25.352Z"}
+{"arm":"T-untyped","task_id":"eval-SP-C-001","rep":1,"cost_usd":0,"cumulative_cost_usd":0,"has_response":true,"timestamp":"2026-05-03T03:50:36.497Z"}
+{"arm":"T-untyped","task_id":"eval-SP-D-001","rep":1,"cost_usd":0,"cumulative_cost_usd":0,"has_response":true,"timestamp":"2026-05-03T03:52:12.906Z"}
+{"arm":"T-untyped","task_id":"eval-SP-D-002","rep":1,"cost_usd":0,"cumulative_cost_usd":0,"has_response":true,"timestamp":"2026-05-03T03:53:49.857Z"}

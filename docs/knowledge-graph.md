@@ -28,6 +28,7 @@ references:
 - [6. Confidence convention](#kg-confidence)
 - [7. Link syntax](#kg-link-syntax)
 - [8. Node-type taxonomy](#kg-node-types)
+- [8.1 Build-derived synthetic node types](#kg-synthetic-types)
 - [9. Topic vocabulary](#kg-topic-vocab)
 - [10. Build artifacts and cache](#kg-cache)
 - [11. Search index (BM25)](#kg-search)
@@ -38,6 +39,7 @@ references:
 - [16. Maintenance rules](#kg-maintenance)
 - [17. Empirical baseline + target (Plan B fills)](#kg-empirical-baseline)
 - [18. Skill + rule frontmatter spike outcomes](#kg-spike-outcomes)
+- [19. Hygiene decisions summary (Plan D)](#kg-hygiene-decisions)
 
 <a id="kg-goals"></a>
 ## 1. Goals and non-goals
@@ -82,8 +84,10 @@ The anchor element renders as zero-height in all renderers (GitHub, Cursor, Obsi
 | AGENTS.md hard guardrail | `guardrail-{design,content,engineering}-N` | `guardrail-engineering-27` |
 | Skill | `skill-{slug}` | `skill-graph-query` |
 | Rule | `rule-{slug}` | `rule-password-gate` |
-| Hub | `hub-{design,engineering,content}` | `hub-engineering` |
-| Spoke | `spoke-{slug-derived-from-filename}` | `spoke-analytics-instrumentation` |
+| Hub | `{design,engineering,content}` (bare pillar name) | `engineering` |
+| Spoke | `{pillar}-{slug-derived-from-filename}` | `engineering-analytics-instrumentation` |
+| AGENTS.md knowledge route | `route-knowledge-{a,b,c,d,...}` | `route-knowledge-a` |
+| Eval report | `eval-results` | `eval-results` |
 | Section heading inside any doc | `<doc-id>-<section-slug>` | `kg-edges` |
 
 IDs MUST be lowercase, kebab-case, and globally unique across the whole graph. The `checkAnchorIdUniqueness()` audit check enforces this.
@@ -130,6 +134,8 @@ Edges are typed forward-only relations. The build script auto-derives every inve
 | `references` | `referencedBy` | Generic citation. Default for inline `See [...]` and standard markdown links. | Anything to anything else. |
 
 **Why exactly six.** Smaller is better for an LLM to reason about; six covers every relationship currently in the docs without lossy collapsing. Typos against this allowlist are caught by the build script and emitted as warnings.
+
+**Authority ordering: none (peer-level).** The six edge types carry no explicit authority rank. The semantic weight is implicit in the type name (e.g., `enforces` is stronger than `references`), but no script, tool, or retrieval path consumes a numeric rank today. If weighted retrieval is added later, a ranking column can be introduced with empirical calibration data. See [G1 decision](knowledge-graph-hygiene-decisions.md#g1-edge-type-hierarchy).
 
 **Build script behavior on unknown edge names:** emits a warning to stderr (`[build-graph] WARN: unknown edge name 'foo' in docs/X.md - did you mean 'documents'?`) and skips that edge. Never silently drops or guesses.
 
@@ -217,9 +223,24 @@ The full set declared by Plan A so that Plans B and C have stable types to point
 | `eval-baseline` | A captured baseline run output. | `docs/eval-baselines/current/<task-id>/run-<n>.md` | C |
 | `eval-report` | A completed evaluation results document. | `docs/eval-results.md` | C |
 | `eval-spec` | A pre-registered evaluation specification (rubric, pre-registration, controls). | `docs/eval-*.md` | C |
+| `release-log` | A release log file (container for `release` entries). | `docs/release-log.md`, `docs/release-log-archive.md` | A |
 | `spec` | A canonical specification (this file, knowledge-graph.md). | `docs/knowledge-graph.md` | A |
 
 `type` values not in this table cause a `checkFrontmatterSchema()` warning.
+
+<a id="kg-synthetic-types"></a>
+### 8.1 Build-derived synthetic node types
+
+The build script (`scripts/build-graph.mjs`) auto-generates nodes of the following types from anchor patterns. These types have no source frontmatter — they are build artifacts. They are recognized by the schema check but should NOT appear in authored frontmatter.
+
+| Synthetic type | Source | Count (typical) | Notes |
+|---|---|---|---|
+| `route` | Anchors matching `route-N` in `AGENTS.md`. | ~24 | One node per numbered route. |
+| `guardrail` | Anchors matching `guardrail-{pillar}-N` in `AGENTS.md`. | ~43 | One node per hard guardrail. |
+| `section` | Anchors matching `<doc-id>-<slug>` patterns in any doc. | ~130+ | Leaf navigation targets; zero outbound edges is expected. |
+| `unknown` | Fallback when the build script cannot determine a node's type. | 0 (target) | Indicates a parse failure — usually caused by `node_type:` instead of `type:` or missing frontmatter. Not a legitimate classification. |
+
+See [G2a and G2b decisions](knowledge-graph-hygiene-decisions.md#g2a-implicit-synthetic-types-route-guardrail-section).
 
 <a id="kg-topic-vocab"></a>
 ## 9. Topic vocabulary
@@ -443,6 +464,8 @@ Each `file` node deep-links to the underlying doc anchor — clicking opens the 
 
 **Deleting a node.** Set `deprecated: true` in the file's frontmatter rather than removing the file. The build script honors `deprecated: true` by emitting `deprecated: true` on the node and excluding deprecated nodes from default search results. Hard delete only after a release cycle confirms nothing in the active graph still cites it.
 
+**Cascade-deprecation rule.** Edges pointing TO deprecated nodes should be reviewed. The audit script (`scripts/audit-docs.mjs`) flags these as WARN. When deprecating a node, check its inbound edges and update or remove citations that are no longer relevant. See [G4 decision](knowledge-graph-hygiene-decisions.md#g4-node-lifecycle).
+
 <a id="kg-empirical-baseline"></a>
 ## 17. Empirical baseline + target (Plan B Phase 0 — completed 2026-04-26)
 
@@ -602,3 +625,38 @@ references:
 - **Phase 2e (rules annotation)**: create `<rulename>-METADATA.yml` files alongside each `.cursor/rules/<rulename>.md`. Do NOT modify the inline `globs:` field of any rule file.
 - **Phase 1a (build-graph)**: when traversing `.cursor/skills/` and `.cursor/rules/`, the parser reads the sibling METADATA.yml file (if present) for graph metadata; reads the inline frontmatter for the file's own existence and Cursor-schema fields if needed for context. If both exist, the sibling METADATA.yml wins for graph fields; inline frontmatter is authoritative for `name`/`description`/`globs`. There is no field overlap so this is unambiguous.
 - **Future revisit**: a future spike (post-Plan A) may attempt inline-augmentation again if Cursor exposes a definitive schema doc. Until then, sibling files are canonical.
+
+<a id="kg-hygiene-decisions"></a>
+## 19. Hygiene decisions summary (Plan D)
+
+**Date:** 2026-05-03. **Full decisions document:** [knowledge-graph-hygiene-decisions.md](knowledge-graph-hygiene-decisions.md).
+
+| Gap | Decision | Spec change |
+|-----|----------|-------------|
+| G1: Edge type hierarchy | Peer-level, no authority ranking | §5: added disclosure |
+| G2a: Synthetic types (route, guardrail, section) | Documented in new §8.1 as build-derived | §8.1: new subsection |
+| G2b: `unknown` type | Kept as fallback, not promoted | §8.1: documented as error state |
+| G3: Dead-end detection | Added to `audit-docs.mjs` as WARN with per-type allowlist | §16: no spec change needed (script-level) |
+| G4: Node lifecycle | Single-bit `deprecated` retained; cascade-warning added | §16: added cascade-deprecation rule |
+| G5: ID-format drift | Updated spec to match reality (bare hub names, pillar-prefixed spokes) | §3: updated ID-naming table |
+
+### Hygiene pass addendum (D6)
+
+**Date:** 2026-05-03. **Executed by:** Plan D steps D1-D6.
+
+**Remediation summary:**
+
+| Subcheck | D1 baseline | D6 final | Status |
+|----------|------------|----------|--------|
+| Outbound dead-ends (non-allowlisted) | 0 | 0 | Clean |
+| ID-pattern violations | 64 | 0 | Fixed (§3 updated) |
+| Field-name drift (`node_type:` → `type:`) | 2 | 0 | Fixed (2 renumber logs) |
+| Undocumented node types | 5 | 0 | Fixed (§8 + §8.1 updated) |
+| Edges to deprecated nodes | 24 | 24 | Advisory — expected archive backlinks |
+| Pillar-membership gaps | 0 | 0 | Clean |
+
+**Remaining advisory gaps (intentionally left open):**
+- 24 edges to the deprecated `release-log-archive` node. These are structurally expected: archived release entries retain `documentedBy` inverses pointing to their former container. No action needed unless the archive is hard-deleted.
+- 151 outbound dead-end nodes (56 feedback, 95 section) are in the per-type allowlist and considered legitimate terminal nodes.
+
+**Audit check severity promotion:** The three new `audit-docs.mjs` checks (`outbound-dead-ends`, `id-pattern-conformance`, `field-name-drift`) have been verified against a clean D6 baseline and can be promoted from WARN to ERROR.

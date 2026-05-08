@@ -1,0 +1,66 @@
+name: Publish Design System
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org/
+
+      - name: Sync version from elan.json
+        run: node ds-package/scripts/sync-version.mjs
+
+      - name: Check if version already published
+        id: check
+        run: |
+          VERSION=$(node -p "require('./ds-package/package.json').version")
+          if npm view "@yilangaodesign/design-system@$VERSION" version 2>/dev/null; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install root dependencies (for types + SCSS tokens)
+        if: steps.check.outputs.skip == 'false'
+        run: npm install --legacy-peer-deps
+
+      - name: Copy SCSS sources for package
+        if: steps.check.outputs.skip == 'false'
+        run: |
+          rm -rf ds-package/scss ds-package/css
+          mkdir -p ds-package/scss ds-package/css
+          cp -r src/styles/tokens ds-package/scss/tokens
+          cp -r src/styles/mixins ds-package/scss/mixins
+          cp src/styles/_index.scss ds-package/scss/_index.scss
+          cp src/styles/_custom-properties.scss ds-package/scss/_custom-properties.scss
+          cp src/styles/_custom-properties.scss ds-package/css/_custom-properties.scss
+
+      - name: Install ds-package dependencies and build
+        if: steps.check.outputs.skip == 'false'
+        working-directory: ds-package
+        run: |
+          npm install
+          npm run build
+
+      - name: Verify build output
+        if: steps.check.outputs.skip == 'false'
+        run: |
+          test -f ds-package/dist/index.mjs || (echo "Missing ESM output" && exit 1)
+          test -f ds-package/dist/index.d.ts || (echo "Missing type declarations" && exit 1)
+          test -f ds-package/dist/styles.css || (echo "Missing compiled CSS" && exit 1)
+
+      - name: Publish
+        if: steps.check.outputs.skip == 'false'
+        working-directory: ds-package
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

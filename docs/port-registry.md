@@ -35,9 +35,10 @@ references:
 
 | Service | Default Port | Current Port | Status | PID | Notes |
 |---|---|---|---|---|---|
-| Main site (`yilangao.com`) | 4000 | 4000 | running | 10686 | `npm run dev` (webpack mode) |
-| Playground | 4001 | 4001 | running | 3764 | `npm run playground` (`--webpack`; see ENG-150) |
+| Main site (`yilangao.com`) | 4000 | 4000 | running | 14921 | `npm run dev` (webpack mode) |
+| Playground | 4001 | 4001 | running | 15008 | `npm run playground` (`--webpack`; see ENG-150) |
 | ASCII Art Studio | 4002 | 4002 | running | 3767 | `npm run ascii-tool` (`--webpack`; see ENG-150) |
+| Edra Challenge | 4003 | 4003 | running | 39395 | `npm run edra-challenge` (webpack mode) |
 
 ## Key Pages (on main site, no separate server)
 
@@ -50,6 +51,8 @@ references:
 
 | Timestamp (UTC) | Service | Action | Port | Reason |
 |---|---|---|---|---|
+| 2026-05-07 17:32 | Main site, Playground | restarted | 4000, 4001 | User boot up all — prior listeners (PIDs 85753, 85763) accepted TCP but no HTTP response (zombie `next-server`); SIGKILL -9; fresh `npm run dev` / `npm run playground`. ASCII (4002) already healthy. Verified main site → 307 (redirect OK), playground → 200. LISTEN PIDs: 14921 (4000), 15008 (4001), 3767 (4002). |
+| 2026-05-06 23:41 | Edra Challenge | restarted | 4003 | User boot up Edra — prior listener (PID 34904) returned HTTP 500 on `/`; SIGKILL listener; fresh `npm run edra-challenge`. Verified `curl http://127.0.0.1:4003/` → 200. LISTEN PID 4003: 39395. |
 | 2026-04-28 04:11 | Main site | restarted | 4000 | User boot up — 4001/4002 healthy; 4000 had `next-server` LISTEN (ex-PID 71007) but `curl` timed out (no HTTP). SIGKILL listener; fresh `npm run dev`. Verified `curl -L` `/` → 200, `/for/welcome?preview=true` → 200. Playground/ASCII left running. LISTEN PID 4000: 10686 (4001: 3764, 4002: 3767). |
 | 2026-04-27 18:10 | Main site, Playground, ASCII Art Studio | started | 4000–4002 | User boot up — ports were down (`curl` → 000); fresh `npm run dev` / `npm run playground` / `npm run ascii-tool`. Verified `/` → 200 on 4000–4002; `/for/welcome?preview=true` → 200. LISTEN PIDs: 3719 (4000), 3764 (4001), 3767 (4002). |
 | 2026-04-26 16:51 | Main site, Playground, ASCII Art Studio | already running | 4000–4002 | User boot up — health probe: `curl -L http://127.0.0.1:4000/` → 200; `/for/welcome?preview=true` → 200; playground `/` → 200; ASCII `/` → 200. Ledger PIDs refreshed (4000: 23898, 4001: 25555, 4002: 35777). |

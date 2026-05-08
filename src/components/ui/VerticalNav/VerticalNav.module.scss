@@ -11,7 +11,7 @@
 // ── Component tokens ─────────────────────────────────────────────────────────
 
 $_nav-width-expanded: 200px;
-$_nav-width-collapsed: 41px;
+$_nav-width-collapsed: 40px;
 $_nav-footer-height: 44px;
 
 // ── Root (aside) ─────────────────────────────────────────────────────────────
@@ -40,6 +40,22 @@ $_nav-footer-height: 44px;
 
 .collapsed {
   width: $_nav-width-collapsed;
+
+  .header {
+    padding: 0;
+  }
+
+  .content {
+    padding: $portfolio-spacer-0-5x 0;
+  }
+
+  .footer {
+    padding: $portfolio-spacer-0-5x 0;
+  }
+
+  .sectionDivider {
+    height: $portfolio-spacer-1x;
+  }
 }
 
 .mobileOpen {
@@ -83,13 +99,21 @@ $_nav-footer-height: 44px;
   flex-shrink: 0;
 }
 
+.headerExpanded {
+  justify-content: space-between;
+}
+
+.headerCollapsed {
+  justify-content: center;
+}
+
 // ── Content (scrollable middle) ──────────────────────────────────────────────
 
 .content {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 0 $portfolio-spacer-utility-0-75x $portfolio-spacer-2x;
+  padding: $portfolio-spacer-utility-0-75x $portfolio-spacer-utility-0-75x $portfolio-spacer-utility-0-75x;
 }
 
 .contentNav {
@@ -102,10 +126,10 @@ $_nav-footer-height: 44px;
 
 .footer {
   flex-shrink: 0;
-  height: $_nav-footer-height;
   display: flex;
-  align-items: center;
-  padding: 0 $portfolio-spacer-utility-0-75x;
+  flex-direction: column;
+  gap: $portfolio-spacer-0-125x;
+  padding: $portfolio-spacer-utility-0-75x;
   border-top: $portfolio-border-width-thin solid var(--portfolio-border-neutral-subtle);
 }
 

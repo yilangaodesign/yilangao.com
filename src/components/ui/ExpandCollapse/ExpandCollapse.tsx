@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { TRANSITION_EXPAND, getReducedTransition } from "@/lib/motion";
+import { TRANSITION_EXPAND, getReducedTransition } from "../_shared/motion";
 
 /**
  * Animated expand / collapse disclosure.

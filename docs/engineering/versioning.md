@@ -21,7 +21,7 @@ Every app in the monorepo with its own deployment lifecycle has a **version mani
 
 | App | Manifest | Display name | Tracks |
 |-----|----------|-------------|--------|
-| Design system | `elan.json` | Élan | Components, tokens, styles, playground |
+| Design system | `elan.json` | Élan | Components, tokens, styles, playground, NPM package (`@yilangaodesign/design-system`) |
 | Main website | `website.json` | yilangao.com | Pages, routes, CMS schemas, site config |
 | ASCII Art Studio | `ascii-studio.json` | ASCII Art Studio | ASCII tool features |
 
@@ -134,7 +134,7 @@ Integrated into the checkpoint workflow (§6.5). Before merging to `main`, repea
 2. Run `npm run [app:]version:auto` if it recommends a bump
 3. Run `npm run [app:]version:release` to stamp the release
 4. Commit the updated manifest(s) (`elan.json`, `website.json`, `ascii-studio.json`)
-5. Merge to `main` and push
+5. Merge to `main` and push (triggers Vercel deploy + NPM publish of `@yilangaodesign/design-system`)
 6. Return to `dev`, bump to next patch, commit
 
 ## 10.7 Runtime Exposure

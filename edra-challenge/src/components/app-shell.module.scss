@@ -1,0 +1,34 @@
+@use '../../../src/styles' as *;
+
+.shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+.main {
+  flex: 1;
+  min-width: 0;
+}
+
+.logo {
+  flex: 1;
+  font-family: var(--portfolio-font-sans);
+  font-size: var(--portfolio-type-sm);
+  font-weight: var(--portfolio-weight-semibold);
+  letter-spacing: var(--portfolio-tracking-tight);
+  color: var(--portfolio-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.headerIcon {
+  width: 16px;
+  height: 16px;
+}
+
+.navIcon {
+  width: 16px;
+  height: 16px;
+}
+

@@ -28,21 +28,22 @@ The project is split across **three artifacts** that serve different audiences:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│  yilangaodesign/design-system  (separate GitHub repo)       │
-│  ─────────────────────────────                              │
-│  SCSS tokens · mixins · React components · docs             │
-│  Published → GitHub Packages (@yilangaodesign/design-system)│
-│  Versioned with Changesets · Built with tsup                │
-└────────────────────────┬────────────────────────────────────┘
-                         │ npm install (GitHub Packages)
-                         ▼
-┌─────────────────────────────────────────────────────────────┐
-│  yilangao.com  (this repo)                                  │
+│  yilangao.com  (this repo — monorepo)                       │
 │  ─────────────                                              │
 │  Personal site: portfolio, blog, contact, experiments        │
 │  Next.js 16 · Sass · Framer Motion · Payload CMS           │
-│  Consumes @yilangaodesign/design-system via SCSS + React    │
 │  Port 4000 (dev)                                            │
+│                                                             │
+│  src/components/ui/ ─── Élan Design System source           │
+│  src/styles/        ─── SCSS tokens, mixins, custom props   │
+│                                                             │
+│  ┌────────────────────────────────────────────────────────┐ │
+│  │  ds-package/  (NPM publish pipeline)                   │ │
+│  │  ──────────────────────────────────                    │ │
+│  │  Builds src/components/ui/ + src/styles/ into          │ │
+│  │  @yilangaodesign/design-system on public npmjs.com     │ │
+│  │  Auto-published via GitHub Actions on push to main     │ │
+│  └────────────────────────────────────────────────────────┘ │
 │                                                             │
 │  ┌────────────────────────────────────────────────────────┐ │
 │  │  playground/  (subdirectory, separate Next.js app)     │ │
@@ -67,41 +68,46 @@ The project is split across **three artifacts** that serve different audiences:
 
 ## 1. Design System Package
 
-**Repo:** https://github.com/yilangaodesign/design-system
-**Registry:** GitHub Packages (`https://npm.pkg.github.com`)
-**Current version:** 1.0.0
+**Source:** `src/components/ui/` + `src/styles/` in this monorepo
+**Build pipeline:** `ds-package/` (tsup + sass + postcss-modules)
+**Registry:** Public npmjs.com (`@yilangaodesign/design-system`)
+**Version:** Driven by `elan.json` `release.version`
 
 ### What It Contains
 
 | Export | Path | Contents |
 |--------|------|----------|
+| React components (compiled) | `@yilangaodesign/design-system` | ~49 components as ESM + CJS with TypeScript declarations |
+| Pre-compiled CSS | `@yilangaodesign/design-system/styles.css` | All 48 SCSS modules compiled into a single stylesheet |
 | SCSS barrel | `@yilangaodesign/design-system/scss` | All tokens + mixins via `_index.scss` |
 | SCSS sub-modules | `@yilangaodesign/design-system/scss/tokens/colors` | Individual token files |
-| CSS custom properties | `@yilangaodesign/design-system/css/tokens` | Compiled CSS variables |
-| React components (motion) | `@yilangaodesign/design-system` | `FadeIn`, `StaggerChildren`, `StaggerItem` |
-| React components (UI) | `src/components/ui/` (local, promotion pending) | Button, Card, Badge, Divider, Avatar, Input, Textarea, Select, Checkbox, Toggle, Tooltip, Dialog, DropdownMenu, Tabs, Toast |
-| Design docs | `@yilangaodesign/design-system/docs/*` | `design.md`, `design-anti-patterns.md` |
+| CSS custom properties | `@yilangaodesign/design-system/css/_custom-properties` | Compiled CSS variables |
+| Motion constants | `@yilangaodesign/design-system` | `DURATION`, `EASING`, `TRANSITION_ENTER`, etc. |
+
+**Excluded from the package** (site-specific, not generic DS primitives):
+- `TestimonialCard` — imports CMS admin code
+- `Navigation` — uses `usePathname` for site-specific active state
+- `Footer` — site-specific layout
+- `ScrollSpy` — site-specific scroll tracking
 
 ### Publishing Flow
 
-1. Make changes in the design-system repo
-2. Create a changeset (`npx changeset`)
-3. Version bump (`npx changeset version`)
-4. Publish (`npm run release`) — CI pushes to GitHub Packages
-5. Renovate auto-creates a PR in this repo (configured in `renovate.json`, runs every 3 days)
-6. Review changelog, merge the PR
+1. Changes are made in `src/components/ui/` or `src/styles/` in this repo
+2. On push to `main`, GitHub Actions (`.github/workflows/publish-ds.yml`) runs automatically
+3. The workflow syncs the version from `elan.json`, builds the package, and publishes to npmjs.com
+4. If the version is already published, the workflow skips (idempotent)
+5. No Renovate, no cross-repo sync — this repo is the sole source of truth
 
-### Authentication
+### Consumer Usage
 
-GitHub Packages requires authentication even for public packages when using npm.
-Consumer repos need an `.npmrc` with:
-
-```
-@yilangaodesign:registry=https://npm.pkg.github.com
-//npm.pkg.github.com/:_authToken=${NPM_TOKEN}
+```tsx
+import { Button, Card, FadeIn } from '@yilangaodesign/design-system';
+import '@yilangaodesign/design-system/styles.css';
 ```
 
-The `NPM_TOKEN` needs `read:packages` scope (or `write:packages` for publishing).
+No authentication needed — the package is public on npmjs.com.
+
+**Previous architecture:** The separate `yilangaodesign/design-system` repo has been archived. All design system source now lives in this monorepo.
 
 ---
 
@@ -134,11 +140,9 @@ The `(site)` route group wraps all portfolio pages in a shared shell (Navigation
 
 ### How It Consumes the Design System
 
-- **SCSS:** `@use '@yilangaodesign/design-system/scss' as *` — resolved via
-  `sassOptions.includePaths` in `next.config.ts` pointing to `node_modules`
-- **React:** `import { FadeIn } from '@yilangaodesign/design-system'`
-- **Local overrides:** `src/styles/` contains site-specific tokens and mixins
-  that haven't been promoted to the shared package
+- **SCSS:** `@use '../styles' as *` — all components import tokens from the local `src/styles/` barrel
+- **React:** `import { Button } from '@/components/ui'` — all components are consumed locally
+- **NPM package:** The same components are published to `@yilangaodesign/design-system` for external consumers, but this repo never consumes its own package
 
 ### UI Component Layer (`src/components/ui/`)
 
@@ -174,7 +178,7 @@ src/components/ui/
 
 Each component follows the same pattern:
 - `Component.tsx` — React component with typed props and `forwardRef`
-- `Component.module.scss` — SCSS module consuming `@yilangaodesign/design-system/scss` tokens
+- `Component.module.scss` — SCSS module consuming `src/styles/` tokens
 - `index.ts` — re-export for clean imports
 
 **Styling:** All components use SCSS modules with design system tokens. No inline styles, no Tailwind.
@@ -186,7 +190,7 @@ Each component follows the same pattern:
 import { Button, Card, Badge } from "@/components/ui";
 ```
 
-**Promotion path:** Once a component is stable and used in production, it gets promoted to the `@yilangaodesign/design-system` package (see §6 below).
+**Publishing:** Components in `src/components/ui/` are automatically published to `@yilangaodesign/design-system` on npmjs.com via the `ds-package/` build pipeline. Site-specific components (TestimonialCard, Navigation, Footer, ScrollSpy) are excluded from the package.
 
 **Tier 4 — Headless data layer (future):** For complex data-heavy components, use headless logic libraries: `@tanstack/react-table` for data tables, `react-hook-form` + `zod` for form validation, `react-day-picker` for date picking, `@tanstack/react-virtual` for virtualized lists. These handle logic without imposing design.
 
@@ -215,9 +219,8 @@ For full details see `docs/engineering/storage.md` §12.5.
 
 | Location | Role |
 |----------|------|
-| `@yilangaodesign/design-system/scss/tokens/*` | Canonical, shared tokens |
-| `src/styles/tokens/*` | Site-specific overrides and tokens not yet in the package |
-| `src/styles/_index.scss` | Local barrel that mirrors the package structure for site-specific additions |
+| `src/styles/tokens/*` | Canonical, sole source of truth for all tokens |
+| `src/styles/_index.scss` | SCSS barrel importing all tokens + mixins |
 
 ---
 
@@ -237,7 +240,7 @@ For full details see `docs/engineering/storage.md` §12.5.
 
 ### Current Token Source (Important)
 
-The playground does **NOT** consume `@yilangaodesign/design-system`. Instead:
+The playground consumes components directly from `src/components/ui/` via the `@ds/*` alias. For tokens:
 
 1. `src/styles/tokens/_colors.scss` is the local SCSS source
 2. `npm run sync-tokens` (from repo root) reads the SCSS and regenerates the
@@ -266,7 +269,7 @@ relative paths. This works in local development. In production (Vercel):
 
 | Artifact | Target | Status | Production URL | Vercel Project | Notes |
 |----------|--------|--------|---------------|----------------|-------|
-| Design system package | GitHub Packages | **Deployed** (v1.0.0) | — | — | Changesets + CI publish |
+| Design system package | npmjs.com (public) | **Deployed** | — | — | Auto-published via GitHub Actions on push to `main` |
 | Main site | Vercel | **Deployed** | `new.yilangao.com` (interim) | `yilangao-portfolio` | Root dir `.`, production branch `main` |
 | Playground UI | Vercel | **Deployed** | — | `yilangao-design-system` | Root dir `playground/`, production branch `main` |
 | ASCII Art Studio | Vercel | Not deployed | — | — | Standalone, would need its own project |
@@ -349,8 +352,8 @@ The playground is deployed as a **separate Vercel project** from the same GitHub
 3. Framework: Next.js (auto-detected)
 4. Build command: `npm run build` (default — the `prebuild` script runs
    `sync-tokens` automatically to ensure fresh token data)
-5. No additional env vars needed (the playground doesn't import from
-   `@yilangaodesign/design-system` directly)
+5. No additional env vars needed (the playground imports from
+   `src/components/ui/` directly via `@ds/*` alias)
 
 **What works in production:**
 - All token galleries (colors, typography, spacing, motion, elevation)
@@ -452,13 +455,9 @@ The admin panel organizes content into **3 sidebar groups**:
 
 ## 5. Known Architectural Tensions
 
-### 5.1 Dual Token Sources (Partially Resolved)
+### 5.1 Token Source (Resolved)
 
-Tokens have two paths:
-- **Package path:** `@yilangaodesign/design-system/scss/tokens/*` → consumed by main site via `@use`
-- **Local path:** `src/styles/tokens/*` → consumed by `sync-tokens` → feeds playground
-
-The SCSS-to-CSS custom property migration (ENG-082/083/084) has partially resolved this drift. Components now consume `var(--portfolio-*)` CSS custom properties instead of SCSS variables directly. The `_custom-properties.scss` file generates both `:root` and `.dark` blocks, which are the runtime source of truth for theming. SCSS tokens remain the build-time source that feeds into the custom property generation.
+`src/styles/` is the sole source of truth for all design tokens. The previous dual-source tension (external package vs. local) has been fully resolved — the external `yilangaodesign/design-system` repo is archived. Components consume `var(--portfolio-*)` CSS custom properties at runtime. SCSS tokens in `src/styles/tokens/*` are the build-time source that feeds into the `_custom-properties.scss` generation of `:root` and `.dark` blocks. The `ds-package/` build pipeline copies raw SCSS tokens into the published npm package for external consumers.
 
 ### 5.2 Playground Token Independence (Partially Resolved)
 

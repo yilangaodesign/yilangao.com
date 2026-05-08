@@ -21,7 +21,14 @@
 
 import { readFileSync, writeFileSync, mkdirSync, existsSync, appendFileSync, readdirSync } from 'fs';
 import { resolve, join } from 'path';
+import { fileURLToPath } from 'url';
 import { generateText } from 'ai';
+import { loadEvalConfig } from './lib/eval-config.mjs';
+
+// Only run main() / parse CLI args / validate when invoked directly so that
+// other scripts (e.g. test-citation-f1.mjs) can import classifyCitations and
+// extractCitations without side effects.
+const isDirectInvocation = process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url);
 
 async function resolveModel(modelId) {
   if (process.env.VERCEL_OIDC_TOKEN) {
@@ -64,18 +71,24 @@ const RUN_ID = getArg('run-id', '');
 const ONLY_TASK = getArg('task', null);
 const RESUME = hasFlag('resume');
 const CALIBRATION = hasFlag('calibration');
+const EVAL_CONFIG_PATH = getArg('eval-config', null);
 
-if (!RUN_ID) {
+// Validation only fires when invoked directly so importers can pull in the
+// pure functions (extractCitations, classifyCitations) without args.
+if (isDirectInvocation && !RUN_ID) {
   console.error('Usage: --run-id <id> required');
   process.exit(1);
 }
 
+// Skip eval-config resolution entirely on import; it's only needed by main().
+const EVAL_CONFIG = isDirectInvocation ? loadEvalConfig(EVAL_CONFIG_PATH, ROOT) : null;
+
 // ---------------------------------------------------------------------------
 // Paths and constants
 // ---------------------------------------------------------------------------
-const RESULTS_DIR = resolve(ROOT, 'eval-results', RUN_ID);
-const JUDGMENTS_FILE = resolve(RESULTS_DIR, 'judgments.jsonl');
-const RUBRIC_FILE = resolve(ROOT, 'docs/eval-judge-rubric.md');
+const RESULTS_DIR = isDirectInvocation ? resolve(ROOT, 'eval-results', RUN_ID) : null;
+const JUDGMENTS_FILE = isDirectInvocation ? resolve(RESULTS_DIR, 'judgments.jsonl') : null;
+const RUBRIC_FILE = isDirectInvocation ? resolve(ROOT, EVAL_CONFIG.files.judge_rubric) : null;
 
 const JUDGE_MODELS = [
   'openai/gpt-5.4',
@@ -83,11 +96,46 @@ const JUDGE_MODELS = [
   'xai/grok-3',
 ];
 
-const COMPARISON_PAIRS = [
-  ['T', 'R'],
-  ['T', 'P'],
-  ['T', 'B'],
-];
+// I5: judge-side cost tracking. Rates are APPROXIMATE Claude-Sonnet-class
+// list prices applied uniformly across the three judges, mirroring the
+// constants in scripts/eval-runner.mjs. Use the AI Gateway dashboard for
+// authoritative billing — these constants exist only for runaway detection
+// and a coarse in-flight budget signal.
+const JUDGE_COST_PER_1K_INPUT = 0.003;
+const JUDGE_COST_PER_1K_OUTPUT = 0.015;
+const PER_RUN_COST_CAP_USD = 5;
+
+function estimateJudgeCost(usage) {
+  if (!usage) return 0;
+  const inputCost = ((usage.promptTokens || 0) / 1000) * JUDGE_COST_PER_1K_INPUT;
+  const outputCost = ((usage.completionTokens || 0) / 1000) * JUDGE_COST_PER_1K_OUTPUT;
+  return inputCost + outputCost;
+}
+
+// Pairs ordered as [armA, armB]. Either order is valid; the runner stores
+// per-arm runs in disjoint directories so loading is symmetric.
+const COMPARISON_PAIRS = isDirectInvocation ? EVAL_CONFIG.comparison_pairs : null;
+const ARM_IDS = isDirectInvocation ? Object.keys(EVAL_CONFIG.arms) : null;
+// Anchor arm for task enumeration: derived from the primary pair (the
+// "treatment" side) so judging always iterates over the universe of tasks
+// the treatment arm produced.
+const ANCHOR_ARM = isDirectInvocation
+  ? resolveAnchorArm(EVAL_CONFIG.primary_pair.split('-'), ARM_IDS, COMPARISON_PAIRS, EVAL_CONFIG.primary_pair)
+  : null;
+
+function resolveAnchorArm(parts, ids, pairs, primaryPair) {
+  // Try every prefix split — pick the one whose [a, b] match a known pair.
+  for (let i = 1; i < parts.length; i++) {
+    const a = parts.slice(0, i).join('-');
+    const b = parts.slice(i).join('-');
+    if (ids.includes(a) && ids.includes(b) && pairs.some(([x, y]) => x === a && y === b)) {
+      return a;
+    }
+  }
+  throw new Error(
+    `Cannot resolve primary_pair '${primaryPair}' against arms [${ids.join(', ')}] and comparison_pairs [${pairs.map((p) => p.join('-')).join(', ')}]`,
+  );
+}
 
 // ---------------------------------------------------------------------------
 // Load judge rubric
@@ -110,19 +158,74 @@ function loadRubric() {
 // ---------------------------------------------------------------------------
 const CITATION_REGEX = /(?:AP|EAP|CAP)-\d+(?:-[A-Z0-9-]+)?/g;
 
-function extractCitations(text) {
+export function extractCitations(text) {
   if (!text) return [];
   return [...new Set(text.match(CITATION_REGEX) || [])];
 }
 
-function classifyCitations(citations, expectedCitation) {
+/**
+ * I4: multi-citation F1 grading.
+ *
+ * Inputs:
+ *   citations           — extracted citation IDs from the model response
+ *   expectedCitations   — canonical array of gold IDs (Phase 1+ schema)
+ *   expectedCitationStr — singular fallback when only v1 corpus available
+ *
+ * Returns: { gold, wrong, noCite, precision, recall, f1, n_expected, n_extracted }
+ *
+ * Edge cases (pre-registered convention from multipillar plan Appendix A):
+ *   - extracted = []                 → precision=0, F1=0 (recall undefined → 0 if expected non-empty; vacuous 1 if expected also empty)
+ *   - expected = [], extracted = X   → recall=1 (vacuous), precision=0, F1=0
+ *   - extracted = [], expected = []  → precision=1, recall=1, F1=1 (perfect: model correctly avoided citing)
+ *
+ * Adversarial tasks set expected_citations to a sentinel
+ * (e.g. ["EAP-FAKE-NNN-EVAL-ONLY"]); a "gold cite" against this sentinel
+ * indicates the model HALLUCINATED. eval-aggregate.mjs is responsible for
+ * relabeling the metric for tasks tagged adversarial: true.
+ */
+export function classifyCitations(citations, expectedCitations, expectedCitationStr) {
+  const expectedArr = (expectedCitations && expectedCitations.length > 0)
+    ? expectedCitations
+    : (expectedCitationStr ? [expectedCitationStr] : []);
+  const expectedSet = new Set(expectedArr);
+  const extractedSet = new Set(citations);
+
   const gold = [];
   const wrong = [];
   for (const c of citations) {
-    if (c === expectedCitation) gold.push(c);
+    if (expectedSet.has(c)) gold.push(c);
     else wrong.push(c);
   }
-  return { gold, wrong, noCite: citations.length === 0 };
+
+  const tp = [...extractedSet].filter((c) => expectedSet.has(c)).length;
+
+  let precision, recall, f1;
+  if (extractedSet.size === 0 && expectedSet.size === 0) {
+    precision = 1; recall = 1; f1 = 1;
+  } else if (extractedSet.size === 0) {
+    // Model cited nothing but should have cited something.
+    precision = 0; recall = 0; f1 = 0;
+  } else if (expectedSet.size === 0) {
+    // Vacuous recall (no gold to find), but precision=0 because every
+    // extracted ID is wrong by definition.
+    precision = 0; recall = 1; f1 = 0;
+  } else {
+    precision = tp / extractedSet.size;
+    recall = tp / expectedSet.size;
+    f1 = (precision + recall) === 0 ? 0 : (2 * precision * recall) / (precision + recall);
+  }
+
+  return {
+    gold,
+    wrong,
+    noCite: citations.length === 0,
+    precision,
+    recall,
+    f1,
+    n_expected: expectedSet.size,
+    n_extracted: extractedSet.size,
+    expected: [...expectedSet],
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -216,9 +319,10 @@ async function main() {
   const rubric = loadRubric();
   console.log(`Rubric loaded (system prompt: ${rubric.systemPrompt.length} chars)`);
 
-  // Load all arms
+  // Load every arm declared in the config. Arms with no run directory are
+  // tolerated (e.g. partial dry-runs); they simply produce zero pairings.
   const armData = {};
-  for (const arm of ['T', 'R', 'P', 'B']) {
+  for (const arm of ARM_IDS) {
     armData[arm] = loadRunsForArm(arm);
     const taskCount = Object.keys(armData[arm]).length;
     const runCount = Object.values(armData[arm]).reduce((s, r) => s + r.length, 0);
@@ -230,8 +334,9 @@ async function main() {
     console.log(`Resuming: ${existingJudgments.size} judgments already exist`);
   }
 
-  // Collect all task IDs from Treatment arm
-  let taskIds = Object.keys(armData.T);
+  // Enumerate tasks from the anchor arm (the "treatment" side of the primary
+  // pair). For Phase 1 this is `T-typed`; for v1 fallback this is `T`.
+  let taskIds = Object.keys(armData[ANCHOR_ARM] || {});
   if (ONLY_TASK) {
     taskIds = taskIds.filter(t => t === ONLY_TASK);
   }
@@ -244,9 +349,9 @@ async function main() {
   let totalCost = 0;
 
   for (const taskId of taskIds) {
-    const tRuns = armData.T[taskId] || [];
+    const anchorRuns = armData[ANCHOR_ARM][taskId] || [];
 
-    for (const tRun of tRuns) {
+    for (const tRun of anchorRuns) {
       const rep = tRun.rep;
 
       for (const [armA, armB] of COMPARISON_PAIRS) {
@@ -295,11 +400,13 @@ async function main() {
             else if (deblindedPreference === 'B') deblindedPreference = 'A';
           }
 
-          // Citation extraction (deterministic)
+          // Citation extraction (deterministic). Pass both array (I4 canonical)
+          // and singular fallback so v1 run JSONLs with only expected_citation
+          // still grade correctly.
           const citationsA = extractCitations(runA.response);
           const citationsB = extractCitations(runB.response);
-          const citClassA = classifyCitations(citationsA, runA.expected_citation);
-          const citClassB = classifyCitations(citationsB, runB.expected_citation);
+          const citClassA = classifyCitations(citationsA, runA.expected_citations, runA.expected_citation);
+          const citClassB = classifyCitations(citationsB, runB.expected_citations, runB.expected_citation);
 
           const judgment = {
             task_id: taskId,
@@ -327,14 +434,20 @@ async function main() {
           judgeCount++;
           if (judgeResult.error) errorCount++;
 
-          const cost = judgeResult.usage
-            ? ((judgeResult.usage.promptTokens || 0) / 1000) * 0.003 +
-              ((judgeResult.usage.completionTokens || 0) / 1000) * 0.015
-            : 0;
-          totalCost += cost;
+          // Cost estimate uses Claude-Sonnet-class APPROXIMATE rates and
+          // applies them uniformly to all judges. Rates are mirrored in
+          // scripts/eval-runner.mjs (COST_PER_1K_INPUT/OUTPUT). For final
+          // reconciliation, consult the AI Gateway dashboard — these
+          // numbers are only used for in-flight runaway detection and an
+          // order-of-magnitude budget signal.
+          const judgeCost = estimateJudgeCost(judgeResult.usage);
+          totalCost += judgeCost;
+          if (judgeCost > PER_RUN_COST_CAP_USD) {
+            console.warn(`    [runaway-judge] ${taskId} rep ${rep} ${judgeModel}: $${judgeCost.toFixed(2)} exceeded per-run cap $${PER_RUN_COST_CAP_USD}`);
+          }
 
           const pref = deblindedPreference || 'error';
-          console.log(`    -> pref: ${pref} | adh: ${judgeResult.parsed?.adherence_a || '?'}/${judgeResult.parsed?.adherence_b || '?'} | $${cost.toFixed(4)}`);
+          console.log(`    -> pref: ${pref} | adh: ${judgeResult.parsed?.adherence_a || '?'}/${judgeResult.parsed?.adherence_b || '?'} | $${judgeCost.toFixed(4)}`);
         }
       }
     }
@@ -345,7 +458,9 @@ async function main() {
   console.log(`Total judge cost: $${totalCost.toFixed(2)}`);
 }
 
-main().catch((err) => {
-  console.error('Fatal error:', err);
-  process.exit(1);
-});
+if (isDirectInvocation) {
+  main().catch((err) => {
+    console.error('Fatal error:', err);
+    process.exit(1);
+  });
+}

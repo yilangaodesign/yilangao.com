@@ -19,6 +19,7 @@ derivedFrom:
 |-----|---------------|----------------|-------------------|----------------|
 | Main site | `yilangao-portfolio` | `.` | `main` | `new.yilangao.com` (interim) → `yilangao.com` (final) |
 | Playground | `yilangao-design-system` | `playground` | `main` | — |
+| Edra Challenge | `edra-challenge` (TBD) | `edra-challenge` | `main` | `*.vercel.app` (auto-generated) |
 
 **Note:** `.vercel/project.json` at repo root links to the Playground project, not the main site.
 
@@ -57,6 +58,28 @@ A record `76.76.21.21`), and add `yilangao.com` as a domain in the Vercel projec
 
 Do NOT set `PAYLOAD_ADMIN_EMAIL` or `PAYLOAD_ADMIN_PASSWORD` in production — those
 enable auto-login and are for local development only.
+
+## Environment Variables (Edra Challenge)
+
+| Variable | Source | Notes |
+|----------|--------|-------|
+| `DATABASE_URL` | Supabase Dashboard → Settings → Database → Connection string | Same Supabase instance as main site; pooler URI |
+
+The Supabase JS client (`@supabase/supabase-js`) is defined in `src/lib/supabase.ts` but
+not imported by any runtime code. All queries go through the `pg` pool using `DATABASE_URL`.
+
+## Edra Challenge Deployment Setup
+
+**Status:** Not yet deployed. Steps to create the Vercel project:
+
+1. Create a new Vercel project linked to this repo with root directory `edra-challenge`
+2. Set `DATABASE_URL` environment variable (same value as main site's Supabase pooler URI)
+3. The install command needs the same dual-install pattern as Playground because
+   `edra-challenge/src/` imports SCSS tokens from `../src/styles/`:
+   ```
+   npm install && cd .. && npm install --omit=dev
+   ```
+4. The auto-generated `*.vercel.app` URL is sufficient (no custom domain needed)
 
 **Password gate note:** `src/proxy.ts` must be present for the password gate to function.
 If removed, all pages become publicly accessible. See `docs/architecture.md` §4.1.
@@ -143,3 +166,16 @@ npm run build --prefix ascii-tool   # ASCII Art Studio
 
 This is step 3 of the Checkpoint Procedure in `.cursor/skills/checkpoint/SKILL.md`.
 If any build fails, do NOT merge to main.
+
+## NPM Package Publishing
+
+Push to `main` also triggers the **Publish Design System** GitHub Actions workflow
+(`.github/workflows/publish-ds.yml`). This automatically:
+
+1. Syncs the version from `elan.json` into `ds-package/package.json`
+2. Checks if that version is already published on npmjs.com
+3. If not, builds the package (`ds-package/`) and publishes `@yilangaodesign/design-system`
+4. The workflow is idempotent — only publishes when the Élan version changes (after a checkpoint)
+
+If the workflow fails, check [GitHub Actions](https://github.com/yilangaodesign/yilangao.com/actions).
+The Vercel deployments are fully independent from the NPM publish pipeline.

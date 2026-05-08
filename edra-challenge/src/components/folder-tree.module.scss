@@ -1,0 +1,359 @@
+@use '../../../src/styles' as *;
+
+.tree {
+  width: 100%;
+  font-family: var(--portfolio-font-sans);
+  font-size: var(--portfolio-type-sm);
+  border: 1px solid var(--portfolio-border-subtle);
+  border-radius: var(--portfolio-radius-sm);
+  overflow: hidden;
+}
+
+// ─── Column grid ─────────────────────────────────────────────────────────────
+
+.headerRow,
+.row {
+  display: grid;
+  grid-template-columns: minmax(360px, 1fr) 140px 140px;
+  align-items: center;
+  min-height: 32px;
+}
+
+// ─── Header ──────────────────────────────────────────────────────────────────
+
+.headerRow {
+  background: var(--portfolio-surface-secondary);
+  border-bottom: 1px solid var(--portfolio-border-subtle);
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.headerCell {
+  display: flex;
+  align-items: center;
+  gap: var(--portfolio-spacer-0-5x);
+  padding: var(--portfolio-spacer-1x) var(--portfolio-spacer-2x);
+  border: none;
+  background: none;
+  font-family: var(--portfolio-font-sans);
+  font-size: var(--portfolio-type-xs);
+  font-weight: var(--portfolio-weight-medium);
+  color: var(--portfolio-text-secondary);
+  white-space: nowrap;
+  user-select: none;
+  cursor: pointer;
+  transition: color 120ms ease;
+
+  &:hover {
+    color: var(--portfolio-text-primary);
+  }
+}
+
+.headerCellActive {
+  color: var(--portfolio-text-primary);
+}
+
+.sortIcon {
+  width: 10px;
+  height: 10px;
+  flex-shrink: 0;
+}
+
+// ─── Rows ────────────────────────────────────────────────────────────────────
+
+.row {
+  border-bottom: 1px solid var(--portfolio-border-subtle);
+  transition: background-color 80ms ease, opacity 150ms ease, box-shadow 120ms ease;
+  cursor: grab;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:hover {
+    background: var(--portfolio-surface-neutral-minimal);
+  }
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+.rowDragging {
+  opacity: 0.35;
+}
+
+.rowSelected {
+  background: color-mix(in srgb, var(--portfolio-surface-brand-subtle) 45%, transparent);
+
+  &:hover {
+    background: color-mix(in srgb, var(--portfolio-surface-brand-subtle) 60%, transparent);
+  }
+}
+
+.rowDropTarget {
+  background: color-mix(in srgb, var(--portfolio-surface-brand-minimal) 60%, transparent) !important;
+  box-shadow: inset 0 0 0 2px var(--portfolio-border-brand-bold);
+  border-radius: 2px;
+}
+
+.folderRow {
+  cursor: pointer;
+  user-select: none;
+  font-weight: var(--portfolio-weight-medium);
+  border-top: 1px solid var(--portfolio-border-subtle);
+  margin-top: -1px;
+
+  &:focus-visible {
+    outline: 2px solid var(--portfolio-border-brand-bold);
+    outline-offset: -2px;
+  }
+}
+
+.treePending {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+// ─── Cells ───────────────────────────────────────────────────────────────────
+
+.cellName {
+  display: flex;
+  align-items: center;
+  gap: var(--portfolio-spacer-0-5x);
+  padding: var(--portfolio-spacer-1x) var(--portfolio-spacer-2x);
+  min-width: 0;
+}
+
+.cell {
+  padding: var(--portfolio-spacer-1x) var(--portfolio-spacer-2x);
+  font-size: var(--portfolio-type-xs);
+  color: var(--portfolio-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.inlineBadges {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--portfolio-spacer-0-5x);
+  margin-left: var(--portfolio-spacer-1x);
+  flex-shrink: 0;
+}
+
+// ─── Icons ───────────────────────────────────────────────────────────────────
+
+.chevron {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+  color: var(--portfolio-text-secondary);
+  transition: transform 150ms ease;
+}
+
+.chevronOpen {
+  transform: rotate(90deg);
+}
+
+.chevronHidden {
+  visibility: hidden;
+}
+
+.folderIcon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  color: var(--portfolio-text-secondary);
+}
+
+.fileIcon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  color: var(--portfolio-text-secondary);
+}
+
+// ─── Text ────────────────────────────────────────────────────────────────────
+
+.nameText {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+  color: var(--portfolio-text-primary);
+}
+
+.uncategorizedName {
+  color: var(--portfolio-text-secondary);
+  font-style: italic;
+  padding-inline-end: 2px;
+}
+
+.uncategorizedIcon {
+  color: var(--portfolio-text-secondary);
+  opacity: 0.7;
+}
+
+// ─── Hover card (portal) ────────────────────────────────────────────────────
+
+.hoverCard {
+  max-width: 280px;
+  padding: var(--portfolio-spacer-1-5x) var(--portfolio-spacer-2x);
+  background: var(--portfolio-surface-secondary);
+  border: 1px solid var(--portfolio-border-subtle);
+  border-radius: var(--portfolio-radius-sm);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.08);
+  font-family: var(--portfolio-font-sans);
+  font-size: var(--portfolio-type-xs);
+  color: var(--portfolio-text-primary);
+  display: flex;
+  flex-direction: column;
+  gap: var(--portfolio-spacer-0-5x);
+  pointer-events: none;
+}
+
+.hoverCardRow {
+  display: flex;
+  gap: var(--portfolio-spacer-1x);
+  line-height: 1.4;
+}
+
+.hoverCardLabel {
+  flex-shrink: 0;
+  color: var(--portfolio-text-secondary);
+  min-width: 72px;
+}
+
+.hoverCardValue {
+  color: var(--portfolio-text-primary);
+}
+
+// ─── Cursor badge (drag-outside-to-unfile) ──────────────────────────────────
+
+.cursorBadge {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  gap: var(--portfolio-spacer-0-5x);
+  padding: var(--portfolio-spacer-0-5x) var(--portfolio-spacer-1-5x);
+  background: var(--portfolio-surface-secondary);
+  border: 1px solid var(--portfolio-border-subtle);
+  border-radius: var(--portfolio-radius-sm);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.12);
+  font-family: var(--portfolio-font-sans);
+  font-size: var(--portfolio-type-xs);
+  font-weight: var(--portfolio-weight-medium);
+  color: var(--portfolio-text-secondary);
+  white-space: nowrap;
+  will-change: transform;
+}
+
+.cursorBadgeIcon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  color: var(--portfolio-text-secondary);
+}
+
+// ─── Compact 2-column variant (used in modal preview) ─────────────────────
+
+.treeCompact {
+  .headerRow,
+  .row {
+    grid-template-columns: 1fr 120px;
+  }
+
+  .row {
+    cursor: default;
+
+    &:hover {
+      background: transparent;
+    }
+  }
+
+  .folderRow {
+    cursor: pointer;
+
+    &:hover {
+      background: var(--portfolio-surface-neutral-minimal);
+    }
+  }
+}
+
+// ─── Sample doc validation buttons ──────────────────────────────────────────
+
+.docActions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.actionBtn {
+  appearance: none;
+  background: none;
+  border: 1px solid var(--portfolio-border-subtle);
+  border-radius: var(--portfolio-radius-sm);
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--portfolio-text-secondary);
+  transition: color 0.15s, background 0.15s, border-color 0.15s;
+  padding: 0;
+
+  &:hover {
+    color: var(--portfolio-text-primary);
+    background: var(--portfolio-surface-secondary);
+    border-color: var(--portfolio-border-strong);
+  }
+}
+
+.actionBtnConfirm:hover {
+  color: var(--portfolio-text-positive);
+  border-color: var(--portfolio-border-positive);
+  background: color-mix(in srgb, var(--portfolio-surface-positive-minimal) 50%, transparent);
+}
+
+.actionBtnReject:hover {
+  color: var(--portfolio-text-negative);
+  border-color: var(--portfolio-border-negative);
+  background: color-mix(in srgb, var(--portfolio-surface-negative-minimal) 50%, transparent);
+}
+
+.confirmedLabel {
+  font-family: var(--portfolio-font-sans);
+  font-size: var(--portfolio-type-xs);
+  color: var(--portfolio-text-positive);
+  font-weight: var(--portfolio-weight-medium);
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.docRowSwap {
+  animation: docSwapIn 0.25s ease-out;
+}
+
+@keyframes docSwapIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+

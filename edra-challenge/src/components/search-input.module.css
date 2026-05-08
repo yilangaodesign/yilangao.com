@@ -1,0 +1,592 @@
+.wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.plusTrigger {
+  position: absolute;
+  top: 50%;
+  left: 9px;
+  z-index: 2;
+  transform: translateY(-50%);
+}
+
+.plusGhost {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+}
+
+.menuPopover {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 10;
+}
+
+/* ── Tag-input hybrid container ─────────────────────── */
+
+.tagContainer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  background-color: var(--portfolio-surface-neutral-minimal);
+  border: 1px solid var(--portfolio-border-neutral-subtle);
+  border-radius: var(--portfolio-radius-sm);
+  padding: 10px 12px;
+  padding-left: 41px;
+  padding-right: 41px;
+  font-family: var(--portfolio-font-sans);
+  font-size: var(--portfolio-type-base);
+  line-height: 20px;
+  cursor: text;
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.tagContainer:hover {
+  border-color: var(--portfolio-border-neutral-bold);
+  box-shadow: 0 0 0 1px var(--portfolio-border-neutral-bold);
+}
+
+.tagContainerFocused {
+  border-color: var(--portfolio-border-neutral-bold);
+  box-shadow: 0 0 0 1px var(--portfolio-border-neutral-bold);
+}
+
+.tagContainerNoPad {
+  padding-left: 12px;
+}
+
+/* ── Confirmed entity pills ─────────────────────────── */
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  background-color: var(--portfolio-surface-neutral-regular);
+  border-radius: var(--portfolio-radius-full);
+  font-size: var(--portfolio-type-xs);
+  line-height: 18px;
+  color: var(--portfolio-text-neutral-bold);
+  white-space: nowrap;
+  max-width: 200px;
+  overflow: hidden;
+}
+
+.pillType {
+  color: var(--portfolio-text-neutral-subtle);
+  font-size: var(--portfolio-type-2xs);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.pillDismiss {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: none;
+  color: var(--portfolio-icon-neutral-bold);
+  cursor: pointer;
+  border-radius: var(--portfolio-radius-full);
+  flex-shrink: 0;
+  transition: background-color 150ms ease;
+}
+
+.pillDismiss:hover {
+  background-color: var(--portfolio-overlay-black-06);
+}
+
+/* ── Text input area ────────────────────────────────── */
+
+.textArea {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 100px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+.nativeInput {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font: inherit;
+  color: var(--portfolio-text-neutral-bold);
+  padding: 0;
+  margin: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.nativeInputHidden {
+  color: transparent;
+  caret-color: var(--portfolio-text-neutral-bold);
+}
+
+.nativeInput::placeholder {
+  color: var(--portfolio-text-neutral-minimal);
+}
+
+/* ── Text overlay (mirror + ghost text) ─────────────── */
+
+.textOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+  overflow: hidden;
+  white-space: nowrap;
+  z-index: 2;
+}
+
+.overlayText {
+  color: transparent;
+  pointer-events: none;
+}
+
+.overlayTextVisible {
+  color: var(--portfolio-text-neutral-bold);
+  pointer-events: none;
+  white-space: pre;
+}
+
+.entityHighlight {
+  color: transparent;
+  text-decoration: underline dotted var(--portfolio-text-neutral-subtle);
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1.5px;
+  pointer-events: auto;
+  cursor: pointer;
+  border-radius: 2px;
+  position: relative;
+}
+
+.entityHighlightVisible {
+  composes: entityHighlight;
+  color: var(--portfolio-text-neutral-bold);
+}
+
+.entityHighlight:hover,
+.entityHighlightVisible:hover {
+  text-decoration-color: var(--portfolio-text-neutral-bold);
+  background-color: var(--portfolio-overlay-black-03);
+}
+
+.ghostSuggestion {
+  color: var(--portfolio-text-neutral-minimal);
+  pointer-events: none;
+  white-space: pre;
+}
+
+/* ── Search icon ────────────────────────────────────── */
+
+.searchIcon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  color: var(--portfolio-icon-neutral-bold);
+  pointer-events: none;
+}
+
+/* ── Idle ghost text overlay (typing animation) ─────── */
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding-left: 41px;
+  padding-right: 41px;
+}
+
+.ghostText {
+  font-family: var(--portfolio-font-sans);
+  font-size: var(--portfolio-type-base);
+  line-height: 20px;
+  color: var(--portfolio-text-neutral-minimal);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.breathing {
+  animation: breathe 1.2s cubic-bezier(0.2, 0, 0.38, 0.9) infinite;
+}
+
+@keyframes breathe {
+  0%, 100% { color: var(--portfolio-text-neutral-minimal); }
+  50% { color: var(--portfolio-text-neutral-bold); }
+}
+
+/* ── Disambiguation popover ─────────────────────────── */
+
+.disambigPopover {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  top: auto;
+  z-index: 20;
+  min-width: 260px;
+  max-width: 360px;
+  background-color: var(--portfolio-surface-neutral-minimal);
+  border: 1px solid var(--portfolio-border-neutral-subtle);
+  border-radius: var(--portfolio-radius-sm);
+  box-shadow: 0 4px 16px var(--portfolio-overlay-black-06);
+  padding: 4px 0;
+  overflow: hidden;
+}
+
+.disambigPopoverBelow {
+  top: calc(100% + 6px);
+  bottom: auto;
+}
+
+.disambigHeader {
+  padding: 6px 12px;
+  font-size: var(--portfolio-type-xs);
+  color: var(--portfolio-text-neutral-subtle);
+  border-bottom: 1px solid var(--portfolio-border-neutral-subtle);
+}
+
+.disambigRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background-color 100ms ease;
+}
+
+.disambigRow:hover,
+.disambigRowActive {
+  background-color: var(--portfolio-surface-neutral-regular);
+}
+
+.disambigDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--portfolio-text-neutral-subtle);
+  margin-top: 7px;
+  flex-shrink: 0;
+}
+
+.disambigContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.disambigName {
+  font-size: var(--portfolio-type-sm);
+  font-weight: 500;
+  color: var(--portfolio-text-neutral-bold);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.disambigTypeBadge {
+  font-size: var(--portfolio-type-2xs);
+  color: var(--portfolio-text-neutral-subtle);
+  background-color: var(--portfolio-surface-neutral-regular);
+  padding: 1px 6px;
+  border-radius: var(--portfolio-radius-full);
+  white-space: nowrap;
+}
+
+.disambigCount {
+  font-size: var(--portfolio-type-xs);
+  color: var(--portfolio-text-neutral-subtle);
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.disambigDesc {
+  font-size: var(--portfolio-type-xs);
+  color: var(--portfolio-text-neutral-subtle);
+  margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Inline confirmed entity pills (in overlay) ───── */
+
+.inlinePill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 8px;
+  margin-left: var(--spacer-0-5x);
+  background-color: var(--portfolio-surface-neutral-regular);
+  border-radius: var(--portfolio-radius-full);
+  font-size: var(--portfolio-type-xs);
+  line-height: 18px;
+  color: var(--portfolio-text-neutral-bold);
+  white-space: nowrap;
+  pointer-events: auto;
+  vertical-align: baseline;
+  position: relative;
+  z-index: 3;
+}
+
+.inlinePillType {
+  color: var(--portfolio-text-neutral-subtle);
+  font-size: var(--portfolio-type-2xs);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-right: 2px;
+}
+
+.inlinePillDismiss {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: none;
+  color: var(--portfolio-icon-neutral-bold);
+  cursor: pointer;
+  border-radius: var(--portfolio-radius-full);
+  flex-shrink: 0;
+  transition: background-color 150ms ease;
+}
+
+.inlinePillDismiss:hover {
+  background-color: var(--portfolio-overlay-black-06);
+}
+
+/* ── Inline chip selector popover ──────────────────── */
+
+.chipPopover {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  top: auto;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  background-color: var(--portfolio-surface-neutral-minimal);
+  border: 1px solid var(--portfolio-border-neutral-subtle);
+  border-radius: var(--portfolio-radius-sm);
+  box-shadow: 0 4px 16px var(--portfolio-overlay-black-06);
+  padding: 4px 0;
+  overflow: hidden;
+}
+
+.chipPopoverBelow {
+  top: calc(100% + 6px);
+  bottom: auto;
+}
+
+.chipPopoverSearch {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--portfolio-border-neutral-subtle);
+}
+
+.chipPopoverInput {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: var(--portfolio-font-sans);
+  font-size: var(--portfolio-type-sm);
+  color: var(--portfolio-text-neutral-bold);
+  padding: 0;
+}
+
+.chipPopoverInput::placeholder {
+  color: var(--portfolio-text-neutral-minimal);
+}
+
+.chipPopoverList {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.chipPopoverRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background-color 100ms ease;
+}
+
+.chipPopoverRow:hover,
+.chipPopoverRowActive {
+  background-color: var(--portfolio-surface-neutral-regular);
+}
+
+.chipPopoverLabel {
+  font-size: var(--portfolio-type-sm);
+  font-weight: 500;
+  color: var(--portfolio-text-neutral-bold);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chipPopoverMeta {
+  font-size: var(--portfolio-type-xs);
+  color: var(--portfolio-text-neutral-subtle);
+  white-space: nowrap;
+}
+
+/* ── Search results dropdown ───────────────────────── */
+
+.searchResults {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 20;
+  background-color: var(--portfolio-surface-neutral-minimal);
+  border: 1px solid var(--portfolio-border-neutral-subtle);
+  border-radius: var(--portfolio-radius-sm);
+  box-shadow: 0 4px 16px var(--portfolio-overlay-black-06);
+  padding: 4px 0;
+  overflow: hidden;
+}
+
+.searchResultsHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 12px;
+  font-size: var(--portfolio-type-xs);
+  color: var(--portfolio-text-neutral-subtle);
+  border-bottom: 1px solid var(--portfolio-border-neutral-subtle);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 500;
+}
+
+.searchResultsSpinner {
+  width: 12px;
+  height: 12px;
+  border: 1.5px solid var(--portfolio-border-neutral-subtle);
+  border-top-color: var(--portfolio-text-neutral-bold);
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.searchResultsList {
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.searchResultRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background-color 100ms ease;
+}
+
+.searchResultRow:hover,
+.searchResultRowActive {
+  background-color: var(--portfolio-surface-neutral-regular);
+}
+
+.searchResultIcon {
+  flex-shrink: 0;
+  color: var(--portfolio-icon-neutral-bold);
+  opacity: 0.6;
+}
+
+.searchResultContent {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.searchResultTitle {
+  font-size: var(--portfolio-type-sm);
+  font-weight: 500;
+  color: var(--portfolio-text-neutral-bold);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.searchResultMeta {
+  font-size: var(--portfolio-type-xs);
+  color: var(--portfolio-text-neutral-subtle);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ─── GroupBy Dimension Picker ─────────────────────────── */
+
+.groupByHeader {
+  padding: 8px 12px 4px;
+  font-size: var(--portfolio-type-xs);
+  font-weight: 600;
+  color: var(--portfolio-text-neutral-subtle);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.groupByDescription {
+  font-size: var(--portfolio-type-xs);
+  color: var(--portfolio-text-neutral-subtle);
+  margin-left: -4px;
+}
+
+.groupByAction {
+  margin-left: auto;
+  font-size: var(--portfolio-type-xs);
+  color: var(--portfolio-text-neutral-subtle);
+  opacity: 0.7;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.groupByRowDisabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+

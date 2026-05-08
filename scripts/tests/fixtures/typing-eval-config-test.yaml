@@ -1,0 +1,30 @@
+# Integration test eval-config (mirrors docs/eval-typing-eval-config.yaml shape).
+# Used by scripts/tests/test-integration-phase1.mjs.
+
+phase: typing-test
+schema_version: 1
+
+stratification_field: pillar
+strata: [multi-pillar, single-pillar]
+
+files:
+  corpus: scripts/tests/fixtures/typing-corpus-test.md
+  pre_registration: docs/eval-pre-registration.md   # reuse v1 thresholds for the test
+  judge_rubric: docs/eval-judge-rubric.md
+  adversarial: null
+  calibration: null
+
+arms:
+  T-typed:
+    arm_role: treatment
+    label: "Typed graph (test)"
+    graph_cache: .cache/graph.json
+  T-untyped:
+    arm_role: treatment
+    label: "Untyped graph (test)"
+    graph_cache: .cache/graph-untyped.json
+
+comparison_pairs:
+  - [T-typed, T-untyped]
+
+primary_pair: T-typed-T-untyped

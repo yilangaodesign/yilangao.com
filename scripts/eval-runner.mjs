@@ -27,6 +27,7 @@ import { execSync, spawn } from 'child_process';
 import { createHash } from 'crypto';
 import { generateText, tool, stepCountIs } from 'ai';
 import { z } from 'zod';
+import { loadEvalConfig, armRole, armGraphCache } from './lib/eval-config.mjs';
 
 // Model resolution: prefer AI Gateway OIDC, fall back to direct provider SDK
 async function resolveModel(modelId) {
@@ -69,17 +70,31 @@ function hasFlag(name) {
   return args.includes(`--${name}`);
 }
 
-const ARM = getArg('arm', '').toUpperCase();
+// --arm accepts arbitrary strings now. v1's auto-uppercase behavior is
+// preserved ONLY for the v1 fallback path (T/R/P/B). When --eval-config is
+// provided, arm IDs are case-sensitive and must match the YAML keys.
+const RAW_ARM = getArg('arm', '');
 const RUN_ID = getArg('run-id', `eval-${Date.now()}`);
 const ONLY_TASK = getArg('task', null);
 const REPS = parseInt(getArg('reps', '10'), 10);
 const RESUME = hasFlag('resume');
 const CALIBRATION = hasFlag('calibration');
+const EVAL_CONFIG_PATH = getArg('eval-config', null);
 
-if (!['T', 'R', 'P', 'B'].includes(ARM)) {
-  console.error('Usage: --arm {T|R|P|B} required');
+const EVAL_CONFIG = loadEvalConfig(EVAL_CONFIG_PATH, ROOT);
+// In the v1 fallback (no --eval-config), preserve the original
+// uppercase-coercion behavior so callers still using `--arm t` keep working.
+const ARM = EVAL_CONFIG._isFallback ? RAW_ARM.toUpperCase() : RAW_ARM;
+
+if (!ARM || !EVAL_CONFIG.arms[ARM]) {
+  console.error(
+    `Usage: --arm <id> required. Known arms: ${Object.keys(EVAL_CONFIG.arms).join(', ')}` +
+      (EVAL_CONFIG._isFallback ? ' (v1 default; pass --eval-config to override)' : ` (from ${EVAL_CONFIG_PATH})`),
+  );
   process.exit(1);
 }
+
+const ARM_ROLE = armRole(EVAL_CONFIG, ARM);
 
 // ---------------------------------------------------------------------------
 // Paths
@@ -87,11 +102,21 @@ if (!['T', 'R', 'P', 'B'].includes(ARM)) {
 const RESULTS_DIR = resolve(ROOT, 'eval-results', RUN_ID);
 const CHECKPOINT_FILE = resolve(RESULTS_DIR, 'checkpoint.jsonl');
 const MANIFEST_FILE = resolve(RESULTS_DIR, 'manifest.json');
-const CORPUS_FILE = resolve(ROOT, 'docs/eval-task-corpus.md');
-const ADVERSARIAL_FILE = resolve(ROOT, 'docs/eval-adversarial-controls.md');
-const CALIBRATION_FILE = resolve(ROOT, 'docs/eval-calibration-prompts.md');
-const PRE_REG_FILE = resolve(ROOT, 'docs/eval-pre-registration.md');
-const GRAPH_FILE = resolve(ROOT, '.cache/graph.json');
+const CORPUS_FILE = resolve(ROOT, EVAL_CONFIG.files.corpus);
+const ADVERSARIAL_FILE = EVAL_CONFIG.files.adversarial
+  ? resolve(ROOT, EVAL_CONFIG.files.adversarial)
+  : null;
+const CALIBRATION_FILE = EVAL_CONFIG.files.calibration
+  ? resolve(ROOT, EVAL_CONFIG.files.calibration)
+  : null;
+const PRE_REG_FILE = resolve(ROOT, EVAL_CONFIG.files.pre_registration);
+// Resolve graph cache: arm config wins, then env override, then default.
+const armCachePath = armGraphCache(EVAL_CONFIG, ARM);
+let GRAPH_CACHE_PATH = armCachePath
+  ? resolve(ROOT, armCachePath)
+  : process.env.GRAPH_CACHE_PATH
+    ? resolve(ROOT, process.env.GRAPH_CACHE_PATH)
+    : resolve(ROOT, '.cache/graph.json');
 const INDEX_FILE = resolve(ROOT, '.cache/search-index.json');
 const WORKTREE_PATH = resolve(process.env.HOME, 'eval/yilangao-current');
 
@@ -175,25 +200,69 @@ function parseTasks(filepath) {
     if (currentKey) fields[currentKey] = currentVal.trim();
 
     if (fields.id && fields.prompt) {
+      // Multi-citation grading (I4): canonical form is `expected_citations`
+      // (plural array). For v1 backward-compat, fall back to the singular
+      // `expected_citation` and wrap as a single-element array.
+      const expectedCitations = parseCitationList(
+        fields.expected_citations,
+        fields.expected_citation,
+      );
       tasks.push({
         id: fields.id,
         pillar: fields.pillar || '',
         difficulty: fields.difficulty || '',
+        // The configured stratification field (e.g. 'combination') is also
+        // captured if present so judge/aggregate don't need to re-parse YAML.
+        combination: fields.combination || '',
+        adversarial: parseBool(fields.adversarial),
         prompt: fields.prompt,
         gold_resolution: fields.gold_resolution || '',
-        expected_citation: fields.expected_citation || '',
+        expected_citations: expectedCitations,
+        // Singular kept for v1 backward-compat in tooling that hasn't migrated.
+        expected_citation: expectedCitations[0] || '',
       });
     }
   }
   return tasks;
 }
 
+// Accepts either a YAML inline array string ("[AP-066, EAP-082]") or a
+// singular fallback. Returns an array of trimmed citation IDs (may be empty).
+function parseCitationList(plural, singular) {
+  if (plural && plural.trim().length > 0) {
+    let s = plural.trim();
+    if (s.startsWith('[') && s.endsWith(']')) {
+      s = s.slice(1, -1);
+    }
+    return s
+      .split(',')
+      .map((v) => v.trim().replace(/^["']|["']$/g, ''))
+      .filter(Boolean);
+  }
+  if (singular && singular.trim().length > 0) {
+    return [singular.trim()];
+  }
+  return [];
+}
+
+function parseBool(v) {
+  if (v == null) return false;
+  const s = String(v).trim().toLowerCase();
+  return s === 'true' || s === 'yes' || s === '1';
+}
+
 function loadTasks() {
   if (CALIBRATION) {
+    if (!CALIBRATION_FILE) {
+      console.error(`--calibration requested but eval-config has no files.calibration entry`);
+      process.exit(1);
+    }
     return parseTasks(CALIBRATION_FILE);
   }
   const corpus = parseTasks(CORPUS_FILE);
-  const adversarial = parseTasks(ADVERSARIAL_FILE);
+  const adversarial = ADVERSARIAL_FILE && existsSync(ADVERSARIAL_FILE)
+    ? parseTasks(ADVERSARIAL_FILE)
+    : [];
   return [...corpus, ...adversarial];
 }
 
@@ -229,13 +298,13 @@ function shaFile(filepath) {
 }
 
 function verifyCacheIntegrity(manifest) {
-  if (ARM === 'T' && manifest.graph_sha) {
-    const current = shaFile(GRAPH_FILE);
+  if (ARM_ROLE === 'treatment' && manifest.graph_sha) {
+    const current = shaFile(GRAPH_CACHE_PATH);
     if (current !== manifest.graph_sha) {
-      throw new Error(`graph.json SHA mismatch! Expected ${manifest.graph_sha}, got ${current}`);
+      throw new Error(`graph cache SHA mismatch (${GRAPH_CACHE_PATH})! Expected ${manifest.graph_sha}, got ${current}`);
     }
   }
-  if (ARM === 'R' && manifest.index_sha) {
+  if (ARM_ROLE === 'rag' && manifest.index_sha) {
     const current = shaFile(INDEX_FILE);
     if (current !== manifest.index_sha) {
       throw new Error(`search-index.json SHA mismatch! Expected ${manifest.index_sha}, got ${current}`);
@@ -312,10 +381,18 @@ let mcpBuffer = '';
 function startMcpServer() {
   return new Promise((res, rej) => {
     const serverPath = join(ROOT, 'scripts/mcp-graph-server.mjs');
+    // Pass GRAPH_CACHE_PATH explicitly so the MCP server (and the query-graph
+    // subprocesses it spawns) read from the arm-specific graph variant.
+    // EVAL_FREEZE_CACHE=1 prevents query-graph from triggering build-graph
+    // mid-run (which would change SHA and invalidate the manifest pin).
     mcpProcess = spawn(process.execPath, [serverPath], {
       cwd: ROOT,
       stdio: ['pipe', 'pipe', 'pipe'],
-      env: { ...process.env, EVAL_FREEZE_CACHE: '1' },
+      env: {
+        ...process.env,
+        EVAL_FREEZE_CACHE: '1',
+        GRAPH_CACHE_PATH,
+      },
     });
 
     let started = false;
@@ -396,15 +473,25 @@ function stopMcpServer() {
 }
 
 // ---------------------------------------------------------------------------
-// Tool definitions per arm (using Zod schemas)
+// Tool definitions per arm role (using Zod schemas).
+//
+// Dispatch is on `arm_role`, not on the arm ID itself: this is what lets a
+// Phase 1 arm named `T-typed` and a Phase 2 arm named `T` share the same
+// "treatment" tool set without duplicating code paths.
+//
+// Roles:
+//   treatment      → query_node + subgraph + search_graph (MCP) + read_file
+//   rag            → grep_docs + lunr_search + read_file (no graph)
+//   pre_initiative → grep + read_file scoped to eval-baseline-current worktree
+//   no_memory      → no tools at all
 // ---------------------------------------------------------------------------
-function buildToolsForArm(arm) {
-  if (arm === 'B') return { tools: {}, toolCallLog: [] };
+function buildToolsForArm(role) {
+  if (role === 'no_memory') return { tools: {}, toolCallLog: [] };
 
   const toolCallLog = [];
   const tools = {};
 
-  if (arm === 'T') {
+  if (role === 'treatment') {
     tools.query_node = tool({
       description: 'Look up a node by ID and return the node + its 1-hop neighbors. IDs are lowercase kebab-case.',
       inputSchema: z.object({
@@ -444,7 +531,7 @@ function buildToolsForArm(arm) {
     });
   }
 
-  if (arm === 'T' || arm === 'R') {
+  if (role === 'treatment' || role === 'rag') {
     tools.read_file = tool({
       description: 'Read a file from the project docs directory',
       inputSchema: z.object({
@@ -465,7 +552,7 @@ function buildToolsForArm(arm) {
     });
   }
 
-  if (arm === 'R') {
+  if (role === 'rag') {
     tools.grep_docs = tool({
       description: 'Search docs with ripgrep. Searches docs/, AGENTS.md, .cursor/skills/, .cursor/rules/',
       inputSchema: z.object({
@@ -510,7 +597,7 @@ function buildToolsForArm(arm) {
     });
   }
 
-  if (arm === 'P') {
+  if (role === 'pre_initiative') {
     tools.grep_docs_pre_init = tool({
       description: 'Search pre-initiative docs with ripgrep (eval-baseline-current worktree)',
       inputSchema: z.object({
@@ -559,7 +646,7 @@ function buildToolsForArm(arm) {
 // ---------------------------------------------------------------------------
 // System prompt construction
 // ---------------------------------------------------------------------------
-function buildSystemPrompt(arm, task, injectedSkills) {
+function buildSystemPrompt(role, task, injectedSkills) {
   const parts = [
     'You are an expert software engineering assistant working on a design-system portfolio project (yilangao.com).',
     'The project uses Next.js 16, Payload CMS 3, Tailwind CSS 4, and a custom design system (Elan).',
@@ -567,7 +654,7 @@ function buildSystemPrompt(arm, task, injectedSkills) {
     'Provide specific file paths and code changes. Structure your response as: diagnosis, root cause, fix, principle.',
   ];
 
-  if (arm === 'T') {
+  if (role === 'treatment') {
     parts.push(
       '',
       'You have access to a documentation knowledge graph via tools:',
@@ -586,7 +673,7 @@ function buildSystemPrompt(arm, task, injectedSkills) {
       }
       parts.push('--- End skill fragments ---');
     }
-  } else if (arm === 'R') {
+  } else if (role === 'rag') {
     parts.push(
       '',
       'You have access to documentation search tools:',
@@ -594,7 +681,7 @@ function buildSystemPrompt(arm, task, injectedSkills) {
       '- lunr_search: BM25 keyword search over the search index',
       '- read_file: read any file in the project docs',
     );
-  } else if (arm === 'P') {
+  } else if (role === 'pre_initiative') {
     parts.push(
       '',
       'You have access to documentation search tools (pre-initiative snapshot):',
@@ -613,10 +700,23 @@ function buildSystemPrompt(arm, task, injectedSkills) {
 }
 
 // ---------------------------------------------------------------------------
-// Cost tracking (approximate, Claude Sonnet pricing)
+// Cost tracking
+//
+// Rates are APPROXIMATE Claude Sonnet 4.6 list prices and are mirrored in
+// scripts/eval-judge.mjs. They do not reflect AI Gateway markups, batch
+// discounts, or Anthropic price changes. For final cost reconciliation the
+// AI Gateway dashboard is the source of truth — these numbers are only used
+// for in-flight budget caps and per-run runaway detection.
+//
+// I5 also adds a per-run hard kill: any single task-rep that exceeds
+// PER_RUN_COST_CAP_USD or PER_RUN_OUTPUT_TOKEN_CAP is recorded as
+// `error: 'runaway'` and the harness moves on to the next task. The intent
+// is to bound exposure when a single prompt triggers an infinite tool loop.
 // ---------------------------------------------------------------------------
-const COST_PER_1K_INPUT = 0.003;
-const COST_PER_1K_OUTPUT = 0.015;
+const COST_PER_1K_INPUT = 0.003;   // approximate
+const COST_PER_1K_OUTPUT = 0.015;  // approximate
+const PER_RUN_COST_CAP_USD = 5;
+const PER_RUN_OUTPUT_TOKEN_CAP = 30000;
 let cumulativeCost = 0;
 
 function estimateCost(usage) {
@@ -626,11 +726,22 @@ function estimateCost(usage) {
   return inputCost + outputCost;
 }
 
+function isRunaway(usage, cost) {
+  if (cost > PER_RUN_COST_CAP_USD) {
+    return `cost $${cost.toFixed(2)} exceeded per-run cap $${PER_RUN_COST_CAP_USD}`;
+  }
+  const outTokens = usage?.completionTokens || 0;
+  if (outTokens > PER_RUN_OUTPUT_TOKEN_CAP) {
+    return `output tokens ${outTokens} exceeded per-run cap ${PER_RUN_OUTPUT_TOKEN_CAP}`;
+  }
+  return null;
+}
+
 // ---------------------------------------------------------------------------
-// Worktree setup for Arm P
+// Worktree setup for the pre_initiative role (v1: Arm P)
 // ---------------------------------------------------------------------------
 function ensureWorktree() {
-  if (ARM !== 'P') return;
+  if (ARM_ROLE !== 'pre_initiative') return;
   if (existsSync(WORKTREE_PATH)) {
     const status = execSync(`git -C "${WORKTREE_PATH}" status --porcelain`, { encoding: 'utf8' }).trim();
     if (status) {
@@ -672,13 +783,20 @@ async function runTask(task, rep, armTools, systemPrompt) {
     const cost = estimateCost(result.usage);
     cumulativeCost += cost;
 
+    const runawayReason = isRunaway(result.usage, cost);
+    if (runawayReason) {
+      console.error(`  [runaway] ${task.id} rep ${rep}: ${runawayReason}`);
+    }
+
     return {
       task_id: task.id,
       arm: ARM,
+      arm_role: ARM_ROLE,
       rep,
       system_prompt_length: systemPrompt.length,
       prompt: task.prompt,
       response: result.text,
+      ...(runawayReason ? { error: 'runaway', runaway_reason: runawayReason } : {}),
       tool_calls: [...toolCallLog],
       steps: result.steps?.length || 0,
       usage: result.usage,
@@ -686,15 +804,21 @@ async function runTask(task, rep, armTools, systemPrompt) {
       cumulative_cost_usd: cumulativeCost,
       wall_time_ms: wallTime,
       timestamp: new Date().toISOString(),
+      // I4: store the canonical multi-citation array so judge can compute F1.
+      expected_citations: task.expected_citations,
+      // Singular kept for v1 backward-compat; equals expected_citations[0].
       expected_citation: task.expected_citation,
       difficulty: task.difficulty,
       pillar: task.pillar,
+      combination: task.combination || null,
+      adversarial: task.adversarial,
     };
   } catch (error) {
     const wallTime = Date.now() - startTime;
     return {
       task_id: task.id,
       arm: ARM,
+      arm_role: ARM_ROLE,
       rep,
       system_prompt_length: systemPrompt.length,
       prompt: task.prompt,
@@ -707,9 +831,12 @@ async function runTask(task, rep, armTools, systemPrompt) {
       cumulative_cost_usd: cumulativeCost,
       wall_time_ms: wallTime,
       timestamp: new Date().toISOString(),
+      expected_citations: task.expected_citations,
       expected_citation: task.expected_citation,
       difficulty: task.difficulty,
       pillar: task.pillar,
+      combination: task.combination || null,
+      adversarial: task.adversarial,
     };
   }
 }
@@ -733,7 +860,8 @@ async function main() {
       started_at: new Date().toISOString(),
       generation_model: 'anthropic/claude-4.6-sonnet',
       budget_cap_usd: BUDGET_CAP,
-      graph_sha: existsSync(GRAPH_FILE) ? shaFile(GRAPH_FILE) : null,
+      graph_sha: existsSync(GRAPH_CACHE_PATH) ? shaFile(GRAPH_CACHE_PATH) : null,
+      graph_cache_path: GRAPH_CACHE_PATH,
       index_sha: existsSync(INDEX_FILE) ? shaFile(INDEX_FILE) : null,
     };
     writeFileSync(MANIFEST_FILE, JSON.stringify(manifest, null, 2));
@@ -746,13 +874,12 @@ async function main() {
     console.log(`Resuming: ${completed.size} runs already completed`);
   }
 
-  // Start MCP server for Arm T
-  if (ARM === 'T') {
-    console.log('Starting MCP graph server...');
+  // Start MCP server for treatment-role arms
+  if (ARM_ROLE === 'treatment') {
+    console.log(`Starting MCP graph server (arm=${ARM}, role=treatment, GRAPH_CACHE_PATH=${GRAPH_CACHE_PATH})...`);
     await startMcpServer();
     console.log('MCP server initialized');
 
-    // Health check
     try {
       const healthResult = await callMcpTool('search', { query: 'anti-pattern', limit: 1 });
       console.log(`MCP health check passed (got ${healthResult.length} chars)`);
@@ -763,16 +890,15 @@ async function main() {
     }
   }
 
-  // Load skills for Arm T
-  const skills = ARM === 'T' ? loadSkills() : [];
+  // Skill injection is a treatment-role behavior.
+  const skills = ARM_ROLE === 'treatment' ? loadSkills() : [];
   if (skills.length > 0) {
     console.log(`Loaded ${skills.length} skills for injection`);
   }
 
-  // Build tools
-  const armTools = buildToolsForArm(ARM);
+  const armTools = buildToolsForArm(ARM_ROLE);
   const toolNames = Object.keys(armTools.tools || {});
-  console.log(`Tools available: ${toolNames.join(', ') || '(none)'}`);
+  console.log(`Tools available (role=${ARM_ROLE}): ${toolNames.join(', ') || '(none)'}`);
 
   // Filter tasks
   const tasks = ONLY_TASK
@@ -818,10 +944,10 @@ async function main() {
         }
       }
 
-      const injectedSkills = ARM === 'T' ? matchSkills(task.prompt, skills) : [];
-      const systemPrompt = buildSystemPrompt(ARM, task, injectedSkills);
+      const injectedSkills = ARM_ROLE === 'treatment' ? matchSkills(task.prompt, skills) : [];
+      const systemPrompt = buildSystemPrompt(ARM_ROLE, task, injectedSkills);
 
-      console.log(`[${runCount + skipCount + 1}/${tasks.length * REPS}] ${task.id} rep ${rep}/${REPS} (Arm ${ARM})...`);
+      console.log(`[${runCount + skipCount + 1}/${tasks.length * REPS}] ${task.id} rep ${rep}/${REPS} (arm=${ARM} role=${ARM_ROLE})...`);
 
       const result = await runTask(task, rep, armTools, systemPrompt);
 
