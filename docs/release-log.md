@@ -17,7 +17,26 @@ references:
 >
 > **Who reads this:** AI agents when the `ship-it` skill is activated — scan recent entries for recurring pitfalls before starting a new release.
 > **Who writes this:** AI agents after each ship-it run via the Post-Release Audit protocol in `ship-it/SKILL.md`.
-> **Last updated:** 2026-05-02 (REL-038: Welcome-page fallback login across all active companies — Élan 2.15.7, ASCII Art Studio 0.6.26)
+> **Last updated:** 2026-05-08 (REL-039: DS package, eval pipeline, shared utility refactor, Edra challenge — Élan 2.16.0, ASCII Art Studio 0.6.27)
+
+---
+
+<a id="rel-039"></a>
+## REL-039 — DS Package, Eval Pipeline & Edra Challenge (2026-05-08)
+
+**Scope:** 207 tracked files across 8 dependency-ordered commits (L0 ×7, L1 ×28, L3 ×13, L5+6 ×18, L7 ×5, eval-scripts ×17, eval-results ×82, edra-challenge ×58) + 1 tsconfig fix commit + 1 release commit + 1 dev-patch-bump commit. 2 macOS duplicate files cleaned (`eval-results/full-001/summary 2.*`).
+**Semver:** Minor for Élan (2.15.7 → 2.16.0, new shared utilities and ds-package). Patch for ASCII Art Studio (0.6.26 → 0.6.27, manifest sync only).
+**Previous release:** Élan 2.15.7, ASCII Art Studio 0.6.26
+
+**Incidents:**
+1. **Build gate failure — root tsconfig scanning edra-challenge/** (REL-AP-006 variant): `next build` type-checked `edra-challenge/src/app/actions.ts` which uses `@/lib/queries` path alias that doesn't resolve from the root tsconfig. Fix: added `edra-challenge` and `ds-package` to root `tsconfig.json` `exclude` array. Same pattern as playground/ascii-tool/archive.
+2. **Git lock file during merge**: `git merge dev` on main produced a `refs/heads/main.lock` error but the merge still completed. First merge captured stale dev state (previous release only); required a second merge after pushing the fix commit.
+3. **Playground Vercel deployment error**: Playground deployment (`yilangao-design-system`) showed "Error" status with 0ms build time. Local build passed. Under investigation — may be transient or install-phase issue.
+
+**Layer classification notes:**
+- `src/components/ui/_shared/` is a new shared utility directory (Layer 5) but its creation is coupled with component import updates (Layer 6). Combined as one commit to avoid broken intermediate states.
+- `edra-challenge/` treated as its own commit outside the standard layer system (similar to ascii-tool).
+- `eval-results/` and `scripts/` treated as separate commits outside the standard layer system.
 
 ---
 
