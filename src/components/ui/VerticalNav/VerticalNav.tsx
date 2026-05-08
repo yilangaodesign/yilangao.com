@@ -12,7 +12,7 @@ import {
   type HTMLAttributes,
 } from "react";
 import { createPortal } from "react-dom";
-import { useSafeTriangle } from "../../../hooks/use-safe-triangle";
+import { useSafeTriangle } from "../_shared/use-safe-triangle";
 import { NavItem } from "../NavItem/NavItem";
 import { NavItemChildren } from "../NavItem/NavItemChildren";
 import styles from "./VerticalNav.module.scss";
@@ -21,7 +21,7 @@ import navItemStyles from "../NavItem/NavItem.module.scss";
 // ── Constants ────────────────────────────────────────────────────────────────
 
 const W_EXPANDED = 200;
-const W_COLLAPSED = 41;
+const W_COLLAPSED = 40;
 
 // ── Context: Public (collapsed / mobile state) ──────────────────────────────
 
@@ -244,13 +244,17 @@ export const VerticalNavHeader = forwardRef<
   HTMLDivElement,
   VerticalNavHeaderProps
 >(({ children, className, ...rest }, ref) => {
-  const { dismissSliver } = useContext(SliverContext);
+  const { dismissSliver, isCollapsedDesktop } = useContext(SliverContext);
 
   return (
     <div
       ref={ref}
       onMouseEnter={dismissSliver}
-      className={[styles.header, className].filter(Boolean).join(" ")}
+      className={[
+        styles.header,
+        isCollapsedDesktop ? styles.headerCollapsed : styles.headerExpanded,
+        className,
+      ].filter(Boolean).join(" ")}
       {...rest}
     >
       {children}

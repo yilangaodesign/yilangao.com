@@ -9,7 +9,7 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { DURATION, EASING } from "@/lib/motion";
+import { DURATION, EASING } from "../_shared/motion";
 import styles from "./ScrollSpy.module.scss";
 
 const useIsomorphicLayoutEffect =

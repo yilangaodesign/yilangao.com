@@ -13,6 +13,12 @@
   &[data-state='open'] {
     animation: slideDown $portfolio-duration-fast $portfolio-easing-entrance;
   }
+
+  // Radix manages highlight state via [data-highlighted]; suppress the
+  // browser focus-visible ring that fires when items receive programmatic focus.
+  [role='menuitem']:focus-visible {
+    outline: none;
+  }
 }
 
 .shortcut {

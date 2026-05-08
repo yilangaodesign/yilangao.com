@@ -7,7 +7,7 @@ import {
   TRANSITION_STAGGER_ITEM,
   ENTRANCE_Y,
   getReducedTransition,
-} from "@/lib/motion";
+} from "../_shared/motion";
 
 export function StaggerChildren({
   children,

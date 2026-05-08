@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import styles from "./VideoEmbed.module.scss";
-import type { EmbedProvider } from "../../../lib/parse-video-embed";
+import type { EmbedProvider } from "../_shared/parse-video-embed";
 
 export interface VideoEmbedProps {
   provider: EmbedProvider;
