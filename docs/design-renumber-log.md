@@ -1,5 +1,5 @@
 ---
-node_type: renumber-log
+type: renumber-log
 id: design-renumber-log
 domain: design
 ---

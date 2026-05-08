@@ -1,6 +1,7 @@
 ---
 type: eval-report
-id: eval-results-full-001
+id: eval-results
+eval_run_id: full-001
 topics: [eval, knowledge-graph]
 derivedFrom:
   - docs/initiatives/docs-knowledge-graph-initiative.md

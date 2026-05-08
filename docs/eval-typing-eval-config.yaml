@@ -1,0 +1,57 @@
+# Eval-config — Phase 1 (typed vs untyped graph A/B)
+# ----------------------------------------------------
+# Read by scripts/eval-runner.mjs, scripts/eval-judge.mjs, and
+# scripts/eval-aggregate.mjs via the --eval-config flag.
+#
+# Phase 1 isolates whether *edge typing* (vs raw connectivity) drives the
+# agent advantage observed in v1's full-001 run. Both arms are role
+# 'treatment' (graph + skills + read_file), differing ONLY in which graph
+# cache file they consume.
+
+phase: typing
+schema_version: 1
+
+# Where the per-stratum strata IDs come from in the corpus YAML. Phase 1
+# uses 'pillar' so each task slots into exactly one stratum (multi-pillar
+# vs single-pillar). The aggregate script treats this as the strata axis.
+stratification_field: pillar
+strata: [multi-pillar, single-pillar]
+
+# Files referenced by all three scripts. Paths are project-root relative.
+files:
+  corpus: docs/eval-typing-task-corpus.md
+  pre_registration: docs/eval-typing-pre-registration.md
+  judge_rubric: docs/eval-judge-rubric.md
+  # Phase 1 has no adversarial subset (it's covered in Phase 2 only).
+  adversarial: null
+  calibration: null
+
+# Arms. Keys (T-typed, T-untyped) are the IDs passed to --arm.
+# arm_role determines which code path the runner takes — see
+# scripts/eval-runner.mjs buildToolsForArm() and the role dispatch in main().
+arms:
+  T-typed:
+    arm_role: treatment
+    label: "Typed graph (current)"
+    graph_cache: .cache/graph.json
+    description: |
+      Existing graph with all 6 forward edge types (enforces, references,
+      documents, supersedes, derivedFrom, triggers) plus inverses, full
+      confidence range. Identical to v1 Arm T.
+  T-untyped:
+    arm_role: treatment
+    label: "Untyped graph (collapsed)"
+    graph_cache: .cache/graph-untyped.json
+    description: |
+      Same nodes + connectivity as T-typed, but every edge collapsed to
+      type='references', confidence=1.0. Equivalent to "we know A and B
+      are related but not how or how strongly." Built by build-graph.mjs
+      via untypeGraph() in the same pass.
+
+# Pairwise comparisons judged by the LLM ensemble. List of [armA, armB].
+comparison_pairs:
+  - [T-typed, T-untyped]
+
+# The pair the decision rules in eval-aggregate.mjs anchor on.
+# Encoded as 'armA-armB' to match the byPair key shape in aggregate.
+primary_pair: T-typed-T-untyped

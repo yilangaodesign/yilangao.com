@@ -1,0 +1,60 @@
+# Eval-config — Phase 2 (multi-pillar A/B with 4 arms)
+# -----------------------------------------------------
+# Read by scripts/eval-runner.mjs, scripts/eval-judge.mjs, and
+# scripts/eval-aggregate.mjs via the --eval-config flag.
+#
+# Phase 2 evaluates whether the typed knowledge graph improves agent
+# performance on multi-pillar feedback (D+E, D+E+C, D+C, E+C). T is the
+# treatment (current main + graph + skills); R, P, B are baselines.
+
+phase: multipillar
+schema_version: 1
+
+# Stratification axis. Each task in the corpus has a `combination` field
+# (e.g. "D+E", "D+E+C", "D+C", "E+C", or "single-pillar"). The aggregate
+# script reports per-stratum metrics with Holm correction.
+stratification_field: combination
+strata: ["D+E", "D+E+C", "D+C", "E+C", "single-pillar"]
+
+files:
+  corpus: docs/eval-multipillar-task-corpus.md
+  pre_registration: docs/eval-multipillar-pre-registration.md
+  judge_rubric: docs/eval-judge-rubric.md
+  adversarial: docs/eval-multipillar-adversarial-controls.md
+  calibration: docs/eval-multipillar-calibration-prompts.md
+
+arms:
+  T:
+    arm_role: treatment
+    label: "Treatment (post-init main + graph + skills)"
+    graph_cache: .cache/graph.json
+    description: |
+      Same as v1 Arm T: knowledge graph via MCP (query_node, subgraph,
+      search_graph), read_file across project docs, plus skill injection
+      based on prompt-content matching.
+  R:
+    arm_role: rag
+    label: "RAG baseline (grep + lunr + read_file)"
+    description: |
+      Same as v1 Arm R: ripgrep over docs/ + AGENTS.md + .cursor/skills/
+      + .cursor/rules/, BM25 lunr search, plus read_file. No graph, no
+      skill injection.
+  P:
+    arm_role: pre_initiative
+    label: "Pre-initiative baseline (worktree snapshot)"
+    description: |
+      Same as v1 Arm P: ripgrep + read_file scoped to the
+      eval-baseline-current worktree (pre-initiative docs).
+  B:
+    arm_role: no_memory
+    label: "Bare model (no tools)"
+    description: |
+      Same as v1 Arm B: no tools at all; the model answers from its own
+      training knowledge.
+
+comparison_pairs:
+  - [T, R]
+  - [T, P]
+  - [T, B]
+
+primary_pair: T-R
