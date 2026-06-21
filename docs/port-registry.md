@@ -35,10 +35,10 @@ references:
 
 | Service | Default Port | Current Port | Status | PID | Notes |
 |---|---|---|---|---|---|
-| Main site (`yilangao.com`) | 4000 | 4000 | running | 14921 | `npm run dev` (webpack mode) |
-| Playground | 4001 | 4001 | running | 15008 | `npm run playground` (`--webpack`; see ENG-150) |
-| ASCII Art Studio | 4002 | 4002 | running | 3767 | `npm run ascii-tool` (`--webpack`; see ENG-150) |
-| Edra Challenge | 4003 | 4003 | running | 39395 | `npm run edra-challenge` (webpack mode) |
+| Main site (`yilangao.com`) | 4000 | 4000 | running | 15139 | `npm run dev` (webpack mode) |
+| Playground | 4001 | 4001 | running | 47868 | `npm run playground` (`--webpack`; see ENG-150) |
+| ASCII Art Studio | 4002 | — | stopped | — | `npm run ascii-tool` (`--webpack`; see ENG-150) |
+| Edra Challenge | 4003 | — | stopped | — | `npm run edra-challenge` (webpack mode) |
 
 ## Key Pages (on main site, no separate server)
 
@@ -51,6 +51,12 @@ references:
 
 | Timestamp (UTC) | Service | Action | Port | Reason |
 |---|---|---|---|---|
+| 2026-06-21 05:50 | ASCII Art Studio, Edra Challenge | stopped | 4002, 4003 | Registry reconciliation (`audit-docs` server-health ERRORs). 4002 held a 25-day-old zombie `next-server` (PID 15675) accepting TCP but returning HTTP 000 (timeout, not serving) — SIGKILL'd to reclaim the port. 4003 had no listener (recorded PID 39395 gone). Neither app is needed for current work; marked `stopped` to match reality rather than booting unrequested servers. Both ports verified free via `lsof`. |
+| 2026-06-21 05:29 | Playground | restarted | 4001 | ButtonSelect background-clip fix — mandatory flush-and-restart (EAP-042). SIGKILL prior listener (PID 38358) + `rm -rf playground/.next` + fresh `npm run playground`. Verified `/components/button-select` → 200; `background-clip: padding-box` confirmed in compiled CSS. LISTEN PID 4001: 47868. |
+| 2026-06-21 05:10 | Playground | restarted | 4001 | DataGrid component shipped — mandatory flush-and-restart (EAP-042) after adding `playground/src/app/components/data-grid/page.tsx` + sidebar entry. SIGKILL prior listener (PID 17096) + `rm -rf playground/.next` + fresh `npm run playground`. Verified `/components/data-grid` → 200; browser console clean (no hydration/icon errors); sorting works. LISTEN PID 4001: 38358. |
+| 2026-06-21 02:47 | Playground | restarted | 4001 | User boot up — prior listener (PID 15148) accepted TCP but no HTTP response (zombie next-server); SIGKILL + `rm -rf playground/.next`; fresh `npm run playground`. Verified: 4001 → 200. Main site (4000 → 307 OK, PID 15139) and ASCII Art Studio (4002 → 200, PID 15675) already healthy. LISTEN PIDs: 15139 (4000), 17096 (4001), 15675 (4002). |
+| 2026-05-26 21:19 | Main site, Playground, ASCII Art Studio | started | 4000–4002 | User boot up — all ports were down (curl → 000); fresh starts. Verified: 4000 → 307 (redirect OK), 4001 → 200, 4002 → 200. LISTEN PIDs: 15525 (4000), 15600 (4001), 15675 (4002). |
+| 2026-05-18 20:25 | Main site | restarted | 4000 | Personalize skill — restarted for CMS queries (schema push prompt blocking). PID 28196. |
 | 2026-05-07 17:32 | Main site, Playground | restarted | 4000, 4001 | User boot up all — prior listeners (PIDs 85753, 85763) accepted TCP but no HTTP response (zombie `next-server`); SIGKILL -9; fresh `npm run dev` / `npm run playground`. ASCII (4002) already healthy. Verified main site → 307 (redirect OK), playground → 200. LISTEN PIDs: 14921 (4000), 15008 (4001), 3767 (4002). |
 | 2026-05-06 23:41 | Edra Challenge | restarted | 4003 | User boot up Edra — prior listener (PID 34904) returned HTTP 500 on `/`; SIGKILL listener; fresh `npm run edra-challenge`. Verified `curl http://127.0.0.1:4003/` → 200. LISTEN PID 4003: 39395. |
 | 2026-04-28 04:11 | Main site | restarted | 4000 | User boot up — 4001/4002 healthy; 4000 had `next-server` LISTEN (ex-PID 71007) but `curl` timed out (no HTTP). SIGKILL listener; fresh `npm run dev`. Verified `curl -L` `/` → 200, `/for/welcome?preview=true` → 200. Playground/ASCII left running. LISTEN PID 4000: 10686 (4001: 3764, 4002: 3767). |

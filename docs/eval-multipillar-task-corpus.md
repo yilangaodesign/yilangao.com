@@ -19,7 +19,7 @@ references:
 >
 > **Frozen**: do NOT edit task IDs, prompts, or gold citations after first use. Adding a 28th task contaminates per-stratum power. Replacing a task contaminates Phase 1↔Phase 2 commensurability. If a task turns out to be malformed, mark it `excluded: true` rather than rewriting it.
 >
-> **Phase 1 subset (deterministic)**: Phase 1 draws 3 multi-pillar (lowest task ID per stratum from D+E, D+E+C, D+C) + 3 single-pillar (lowest 3 IDs from the single-pillar pool). The Phase 1 subset is materialized as a list of IDs + this corpus's SHA-pin in [`docs/eval-typing-task-corpus.md`](docs/eval-typing-task-corpus.md), NOT as a duplicate of task definitions. E+C is intentionally not represented in Phase 1 (its rarity makes it a Phase 2-only stratum).
+> **Phase 1 subset (deterministic)**: Phase 1 draws 3 multi-pillar (lowest task ID per stratum from D+E, D+E+C, D+C) + 3 single-pillar (lowest 3 IDs from the single-pillar pool). The Phase 1 subset is materialized as a list of IDs + this corpus's SHA-pin in [`docs/eval-typing-task-corpus.md`](eval-typing-task-corpus.md), NOT as a duplicate of task definitions. E+C is intentionally not represented in Phase 1 (its rarity makes it a Phase 2-only stratum).
 >
 > **Phase 2 calibration**: Phase 2 step 2c uses the 3 calibration tasks (`eval-CAL-001..003`) which are held out from the main run.
 
@@ -1163,4 +1163,4 @@ Adversarial tasks set `expected_citations` to a single fake-AP sentinel of the f
 | E+C | (Phase 1 drops E+C) |
 | single-pillar | `eval-SP-C-001`, `eval-SP-D-001`, `eval-SP-D-002` (lowest 3 by lex order) |
 
-Phase 1 subset (per the deterministic rule): `eval-MP-DE-001`, `eval-MP-DEC-001`, `eval-MP-DC-001`, `eval-SP-C-001`, `eval-SP-D-001`, `eval-SP-D-002` (6 tasks). See [`docs/eval-typing-task-corpus.md`](docs/eval-typing-task-corpus.md) for the locked subset reference.
+Phase 1 subset (per the deterministic rule): `eval-MP-DE-001`, `eval-MP-DEC-001`, `eval-MP-DC-001`, `eval-SP-C-001`, `eval-SP-D-001`, `eval-SP-D-002` (6 tasks). See [`docs/eval-typing-task-corpus.md`](eval-typing-task-corpus.md) for the locked subset reference.

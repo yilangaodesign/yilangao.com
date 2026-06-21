@@ -58,6 +58,22 @@ Raw buttons are acceptable ONLY when all three conditions are met:
 
 The contact page submit button uses `$portfolio-surface-inverse` background (black on light mode) — a pattern not covered by the current DS Button variants. Consider adding a `variant="inverse"` to the Button component.
 
+### 20.4 Choosing Between `Button`, `ButtonGroup`, and `ButtonSelect`
+
+There are three button-family primitives, separated by **intent**, not appearance. Pick by answering "how many actions, and are they independent?"
+
+| Primitive | Use when | Cardinality | Visual relationship | Spacing |
+|-----------|----------|-------------|---------------------|---------|
+| `Button` | A single action (submit, cancel, navigate). | One | Standalone | n/a |
+| `ButtonGroup` | Two or more **independent** actions shown together (toolbars, dialog footers, stacked mobile CTAs). | Many | Visually **separate** — never joined or merged | Token-based gap; `default` = 8px floor (enforces `spacing.md` §1.3); `compact` = 4px opt-in dense |
+| `ButtonSelect` | Mutually-exclusive **selection** among options (a segmented control / filter / view toggle). | Many | Visually **fused** into one control — shared borders, `gap-0` | No gap by design |
+
+**The two decisions that separate `ButtonGroup` from `ButtonSelect`:**
+1. **Independence** — `ButtonGroup` children each trigger their own action; `ButtonSelect` options set one shared value. If clicking one button shouldn't visually "deselect" another, it's a `ButtonGroup`.
+2. **Joining** — `ButtonGroup` always spaces its children (it is the canonical fix for AP-045 cramped buttons); `ButtonSelect` is the *only* button-family component permitted to fuse buttons with `gap-0`. Fusing is `ButtonSelect`'s job; spacing is `ButtonGroup`'s.
+
+`ButtonGroup` does not resize its children — they carry their own `size`. Its `size` prop only tunes the inter-button gap (near-constant 4/8/12px for compact/default/relaxed at xs–lg; one step up — 8/12/16px — for `xl`'s extra visual mass). `default` (8px) holds the §1.3 floor; `compact` (4px) is a deliberate dense opt-in below it. See the playground page `/components/button-group` and `spacing.md` §1.3.
+
 ---
 
 ## §21 Undocumented Patterns (DS Gap Analysis)

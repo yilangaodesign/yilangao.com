@@ -78,14 +78,14 @@ Clean progression: sub-1x uses halving (0.5, 0.25, 0.125), 1x–2.5x use half-st
 
 ### 1.3 Minimum Inter-Component Gap for Buttons
 
-Buttons must never be placed directly adjacent to each other — horizontally or vertically — without a gap. This applies universally unless a dedicated button group component explicitly overrides it (e.g., a segmented control or split button with internal border separators).
+Buttons must never be placed directly adjacent to each other — horizontally or vertically — without a gap. This applies universally unless a dedicated segmented control explicitly overrides it (e.g., `ButtonSelect`, a split button with internal border separators). The `ButtonGroup` component is the canonical way to satisfy this contract — its `default` spacing sits exactly on the 8px floor, so a group can never accidentally under-space its buttons. (Its `compact` spacing at 4px is a deliberate, opt-in dense exception — see the "Why not 4px?" note below.)
 
 - **Minimum gap between adjacent buttons:** 8px (`gap-2` / `spacer-1x`). This is the floor — not a target.
 - **Recommended gap for side-by-side buttons:** 12px (`gap-3` / `spacer-1.5x`). This is the standard for button rows in forms, toolbars, and previews.
 - **Recommended gap for stacked full-width buttons:** 12px (`space-y-3` / `spacer-1.5x`). Full-width buttons each carry their own background/border, so the gap between them must be large enough to read as distinct elements, not a single merged block.
-- **Why not 4px?** While 4px (`gap-1`) is technically non-zero, it's visually indistinguishable from touching at normal viewing distances, especially between elements with filled backgrounds. 8px is the practical minimum where two adjacent buttons read as separate entities.
+- **Why not 4px?** While 4px (`gap-1`) is technically non-zero, it's visually indistinguishable from touching at normal viewing distances, especially between elements with filled backgrounds. 8px is the practical floor where two adjacent buttons read as separate entities. **Deliberate-dense exception:** `ButtonGroup`'s `spacing="compact"` (4px) is a conscious opt-in for dense, space-constrained clusters of low-emphasis or icon-only buttons (tight toolbars, admin control strips), where the author accepts the tighter read. It is never the default — `default` (8px) holds the floor — and 4px should never be used for high-emphasis, filled, side-by-side, or stacked full-width buttons, where merging is most likely.
 
-**Button group exception:** A component that explicitly groups buttons into a unified control (e.g., `ButtonGroup`, `SegmentedControl`) may use `gap-0` with internal dividers or shared borders. This is a deliberate design decision, not an accident. The visual cohesion of the group communicates "these are facets of one control."
+**Segmented-control exception:** A component that explicitly fuses buttons into a single unified control (`ButtonSelect`, split buttons) may use `gap-0` with internal dividers or shared borders. This is a deliberate design decision, not an accident — the visual cohesion communicates "these are facets of one control." Note that `ButtonGroup` is **not** this exception: it lays out independent button actions with a token-based gap and never joins or merges them. Fusing buttons (gap-0) is `ButtonSelect`'s job; spacing them (8px floor at `default`, 4px at the opt-in `compact`) is `ButtonGroup`'s.
 
 ### 1.4 Never Zero
 
