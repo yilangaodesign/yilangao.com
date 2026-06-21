@@ -8,6 +8,14 @@ export type {
   ButtonShape,
 } from "../../src/components/ui/Button";
 
+export { ButtonGroup } from "../../src/components/ui/ButtonGroup";
+export type {
+  ButtonGroupProps,
+  ButtonGroupOrientation,
+  ButtonGroupAlign,
+  ButtonGroupSpacing,
+} from "../../src/components/ui/ButtonGroup";
+
 export { Card, CardHeader, CardBody, CardFooter } from "../../src/components/ui/Card";
 export type { CardProps, CardSectionProps, CardVariant } from "../../src/components/ui/Card";
 
@@ -201,6 +209,29 @@ export {
   TableCell,
 } from "../../src/components/ui/Table";
 export type { TableCellProps } from "../../src/components/ui/Table";
+
+export {
+  DataGrid,
+  DataGridCell,
+  TextCell,
+  MultiLineTextCell,
+  ProgressCell,
+  BadgeCell,
+  ButtonCell,
+  InputCell,
+  SlotCell,
+} from "../../src/components/ui/DataGrid";
+export type {
+  DataGridProps,
+  DataGridSize,
+  DataGridDensity,
+  DataGridAlign,
+  DataGridCellContent,
+  DataGridCellStatus,
+  DataGridCellBackground,
+  DataGridColumnMeta,
+  DataGridCellProps,
+} from "../../src/components/ui/DataGrid";
 
 export { InlineCode } from "../../src/components/ui/InlineCode";
 export type { InlineCodeProps } from "../../src/components/ui/InlineCode";
