@@ -14,7 +14,7 @@ references:
 
 # Phase 1 — Typed vs untyped graph A/B (Eval-B)
 
-> Phase 1 of the Eval Experiment Program ([`eval_experiment_program_0516e9af.plan.md`](.cursor/plans/eval_experiment_program_0516e9af.plan.md)).
+> Phase 1 of the Eval Experiment Program ([`eval_experiment_program_0516e9af.plan.md`](../.cursor/plans/eval_experiment_program_0516e9af.plan.md)).
 >
 > Pre-registered design: [`docs/eval-typing-pre-registration.md`](eval-typing-pre-registration.md).
 > Subset corpus: [`docs/eval-typing-task-corpus.md`](eval-typing-task-corpus.md) (6 tasks, SHA-pinned to multipillar corpus `c193de490ca8`).

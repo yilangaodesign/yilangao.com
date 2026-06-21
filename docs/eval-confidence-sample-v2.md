@@ -401,7 +401,7 @@ Moderately confident — detected from markdown links or "Related:" mentions rat
 > # Design System — Accumulated Knowledge > **What this file is:** The hub file for the design knowledge base. Detailed section content lives in spoke files under `docs/design/`. This file contains the Section Index for routing, the Design Posture (read every time), Process Principles, and the Feedback Frequency Map. > > **Who reads this:** AI agents
 >
 > **TO:** `design-layout` — *Sub-topic page*
-> # Layout Integrity > Spoke file for `docs/design.md`. Return to the [hub](../design.md) for the Section Index. ### 2.1 No Overlapping Navigation and content must coexist as **flex siblings**, never overlap via z-index. The pattern: ``` <div class="flex min-h-screen">
+> # Layout Integrity > Spoke file for `docs/design.md`. Return to the [hub](design.md) for the Section Index. ### 2.1 No Overlapping Navigation and content must coexist as **flex siblings**, never overlap via z-index. The pattern: ``` <div class="flex min-h-screen">
 >
 > **How they're connected:** references (detected via markdown-link)
 
@@ -561,7 +561,7 @@ Moderately confident — detected from markdown links or "Related:" mentions rat
 > # Engineering — Accumulated Knowledge > **What this file is:** The hub of the engineering knowledge base for yilangao.com. Detailed topic sections live in `docs/engineering/*.md` spoke files; this hub contains the Section Index, meta-principles, and the incident frequency map. Every principle here was extracted from real incidents, debugging sessio
 >
 > **TO:** `engineering-debugging` — *Sub-topic page*
-> # Debugging Methodology > Spoke file for `docs/engineering.md`. Return to the [hub](../engineering.md) for the Section Index. ## 4.1 Diagnose Before You Patch When something "doesn't work," the root cause is usually one of: 1. **Data sync issue** — the UI reads from a different source than what was modified. 2. **Process issue** — the server isn't 
+> # Debugging Methodology > Spoke file for `docs/engineering.md`. Return to the [hub](engineering.md) for the Section Index. ## 4.1 Diagnose Before You Patch When something "doesn't work," the root cause is usually one of: 1. **Data sync issue** — the UI reads from a different source than what was modified. 2. **Process issue** — the server isn't 
 >
 > **How they're connected:** references (detected via markdown-link)
 
@@ -577,7 +577,7 @@ Moderately confident — detected from markdown links or "Related:" mentions rat
 > # Engineering — Accumulated Knowledge > **What this file is:** The hub of the engineering knowledge base for yilangao.com. Detailed topic sections live in `docs/engineering/*.md` spoke files; this hub contains the Section Index, meta-principles, and the incident frequency map. Every principle here was extracted from real incidents, debugging sessio
 >
 > **TO:** `engineering-versioning` — *Sub-topic page*
-> # Multi-App Versioning > Spoke file for `docs/engineering.md`. Return to the [hub](../engineering.md) for the Section Index. **Source:** Session 2026-03-29 — "Let's start doing version control for the design system." Extended 2026-04-09 to cover the main website. ## 10.1 Overview Every app in the monorepo with its own deployment lifecycle has a **v
+> # Multi-App Versioning > Spoke file for `docs/engineering.md`. Return to the [hub](engineering.md) for the Section Index. **Source:** Session 2026-03-29 — "Let's start doing version control for the design system." Extended 2026-04-09 to cover the main website. ## 10.1 Overview Every app in the monorepo with its own deployment lifecycle has a **v
 >
 > **How they're connected:** references (detected via markdown-link)
 
@@ -590,10 +590,10 @@ Moderately confident — detected from markdown links or "Related:" mentions rat
 **The Storage sub-page says "for external video embeds, see media-embeds.md" — a cross-reference between sibling topics.**
 
 > **FROM:** `engineering-storage` — *Sub-topic page*
-> # Media & File Storage (Supabase Storage) > Spoke file for `docs/engineering.md`. Return to the [hub](../engineering.md) for the Section Index. **Source:** Session 2026-03-30, ENG-053 — "How do I store assets? Where are thumbnails and resumes stored?" **Updated:** 2026-04-20 — Added scope-boundary cross-reference to media-embeds.md (ENG-153) > **Sc
+> # Media & File Storage (Supabase Storage) > Spoke file for `docs/engineering.md`. Return to the [hub](engineering.md) for the Section Index. **Source:** Session 2026-03-30, ENG-053 — "How do I store assets? Where are thumbnails and resumes stored?" **Updated:** 2026-04-20 — Added scope-boundary cross-reference to media-embeds.md (ENG-153) > **Sc
 >
 > **TO:** `engineering-media-embeds` — *Sub-topic page*
-> # External Video Embeds (YouTube / Vimeo / Loom) > Spoke file for `docs/engineering.md`. Return to the [hub](../engineering.md) for the Section Index. **Source:** Session 2026-04-20, ENG-153 — "Add external video embed support to case studies (Path A: new `videoEmbed` block)." **Updated:** 2026-04-20 — Initial creation. > **Scope: external embed re
+> # External Video Embeds (YouTube / Vimeo / Loom) > Spoke file for `docs/engineering.md`. Return to the [hub](engineering.md) for the Section Index. **Source:** Session 2026-04-20, ENG-153 — "Add external video embed support to case studies (Path A: new `videoEmbed` block)." **Updated:** 2026-04-20 — Initial creation. > **Scope: external embed re
 >
 > **How they're connected:** references (detected via markdown-link)
 
@@ -654,10 +654,10 @@ Moderately confident — detected from markdown links or "Related:" mentions rat
 **The Media Embeds sub-page links back to Storage — the reverse of E035. Two sibling pages pointing at each other.**
 
 > **FROM:** `engineering-media-embeds` — *Sub-topic page*
-> # External Video Embeds (YouTube / Vimeo / Loom) > Spoke file for `docs/engineering.md`. Return to the [hub](../engineering.md) for the Section Index. **Source:** Session 2026-04-20, ENG-153 — "Add external video embed support to case studies (Path A: new `videoEmbed` block)." **Updated:** 2026-04-20 — Initial creation. > **Scope: external embed re
+> # External Video Embeds (YouTube / Vimeo / Loom) > Spoke file for `docs/engineering.md`. Return to the [hub](engineering.md) for the Section Index. **Source:** Session 2026-04-20, ENG-153 — "Add external video embed support to case studies (Path A: new `videoEmbed` block)." **Updated:** 2026-04-20 — Initial creation. > **Scope: external embed re
 >
 > **TO:** `engineering-storage` — *Sub-topic page*
-> # Media & File Storage (Supabase Storage) > Spoke file for `docs/engineering.md`. Return to the [hub](../engineering.md) for the Section Index. **Source:** Session 2026-03-30, ENG-053 — "How do I store assets? Where are thumbnails and resumes stored?" **Updated:** 2026-04-20 — Added scope-boundary cross-reference to media-embeds.md (ENG-153) > **Sc
+> # Media & File Storage (Supabase Storage) > Spoke file for `docs/engineering.md`. Return to the [hub](engineering.md) for the Section Index. **Source:** Session 2026-03-30, ENG-053 — "How do I store assets? Where are thumbnails and resumes stored?" **Updated:** 2026-04-20 — Added scope-boundary cross-reference to media-embeds.md (ENG-153) > **Sc
 >
 > **How they're connected:** references (detected via markdown-link)
 

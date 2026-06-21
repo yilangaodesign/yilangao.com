@@ -17,7 +17,7 @@ references:
 >
 > **Who reads this:** AI agents before making UI changes — scan for relevant anti-patterns.
 > **Who writes this:** AI agents when a feedback cycle reveals a new anti-pattern.
-> **Last updated:** 2026-04-24 (AP-072 amended: micro mode abolished — row mode must use normal `type-xs`, not `type-3xs`. Silent width lowered to 20px. FB-192.) Prior: AP-071: Brand accent as general-purpose highlight in embedded visuals — using `$portfolio-accent-*` for decorative differentiation in component visualizations dilutes Lumen's scarcity signal. Neutral weight hierarchy is the correct tool for structural emphasis. FB-178.) Prior: 2026-04-21 (AP-054 amended a second time same day — after the fourth same-session complaint (FB-163 / ENG-187) that ENG-186's 2px-base-plus-ring rendered resting inputs as over-heavy 2px borders and engaged inputs as compound 3px rims. Rewrote the Correct Alternative with an explicit "Structural rule vs value choice" block: AP-054 binds CHANGE (no state-to-state `border-width` flip, ever) but not VALUE (the constant is a pure design choice, free within the structural rule). Default base for inputs is now 1px via `$portfolio-border-width-thin` — engaged-state box-shadow ring adds +1px for a solid 2px visual rim. Implementation template updated to use `$portfolio-border-width-thin`. Rejection chronology extended to four failed iterations + one standing: FB-086 gapped ring → FB-088 padding comp → ENG-136 color-only/2px → ENG-186 two-axis/2px → ENG-187 two-axis/1px (current canonical). Frustration count 5 → 6 rounds. This fifth amendment exists because two separate engineering iterations (ENG-136 and ENG-186) misread the rule as binding the base value, so the fix restatement is now explicit on where the rule stops.) Prior: AP-070 (framer-motion `x`/`y`/`scale`/`rotate` on an element with a base CSS `transform` — the motion library writes an inline `transform` that silently overwrites the CSS rule. Fix is to split the static and animated transforms across two elements, or use `transformTemplate` to compose them on the same element. Default: split.) Prior: AP-069 (`mix-blend-mode` applied inside a fixed-position or otherwise stacking-context-creating ancestor — blend isolates to that context's interior and never reaches the document backdrop. Fix is to portal to `document.body`.) Prior: AP-068 (Relying on grid track minimum alone to prevent text wrap in a one-line-per-item list).
+> **Last updated:** 2026-06-21 (AP-074: New component hardcodes literals and diverges from its canonical sibling instead of mirroring its token treatment — DataGrid shipped with a 10px header (smaller than the 12px body), `padding: 0` header cells, cramped 4px density, and a literal px ladder, all while a `Table` component already encoded the right answer. Fix: mirror the sibling + express every value as a token. FB-248 / EAP-126.) Prior: AP-073: Transparent borders with default `background-clip: border-box` cause fill bleed — background paints through transparent border areas. Fix: `background-clip: padding-box`. FB-247.) Prior: 2026-04-24 (AP-072 amended: micro mode abolished — row mode must use normal `type-xs`, not `type-3xs`. Silent width lowered to 20px. FB-192.) Prior: AP-071: Brand accent as general-purpose highlight in embedded visuals — using `$portfolio-accent-*` for decorative differentiation in component visualizations dilutes Lumen's scarcity signal. Neutral weight hierarchy is the correct tool for structural emphasis. FB-178.) Prior: 2026-04-21 (AP-054 amended a second time same day — after the fourth same-session complaint (FB-163 / ENG-187) that ENG-186's 2px-base-plus-ring rendered resting inputs as over-heavy 2px borders and engaged inputs as compound 3px rims. Rewrote the Correct Alternative with an explicit "Structural rule vs value choice" block: AP-054 binds CHANGE (no state-to-state `border-width` flip, ever) but not VALUE (the constant is a pure design choice, free within the structural rule). Default base for inputs is now 1px via `$portfolio-border-width-thin` — engaged-state box-shadow ring adds +1px for a solid 2px visual rim. Implementation template updated to use `$portfolio-border-width-thin`. Rejection chronology extended to four failed iterations + one standing: FB-086 gapped ring → FB-088 padding comp → ENG-136 color-only/2px → ENG-186 two-axis/2px → ENG-187 two-axis/1px (current canonical). Frustration count 5 → 6 rounds. This fifth amendment exists because two separate engineering iterations (ENG-136 and ENG-186) misread the rule as binding the base value, so the fix restatement is now explicit on where the rule stops.) Prior: AP-070 (framer-motion `x`/`y`/`scale`/`rotate` on an element with a base CSS `transform` — the motion library writes an inline `transform` that silently overwrites the CSS rule. Fix is to split the static and animated transforms across two elements, or use `transformTemplate` to compose them on the same element. Default: split.) Prior: AP-069 (`mix-blend-mode` applied inside a fixed-position or otherwise stacking-context-creating ancestor — blend isolates to that context's interior and never reaches the document backdrop. Fix is to portal to `document.body`.) Prior: AP-068 (Relying on grid track minimum alone to prevent text wrap in a one-line-per-item list).
 
 ---
 
@@ -25,16 +25,16 @@ references:
 
 | Category | Entries | Count | Active |
 |----------|---------|------:|-------:|
-| CSS Cascade & Build | AP-001, AP-002, AP-003, AP-008, AP-021, AP-038 | 6 | 6 |
+| CSS Cascade & Build | AP-001, AP-002, AP-003, AP-008, AP-021, AP-038, AP-073 | 7 | 7 |
 | Spacing & Layout | AP-004, AP-005, AP-006, AP-007, AP-009, AP-018, AP-020, AP-027, AP-045, AP-048†, AP-067, AP-068 | 12 | 12 |
 | Positioning & Transforms | AP-013, AP-031, AP-033, AP-069, AP-070 | 5 | 5 |
 | Theming & Dark Mode | AP-042, AP-043, AP-044, AP-047, AP-061 | 5 | 5 |
 | Interaction & Pointer Behavior | AP-011, AP-012, AP-022, AP-025, AP-035 | 5 | 5 |
 | Navigation & Menus | AP-014, AP-015, AP-016, AP-029, AP-046, AP-049, AP-066 | 7 | 7 |
-| Visual Hierarchy & Affordances | AP-010, AP-017, AP-019, AP-026, AP-030, AP-032, AP-039, AP-040, AP-041, AP-048‡, AP-050, AP-051, AP-052, AP-054, AP-057, AP-060, AP-071, AP-072 | 18 | 18 |
+| Visual Hierarchy & Affordances | AP-010, AP-017, AP-019, AP-026, AP-030, AP-032, AP-039, AP-040, AP-041, AP-048‡, AP-050, AP-051, AP-052, AP-054, AP-057, AP-060, AP-071, AP-072, AP-074 | 19 | 19 |
 | Form & Input UX | AP-023, AP-024, AP-028, AP-036, AP-064, AP-065 | 6 | 6 |
 | Admin UI Patterns | AP-034, AP-037 | 2 | 2 |
-| **Total** | | **65** | **65** |
+| **Total** | | **67** | **67** |
 
 > **†** AP-048 "Independent Padding Decisions Across Adjacent Panels" (spacing entry)
 > **‡** AP-048 "Incremental State-by-State Implementation Without a Holistic Model" (state modeling entry)
@@ -754,11 +754,11 @@ Use `var(--ds-*, #{$scss-fallback})`. The CSS custom property adapts at runtime;
 
 **Status: ACTIVE**
 
-**Trigger:** Placing two or more buttons directly next to each other (horizontally or vertically) with `gap-0`, `gap-1` (4px), or no gap at all — outside of a dedicated button group component.
+**Trigger:** Placing two or more buttons directly next to each other (horizontally or vertically) with `gap-0`, `gap-1` (4px), or no gap at all — outside of a dedicated segmented control.
 
 **Why it's wrong:** Buttons are discrete interactive elements. When placed flush or near-flush, they visually merge into a single block — users can't tell where one button ends and the next begins, especially when both have filled backgrounds or borders. This creates a false affordance (looks like one wide button) and violates the principle that each interactive element must be visually distinct. The problem is worse for full-width stacked buttons, where the entire width of adjacent backgrounds creates a wall of color with no separation. Even 4px is too small to read as intentional separation at normal viewing distances.
 
-**Correct alternative:** Use a minimum gap of 8px (`gap-2` / `spacer-1x`) between adjacent buttons. The recommended default is 12px (`gap-3` / `spacer-1.5x`). The only exception is a dedicated button group component (`ButtonGroup`, `SegmentedControl`) that uses shared borders or internal dividers to communicate "these are facets of one control." See `design.md` → `docs/design/spacing.md` §1.3.
+**Correct alternative:** Reach for the `ButtonGroup` component — its `default` spacing sits on the 8px floor (`spacer-1x`) so adjacent actions can never accidentally collapse into a wall. If you must hand-roll the layout, use a minimum gap of 8px (`gap-2` / `spacer-1x`). Two sanctioned exceptions to the floor: (1) a segmented control (`ButtonSelect`, split buttons) that *deliberately* fuses buttons with `gap-0` + shared borders/dividers to communicate "these are facets of one control" — that is `ButtonSelect`'s job, not `ButtonGroup`'s; (2) `ButtonGroup`'s `spacing="compact"` (4px), a conscious opt-in for dense clusters of low-emphasis/icon-only buttons. Both are explicit, named choices — neither licenses ad-hoc 4px/`gap-1` between filled, high-emphasis, or stacked full-width buttons, which is what this anti-pattern targets. See `design.md` → `docs/design/spacing.md` §1.3.
 
 **Frustration caused:** 1 round — user identified the full-width button section as "horrible design practice" due to cramped stacking.
 
@@ -1132,6 +1132,36 @@ Rule of thumb: **if losing a piece of text to clipping would be worse than losin
 **Correct alternative:** Left-align the footer to share the same left edge as the form elements above. In narrow containers (under ~500px), left-alignment creates a cleaner visual stack than centering.
 
 **Frustration caused:** 1 round — FB-127.
+
+---
+
+<a id="ap-073"></a>
+## AP-073: Transparent Borders with Default `background-clip` Causing Fill Bleed
+
+**Status: ACTIVE**
+
+**Trigger:** Setting `border-color: transparent` on a state transition (e.g., selected item's `border-right-color: transparent`) while the element has a non-transparent `background-color` and the default `background-clip: border-box`.
+
+**Why it's wrong:** CSS backgrounds paint under borders by default (`background-clip: border-box`). When a border is made transparent, the background shows through the border area, extending the fill visually into the space where the border should provide separation. The border doesn't disappear — it becomes a window into the background, making the fill appear to "cover" or "eat" the border. This is particularly bad when the transparent border is between a filled element and a container border or adjacent divider, because the fill bleeds into the inter-element gap.
+
+**Correct alternative:** Use `background-clip: padding-box` on the element. This clips the background at the padding edge, so even transparent borders act as visible gaps. If the element doesn't have borders on all sides, add transparent borders on the missing sides (e.g., `border-top: 1px solid transparent; border-bottom: 1px solid transparent;`) to create inset on those axes too. With `box-sizing: border-box`, these borders are inside the declared dimensions, so no layout inflation occurs.
+
+**Frustration caused:** 1 round — FB-247.
+
+---
+
+<a id="ap-074"></a>
+## AP-074: New component hardcodes literals and diverges from its canonical sibling instead of mirroring its token treatment
+
+**Status: ACTIVE**
+
+**Trigger:** Authoring a new DS component's styles from scratch — picking literal values (`border: 1px`, `border-radius: 0`, `line-height: 1.4`, `padding: 4px`, a `20/26/34/50px` size ladder) and an independent type/spacing treatment — when a closely-related component already exists in the system (e.g. building `DataGrid` without mirroring `Table`).
+
+**Why it's wrong:** Two failures compound. (1) **Token drift:** hardcoded literals bypass the token system, so the component doesn't move with theme/scale changes and silently breaks the 8px grid and type scale. Note this is NOT a broken-`var()` problem — every `var()` reference can resolve correctly and the component still looks off, because the *literals* are the issue. (2) **Sibling divergence:** the system already encodes the right answer for "what does a table header look like" in the canonical component; re-deriving it independently produces an inverted hierarchy (header font *smaller* than body), cramped rhythm, and zero-padding edge cases (non-sortable header cells). The result reads as "off" on first glance even though it technically renders. A user can tell a component "doesn't belong" before they can articulate why.
+
+**Correct alternative:** Before styling a new component, open its closest existing sibling's `.module.scss` and mirror its treatment: same header tint, header font step, weight, cell padding scale, and separators. Then express EVERY value as a token — borders via `--portfolio-border-width-*`, corners via `--portfolio-radius-*`, line-height via `--portfolio-leading-*`, spacing via `--portfolio-spacer-*` (snap any Figma-derived px to the nearest grid step). If a value genuinely has no token, that's a signal to add one or to question the value — not to hardcode. Header hierarchy: header font should be ≥ body font (or equal, carried by weight + tint + color), never smaller.
+
+**Frustration caused:** 1 round — FB-248 (DataGrid shipped with 10px headers, `padding: 0` header cells, 4px cramped density, and a literal px ladder). Cross-category with EAP-126 (the verification gap that let it ship).
 
 ---
 

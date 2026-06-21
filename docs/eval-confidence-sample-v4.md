@@ -828,7 +828,7 @@ After labeling all 60 items, count how many fall into each category:
 
 ## Lookup Table
 
-Each item above was shuffled from its original position in [v0](docs/eval-confidence-sample-v0.md). Use this table to trace any item back to its technical edge ID, which you can then find in v0's data table.
+Each item above was shuffled from its original position in [v0](eval-confidence-sample-v0.md). Use this table to trace any item back to its technical edge ID, which you can then find in v0's data table.
 
 | v4 item | v0 edge ID | | v4 item | v0 edge ID |
 |---------|------------|-|---------|------------|

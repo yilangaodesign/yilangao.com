@@ -8,6 +8,14 @@ export type {
   ButtonShape,
 } from "./Button";
 
+export { ButtonGroup } from "./ButtonGroup";
+export type {
+  ButtonGroupProps,
+  ButtonGroupOrientation,
+  ButtonGroupAlign,
+  ButtonGroupSpacing,
+} from "./ButtonGroup";
+
 export { Card, CardHeader, CardBody, CardFooter } from "./Card";
 export type { CardProps, CardSectionProps, CardVariant } from "./Card";
 
@@ -189,6 +197,29 @@ export {
   TableCell,
 } from "./Table";
 export type { TableCellProps } from "./Table";
+
+export {
+  DataGrid,
+  DataGridCell,
+  TextCell,
+  MultiLineTextCell,
+  ProgressCell,
+  BadgeCell,
+  ButtonCell,
+  InputCell,
+  SlotCell,
+} from "./DataGrid";
+export type {
+  DataGridProps,
+  DataGridSize,
+  DataGridDensity,
+  DataGridAlign,
+  DataGridCellContent,
+  DataGridCellStatus,
+  DataGridCellBackground,
+  DataGridColumnMeta,
+  DataGridCellProps,
+} from "./DataGrid";
 
 export { InlineCode } from "./InlineCode";
 export type { InlineCodeProps } from "./InlineCode";

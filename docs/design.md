@@ -23,6 +23,7 @@ documents:
   - design/button-sizing.md
   - design/tooltip.md
   - design/branding.md
+  - design/data-grid.md
 references:
   - design-anti-patterns.md
   - design-feedback-log.md
@@ -34,7 +35,7 @@ references:
 >
 > **Who reads this:** AI agents routed here by `AGENTS.md` Pre-Flight. Read the Section Index first, then open only the spoke file matching your task.
 > **Who writes this:** AI agents after processing user feedback via the `design-iteration` skill.
-> **Last updated:** 2026-04-22 (FB-169: Added §6.13 "Composition-Scaling Coherence" to `docs/design/responsive.md`. New durable principle: a composition that mixes scaling children (flex-ratio columns, canvases that fill their pane) with fixed-size children (cards with `max-width: 380px`) is only valid across the range of container widths where the proportions between them hold. Past that range the scaling element outgrows the fixed one and gaps/gutters degrade monotonically. Anti-pattern: capping the container at a canonical width for normal desktops, then re-expanding to `80vw` at a `min-width: 1800px` breakpoint — this creates a ~28% size snap at the breakpoint crossing AND widens the gap between fixed and scaling children without bound on ultra-wide displays. Canonical example: password gate `.inner` — removed the `@media (min-width: 1800px) { max-width: 80vw }` rule; inner now stays at `1120px` for all viewports ≥ 1120px. At 1900px viewport the portrait-to-card gap returns from ~197px to the tuned 149px; on ultra-wide the composition sits in a generous terra field as atmospheric negative space. "Responsive breakpoints" frequency bumped to 4 with the composition-scaling rule added to the entry. Prior: FB-168: Added §1.8 "Optical Balance — Whitespace Follows Visual Weight" to `docs/design/spacing.md`.
+> **Last updated:** 2026-06-21 (FB-246: Added `ButtonGroup` (spaced layout primitive), reframed `spacing.md` §1.3 + AP-045 so the `gap-0` exception points at `ButtonSelect` and `ButtonGroup` is the canonical spaced pattern, and added the three-way Button/ButtonGroup/ButtonSelect selection model to `design/admin-ui.md` §20.4. Prior: 2026-04-22 (FB-169: Added §6.13 "Composition-Scaling Coherence" to `docs/design/responsive.md`. New durable principle: a composition that mixes scaling children (flex-ratio columns, canvases that fill their pane) with fixed-size children (cards with `max-width: 380px`) is only valid across the range of container widths where the proportions between them hold. Past that range the scaling element outgrows the fixed one and gaps/gutters degrade monotonically. Anti-pattern: capping the container at a canonical width for normal desktops, then re-expanding to `80vw` at a `min-width: 1800px` breakpoint — this creates a ~28% size snap at the breakpoint crossing AND widens the gap between fixed and scaling children without bound on ultra-wide displays. Canonical example: password gate `.inner` — removed the `@media (min-width: 1800px) { max-width: 80vw }` rule; inner now stays at `1120px` for all viewports ≥ 1120px. At 1900px viewport the portrait-to-card gap returns from ~197px to the tuned 149px; on ultra-wide the composition sits in a generous terra field as atmospheric negative space. "Responsive breakpoints" frequency bumped to 4 with the composition-scaling rule added to the entry. Prior: FB-168: Added §1.8 "Optical Balance — Whitespace Follows Visual Weight" to `docs/design/spacing.md`.
 
 ---
 
@@ -66,6 +67,7 @@ references:
 | §22 | Button Sizing | [`docs/design/button-sizing.md`](design/button-sizing.md) | Icon/label proportionality |
 | §23 | Tooltip | [`docs/design/tooltip.md`](design/tooltip.md) | Tooltip component, InfoTooltip, placement, content guardrails |
 | §24 | Branding — yilangao.com | [`docs/design/branding.md`](design/branding.md) | **Always** for portfolio work (UI, content, or strategy). Covers: zero corner radius, brand position & personality, taste & tradition, atmospheric dials, visual identity, proof map. |
+| §25 | Data Grid | [`docs/design/data-grid.md`](design/data-grid.md) | DataGrid component — engine (ADR-001) & substrate (ADR-002) decisions, prop naming, density mapping, cell conventions, v2 scope |
 | §7 | Process Principles | *(this file)* | Meta — how to diagnose |
 | App. | Frequency Map | *(this file)* | Checking recurring patterns |
 
@@ -252,7 +254,7 @@ Any tooltip or compact card that has a **topic label**, a **content body**, and 
 
 | Pattern | Times Raised | Priority |
 |---------|-------------|----------|
-| Spacing / Padding / Breathing Room | 16 | Critical — FB-168: Added §1.8 "Optical Balance" — whitespace distribution must compensate for visual weight delta between elements (density, motion, contrast, detail). Mathematical centering of unequal-weight elements reads as imbalanced. |
+| Spacing / Padding / Breathing Room | 17 | Critical — FB-246: `ButtonGroup` component codifies the §1.3 minimum-gap contract structurally (`default` = 8px floor; `compact` = 4px deliberate dense opt-in; relaxed 12px for xs–lg, xl bump to 8/12/16px). A layout primitive that encodes a written spacing rule is more durable than the rule alone. FB-168: Added §1.8 "Optical Balance" — whitespace distribution must compensate for visual weight delta between elements (density, motion, contrast, detail). Mathematical centering of unequal-weight elements reads as imbalanced. |
 | State transition consistency (toggle jump / layout shift / mode coherence) | 8 | Critical |
 | Component state modeling (define all states before coding) | 1 | Critical |
 | Layout integrity (no overlapping, cross-panel alignment) | 5 | Critical |
@@ -263,7 +265,7 @@ Any tooltip or compact card that has a **topic label**, a **content body**, and 
 | Information architecture / taxonomy / naming / tab consolidation | 8 | Critical — FB-091: Eyebrow component built. FB-072: Migrated ~44 hand-rolled label instances across 9 files to `<Eyebrow>`, removing `@include label`/`label-sm` mixins from all public pages and elan-visuals. |
 | Visual identity across spatial contexts (size/alignment consistency) | 6 | Critical — FB-074: Menu lg/xl gap and px-padding scaled too aggressively; gap capped at 1.25x for dense list rows. |
 | Centering / Symmetry | 4 | Critical |
-| Token-first, no inline styles | 2 | High |
+| Token-first, no inline styles | 3 | High — FB-248: DataGrid hardcoded literals (`border: 1px`, `border-radius: 0`, `line-height: 1.4`, a `20/26/34/50px` density ladder) instead of tokens, and diverged from the canonical `Table` treatment (10px header smaller than 12px body, `padding: 0` header cells). Fix mirrors the sibling component and snaps every value to a token. AP-074. Note: the failure is hardcoded *literals*, not broken `var()` — all references resolved; the component still looked off. |
 | CSS framework architecture (global resets breaking inline elements) | 3 | High |
 | Collapsibility / Compact modes | 2 | Medium |
 | Interaction proximity (response near trigger) | 1 | High |
@@ -292,6 +294,7 @@ Any tooltip or compact card that has a **topic label**, a **content body**, and 
 | Visual language collision (same treatment for different semantics in same context) | 1 | High |
 | Spacing must account for visual overflow, not box-model edges | 1 | High |
 | Semantic intent naming (props/tokens named by context, not CSS effect) | 1 | Critical — FB-071: Eyebrow `mono` renamed to `metric`. Establishes guardrail Design #8 and Process Principle §7.7. |
+| Button-family intent separation (Button / ButtonGroup / ButtonSelect) | 1 | High — FB-246: Patterns that share an appearance but differ in intent are different components. `ButtonGroup` spaces independent actions (8px floor); `ButtonSelect` fuses mutually-exclusive options (`gap-0`). Three-way selection model documented in `design/admin-ui.md` §20.4. |
 | Slot semantic separation (distinct roles for affix vs icon vs generic content) | 1 | High — FB-073: Input `trailing` slot added. `suffix` was conflating value affixes with generic content like Kbd. |
 | Decorative font weight mismatch (synthetic bolding destroys pixel font patterns) | 1 | High — AP-062: Geist Pixel fonts ship at weight 500 only. Using 700 triggers synthetic bolding that fills decorative gaps. |
 | Display-scale serif in native `<input>` (glyph clipping) | 1 | High — FB-129: Browser clips serif flourishes at text origin. Text overlay pattern is the only fix. See AP-064, EAP-077. |

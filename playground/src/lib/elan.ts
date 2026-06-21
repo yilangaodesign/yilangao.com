@@ -4,10 +4,10 @@
  */
 export const elan = {
   name: "Élan",
-  version: "2.16.1",
+  version: "2.17.0",
   release: {
-    version: "2.16.0",
-    name: "Élan 2.16.0",
-    releasedAt: "2026-05-08T05:38:54.828Z",
+    version: "2.17.0",
+    name: "Élan 2.17.0",
+    releasedAt: "2026-06-21T05:55:29.331Z",
   },
 } as const;
