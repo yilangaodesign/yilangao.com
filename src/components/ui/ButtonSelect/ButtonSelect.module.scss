@@ -47,11 +47,14 @@
   cursor: pointer;
   background-color: transparent;
   color: var(--portfolio-text-secondary);
+  border-top: 1px solid transparent;
+  border-bottom: 1px solid transparent;
   border-right: 1px solid var(--portfolio-border-subtle);
+  background-clip: padding-box;
   @include transition-fast;
 
   &:last-child {
-    border-right: none;
+    border-right-color: transparent;
   }
 
   &:focus-visible {
@@ -101,14 +104,6 @@
 // ---------------------------------------------------------------------------
 
 .neutral {
-  .item[data-state='on'] {
-    border-right-color: transparent;
-
-    + .item {
-      border-left-color: transparent;
-    }
-  }
-
   &.bold .item[data-state='on'] {
     background-color: var(--portfolio-surface-inverse-bold);
     color: var(--portfolio-text-inverse-bold);
@@ -157,14 +152,6 @@
 // ---------------------------------------------------------------------------
 
 .highlight {
-  .item[data-state='on'] {
-    border-right-color: transparent;
-
-    + .item {
-      border-left-color: transparent;
-    }
-  }
-
   &.bold .item[data-state='on'] {
     background-color: var(--portfolio-action-brand-bold);
     color: var(--portfolio-text-always-light-bold);
