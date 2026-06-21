@@ -245,7 +245,7 @@ user with the final summary.
 
 > Accumulated lessons from past ship-it runs. Scan before each release.
 > Escalation: 3+ occurrences → promote to procedure change or guardrail.
-> Last updated: 2026-04-22 (7 pitfalls from REL-001, REL-004, REL-009, REL-012)
+> Last updated: 2026-06-21 (8 pitfalls from REL-001, REL-004, REL-009, REL-012, REL-040)
 
 ### REL-AP-001: Version sync targets left uncommitted before branch switch
 
@@ -393,3 +393,24 @@ like `(site)` are organizational — they don't affect the URL structure.
 is a route group reorganization. Long-term: update `version-analyze.mjs`
 to recognize `(parenthesized)` directories as route groups that don't
 affect URLs.
+
+---
+
+### REL-AP-009: Playground Next.js version mismatch causes workStore prerender error
+
+**Occurrences:** 1 (REL-040)
+
+**Trigger:** Root `package.json` upgraded `next` from 16.2.1 to 16.2.6 but
+`playground/package.json` was left at 16.2.1. npm hoisted the root's `next`
+binary (16.2.6) while `playground/node_modules/next/` remained at 16.2.1.
+The `npm run build --prefix playground` command resolved the root's `next`
+binary because `playground/node_modules/.bin/next` did not exist.
+
+**Failure:** Build gate failed with `InvariantError: Expected workStore to
+be initialized` on prerendered pages (`/components/description-list`,
+`/components/select`, `/_global-error`). The 16.2.6 binary loaded different
+server internals than the 16.2.1 package expected.
+
+**Fix:** Upgraded `playground/package.json` `next` to 16.2.6 to align with
+root. When upgrading `next` in the root, always upgrade it in all sub-apps
+(`playground/`, `ascii-tool/`, `edra-challenge/`) in the same commit.
