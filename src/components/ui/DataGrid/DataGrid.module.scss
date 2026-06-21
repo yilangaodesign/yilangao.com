@@ -1,0 +1,337 @@
+@use '../../../styles' as *;
+
+// =============================================================================
+// Élan DataGrid (v1)
+// Div-based ARIA grid (ADR-002). Zero corner radius. Size = font + horizontal
+// padding; density = row height + vertical padding (values derived from the GS
+// "One GS" Figma symbol heights). Sticky maps + resize live in v2.
+// =============================================================================
+
+.dataGridWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--portfolio-spacer-1x);
+  width: 100%;
+}
+
+.dataGrid {
+  // Defaults = "standard" density / "md" size (overridden by modifier classes).
+  --dg-font: var(--portfolio-type-xs);
+  --dg-pad-x: var(--portfolio-spacer-2x);
+  --dg-row-h: var(--portfolio-spacer-5x);  // 40px
+  --dg-pad-y: var(--portfolio-spacer-1x);  // 8px
+
+  width: 100%;
+  overflow: auto;
+  border: var(--portfolio-border-width-thin) solid var(--portfolio-border-subtle);
+  border-radius: var(--portfolio-radius-none); // portfolio identity: zero corner radius
+  background-color: var(--portfolio-surface-primary);
+  font-family: var(--portfolio-font-sans);
+  font-size: var(--dg-font);
+  color: var(--portfolio-text-primary);
+}
+
+// ---------------------------------------------------------------------------
+// Size axis — font size + horizontal padding
+// ---------------------------------------------------------------------------
+
+.sizeSm {
+  --dg-font: var(--portfolio-type-2xs);
+  --dg-pad-x: var(--portfolio-spacer-1-5x);
+}
+
+.sizeMd {
+  --dg-font: var(--portfolio-type-xs);
+  --dg-pad-x: var(--portfolio-spacer-2x);
+}
+
+.sizeLg {
+  --dg-font: var(--portfolio-type-sm);
+  --dg-pad-x: var(--portfolio-spacer-2-5x);
+}
+
+// ---------------------------------------------------------------------------
+// Density axis — row height + vertical padding.
+// Heights snap to the 8px-grid spacer scale (GS Figma symbol heights rounded
+// to the nearest token): x-compact 24 / compact 32 / standard 40 / spacious 48.
+// ---------------------------------------------------------------------------
+
+.densityXCompact {
+  --dg-row-h: var(--portfolio-spacer-3x);   // 24px
+  --dg-pad-y: var(--portfolio-spacer-0-25x); // 2px
+}
+
+.densityCompact {
+  --dg-row-h: var(--portfolio-spacer-4x);   // 32px
+  --dg-pad-y: var(--portfolio-spacer-0-5x);  // 4px
+}
+
+.densityStandard {
+  --dg-row-h: var(--portfolio-spacer-5x);   // 40px
+  --dg-pad-y: var(--portfolio-spacer-1x);    // 8px
+}
+
+.densitySpacious {
+  --dg-row-h: var(--portfolio-spacer-6x);   // 48px
+  --dg-pad-y: var(--portfolio-spacer-1-5x);  // 12px
+}
+
+// ---------------------------------------------------------------------------
+// Rows
+// ---------------------------------------------------------------------------
+
+.row {
+  display: grid;
+  grid-template-columns: var(--dg-template);
+  align-items: stretch;
+}
+
+.headerGroup {
+  background-color: var(--portfolio-surface-secondary);
+}
+
+.stickyHeader .headerGroup {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.headerRow {
+  border-bottom: var(--portfolio-border-width-thin) solid var(--portfolio-border-strong);
+}
+
+.bodyRow {
+  border-bottom: var(--portfolio-border-width-thin) solid var(--portfolio-border-subtle);
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.zebra .bodyRow:nth-child(even) {
+  background-color: var(--portfolio-surface-secondary);
+}
+
+.rowSelected,
+.zebra .rowSelected:nth-child(even) {
+  background-color: var(--portfolio-surface-brand-subtle);
+}
+
+.filterRow {
+  border-bottom: var(--portfolio-border-width-thin) solid var(--portfolio-border-subtle);
+  background-color: var(--portfolio-surface-primary);
+}
+
+// ---------------------------------------------------------------------------
+// Cells
+// ---------------------------------------------------------------------------
+
+.cell {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  min-height: var(--dg-row-h);
+  padding: var(--dg-pad-y) var(--dg-pad-x);
+  font-size: var(--dg-font);
+  line-height: var(--portfolio-leading-snug);
+  color: var(--portfolio-text-primary);
+
+  &:focus-visible {
+    outline: var(--portfolio-border-width-regular) solid var(--portfolio-focus);
+    outline-offset: calc(-1 * var(--portfolio-border-width-regular));
+  }
+}
+
+.alignLeft {
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.alignCenter {
+  justify-content: center;
+  text-align: center;
+}
+
+.alignRight {
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.numeric {
+  font-variant-numeric: tabular-nums;
+}
+
+// Status tint (GS Status token) — left accent + subtle fill
+.statusSuccess {
+  background-color: var(--portfolio-surface-positive-subtle);
+  box-shadow: inset var(--portfolio-border-width-regular) 0 0 0 var(--portfolio-border-positive);
+}
+
+.statusWarning {
+  background-color: var(--portfolio-surface-warning-subtle);
+  box-shadow: inset var(--portfolio-border-width-regular) 0 0 0 var(--portfolio-border-warning);
+}
+
+.statusError {
+  background-color: var(--portfolio-surface-negative-subtle);
+  box-shadow: inset var(--portfolio-border-width-regular) 0 0 0 var(--portfolio-border-negative);
+}
+
+// Background fill (GS Background token)
+.bgNeutralSubtle {
+  background-color: var(--portfolio-surface-neutral-subtle);
+}
+
+.bgNeutralRegular {
+  background-color: var(--portfolio-surface-neutral-regular);
+}
+
+// ---------------------------------------------------------------------------
+// Header cells
+// ---------------------------------------------------------------------------
+
+.headerCell {
+  // Inherits .cell padding / min-height — only the type treatment differs.
+  // Font tracks --dg-font (was a fixed 10px, which read smaller than the body);
+  // weight + secondary color + the header-group tint carry the hierarchy.
+  font-size: var(--dg-font);
+  font-weight: var(--portfolio-weight-semibold);
+  color: var(--portfolio-text-secondary);
+  letter-spacing: var(--portfolio-tracking-normal);
+}
+
+.headerLabel {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sortable {
+  cursor: pointer;
+}
+
+.sortButton {
+  display: flex;
+  align-items: center;
+  gap: var(--portfolio-spacer-0-5x);
+  width: 100%;
+  height: 100%;
+  // The header cell already supplies padding (inherited from .cell) — the
+  // button only fills it, so it must not add its own or padding doubles.
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  font-weight: var(--portfolio-weight-semibold);
+  color: inherit;
+  cursor: pointer;
+  text-align: inherit;
+  justify-content: inherit;
+
+  &:hover {
+    color: var(--portfolio-text-primary);
+  }
+}
+
+.alignRight .sortButton {
+  flex-direction: row-reverse;
+}
+
+.sortIcon {
+  display: inline-flex;
+  flex-shrink: 0;
+  color: var(--portfolio-text-tertiary);
+}
+
+// ---------------------------------------------------------------------------
+// Filter cells
+// ---------------------------------------------------------------------------
+
+.filterCell {
+  padding: var(--portfolio-spacer-0-5x) var(--dg-pad-x);
+  align-items: center;
+}
+
+// ---------------------------------------------------------------------------
+// Cell content renderers
+// ---------------------------------------------------------------------------
+
+.textCell {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 100%;
+}
+
+.multiLineCell {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  white-space: normal;
+  width: 100%;
+}
+
+.progressCell {
+  width: 100%;
+}
+
+.inputCell {
+  width: 100%;
+}
+
+.slotCell {
+  display: flex;
+  align-items: center;
+  gap: var(--portfolio-spacer-0-5x);
+  width: 100%;
+}
+
+// ---------------------------------------------------------------------------
+// Empty state
+// ---------------------------------------------------------------------------
+
+.emptyRow {
+  display: block;
+}
+
+.emptyCell {
+  padding: var(--portfolio-spacer-3x);
+  text-align: center;
+  color: var(--portfolio-text-tertiary);
+  font-size: var(--dg-font);
+
+  &:focus-visible {
+    outline: 2px solid var(--portfolio-focus);
+    outline-offset: -2px;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Pagination
+// ---------------------------------------------------------------------------
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--portfolio-spacer-2x);
+  flex-wrap: wrap;
+}
+
+.paginationSummary {
+  font-size: var(--portfolio-type-xs);
+  color: var(--portfolio-text-secondary);
+}
+
+.paginationControls {
+  display: flex;
+  align-items: center;
+  gap: var(--portfolio-spacer-1x);
+}
+
+.paginationPage {
+  font-size: var(--portfolio-type-xs);
+  color: var(--portfolio-text-secondary);
+  white-space: nowrap;
+}

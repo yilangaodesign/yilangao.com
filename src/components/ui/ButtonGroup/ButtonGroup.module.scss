@@ -1,0 +1,76 @@
+@use '../../../styles' as *;
+
+// =============================================================================
+// ButtonGroup — spaced layout primitive
+// =============================================================================
+// Arranges independent Button children in a row or column with a token-based
+// gap. NEVER joined: no shared borders, no internal dividers, no negative
+// margins — visual fusion of buttons is ButtonSelect's job, not this one.
+// Implements the docs/design/spacing.md §1.3 gap contract: default = 8px floor;
+// compact = 4px is a deliberate dense opt-in below the perceptual floor.
+// =============================================================================
+
+.group {
+  display: flex;
+  width: 100%;
+  align-items: center;
+}
+
+// ---------------------------------------------------------------------------
+// Orientation
+// ---------------------------------------------------------------------------
+
+.horizontal {
+  flex-direction: row;
+}
+
+.vertical {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+// ---------------------------------------------------------------------------
+// Alignment — main-axis distribution (justify-content)
+// ---------------------------------------------------------------------------
+
+.start { justify-content: flex-start; }
+.center { justify-content: center; }
+.end { justify-content: flex-end; }
+.between { justify-content: space-between; }
+
+// ---------------------------------------------------------------------------
+// Spacing — standard tier (size xs–lg or unset). default = 8px §1.3 floor;
+// compact = 4px is a deliberate dense opt-in below the floor.
+// ---------------------------------------------------------------------------
+
+.compact { gap: var(--portfolio-spacer-0-5x); } // 4px
+.default { gap: var(--portfolio-spacer-1x); }   // 8px
+.relaxed { gap: var(--portfolio-spacer-1-5x); } // 12px
+
+// ---------------------------------------------------------------------------
+// Spacing — xl tier (one step up for the extra visual mass of xl buttons)
+// ---------------------------------------------------------------------------
+
+.xl {
+  &.compact { gap: var(--portfolio-spacer-1x); }   // 8px
+  &.default { gap: var(--portfolio-spacer-1-5x); } // 12px
+  &.relaxed { gap: var(--portfolio-spacer-2x); }   // 16px
+}
+
+// ---------------------------------------------------------------------------
+// Modifiers
+// ---------------------------------------------------------------------------
+
+.wrap {
+  flex-wrap: wrap;
+}
+
+// Equal-width children. Horizontal → equal widths across the track;
+// vertical → stretch to full width (natural heights).
+.horizontal.equalWidth > * {
+  flex: 1 1 0;
+}
+
+.vertical.equalWidth {
+  align-items: stretch;
+}

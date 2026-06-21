@@ -1,6 +1,29 @@
 {
   "items": [
     {
+      "id": "shared-ui-data-grid",
+      "name": "Data Grid",
+      "type": "Component",
+      "experiment": "shared",
+      "status": "active",
+      "description": "Headless TanStack Table v8 rendered into a bespoke div-based ARIA grid in Élan tokens. v1: full presentational layer plus sorting, per-column filtering, row selection, pagination, and the WAI-ARIA grid keyboard pattern.",
+      "sourcePath": "src/components/ui/DataGrid/DataGrid.tsx",
+      "createdAt": "2026-06-21T00:00:00Z",
+      "createdBy": "cursor",
+      "origin": {
+        "type": "hybrid",
+        "library": "@tanstack/react-table",
+        "url": "https://tanstack.com/table"
+      },
+      "tags": [
+        "data",
+        "grid",
+        "table",
+        "tanstack"
+      ],
+      "hasPreview": true
+    },
+    {
       "id": "exp02-navigation",
       "name": "Global Navigation Bar",
       "type": "Component",
@@ -1210,6 +1233,24 @@
         "library": "@radix-ui/react-toggle-group"
       },
       "tags": ["ui", "selection", "toggle-group", "button", "segmented-control", "radix"],
+      "hasPreview": true
+    },
+    {
+      "id": "shared-ui-button-group",
+      "name": "ButtonGroup",
+      "type": "Component",
+      "experiment": "shared",
+      "status": "active",
+      "description": "Spaced layout primitive that arranges independent Button children in a row or column with a consistent, token-based gap. Never joined — visual fusion of buttons is ButtonSelect's role. Props: orientation, align, spacing (compact/default/relaxed), size (gap tier; only xl diverges), equalWidth, wrap. Encodes the docs/design/spacing.md §1.3 minimum-gap contract (8px floor / 12px default). Inspired by One GS Button Group.",
+      "sourcePath": "src/components/ui/ButtonGroup/ButtonGroup.tsx",
+      "createdAt": "2026-06-21T00:00:00Z",
+      "createdBy": "cursor",
+      "origin": {
+        "type": "hybrid",
+        "library": "One GS Design System",
+        "url": "https://www.figma.com/design/MoZ2aLe1MQK88V57lnMxUf/-One-GS--Components?node-id=1-13"
+      },
+      "tags": ["ui", "button", "layout", "action", "group", "primitive"],
       "hasPreview": true
     },
     {
