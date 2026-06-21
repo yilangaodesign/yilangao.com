@@ -59,6 +59,7 @@ import Columns from "lucide-react/dist/esm/icons/columns";
 import Code2 from "lucide-react/dist/esm/icons/code-2";
 import Heading from "lucide-react/dist/esm/icons/heading";
 import AlertTriangle from "lucide-react/dist/esm/icons/alert-triangle";
+import Group from "lucide-react/dist/esm/icons/group";
 import { cn } from "@/lib/utils";
 import { elan } from "@/lib/elan";
 import s from "./sidebar.module.scss";
@@ -114,6 +115,8 @@ type NavLink = {
   label: string;
   icon: React.ComponentType<{ className?: string }>;
   group?: string;
+  /** Synonyms / alternate names for fuzzy search (e.g. "spreadsheet" for DataGrid). */
+  keywords?: string[];
 };
 
 type NavCategory = {
@@ -155,6 +158,7 @@ const componentCategories: NavCategory[] = [
     section: "Components",
     links: [
       { href: "/components/button", label: "Button", icon: Square, group: "Action" },
+      { href: "/components/button-group", label: "ButtonGroup", icon: Group, group: "Action" },
       { href: "/components/avatar", label: "Avatar", icon: CircleUser, group: "Display" },
       { href: "/components/badge", label: "Badge", icon: Tag, group: "Display" },
       { href: "/components/badge-overlay", label: "BadgeOverlay", icon: Bell, group: "Display" },
@@ -208,6 +212,13 @@ const componentCategories: NavCategory[] = [
       { href: "/components/code-block", label: "CodeBlock", icon: Code2, group: "Display" },
       { href: "/components/description-list", label: "DescriptionList", icon: LayoutList, group: "Display" },
       { href: "/components/table", label: "Table", icon: Table2, group: "Display" },
+      {
+        href: "/components/data-grid",
+        label: "DataGrid",
+        icon: Table2,
+        group: "Display",
+        keywords: ["table", "spreadsheet", "striped", "banded", "rows", "columns", "sortable", "filter", "grid"],
+      },
       { href: "/components/canvas", label: "Canvas", icon: Scan, group: "Visualization" },
       { href: "/components/force-graph", label: "ForceGraph", icon: Share2, group: "Visualization" },
     ],
@@ -277,7 +288,7 @@ const allSearchableItems: SearchItem[] = [
 ];
 
 const fuseInstance = new Fuse(allSearchableItems, {
-  keys: ["label", "section"],
+  keys: ["label", "section", "keywords"],
   threshold: 0.4,
   includeScore: true,
 });
