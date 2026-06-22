@@ -37,9 +37,13 @@
     "react": ">=18",
     "react-dom": ">=18",
     "framer-motion": ">=10",
+    "lucide-react": ">=0.300",
     "next": ">=14"
   },
   "peerDependenciesMeta": {
+    "lucide-react": {
+      "optional": true
+    },
     "next": {
       "optional": true
     }

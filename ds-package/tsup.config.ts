@@ -64,7 +64,7 @@ export default defineConfig({
   entry: ["src/index.ts"],
   format: ["esm", "cjs"],
   dts: true,
-  external: ["react", "react-dom", "react/jsx-runtime", "framer-motion", "next", "next/link", "next/image", "next/dynamic", "next/navigation"],
+  external: ["react", "react-dom", "react/jsx-runtime", "framer-motion", "next", "next/link", "next/image", "next/dynamic", "next/navigation", /^lucide-react/],
   outDir: "dist",
   clean: true,
   esbuildPlugins: [scssModulePlugin()],
