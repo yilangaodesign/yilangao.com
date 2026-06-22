@@ -17,7 +17,25 @@ references:
 >
 > **Who reads this:** AI agents when the `ship-it` skill is activated — scan recent entries for recurring pitfalls before starting a new release.
 > **Who writes this:** AI agents after each ship-it run via the Post-Release Audit protocol in `ship-it/SKILL.md`.
-> **Last updated:** 2026-05-08 (REL-039: DS package, eval pipeline, shared utility refactor, Edra challenge — Élan 2.16.0, ASCII Art Studio 0.6.27)
+> **Last updated:** 2026-06-21 (REL-040: ButtonGroup, DataGrid, Next.js 16.2.6 — Élan 2.17.0, ASCII Art Studio 0.6.28, yilangao.com 1.5.9)
+
+---
+
+<a id="rel-040"></a>
+## REL-040 — ButtonGroup, DataGrid & Next.js 16.2.6 (2026-06-21)
+
+**Scope:** 44 tracked files across 6 dependency-ordered commits (L1 ×15, L3 ×6, L5 ×18, L6 ×1, L8 ×1, L9 ×3) + 1 build-fix commit (playground next version alignment) + 1 release commit + 1 dev-patch-bump commit. 40 macOS duplicate files cleaned (eval-results, playground pages, API route).
+**Semver:** Minor for Élan (2.16.0 → 2.17.0, new ButtonGroup and DataGrid components). Patch for ASCII Art Studio (0.6.27 → 0.6.28, manifest sync). Patch for yilangao.com (1.5.8 → 1.5.9, manifest sync).
+**Previous release:** Élan 2.16.0, ASCII Art Studio 0.6.27, yilangao.com 1.5.8
+
+**Incidents:**
+1. **Build gate failure — playground Next.js version mismatch**: Playground had `next@16.2.1` in its `package.json` but no `.bin/next` symlink, so `npm run build --prefix playground` resolved the root's `next@16.2.6` binary. The 16.2.6 binary + 16.2.1 internals caused `InvariantError: Expected workStore to be initialized` on `/components/description-list` and `/components/select` pages during prerendering. Fix: upgraded playground's `next` to 16.2.6 to align versions. New pitfall: REL-AP-009.
+2. **Git lock file during merge** (recurring): `git merge dev` on main produced a `refs/heads/main.lock` error. Removed lock file and completed merge manually. Same pattern as REL-039 incident 2.
+
+**Layer classification notes:**
+- `ds-package/src/index.ts` classified as L3 (deps) since it exports new component types for the npm package.
+- `src/types/lucide-icons.d.ts` classified as L5 (new components) as it supports direct ESM icon imports used by DataGrid.
+- All 40 macOS duplicate files were untracked — no git history impact.
 
 ---
 

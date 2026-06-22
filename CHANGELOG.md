@@ -4,6 +4,25 @@ All notable changes to the Élan design system are documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.17.0] — 2026-06-21
+
+Minor release: new ButtonGroup and DataGrid components, Next.js 16.2.6 upgrade, design system package export expansion.
+
+### Added
+
+- **Élan**: `ButtonGroup` component - groups related buttons with shared container styling, supports horizontal/vertical orientation and size variants.
+- **Élan**: `DataGrid` component - full-featured data grid built on @tanstack/react-table with sortable columns, inline filtering, pagination, keyboard navigation, and cell renderers (text, badge, link, actions).
+- **Élan**: Playground pages for ButtonGroup and DataGrid with interactive demos and props tables.
+- **Élan**: Lucide icon type declarations (`src/types/lucide-icons.d.ts`) for direct ESM icon imports.
+- **Élan**: DS package exports for ButtonGroup, DataGrid, and supporting types.
+
+### Changed
+
+- **Élan**: Upgraded Next.js from 16.2.1 to 16.2.6 (main site and playground).
+- **Élan**: Simplified `ButtonSelect` SCSS module.
+- **Élan**: Updated Payload admin importMap.
+- **Élan**: Added @tanstack/react-table dependency.
+
 ## [2.13.1] — 2026-04-25
 
 Patch release: analytics instrumentation for engagement depth, session tracking, and event enrichment.
